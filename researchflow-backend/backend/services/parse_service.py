@@ -3,7 +3,8 @@
 Parser Ensemble:
   1. GROBID → structured metadata (title, authors, affiliations, refs)
   2. PyMuPDF → text, sections, figure images (fast fallback)
-  3. MinerU → formulas, tables, reading order (when available)
+  3. MinerU → formulas, tables, reading order (when API key configured)
+  4. VLM → precise figure extraction, formula OCR, table content (when LLM available)
 
 Results are merged with conflict marking.
 """
@@ -22,6 +23,7 @@ from backend.models.paper import Paper
 from backend.services.object_storage import get_storage
 from backend.utils.grobid_client import GrobidClient
 from backend.utils.pdf_extract import parse_pdf
+from backend.utils.mineru_client import MinerUClient, MinerUResult, get_mineru_client
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +109,24 @@ async def parse_paper_pdf(session: AsyncSession, paper_id: UUID) -> PaperAnalysi
             logger.warning(f"GROBID parse failed for {paper_id}: {e}")
     else:
         logger.info("GROBID not available, using PyMuPDF only")
+
+    # ── 3. MinerU: deep table + formula extraction ──────────────────
+    mineru_result: MinerUResult | None = None
+    mineru_client = get_mineru_client()
+    if mineru_client and pdf_path:
+        try:
+            mineru_result = await mineru_client.parse_pdf(pdf_path)
+            if mineru_result.success:
+                logger.info(
+                    "MinerU parsed %s: %d tables, %d formulas",
+                    paper_id,
+                    len(mineru_result.tables),
+                    len(mineru_result.formulas),
+                )
+            else:
+                logger.debug("MinerU parse skipped for %s: %s", paper_id, mineru_result.error)
+        except Exception as e:
+            logger.debug("MinerU unavailable for %s: %s", paper_id, e)
 
     # ── S2 fallback for refs + authors when GROBID fails ─────────
     if not grobid_refs:
@@ -334,6 +354,56 @@ async def parse_paper_pdf(session: AsyncSession, paper_id: UUID) -> PaperAnalysi
         except Exception as e:
             logger.warning(f"Table content extraction failed for {paper_id}: {e}")
 
+    # ── MinerU merge: tables → table_captions ──────────────────────
+    if mineru_result and mineru_result.tables:
+        for mt in mineru_result.tables:
+            # Match to existing caption entry by table_index or caption text
+            matched = False
+            for existing in table_captions:
+                if existing.get("table_num") == mt.table_index:
+                    existing["html"] = mt.html
+                    existing["csv"] = mt.csv
+                    existing["mineru_confidence"] = mt.confidence
+                    matched = True
+                    break
+            if not matched:
+                # Try matching by caption substring
+                for existing in table_captions:
+                    cap = existing.get("caption", "")
+                    if cap and mt.caption and (
+                        cap[:30] in mt.caption or mt.caption[:30] in cap
+                    ):
+                        existing["html"] = mt.html
+                        existing["csv"] = mt.csv
+                        existing["mineru_confidence"] = mt.confidence
+                        matched = True
+                        break
+            if not matched and mt.html:
+                table_captions.append({
+                    "table_num": mt.table_index,
+                    "caption": mt.caption,
+                    "html": mt.html,
+                    "csv": mt.csv,
+                    "mineru_confidence": mt.confidence,
+                })
+        logger.info(
+            "MinerU tables merged: %d into %d existing for %s",
+            len(mineru_result.tables), len(table_captions), paper_id,
+        )
+
+    # ── MinerU merge: formulas (supplement, lower priority than TeX) ─
+    if mineru_result and mineru_result.formulas:
+        if formula_source in ("pymupdf",):  # Only supplement when no better source
+            mineru_latex = [f.latex for f in mineru_result.formulas if f.latex]
+            if mineru_latex:
+                extracted_formulas = list(dict.fromkeys(
+                    list(extracted_formulas) + mineru_latex
+                ))  # Deduplicate preserving order
+                logger.info(
+                    "MinerU formulas supplement: %d added to %d existing for %s",
+                    len(mineru_latex), len(extracted_formulas), paper_id,
+                )
+
     # ── Build parse metadata ─────────────────────────────────────
     parse_metadata = {
         "parsers_used": ["pymupdf"],
@@ -351,11 +421,16 @@ async def parse_paper_pdf(session: AsyncSession, paper_id: UUID) -> PaperAnalysi
         "final_formula_count": len(extracted_formulas),
         "pymupdf_figure_count": len(pymupdf_result.figure_captions),
         "vlm_available": True,
+        "mineru_available": mineru_result is not None and mineru_result.success,
+        "mineru_table_count": len(mineru_result.tables) if mineru_result else 0,
+        "mineru_formula_count": len(mineru_result.formulas) if mineru_result else 0,
     }
     if tex_result:
         parse_metadata["parsers_used"].append("arxiv_tex")
     if grobid_result:
         parse_metadata["parsers_used"].append("grobid")
+    if mineru_result and mineru_result.success:
+        parse_metadata["parsers_used"].append("mineru")
 
     # ── Create L2 analysis ───────────────────────────────────────
     # Apply NULL-byte scrubber to ALL JSONB fields and the formulas array,
@@ -392,6 +467,10 @@ async def parse_paper_pdf(session: AsyncSession, paper_id: UUID) -> PaperAnalysi
             "section_hierarchy": pymupdf_result.sections_hierarchy if pymupdf_result else [],
             "citation_contexts": pymupdf_result.citation_contexts[:100] if pymupdf_result else [],
             "dataset_mentions": pymupdf_result.dataset_mentions if pymupdf_result else [],
+            # MinerU output (for downstream deep_ingest table/formula enhancement)
+            "mineru_markdown": mineru_result.markdown[:10000] if mineru_result and mineru_result.markdown else "",
+            "mineru_reading_order": mineru_result.reading_order if mineru_result else [],
+            "mineru_doc_metadata": mineru_result.metadata if mineru_result else {},
         }),
         is_current=True,
     )

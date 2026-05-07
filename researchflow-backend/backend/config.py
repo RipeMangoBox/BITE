@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     # GROBID
     grobid_url: str = "http://localhost:8070"
 
+    # MinerU
+    mineru_api_key: str = ""       # API key from mineru.net (free: 5000 files/day)
+    mineru_base_url: str = ""      # Defaults to https://mineru.net/api/v1 if empty
+
     # MCP Auth
     mcp_auth_token: str = ""  # Set in .env for production
 
