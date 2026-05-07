@@ -655,6 +655,13 @@ class IngestWorkflow:
             "edges_created": known_result.get("edges_created", 0),
         }
 
+    @staticmethod
+    def _compute_avg_confidence(evidence_refs: list) -> float:
+        if not evidence_refs:
+            return 50.0
+        confs = [ref.get("confidence", 0.5) for ref in evidence_refs]
+        return sum(confs) / len(confs) * 100
+
     # ── Phase 3: Deep Ingest ──────────────────────────────────────────
 
     async def deep_ingest(
@@ -762,13 +769,21 @@ class IngestWorkflow:
         qualifying_nodes = []
         node_candidates = graph_candidates.get("node_candidates", graph_candidates.get("nodes", []))
         for node_cand in node_candidates:
+            evidence_refs = node_cand.get("evidence_refs", [])
+            avg_conf = self._compute_avg_confidence(evidence_refs)
+            sections = set(ref.get("section", "") for ref in evidence_refs)
+            node_type = node_cand.get("node_type", "")
+            _NTYPE_SIGNAL = {
+                "method": 70, "mechanism": 60, "task": 50,
+                "dataset": 40, "benchmark": 40, "lineage": 55, "lab": 20,
+            }
             node_signals = {
-                "evidence_count": node_cand.get("evidence_count", 30),
-                "connected_paper_quality": node_cand.get("connected_paper_quality", 50),
-                "source_diversity": node_cand.get("source_diversity", 40),
-                "structural_importance": node_cand.get("structural_importance", 40),
-                "name_stability": node_cand.get("name_stability", 60),
-                "profile_completeness": node_cand.get("profile_completeness", 30),
+                "evidence_count": min(100, len(evidence_refs) * 20),
+                "connected_paper_quality": avg_conf,
+                "source_diversity": min(100, max(25, len(sections) * 25 + 25)),
+                "structural_importance": _NTYPE_SIGNAL.get(node_type, 40),
+                "name_stability": min(100, 40 + len(node_cand.get("name", "")) * 2),
+                "profile_completeness": 30,  # baseline, updated after profiling
             }
             node_score = self.engine.compute_node_promotion_score(node_signals)
             if node_score.total >= 75:
@@ -777,13 +792,24 @@ class IngestWorkflow:
         qualifying_edges = []
         edge_candidates = graph_candidates.get("edge_candidates", graph_candidates.get("edges", []))
         for edge_cand in edge_candidates:
+            evidence_refs = edge_cand.get("evidence_refs", [])
+            avg_conf = self._compute_avg_confidence(evidence_refs)
+            relation_type = edge_cand.get("relation_type", "")
+            _RTYPE_SIGNAL = {
+                "modifies_slot": 90, "proposes_method": 85,
+                "extends_method": 80, "compares_against": 70,
+                "evaluates_on": 65, "uses_dataset": 60,
+                "cites_as_baseline": 55, "belongs_to_task": 50,
+                "part_of_lineage": 50, "produced_by_lab": 30,
+            }
+            one_liner = edge_cand.get("one_liner", "")
             edge_signals = {
-                "evidence_directness": edge_cand.get("evidence_directness", 40),
-                "relation_specificity": edge_cand.get("relation_specificity", 50),
-                "extractor_agreement": edge_cand.get("extractor_agreement", 50),
-                "source_reliability": edge_cand.get("source_reliability", 50),
-                "graph_consistency": edge_cand.get("graph_consistency", 40),
-                "description_quality": edge_cand.get("description_quality", 40),
+                "evidence_directness": min(100, len(evidence_refs) * 25 + 25),
+                "relation_specificity": _RTYPE_SIGNAL.get(relation_type, 40),
+                "extractor_agreement": 50,  # single agent, no cross-validation
+                "source_reliability": avg_conf,
+                "graph_consistency": 40,  # baseline, needs cross-paper validation
+                "description_quality": min(100, max(20, len(one_liner) * 1.5)),
             }
             edge_score = self.engine.compute_edge_confidence_score(edge_signals)
             if edge_score.total >= 70:
@@ -811,37 +837,6 @@ class IngestWorkflow:
                 edges_created = len(profile_result.get("edge_profiles", []))
             except Exception as e:
                 logger.error("kb_profiler agent failed: %s", e)
-
-        # ── Report agent ──
-
-        try:
-            figures_block = await self._build_figures_block(paper_id)
-            metadata_block = self._build_paper_metadata_block(paper)
-
-            report_context = {
-                "user_content": (
-                    f"Paper title: {paper.title}\n\n"
-                    f"=== Paper metadata (use in section 1 metadata_overview) ===\n"
-                    f"{metadata_block}\n\n"
-                    f"=== Figures available (use EXACT labels in figure_placements.preferred_labels) ===\n"
-                    f"{figures_block}\n\n"
-                    f"=== Agent analysis artifacts ===\n"
-                    f"{agent_results}\n\n"
-                    f"Graph nodes created: {nodes_created}, edges created: {edges_created}"
-                ),
-                "token_budget": 8192,
-            }
-            report_result = await self.runner.run_agent(
-                "paper_report", report_context, paper_id=paper_id,
-            )
-            agents_run.append("paper_report")
-            agent_results["paper_report"] = report_result
-            secs = report_result.get("sections", [])
-            report_sections = [s.get("section_type", "") for s in secs] if isinstance(secs, list) else []
-        except Exception as e:
-            logger.error("paper_report agent failed for %s: %s", paper_id, e)
-
-        # quality_audit removed (Phase 2E) — replaced by deterministic validation
 
         # ── Phase 3A: Materialize agent outputs to DeltaCard/GraphAssertion ──
         delta_card_result = {}
@@ -880,7 +875,50 @@ class IngestWorkflow:
             except Exception as e:
                 logger.warning("KB profile persistence failed: %s", e)
 
-        # ── Phase 3C: Persist paper report to tables ──
+        # ── Phase 3C: Paper report (AFTER materialization, from verified blackboard) ──
+        if delta_card_result and delta_card_result.get("delta_card_id"):
+            try:
+                figures_block = await self._build_figures_block(paper_id)
+                metadata_block = self._build_paper_metadata_block(paper)
+
+                # Use ContextPackBuilder with ALL_VERIFIED to consume only verified items
+                try:
+                    report_ctx = await self.ctx_builder.build(
+                        "paper_report", paper_id=paper_id,
+                    )
+                    verified_content = report_ctx.get("user_content", "")
+                    token_budget = report_ctx.get("token_budget", 8192)
+                except Exception as ctx_err:
+                    logger.warning("Context pack build for paper_report failed: %s, falling back", ctx_err)
+                    verified_content = f"Paper title: {paper.title}\n\n{agent_results}"
+                    token_budget = 8192
+
+                report_context = {
+                    "user_content": (
+                        f"{verified_content}\n\n"
+                        f"=== Paper metadata ===\n"
+                        f"{metadata_block}\n\n"
+                        f"=== Figures available ===\n"
+                        f"{figures_block}\n\n"
+                        f"Graph nodes created: {nodes_created}, edges created: {edges_created}"
+                    ),
+                    "token_budget": token_budget,
+                }
+                report_result = await self.runner.run_agent(
+                    "paper_report", report_context, paper_id=paper_id,
+                )
+                agents_run.append("paper_report")
+                agent_results["paper_report"] = report_result
+                secs = report_result.get("sections", [])
+                report_sections = [s.get("section_type", "") for s in secs] if isinstance(secs, list) else []
+            except Exception as e:
+                logger.error("paper_report agent failed for %s: %s", paper_id, e)
+        else:
+            logger.warning(
+                "Skipping paper_report for %s: materialization did not produce a DeltaCard", paper_id,
+            )
+
+        # ── Phase 3D: Persist paper report to tables ──
         report_result_data = agent_results.get("paper_report") if "paper_report" in agents_run else None
         if not report_result_data:
             # Try loading from blackboard
@@ -907,7 +945,7 @@ class IngestWorkflow:
             except Exception as e:
                 logger.warning("Paper report persistence failed: %s", e)
 
-        # ── Phase 3D: Materialize paper-paper relations from reference_role_map ──
+        # ── Phase 3E: Materialize paper-paper relations from reference_role_map ──
         try:
             from backend.services.paper_relation_service import materialize_for_paper
             rel_stats = await materialize_for_paper(self.session, paper_id)
@@ -971,9 +1009,14 @@ class IngestWorkflow:
                 s.get("slot_name", "") for s in method_full.get("changed_slots", method_delta_lite.get("changed_slots", []))
             ],
             "is_plugin_patch": method_delta_lite.get("is_plugin_patch", False),
-            "structurality_score": 0.7 if method_delta_lite.get("is_structural_change") else 0.3,
-            "extensionability_score": None,
-            "transferability_score": None,
+            # --- Continuous structurality_score (C4 fix) ---
+            # Compute structurality from deep analysis pipeline outputs,
+            # keeping the original is_structural_change boolean as one component.
+            "structurality_score": self._compute_structurality_score(method_full, method_delta_lite),
+            # extensionability: evidence strength + ablation granularity
+            "extensionability_score": self._compute_extensionability_score(experiment),
+            # transferability: cross-domain signals from experiment data
+            "transferability_score": self._compute_transferability_score(method_delta_lite, experiment),
             "delta_card": {
                 "paradigm": paper_essence.get("training_paradigm", "unknown"),
                 "slots": {
@@ -1092,6 +1135,98 @@ class IngestWorkflow:
             "evidence_count": len(result.get("evidence_units", [])),
             "assertion_count": len(result.get("assertions", [])),
         }
+
+    @staticmethod
+    def _compute_structurality_score(method_full: dict, method_delta_lite: dict) -> float:
+        """Compute continuous structurality score from deep analysis outputs.
+
+        Combines three signals:
+          - new_module_ratio: fraction of pipeline modules marked as new
+          - novel_slot_ratio: fraction of changed slots that are genuinely novel
+          - is_structural_change: the original binary boolean from method_delta_lite
+
+        Returns a float in [0.2, 1.0] rounded to 2 decimal places.
+        """
+        pipeline_modules = method_full.get("pipeline_modules", [])
+        changed_slots = method_full.get("changed_slots", [])
+        new_components = method_full.get("new_components", [])
+
+        pipeline_total = max(len(pipeline_modules), 1)
+        new_module_ratio = sum(1 for m in pipeline_modules if m.get("is_new")) / pipeline_total
+
+        novel_slot_ratio = (
+            sum(1 for s in changed_slots if s.get("is_novel"))
+            / max(len(changed_slots), 1)
+            if changed_slots else 0
+        )
+
+        is_structural_bool = method_delta_lite.get("is_structural_change", False)
+
+        score = 0.2 + (
+            0.30 * new_module_ratio +
+            0.25 * novel_slot_ratio +
+            0.25 * float(is_structural_bool)
+        )
+        return round(min(1.0, score), 2)
+
+    @staticmethod
+    def _compute_extensionability_score(experiment: dict) -> float:
+        """Derive extensionability from ablation coverage and evidence strength.
+
+        Higher scores for papers with:
+          - More ablation components that support the core claim
+          - Higher overall evidence strength from fairness assessment
+
+        Falls back to a neutral 0.5 when experiment data is unavailable.
+        """
+        ablations = experiment.get("ablations", [])
+        fairness = experiment.get("fairness_assessment", {})
+
+        if not ablations and not fairness:
+            return round(0.5, 2)
+
+        # Ablation support ratio: how many ablations confirm the core claim
+        ablation_support_ratio = 0.0
+        if ablations:
+            ablation_support_ratio = sum(1 for a in ablations if a.get("supports_core_claim")) / len(ablations)
+
+        # Evidence strength from fairness assessment (already 0-1)
+        evidence_strength = fairness.get("overall_evidence_strength", 0.5) if fairness else 0.5
+
+        score = 0.3 + 0.4 * ablation_support_ratio + 0.3 * evidence_strength
+        return round(min(1.0, score), 2)
+
+    @staticmethod
+    def _compute_transferability_score(method_delta_lite: dict, experiment: dict) -> float:
+        """Estimate transferability from cross-domain signals.
+
+        Signals:
+          - Not a plugin/patch (method is more general)
+          - Multiple benchmarks tested (broader applicability)
+          - Novel slots present (fundamental contribution, not a minor tweak)
+
+        Falls back to a neutral 0.5 when signals are unavailable.
+        """
+        is_plugin_patch = method_delta_lite.get("is_plugin_patch", False)
+        main_results = experiment.get("main_results", [])
+        changed_slots = method_delta_lite.get("changed_slots", [])
+
+        if not main_results and not changed_slots:
+            return round(0.5, 2)
+
+        # Plugin/patch methods are narrow; non-plugin methods transfer better
+        generality_signal = 0.0 if is_plugin_patch else 1.0
+
+        # Benchmark diversity: more benchmarks suggests broader applicability
+        benchmark_count = len(main_results)
+        benchmark_signal = min(benchmark_count / 3.0, 1.0)  # saturates at 3+ benchmarks
+
+        # Novelty signal from slots
+        novel_count = sum(1 for s in changed_slots if s.get("is_novel"))
+        novelty_signal = min(novel_count / 3.0, 1.0)  # saturates at 3+ novel slots
+
+        score = 0.2 + 0.35 * generality_signal + 0.25 * benchmark_signal + 0.20 * novelty_signal
+        return round(min(1.0, score), 2)
 
     async def _write_taxonomy_facets(
         self, paper, paper_essence: dict, method_delta: dict, experiment: dict,
