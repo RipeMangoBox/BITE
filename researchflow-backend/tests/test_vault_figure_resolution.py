@@ -9,10 +9,14 @@ from types import SimpleNamespace
 from backend.services.vault_export_v6 import (
     _autoinject_figures_by_role,
     _extract_figure_placements,
+    _best_method_text,
+    _normalize_heading_spacing,
     _paper_acronym,
     _paper_aliases,
     _paper_slug,
+    _render_figure,
     _resolve_figure_markers,
+    _venue_line,
 )
 
 
@@ -104,6 +108,18 @@ def test_resolver_TBL_marker_picks_table_over_figure():
     assert "https://o/fig5.png" not in out, "TBL must NOT pick a figure when table exists"
 
 
+def test_resolver_TBL_marker_works_without_public_url():
+    body = "{{TBL:result}}\n"
+    figures = [
+        {"label": "Table 1", "type": "table", "semantic_role": "result",
+         "object_key": "papers/x/t1.png", "vault_asset": "assets/figures/papers/x/t1.png",
+         "caption": "main results"},
+    ]
+    out = _resolve_figure_markers(body, figures, placements=[])
+    assert "![[assets/figures/papers/x/t1.png]]" in out
+    assert "{{TBL:" not in out
+
+
 def test_resolver_TBL_falls_back_to_any_table_when_no_role_match():
     """TBL with unknown hint should still surface any unused table."""
     body = "{{TBL:nonexistent_hint}}\n"
@@ -185,6 +201,27 @@ def test_autoinject_handles_no_h2_by_appending_all():
     assert "## 论文图表" not in out
 
 
+def test_render_figure_uses_vault_asset_when_url_missing():
+    out = _render_figure({
+        "label": "Figure 1",
+        "type": "figure",
+        "semantic_role": "pipeline",
+        "object_key": "papers/x/Figure_1.png",
+        "vault_asset": "assets/figures/papers/x/Figure_1.png",
+        "caption": "Figure 1: Pipeline overview",
+    })
+    assert "![[assets/figures/papers/x/Figure_1.png]]" in out
+    assert "Figure 1 (pipeline): Pipeline overview" in out
+    assert "Figure 1: Figure 1:" not in out
+
+
+def test_normalize_heading_spacing_keeps_single_blank_line():
+    out = _normalize_heading_spacing("## 小结\n\n\nbody\n### 子节\nbody2")
+    assert "## 小结\n\nbody" in out
+    assert "### 子节\n\nbody2" in out
+    assert "\n\n\nbody" not in out
+
+
 # ── Naming helpers ────────────────────────────────────────────────────
 
 def _paper(**kw):
@@ -239,3 +276,20 @@ def test_paper_aliases_empty_when_no_signals():
     # Title-based acronym still produces something; check it's clean
     aliases = _paper_aliases(p)
     assert all(len(a) >= 2 for a in aliases)
+
+
+def test_venue_line_adds_year_before_acceptance():
+    assert _venue_line("ICLR", 2026, "accepted") == "ICLR 2026 (accepted)"
+    assert _venue_line("ICLR 2026", 2026, None) == "ICLR 2026"
+
+
+def test_best_method_text_falls_back_to_report_table_then_title():
+    p = _paper(full_report_md="| 字段 | 内容 |\n|------|------|\n| 方法 | A-TPT |\n")
+    assert _best_method_text(p, []) == "A-TPT"
+    p = _paper(
+        title="3D Scene Prompting for Camera Control",
+        delta_statement="3DScenePrompt, by using scene memory, improves consistency.",
+    )
+    assert _best_method_text(p, [], ["3D场景提示", "3DScenePrompt"]) == "3DScenePrompt"
+    p = _paper(title="ASTGI: Adaptive Spatio-Temporal Graph Interactions")
+    assert _best_method_text(p, []) == "ASTGI"

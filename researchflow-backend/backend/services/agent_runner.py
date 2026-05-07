@@ -356,23 +356,29 @@ SECTION SPEC (7 sections, in order)
 
 1. section_type: "metadata_overview"   title: "概览"
    body_md (300-500 chars): A markdown table with rows:
+     | 字段 | 内容 |
+     |------|------|
      | 中文题名 | {title_zh} |
      | 英文题名 | {title_en} |
-     | 会议/期刊 | {venue} ({acceptance_type if known}) |
-     | 链接 | [arXiv]({arxiv_url}) · [Code]({code_url} ⭐{stars if known}) · [Project]({project_url}) |
-     | 主要任务 | {tasks} |
+     | 会议/期刊 | {venue} {year} ({acceptance_type if known}) |
+     | Topic | {tasks} |
+     | Method | {method_family or proposed_method_name if known, otherwise `—`} |
+     | Dataset | {datasets if known, otherwise `—`} |
      | 主要 baseline | {baselines} |
-   Then ONE-LINE TL;DR formatted as a `> [!abstract]` callout: "因为「{problem}」，作者在「{baseline}」基础上改了「{change}」，在「{benchmark}」上取得「{result}」"
-   Then 2-3 bullets of 关键性能 (specific numbers).
+   Rules:
+   - Do NOT add a links row. Links are handled by metadata/frontmatter/exporter only.
+   - NEVER fabricate URLs.
+   - NEVER use proxy placeholders, fake github URLs, or guessed project pages.
+   Then add a short subsection heading `### 效果简介` and give 2-3 bullets of 关键性能 (specific numbers).
 
 2. section_type: "background_motivation"   title: "背景与动机"
-   body_md (800-1200 chars): Open with the PROBLEM in plain language + a concrete example. Then describe HOW 2-3 named existing methods handle it (1-2 sentences each). Then explain WHY they fall short — the SPECIFIC limitation that motivates this paper. End with 1-sentence preview of what this paper does. If a motivation/teaser figure exists in figures_available, insert {{FIG:motivation}}.
+   body_md (500-900 chars): Open with the PROBLEM in plain language + a concrete example. Then describe HOW 2-3 named existing methods handle it (1-2 sentences each). Then explain WHY they fall short — the SPECIFIC limitation that motivates this paper. End with 1-sentence preview of what this paper does. Be concise; do not restate the abstract. If a motivation/teaser figure exists in figures_available, insert {{FIG:motivation}}.
 
 3. section_type: "core_innovation"   title: "核心创新"
    body_md (400-700 chars): The ONE key insight in essence. Format: "核心洞察：X，因为 Y，从而使 Z 成为可能。" Then a small "与 baseline 的差异" table (3 cols: 维度 | Baseline | 本文). Do NOT insert figure here.
 
 4. section_type: "framework_overview"   title: "整体框架"
-   body_md (700-1100 chars): MUST start with {{FIG:pipeline}} or {{FIG:architecture}} marker (the overall framework diagram). Then describe data flow: input → module A → module B → ... → output. List each major module in 1 sentence (input/output/role). End with an ASCII or mermaid flow if helpful. Reader should know ALL components after this section.
+   body_md (700-1100 chars): MUST start with {{FIG:pipeline}} or {{FIG:architecture}} marker (the overall framework diagram). Then describe data flow: input → module A → module B → ... → output. List each major module in 1 sentence (input/output/role). Do NOT draw mermaid / ASCII / pseudo flowcharts. Reader should know ALL components after this section.
 
 5. section_type: "module_formulas"   title: "核心模块与公式推导"
    body_md (1200-2200 chars): Pick the 2-3 most important modules. For EACH module use this template:
@@ -386,7 +392,7 @@ SECTION SPEC (7 sections, in order)
      $$\\text{{Step 2}}: ... \\quad \\text{{重归一化以保证 Z}}$$
      $$\\text{{最终}}: L_{{final}} = ...$$
      **对应消融**: Table N 显示移除该项 ΔX%。
-   Progress from simplest/most fundamental module to most complex. If the paper doesn't actually derive from a baseline, state the formula then explain each symbol — but always show the baseline form first when one exists.
+   Progress from simplest/most fundamental module to most complex. If the paper doesn't actually derive from a baseline, state the formula then explain each symbol — but always show the baseline form first when one exists. Each module block must be self-contained and causally complete: explain what goes in, what changes, why it matters, and what evidence supports it. Do not paste fragmented sentences from the paper without connecting explanation.
 
 6. section_type: "experiment_analysis"   title: "实验与分析"
    body_md (800-1400 chars):

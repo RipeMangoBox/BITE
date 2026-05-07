@@ -10,6 +10,7 @@ Design principles:
 """
 
 import logging
+import os
 import re
 import shutil
 from pathlib import Path
@@ -116,6 +117,193 @@ def _paper_slug(p) -> str:
     return _slug(p.title_sanitized or p.title or "Untitled", 55)
 
 
+def _pdf_ref_for_paper(p) -> str | None:
+    """Best-effort paperPDFs-relative path for Obsidian PDF embedding."""
+    pdf_path_local = getattr(p, "pdf_path_local", None)
+    if pdf_path_local and not pdf_path_local.startswith("papers/"):
+        if pdf_path_local.startswith("paperPDFs/"):
+            return pdf_path_local
+        return f"paperPDFs/{pdf_path_local.lstrip('./')}"
+    if not getattr(p, "title_sanitized", None):
+        return None
+    vy = _venue_year(getattr(p, "venue", None), getattr(p, "year", None))
+    cat = getattr(p, "category", None) or "Uncategorized"
+    year = str(getattr(p, "year", None) or "Unknown")
+    return f"paperPDFs/{cat}/{vy}/{year}_{p.title_sanitized}.pdf"
+
+
+def _clean_caption(label: str, caption: str) -> str:
+    """Deduplicate repeated figure/table prefixes in captions."""
+    if not caption:
+        return ""
+    s = re.sub(r"\s+", " ", caption).strip()
+    if label:
+        s = re.sub(rf"^(?:{re.escape(label)}\s*[:.\-–—]?\s*)+", "", s, flags=re.IGNORECASE)
+    s = re.sub(r"^(?:(?:Figure|Fig\.|Table)\s*\d+[A-Za-z]?\s*[:.\-–—]?\s*)+", "", s, flags=re.IGNORECASE)
+    return s.strip(" \t\r\n-:;,.")
+
+
+def _split_report_preface(raw: str) -> tuple[str, str]:
+    """Extract leading effect-summary bullets and drop legacy abstract/table blocks."""
+    lines = raw.splitlines()
+    i = 0
+    while i < len(lines) and not lines[i].strip():
+        i += 1
+    if i < len(lines) and lines[i].lstrip().startswith("|"):
+        while i < len(lines) and lines[i].lstrip().startswith("|"):
+            i += 1
+        while i < len(lines) and not lines[i].strip():
+            i += 1
+    if i < len(lines) and lines[i].startswith("> [!abstract]"):
+        i += 1
+        while i < len(lines) and lines[i].startswith(">"):
+            i += 1
+        while i < len(lines) and not lines[i].strip():
+            i += 1
+    effect_lines = []
+    while i < len(lines) and not lines[i].startswith("## "):
+        effect_lines.append(lines[i])
+        i += 1
+    return "\n".join(effect_lines).strip(), "\n".join(lines[i:]).strip()
+
+
+def _normalize_heading_spacing(md: str) -> str:
+    """Keep exactly one blank line between Markdown headings and content."""
+    md = re.sub(r"(?m)^(#{2,6}\s+.+)\n{3,}", r"\1\n\n", md)
+    md = re.sub(r"(?m)^(#{2,6}\s+.+)\n(?!\n)", r"\1\n\n", md)
+    return md.rstrip() + "\n"
+
+
+def _table_cell(value: object) -> str:
+    """Escape Markdown table separators inside cell values."""
+    s = str(value or "—").replace("\n", " ").strip()
+    return s.replace("|", "/") or "—"
+
+
+def _venue_line(venue: str | None, year: int | None, acceptance: str | None = None) -> str:
+    out = _normalize_venue(venue)
+    if year and str(year) not in out:
+        out = f"{out} {year}"
+    if acceptance:
+        out = f"{out} ({acceptance})"
+    return out
+
+
+def _extract_table_value(md: str | None, labels: tuple[str, ...]) -> str:
+    """Extract a value from a simple two-column markdown table."""
+    if not md:
+        return ""
+    label_alt = "|".join(re.escape(label) for label in labels)
+    pattern = rf"(?m)^\|\s*(?:{label_alt})\s*\|\s*([^|\n]+?)\s*\|"
+    m = re.search(pattern, md)
+    if not m:
+        return ""
+    value = m.group(1).strip()
+    if value in {"—", "-", "N/A", "n/a", "TBD", "待补充", "未知"}:
+        return ""
+    return value
+
+
+def _method_from_title(title: str | None) -> str:
+    """Conservative fallback for explicit method names in paper titles."""
+    title = (title or "").strip()
+    if not title:
+        return ""
+    prefix = title.split(":", 1)[0].strip()
+    if 2 <= len(prefix) <= 24 and re.search(r"[A-Z0-9]", prefix):
+        return prefix
+    token = title.split(maxsplit=1)[0].strip(" :,")
+    if 3 <= len(token) <= 24 and re.search(r"[A-Z]", token):
+        return token
+    return ""
+
+
+def _method_from_delta(delta: str | None) -> str:
+    delta = (delta or "").strip()
+    if not delta:
+        return ""
+    m = re.match(r"^([A-Za-z0-9][A-Za-z0-9._+\-]{1,31})\s*,", delta)
+    if not m:
+        return ""
+    name = m.group(1)
+    if name.lower() in {"this", "the", "a", "an"}:
+        return ""
+    return name
+
+
+def _method_from_aliases(aliases: list[str]) -> str:
+    mixed_case = []
+    initialisms = []
+    for alias in aliases:
+        alias = (alias or "").strip()
+        if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._+\-]{2,31}", alias):
+            if re.search(r"[a-z]", alias):
+                mixed_case.append(alias)
+            else:
+                initialisms.append(alias)
+    return (mixed_case or initialisms or [""])[0]
+
+
+
+def _best_method_text(p, method_links: list[str], aliases: list[str] | None = None) -> str:
+    if method_links:
+        return ", ".join(method_links)
+    if getattr(p, "method_family", None):
+        return p.method_family
+    report_method = _extract_table_value(getattr(p, "full_report_md", None), ("方法", "Method"))
+    if report_method:
+        return report_method
+    delta_method = _method_from_delta(getattr(p, "delta_statement", None))
+    if delta_method:
+        return delta_method
+    title_method = _method_from_title(getattr(p, "title", None))
+    if title_method:
+        return title_method
+    alias_method = _method_from_aliases(aliases or [])
+    if alias_method:
+        return alias_method
+    return "—"
+
+
+def _safe_object_key_path(key: str | None) -> str:
+    parts = []
+    for part in (key or "").replace("\\", "/").split("/"):
+        if not part or part in {".", ".."}:
+            continue
+        parts.append(_slug(part, 120))
+    return "/".join(parts)
+
+
+def _local_storage_path(key: str | None) -> Path | None:
+    rel = _safe_object_key_path(key)
+    if not rel:
+        return None
+    storage_root = Path(__file__).resolve().parents[2] / "storage"
+    path = storage_root / rel
+    return path if path.exists() else None
+
+
+def _prepare_figure_assets(figures: list[dict], vault: Path) -> list[dict]:
+    """Attach Obsidian-local asset refs for figures that lack public URLs."""
+    out = []
+    for fig in figures:
+        if not isinstance(fig, dict):
+            continue
+        item = dict(fig)
+        if not item.get("public_url") and item.get("object_key"):
+            safe_key = _safe_object_key_path(item.get("object_key"))
+            if safe_key:
+                rel = f"assets/figures/{safe_key}"
+                item["vault_asset"] = rel
+                src = _local_storage_path(item.get("object_key"))
+                if src:
+                    dst = vault / rel
+                    dst.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dst)
+        out.append(item)
+    return out
+
+
 def _paper_aliases(p) -> list[str]:
     """Build short aliases for the Obsidian graph view.
 
@@ -206,6 +394,36 @@ def _summarize_venue_distribution(venues, top: int = 5) -> str:
 
 # ── Main Export ──────────────────────────────────────────────────
 
+def _infer_bind_mount_owner(vault: Path) -> tuple[int, int] | None:
+    """When exporting as root in Docker, preserve the host bind-mount owner."""
+    if not hasattr(os, "geteuid") or os.geteuid() != 0:
+        return None
+    for path in (vault, vault.parent):
+        try:
+            st = path.stat()
+        except OSError:
+            continue
+        if st.st_uid != 0:
+            return st.st_uid, st.st_gid
+    return None
+
+
+def _restore_bind_mount_owner(vault: Path, owner: tuple[int, int] | None) -> None:
+    if not owner or not hasattr(os, "lchown") or not vault.exists():
+        return
+    uid, gid = owner
+    first_error: tuple[Path, OSError] | None = None
+    for path in (vault, *vault.rglob("*")):
+        try:
+            os.lchown(path, uid, gid)
+        except OSError as exc:
+            if first_error is None:
+                first_error = (path, exc)
+    if first_error:
+        path, exc = first_error
+        logger.warning("Failed to restore vault ownership for %s: %s", path, exc)
+
+
 async def export_vault(session: AsyncSession, vault_dir: str | None = None) -> dict:
     """Export the full Obsidian vault from DB state.
 
@@ -213,38 +431,42 @@ async def export_vault(session: AsyncSession, vault_dir: str | None = None) -> d
     """
     vault_dir = vault_dir or getattr(settings, "obsidian_vault_dir", None) or "/obsidian-vault"
     vault = Path(vault_dir)
+    bind_mount_owner = _infer_bind_mount_owner(vault)
     # Clear CONTENTS instead of removing the directory itself, because the
     # production vault is a bind-mount and rmtree fails with EBUSY.
-    if vault.exists():
-        for child in vault.iterdir():
-            if child.is_dir():
-                shutil.rmtree(child, ignore_errors=True)
-            else:
-                try:
-                    child.unlink()
-                except OSError:
-                    pass
-    else:
-        vault.mkdir(parents=True, exist_ok=True)
+    try:
+        if vault.exists():
+            for child in vault.iterdir():
+                if child.is_dir():
+                    shutil.rmtree(child, ignore_errors=True)
+                else:
+                    try:
+                        child.unlink()
+                    except OSError:
+                        pass
+        else:
+            vault.mkdir(parents=True, exist_ok=True)
 
-    stats = {"domains": 0, "tasks": 0, "methods": 0, "datasets": 0, "papers": 0}
+        stats = {"domains": 0, "tasks": 0, "methods": 0, "datasets": 0, "papers": 0}
 
-    # Load all data first
-    data = await _load_all_data(session)
+        # Load all data first
+        data = await _load_all_data(session)
 
-    # Generate pages (no views — paper/ by venue_year/ is sufficient)
-    await _export_domains_and_tasks(vault, data, stats)
-    await _export_methods(vault, data, stats)
-    await _export_datasets(vault, data, stats)
-    await _export_papers(vault, session, data, stats)
-    _export_home(vault, data, stats)
+        # Generate pages (no views — paper/ by venue_year/ is sufficient)
+        await _export_domains_and_tasks(vault, data, stats)
+        await _export_methods(vault, data, stats)
+        await _export_datasets(vault, data, stats)
+        await _export_papers(vault, session, data, stats)
+        _export_home(vault, data, stats)
 
-    logger.info(
-        "Vault exported to %s: %d domains, %d tasks, %d methods, %d datasets, %d papers",
-        vault, stats["domains"], stats["tasks"], stats["methods"],
-        stats["datasets"], stats["papers"],
-    )
-    return stats
+        logger.info(
+            "Vault exported to %s: %d domains, %d tasks, %d methods, %d datasets, %d papers",
+            vault, stats["domains"], stats["tasks"], stats["methods"],
+            stats["datasets"], stats["papers"],
+        )
+        return stats
+    finally:
+        _restore_bind_mount_owner(vault, bind_mount_owner)
 
 
 # ── Data Loading ─────────────────────────────────────────────────
@@ -255,7 +477,8 @@ async def _load_all_data(session: AsyncSession) -> dict:
     # Papers with DeltaCard + Analysis + latest PaperReport (for title_zh)
     papers_raw = (await session.execute(text("""
         SELECT p.id, p.title, p.title_sanitized, p.venue, p.year, p.category,
-               p.tags, p.paper_link, p.code_url, p.method_family, p.ring,
+               p.tags, p.paper_link, p.project_link, p.arxiv_id, p.code_url,
+               p.method_family, p.ring, p.pdf_path_local, p.pdf_object_key,
                p.acceptance_type, p.cited_by_count, p.authors, p.abstract,
                p.current_delta_card_id,
                dc.delta_statement, dc.baseline_paradigm,
@@ -310,13 +533,23 @@ async def _load_all_data(session: AsyncSession) -> dict:
         "SELECT entity_type, entity_id, one_liner, short_intro_md FROM kb_node_profiles WHERE lang = 'zh'"
     ))).fetchall()
 
-    # Figure images from L2 parse
+    # Figure images from L2 parse (legacy JSONB) and paper_figures (new table).
     figure_rows = (await session.execute(text("""
         SELECT paper_id, extracted_figure_images
         FROM paper_analyses
         WHERE level = 'l2_parse' AND is_current = true
           AND extracted_figure_images IS NOT NULL
     """))).fetchall()
+    paper_figure_rows = []
+    try:
+        paper_figure_rows = (await session.execute(text("""
+            SELECT paper_id, label, type, semantic_role, page_num, object_key,
+                   public_url, caption, description, width, height, size_bytes
+            FROM paper_figures
+            ORDER BY paper_id, page_num NULLS LAST, label
+        """))).fetchall()
+    except Exception:
+        pass
 
     # Paper-paper relations (baseline / cite DAG). Optional table — may not
     # exist on pre-024 deployments, so swallow the error.
@@ -336,6 +569,30 @@ async def _load_all_data(session: AsyncSession) -> dict:
         figs = fr.extracted_figure_images
         if isinstance(figs, list):
             figure_map[str(fr.paper_id)] = figs
+    for fr in paper_figure_rows:
+        item = {
+            "label": fr.label,
+            "type": fr.type or "figure",
+            "semantic_role": fr.semantic_role or "other",
+            "page_num": fr.page_num,
+            "object_key": fr.object_key,
+            "public_url": fr.public_url,
+            "caption": fr.caption or "",
+            "description": fr.description or "",
+            "width": fr.width,
+            "height": fr.height,
+            "size_bytes": fr.size_bytes,
+        }
+        paper_id = str(fr.paper_id)
+        bucket = figure_map.setdefault(paper_id, [])
+        key = item.get("object_key") or item.get("label")
+        existing = {
+            fig.get("object_key") or fig.get("label")
+            for fig in bucket
+            if isinstance(fig, dict)
+        }
+        if key not in existing:
+            bucket.append(item)
     tax_by_id = {str(n.id): n for n in tax_nodes}
     tax_by_dim = {}
     for n in tax_nodes:
@@ -1307,6 +1564,9 @@ async def _export_papers(vault: Path, session: AsyncSession, data: dict, stats: 
             "year": p.year,
             "paper_link": p.paper_link,
         }
+        pdf_ref = _pdf_ref_for_paper(p)
+        if pdf_ref:
+            fm_data["pdf_ref"] = pdf_ref
         if aliases:
             fm_data["aliases"] = aliases
         if p.acceptance_type:
@@ -1339,52 +1599,56 @@ async def _export_papers(vault: Path, session: AsyncSession, data: dict, stats: 
         fm = _fm(fm_data)
 
         body = f"# {p.title}\n\n"
-
-        # Links
-        links = []
-        if p.paper_link:
-            links.append(f"[Paper]({p.paper_link})")
-        if p.code_url:
-            links.append(f"[Code]({p.code_url})")
-        if links:
-            body += " | ".join(links) + "\n\n"
-
-        # Wikilinks. Single-paper task / dataset nodes (which weren't
-        # exported) appear as plain-text mentions instead of broken [[]].
-        wiki_parts = []
         topic_part = ", ".join(task_links[:5])
         if task_text_only:
             extra = ", ".join(task_text_only[:3])
             topic_part = (topic_part + " (其他: " + extra + ")") if topic_part else extra
-        if topic_part:
-            wiki_parts.append("**Topics**: " + topic_part)
-        if method_links:
-            wiki_parts.append("**Method**: " + ", ".join(method_links))
         ds_part = ", ".join(dataset_links[:5])
         if ds_text_only:
             extra = ", ".join(ds_text_only[:5])
             ds_part = (ds_part + " (其他: " + extra + ")") if ds_part else extra
-        if ds_part:
-            wiki_parts.append("**Datasets**: " + ds_part)
-        if wiki_parts:
-            body += " | ".join(wiki_parts) + "\n\n"
 
         # Delta statement as callout
         if p.delta_statement:
             body += f"> [!tip] 核心洞察\n> {p.delta_statement}\n\n"
 
+        # Unified info table: links + topics + method + datasets go here.
+        table_rows = [
+            "| 字段 | 内容 |",
+            "|------|------|",
+        ]
+        title_zh = getattr(p, "title_zh", None)
+        if title_zh:
+            table_rows.append(f"| 中文题名 | {title_zh} |")
+        table_rows.append(f"| 英文题名 | {p.title} |")
+        table_rows.append(
+            f"| 会议/期刊 | {_table_cell(_venue_line(p.venue, p.year, getattr(p, 'acceptance_type', None)))} |"
+        )
+        table_rows.append(f"| Topic | {_table_cell(topic_part)} |")
+        table_rows.append(f"| Method | {_table_cell(_best_method_text(p, method_links, aliases))} |")
+        table_rows.append(f"| Dataset | {_table_cell(ds_part)} |")
+        if baseline_targets_dedup:
+            b_names = []
+            for tp, _ in baseline_targets_dedup[:5]:
+                b_names.append(tp.title)
+            table_rows.append(f"| 主要 baseline | {_table_cell(', '.join(b_names))} |")
+        body += "\n".join(table_rows) + "\n\n"
+
         # Full report with figure resolution
-        figures = figure_map.get(str(p.id), [])
+        figures = _prepare_figure_assets(figure_map.get(str(p.id), []), vault)
         if p.full_report_md:
             # Strip embedded figure_placements comment and use it to resolve markers
             raw = p.full_report_md
             placements, raw = _extract_figure_placements(raw)
-            if "{{FIG:" in raw:
+            effect_intro, raw = _split_report_preface(raw)
+            if effect_intro:
+                body += "### 效果简介\n\n" + effect_intro + "\n\n"
+            if re.search(r"\{\{(?:FIG|TBL):", raw):
                 report_body = _resolve_figure_markers(raw, figures, placements)
             else:
                 # Report has no markers — auto-inject by semantic_role at section ends
                 report_body = _autoinject_figures_by_role(raw, figures)
-            body += report_body + "\n"
+            body += _normalize_heading_spacing(report_body) + "\n"
         else:
             if p.problem_summary:
                 body += f"## 背景与动机\n\n{p.problem_summary}\n\n"
@@ -1445,6 +1709,11 @@ async def _export_papers(vault: Path, session: AsyncSession, data: dict, stats: 
                     body += f"- {sp.title} _({venue_y}, 未深度分析)_{ev_clip}\n"
             body += "\n"
 
+        if pdf_ref:
+            body += "## 原文 PDF\n\n"
+            body += f"![[{pdf_ref}]]\n"
+
+        body = re.sub(r"\n{3,}", "\n\n", body).rstrip() + "\n"
         (vy_dir / f"P__{pslug}.md").write_text(fm + body, encoding="utf-8")
         stats["papers"] += 1
 
@@ -1475,12 +1744,16 @@ def _extract_figure_placements(body: str) -> tuple[list[dict], str]:
 def _render_figure(fig: dict) -> str:
     """Render a single figure as an inline markdown image + caption line."""
     url = fig.get("public_url", "")
+    asset = fig.get("vault_asset", "")
     label = fig.get("label", "Figure")
-    caption = (fig.get("caption") or "").strip()
+    caption = _clean_caption(label, fig.get("caption") or "")
     role = fig.get("semantic_role", "")
-    if not url:
+    if not url and not asset:
         return ""
-    out = f"\n![{label}]({url})\n"
+    if url:
+        out = f"![{label}]({url})\n"
+    else:
+        out = f"![[{asset}]]\n"
     if caption:
         suffix = f" ({role})" if role and role != "other" else ""
         out += f"*{label}{suffix}: {caption}*\n"
