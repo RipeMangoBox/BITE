@@ -685,12 +685,30 @@ class IngestWorkflow:
         Returns:
             {paper_id, agents_run, nodes_created, edges_created, report_sections}
         """
+        from sqlalchemy import select
         from backend.models.paper import Paper
         from backend.models.enums import PaperState
+        from backend.models.analysis import PaperAnalysis
+        from backend.models.enums import AnalysisLevel
 
         paper = await self.session.get(Paper, paper_id)
         if not paper:
             return {"error": f"Paper {paper_id} not found"}
+
+        # Idempotency guard: skip if L4_DEEP already exists (M1 fix)
+        has_l4 = (await self.session.execute(
+            select(PaperAnalysis.id).where(
+                PaperAnalysis.paper_id == paper_id,
+                PaperAnalysis.level == AnalysisLevel.L4_DEEP,
+                PaperAnalysis.is_current.is_(True),
+            )
+        )).scalar_one_or_none()
+        if has_l4:
+            return {
+                "paper_id": str(paper_id),
+                "status": "skipped",
+                "reason": "L4_DEEP analysis already exists",
+            }
 
         agents_run = []
         agent_results = {}
@@ -863,6 +881,7 @@ class IngestWorkflow:
                 )
                 .values(is_verified=True)
             )
+            await self.session.flush()
         except Exception as e:
             logger.error("Graph materialization failed for %s: %s", paper_id, e)
 
@@ -878,28 +897,24 @@ class IngestWorkflow:
         # ── Phase 3C: Paper report (AFTER materialization, from verified blackboard) ──
         if delta_card_result and delta_card_result.get("delta_card_id"):
             try:
-                figures_block = await self._build_figures_block(paper_id)
                 metadata_block = self._build_paper_metadata_block(paper)
 
-                # Use ContextPackBuilder with ALL_VERIFIED to consume only verified items
-                try:
-                    report_ctx = await self.ctx_builder.build(
-                        "paper_report", paper_id=paper_id,
-                    )
-                    verified_content = report_ctx.get("user_content", "")
-                    token_budget = report_ctx.get("token_budget", 8192)
-                except Exception as ctx_err:
-                    logger.warning("Context pack build for paper_report failed: %s, falling back", ctx_err)
-                    verified_content = f"Paper title: {paper.title}\n\n{agent_results}"
-                    token_budget = 8192
+                # Build context from verified blackboard items via ContextPackBuilder.
+                # The "paper_report" pack uses ALL_VERIFIED to query only is_verified=True
+                # items, and already includes report_section_schema, selected_evidence,
+                # and figure_image_metadata — no raw agent_results fallback.
+                report_ctx = await self.ctx_builder.build(
+                    "paper_report", paper_id=paper_id,
+                )
+                verified_content = report_ctx.get("user_content", "")
+                token_budget = report_ctx.get("token_budget", 8192)
 
                 report_context = {
                     "user_content": (
-                        f"{verified_content}\n\n"
-                        f"=== Paper metadata ===\n"
+                        f"Paper title: {paper.title}\n\n"
+                        f"=== Paper metadata (use in section 1 metadata_overview) ===\n"
                         f"{metadata_block}\n\n"
-                        f"=== Figures available ===\n"
-                        f"{figures_block}\n\n"
+                        f"{verified_content}\n\n"
                         f"Graph nodes created: {nodes_created}, edges created: {edges_created}"
                     ),
                     "token_budget": token_budget,
@@ -950,10 +965,37 @@ class IngestWorkflow:
             from backend.services.paper_relation_service import materialize_for_paper
             rel_stats = await materialize_for_paper(self.session, paper_id)
             logger.info("Paper relations materialized for %s: %s", paper_id, rel_stats)
+
+            # Merge LLM-identified direct baselines into DeltaCard.baseline_paper_ids (M3 fix)
+            if delta_card_result and delta_card_result.get("delta_card_id"):
+                try:
+                    from backend.models.delta_card import DeltaCard
+                    from backend.models.paper_relation import PaperRelation
+                    dc = await self.session.get(DeltaCard, UUID(delta_card_result["delta_card_id"]))
+                    if dc:
+                        baseline_rows = (await self.session.execute(
+                            select(PaperRelation.target_paper_id).where(
+                                PaperRelation.source_paper_id == paper_id,
+                                PaperRelation.relation_type == "direct_baseline",
+                            )
+                        )).scalars().all()
+                        if baseline_rows:
+                            existing = set(dc.baseline_paper_ids or [])
+                            new_ids = [pid for pid in baseline_rows if pid not in existing]
+                            if new_ids:
+                                merged = list(existing) + new_ids
+                                dc.baseline_paper_ids = merged
+                                await self.session.flush()
+                                logger.info(
+                                    "Merged %d baseline paper IDs into DeltaCard %s",
+                                    len(new_ids), dc.id,
+                                )
+                except Exception as e:
+                    logger.warning("Baseline merge into DeltaCard failed: %s", e)
         except Exception as e:
             logger.warning("Paper relation materialization failed for %s: %s", paper_id, e)
 
-        # ── Phase 3E: Promote baseline references (multi-source search + ingest) ──
+        # ── Phase 3F: Promote baseline references (multi-source search + ingest) ──
         # For each baseline-role ref the agent identified, ensure the target
         # paper is either already in `papers`, has been promoted from
         # `venue_papers`, or has a fresh `paper_candidates` row queued.
@@ -1047,6 +1089,27 @@ class IngestWorkflow:
                 for ref in paper_essence.get("evidence_refs", [])
             ],
         }
+
+        # Merge deep evidence from experiment analysis (C2 fix)
+        deep_evidence = []
+        for mr in experiment.get("main_results", []):
+            for ref in mr.get("evidence_refs", []):
+                deep_evidence.append({
+                    "atom_type": "evidence",
+                    "claim": f"{mr.get('benchmark', '')}: {mr.get('proposed_score', '')} (improvement: {mr.get('improvement', '')})",
+                    "confidence": ref.get("confidence", 0.7),
+                    "basis": "experiment_backed",
+                    "source_section": ref.get("section", ""),
+                })
+        for ab in experiment.get("ablations", []):
+            deep_evidence.append({
+                "atom_type": "evidence",
+                "claim": f"Ablation: remove {ab.get('component_removed', '')} → {ab.get('effect', '')} (Δ={ab.get('delta_value', '')})",
+                "confidence": 0.85 if ab.get("supports_core_claim") else 0.6,
+                "basis": "experiment_backed",
+                "source_section": "experiments",
+            })
+        analysis_data["evidence_units"].extend(deep_evidence)
 
         # Build evidence_summary from experiment fairness
         fairness = experiment.get("fairness_assessment", {})
@@ -1603,6 +1666,17 @@ class IngestWorkflow:
 
         if not sections:
             return
+
+        # Validate required sections are present (M2 fix)
+        REQUIRED_SECTIONS = {
+            "metadata_overview", "background_motivation", "core_innovation",
+            "framework_overview", "module_formulas", "experiment_analysis",
+            "lineage_positioning",
+        }
+        got_sections = {s.get("section_type", "") for s in sections}
+        missing = REQUIRED_SECTIONS - got_sections
+        if missing:
+            logger.warning("Paper %s report missing sections: %s", paper_id, missing)
 
         # Create PaperReport
         report = PaperReport(
