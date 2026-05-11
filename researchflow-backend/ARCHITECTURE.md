@@ -107,7 +107,7 @@ RL (type=mechanism_family, maturity=established_baseline)
 
 ---
 
-## 4. 6-Agent Pipeline
+## 4. 2-Agent Pipeline
 
 ### 4.1 完整流程
 
@@ -119,51 +119,46 @@ POST /pipeline/{paper_id}/run
  ├─ Step 2: enrich_paper() (10 API)       [enrich_service]
  ├─ Step 2.5: venue_resolution            [venue_resolver_service]
  ├─ Step 3: parse_paper_pdf() (L2)        [parse_service]
- ├─ Step 4: skim_paper() (L3)             [analysis_service]
+ ├─ Step 4: analysis_agent → L3 projection [ingest_workflow]
  │
- └─ Step 5: deep_ingest() (V6 pipeline)   [ingest_workflow]
+ └─ Step 5: deep_ingest()                 [ingest_workflow]
       │
-      ├─ Agent 1: shallow_extractor (18K tokens)
-      │   输入: abstract + method/experiment excerpts
-      │   输出: paper_essence + method_delta
+      ├─ Agent 1: analysis_agent (80K tokens)
+      │   输入: parse text + MinerU reading order + formulas/tables +
+      │        references + graph schema/context
+      │   输出: analysis_truth + paper_essence + method_delta +
+      │        reference_role_map + deep_analysis + graph_candidates +
+      │        kb_profiles
       │
-      ├─ Agent 2: reference_role (30K tokens)
-      │   输入: reference_list + citation_contexts
-      │   输出: classifications + anchor_baselines
+      ├─ compatibility projections (纯 DB / blackboard)
+      │   shallow_extract / reference_role_map / deep_analysis /
+      │   graph_candidates / kb_profiles
       │
       │   ↓ 确定性评分 (scoring_engine → DeepIngestScore)
       │   ↓ ≥88 auto_deep / 80-87 review_deep / <80 stay L1
       │
-      ├─ Agent 3: deep_analyzer (40K tokens)
-      │   输入: 全文 + shallow results
-      │   输出: method/experiment/formulas
-      │
-      ├─ Agent 4: graph_candidate (20K tokens)
-      │   输入: all prior + graph summary
-      │   输出: node/edge/lineage candidates
-      │
-      ├─ Agent 5: kb_profiler (20K tokens, batched)
-      │   输入: qualifying candidates (node ≥75, edge ≥70)
-      │   输出: wiki profiles (Chinese)
-      │
-      ├─ Agent 6: paper_report (80K tokens)
-      │   输入: ALL verified blackboard items
-      │   输出: 10-section structured report
-      │
-      └─ _materialize_to_graph() (纯 DB)
+      ├─ _materialize_to_graph() (纯 DB)
            ├─ run_delta_card_pipeline()
            │   build_delta_card → persist_evidence → finalize → propose_assertions → publish
            ├─ link_to_parent_baselines() → DeltaCardLineage
            ├─ synthesize_concepts() → MethodNode + CanonicalIdea
            ├─ reconcile_neighbors() → same_family updates
            └─ _write_taxonomy_facets() → TaxonomyNode + PaperFacet
+      │
+      ├─ materialize paper_relations (纯 DB)
+      │
+      └─ Agent 2: writer_agent (80K tokens)
+          输入: verified truth + selected evidence + text-only figure metadata +
+               deterministic lineage/facet context
+          输出: 7-section structured report
 ```
 
 ### 4.2 Agent 共享记忆
 
 ```
 Blackboard 模式 (agent_blackboard_items 表):
-  Agent N 写入 → Agent N+1 通过 ContextPackBuilder 读取
+  analysis_agent 写入 verified truth + compatibility projections
+  writer_agent 通过 ContextPackBuilder 读取每类最新 verified item
 
 4 层上下文:
   Global:  schema 定义 (node_types, relation_types, slot_types)
@@ -176,7 +171,7 @@ Blackboard 模式 (agent_blackboard_items 表):
 
 | # | 防线 | 机制 |
 |---|------|------|
-| 1 | 先看改动不先听故事 | deep_analyzer prompt: FIRST Method → THEN Experiments → ONLY THEN Abstract |
+| 1 | 先看改动不先听故事 | analysis_agent 同时读取方法、实验、公式、引用和图谱上下文 |
 | 2 | 比较集不是论文自己说了算 | baseline_comparator_service: 从 DB 查 4 个来源自动补齐 |
 | 3 | 高价值结论必须有证据 | DeltaCard 发布门控: evidence_refs ≥ 2 |
 
@@ -185,14 +180,14 @@ Blackboard 模式 (agent_blackboard_items 表):
 批量分析的总览和 agent 执行约束维护在
 [`docs/analysis_plan.md`](../docs/analysis_plan.md)。架构层只定义能力边界；
 实际执行时，每个批次必须先声明 goal、source、selection rule、budget 和
-output target，再按 6-Agent Pipeline 推进。
+output target，再按 2-Agent Pipeline 推进。
 
 执行约束:
 
 - 只通过 API/service 写入 PostgreSQL；Markdown/Obsidian 是导出投影。
 - 每个 agent 只消费声明过的上下文，并把证据 anchor 写入 blackboard/DB。
 - DeepIngestScore、node score、edge score 和 DeltaCard evidence gate 是硬门槛。
-- paper_report 与 kb_profile 只能使用已验证 blackboard items，不新增无证据结论。
+- writer_agent 与 deterministic profiles 只能使用已验证 blackboard/DB items，不新增无证据结论。
 - 生成导出、快照、备份、本地 storage 和软链接不得作为源码提交。
 
 ---

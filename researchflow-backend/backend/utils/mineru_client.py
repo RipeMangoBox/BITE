@@ -60,6 +60,7 @@ class MinerUResult:
     markdown: str = ""           # Full document as markdown
     tables: list[MinerUTable] = field(default_factory=list)
     formulas: list[MinerUFormula] = field(default_factory=list)
+    figures: list[dict] = field(default_factory=list)
     reading_order: list[int] = field(default_factory=list)  # page sequence
     metadata: dict = field(default_factory=dict)
     error: str = ""
@@ -231,7 +232,7 @@ def get_mineru_client(api_key: str = "") -> MinerUClient | None:
     from backend.config import settings  # deferred import to avoid circular
 
     key = api_key or getattr(settings, "mineru_api_key", "")
-    base_url = getattr(settings, "mineru_base_url", DEFAULT_BASE_URL)
+    base_url = getattr(settings, "mineru_base_url", "") or DEFAULT_BASE_URL
     if not key:
         return None
     _client = MinerUClient(api_key=key, base_url=base_url)

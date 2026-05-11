@@ -1,9 +1,7 @@
 """Backfill kb_node_profiles for taxonomy_nodes that have none.
 
-The kb_profiler agent was originally designed to run during deep_ingest on
-fresh node candidates. For existing taxonomy nodes (loaded by an earlier
-pipeline), we synthesize candidates from each node + the papers attached
-via paper_facets, then batch-call the agent.
+For existing taxonomy nodes (loaded by an earlier pipeline), synthesize a
+conservative profile from each node plus papers attached via paper_facets.
 
 Usage:
     python -m scripts.backfill_kb_profiles                  # all unprofiled nodes
@@ -25,7 +23,6 @@ from sqlalchemy import text
 
 from backend.database import async_session
 from backend.models.kb import KBNodeProfile
-from backend.services.agent_runner import AgentRunner
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -53,7 +50,7 @@ SQL_NODE_PAPERS = text("""
 
 
 def _node_to_candidate(node, papers: list[Any]) -> dict:
-    """Build the synthetic candidate the kb_profiler agent expects."""
+    """Build a synthetic candidate from DB evidence."""
     connected = []
     for p in papers:
         ds = (p.delta_statement or "").strip()
@@ -75,6 +72,58 @@ def _node_to_candidate(node, papers: list[Any]) -> dict:
     }
 
 
+def _profile_from_candidate(candidate: dict) -> dict:
+    name = (candidate.get("name") or "").strip()
+    label = (candidate.get("name_zh") or name or "未命名节点").strip()
+    node_type = candidate.get("node_type") or "taxonomy"
+    connected = candidate.get("connected_papers") or []
+    evidence_count = candidate.get("evidence_count") or len(connected)
+    description = (candidate.get("existing_description") or "").strip()
+
+    venues = []
+    for paper in connected:
+        venue = (paper.get("venue") or "").strip()
+        if venue and venue not in venues:
+            venues.append(venue)
+    venue_text = "，主要来源：" + "、".join(venues[:3]) if venues else ""
+
+    one_liner = f"{label} 是一个 {node_type} 知识节点，目前由 {evidence_count} 篇论文支撑。"
+    intro = f"{one_liner}{venue_text}"
+    if description:
+        intro += f"\n\n{description}"
+
+    evidence_lines = []
+    for paper in connected[:8]:
+        title = (paper.get("title") or "").strip()
+        claim = (paper.get("claim") or "").strip()
+        if not title:
+            continue
+        suffix = f"：{claim}" if claim else ""
+        evidence_lines.append(f"- {title}{suffix}")
+    detailed = "## 支撑论文\n\n" + ("\n".join(evidence_lines) if evidence_lines else "暂无已连接论文。")
+
+    return {
+        "node_name": name,
+        "one_liner": one_liner,
+        "short_intro_md": intro,
+        "detailed_md": detailed,
+        "structured_json": {
+            "profile_source": "deterministic_db_evidence",
+            "node_type": node_type,
+            "evidence_count": evidence_count,
+        },
+        "evidence_refs": [
+            {
+                "title": p.get("title"),
+                "venue": p.get("venue"),
+                "year": p.get("year"),
+                "basis": "paper_facets",
+            }
+            for p in connected[:8]
+        ],
+    }
+
+
 async def _persist_profile(session, node_id: UUID, np: dict, run_id: UUID | None) -> None:
     """Upsert a single kb_node_profiles row for a taxonomy node."""
     profile = KBNodeProfile(
@@ -87,6 +136,8 @@ async def _persist_profile(session, node_id: UUID, np: dict, run_id: UUID | None
         structured_json=np.get("structured_json"),
         evidence_refs=np.get("evidence_refs"),
         generated_by_run_id=run_id,
+        model_name="deterministic_profile",
+        prompt_version="v1_two_agent_cleanup",
     )
     session.add(profile)
 
@@ -107,54 +158,20 @@ async def main(batch_size: int, limit: int | None, dry_run: bool) -> None:
             papers = (await session.execute(SQL_NODE_PAPERS, {"node_id": str(n.id)})).fetchall()
             node_with_candidates.append((n, _node_to_candidate(n, papers)))
 
-        runner = AgentRunner(session)
         total_persisted = 0
-        total_failed = 0
 
         for i in range(0, len(node_with_candidates), batch_size):
             batch = node_with_candidates[i:i + batch_size]
-            payload = {
-                "node_candidates": [c for (_, c) in batch],
-                "edge_candidates": [],
-            }
-            import json as _json
-            user_content = (
-                "Generate node profiles for the following taxonomy nodes.\n"
-                "For each node, draw evidence ONLY from `connected_papers`.\n"
-                "Match `node_name` in the output exactly to the candidate `name`.\n\n"
-                f"{_json.dumps(payload, ensure_ascii=False)}"
-            )
-            context = {"user_content": user_content, "token_budget": 8192}
-
             t0 = time.monotonic()
-            logger.info("Batch %d-%d / %d: calling kb_profiler",
+            logger.info("Batch %d-%d / %d: deterministic profile build",
                         i, i + len(batch), len(node_with_candidates))
-            try:
-                result = await runner.run_agent("kb_profiler", context)
-            except Exception as e:
-                logger.error("kb_profiler batch failed: %s", e)
-                total_failed += len(batch)
-                continue
-
-            # Index result by node name (case-insensitive)
-            np_by_name = {}
-            for np in result.get("node_profiles", []) or []:
-                key = (np.get("node_name") or "").strip().lower()
-                if key:
-                    np_by_name[key] = np
 
             run_id = None  # AgentRunner already created an AgentRun, but
             # the id isn't returned; leaving NULL is acceptable.
 
             persisted = 0
             for node, candidate in batch:
-                np = np_by_name.get((node.name or "").lower())
-                if not np:
-                    logger.warning("kb_profiler did not return profile for %s", node.name)
-                    continue
-                if not (np.get("short_intro_md") or np.get("one_liner")):
-                    logger.warning("Profile for %s is empty, skipping", node.name)
-                    continue
+                np = _profile_from_candidate(candidate)
                 if not dry_run:
                     await _persist_profile(session, node.id, np, run_id)
                 persisted += 1
@@ -165,8 +182,8 @@ async def main(batch_size: int, limit: int | None, dry_run: bool) -> None:
             logger.info("Batch done in %.1fs — persisted %d/%d profiles",
                         time.monotonic() - t0, persisted, len(batch))
 
-        logger.info("=== DONE: persisted=%d failed=%d total=%d ===",
-                    total_persisted, total_failed, len(node_with_candidates))
+        logger.info("=== DONE: persisted=%d total=%d ===",
+                    total_persisted, len(node_with_candidates))
 
 
 if __name__ == "__main__":

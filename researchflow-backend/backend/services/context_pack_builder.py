@@ -7,7 +7,7 @@ Each agent gets a different subset with a token budget.
 import logging
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.models.agent import AgentBlackboardItem
@@ -108,13 +108,14 @@ class ContextPackBuilder:
 - description: str — natural language description of the relation"""
 
     GLOBAL_REPORT_SECTION_SCHEMA = """Report section schema:
-- paper_essence: PaperEssence — core summary
-- method_analysis: MethodDelta — slot-level changes
-- experiment_matrix: ExperimentMatrix — benchmark results
-- reference_map: ReferenceRoleMap — classified references
-- contribution_assessment: ContributionAssessment — novelty/significance
-- limitations_and_future: str — limitations and future work
-- quality_audit: QualityAudit — evidence quality assessment"""
+- metadata_overview: paper metadata table plus `> [!tip] 效果简介` callout.
+- background_motivation: concrete problem, named baselines, and their bottleneck.
+- core_innovation: one causal insight, not a TL;DR or contribution list.
+- framework_overview: system skeleton and module responsibilities.
+- module_formulas: 2-3 key modules with formula intuition and evidence.
+- experiment_analysis: original table/figure markers plus numeric prose summary.
+- lineage_positioning: deterministic method family, parent/baseline relations,
+  changed slots, facets, and follow-up positioning."""
 
     _GLOBAL_ITEMS = {
         "node_types": GLOBAL_NODE_TYPES,
@@ -132,6 +133,39 @@ class ContextPackBuilder:
     # ── Pack Configurations ──────────────────────────────────────────────
 
     PACK_CONFIGS = {
+        "analysis_agent": {
+            "global": [
+                "node_types", "relation_types", "slot_types",
+                "reference_role_definitions", "experiment_schema",
+                "edge_rules", "profile_schema", "edge_profile_schema",
+            ],
+            "domain": [
+                "scope", "existing_tasks_summary", "existing_methods_summary",
+                "baselines", "known_benchmarks", "graph_summary",
+                "task_hierarchy", "method_hierarchy",
+            ],
+            "paper": [
+                "abstract", "introduction_excerpt", "method_section_full",
+                "algorithm_blocks", "all_formula_contexts", "result_tables",
+                "experiment_section", "ablation_section", "reference_list",
+                "citation_contexts", "figure_image_metadata",
+                "mineru_markdown_excerpt",
+            ],
+            "run": [],
+            "token_budget": 80_000,
+        },
+
+        "writer_agent": {
+            "global": ["report_section_schema"],
+            "domain": [],
+            "paper": [
+                "selected_evidence", "figure_image_metadata",
+                "lineage_positioning_context",
+            ],
+            "run": ["ALL_VERIFIED"],
+            "token_budget": 80_000,
+        },
+
         # ── Shallow Phase (merged) ──
         "shallow_extractor": {
             "global": ["node_types", "relation_types", "slot_types"],
@@ -159,6 +193,7 @@ class ContextPackBuilder:
             "paper": [
                 "method_section_full", "algorithm_blocks", "all_formula_contexts",
                 "result_tables", "experiment_section", "ablation_section",
+                "mineru_markdown_excerpt",
             ],
             "run": ["shallow_extract", "reference_role_map"],
             "token_budget": 40_000,
@@ -192,6 +227,14 @@ class ContextPackBuilder:
             "token_budget": 80_000,
         },
 
+    }
+
+    LEGACY_PACK_CONFIGS = PACK_CONFIGS.copy()
+    LEGACY_PACK_CONFIGS.pop("analysis_agent", None)
+    LEGACY_PACK_CONFIGS.pop("writer_agent", None)
+    PACK_CONFIGS = {
+        "analysis_agent": PACK_CONFIGS["analysis_agent"],
+        "writer_agent": PACK_CONFIGS["writer_agent"],
     }
 
     def __init__(self, session: AsyncSession):
@@ -271,9 +314,9 @@ class ContextPackBuilder:
         """Return static schema definitions for the requested global items."""
         sections: list[str] = []
         for item in items:
-            text = self._GLOBAL_ITEMS.get(item)
-            if text:
-                sections.append(text)
+            content = self._GLOBAL_ITEMS.get(item)
+            if content:
+                sections.append(content)
             else:
                 logger.warning("Unknown global context item: %s", item)
         return "\n\n".join(sections)
@@ -452,35 +495,35 @@ class ContextPackBuilder:
 
         for item in items:
             if item == "abstract":
-                text = extracted.get("abstract", "")
-                if text:
-                    sections.append(f"[Abstract]\n{text}")
+                content = extracted.get("abstract", "")
+                if content:
+                    sections.append(f"[Abstract]\n{content}")
 
             elif item in ("introduction_excerpt",):
-                text = extracted.get("introduction", "")
-                if text:
+                content = extracted.get("introduction", "")
+                if content:
                     # Excerpt: first 2000 chars
-                    sections.append(f"[Introduction Excerpt]\n{text[:2000]}")
+                    sections.append(f"[Introduction Excerpt]\n{content[:2000]}")
 
             elif item in ("method_excerpt", "method_section"):
-                text = extracted.get("method", "") or extracted.get("methodology", "")
-                if text:
-                    sections.append(f"[Method Section]\n{text[:4000]}")
+                content = extracted.get("method", "") or extracted.get("methodology", "")
+                if content:
+                    sections.append(f"[Method Section]\n{content[:4000]}")
 
             elif item == "method_section_full":
-                text = extracted.get("method", "") or extracted.get("methodology", "")
-                if text:
-                    sections.append(f"[Method Section (Full)]\n{text}")
+                content = extracted.get("method", "") or extracted.get("methodology", "")
+                if content:
+                    sections.append(f"[Method Section (Full)]\n{content}")
 
             elif item in ("experiment_excerpt", "experiment_section"):
-                text = extracted.get("experiments", "") or extracted.get("results", "")
-                if text:
-                    sections.append(f"[Experiment Section]\n{text[:4000]}")
+                content = extracted.get("experiments", "") or extracted.get("results", "")
+                if content:
+                    sections.append(f"[Experiment Section]\n{content[:4000]}")
 
             elif item == "ablation_section":
-                text = extracted.get("ablation", "") or extracted.get("ablation_study", "")
-                if text:
-                    sections.append(f"[Ablation Section]\n{text}")
+                content = extracted.get("ablation", "") or extracted.get("ablation_study", "")
+                if content:
+                    sections.append(f"[Ablation Section]\n{content}")
 
             elif item == "figure_table_captions":
                 captions = analysis.figure_captions if analysis else None
@@ -499,24 +542,35 @@ class ContextPackBuilder:
                     )
 
             elif item in ("algorithm_blocks",):
-                text = extracted.get("algorithm", "") or extracted.get("algorithms", "")
-                if text:
-                    sections.append(f"[Algorithm Blocks]\n{text}")
+                content = extracted.get("algorithm", "") or extracted.get("algorithms", "")
+                if content:
+                    sections.append(f"[Algorithm Blocks]\n{content}")
 
             elif item in ("formula_contexts", "all_formula_contexts"):
                 formulas = analysis.extracted_formulas if analysis else None
                 if formulas:
                     sections.append(f"[Formulas]\n" + "\n".join(formulas))
 
+            elif item == "mineru_markdown_excerpt":
+                mineru_md = ""
+                if analysis and analysis.evidence_spans:
+                    mineru_md = analysis.evidence_spans.get("mineru_markdown", "") or ""
+                if mineru_md:
+                    sections.append(
+                        "[MinerU Markdown Excerpt]\n"
+                        "Use this for reading order, table/formula context, and dense method text.\n"
+                        f"{mineru_md[:12000]}"
+                    )
+
             elif item == "reference_list":
-                text = extracted.get("references", "")
-                if text:
-                    sections.append(f"[Reference List]\n{text}")
+                content = extracted.get("references", "")
+                if content:
+                    sections.append(f"[Reference List]\n{content}")
 
             elif item == "citation_contexts":
-                text = extracted.get("citation_contexts", "")
-                if text:
-                    sections.append(f"[Citation Contexts]\n{text}")
+                content = extracted.get("citation_contexts", "")
+                if content:
+                    sections.append(f"[Citation Contexts]\n{content}")
 
             elif item == "selected_evidence":
                 evidence_rows = (
@@ -536,7 +590,8 @@ class ContextPackBuilder:
                     sections.append(f"[Selected Evidence]\n" + "\n".join(lines))
 
             elif item == "figure_image_metadata":
-                # Load extracted figure images from L2 analysis
+                # Text-only figure metadata for report placement. Do not pass
+                # image URLs/object keys to LLM agents.
                 l2_figs = l2_analysis.extracted_figure_images if l2_analysis else None
                 if l2_figs and isinstance(l2_figs, list):
                     lines = []
@@ -544,10 +599,86 @@ class ContextPackBuilder:
                         lines.append(
                             f"- {fig.get('label', 'Unknown')} (page {fig.get('page_num', '?')}): "
                             f"role={fig.get('semantic_role', 'unknown')}, "
-                            f"caption={fig.get('caption', '')[:80]}, "
-                            f"url={fig.get('public_url', 'N/A')}"
+                            f"type={fig.get('type', 'figure')}, "
+                            f"caption={fig.get('caption', '')[:120]}"
                         )
                     sections.append(f"[Available Figures ({len(l2_figs)})]\n" + "\n".join(lines))
+
+            elif item == "lineage_positioning_context":
+                parts = []
+                rel_rows = (await self.session.execute(text("""
+                    SELECT pr.relation_type, pr.confidence, pr.evidence,
+                           pr.ref_title_raw, tp.title AS target_title,
+                           tp.method_family AS target_method
+                    FROM paper_relations pr
+                    LEFT JOIN papers tp ON tp.id = pr.target_paper_id
+                    WHERE pr.source_paper_id = :pid
+                    ORDER BY pr.relation_type, pr.confidence DESC NULLS LAST
+                    LIMIT 20
+                """), {"pid": paper_id})).fetchall()
+                if rel_rows:
+                    parts.append("Paper relations already materialized:")
+                    for r in rel_rows:
+                        target = r.target_title or r.ref_title_raw or "unknown target"
+                        method = f" / method={r.target_method}" if r.target_method else ""
+                        conf = f" / conf={r.confidence}" if r.confidence is not None else ""
+                        evidence = f" / evidence={(r.evidence or '')[:120]}" if r.evidence else ""
+                        parts.append(f"- {r.relation_type}: {target}{method}{conf}{evidence}")
+
+                facet_rows = (await self.session.execute(text("""
+                    SELECT tn.dimension, tn.name, pf.facet_role, pf.confidence
+                    FROM paper_facets pf
+                    JOIN taxonomy_nodes tn ON tn.id = pf.node_id
+                    WHERE pf.paper_id = :pid
+                    ORDER BY tn.dimension, pf.facet_role, tn.name
+                    LIMIT 40
+                """), {"pid": paper_id})).fetchall()
+                if facet_rows:
+                    parts.append("Paper facets:")
+                    for r in facet_rows:
+                        parts.append(
+                            f"- {r.dimension}/{r.facet_role}: {r.name}"
+                            f" (conf={r.confidence})"
+                        )
+
+                method_rows = []
+                if paper and paper.method_family:
+                    method_rows = (await self.session.execute(text("""
+                        SELECT m.id, m.name, m.type, m.maturity, m.domain,
+                               m.description, parent.name AS parent_name,
+                               kp.one_liner, kp.short_intro_md
+                        FROM method_nodes m
+                        LEFT JOIN method_nodes parent ON parent.id = m.parent_method_id
+                        LEFT JOIN kb_node_profiles kp
+                          ON kp.entity_type = 'method_node'
+                         AND kp.entity_id = m.id
+                         AND kp.lang = 'zh'
+                        WHERE lower(m.name) = lower(:method)
+                           OR EXISTS (
+                               SELECT 1
+                               FROM unnest(coalesce(m.aliases, ARRAY[]::text[])) AS a(alias_value)
+                               WHERE lower(a.alias_value) = lower(:method)
+                           )
+                        ORDER BY m.downstream_count DESC NULLS LAST, m.updated_at DESC NULLS LAST
+                        LIMIT 5
+                    """), {"method": paper.method_family})).fetchall()
+                if method_rows:
+                    parts.append("Method node/profile matches:")
+                    for r in method_rows:
+                        desc = r.one_liner or r.description or r.short_intro_md or ""
+                        parent = f" / parent={r.parent_name}" if r.parent_name else ""
+                        parts.append(
+                            f"- {r.name} ({r.type}, {r.maturity})"
+                            f"{parent}: {desc[:180]}"
+                        )
+                elif paper and paper.method_family:
+                    parts.append(
+                        "Method node/profile matches: none verified; use the "
+                        f"paper method_family only: {paper.method_family}"
+                    )
+
+                if parts:
+                    sections.append("[Lineage Positioning Context]\n" + "\n".join(parts))
 
             else:
                 logger.debug("Unhandled paper context item: %s", item)
@@ -603,9 +734,14 @@ class ContextPackBuilder:
                             *conditions,
                             AgentBlackboardItem.is_verified.is_(True),
                         )
+                        .order_by(AgentBlackboardItem.created_at.desc())
                     )
                 ).all()
+                seen_item_types: set[str] = set()
                 for r in rows:
+                    if r.item_type in seen_item_types:
+                        continue
+                    seen_item_types.add(r.item_type)
                     val_str = json.dumps(r.value_json, ensure_ascii=False, indent=1)
                     sections.append(f"[{r.item_type}]\n{val_str}")
                 break

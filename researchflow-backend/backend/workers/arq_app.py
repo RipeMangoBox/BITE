@@ -213,13 +213,15 @@ async def task_parse_batch(ctx: dict, limit: int = 5):
     return {"processed": len(results), "results": results}
 
 
-async def task_pipeline_run(ctx: dict, paper_id: str):
+async def task_pipeline_run(
+    ctx: dict,
+    paper_id: str,
+    force_reanalyze: bool = False,
+):
     """Run the FULL pipeline for an existing paper.
 
-    Use run_for_existing_paper — it runs enrich → parse → shallow agents
-    (shallow_extractor + reference_role) → deep agents → materialize. The
-    earlier version skipped shallow_ingest, so structural papers ended up
-    with empty shallow_extract blackboard, no delta_card, and no facets.
+    Default worker retries remain idempotent. Set force_reanalyze=True only for
+    explicit batch re-analysis jobs that should refresh current L4 reports.
     """
     from uuid import UUID
     from backend.database import async_session
@@ -237,12 +239,16 @@ async def task_pipeline_run(ctx: dict, paper_id: str):
             paper = await session.get(Paper, pid)
             if paper is None:
                 return {"paper_id": paper_id, "skipped": "not_found"}
-            if (paper.state == PaperState.L4_DEEP
+            if (not force_reanalyze
+                    and paper.state == PaperState.L4_DEEP
                     and paper.current_delta_card_id is not None):
                 return {"paper_id": paper_id, "skipped": "already_l4_deep"}
 
             workflow = IngestWorkflow(session)
-            result = await workflow.run_for_existing_paper(pid)
+            result = await workflow.run_for_existing_paper(
+                pid,
+                force_reanalyze=force_reanalyze,
+            )
             await session.commit()
             logger.info(f"Pipeline completed for {paper_id}")
             return result

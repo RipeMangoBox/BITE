@@ -3,8 +3,8 @@
 Replaces both the old pipeline_service.run_full_pipeline and V6 run_full_v6_pipeline.
 
 Complete flow:
-  import_and_score → enrich_and_prepare (metadata+pdf+parse) → shallow_ingest
-  → deep_ingest (agents+graph+report) → discover_neighborhood
+  import_and_score → enrich_and_prepare (metadata+pdf+parse) → analysis_agent
+  → deterministic materialization → writer_agent → discover_neighborhood
 
 Each phase is independently retryable. Score gates prevent low-value papers
 from consuming resources; force_ingest bypasses gates for top-conference papers.
@@ -40,6 +40,208 @@ class IngestWorkflow:
         self.runner = AgentRunner(session)
         self.ctx_builder = ContextPackBuilder(self.session)
 
+    @staticmethod
+    def _analysis_projection(analysis_result: dict) -> dict:
+        """Project the two-agent truth output into DB-compatible item types.
+
+        Downstream materialization services still consume stable blackboard
+        item_type names such as shallow_extract and graph_candidates. These are
+        compatibility projections of analysis_agent output, not separate agent
+        runs.
+        """
+        paper_essence = analysis_result.get("paper_essence", {}) or {}
+        method_delta = analysis_result.get("method_delta", {}) or {}
+        deep_analysis = analysis_result.get("deep_analysis", {}) or {}
+        return {
+            "shallow_extract": {
+                "paper_essence": paper_essence,
+                "method_delta": method_delta,
+            },
+            "reference_role_map": analysis_result.get("reference_role_map", {}) or {},
+            "deep_analysis": deep_analysis,
+            "graph_candidates": analysis_result.get("graph_candidates", {}) or {},
+            "kb_profiles": analysis_result.get("kb_profiles", {}) or {},
+        }
+
+    async def _write_compat_blackboard_items(
+        self,
+        *,
+        paper_id: UUID,
+        source_run_id: UUID,
+        projected: dict,
+    ) -> None:
+        from backend.models.agent import AgentBlackboardItem
+
+        for item_type, value in projected.items():
+            if not value:
+                continue
+            self.session.add(AgentBlackboardItem(
+                run_id=source_run_id,
+                paper_id=paper_id,
+                item_type=item_type,
+                value_json=value,
+                producer_agent="analysis_agent",
+                is_verified=False,
+            ))
+        await self.session.flush()
+
+    async def _latest_agent_run_id(self, paper_id: UUID, agent_name: str) -> UUID | None:
+        from sqlalchemy import select
+        from backend.models.agent import AgentRun
+
+        return (await self.session.execute(
+            select(AgentRun.id)
+            .where(AgentRun.paper_id == paper_id, AgentRun.agent_name == agent_name)
+            .order_by(AgentRun.started_at.desc())
+            .limit(1)
+        )).scalar_one_or_none()
+
+    async def _run_analysis_agent(self, paper) -> dict:
+        paper_id = paper.id
+        try:
+            context = await self.ctx_builder.build("analysis_agent", paper_id=paper_id)
+        except Exception as e:
+            logger.warning("Context build failed for analysis_agent/%s: %s", paper_id, e)
+            context = {
+                "user_content": f"Paper: {paper.title}\nAbstract: {paper.abstract or 'N/A'}",
+                "token_budget": 8192,
+            }
+
+        result = await self.runner.run_agent("analysis_agent", context, paper_id=paper_id)
+        run_id = await self._latest_agent_run_id(paper_id, "analysis_agent")
+        if run_id:
+            await self._write_compat_blackboard_items(
+                paper_id=paper_id,
+                source_run_id=run_id,
+                projected=self._analysis_projection(result),
+            )
+        return result
+
+    async def _persist_l3_from_analysis(self, paper_id: UUID, analysis_result: dict) -> None:
+        from sqlalchemy import select
+        from backend.models.analysis import PaperAnalysis
+        from backend.models.enums import AnalysisLevel
+
+        projected = self._analysis_projection(analysis_result)
+        shallow_extract = projected.get("shallow_extract", {})
+        paper_essence = shallow_extract.get("paper_essence", {}) or {}
+        method_delta = shallow_extract.get("method_delta", {}) or {}
+        truth = analysis_result.get("analysis_truth", {}) or {}
+
+        if not paper_essence:
+            return
+
+        old_l3 = (await self.session.execute(
+            select(PaperAnalysis).where(
+                PaperAnalysis.paper_id == paper_id,
+                PaperAnalysis.level == AnalysisLevel.L3_SKIM,
+                PaperAnalysis.is_current.is_(True),
+            )
+        )).scalar_one_or_none()
+        if old_l3:
+            old_l3.is_current = False
+
+        self.session.add(PaperAnalysis(
+            paper_id=paper_id,
+            level=AnalysisLevel.L3_SKIM,
+            model_provider="agent",
+            model_name="analysis_agent",
+            prompt_version="v8_two_agent",
+            schema_version="v3",
+            confidence=0.8,
+            problem_summary=paper_essence.get("problem_statement"),
+            method_summary=paper_essence.get("method_summary"),
+            core_intuition=truth.get("core_insight") or paper_essence.get("core_claim"),
+            changed_slots=[
+                s.get("slot_name", "")
+                for s in method_delta.get("changed_slots", [])
+                if isinstance(s, dict)
+            ],
+            is_plugin_patch=method_delta.get("is_plugin_patch"),
+            worth_deep_read=bool(method_delta.get("should_create_method_node")),
+            confidence_notes=paper_essence.get("evidence_refs"),
+            is_current=True,
+        ))
+        await self.session.flush()
+
+    def _compute_deep_score_from_analysis(
+        self,
+        analysis_result: dict,
+        *,
+        source_type: str = "",
+    ):
+        projected = self._analysis_projection(analysis_result)
+        shallow_extract = projected.get("shallow_extract", {})
+        paper_essence = shallow_extract.get("paper_essence", {}) or {}
+        method_delta = shallow_extract.get("method_delta", {}) or {}
+        ref_role_map = projected.get("reference_role_map", {}) or {}
+        deep_analysis = projected.get("deep_analysis", {}) or {}
+        experiment = deep_analysis.get("experiment", {}) if isinstance(deep_analysis, dict) else {}
+
+        changed_slots = method_delta.get("changed_slots", []) or []
+        evidence_refs = paper_essence.get("evidence_refs", []) or []
+        classifications = ref_role_map.get("classifications", []) or []
+        anchor_baselines = ref_role_map.get("anchor_baselines", []) or []
+        main_results = experiment.get("main_results", []) or []
+        ablations = experiment.get("ablations", []) or []
+
+        has_code = any(
+            isinstance(e, dict) and e.get("basis") == "code_verified"
+            for e in evidence_refs
+        ) or "code" in (paper_essence.get("method_summary") or "").lower()
+        has_ablation = bool(ablations) or len(changed_slots) > 1
+        same_primary_task = bool(paper_essence.get("target_tasks"))
+        has_changed_slots = len(changed_slots) > 0
+        baseline_count = len(method_delta.get("baseline_methods", []) or [])
+        novel_count = sum(
+            1 for s in changed_slots
+            if isinstance(s, dict) and s.get("is_novel")
+        )
+        method_novelty = min(
+            1.0,
+            novel_count * 0.3 + 0.2 * int(method_delta.get("is_structural_change", False)),
+        )
+        evidence_quality = min(
+            1.0,
+            sum(e.get("confidence", 0.5) for e in evidence_refs if isinstance(e, dict))
+            / max(len(evidence_refs), 1),
+        )
+        result_signal = min(1.0, len(main_results) / 3.0)
+
+        deep_signals = {
+            "domain_fit": evidence_quality * 55 + method_novelty * 35 + result_signal * 10,
+            "relation_type": "same_task_prior" if same_primary_task else "",
+            "reusable_knowledge": (
+                50 * int(bool(method_delta.get("should_create_method_node")))
+                + 30 * int(has_changed_slots)
+                + 20 * int(has_ablation)
+            ),
+            "evidence_quality": evidence_quality * 100,
+            "experiment_value": (
+                40 * int(has_ablation)
+                + 30 * int(baseline_count >= 3)
+                + 30 * result_signal
+            ),
+            "has_code": has_code,
+            "has_data": False,
+            "has_model": False,
+            "has_benchmark": bool(main_results),
+            "novelty_freshness": method_novelty * 100,
+            "source_type": source_type,
+            "is_direct_baseline": bool(anchor_baselines),
+            "in_experiment_table": any(
+                isinstance(c, dict) and c.get("role") in {"direct_baseline", "comparison_baseline"}
+                for c in classifications
+            ),
+            "same_primary_task": same_primary_task,
+            "has_changed_slots": has_changed_slots,
+            "has_ablation": has_ablation,
+            "is_baseline": bool(anchor_baselines),
+            "has_strong_ablation": has_ablation and len(changed_slots) >= 2,
+            "fills_graph_gap": False,
+        }
+        return self.engine.compute_deep_ingest_score(deep_signals)
+
     # ── Direct entry for existing papers (bypasses candidate layer) ──
 
     async def run_for_existing_paper(
@@ -48,16 +250,18 @@ class IngestWorkflow:
         *,
         skip_enrich: bool = False,
         skip_parse: bool = False,
+        force_reanalyze: bool = False,
     ) -> dict:
         """Run the full pipeline on a paper already in the papers table.
 
         Bypasses candidate creation/scoring — the paper already exists.
-        Flow: enrich → parse → shallow agents → deep agents → materialize → report
+        Flow: enrich → parse → analysis_agent → materialize → writer_agent
 
         Args:
             paper_id: UUID of existing paper in papers table.
             skip_enrich: Skip metadata enrichment if already done.
             skip_parse: Skip L2 PDF parse if already done.
+            force_reanalyze: Re-materialize/write even when current L4 exists.
 
         Returns:
             Complete pipeline result dict with all phase outcomes.
@@ -90,94 +294,35 @@ class IngestWorkflow:
             except Exception:
                 paper = await self.session.get(Paper, paper_id)
 
-        # Phase 2: Run shallow agents (shallow_extractor + reference_role)
-        # Build context directly from Paper (no candidate needed)
-        agents_run = []
-        agent_results = {}
-
-        shallow_agents = [
-            ("shallow_extractor", "shallow_extract"),
-            ("reference_role", "reference_role_map"),
-        ]
-
-        for agent_name, result_key in shallow_agents:
+        # Phase 2: Run the single analysis truth agent.
+        analysis_result = {}
+        projected = {}
+        try:
+            analysis_result = await self._run_analysis_agent(paper)
+            projected = self._analysis_projection(analysis_result)
+            await self._persist_l3_from_analysis(paper_id, analysis_result)
+            await self.session.flush()
+        except Exception as e:
+            logger.error("analysis_agent failed for %s: %s", paper_id, e)
+            result["phases"]["analysis"] = {"error": str(e)[:200]}
             try:
-                context = await self.ctx_builder.build(
-                    agent_name, paper_id=paper_id,
-                )
-            except Exception as e:
-                logger.warning("Context build failed for %s: %s", agent_name, e)
-                context = {
-                    "user_content": (
-                        f"Paper: {paper.title}\n"
-                        f"Abstract: {paper.abstract or 'N/A'}"
-                    ),
-                    "token_budget": 4096,
-                }
+                await self.session.rollback()
+            except Exception:
+                pass
 
-            try:
-                res = await self.runner.run_agent(
-                    agent_name, context, paper_id=paper_id,
-                )
-                agents_run.append(agent_name)
-                agent_results[result_key] = res
-                await self.session.flush()
-            except Exception as e:
-                logger.error("%s failed for %s: %s", agent_name, paper_id, e)
-                agent_results[result_key] = {}
-                try:
-                    await self.session.rollback()
-                except Exception:
-                    pass
-
-        # Write L3-compatible PaperAnalysis from shallow output
-        shallow_extract = agent_results.get("shallow_extract", {})
-        paper_essence = shallow_extract.get("paper_essence", {})
-        method_delta = shallow_extract.get("method_delta", {})
-
-        if paper_essence:
-            try:
-                from sqlalchemy import select
-                old_l3 = (await self.session.execute(
-                    select(PaperAnalysis).where(
-                        PaperAnalysis.paper_id == paper_id,
-                        PaperAnalysis.level == AnalysisLevel.L3_SKIM,
-                        PaperAnalysis.is_current.is_(True),
-                    )
-                )).scalar_one_or_none()
-                if old_l3:
-                    old_l3.is_current = False
-
-                l3 = PaperAnalysis(
-                    paper_id=paper_id,
-                    level=AnalysisLevel.L3_SKIM,
-                    model_provider="agent",
-                    model_name="shallow_extractor",
-                    prompt_version="v7_unified",
-                    schema_version="v2",
-                    confidence=0.75,
-                    problem_summary=paper_essence.get("problem_statement"),
-                    method_summary=paper_essence.get("method_summary"),
-                    core_intuition=paper_essence.get("core_claim"),
-                    changed_slots=[s.get("slot_name", "") for s in method_delta.get("changed_slots", [])],
-                    is_plugin_patch=method_delta.get("is_plugin_patch"),
-                    worth_deep_read=bool(method_delta.get("should_create_method_node")),
-                    confidence_notes=paper_essence.get("evidence_refs"),
-                    is_current=True,
-                )
-                self.session.add(l3)
-                await self.session.flush()
-            except Exception as e:
-                logger.warning("L3 write failed: %s", e)
-
-        result["phases"]["shallow"] = {
-            "agents_run": agents_run,
+        shallow_extract = projected.get("shallow_extract", {})
+        paper_essence = shallow_extract.get("paper_essence", {}) or {}
+        method_delta = shallow_extract.get("method_delta", {}) or {}
+        result["phases"]["analysis"] = {
+            "agents_run": ["analysis_agent"] if analysis_result else [],
             "has_paper_essence": bool(paper_essence),
             "has_method_delta": bool(method_delta),
+            "has_deep_analysis": bool(projected.get("deep_analysis")),
+            "has_graph_candidates": bool(projected.get("graph_candidates")),
         }
 
-        # Link known references
-        ref_map = agent_results.get("reference_role_map", {})
+        # Link known references from analysis truth.
+        ref_map = projected.get("reference_role_map", {}) or {}
         classifications = ref_map.get("classifications", [])
         try:
             known_result = await self._handle_known_references(
@@ -187,7 +332,7 @@ class IngestWorkflow:
         except Exception as e:
             logger.warning("Known refs failed: %s", e)
 
-        # Commit shallow results before deep phase
+        # Commit analysis truth before materialization/writer phase.
         try:
             await self.session.commit()
         except Exception:
@@ -195,7 +340,10 @@ class IngestWorkflow:
 
         # Phase 3: Deep agents + materialization
         try:
-            deep_result = await self.deep_ingest(paper_id)
+            deep_result = await self.deep_ingest(
+                paper_id,
+                force_reanalyze=force_reanalyze,
+            )
             result["phases"]["deep_ingest"] = deep_result
             await self.session.commit()
         except Exception as e:
@@ -459,13 +607,10 @@ class IngestWorkflow:
     # ── Phase 2: Shallow Ingest ────────────────────────────────────────
 
     async def shallow_ingest(self, candidate_id: UUID) -> dict:
-        """Promote candidate to Paper (L1) and run shallow-phase agents.
+        """Promote candidate to Paper (L1) and run the analysis truth agent.
 
-        Agents run sequentially:
-            1. ShallowPaperAgent → paper_essence
-            2. ReferenceRoleAgent → reference_role_map
-            3. MethodDeltaAgent-lite → method_delta
-            4. ScoreAgent → score_signals
+        The single analysis_agent emits verified truth plus compatibility
+        projections used by deterministic materialization.
 
         Then computes DeepIngestScore and routes:
             >= 88 → enqueue deep_ingest
@@ -487,144 +632,15 @@ class IngestWorkflow:
         paper_id = paper.id
         await self.session.flush()
 
-        agents_run = []
-        agent_results = {}
-
-        # Run shallow agents sequentially (merged: 2 agents instead of 4)
-        shallow_agents = [
-            ("shallow_extractor", "shallow_extract"),
-            ("reference_role", "reference_role_map"),
-        ]
-
-        for agent_name, result_key in shallow_agents:
-            try:
-                context = await self.ctx_builder.build(
-                    agent_name,
-                    paper_id=paper_id,
-                )
-            except Exception as e:
-                logger.warning(
-                    "Context pack build failed for %s/%s: %s",
-                    agent_name, paper_id, e,
-                )
-                context = {
-                    "user_content": (
-                        f"Paper: {paper.title}\n"
-                        f"Abstract: {paper.abstract or 'N/A'}"
-                    ),
-                    "token_budget": 4096,
-                }
-
-            try:
-                result = await self.runner.run_agent(
-                    agent_name, context, paper_id=paper_id,
-                )
-                agents_run.append(agent_name)
-                agent_results[result_key] = result
-            except Exception as e:
-                logger.error(
-                    "%s agent failed for %s: %s", agent_name, paper_id, e,
-                )
-                agent_results[result_key] = {}
-
-        # ── Write L3-compatible PaperAnalysis from shallow_extractor output ──
-        # This replaces the old L3 skim step — shallow_extractor covers the same ground.
-        shallow_extract = agent_results.get("shallow_extract", {})
-        paper_essence = shallow_extract.get("paper_essence", {})
-        method_delta = shallow_extract.get("method_delta", {})
-
-        if paper_essence:
-            try:
-                from backend.models.analysis import PaperAnalysis
-                from backend.models.enums import AnalysisLevel
-                # Mark old L3 as superseded
-                old_l3 = await self.session.execute(
-                    select(PaperAnalysis).where(
-                        PaperAnalysis.paper_id == paper_id,
-                        PaperAnalysis.level == AnalysisLevel.L3_SKIM,
-                        PaperAnalysis.is_current.is_(True),
-                    )
-                )
-                old = old_l3.scalar_one_or_none()
-                if old:
-                    old.is_current = False
-
-                l3_compat = PaperAnalysis(
-                    paper_id=paper_id,
-                    level=AnalysisLevel.L3_SKIM,
-                    model_provider="agent",
-                    model_name="shallow_extractor",
-                    prompt_version="v7_merged",
-                    schema_version="v2",
-                    confidence=0.75,
-                    problem_summary=paper_essence.get("problem_statement"),
-                    method_summary=paper_essence.get("method_summary"),
-                    core_intuition=paper_essence.get("core_claim"),
-                    changed_slots=[s.get("slot_name", "") for s in method_delta.get("changed_slots", [])],
-                    is_plugin_patch=method_delta.get("is_plugin_patch"),
-                    worth_deep_read=bool(method_delta.get("should_create_method_node")),
-                    confidence_notes=paper_essence.get("evidence_refs"),
-                    is_current=True,
-                )
-                self.session.add(l3_compat)
-                await self.session.flush()
-            except Exception as e:
-                logger.warning("L3 compat write failed for %s: %s", paper_id, e)
-
-        # Build deep-ingest signals deterministically
-        ref_role_map = agent_results.get("reference_role_map", {})
-
-        # Derive scoring signals from shallow_extract + reference_role_map
-        changed_slots = method_delta.get("changed_slots", [])
-        evidence_refs = paper_essence.get("evidence_refs", [])
+        analysis_result = await self._run_analysis_agent(paper)
+        await self._persist_l3_from_analysis(paper_id, analysis_result)
+        projected = self._analysis_projection(analysis_result)
+        ref_role_map = projected.get("reference_role_map", {}) or {}
         classifications = ref_role_map.get("classifications", [])
-        anchor_baselines = ref_role_map.get("anchor_baselines", [])
-
-        has_code = any(
-            e.get("basis") == "code_verified" for e in evidence_refs
-        ) or "code" in (paper_essence.get("method_summary") or "").lower()
-        has_ablation = len(changed_slots) > 1  # multiple slots implies ablation likely
-        is_direct_baseline = len(anchor_baselines) > 0
-        same_primary_task = bool(paper_essence.get("target_tasks"))
-        has_changed_slots = len(changed_slots) > 0
-        baseline_count = len(method_delta.get("baseline_methods", []))
-        novel_count = sum(1 for s in changed_slots if s.get("is_novel"))
-        method_novelty = min(1.0, novel_count * 0.3 + 0.2 * int(method_delta.get("is_structural_change", False)))
-        evidence_quality = min(1.0, sum(
-            e.get("confidence", 0.5) for e in evidence_refs
-        ) / max(len(evidence_refs), 1))
-
-        deep_signals = {
-            "domain_fit": evidence_quality * 60 + method_novelty * 40,
-            "relation_type": "same_task_prior" if same_primary_task else "",
-            "reusable_knowledge": (
-                50 * int(bool(method_delta.get("should_create_method_node")))
-                + 30 * int(has_changed_slots)
-                + 20 * int(has_ablation)
-            ),
-            "evidence_quality": evidence_quality * 100,
-            "experiment_value": (
-                40 * int(has_ablation)
-                + 30 * int(baseline_count >= 3)
-                + 30 * int(bool(paper_essence.get("limitations")))
-            ),
-            "has_code": has_code,
-            "has_data": False,
-            "has_model": False,
-            "has_benchmark": False,
-            "novelty_freshness": method_novelty * 100,
-            "source_type": candidate.discovery_source or "",
-            "is_direct_baseline": is_direct_baseline,
-            "in_experiment_table": is_direct_baseline,  # approximation
-            "same_primary_task": same_primary_task,
-            "has_changed_slots": has_changed_slots,
-            "has_ablation": has_ablation,
-            "is_baseline": is_direct_baseline,
-            "has_strong_ablation": has_ablation and len(changed_slots) >= 2,
-            "fills_graph_gap": False,
-        }
-
-        deep_score_result = self.engine.compute_deep_ingest_score(deep_signals)
+        deep_score_result = self._compute_deep_score_from_analysis(
+            analysis_result,
+            source_type=candidate.discovery_source or "",
+        )
         decision = deep_score_result.decision
 
         # Update paper state based on routing
@@ -650,7 +666,7 @@ class IngestWorkflow:
             "paper_id": str(paper_id),
             "deep_ingest_score": deep_score_result.total,
             "decision": decision,
-            "agents_run": agents_run,
+            "agents_run": ["analysis_agent"],
             "known_refs_linked": known_result.get("known_refs_linked", 0),
             "edges_created": known_result.get("edges_created", 0),
         }
@@ -669,18 +685,13 @@ class IngestWorkflow:
         paper_id: UUID,
         *,
         review_needed: bool = False,
+        force_reanalyze: bool = False,
     ) -> dict:
-        """Run deep-phase agents, profile qualifying nodes/edges, generate report.
+        """Materialize analysis truth and run writer_agent.
 
-        Deep agents (sequential, merged):
-            1. DeepAnalyzer → deep_analysis (method + experiment + formulas)
-            2. GraphCandidateAgent → graph_candidates
-
-        Profile agents (batched):
-            3. KBProfiler → node + edge profiles (single call)
-
-        Report agents:
-            4. PaperReportAgent → 10-section structured report
+        The LLM path is two-agent only:
+            1. analysis_agent → analysis_truth and compatibility projections
+            2. writer_agent → 7-section structured report
 
         Returns:
             {paper_id, agents_run, nodes_created, edges_created, report_sections}
@@ -695,7 +706,8 @@ class IngestWorkflow:
         if not paper:
             return {"error": f"Paper {paper_id} not found"}
 
-        # Idempotency guard: skip if L4_DEEP already exists (M1 fix)
+        # Idempotency guard: skip if L4_DEEP already exists unless a batch
+        # re-analysis explicitly asks to refresh materialization/report.
         has_l4 = (await self.session.execute(
             select(PaperAnalysis.id).where(
                 PaperAnalysis.paper_id == paper_id,
@@ -703,7 +715,7 @@ class IngestWorkflow:
                 PaperAnalysis.is_current.is_(True),
             )
         )).scalar_one_or_none()
-        if has_l4:
+        if has_l4 and not force_reanalyze:
             return {
                 "paper_id": str(paper_id),
                 "status": "skipped",
@@ -726,8 +738,12 @@ class IngestWorkflow:
         from backend.models.agent import AgentBlackboardItem
         from sqlalchemy import select as _select
         for _item_type, _result_key in (
+            ("analysis_truth", "analysis_truth"),
             ("shallow_extract", "shallow_extract"),
             ("reference_role_map", "reference_role_map"),
+            ("deep_analysis", "deep_analysis"),
+            ("graph_candidates", "graph_candidates"),
+            ("kb_profiles", "kb_profiles"),
         ):
             row = (await self.session.execute(
                 _select(AgentBlackboardItem)
@@ -741,45 +757,37 @@ class IngestWorkflow:
             if row and row.value_json:
                 agent_results[_result_key] = row.value_json
 
-        # ── Deep agents (sequential, each with own context pack) ──
+        analysis_reused = bool(agent_results.get("analysis_truth"))
+        if not analysis_reused:
+            try:
+                analysis_result = await self._run_analysis_agent(paper)
+                agent_results["analysis_truth"] = analysis_result.get("analysis_truth", {}) or {}
+                agent_results.update(self._analysis_projection(analysis_result))
+                agents_run.append("analysis_agent")
+            except Exception as e:
+                logger.error("analysis_agent failed during deep_ingest for %s: %s", paper_id, e)
+                agent_results.setdefault("analysis_truth", {})
 
-        deep_agents = [
-            ("deep_analyzer", "deep_analysis"),
-            ("graph_candidate", "graph_candidates"),
+        required_analysis = ("analysis_truth", "shallow_extract", "deep_analysis")
+        missing_analysis = [
+            key for key in required_analysis
+            if not agent_results.get(key)
         ]
+        if missing_analysis:
+            return {
+                "paper_id": str(paper_id),
+                "status": "needs_repair",
+                "reason": "analysis_agent_output_missing",
+                "missing": missing_analysis,
+                "agents_run": agents_run,
+                "nodes_created": 0,
+                "edges_created": 0,
+                "report_sections": [],
+                "analysis_projection_reused": analysis_reused,
+                "graph": {},
+            }
 
-        for agent_name, result_key in deep_agents:
-            try:
-                context = await self.ctx_builder.build(
-                    agent_name,
-                    paper_id=paper_id,
-                )
-            except Exception as e:
-                logger.warning(
-                    "Context pack build failed for %s/%s: %s",
-                    agent_name, paper_id, e,
-                )
-                context = {
-                    "user_content": (
-                        f"Paper: {paper.title}\n"
-                        f"Abstract: {paper.abstract or 'N/A'}"
-                    ),
-                    "token_budget": 8192,
-                }
-
-            try:
-                result = await self.runner.run_agent(
-                    agent_name, context, paper_id=paper_id,
-                )
-                agents_run.append(agent_name)
-                agent_results[result_key] = result
-            except Exception as e:
-                logger.error(
-                    "%s agent failed for %s: %s", agent_name, paper_id, e,
-                )
-                agent_results[result_key] = {}
-
-        # ── Scoring & Profile agents (batched into single LLM call) ──
+        # ── Deterministic scoring from analysis truth ──
 
         graph_candidates = agent_results.get("graph_candidates", {})
 
@@ -833,28 +841,9 @@ class IngestWorkflow:
             if edge_score.total >= 70:
                 qualifying_edges.append(edge_cand)
 
-        # Run batched KBProfiler for all qualifying candidates (single LLM call)
-        if qualifying_nodes or qualifying_edges:
-            try:
-                import json
-                profile_context = {
-                    "user_content": (
-                        f"Paper: {paper.title}\n\n"
-                        f"Node candidates to profile ({len(qualifying_nodes)}):\n"
-                        f"{json.dumps(qualifying_nodes, ensure_ascii=False, default=str)}\n\n"
-                        f"Edge candidates to profile ({len(qualifying_edges)}):\n"
-                        f"{json.dumps(qualifying_edges, ensure_ascii=False, default=str)}"
-                    ),
-                    "token_budget": 8192,
-                }
-                profile_result = await self.runner.run_agent(
-                    "kb_profiler", profile_context, paper_id=paper_id,
-                )
-                agents_run.append("kb_profiler")
-                nodes_created = len(profile_result.get("node_profiles", []))
-                edges_created = len(profile_result.get("edge_profiles", []))
-            except Exception as e:
-                logger.error("kb_profiler agent failed: %s", e)
+        kb_profiles = agent_results.get("kb_profiles", {}) or {}
+        nodes_created = len(kb_profiles.get("node_profiles", []) or [])
+        edges_created = len(kb_profiles.get("edge_profiles", []) or [])
 
         # ── Phase 3A: Materialize agent outputs to DeltaCard/GraphAssertion ──
         delta_card_result = {}
@@ -895,16 +884,31 @@ class IngestWorkflow:
                 logger.warning("KB profile persistence failed: %s", e)
 
         # ── Phase 3C: Paper report (AFTER materialization, from verified blackboard) ──
-        if delta_card_result and delta_card_result.get("delta_card_id"):
+        verified_analysis_ready = bool(
+            agent_results.get("analysis_truth")
+            and agent_results.get("shallow_extract")
+            and agent_results.get("deep_analysis")
+        )
+        if delta_card_result and delta_card_result.get("delta_card_id") and verified_analysis_ready:
+            # Materialize paper-paper relations before writer runs so
+            # lineage_positioning can use deterministic DB context instead of
+            # only raw graph-candidate prose.
+            try:
+                await self._materialize_paper_relations_and_baselines(
+                    paper_id,
+                    delta_card_result,
+                )
+            except Exception as e:
+                logger.warning(
+                    "Pre-writer paper relation materialization failed for %s: %s",
+                    paper_id, e,
+                )
             try:
                 metadata_block = self._build_paper_metadata_block(paper)
 
-                # Build context from verified blackboard items via ContextPackBuilder.
-                # The "paper_report" pack uses ALL_VERIFIED to query only is_verified=True
-                # items, and already includes report_section_schema, selected_evidence,
-                # and figure_image_metadata — no raw agent_results fallback.
+                # Build context from verified analysis truth via ContextPackBuilder.
                 report_ctx = await self.ctx_builder.build(
-                    "paper_report", paper_id=paper_id,
+                    "writer_agent", paper_id=paper_id,
                 )
                 verified_content = report_ctx.get("user_content", "")
                 token_budget = report_ctx.get("token_budget", 8192)
@@ -920,21 +924,21 @@ class IngestWorkflow:
                     "token_budget": token_budget,
                 }
                 report_result = await self.runner.run_agent(
-                    "paper_report", report_context, paper_id=paper_id,
+                    "writer_agent", report_context, paper_id=paper_id,
                 )
-                agents_run.append("paper_report")
+                agents_run.append("writer_agent")
                 agent_results["paper_report"] = report_result
                 secs = report_result.get("sections", [])
                 report_sections = [s.get("section_type", "") for s in secs] if isinstance(secs, list) else []
             except Exception as e:
-                logger.error("paper_report agent failed for %s: %s", paper_id, e)
+                logger.error("writer_agent failed for %s: %s", paper_id, e)
         else:
             logger.warning(
-                "Skipping paper_report for %s: materialization did not produce a DeltaCard", paper_id,
+                "Skipping writer_agent for %s: materialization/verified analysis gate not satisfied", paper_id,
             )
 
         # ── Phase 3D: Persist paper report to tables ──
-        report_result_data = agent_results.get("paper_report") if "paper_report" in agents_run else None
+        report_result_data = agent_results.get("paper_report") if "writer_agent" in agents_run else None
         if not report_result_data:
             # Try loading from blackboard
             try:
@@ -960,40 +964,7 @@ class IngestWorkflow:
             except Exception as e:
                 logger.warning("Paper report persistence failed: %s", e)
 
-        # ── Phase 3E: Materialize paper-paper relations from reference_role_map ──
-        try:
-            from backend.services.paper_relation_service import materialize_for_paper
-            rel_stats = await materialize_for_paper(self.session, paper_id)
-            logger.info("Paper relations materialized for %s: %s", paper_id, rel_stats)
-
-            # Merge LLM-identified direct baselines into DeltaCard.baseline_paper_ids (M3 fix)
-            if delta_card_result and delta_card_result.get("delta_card_id"):
-                try:
-                    from backend.models.delta_card import DeltaCard
-                    from backend.models.paper_relation import PaperRelation
-                    dc = await self.session.get(DeltaCard, UUID(delta_card_result["delta_card_id"]))
-                    if dc:
-                        baseline_rows = (await self.session.execute(
-                            select(PaperRelation.target_paper_id).where(
-                                PaperRelation.source_paper_id == paper_id,
-                                PaperRelation.relation_type == "direct_baseline",
-                            )
-                        )).scalars().all()
-                        if baseline_rows:
-                            existing = set(dc.baseline_paper_ids or [])
-                            new_ids = [pid for pid in baseline_rows if pid not in existing]
-                            if new_ids:
-                                merged = list(existing) + new_ids
-                                dc.baseline_paper_ids = merged
-                                await self.session.flush()
-                                logger.info(
-                                    "Merged %d baseline paper IDs into DeltaCard %s",
-                                    len(new_ids), dc.id,
-                                )
-                except Exception as e:
-                    logger.warning("Baseline merge into DeltaCard failed: %s", e)
-        except Exception as e:
-            logger.warning("Paper relation materialization failed for %s: %s", paper_id, e)
+        # ── Phase 3E: Paper-paper relations were materialized before writer ──
 
         # ── Phase 3F: Promote baseline references (multi-source search + ingest) ──
         # For each baseline-role ref the agent identified, ensure the target
@@ -1017,8 +988,48 @@ class IngestWorkflow:
             "nodes_created": nodes_created,
             "edges_created": edges_created,
             "report_sections": report_sections,
+            "analysis_projection_reused": analysis_reused,
             "graph": delta_card_result,
         }
+
+    async def _materialize_paper_relations_and_baselines(
+        self,
+        paper_id: UUID,
+        delta_card_result: dict,
+    ) -> dict:
+        """Materialize reference-role relations and merge direct baselines."""
+        from sqlalchemy import select
+        from backend.services.paper_relation_service import materialize_for_paper
+        from backend.models.delta_card import DeltaCard
+        from backend.models.paper_relation import PaperRelation
+
+        rel_stats = await materialize_for_paper(self.session, paper_id)
+        logger.info("Paper relations materialized for %s: %s", paper_id, rel_stats)
+
+        if not delta_card_result or not delta_card_result.get("delta_card_id"):
+            return rel_stats
+
+        dc = await self.session.get(DeltaCard, UUID(delta_card_result["delta_card_id"]))
+        if not dc:
+            return rel_stats
+
+        baseline_rows = (await self.session.execute(
+            select(PaperRelation.target_paper_id).where(
+                PaperRelation.source_paper_id == paper_id,
+                PaperRelation.relation_type == "direct_baseline",
+            )
+        )).scalars().all()
+        if baseline_rows:
+            existing = set(dc.baseline_paper_ids or [])
+            new_ids = [pid for pid in baseline_rows if pid not in existing]
+            if new_ids:
+                dc.baseline_paper_ids = list(existing) + new_ids
+                await self.session.flush()
+                logger.info(
+                    "Merged %d baseline paper IDs into DeltaCard %s",
+                    len(new_ids), dc.id,
+                )
+        return rel_stats
 
     async def _materialize_to_graph(self, paper, agent_results: dict) -> dict:
         """Convert agent outputs to DeltaCard → GraphAssertions.
@@ -1084,7 +1095,8 @@ class IngestWorkflow:
                     "claim": ref.get("claim", ""),
                     "confidence": ref.get("confidence", 0.5),
                     "basis": ref.get("basis", "text_stated"),
-                    "source_section": ref.get("reasoning", ""),
+                    "source_section": "analysis_truth",
+                    "source_quote": ref.get("reasoning", ""),
                 }
                 for ref in paper_essence.get("evidence_refs", [])
             ],
@@ -1372,10 +1384,16 @@ class IngestWorkflow:
         main_results = experiment.get("main_results", [])
         seen_datasets = set()
         for result in main_results[:5]:
-            benchmark = result.get("benchmark", "")
-            if benchmark and benchmark not in seen_datasets:
-                seen_datasets.add(benchmark)
-                ds_node = await get_or_create_taxnode(benchmark, "dataset")
+            dataset_name = (
+                result.get("benchmark")
+                or result.get("benchmark_name")
+                or result.get("dataset_name")
+                or result.get("dataset")
+                or ""
+            )
+            if dataset_name and dataset_name not in seen_datasets:
+                seen_datasets.add(dataset_name)
+                ds_node = await get_or_create_taxnode(dataset_name, "dataset")
                 await add_facet(paper.id, ds_node.id, "dataset")
 
         await self.session.flush()
@@ -1383,9 +1401,9 @@ class IngestWorkflow:
     # ── Persistence: KB profiles → tables ────────────────────────────
 
     async def _persist_kb_profiles(self, paper_id: UUID, graph_candidates: dict):
-        """Persist kb_profiler agent output to KBNodeProfile / KBEdgeProfile tables.
+        """Persist analysis_agent profile projections to KB profile tables.
 
-        Reads profiles from the blackboard and writes to the persistent tables
+        Reads `kb_profiles` from the blackboard and writes to the persistent tables
         used by vault_export and the MCP server.
         """
         from sqlalchemy import select as sa_select
@@ -1657,6 +1675,7 @@ class IngestWorkflow:
         from backend.models.kb import PaperReport, PaperReportSection
         from backend.models.analysis import PaperAnalysis
         from backend.models.enums import AnalysisLevel
+        from sqlalchemy import func
         from sqlalchemy import select as sa_select
 
         title_zh = report_data.get("title_zh", "")
@@ -1678,11 +1697,28 @@ class IngestWorkflow:
         if missing:
             logger.warning("Paper %s report missing sections: %s", paper_id, missing)
 
+        version_result = await self.session.execute(
+            sa_select(func.coalesce(func.max(PaperReport.report_version), 0))
+            .where(PaperReport.paper_id == paper_id)
+        )
+        next_version = int(version_result.scalar_one() or 0) + 1
+
+        old_current = (await self.session.execute(
+            sa_select(PaperReport).where(
+                PaperReport.paper_id == paper_id,
+                PaperReport.review_status == "current",
+            )
+        )).scalars().all()
+        for old in old_current:
+            old.review_status = "superseded"
+
         # Create PaperReport
         report = PaperReport(
             paper_id=paper_id,
+            report_version=next_version,
             title_zh=title_zh,
             title_en=title_en,
+            review_status="current",
         )
         self.session.add(report)
         await self.session.flush()
@@ -1743,9 +1779,9 @@ class IngestWorkflow:
                     paper_id=paper_id,
                     level=AnalysisLevel.L4_DEEP,
                     model_provider="agent",
-                    model_name="paper_report",
-                    prompt_version="v7_unified",
-                    schema_version="v2",
+                    model_name="writer_agent",
+                    prompt_version="v8_two_agent",
+                    schema_version="v3",
                     full_report_md=full_report_md,
                     is_current=True,
                 )

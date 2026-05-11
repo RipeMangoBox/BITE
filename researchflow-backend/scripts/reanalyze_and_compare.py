@@ -5,7 +5,7 @@ Usage:
 
 Workflow:
     1. Snapshot current paper state (before)
-    2. Run IngestWorkflow.run_for_existing_paper() — fresh analysis
+    2. Run IngestWorkflow.run_for_existing_paper(force_reanalyze=True)
     3. Snapshot new paper state (after)
     4. Diff and report improvements/regressions
 """
@@ -155,9 +155,14 @@ async def snapshot_paper(session, paper_id: UUID) -> dict:
         FROM paper_report_sections prs
         JOIN paper_reports pr ON pr.id = prs.report_id
         WHERE pr.paper_id = :pid
+          AND pr.review_status = 'current'
     """), {"pid": paper_id})).fetchone()
+    report_versions = (await session.execute(text("""
+        SELECT count(*) FROM paper_reports WHERE paper_id = :pid
+    """), {"pid": paper_id})).scalar()
     snap["paper_report"] = {
         "reports": row.reports or 0,
+        "total_versions": report_versions or 0,
         "sections": row.sections or "",
         "section_count": len(row.sections.split(",")) if row.sections else 0,
     }
@@ -268,7 +273,10 @@ async def reanalyze_paper(session, paper_id: UUID) -> dict:
     from backend.services.ingest_workflow import IngestWorkflow
 
     workflow = IngestWorkflow(session)
-    result = await workflow.run_for_existing_paper(paper_id)
+    result = await workflow.run_for_existing_paper(
+        paper_id,
+        force_reanalyze=True,
+    )
     await session.commit()
     return result
 
@@ -328,7 +336,8 @@ async def main(args):
                 results[str(pid)] = {"before": before, "after": None, "diff": None}
                 continue
 
-            # 2. Re-analyze (fresh, not referencing old data)
+            # 2. Re-analyze. This explicitly bypasses the L4 idempotency guard
+            # so existing papers receive a new materialization/report version.
             try:
                 pipeline_result = await reanalyze_paper(session, pid)
                 if "error" in pipeline_result:

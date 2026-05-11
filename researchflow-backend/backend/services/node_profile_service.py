@@ -1,7 +1,6 @@
 """Node profile generation and management.
 
-Generates structured profiles for T/M/C/D/L/Lab nodes.
-Profiles are evidence-based, not hallucinated.
+Generates structured profiles for T/M/C/D/L/Lab nodes from DB evidence.
 """
 
 import logging
@@ -11,8 +10,6 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.models.kb import KBNodeProfile
-from backend.services.agent_runner import AgentRunner
-from backend.services.context_pack_builder import ContextPackBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +25,9 @@ async def generate_profile(
     """Generate or refresh a wiki-style profile for a KB node.
 
     Checks for an existing non-stale profile first (unless *force_refresh*).
-    Gathers context from connected papers, edges, and evidence, then runs
-    the ``node_profile`` agent to produce structured content.
+    Gathers context from connected papers, edges, and evidence, then produces
+    a conservative deterministic profile. The former node_profile agent is no
+    longer an active ResearchFlow agent.
 
     Returns the saved / updated :class:`KBNodeProfile` row.
     """
@@ -45,15 +43,7 @@ async def generate_profile(
     # ── Gather context ──────────────────────────────────────────────────
     run_items = await _gather_node_context(session, entity_type, entity_id)
 
-    builder = ContextPackBuilder(session)
-    context = await builder.build(
-        "node_profile",
-        run_items=run_items,
-    )
-
-    # ── Run agent ───────────────────────────────────────────────────────
-    runner = AgentRunner(session)
-    result = await runner.run_agent("node_profile", context)
+    result = _profile_from_context(entity_type, entity_id, run_items)
 
     # ── Persist ─────────────────────────────────────────────────────────
     profile = await get_profile(session, entity_type, entity_id, lang=lang)
@@ -72,6 +62,8 @@ async def generate_profile(
     profile.detailed_md = result.get("detailed_md")
     profile.structured_json = result.get("structured_json")
     profile.evidence_refs = result.get("evidence_refs")
+    profile.model_name = "deterministic_profile"
+    profile.prompt_version = "v1_two_agent_cleanup"
     profile.staleness_trigger_count = 0
     profile.profile_version = (profile.profile_version or 0) + 1
     profile.review_status = "auto"
@@ -170,6 +162,73 @@ async def get_profile(
 # ── Private Helpers ─────────────────────────────────────────────────────
 
 
+def _profile_from_context(entity_type: str, entity_id: UUID, run_items: dict) -> dict:
+    metadata = run_items.get("node_metadata") or {}
+    papers = run_items.get("connected_papers") or []
+    edges = run_items.get("connected_edges") or []
+
+    name = metadata.get("name") or metadata.get("name_zh") or str(entity_id)
+    label = metadata.get("name_zh") or name
+    node_type = metadata.get("node_type") or entity_type
+    evidence_count = len(papers)
+
+    venues: list[str] = []
+    for paper in papers:
+        venue = (paper.get("venue") or "").strip()
+        if venue and venue not in venues:
+            venues.append(venue)
+    venue_text = "，主要来源：" + "、".join(venues[:3]) if venues else ""
+
+    one_liner = f"{label} 是一个 {node_type} 知识节点，目前由 {evidence_count} 篇论文支撑。"
+    intro = f"{one_liner}{venue_text}"
+    if metadata.get("one_liner"):
+        intro += f"\n\n{metadata['one_liner']}"
+
+    paper_lines = []
+    for paper in papers[:10]:
+        title = (paper.get("title") or "").strip()
+        if not title:
+            continue
+        suffix_parts = [str(v) for v in (paper.get("venue"), paper.get("year")) if v]
+        suffix = f" ({', '.join(suffix_parts)})" if suffix_parts else ""
+        paper_lines.append(f"- {title}{suffix}")
+
+    edge_lines = []
+    for edge in edges[:10]:
+        relation = edge.get("relation_type") or "related_to"
+        target = edge.get("target_type") or edge.get("source_type") or "node"
+        edge_lines.append(f"- {relation}: {target}")
+
+    detailed_parts = ["## 支撑论文\n", "\n".join(paper_lines) if paper_lines else "暂无已连接论文。"]
+    if edge_lines:
+        detailed_parts.extend(["\n\n## 关联关系\n", "\n".join(edge_lines)])
+
+    return {
+        "one_liner": one_liner,
+        "short_intro_md": intro,
+        "detailed_md": "".join(detailed_parts),
+        "structured_json": {
+            "profile_source": "deterministic_db_evidence",
+            "entity_type": entity_type,
+            "node_type": node_type,
+            "paper_count": evidence_count,
+            "edge_count": len(edges),
+        },
+        "evidence_refs": {
+            "papers": [
+                {
+                    "paper_id": p.get("paper_id"),
+                    "title": p.get("title"),
+                    "venue": p.get("venue"),
+                    "year": p.get("year"),
+                }
+                for p in papers[:10]
+            ],
+            "edges": edges[:10],
+        },
+    }
+
+
 async def _gather_node_context(
     session: AsyncSession,
     entity_type: str,
@@ -177,9 +236,8 @@ async def _gather_node_context(
 ) -> dict:
     """Build run_items dict with node metadata, connected papers, and edges.
 
-    This populates the ``run`` layer items expected by the
-    ``node_profile`` context pack config: node_metadata, connected_papers,
-    connected_edges.
+    This populates node_metadata, connected_papers, and connected_edges for
+    deterministic profile rendering.
     """
     import json
 

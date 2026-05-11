@@ -7,6 +7,7 @@ AgentRun records are created for tracking, and results go to the blackboard.
 import json
 import logging
 import time
+import asyncio
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -24,6 +25,126 @@ class AgentRunner:
     # ── Agent Prompt Templates ───────────────────────────────────────────
 
     AGENT_PROMPTS = {
+        "analysis_agent": {
+            "system": """You are ResearchFlow's single analysis truth agent.
+
+Read the parsed paper text, formulas, tables, figure metadata, references, and graph context together. Produce ONE verified analysis-truth JSON object. Do not write a long narrative report.
+
+Output exactly this JSON shape:
+{
+  "analysis_truth": {
+    "real_bottleneck": str,
+    "causal_knob": str,
+    "capability_delta": str,
+    "core_insight": str,
+    "decisive_evidence": [{"claim": str, "section": str, "confidence": float}]
+  },
+  "paper_essence": {
+    "problem_statement": str,
+    "core_claim": str,
+    "method_summary": str,
+    "main_contributions": [str],
+    "target_tasks": [str],
+    "target_modalities": [str],
+    "training_paradigm": str,
+    "limitations": [str],
+    "evidence_refs": [{"claim": str, "confidence": float, "basis": "code_verified"|"experiment_backed"|"text_stated"|"inferred"|"speculative", "reasoning": str}]
+  },
+  "method_delta": {
+    "proposed_method_name": str,
+    "baseline_methods": [{"name": str, "role": str}],
+    "changed_slots": [{"slot_name": str, "baseline_value": str, "proposed_value": str, "change_type": "replace"|"modify"|"add"|"remove"|"replaced"|"modified"|"added"|"removed", "is_novel": bool}],
+    "is_plugin_patch": bool,
+    "is_structural_change": bool,
+    "should_create_method_node": bool,
+    "creation_reason": str | null,
+    "key_equations": [str]
+  },
+  "reference_role_map": {
+    "classifications": [{"ref_index": str, "ref_title": str, "role": str, "confidence": float, "where_mentioned": [str], "recommended_ingest_level": str, "reason": str}],
+    "anchor_baselines": [str],
+    "method_sources": [str]
+  },
+  "deep_analysis": {
+    "method": {"proposed_method_name": str, "baseline_methods": [dict], "changed_slots": [dict], "new_components": [dict], "pipeline_modules": [dict], "should_create_method_node": bool, "should_create_lineage_edge": bool, "lineage_parent": str | null},
+    "experiment": {"main_results": [dict], "ablations": [dict], "costs": dict, "fairness_assessment": dict},
+    "formulas": {"key_formulas": [dict], "pipeline_figure": dict | null, "figure_roles": [dict], "formula_derivation_steps": [dict]}
+  },
+  "graph_candidates": {
+    "node_candidates": [dict],
+    "edge_candidates": [dict],
+    "lineage_candidates": [dict]
+  },
+  "kb_profiles": {
+    "node_profiles": [dict],
+    "edge_profiles": [dict]
+  }
+}
+
+Rules:
+1. Base every field on provided parse evidence; mark inference through confidence and basis.
+2. Read method and experiment evidence before abstract-level claims.
+3. Preserve exact table/figure/equation anchors when available.
+4. Do not include image URLs or object keys.
+5. Keep node/profile content compact; the writer_agent will produce prose later.
+
+Output ONLY valid JSON, no markdown fences, no commentary.""",
+            "output_schema": "AnalysisTruth",
+            "item_type": "analysis_truth",
+            "phase": "analysis",
+        },
+
+        "writer_agent": {
+            "system": """You are ResearchFlow's writer agent. You write the final paper report from verified analysis truth and parse metadata only.
+
+CRITICAL RULES
+- Do NOT introduce unsupported claims. If evidence is missing, omit the sentence.
+- Write in Chinese with English method/dataset/metric names where natural.
+- Use exact table/figure/equation labels from the provided figure metadata.
+- Do not add paper/project/code URLs; exporter metadata handles links.
+- Total length 4000-7000 Chinese characters across all 7 sections.
+
+Output exactly this JSON shape:
+{
+  "title_zh": str,
+  "title_en": str,
+  "sections": [{"section_type": str, "title": str, "body_md": str}],
+  "figure_placements": [{"marker": str, "preferred_labels": [str], "semantic_role": str, "section_hint": str}]
+}
+
+Required sections, in order:
+1. metadata_overview / 概览
+   Start with a markdown table:
+   | 字段 | 内容 |
+   |------|------|
+   | 中文题名 | ... |
+   | 英文题名 | ... |
+   | 会议/期刊 | ... |
+   | Topic | ... |
+   | Method | ... |
+   | Dataset | ... |
+   | 主要 baseline | ... |
+   After the table, add an Obsidian callout, not a heading:
+   > [!tip] 效果简介
+   > - ...
+   > - ...
+   Use 2-3 bullets with specific performance numbers when available.
+2. background_motivation / 背景与动机
+3. core_innovation / 核心创新
+   Start with: 核心洞察：X，因为 Y，从而使 Z 成为可能。
+4. framework_overview / 整体框架
+   Use {{FIG:pipeline}} or {{FIG:architecture}} only if such a figure exists.
+5. module_formulas / 核心模块与公式推导
+6. experiment_analysis / 实验与分析
+   Use {{TBL:result}}, {{TBL:ablation}}, or {{FIG:result}} for original tables/figures; do not reconstruct complex result tables as markdown tables.
+7. lineage_positioning / 方法谱系与知识库定位
+
+Output ONLY valid JSON, no markdown fences, no commentary.""",
+            "output_schema": "PaperReport",
+            "item_type": "paper_report",
+            "phase": "writer",
+        },
+
         # ── Shallow Phase Agents (merged: shallow_paper + method_delta_lite) ──
 
         "shallow_extractor": {
@@ -369,21 +490,25 @@ SECTION SPEC (7 sections, in order)
    - Do NOT add a links row. Links are handled by metadata/frontmatter/exporter only.
    - NEVER fabricate URLs.
    - NEVER use proxy placeholders, fake github URLs, or guessed project pages.
-   Then add a short subsection heading `### 效果简介` and give 2-3 bullets of 关键性能 (specific numbers).
+   Then add an Obsidian callout, not a heading:
+   > [!tip] 效果简介
+   > - ...
+   > - ...
+   Give 2-3 bullets of 关键性能 (specific numbers).
 
 2. section_type: "background_motivation"   title: "背景与动机"
    body_md (500-900 chars): Open with the PROBLEM in plain language + a concrete example. Then describe HOW 2-3 named existing methods handle it (1-2 sentences each). Then explain WHY they fall short — the SPECIFIC limitation that motivates this paper. End with 1-sentence preview of what this paper does. Be concise; do not restate the abstract. If a motivation/teaser figure exists in figures_available, insert {{FIG:motivation}}.
 
 3. section_type: "core_innovation"   title: "核心创新"
-   body_md (400-700 chars): The ONE key insight in essence. Format: "核心洞察：X，因为 Y，从而使 Z 成为可能。" Then a small "与 baseline 的差异" table (3 cols: 维度 | Baseline | 本文). Do NOT insert figure here.
+   body_md (400-700 chars): The ONE key insight in essence. Format: "核心洞察：X，因为 Y，从而使 Z 成为可能。" This is NOT a TL;DR and NOT a contribution list. It must answer the causal chain: what changed → which bottleneck / constraint / information flow changed → which capability changed. Do NOT repeat the module list, data flow, or abstract-level claims here. Then add a small "与 baseline 的差异" table (3 cols: 维度 | Baseline | 本文). Do NOT insert figure here.
 
 4. section_type: "framework_overview"   title: "整体框架"
-   body_md (700-1100 chars): MUST start with {{FIG:pipeline}} or {{FIG:architecture}} marker (the overall framework diagram). Then describe data flow: input → module A → module B → ... → output. List each major module in 1 sentence (input/output/role). Do NOT draw mermaid / ASCII / pseudo flowcharts. Reader should know ALL components after this section.
+   body_md (700-1100 chars): MUST start with {{FIG:pipeline}} or {{FIG:architecture}} marker (the overall framework diagram). This section is the system overview only: describe data flow `input → module A → module B → ... → output`, and list each major module in 1 sentence (input/output/role). Do NOT explain the deeper causal reason the design works here if that would repeat section 3; keep the focus on architecture and process. Do NOT draw mermaid / ASCII / pseudo flowcharts. Reader should know ALL components after this section.
 
 5. section_type: "module_formulas"   title: "核心模块与公式推导"
    body_md (1200-2200 chars): Pick the 2-3 most important modules. For EACH module use this template:
      ### 模块 N: {名称}（对应框架图 {位置}）
-     **直觉**: 一句话为什么这样设计。
+     **直觉**: 一句话说明该模块试图改变哪个瓶颈/约束。
      **Baseline 公式** ({baseline_name}): $$L_{{base}} = ...$$
      符号: $\\theta$ = ..., ...（只解释关键符号）
      **变化点**: 为什么 baseline 不够 → 改了什么假设/项/权重。
@@ -392,7 +517,7 @@ SECTION SPEC (7 sections, in order)
      $$\\text{{Step 2}}: ... \\quad \\text{{重归一化以保证 Z}}$$
      $$\\text{{最终}}: L_{{final}} = ...$$
      **对应消融**: Table N 显示移除该项 ΔX%。
-   Progress from simplest/most fundamental module to most complex. If the paper doesn't actually derive from a baseline, state the formula then explain each symbol — but always show the baseline form first when one exists. Each module block must be self-contained and causally complete: explain what goes in, what changes, why it matters, and what evidence supports it. Do not paste fragmented sentences from the paper without connecting explanation.
+   Progress from simplest/most fundamental module to most complex. If the paper doesn't actually derive from a baseline, state the formula then explain each symbol — but always show the baseline form first when one exists. Each module block must be self-contained and causally complete: explain what goes in, what changes, which information flow / constraint / distribution is altered, why that matters, and what evidence supports it. Do not paste fragmented sentences from the paper without connecting explanation.
 
 6. section_type: "experiment_analysis"   title: "实验与分析"
    body_md (800-1400 chars):
@@ -427,6 +552,14 @@ Output ONLY valid JSON, no markdown fences, no commentary.""",
             "phase": "report",
         },
         # quality_audit — removed (Phase 2E), replaced by deterministic validation
+    }
+
+    LEGACY_AGENT_PROMPTS = AGENT_PROMPTS.copy()
+    LEGACY_AGENT_PROMPTS.pop("analysis_agent", None)
+    LEGACY_AGENT_PROMPTS.pop("writer_agent", None)
+    AGENT_PROMPTS = {
+        "analysis_agent": AGENT_PROMPTS["analysis_agent"],
+        "writer_agent": AGENT_PROMPTS["writer_agent"],
     }
 
     def __init__(self, session: AsyncSession, llm_service=None):
@@ -500,24 +633,48 @@ Output ONLY valid JSON, no markdown fences, no commentary.""",
                     "Context pack may have failed to load any data."
                 )
 
-            # 3. Call LLM
+            # 3. Call LLM and parse JSON. If the model returns malformed JSON,
+            # first ask for a short JSON repair of the raw output. Only if that
+            # fails do we pay for a full re-analysis completion.
             token_budget = context.get("token_budget", 4096)
             max_output_tokens = min(token_budget, 8192)
 
-            llm_response = await self._call_llm(
-                prompt=user_content,
-                system=system_prompt,
-                max_tokens=max_output_tokens,
-                temperature=0.2,
-                session=self.session,
-                paper_id=paper_id,
-                prompt_version=f"agent_{agent_name}_v1",
-            )
+            llm_response = None
+            result = None
+            for parse_attempt in range(2):
+                llm_response = await self._call_llm(
+                    prompt=user_content,
+                    system=system_prompt,
+                    max_tokens=max_output_tokens,
+                    temperature=0.2,
+                    session=self.session,
+                    paper_id=paper_id,
+                    prompt_version=f"agent_{agent_name}_v1",
+                )
+                try:
+                    result = self._parse_json_response(llm_response.text, agent_name)
+                    break
+                except Exception as parse_error:
+                    repaired = await self._repair_json_with_llm(
+                        agent_name=agent_name,
+                        raw_text=llm_response.text,
+                        max_tokens=max_output_tokens,
+                        paper_id=paper_id,
+                    )
+                    if repaired is not None:
+                        result = repaired
+                        break
+                    if parse_attempt == 0:
+                        logger.warning(
+                            "Agent %s JSON parse and repair failed; retrying full analysis once: %s",
+                            agent_name, parse_error,
+                        )
+                        continue
+                    raise
+            if result is None or llm_response is None:
+                raise RuntimeError(f"Agent {agent_name} produced no parseable result")
 
-            # 4. Parse JSON response
-            result = self._parse_json_response(llm_response.text, agent_name)
-
-            # 5. Save to blackboard
+            # 4. Save to blackboard
             item_type = agent_config["item_type"]
             blackboard_item = AgentBlackboardItem(
                 run_id=run_id,
@@ -530,7 +687,7 @@ Output ONLY valid JSON, no markdown fences, no commentary.""",
             )
             self.session.add(blackboard_item)
 
-            # 6. Update AgentRun — success
+            # 5. Update AgentRun — success
             duration_ms = int((time.monotonic() - start_time) * 1000)
             run.status = "success"
             run.model_name = llm_response.model
@@ -608,6 +765,58 @@ Output ONLY valid JSON, no markdown fences, no commentary.""",
 
     # ── Private Helpers ──────────────────────────────────────────────────
 
+    async def _repair_json_with_llm(
+        self,
+        *,
+        agent_name: str,
+        raw_text: str,
+        max_tokens: int,
+        paper_id: UUID | None,
+    ) -> dict | None:
+        """Repair malformed agent JSON without re-reading the full paper.
+
+        This keeps Scheme A intact while making malformed punctuation cheaper:
+        the repair call sees only the raw broken JSON and must preserve content.
+        If repair fails, callers fall back to the full agent completion.
+        """
+        raw = raw_text.strip()
+        if not raw:
+            return None
+        repair_system = (
+            "You repair malformed JSON produced by a research extraction agent. "
+            "Return ONLY one valid JSON object. Preserve all keys, values, and "
+            "scientific content exactly where possible. Do not add new claims. "
+            "Fix only syntax problems such as missing commas, missing colons, "
+            "bad escaping, trailing commas, markdown fences, or truncation."
+        )
+        repair_prompt = (
+            f"Agent name: {agent_name}\n\n"
+            "Repair this malformed JSON into one valid JSON object:\n\n"
+            f"{raw}"
+        )
+        try:
+            repair_response = await asyncio.wait_for(
+                self._call_llm(
+                    prompt=repair_prompt,
+                    system=repair_system,
+                    max_tokens=max(2048, min(max_tokens, 4096)),
+                    temperature=0.0,
+                    session=self.session,
+                    paper_id=paper_id,
+                    prompt_version=f"repair_{agent_name}_v1",
+                ),
+                timeout=90,
+            )
+            result = self._parse_json_response(repair_response.text, agent_name)
+            logger.warning(
+                "Agent %s: repaired malformed JSON via repair-only LLM call",
+                agent_name,
+            )
+            return result
+        except Exception as exc:
+            logger.warning("Agent %s JSON repair call failed: %s", agent_name, exc)
+            return None
+
     def _parse_json_response(self, text: str, agent_name: str) -> dict:
         """Parse LLM response text as JSON, handling common formatting issues.
 
@@ -656,8 +865,16 @@ Output ONLY valid JSON, no markdown fences, no commentary.""",
                         agent_name,
                     )
                 except json.JSONDecodeError:
-                    # Layer 3: truncation repair (close open braces/brackets)
-                    result = self._repair_truncated_json(cleaned, agent_name)
+                    # Layer 3: common punctuation repairs, then truncation repair.
+                    try:
+                        repaired_common = self._repair_common_json_issues(cleaned)
+                        result = json.loads(repaired_common)
+                        logger.warning(
+                            "Agent %s: recovered via common punctuation repair",
+                            agent_name,
+                        )
+                    except json.JSONDecodeError:
+                        result = self._repair_truncated_json(cleaned, agent_name)
 
         if not isinstance(result, dict):
             raise RuntimeError(
@@ -665,6 +882,20 @@ Output ONLY valid JSON, no markdown fences, no commentary.""",
             )
 
         return result
+
+    @staticmethod
+    def _repair_common_json_issues(text: str) -> str:
+        """Repair a few high-frequency punctuation mistakes in model JSON."""
+        import re as _re
+        repaired = text
+        # Remove trailing commas before object/array close.
+        repaired = _re.sub(r',(\s*[}\]])', r'\1', repaired)
+        # Insert commas between adjacent JSON string/object tokens when omitted.
+        repaired = _re.sub(r'(")\s+(")', r'\1,\n\2', repaired)
+        repaired = _re.sub(r'([}\]])\s+(")', r'\1,\n\2', repaired)
+        repaired = _re.sub(r'(")\s+(\{)', r'\1,\n\2', repaired)
+        repaired = _re.sub(r'([}\]])\s+(\{)', r'\1,\n\2', repaired)
+        return repaired
 
     @staticmethod
     def _fix_invalid_escapes(text: str) -> str:

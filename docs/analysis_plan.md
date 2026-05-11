@@ -27,16 +27,20 @@ selection rule before agents start. A valid batch records:
   `DiscoveryScore >= 75`, venue/year, domain, or explicit paper IDs.
 - Budget: maximum papers, expected depth, and stop conditions.
 - Output target: graph materialization, paper report, profile refresh, or export.
+- Rerun mode: first ingest uses default idempotency; full re-analysis of
+  already-current L4 papers must explicitly set `force_reanalyze=True`.
 
 The minimum batch lifecycle is:
 
 1. Select candidates through backend APIs.
 2. Import and score candidates.
-3. Run shallow analysis for qualified papers.
+3. Run `analysis_agent` for qualified papers.
 4. Promote only papers that pass deterministic deep-ingest gates.
-5. Materialize verified claims into DeltaCard, evidence, and graph tables.
-6. Generate reports/profiles from verified blackboard items.
-7. Export Obsidian/Markdown views only after DB state is complete.
+5. Materialize verified truth into DeltaCard, evidence, and graph tables.
+6. Materialize paper-paper relations and deterministic lineage/facet context.
+7. Generate reports with `writer_agent` from verified blackboard items and the
+   lineage/facet context.
+8. Export Obsidian/Markdown views only after DB state is complete.
 
 ## Agent Execution Constraints
 
@@ -46,17 +50,19 @@ leave enough evidence for downstream agents to audit the result.
 
 | Agent | Required constraint | Promotion gate |
 |-------|---------------------|----------------|
-| shallow_extractor | Extract paper essence and method delta from abstract plus method/experiment excerpts; do not infer unsupported baselines. | Writes paper_essence and method_delta. |
-| reference_role | Classify references from reference list and citation contexts; separate anchor baselines from related work and datasets. | Enables deterministic DeepIngestScore. |
-| deep_analyzer | Read method and experiment evidence before abstract-level claims; extract slots, pipeline, experiments, and formulas with anchors. | Runs only after deep-ingest gate. |
-| graph_candidate | Propose node, edge, and lineage candidates only from prior verified items plus graph summary. | Node score >= 75, edge score >= 70. |
-| kb_profiler | Profile only qualifying graph candidates; batch related nodes/edges without merging unverified concepts. | Writes Chinese node/edge profiles. |
-| paper_report | Build the 10-section report from verified blackboard items; no new unsupported claims. | Requires completed prior agent outputs. |
+| analysis_agent | Read parse text, MinerU reading order, formulas/tables, references, and graph context together; output verified analysis truth plus compatibility projections. | Enables deterministic DeepIngestScore and graph scoring. |
+| writer_agent | Build the 7-section report from latest verified analysis truth, selected evidence, text-only figure metadata, and deterministic lineage/facet context; no new unsupported claims. | Runs only after materialization verifies analysis truth and paper relations. |
+
+Compatibility item types such as `shallow_extract`, `reference_role_map`,
+`deep_analysis`, `graph_candidates`, and `kb_profiles` may still be present in
+`agent_blackboard_items`; they are projections of `analysis_agent` output for
+deterministic materialization services, not separate active agents.
 
 Cross-agent rules:
 
 - Keep steps idempotent. If a step is already complete, reruns must skip or
-  update through the service layer without duplicating records.
+  update through the service layer without duplicating records; only declared
+  re-analysis batches may use `force_reanalyze=True`.
 - Preserve source anchors for claims, formulas, experiments, and baseline
   comparisons.
 - Do not promote a DeltaCard unless `evidence_refs >= 2`.
@@ -73,6 +79,8 @@ Before a batch:
 - Confirm API, worker, PostgreSQL, Redis, and object storage are reachable.
 - Record the batch goal, source, selection rule, budget, and expected output.
 - Check whether the same paper IDs already have completed pipeline steps.
+- For a full rerun of existing L4 papers, confirm `force_reanalyze=True` is set
+  in the batch job or script.
 
 During a batch:
 

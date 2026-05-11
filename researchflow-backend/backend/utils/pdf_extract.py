@@ -96,8 +96,6 @@ def parse_pdf(pdf_path: str | Path) -> ParsedPDF:
     # Extract figure images
     result.figure_images = _extract_figure_images(doc)
 
-    doc.close()
-
     # Parse sections
     result.sections = _extract_sections(result.full_text)
     result.sections_hierarchy = _extract_sections_hierarchical(result.full_text)
@@ -110,6 +108,15 @@ def parse_pdf(pdf_path: str | Path) -> ParsedPDF:
 
     # Extract table captions
     result.tables = _extract_table_captions(result.full_text)
+
+    # Filter raw figure crops after captions are available. This helps avoid
+    # fragmented xref-embedded assets dominating the final export when PyMuPDF
+    # falls back from page-region detection.
+    result.figure_images = _filter_figure_images(
+        result.figure_images, result.figure_captions,
+    )
+
+    doc.close()
 
     # Extract references section
     if "references" in result.sections:
@@ -650,6 +657,43 @@ def _extract_xref_images(doc) -> list[dict]:
                 continue
 
     return images
+
+
+def _filter_figure_images(images: list[dict], captions: list[dict]) -> list[dict]:
+    """Prefer larger, caption-matchable crops over fragmented fallback assets."""
+    if not images:
+        return images
+
+    page_caption_counts: dict[int, int] = {}
+    for cap in captions or []:
+        page = cap.get("page_num")
+        if isinstance(page, int):
+            page_caption_counts[page] = page_caption_counts.get(page, 0) + 1
+
+    preferred = []
+    fallback = []
+    for img in images:
+        width = int(img.get("width") or 0)
+        height = int(img.get("height") or 0)
+        area = width * height
+        method = img.get("extraction_method") or ""
+        page_num = img.get("page_num")
+        has_caption_page = isinstance(page_num, int) and page_caption_counts.get(page_num, 0) > 0
+
+        if method == "page_region":
+            preferred.append(img)
+            continue
+        if has_caption_page and area >= 40_000:
+            preferred.append(img)
+            continue
+        if area >= 120_000:
+            fallback.append(img)
+
+    if preferred:
+        return preferred[:20]
+    if fallback:
+        return fallback[:20]
+    return images[:20]
 
 
 def get_pdf_size_mb(pdf_path: str | Path) -> float:

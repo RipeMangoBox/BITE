@@ -198,12 +198,20 @@ Use one of these exact headings:
 **Semantics: what causal knob did the authors introduce, and what is the core mechanism?**
 
 - overall design philosophy (paradigm shift/innovation point)
+- opening Part II paragraph/subsection should explain the **system-level design**:
+  input/output interface, main stages/modules, and where the method actually inserts its new control knob
 - **Must include an explicit subsection**:
   - `zh`: `### 核心直觉`
   - `en`: `### The "Aha!" Moment`
   - core intuition: what changed → which distributions/constraints/information bottlenecks changed → what capability changed
-  - why this design works (causal explanation, not restatement)
+  - why this design works (causal explanation, not restatement of the system overview)
   - strategic trade-offs (advantages and limits)
+
+Avoid redundancy:
+
+- The opening Part II prose should answer **what the method is structurally**.
+- The required subsection should answer **why that structure works causally**.
+- Do not let both sections repeat the same contribution sentence with minor wording changes.
 
 ### 5. Part III — Evidence & Limits
 

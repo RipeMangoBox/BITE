@@ -25,49 +25,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 
 
 async def _run_reference_role(session, paper_id: UUID) -> dict:
-    """Smoke promotes papers directly into the `papers` table, bypassing
-    `shallow_ingest` (which requires a candidate_id). To still get the
-    reference_role_map blackboard row that baseline_promoter / paper_relation_service
-    depend on, call the agent here using the same pattern as
-    scripts/backfill_paper_relations.py.
+    """Compatibility no-op.
+
+    The smoke path now relies on IngestWorkflow.deep_ingest to run
+    analysis_agent and write reference_role_map as a compatibility projection.
     """
-    from sqlalchemy import text as sa_text
-    from backend.services.agent_runner import AgentRunner
-
-    # Pull GROBID/PyMuPDF references from L2 evidence_spans
-    row = (await session.execute(sa_text("""
-        SELECT evidence_spans
-        FROM paper_analyses
-        WHERE paper_id = :pid AND level = 'l2_parse' AND is_current
-        ORDER BY created_at DESC LIMIT 1
-    """), {"pid": str(paper_id)})).fetchone()
-    if not row or not row[0] or not isinstance(row[0], dict):
-        return {"skipped": "no_l2_evidence_spans"}
-    refs = row[0].get("grobid_references") or []
-    if not refs:
-        return {"skipped": "no_grobid_references"}
-
-    refs_text = "\n".join(
-        f"[{i}] {(r.get('title') or '').strip()[:200]}"
-        for i, r in enumerate(refs[:30], 1)
-        if isinstance(r, dict) and r.get("title")
-    )
-    if not refs_text:
-        return {"skipped": "no_titles_in_refs"}
-
-    user_content = (
-        f"References (numbered, one per line):\n{refs_text}\n\n"
-        "For each reference, classify role and recommended_ingest_level "
-        "per the schema in the system prompt."
-    )
-    runner = AgentRunner(session)
-    try:
-        await runner.run_agent("reference_role",
-                               {"user_content": user_content, "token_budget": 8192},
-                               paper_id=paper_id)
-        return {"agent_ok": True, "n_refs": len(refs)}
-    except Exception as e:
-        return {"agent_error": str(e)[:200]}
+    return {"skipped": "handled_by_analysis_agent", "paper_id": str(paper_id)}
 
 
 async def run_one(paper_id: UUID) -> dict:
@@ -86,8 +49,8 @@ async def run_one(paper_id: UUID) -> dict:
             await session.rollback()
             return {**out, "stage": "enrich", "error": str(e)[:300]}
 
-        # Run reference_role between L2 and deep so that baseline_promoter
-        # and paper_relation_service have data to materialize.
+        # The two-agent workflow writes reference_role_map from analysis_agent
+        # during deep_ingest; keep this key in smoke output for old parsers.
         try:
             rr = await _run_reference_role(session, paper_id)
             await session.commit()

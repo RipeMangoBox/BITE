@@ -36,6 +36,24 @@ async def create_review_task(
     notes: str | None = None,
 ) -> ReviewTask:
     """Create a new review task."""
+    exists = (await session.execute(
+        select(func.to_regclass("public.review_tasks"))
+    )).scalar_one_or_none()
+    if not exists:
+        logger.warning(
+            "Skipping review task creation because public.review_tasks is missing: "
+            "target_type=%s target_id=%s task_type=%s",
+            target_type, target_id, task_type,
+        )
+        return ReviewTask(
+            target_type=target_type,
+            target_id=target_id,
+            task_type=task_type,
+            priority=priority,
+            notes=notes,
+            status="pending",
+        )
+
     task = ReviewTask(
         target_type=target_type,
         target_id=target_id,

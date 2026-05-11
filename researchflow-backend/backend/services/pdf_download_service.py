@@ -23,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.config import settings
 from backend.models.enums import AssetType, PaperState
 from backend.models.paper import Paper, PaperAsset
+from backend.utils.paper_naming import paper_file_slug
 
 logger = logging.getLogger(__name__)
 
@@ -163,7 +164,7 @@ async def download_pdf_to_oss(
     # Build storage key
     category = paper.category or "Uncategorized"
     venue_year = f"{paper.venue}_{paper.year}" if paper.venue and paper.year else "Unknown"
-    filename = f"{paper.title_sanitized or paper.arxiv_id or str(paper_id)[:8]}.pdf"
+    filename = f"{paper_file_slug(paper.title, paper.title_sanitized or paper.arxiv_id or str(paper_id)[:8])}.pdf"
     rel_path = f"{category}/{venue_year}/{filename}"
     object_key = f"papers/raw-pdf/{rel_path}"
 

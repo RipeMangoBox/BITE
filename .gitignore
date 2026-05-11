@@ -40,13 +40,18 @@ TODO.md
 
 # === Paper data (large / personal, not committed) ===
 paperPDFs/
+paperAnalysis/*
+!paperAnalysis/README.md
 paperAnalysis/processing/
-/obsidian-vault
+/obsidian-vault/*
+!/obsidian-vault/README.md
 
 # === PaperBite (separate project) ===
 PaperBite/
 
 # === paperCollection generated outputs (rebuild via papers-build-collection-index skill) ===
+paperCollection/*
+!paperCollection/README.md
 paperCollection/index.jsonl
 paperCollection/_AllPapers.md
 paperCollection/by_task/

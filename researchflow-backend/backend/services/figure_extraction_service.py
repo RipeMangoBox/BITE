@@ -11,6 +11,10 @@ Architecture (no GPU needed):
 
 Total API calls: 1 per paper
 Claude's role: understanding and filtering, NOT coordinate detection
+
+Image uploads to remote LLM/VLM providers are opt-in via
+ALLOW_LLM_IMAGE_UPLOAD=true. When disabled, callers should use deterministic
+PyMuPDF/MinerU outputs instead.
 """
 
 import base64
@@ -46,6 +50,10 @@ async def extract_figures_precise(
 
     Returns list of figure records for PaperAnalysis.extracted_figure_images.
     """
+    if not settings.allow_llm_image_upload:
+        logger.info("Precise figure VLM skipped because ALLOW_LLM_IMAGE_UPLOAD is false")
+        return []
+
     doc = fitz.open(pdf_path)
 
     # Step 1: Detect candidate figure regions

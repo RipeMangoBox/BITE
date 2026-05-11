@@ -12,7 +12,9 @@ import json
 import logging
 from uuid import UUID
 
-from sqlalchemy import select, text
+import uuid
+
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.models.analysis import ParadigmTemplate
@@ -143,11 +145,29 @@ async def _fetch_paradigm(
     if not paradigm:
         return None, []
 
-    slots_result = await session.execute(
-        text("SELECT id, name, description, slot_type, is_required FROM slots WHERE paradigm_id = :pid ORDER BY sort_order"),
-        {"pid": paradigm.id},
-    )
-    slots = [dict(row._mapping) for row in slots_result.fetchall()]
+    raw_slots = getattr(paradigm, "slots", None) or []
+    slots = []
+    if isinstance(raw_slots, dict):
+        for name, info in raw_slots.items():
+            info = info or {}
+            slots.append({
+                "id": str(uuid.uuid4()),
+                "name": name,
+                "description": info.get("description", "") if isinstance(info, dict) else "",
+                "slot_type": info.get("slot_type", "architecture") if isinstance(info, dict) else "architecture",
+                "is_required": info.get("is_required", True) if isinstance(info, dict) else True,
+            })
+    elif isinstance(raw_slots, list):
+        for info in raw_slots:
+            if not isinstance(info, dict) or not info.get("name"):
+                continue
+            slots.append({
+                "id": str(uuid.uuid4()),
+                "name": info["name"],
+                "description": info.get("description", ""),
+                "slot_type": info.get("slot_type", "architecture"),
+                "is_required": info.get("is_required", True),
+            })
     return paradigm, slots
 
 

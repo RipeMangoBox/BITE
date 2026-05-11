@@ -147,6 +147,8 @@ def _run_mineru(pdf_path: Path) -> MinerUResult:
                         "page": -1,
                     })
 
+        result.metadata["figure_paths"] = result.figures
+
         result.success = True
         result.metadata = {
             "pdf_type": ds.classify(),
@@ -154,6 +156,7 @@ def _run_mineru(pdf_path: Path) -> MinerUResult:
             "formula_count": len(result.formulas),
             "table_count": len(result.tables),
             "figure_count": len(result.figures),
+            "figure_paths": result.figures,
         }
 
     return result

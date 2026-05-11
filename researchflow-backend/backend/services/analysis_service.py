@@ -40,9 +40,9 @@ L3_PROMPT_TEMPLATE = """Analyze this paper and return a JSON object with these f
 
 - paper_type: ONE of "method" | "survey" | "benchmark" | "position" | "theoretical" | "dataset"
 - problem_summary: What problem does this paper solve? Distinguish the PAPER'S CLAIM from what experiments actually prove. (2-3 sentences, Chinese)
-- method_summary: What is the core method? What did they ACTUALLY change vs inherit from prior work? (3-5 sentences, Chinese)
+- method_summary: Give a compact system-level method overview. Focus on input/output interface, major modules, and the real design knob relative to prior work. Do NOT explain why it works here; reserve causal explanation for core_intuition. (3-5 sentences, Chinese)
 - evidence_summary: Key experimental results. Are baselines strong and fair? Any cherry-picking? (2-3 sentences, Chinese)
-- core_intuition: The "Aha!" moment — what changed and why it works. (2-3 sentences, Chinese)
+- core_intuition: The "Aha!" moment — use the causal chain `what changed -> which bottleneck / constraint / information flow changed -> which capability changed`. Make this mechanism-level and high-signal. Do NOT restate method_summary. (2-4 sentences, Chinese)
 - narrative_vs_substance: Does the paper's narrative (abstract/intro) match its experimental evidence? Note any discrepancies. (1-2 sentences, Chinese)
 - changed_slots: Array of method slots this paper changes (e.g. ["denoiser", "conditioning", "sampling"]). Empty array [] for surveys/benchmarks.
 - is_plugin_patch: Boolean — is this a small plugin fix or a structural change?

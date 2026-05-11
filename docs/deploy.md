@@ -150,7 +150,7 @@ docker compose exec api python -c \
 |------|---------|
 | Apply migrations | `docker compose run --rm api alembic upgrade head` |
 | Rebuild Obsidian vault | run `vault_export_v6.export_vault` (above) |
-| Rebuild paperCollection index | `python .claude/skills/papers-build-collection-index/scripts/build_paper_collection.py` |
+| Rebuild current Obsidian vault | run `vault_export_v6.export_vault`; this is the canonical 00_Home/dataset/method/domain export |
 | Audit KB quality | `python -m scripts.audit_kb_quality` |
 | Backfill `paper_figures` | `python -m scripts.backfill_paper_figures --commit` |
 | Tail API logs | `docker compose logs -f api` |

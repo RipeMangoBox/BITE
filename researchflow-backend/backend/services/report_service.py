@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.models.analysis import PaperAnalysis
 from backend.models.delta_card import DeltaCard
 from backend.models.enums import AnalysisLevel
+from backend.models.kb import PaperReport, PaperReportSection
 from backend.models.paper import Paper
 from backend.services.llm_service import call_llm
 
@@ -127,10 +128,24 @@ async def generate_report(
         )
         delta_card = dc_result.scalar_one_or_none()
 
+        core_result = await session.execute(
+            select(PaperReportSection.body_md)
+            .join(PaperReport, PaperReport.id == PaperReportSection.report_id)
+            .where(
+                PaperReport.paper_id == pid,
+                PaperReport.review_status == "current",
+                PaperReportSection.section_type == "core_innovation",
+            )
+            .order_by(PaperReportSection.order_index)
+            .limit(1)
+        )
+        core_innovation = core_result.scalar_one_or_none()
+
         papers_data.append({
             "paper": paper,
             "analysis": analysis,
             "delta_card": delta_card,
+            "core_innovation": core_innovation,
         })
 
     if not papers_data:
@@ -204,6 +219,8 @@ def _build_briefing_summaries(papers_data: list[dict]) -> str:
 
         if p.core_operator:
             parts.append(f"Core operator: {p.core_operator[:300]}")
+        if pd.get("core_innovation"):
+            parts.append(f"Core innovation: {pd['core_innovation'][:500]}")
 
         # DeltaCard provides richer structured info than raw analysis
         if dc:

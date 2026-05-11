@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     openai_model: str = ""     # Custom model name override
 
     # VLM max_tokens — Kimi K2.6 需要开大，否则截断
+    # Image upload to remote LLM/VLM providers is opt-in. Text-only analysis is
+    # the default; local figure assets can still be stored/exported.
+    allow_llm_image_upload: bool = False
     vlm_max_tokens_heavy: int = 16384   # 公式页扫描 (多页多公式, 大表格)
     vlm_max_tokens_medium: int = 8192   # 图表分类+遗漏恢复
     vlm_max_tokens_light: int = 4096    # 单图描述/单公式 OCR
@@ -60,6 +63,7 @@ class Settings(BaseSettings):
     paper_analysis_dir: str = "../paperAnalysis"
     paper_pdfs_dir: str = "../paperPDFs"
     paper_collection_dir: str = "../paperCollection"
+    obsidian_vault_dir: str = "../obsidian-vault"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 

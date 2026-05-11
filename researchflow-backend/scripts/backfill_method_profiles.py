@@ -3,7 +3,7 @@
 Mirrors backfill_kb_profiles.py but for method_nodes:
   * Pulls each unprofiled method
   * Gathers up to 6 papers that use that method (via Paper.method_family match)
-  * Builds a synthetic candidate and calls kb_profiler
+  * Builds a conservative deterministic profile from DB evidence
   * Persists short_intro_md + structured_json
 
 The vault method page already prefers `kb_node_profiles.short_intro_md`
@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json as _json
 import logging
 import re
 import time
@@ -29,7 +28,6 @@ from sqlalchemy import text as sa_text
 
 from backend.database import async_session
 from backend.models.kb import KBNodeProfile
-from backend.services.agent_runner import AgentRunner
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -87,6 +85,60 @@ def _build_candidate(method_row, papers) -> dict:
     }
 
 
+def _profile_from_candidate(candidate: dict) -> dict:
+    name = (candidate.get("name") or "").strip()
+    label = (candidate.get("name_zh") or name or "未命名方法").strip()
+    connected = candidate.get("connected_papers") or []
+    evidence_count = candidate.get("evidence_count") or len(connected)
+    domain = candidate.get("domain") or candidate.get("method_type") or "研究方法"
+    description = (candidate.get("existing_description") or "").strip()
+
+    venues = []
+    for paper in connected:
+        venue = (paper.get("venue") or "").strip()
+        if venue and venue not in venues:
+            venues.append(venue)
+    venue_text = "，主要来源：" + "、".join(venues[:3]) if venues else ""
+
+    one_liner = f"{label} 是一个方法节点，目前由知识库中 {evidence_count} 篇论文支撑。"
+    intro = f"{one_liner}{venue_text}"
+    if description:
+        intro += f"\n\n{description}"
+
+    evidence_lines = []
+    for paper in connected[:6]:
+        title = (paper.get("title") or "").strip()
+        claim = (paper.get("claim") or "").strip()
+        if not title:
+            continue
+        suffix = f"：{claim}" if claim else ""
+        evidence_lines.append(f"- {title}{suffix}")
+    detailed = "## 支撑论文\n\n" + ("\n".join(evidence_lines) if evidence_lines else "暂无已连接论文。")
+
+    return {
+        "node_name": name,
+        "one_liner": one_liner,
+        "short_intro_md": intro,
+        "detailed_md": detailed,
+        "structured_json": {
+            "profile_source": "deterministic_db_evidence",
+            "node_type": "method",
+            "method_type": candidate.get("method_type"),
+            "domain": candidate.get("domain"),
+            "evidence_count": evidence_count,
+        },
+        "evidence_refs": [
+            {
+                "title": p.get("title"),
+                "venue": p.get("venue"),
+                "year": p.get("year"),
+                "basis": "connected_papers",
+            }
+            for p in connected[:6]
+        ],
+    }
+
+
 async def _persist(session, method_id: UUID, np: dict) -> None:
     profile = KBNodeProfile(
         entity_type="method_node",
@@ -97,6 +149,8 @@ async def _persist(session, method_id: UUID, np: dict) -> None:
         detailed_md=np.get("detailed_md"),
         structured_json=np.get("structured_json"),
         evidence_refs=np.get("evidence_refs"),
+        model_name="deterministic_profile",
+        prompt_version="v1_two_agent_cleanup",
     )
     session.add(profile)
 
@@ -120,41 +174,14 @@ async def main(batch_size: int, limit: int | None, dry_run: bool) -> None:
             })).fetchall()
             per_method.append((m, papers))
 
-        runner = AgentRunner(session)
         total_persisted = 0
         for i in range(0, len(per_method), batch_size):
             batch = per_method[i:i + batch_size]
-            payload = {
-                "node_candidates": [_build_candidate(m, ps) for (m, ps) in batch],
-                "edge_candidates": [],
-            }
-            user_content = (
-                "Generate node profiles for the following METHOD nodes (not "
-                "tasks or datasets). Each is a research method/algorithm. "
-                "Draw evidence ONLY from connected_papers. Match node_name "
-                "in your output to the candidate `name` exactly.\n\n"
-                f"{_json.dumps(payload, ensure_ascii=False)}"
-            )
-            ctx = {"user_content": user_content, "token_budget": 8192}
             t0 = time.monotonic()
             logger.info("Batch %d-%d / %d", i, i + len(batch), len(per_method))
-            try:
-                result = await runner.run_agent("kb_profiler", ctx)
-            except Exception as e:
-                logger.error("kb_profiler batch failed: %s", str(e)[:200])
-                continue
-
-            np_by_name = {}
-            for np in result.get("node_profiles", []) or []:
-                key = (np.get("node_name") or "").strip().lower()
-                if key:
-                    np_by_name[key] = np
 
             for m, _papers in batch:
-                np = np_by_name.get((m.name or "").lower())
-                if not np or not (np.get("short_intro_md") or np.get("one_liner")):
-                    logger.warning("No usable profile for %s", m.name)
-                    continue
+                np = _profile_from_candidate(_build_candidate(m, _papers))
                 if not dry_run:
                     await _persist(session, m.id, np)
                 total_persisted += 1

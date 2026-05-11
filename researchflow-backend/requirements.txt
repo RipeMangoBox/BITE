@@ -25,6 +25,7 @@ arxiv-to-prompt>=0.13.0      # arXiv TeX source → flattened LaTeX
 
 # HTTP client
 httpx>=0.28.0
+socksio>=1.0.0
 
 # YAML parsing (for frontmatter)
 pyyaml>=6.0.2

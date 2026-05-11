@@ -116,7 +116,7 @@ def test_resolver_TBL_marker_works_without_public_url():
          "caption": "main results"},
     ]
     out = _resolve_figure_markers(body, figures, placements=[])
-    assert "![[assets/figures/papers/x/t1.png]]" in out
+    assert "![Table 1](assets/figures/papers/x/t1.png)" in out
     assert "{{TBL:" not in out
 
 
@@ -210,7 +210,7 @@ def test_render_figure_uses_vault_asset_when_url_missing():
         "vault_asset": "assets/figures/papers/x/Figure_1.png",
         "caption": "Figure 1: Pipeline overview",
     })
-    assert "![[assets/figures/papers/x/Figure_1.png]]" in out
+    assert "![Figure 1](assets/figures/papers/x/Figure_1.png)" in out
     assert "Figure 1 (pipeline): Pipeline overview" in out
     assert "Figure 1: Figure 1:" not in out
 
@@ -246,17 +246,18 @@ def test_acronym_falls_back_to_initialism():
     assert _paper_acronym(p) == "DTN"
 
 
-def test_paper_slug_uses_title_zh_when_present():
+def test_paper_slug_uses_english_file_slug_when_title_zh_present():
     p = _paper(title_zh="运动生成模型", method_family="HY-Motion")
     slug = _paper_slug(p)
-    assert "运动生成模型" in slug
-    assert "HY-Motion" in slug
+    assert slug == "A_Long_Paper_Title_About_Diffusion_Transformers"
+    assert "运动生成模型" not in slug
 
 
-def test_paper_slug_falls_back_to_method_family():
+def test_paper_slug_uses_english_title_not_method_family():
     p = _paper(method_family="MoCap-LLM")
     slug = _paper_slug(p)
-    assert "MoCap-LLM" in slug
+    assert slug == "A_Long_Paper_Title_About_Diffusion_Transformers"
+    assert "MoCap-LLM" not in slug
 
 
 def test_paper_aliases_dedup_and_order():

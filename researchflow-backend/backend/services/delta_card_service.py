@@ -149,18 +149,24 @@ async def persist_evidence_for_card(
 
     Each evidence unit gets both delta_card_id and (later) idea_delta_id.
     """
+    def _short_text(value: str | None, limit: int) -> str | None:
+        if value is None:
+            return None
+        text = str(value).strip()
+        return text[:limit] if text else None
+
     units = []
     for ev in evidence_data:
         unit = EvidenceUnit(
             paper_id=paper_id,
             analysis_id=analysis_id,
             delta_card_id=delta_card_id,
-            atom_type=ev.get("atom_type", "evidence"),
-            claim=ev.get("claim", ""),
-            evidence_type=ev.get("evidence_type"),
+            atom_type=_short_text(ev.get("atom_type", "evidence"), 30) or "evidence",
+            claim=ev.get("claim", "") or "",
+            evidence_type=_short_text(ev.get("evidence_type"), 30),
             causal_strength=ev.get("causal_strength"),
             confidence=ev.get("confidence"),
-            source_section=ev.get("source_section"),
+            source_section=_short_text(ev.get("source_section"), 200),
             source_page=ev.get("source_page"),
             source_quote=ev.get("source_quote"),
             conditions=ev.get("conditions"),

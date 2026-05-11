@@ -9,6 +9,9 @@ No GPU needed. Uses Claude Opus 4.6 API to:
 
 Architecture: GROBID + PyMuPDF (CPU, deterministic) → extract raw content
               → Claude API (cloud, intelligent) → understand and filter
+
+Image uploads are disabled by default. Set ALLOW_LLM_IMAGE_UPLOAD=true only
+when sending figure/table/page images to a remote model is explicitly allowed.
 """
 
 import base64
@@ -51,6 +54,16 @@ async def call_vlm(
 
     Returns: {text: str, input_tokens: int, output_tokens: int, model: str}
     """
+    if images and not settings.allow_llm_image_upload:
+        logger.info("VLM image upload skipped because ALLOW_LLM_IMAGE_UPLOAD is false")
+        return {
+            "text": "",
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "model": model or VLM_MODEL_ROUTINE,
+            "error": "llm_image_upload_disabled",
+        }
+
     if not settings.anthropic_api_key and not settings.openai_api_key:
         return {"text": "[VLM mock — no API key]", "input_tokens": 0, "output_tokens": 0, "model": "mock"}
 
@@ -190,6 +203,9 @@ async def classify_and_describe_figures(
     Only processes top N figures (sorted by size, as larger figures are more likely to be key).
     """
     if not figure_images:
+        return []
+    if not settings.allow_llm_image_upload:
+        logger.info("Figure VLM understanding skipped because ALLOW_LLM_IMAGE_UPLOAD is false")
         return []
 
     # Sort by size (larger = more likely to be important), take top N
@@ -405,6 +421,10 @@ async def extract_table_content(
     Returns:
         [{table_num, caption, markdown, headers, rows, page_num}]
     """
+    if not settings.allow_llm_image_upload:
+        logger.info("Table VLM extraction skipped because ALLOW_LLM_IMAGE_UPLOAD is false")
+        return []
+
     results: list[dict] = []
 
     for item in table_images[:max_tables]:

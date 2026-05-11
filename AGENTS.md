@@ -29,27 +29,19 @@ Layer D: Cross-paper Abstraction (Phase 2)
   canonical_ideas, bottlenecks, lineage
 ```
 
-## 6-Agent Pipeline
+## 2-Agent Pipeline
 
 ```
 Candidate → import_and_score()
-    ↓ (DiscoveryScore ≥ 75 → shallow_ingest)
+    ↓ (DiscoveryScore ≥ 75 → analysis)
 
-Shallow Phase (2 LLM calls):
-  1. shallow_extractor → paper_essence + method_delta
-  2. reference_role → reference classifications + anchor_baselines
-    ↓ (deterministic DeepIngestScore ≥ 88 → deep_ingest)
+Analysis Phase (1 LLM call):
+  1. analysis_agent → analysis_truth + paper_essence + method_delta +
+     reference_role_map + deep_analysis + graph_candidates + kb_profiles
+    ↓ (deterministic DeepIngestScore / graph scoring)
 
-Deep Phase (2 LLM calls):
-  3. deep_analyzer → method slots/pipeline + experiment + formulas
-  4. graph_candidate → node/edge/lineage candidates
-    ↓ (scoring: node ≥ 75, edge ≥ 70)
-
-Profile Phase (1 LLM call):
-  5. kb_profiler → node + edge wiki profiles (batched)
-
-Report Phase (1 LLM call):
-  6. paper_report → 10-section structured report
+Writer Phase (1 LLM call):
+  2. writer_agent → 7-section structured report from verified truth only
 
 Materialization (pure DB):
   _materialize_to_graph() → DeltaCard + EvidenceUnit + GraphAssertion
@@ -58,16 +50,17 @@ Materialization (pure DB):
   reconcile_neighbors() → same_family updates
 ```
 
+`shallow_extract`, `reference_role_map`, `deep_analysis`, `graph_candidates`,
+and `kb_profiles` may still appear as blackboard item types. They are
+compatibility projections written by `analysis_agent`, not separate active
+semantic agent calls in the main ingest workflow.
+
 ## What each Agent needs
 
 | Agent | Input | Output | Token Budget |
 |-------|-------|--------|-------------|
-| shallow_extractor | abstract + intro/method/experiment excerpts | paper_essence + method_delta | 18K |
-| reference_role | reference_list + citation_contexts | classifications + anchor_baselines | 30K |
-| deep_analyzer | full text + L2 formulas + shallow results | method/experiment/formulas | 40K |
-| graph_candidate | all prior outputs + graph summary | node/edge/lineage candidates | 20K |
-| kb_profiler | qualifying candidates | node/edge wiki profiles | 20K |
-| paper_report | ALL verified blackboard items | 10-section report | 80K |
+| analysis_agent | parse text + MinerU reading order + formulas/tables + references + graph schemas | verified analysis truth and compatibility projections | 80K |
+| writer_agent | verified analysis truth + selected evidence + figure metadata | 7-section report | 80K |
 
 ## DB Tables (40 tables)
 

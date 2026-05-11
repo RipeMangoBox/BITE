@@ -1,9 +1,9 @@
-"""Re-run only the paper_report agent for a list of paper_ids.
+"""Re-run only the writer_agent for a list of paper_ids.
 
 Skips L2/L3/L4 re-extraction. Loads existing blackboard items
 (shallow_extract / deep_analysis / reference_role_map / graph_candidates),
 rebuilds the report context with the new figures + metadata blocks, calls the
-paper_report agent, and persists via IngestWorkflow._persist_paper_report.
+writer_agent, and persists via IngestWorkflow._persist_paper_report.
 
 Usage:
     python -m scripts.regenerate_paper_report PAPER_ID [PAPER_ID ...]
@@ -117,7 +117,7 @@ async def regenerate_one(paper_id: UUID) -> dict:
 
         try:
             report_result = await wf.runner.run_agent(
-                "paper_report", report_context, paper_id=paper_id,
+                "writer_agent", report_context, paper_id=paper_id,
             )
         except Exception as e:
             await session.rollback()

@@ -10,6 +10,10 @@ Fallback when no API key:
 
 Optional GROBID enhancement (if available):
   - GROBID coords → precise crops → VLM OCR (higher quality per-formula)
+
+Image uploads to remote LLM/VLM providers are opt-in via
+ALLOW_LLM_IMAGE_UPLOAD=true. MinerU/PyMuPDF/GROBID text paths remain available
+without image upload.
 """
 
 import base64
@@ -47,7 +51,7 @@ async def extract_formulas(
 
     Returns: [{latex, label, page, context, source}]
     """
-    if not (settings.anthropic_api_key or settings.openai_api_key):
+    if not settings.allow_llm_image_upload or not (settings.anthropic_api_key or settings.openai_api_key):
         # No API key — can only return GROBID text if available
         if grobid_formulas:
             return [

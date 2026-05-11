@@ -144,7 +144,7 @@ async def call_llm(
                 paper_id=paper_id,
                 model_provider=resp.provider,
                 model_name=resp.model,
-                prompt_version=prompt_version[:50],  # Prevent varchar overflow
+                prompt_version=prompt_version[:20],  # model_runs.prompt_version is VARCHAR(20)
                 input_tokens=resp.input_tokens,
                 output_tokens=resp.output_tokens,
                 cost_usd=_estimate_cost(resp),
@@ -234,8 +234,112 @@ def _mock_response(prompt: str, system: str) -> LLMResponse:
 
     sys_lower = system.lower()
 
-    if "paper_essence" in sys_lower and "method_delta" in sys_lower:
-        # shallow_extractor agent
+    if "single analysis truth agent" in sys_lower or "analysis_truth" in sys_lower:
+        mock = {
+            "analysis_truth": {
+                "real_bottleneck": "[Mock] Existing methods lose global consistency.",
+                "causal_knob": "[Mock] Replace one-way generation with bidirectional masked reasoning.",
+                "capability_delta": "[Mock] Better quality at similar inference cost.",
+                "core_insight": "[Mock] Bidirectional masked reasoning changes information flow, enabling globally consistent generation.",
+                "decisive_evidence": [
+                    {"claim": "[Mock] SOTA on HumanML3D", "section": "experiments", "confidence": 0.85}
+                ],
+            },
+            "paper_essence": {
+                "problem_statement": "[Mock] The paper addresses a key challenge in the domain.",
+                "core_claim": "[Mock] The proposed method improves global consistency.",
+                "method_summary": "[Mock] A novel approach combining hierarchical representations with masked modeling.",
+                "main_contributions": ["[Mock] Novel architecture", "[Mock] New training recipe"],
+                "target_tasks": ["text-to-motion"],
+                "target_modalities": ["text", "motion"],
+                "training_paradigm": "supervised",
+                "limitations": ["[Mock] Limited to short sequences"],
+                "evidence_refs": [
+                    {"claim": "[Mock] SOTA on HumanML3D", "confidence": 0.8, "basis": "experiment_backed", "reasoning": "Table 1"},
+                    {"claim": "[Mock] Ablation supports masked modeling", "confidence": 0.75, "basis": "experiment_backed", "reasoning": "Table 2"},
+                ],
+            },
+            "method_delta": {
+                "proposed_method_name": "[Mock] ProposedMethod",
+                "baseline_methods": [{"name": "T2M-GPT", "role": "primary_baseline"}],
+                "changed_slots": [
+                    {"slot_name": "generation_backbone", "baseline_value": "autoregressive", "proposed_value": "masked_modeling", "change_type": "replace", "is_novel": True}
+                ],
+                "is_plugin_patch": False,
+                "is_structural_change": True,
+                "should_create_method_node": True,
+                "creation_reason": "[Mock] Novel architecture",
+                "key_equations": ["[Mock] L_mask = CE(x_masked, x_target)"],
+            },
+            "reference_role_map": {
+                "classifications": [
+                    {"ref_index": "[1]", "ref_title": "T2M-GPT", "role": "direct_baseline", "confidence": 0.9, "where_mentioned": ["method", "experiments"], "recommended_ingest_level": "deep", "reason": "Primary baseline"}
+                ],
+                "anchor_baselines": ["[1]"],
+                "method_sources": [],
+            },
+            "deep_analysis": {
+                "method": {
+                    "proposed_method_name": "[Mock] ProposedMethod",
+                    "baseline_methods": [{"name": "T2M-GPT", "role": "primary_baseline", "paper_title": None, "evidence_refs": []}],
+                    "changed_slots": [
+                        {"slot_name": "generation_backbone", "baseline_value": "autoregressive", "proposed_value": "masked_modeling", "change_type": "replaced", "is_novel": True, "evidence_refs": [{"claim": "Section 3.1", "section": "method", "confidence": 0.9}]}
+                    ],
+                    "new_components": [{"name": "[Mock] MaskedTransformer", "description": "Bidirectional masked token predictor", "role_in_pipeline": "core generator"}],
+                    "pipeline_modules": [{"name": "MaskedTransformer", "input": "masked tokens", "output": "predicted tokens", "is_new": True, "replaces": "GPT decoder"}],
+                    "should_create_method_node": True,
+                    "should_create_lineage_edge": True,
+                    "lineage_parent": "T2M-GPT",
+                },
+                "experiment": {
+                    "main_results": [{"benchmark": "HumanML3D", "metric": "FID", "proposed_score": 0.045, "baseline_scores": [{"name": "T2M-GPT", "score": 0.141}], "improvement": "-68%", "is_sota": True, "evidence_refs": [{"table_or_figure": "Table 1", "section": "experiments", "confidence": 0.95}]}],
+                    "ablations": [{"component_removed": "masked modeling", "effect": "FID degrades to 0.228", "delta_value": 0.183, "delta_metric": "FID", "supports_core_claim": True}],
+                    "costs": {"training_compute": None, "inference_latency": None, "model_parameters": None, "gpu_type": None, "training_time": None},
+                    "fairness_assessment": {"are_comparisons_fair": True, "are_baselines_strongest": True, "missing_baselines": [], "potential_issues": [], "overall_evidence_strength": 0.85},
+                },
+                "formulas": {
+                    "key_formulas": [{"latex": "L = CE(x_{masked}, x_{target})", "name": "Masked Modeling Loss", "explanation_zh": "[Mock] 掩码预测训练损失", "slot_affected": "objective", "differs_from_baseline": True, "baseline_formula_latex": None}],
+                    "pipeline_figure": {"description": "[Mock] Tokenizer → Masked Transformer → Decoder", "modules": [{"name": "MaskedTransformer", "role": "generator"}], "flow_description": "Input → Tokenize → Mask → Predict → Decode"},
+                    "figure_roles": [{"fig_ref": "Figure 1", "semantic_role": "pipeline", "description_zh": "[Mock] 方法流程图"}],
+                    "formula_derivation_steps": [],
+                },
+            },
+            "graph_candidates": {
+                "node_candidates": [
+                    {"node_type": "method", "name": "[Mock] ProposedMethod", "name_zh": None, "one_liner": "[Mock] A novel masked modeling approach", "evidence_refs": [{"claim": "Section 3", "section": "method", "confidence": 0.9}], "confidence": 0.85}
+                ],
+                "edge_candidates": [
+                    {"source_type": "paper", "source_ref": "this_paper", "target_type": "method", "target_ref": "[Mock] ProposedMethod", "relation_type": "proposes_method", "slot_name": None, "one_liner": "This paper proposes the method", "evidence_refs": [{"claim": "Abstract", "section": "abstract", "confidence": 0.95}], "confidence": 0.9}
+                ],
+                "lineage_candidates": [{"child_method": "[Mock] ProposedMethod", "parent_method": "T2M-GPT", "relation": "builds_on", "changed_slots": ["generation_backbone"], "evidence": "Section 3"}],
+            },
+            "kb_profiles": {
+                "node_profiles": [
+                    {"node_name": "[Mock] ProposedMethod", "one_liner": "[Mock] 一种新的掩码建模方法", "short_intro_md": "[Mock] 本方法通过掩码建模实现双向注意力。", "detailed_md": "## 概述\n\n[Mock] 详细描述。", "structured_json": {"architecture_type": "transformer"}, "evidence_refs": [{"claim": "Section 3", "source_paper": "this_paper", "confidence": 0.9}]}
+                ],
+                "edge_profiles": [],
+            },
+        }
+    elif "writer agent" in sys_lower or "final paper report" in sys_lower:
+        mock = {
+            "title_zh": "[Mock] 方法深度分析报告",
+            "title_en": "[Mock] Method Analysis Report",
+            "sections": [
+                {"section_type": "metadata_overview", "title": "概览", "body_md": "| 字段 | 内容 |\n|------|------|\n| 中文题名 | [Mock] 方法深度分析报告 |\n| 英文题名 | [Mock] Method Analysis Report |\n| 会议/期刊 | arXiv 2025 |\n| Topic | text-to-motion |\n| Method | [Mock] ProposedMethod |\n| Dataset | HumanML3D |\n| 主要 baseline | T2M-GPT |\n\n> [!tip] 效果简介\n> - HumanML3D FID 达到 0.045，相比 T2M-GPT 的 0.141 降低约 68%。\n> - 移除 masked modeling 后 FID 退化到 0.228。"},
+                {"section_type": "background_motivation", "title": "背景与动机", "body_md": "[Mock] 文本驱动3D运动生成面临质量与多样性的权衡。"},
+                {"section_type": "core_innovation", "title": "核心创新", "body_md": "[Mock] 核心洞察：掩码建模改变 token 间信息流，因为每个 token 能利用双向上下文，从而提升全局一致性。"},
+                {"section_type": "framework_overview", "title": "整体框架", "body_md": "{{FIG:pipeline}}\n\n[Mock] 整体架构分为 tokenizer、masked transformer 和 decoder。"},
+                {"section_type": "module_formulas", "title": "核心模块与公式推导", "body_md": "[Mock]\n### 模块 1: Masked Transformer\n\n$$L = CE(x_{masked}, x_{target})$$"},
+                {"section_type": "experiment_analysis", "title": "实验与分析", "body_md": "{{TBL:result}}\n\n[Mock] HumanML3D FID 达到 0.045。"},
+                {"section_type": "lineage_positioning", "title": "方法谱系与知识库定位", "body_md": "[Mock] 本方法继承 T2M-GPT 的离散表示并替换生成骨干。"},
+            ],
+            "figure_placements": [
+                {"marker": "{{FIG:pipeline}}", "preferred_labels": ["Figure 1"], "semantic_role": "pipeline", "section_hint": "framework_overview"},
+                {"marker": "{{TBL:result}}", "preferred_labels": ["Table 1"], "semantic_role": "result", "section_hint": "experiment_analysis"},
+            ],
+        }
+    elif "paper_essence" in sys_lower and "method_delta" in sys_lower:
+        # legacy shallow_extractor agent
         mock = {
             "paper_essence": {
                 "problem_statement": "[Mock] The paper addresses a key challenge in the domain.",
