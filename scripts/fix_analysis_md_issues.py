@@ -9,8 +9,8 @@ from typing import Dict, List, Optional, Tuple
 
 
 VAULT_ROOT = Path(__file__).resolve().parents[1]
-PAPER_ANALYSIS_DIR = VAULT_ROOT / "paperAnalysis"
-PAPER_PDFS_DIR = VAULT_ROOT / "paperPDFs"
+PAPER_ANALYSIS_DIR = VAULT_ROOT / "obsidian-vault/analysis"
+PAPER_PDFS_DIR = VAULT_ROOT / "obsidian-vault/paperPDFs"
 
 REQUIRED_KEYS = [
     "title",

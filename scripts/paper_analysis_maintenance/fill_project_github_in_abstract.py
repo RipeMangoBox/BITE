@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import re
 from dataclasses import dataclass
 from difflib import SequenceMatcher
@@ -7,8 +8,8 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PAPER_ANALYSIS_DIR = REPO_ROOT / "paperAnalysis"
-LOG_PATH = PAPER_ANALYSIS_DIR / "analysis_log_updated.txt"
+PAPER_ANALYSIS_DIR = REPO_ROOT / "obsidian-vault/analysis"
+LOG_PATH = REPO_ROOT / "obsidian-vault/paper_list.csv"
 
 
 ABSTRACT_HEADER_RX = re.compile(r"^> \[!abstract\].*$", re.M)
@@ -56,18 +57,19 @@ def _extract_abstract_block(md_text: str) -> tuple[int, int, str] | None:
 @dataclass(frozen=True)
 class LogRow:
     title: str
-    link: str  # log column 4 (project/github/homepage)
+    link: str  # project_link_or_github_link
 
 
 def _parse_log() -> list[LogRow]:
     rows: list[LogRow] = []
-    for line in LOG_PATH.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        parts = [x.strip() for x in line.split(" | ")]
-        if len(parts) < 6:
-            continue
-        rows.append(LogRow(title=parts[1], link=parts[3]))
+    with LOG_PATH.open("r", encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            title = (row.get("paper_title") or row.get("title") or "").strip()
+            link = (row.get("project_link_or_github_link") or row.get("project_link") or row.get("github") or "").strip()
+            if not title:
+                continue
+            rows.append(LogRow(title=title, link=link))
     return rows
 
 
@@ -184,4 +186,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

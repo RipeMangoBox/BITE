@@ -5,7 +5,7 @@ Features:
 - Parse a pipe-separated log file with lines like:
   STATUS | Title | Venue | Year | url1 | url2 | topic
 - Detect direct PDF URLs in the fields and optionally download them.
-- Safe file naming and folder mapping: paperPDFs/<topic>/<Venue Year>/Author_Year_Title.pdf
+- Safe file naming and folder mapping: obsidian-vault/paperPDFs/<topic>/<Venue Year>/Author_Year_Title.pdf
 - Dry-run mode prints counts and examples without performing downloads.
 """
 import argparse
@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 try:
     import requests
 except Exception:
-    print("Missing dependency 'requests'. Install with: pip install -r requirements.txt")
+    print("Missing dependency 'requests'. Install with: pip install -r environment/requirements.txt")
     raise
 
 LOG_ENCODING = "utf-8"
@@ -259,7 +259,7 @@ def try_common_paths(base_url):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--log", default="paperPDFs/download_log_updated.txt")
+    p.add_argument("--log", default="obsidian-vault/paperPDFs/download_log_updated.txt")
     p.add_argument("--workers", type=int, default=8)
     p.add_argument("--dry-run", dest="dry_run", action="store_true", default=True)
     p.add_argument("--no-dry-run", dest="dry_run", action="store_false", help="Disable dry-run and perform actions")
@@ -272,14 +272,14 @@ def main():
     for e in wait_entries:
         candidate = choose_pdf_candidate(e["pdf_candidates"])
         if candidate:
-            # build outpath: paperPDFs/<topic>/<venue>/<YEAR_title>.pdf
+            # build outpath: obsidian-vault/paperPDFs/<topic>/<venue>/<YEAR_title>.pdf
             topic = safe_name(e.get("topic") or "Misc")
             venue_raw = (e.get("venue") or "Unknown").strip()
             venue = safe_name(venue_raw)
             # try to extract year from venue (e.g., "NeurIPS 2025")
             m = re.search(r"(19|20)\d{2}", venue_raw)
             year = m.group(0) if m else "unknown"
-            folder = os.path.join("paperPDFs", topic, venue)
+            folder = os.path.join("obsidian-vault/paperPDFs", topic, venue)
             # filename = YEAR_Title
             title = e.get('title') or 'paper'
             base = safe_name(f"{year}_{title}")
@@ -362,7 +362,7 @@ def main():
                         found_pdf = candidate
 
             if found_pdf:
-                outpath = os.path.join('paperPDFs', safe_name(entry.get('topic') or 'Misc'), safe_name(entry.get('venue') or 'Unknown'), safe_name((re.search(r"(19|20)\\d{2}", entry.get('venue') or '') or ['unknown'])[0] + '_' + entry.get('title')) + '.pdf')
+                outpath = os.path.join('obsidian-vault/paperPDFs', safe_name(entry.get('topic') or 'Misc'), safe_name(entry.get('venue') or 'Unknown'), safe_name((re.search(r"(19|20)\\d{2}", entry.get('venue') or '') or ['unknown'])[0] + '_' + entry.get('title')) + '.pdf')
                 ok2, note2 = download_one({"url": found_pdf, "outpath": outpath})
                 if ok2:
                     idx = entry['line_idx']

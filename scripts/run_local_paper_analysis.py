@@ -56,7 +56,7 @@ from scripts.researchflow_local.topic_tags import (
 
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "_private" / "local_analysis_runs"
 DEFAULT_ENV_FILE = REPO_ROOT / ".env"
-LEGACY_PRIVATE_ENV_FILE = REPO_ROOT / "_private" / "researchflow-backend-local" / ".env"
+PRIVATE_ENV_FILE = REPO_ROOT / "_private" / "local_analysis" / ".env"
 DEFAULT_VAULT_ROOT = REPO_ROOT / "obsidian-vault"
 DEFAULT_ASSET_ROOT = DEFAULT_VAULT_ROOT / "assets" / "figures" / "papers"
 DEFAULT_MINERU_BIN = shutil.which("mineru") or "mineru"
@@ -478,8 +478,8 @@ def build_async_openai_client(client_cls: Any, **client_kwargs: Any) -> tuple[An
 
 
 def load_env_file(path: Path) -> None:
-    if path == DEFAULT_ENV_FILE and not path.exists() and LEGACY_PRIVATE_ENV_FILE.exists():
-        path = LEGACY_PRIVATE_ENV_FILE
+    if path == DEFAULT_ENV_FILE and not path.exists() and PRIVATE_ENV_FILE.exists():
+        path = PRIVATE_ENV_FILE
     if not path.exists():
         return
     for raw_line in path.read_text(encoding="utf-8", errors="ignore").splitlines():

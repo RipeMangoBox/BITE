@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Tuple
 
 
 VAULT_ROOT = Path(__file__).resolve().parents[1]
-PAPER_ANALYSIS_DIR = VAULT_ROOT / "paperAnalysis"
+PAPER_ANALYSIS_DIR = VAULT_ROOT / "obsidian-vault/analysis"
 
 
 FRONTMATTER_BOUNDARY = re.compile(r"^---\s*$")
@@ -108,7 +108,7 @@ class Fix:
 def infer_venue_year_from_path(md_path: Path) -> Optional[Tuple[str, str]]:
     """
     Infer (venue, year) from a note's folder structure:
-    paperAnalysis/<task>/<VenueToken_YYYY>/<file>.md
+    obsidian-vault/analysis/<task>/<VenueToken_YYYY>/<file>.md
 
     Examples:
       - .../CVPR_2025/...      -> ("CVPR", "2025")
@@ -122,10 +122,10 @@ def infer_venue_year_from_path(md_path: Path) -> Optional[Tuple[str, str]]:
         return None
 
     parts = rel.split("/")
-    if len(parts) < 4 or parts[0] != "paperAnalysis":
+    if len(parts) < 5 or parts[:2] != ["obsidian-vault", "analysis"]:
         return None
 
-    venue_seg = parts[2]  # e.g. "CVPR_2025"
+    venue_seg = parts[3]  # e.g. "CVPR_2025"
     token = venue_seg.replace("_", " ")  # -> "CVPR 2025" / "SIGGRAPH Asia 2024"
     m = re.match(r"(.+?)\s+(\d{4})$", token)
     if not m:
@@ -256,4 +256,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

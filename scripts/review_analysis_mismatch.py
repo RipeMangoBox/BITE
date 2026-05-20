@@ -4,8 +4,8 @@ from typing import Dict, List, Tuple, Optional
 
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PAPER_ANALYSIS_DIR = os.path.join(ROOT_DIR, "paperAnalysis")
-LOG_PATH = os.path.join(PAPER_ANALYSIS_DIR, "analysis_log.csv")
+PAPER_ANALYSIS_DIR = os.path.join(ROOT_DIR, "obsidian-vault/analysis")
+LOG_PATH = os.path.join(ROOT_DIR, "obsidian-vault/paper_list.csv")
 REPORT_PATH = os.path.join(PAPER_ANALYSIS_DIR, "analysis_mismatch_report.txt")
 
 
@@ -69,7 +69,7 @@ def build_analysis_index() -> Dict[str, AnalysisFile]:
         for fname in files:
             if not fname.endswith(".md"):
                 continue
-            if fname in {"paper_analysis_check_task.txt", "analysis_log_updated.txt", "analysis_log.csv"}:
+            if fname == "README.md":
                 continue
             path = os.path.join(root, fname)
             try:
@@ -173,7 +173,7 @@ def find_analysis_for_title(log_title: str, index: Dict[str, AnalysisFile]) -> O
 
 def describe_mismatch(af: Optional[AnalysisFile]) -> str:
     if af is None:
-        return "no_markdown: 未在 paperAnalysis 目录下找到对应标题的 emergentmind 分析 .md 文件。"
+        return "no_markdown: 未在 obsidian-vault/analysis 目录下找到对应标题的 emergentmind 分析 .md 文件。"
 
     missing = []
     if not af.has_abstract:
