@@ -21,23 +21,13 @@ for Obsidian jumps and backlink-friendly browsing.
 - Use repo-relative paths rooted at the folder that contains `obsidian-vault/analysis/` and `obsidian-vault/paperPDFs/`.
 - When invoking from another workspace, replace these with the correct absolute repository path for your machine.
 
-## Statistics (current sample values)
-
-| Dimension | Count |
-|-----------|--------|
-| Papers | 254 |
-| Tasks | 7 |
-| Technique tags | 587 |
-| Venues | 17 |
-
-Tasks: Human_Human_Interaction, Human_Object_Interaction, Human_Scene_Interaction, Motion_Controlled_ImageVideo_Generation, Motion_Editing, Motion_Generation_Text_Speech_Music_Driven, Motion_Stylization.
-
 ## Where things live
 
 Relative to the repository root:
 
 - **Analysis notes**: `obsidian-vault/analysis/<Topic>/<Venue_Year>/<Year>_<Title>.md` or flat venue folders such as `obsidian-vault/analysis/ICLR_2026/<Title>.md`; PDF path in frontmatter `pdf_ref`.
-- **Generated index / navigation**: `obsidian-vault/index/index.jsonl`, `obsidian-vault/index/README.md`, `_AllPapers.md`, `by_topic/`, `by_method/`, `by_dataset/`, `by_venue/`, `by_year/`.
+- **Generated index / navigation**: `obsidian-vault/index/index.jsonl`, `obsidian-vault/index/_Index.md`, `_AllPapers.md`, `by_topic/`, `by_method/`, `by_dataset/`, `by_venue/`, `by_year/`.
+- **Public placeholder**: `obsidian-vault/index/README.md` is tracked as a stable explanation file and is not overwritten by index generation.
 
 All paths use forward slashes.
 
@@ -65,7 +55,10 @@ If you want refreshed `obsidian-vault/index/index.jsonl` and the Obsidian naviga
 python .claude/skills/papers-build-index/scripts/build_paper_index.py
 ```
 
-Only notes with valid `pdf_ref` (path under `obsidian-vault/paperPDFs/` ending in `.pdf`) are indexed.
+The public repository may produce an empty index until local paper rows or
+analysis notes are added. Notes with clear paper evidence in frontmatter, body
+metadata rows, or venue/year paths can be indexed even when `pdf_ref` still
+needs repair.
 
 ## Output style
 

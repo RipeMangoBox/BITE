@@ -22,6 +22,7 @@ service maintenance.
 | `review_analysis_mismatch.py` | Compare CSV log rows with Markdown files |
 | `run_local_paper_analysis.py` | Formal single-paper analysis chain: MinerU parse/reuse → anchor extraction → main analysis → section writing → vault export with figures/tables |
 | `run_paper_list_analysis.py` | Script-only queue runner for rows in `obsidian-vault/paper_list.csv` |
+| `smoke_index_workflow.py` | Verify `research-workflow` auto routing and `papers-build-index` behavior on temporary empty and one-note vaults |
 
 ## Index Maintenance
 

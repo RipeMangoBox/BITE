@@ -117,6 +117,11 @@ ResearchFlow is useful when you want to:
 - Obsidian is optional. It is only a browsing and backlink layer; the repository
   still works as a normal local folder.
 
+The public repository ships with placeholder vault files only. A fresh clone is
+expected to build an empty `index.jsonl` until you add `paper_list.csv` rows,
+local PDFs, or analysis notes. This is intentional: personal PDFs, generated
+analysis notes, and generated index pages stay out of Git.
+
 ## 🤖 Agent Compatibility
 
 ResearchFlow intentionally stays plain: folders, Markdown, JSONL, CSV, and
@@ -311,6 +316,17 @@ Refresh the index manually when needed:
 
 ```bash
 python3 .claude/skills/papers-build-index/scripts/build_paper_index.py
+```
+
+The generated home page is `obsidian-vault/index/_Index.md`. The tracked
+`obsidian-vault/index/README.md` remains a public placeholder and is not
+overwritten by the builder.
+
+To verify the index/workflow chain on your machine without using private paper
+data:
+
+```bash
+python3 scripts/smoke_index_workflow.py
 ```
 
 Ask a literature question:

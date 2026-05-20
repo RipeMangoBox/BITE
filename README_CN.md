@@ -98,6 +98,10 @@ collect candidate papers / import local PDFs
   reviewer critiques 和 daily logs。
 - Obsidian 是可选的，只是浏览和 backlink 层；仓库作为普通本地文件夹也能工作。
 
+公开仓库只包含 vault 占位文件。全新 clone 在没有 `paper_list.csv` 行、本地 PDF
+或 analysis notes 时，构建出空的 `index.jsonl` 是预期行为：个人 PDF、生成的
+analysis notes 和生成的 index 页面默认不进 Git。
+
 ## 🤖 Agent 兼容
 
 ResearchFlow 有意保持朴素：文件夹、Markdown、JSONL、CSV 和 `SKILL.md`。因此同一
@@ -263,6 +267,15 @@ python3 scripts/run_paper_list_analysis.py \
 
 ```bash
 python3 .claude/skills/papers-build-index/scripts/build_paper_index.py
+```
+
+生成的索引首页是 `obsidian-vault/index/_Index.md`。被 Git 跟踪的
+`obsidian-vault/index/README.md` 只作为公开占位说明，builder 不会覆盖它。
+
+如果想在不使用私人论文数据的情况下验证 index/workflow 链路：
+
+```bash
+python3 scripts/smoke_index_workflow.py
 ```
 
 询问文献问题：

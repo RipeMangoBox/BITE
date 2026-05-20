@@ -4,10 +4,11 @@ import argparse
 import csv
 import json
 import re
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -18,6 +19,10 @@ INDEX_DIR = VAULT_DIR / "index"
 
 FRONTMATTER_BOUNDARY = re.compile(r"^---\s*$")
 KEY_LINE = re.compile(r"^([A-Za-z0-9_\-]+):(?:\s*(.*))?$")
+VENUE_YEAR = re.compile(r"\b([A-Za-z][A-Za-z0-9_.-]*)[_ -]((?:19|20)\d{2})\b")
+NON_PAPER_NOTE_NAMES = {"readme.md", "_index.md"}
+NON_PAPER_NOTE_PREFIXES = ("quality_report_",)
+NON_PAPER_NOTE_DIRS = {"test", "_test", "tests", "_tests"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -42,6 +47,8 @@ class Paper:
     core_operator: str = ""
     primary_logic: str = ""
     source: str = ""
+    paper_link: str = ""
+    project_link: str = ""
 
 
 def read_text(path: Path) -> str:
@@ -128,6 +135,40 @@ def parse_frontmatter(md_text: str) -> Dict[str, object]:
     return data
 
 
+def split_delimited(text: str, delimiters: Set[str]) -> List[str]:
+    out: List[str] = []
+    buf: List[str] = []
+    quote = ""
+    depth = 0
+    pairs = {"(": ")", "[": "]", "{": "}", "（": "）", "【": "】", "《": "》"}
+    closing = set(pairs.values())
+    for ch in text:
+        if quote:
+            buf.append(ch)
+            if ch == quote:
+                quote = ""
+            continue
+        if ch in ("'", '"'):
+            quote = ch
+            buf.append(ch)
+            continue
+        if ch in pairs:
+            depth += 1
+            buf.append(ch)
+            continue
+        if ch in closing and depth > 0:
+            depth -= 1
+            buf.append(ch)
+            continue
+        if ch in delimiters and depth == 0:
+            out.append("".join(buf))
+            buf = []
+            continue
+        buf.append(ch)
+    out.append("".join(buf))
+    return out
+
+
 def split_values(value: object, *, comma_split: bool = True) -> List[str]:
     if value is None:
         return []
@@ -141,9 +182,9 @@ def split_values(value: object, *, comma_split: bool = True) -> List[str]:
         if inline is not None:
             raw = inline
         elif comma_split:
-            raw = re.split(r"[;,]", text)
+            raw = split_delimited(text, {",", ";", "；"})
         else:
-            raw = re.split(r"[;]", text)
+            raw = split_delimited(text, {";", "；"})
 
     out: List[str] = []
     seen = set()
@@ -168,6 +209,7 @@ def first_present(row: Dict[str, str], names: Iterable[str]) -> str:
 
 
 def normalize_title(title: str) -> str:
+    title = unicodedata.normalize("NFKC", title)
     return re.sub(r"\s+", " ", title).strip().lower()
 
 
@@ -184,6 +226,19 @@ def normalize_pdf_ref(value: object) -> str:
     if ref.startswith("paperPDFs/"):
         return f"obsidian-vault/{ref}"
     return ref
+
+
+def infer_venue_year(*values: object) -> Tuple[str, str]:
+    for value in values:
+        text = str(value or "")
+        match = VENUE_YEAR.search(text)
+        if match:
+            return match.group(1).replace(".", ""), match.group(2)
+    return "", ""
+
+
+def clean_scalar(value: object) -> str:
+    return str(value or "").strip().strip("\"'")
 
 
 def clean_generated_dirs() -> None:
@@ -222,31 +277,94 @@ def load_csv_inventory() -> List[Paper]:
             title = first_present(row, ("title", "paper_title", "name"))
             if not title:
                 continue
+            pdf_ref = normalize_pdf_ref(first_present(row, ("pdf_ref", "pdf", "pdf_path")))
+            venue = first_present(row, ("venue", "conference", "journal"))
+            year = first_present(row, ("year", "publication_year"))
+            if not venue or not year:
+                inferred_venue, inferred_year = infer_venue_year(venue, pdf_ref, title)
+                venue = venue or inferred_venue
+                year = year or inferred_year
             papers.append(
                 Paper(
                     title=title,
                     analysis_path=first_present(row, ("analysis_path", "analysis", "note_path", "md_path")),
-                    pdf_ref=normalize_pdf_ref(first_present(row, ("pdf_ref", "pdf", "pdf_path"))),
-                    venue=first_present(row, ("venue", "conference", "journal")),
-                    year=first_present(row, ("year", "publication_year")),
+                    pdf_ref=pdf_ref,
+                    venue=venue,
+                    year=year,
                     topics=split_values(first_present(row, ("topic", "topics", "task", "category"))),
                     methods=split_values(first_present(row, ("method", "methods", "technique", "techniques"))),
                     datasets=split_values(first_present(row, ("dataset", "datasets", "benchmark", "benchmarks"))),
                     tags=split_values(first_present(row, ("tags", "tag"))),
+                    paper_link=first_present(row, ("paper_link", "url", "link", "openreview", "arxiv")),
+                    project_link=first_present(row, ("project_link", "project_link_or_github_link", "github", "code")),
                     source="paper_list.csv",
                 )
             )
     return papers
 
 
-def extract_table_values(md_text: str, field_name: str) -> List[str]:
+def clean_wikilinks(text: str) -> str:
+    text = re.sub(r"!\[\[[^\]]+\]\]", " ", text)
+    text = re.sub(r"\[\[([^\]|]+)\|([^\]]+)\]\]", r"\2", text)
+    text = re.sub(r"\[\[([^\]]+)\]\]", r"\1", text)
+    return text
+
+
+def extract_table_values(md_text: str, field_name: str, *, limit: int = 20) -> List[str]:
     pattern = re.compile(rf"^\|\s*{re.escape(field_name)}\s*\|\s*(.*?)\s*\|", re.IGNORECASE | re.MULTILINE)
     match = pattern.search(md_text)
     if not match:
         return []
-    cell = re.sub(r"\[[^\]]+\]\([^)]+\)", " ", match.group(1))
+    cell = clean_wikilinks(match.group(1))
+    cell = re.sub(r"\[[^\]]+\]\([^)]+\)", " ", cell)
     cell = re.sub(r"#[A-Za-z0-9_\-/]+", lambda m: m.group(0)[1:], cell)
-    return split_values(cell, comma_split=False)
+    return split_values(cell, comma_split=True)[:limit]
+
+
+def extract_first_heading(md_text: str) -> str:
+    match = re.search(r"^#\s+(.+?)\s*$", md_text, re.MULTILINE)
+    return match.group(1).strip() if match else ""
+
+
+def extract_links(md_text: str) -> Tuple[str, str]:
+    paper_link = ""
+    project_link = ""
+    for label, url in re.findall(r"\[([^\]]+)\]\((https?://[^)]+)\)", md_text):
+        lower = label.lower()
+        if not paper_link and any(key in lower for key in ("paper", "openreview", "arxiv", "pdf")):
+            paper_link = url
+        if not project_link and any(key in lower for key in ("project", "github", "code")):
+            project_link = url
+    return paper_link, project_link
+
+
+def should_index_analysis_note(md_path: Path, fm: Dict[str, object], md_text: str) -> bool:
+    relative_parts = md_path.relative_to(ANALYSIS_DIR).parts
+    if any(part.lower() in NON_PAPER_NOTE_DIRS for part in relative_parts[:-1]):
+        return False
+    name = md_path.name.lower()
+    if name in NON_PAPER_NOTE_NAMES:
+        return False
+    if any(name.startswith(prefix) for prefix in NON_PAPER_NOTE_PREFIXES):
+        return False
+    note_type = clean_scalar(fm.get("type")).lower()
+    paper_markers = (
+        clean_scalar(fm.get("pdf_ref")),
+        clean_scalar(fm.get("core_operator")),
+        clean_scalar(fm.get("primary_logic")),
+        clean_scalar(fm.get("venue")),
+        clean_scalar(fm.get("year")),
+        clean_scalar(fm.get("paper_level")),
+        extract_table_values(md_text, "Method", limit=1),
+        extract_table_values(md_text, "Dataset", limit=1),
+    )
+    if note_type and note_type != "paper":
+        return any(bool(x) for x in paper_markers)
+    if note_type == "paper":
+        return True
+    if any(bool(x) for x in paper_markers):
+        return True
+    return len(relative_parts) > 1 and bool(infer_venue_year(*relative_parts)[1])
 
 
 def load_analysis_notes() -> List[Paper]:
@@ -257,15 +375,9 @@ def load_analysis_notes() -> List[Paper]:
     for md_path in sorted(ANALYSIS_DIR.rglob("*.md")):
         text = read_text(md_path)
         fm = parse_frontmatter(text)
-        has_paper_evidence = bool(
-            str(fm.get("type") or "").strip() == "paper"
-            or str(fm.get("pdf_ref") or "").strip()
-            or str(fm.get("core_operator") or "").strip()
-            or str(fm.get("primary_logic") or "").strip()
-        )
-        if not has_paper_evidence:
+        if not should_index_analysis_note(md_path, fm, text):
             continue
-        title = str(fm.get("title") or md_path.stem.replace("_", " ")).strip()
+        title = clean_scalar(fm.get("title")) or extract_first_heading(text) or md_path.stem.replace("_", " ")
         if not title:
             continue
 
@@ -274,27 +386,49 @@ def load_analysis_notes() -> List[Paper]:
         category = split_values(fm.get("category"))
         if not topics and category:
             topics = category
+        if not topics:
+            rel_parts = md_path.relative_to(ANALYSIS_DIR).parts
+            if len(rel_parts) > 2 and not infer_venue_year(rel_parts[0])[1]:
+                topics = [rel_parts[0]]
+            elif len(rel_parts) > 1:
+                topics = [rel_parts[0]]
 
-        methods = split_values(fm.get("methods") or fm.get("method") or fm.get("aliases"))
+        methods = split_values(fm.get("methods") or fm.get("method"))
         datasets = split_values(fm.get("datasets") or fm.get("dataset"))
         if not methods:
-            methods = extract_table_values(text, "Method")[:1]
+            methods = extract_table_values(text, "Method", limit=6)
         if not datasets:
-            datasets = extract_table_values(text, "Dataset")[:12]
+            datasets = extract_table_values(text, "Dataset", limit=20)
+        pdf_ref = normalize_pdf_ref(fm.get("pdf_ref"))
+        venue = clean_scalar(fm.get("venue"))
+        year = clean_scalar(fm.get("year"))
+        if not venue or not year:
+            inferred_venue, inferred_year = infer_venue_year(repo_rel(md_path), pdf_ref, title)
+            venue = venue or inferred_venue
+            year = year or inferred_year
+        paper_link, project_link = extract_links(text)
+        paper_link = clean_scalar(
+            fm.get("paper_link") or fm.get("url") or fm.get("link") or fm.get("openreview") or fm.get("arxiv")
+        ) or paper_link
+        project_link = clean_scalar(
+            fm.get("project_link") or fm.get("project_link_or_github_link") or fm.get("github") or fm.get("code")
+        ) or project_link
 
         papers.append(
             Paper(
                 title=title,
                 analysis_path=repo_rel(md_path),
-                pdf_ref=normalize_pdf_ref(fm.get("pdf_ref")),
-                venue=str(fm.get("venue") or "").strip(),
-                year=str(fm.get("year") or "").strip(),
+                pdf_ref=pdf_ref,
+                venue=venue,
+                year=year,
                 topics=topics,
                 methods=methods,
                 datasets=datasets,
                 tags=tags,
-                core_operator=str(fm.get("core_operator") or "").strip(),
-                primary_logic=str(fm.get("primary_logic") or "").strip(),
+                core_operator=clean_scalar(fm.get("core_operator")),
+                primary_logic=clean_scalar(fm.get("primary_logic") or fm.get("paradigm")),
+                paper_link=paper_link,
+                project_link=project_link,
                 source="analysis",
             )
         )
@@ -319,6 +453,8 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
 
     analysis_by_title = {normalize_title(p.title): p for p in analysis_papers}
     analysis_by_path = {p.analysis_path: p for p in analysis_papers if p.analysis_path}
+    matched_paths: Set[str] = set()
+    matched_titles: Set[str] = set()
 
     merged: List[Paper] = []
     for base in csv_papers:
@@ -331,6 +467,8 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
             merged.append(base)
             continue
 
+        matched_paths.add(ana.analysis_path)
+        matched_titles.add(normalize_title(ana.title))
         base.analysis_path = base.analysis_path or ana.analysis_path
         base.pdf_ref = base.pdf_ref or ana.pdf_ref
         base.venue = base.venue or ana.venue
@@ -341,8 +479,15 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
         base.tags = merge_values(base.tags, ana.tags)
         base.core_operator = base.core_operator or ana.core_operator
         base.primary_logic = base.primary_logic or ana.primary_logic
+        base.paper_link = base.paper_link or ana.paper_link
+        base.project_link = base.project_link or ana.project_link
         base.source = "paper_list.csv+analysis"
         merged.append(base)
+
+    for ana in analysis_papers:
+        if ana.analysis_path in matched_paths or normalize_title(ana.title) in matched_titles:
+            continue
+        merged.append(ana)
 
     return sorted(merged, key=lambda p: (str(p.year), p.venue.lower(), p.title.lower()))
 
@@ -367,6 +512,8 @@ def build_jsonl(papers: List[Paper]) -> str:
             "tags": p.tags,
             "core_operator": p.core_operator,
             "primary_logic": p.primary_logic,
+            "paper_link": p.paper_link,
+            "project_link": p.project_link,
             "source": p.source,
         }
         lines.append(json.dumps(row, ensure_ascii=False, sort_keys=True))
@@ -432,14 +579,15 @@ def group_by_dimension(papers: List[Paper], attr: str) -> Dict[str, List[Paper]]
     return grouped
 
 
-def write_dimension(dirname: str, dimension: str, grouped: Dict[str, List[Paper]], now: str) -> None:
-    if not grouped:
-        return
-
+def write_dimension(
+    dirname: str, dimension: str, grouped: Dict[str, List[Paper]], now: str, *, min_count: int = 1
+) -> None:
     base = INDEX_DIR / dirname
-    keys = sorted(grouped.keys(), key=lambda x: x.lower())
+    keys = [key for key in sorted(grouped.keys(), key=lambda x: x.lower()) if len(grouped[key]) >= min_count]
     index_lines = frontmatter(f"{dimension.title()} Index", dimension, now)
     index_lines.extend([f"# {dimension.title()} Index", ""])
+    if min_count > 1:
+        index_lines.extend([f"Only values linked to at least {min_count} papers are listed here.", ""])
     for key in keys:
         index_lines.append(f"- {note_link(f'obsidian-vault/index/{dirname}/{sanitize_filename(key)}.md', key)} ({len(grouped[key])})")
     index_lines.append("")
@@ -454,7 +602,7 @@ def write_dimension(dirname: str, dimension: str, grouped: Dict[str, List[Paper]
         write_text(base / f"{sanitize_filename(key)}.md", "\n".join(lines))
 
 
-def build_readme(papers: List[Paper], now: str) -> str:
+def build_home_index(papers: List[Paper], now: str) -> str:
     lines = frontmatter("ResearchFlow Paper Index", "home", now)
     lines.extend(
         [
@@ -492,9 +640,9 @@ def main() -> int:
         clean_generated_dirs()
         write_text(INDEX_DIR / "index.jsonl", build_jsonl(papers))
         write_text(INDEX_DIR / "_AllPapers.md", build_all_papers(papers, now))
-        write_text(INDEX_DIR / "README.md", build_readme(papers, now))
+        write_text(INDEX_DIR / "_Index.md", build_home_index(papers, now))
 
-        write_dimension("by_dataset", "dataset", group_by_dimension(papers, "datasets"), now)
+        write_dimension("by_dataset", "dataset", group_by_dimension(papers, "datasets"), now, min_count=2)
         write_dimension("by_method", "method", group_by_dimension(papers, "methods"), now)
         write_dimension("by_topic", "topic", group_by_dimension(papers, "topics"), now)
         write_dimension("by_venue", "venue", group_by_dimension(papers, "venue"), now)

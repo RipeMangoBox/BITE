@@ -14,7 +14,8 @@ Use the matching absolute repository path for your machine when invoking from an
 
 | Path | Description |
 | ------ | ------ |
-| `obsidian-vault/index/README.md` | Home: links to _AllPapers, by_topic, by_method, by_dataset, by_venue, by_year |
+| `obsidian-vault/index/README.md` | Public placeholder explaining generated index files; tracked and not overwritten |
+| `obsidian-vault/index/_Index.md` | Generated home: links to _AllPapers, by_topic, by_method, by_dataset, by_venue, by_year |
 | `obsidian-vault/index/_AllPapers.md` | All papers grouped by topic, then venue/year |
 | `obsidian-vault/index/by_topic/_Index.md` | List of all topics |
 | `obsidian-vault/index/by_topic/<topic>.md` | Papers for one topic |
@@ -41,7 +42,7 @@ Topic, method, dataset, venue, and year filenames are sanitized (e.g. spaces -> 
 
 ## obsidian-vault/analysis note frontmatter
 
-- **Required for indexing**: `pdf_ref` (path like `obsidian-vault/paperPDFs/.../file.pdf`) — only notes with valid pdf_ref are included in obsidian-vault/index.
+- **Strong indexing signal**: `pdf_ref` (path like `obsidian-vault/paperPDFs/.../file.pdf` or `paperPDFs/.../file.pdf`). Notes can still be indexed when other clear paper evidence exists, such as `type: paper`, title/venue/year, method/dataset metadata rows, or venue/year path hints.
 - **Display/navigation**: title, venue, year, tags, aliases
 - **Research/citation**: core_operator, primary_logic (optional; string or multi-line scalar)
 - **Optional**: created, updated, status, note
@@ -61,3 +62,6 @@ Tags are flat lists of short English slugs/phrases. Do not write `category`, `mo
 
 - obsidian-vault/index pages **link to** obsidian-vault/analysis notes via `[[obsidian-vault/analysis/.../file.md|...]]` and to PDFs via `[[obsidian-vault/paperPDFs/.../file.pdf|PDF]]`.
 - obsidian-vault/analysis notes are **not** modified by the collection build; they are only read (frontmatter + path) to build the index.
+- Generated index files are local artifacts. In the public repository, an empty
+  `index.jsonl` after a fresh clone is expected until paper rows or analysis
+  notes are added.

@@ -19,6 +19,7 @@ Inputs:
 Outputs:
 
 - `obsidian-vault/index/index.jsonl`
+- `obsidian-vault/index/_Index.md`
 - `obsidian-vault/index/_AllPapers.md`
 - aggregate pages under:
   - `by_dataset/`
@@ -28,6 +29,11 @@ Outputs:
   - `by_year/`
 
 The builder does not require the platform database.
+`obsidian-vault/index/README.md` is a public placeholder for the generated
+directory and should not be overwritten with local/private index contents.
+`by_dataset/` lists only dataset values that appear in at least two papers so
+single-paper experiment slices do not dominate Obsidian navigation. The full
+per-paper dataset field remains in `index.jsonl`.
 
 ## When to run
 
@@ -52,11 +58,19 @@ Each `index.jsonl` line is one paper record with stable, retrieval-oriented
 fields:
 
 ```json
-{"title":"...","analysis_path":"obsidian-vault/analysis/...md","pdf_ref":"obsidian-vault/paperPDFs/...pdf","venue":"ICLR","year":2026,"topics":["..."],"methods":["..."],"datasets":["..."]}
+{"title":"...","analysis_path":"obsidian-vault/analysis/...md","pdf_ref":"obsidian-vault/paperPDFs/...pdf","venue":"ICLR","year":2026,"topics":["..."],"methods":["..."],"datasets":["..."],"tags":["..."],"core_operator":"...","primary_logic":"...","paper_link":"...","project_link":"...","source":"analysis"}
 ```
 
 The exact set of optional fields may grow, but the builder must keep records
 usable when only `paper_list.csv` exists or only analysis notes exist.
+
+When frontmatter is incomplete or inconsistent, the builder should fall back to
+safe evidence in this order: explicit frontmatter, `paper_list.csv`, body
+metadata tables / links, then path-derived venue/year/topic hints. It should
+not require a valid `pdf_ref` when an analysis note otherwise has clear paper
+evidence.
+Notes under `obsidian-vault/analysis/test/` or similarly named test folders are
+treated as local evaluation artifacts and excluded from the default paper index.
 
 ## Obsidian Markdown rule
 
