@@ -1,229 +1,408 @@
 <p align="center">
-  <img src="./assets/LOGO.png" alt="ResearchFlow" width="260"/>
+  <img src="./assets/LOGO.png" alt="ResearchFlow logo" width="280"/>
 </p>
+
 <h1 align="center">ResearchFlow</h1>
+
+<p align="center"><strong>面向研究 Agent 的结构化论文分析与 Research Memory</strong></p>
+
 <p align="center">
-  <strong>给一篇论文，自动生成领域知识图谱。</strong>
+  <a href="README.md">English</a> |
+  <a href="README_CN.md">中文</a>
 </p>
+
 <p align="center">
-  <a href="README.md">English</a> · <a href="README_CN.md">中文</a>
+  <img alt="Local first" src="https://img.shields.io/badge/Local--first-Research%20Workflow-0f766e?style=flat-square"/>
+  <img alt="MinerU powered" src="https://img.shields.io/badge/MinerU-PDF%20Parsing-0891b2?style=flat-square"/>
+  <img alt="Agent skills" src="https://img.shields.io/badge/Agent-Skills-7c3aed?style=flat-square"/>
+  <img alt="Obsidian optional" src="https://img.shields.io/badge/Obsidian-optional-475569?style=flat-square"/>
+  <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
----
+> **先构建知识，再让 Agent 行动。** 研究 Agent 在写代码、设计实验或起草 related
+> work 之前，应该先能从结构化论文证据中找到支撑决策的依据。
 
-ResearchFlow 是一个研究操作系统，将学术论文转化为结构化、持续演化的知识图谱。给它一篇种子论文或一个研究主题 — 它会自动发现相关工作，通过 6 步 LLM 管线分析每篇论文（内置怀疑机制），以 DAG 而非扁平列表追踪方法之间的改进关系，并导出可导航的 Obsidian vault。
+ResearchFlow 会把论文 PDF 和论文列表整理成本地 research memory：结构化分析笔记、
+轻量索引、Obsidian 友好的导航页面，以及后续 idea 或 review notes。它面向
+human-in-the-loop 的研究流程，帮助 Agent 找到一篇论文改变了什么、哪些证据支撑
+这个结论，以及方法可能在哪里失效。
 
-**核心差异：** ResearchFlow 不只是总结论文。它先读方法和实验，*再*核对摘要声明；从数据库自动构建比较集（不靠论文自述）；高价值结论必须有证据锚点；新论文到来时全图谱保持一致性。
+当前默认 workflow 是 **local files only**。PDF、Markdown 笔记、JSONL 索引和
+idea notes 都放在 `obsidian-vault/` 下。正常使用不需要 API server、数据库或服务
+部署。
 
-## 已完成功能
+ResearchFlow 是一种方法论和本地知识工作流，不是封闭平台。真正有价值的是你持续
+积累的 research memory。
 
-### 领域冷启动
-给一个研究主题 → GitHub awesome 仓库发现 → 自动导入 50-100 篇论文 → triage 评分 → 批量分析 → 完整知识图谱。一个 API 调用即可启动。
+## 当前目标
 
-### 6 步分析管线
-每篇论文经过 6 个独立可重试的分析步骤，不再是一次 LLM 调用：
+- [X] 发布更强的论文分析模板，让论文理解更结构化、可比较、可复用。
+- [ ] 提升从候选论文到维护索引的自动化程度。
+- [ ] 发布高质量论文分析知识库，支持 human-in-the-loop 研究。
+- [ ] 改进结构化 metadata，支持检索、过滤和跨论文对比。
 
-| 步骤 | 功能 | 为什么重要 |
-|------|------|-----------|
-| **extract_evidence** | 公式、图表、证据锚点 | 先读方法/实验，再核对摘要 |
-| **build_delta_card** | 基线对比、改动 slot、机制 | 基于 Step 1 证据，无法 hallucinate |
-| **build_compare_set** | 从 DB 自动补齐比较集 | 4 个来源，不只是论文自述 |
-| **propose_lineage** | builds_on / extends / replaces | 方法形成 DAG，支持多继承 |
-| **synthesize_concept** | 更新跨论文 CanonicalIdea | 概念跨论文累积，不孤立 |
-| **reconcile_neighbors** | 反向更新相关论文 | 知识图谱全局一致 |
+## ResearchFlow 能做什么
 
-### 10 步元数据补全 (8 个 API)
-arXiv → Crossref → OpenAlex → Semantic Scholar → DBLP → OpenReview → GitHub → HuggingFace。结果存入观察账本 (observation ledger)，按权威等级排序 — 冲突自动解决，不盲目覆盖。
-
-### Parser Ensemble (L2)
-GROBID（作者、机构、参考文献、公式坐标）+ PyMuPDF（章节、图表、标题）+ VLM（图表分类、公式 OCR → LaTeX）。先确定性提取，LLM 只处理机器解析不了的。
-
-### 方法演化 DAG
-论文不是扁平列表 — 它们形成有向无环图，追踪方法之间的改进关系：
-
-```
-GRPO (基线, depth=0, 7 篇下游)
-├── GRPO+LP (插件, depth=1)
-│   └── GRPO-LP+sampling (depth=2)
-├── GDPO (结构性, depth=1, parents=[GRPO, DPO])  ← 多继承
-│   └── GDPO+image_thinking (depth=2)
+```text
+collect candidate papers / import local PDFs
+  -> download when needed
+  -> MinerU PDF parse
+  -> structured paper analysis
+  -> index
+  -> query / ideate / review / export
 ```
 
-3+ 篇论文用某方法作 baseline → 自动标记为已确立基线 → 可升级为新范式版本。所有晋升经过审核门控。
+你可以用四种常见模式使用它：
 
-### Faceted Taxonomy (15 维度, 75 种子节点)
-论文在 domain/modality/task/learning_paradigm/mechanism/method_baseline/model_family/dataset/benchmark/metric/lab/venue 等维度标注 — 不只是一个 category。DAG 结构支持 `is_a`/`part_of`/`uses`/`optimizes` 关系。
+| 模式     | 用途                                                    | 常用入口                                                                        |
+| -------- | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Build    | 收集候选论文、下载 PDF、分析论文并刷新索引              | `research-workflow`                                                           |
+| Query    | 按主题、任务、方法、venue、年份、标题或技术标签检索论文 | `papers-query-knowledge-base`                                                 |
+| Decision | 在选择 baseline、修改方案或写 related work 前对比方法   | `papers-query-knowledge-base`                                                 |
+| Idea     | 基于本地知识库生成、收敛并压力测试研究方向              | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
 
-### Obsidian Vault 导出
-一键导出结构化 Obsidian vault，每篇论文 6-10 个 wikilinks（不是毛线团）：
+适合以下场景：
 
+- 从网页、GitHub 论文列表或本地 PDF 文件夹构建特定方向的论文知识库。
+- 将 PDF 转换为结构化分析笔记，保留可比较字段、证据 anchor、公式、表格、
+  figure/table metadata 和 reading-order context。
+- 在选择 baseline、写 related work 或调整研究方案前，对比不同方法。
+- 基于已有论文生成研究想法，收敛为可执行计划，并用 reviewer 视角做压力测试。
+- 导出可分享 Markdown，或在 Obsidian 中浏览知识库。
+
+## 架构
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  输出层              obsidian-vault/ideas/              │
+│                      ideas, plans, review notes          │
+├─────────────────────────────────────────────────────────┤
+│  索引层              obsidian-vault/index/              │
+│                      JSONL index + Obsidian pages        │
+├─────────────────────────────────────────────────────────┤
+│  证据层              obsidian-vault/analysis/           │
+│                      structured notes + logs             │
+│                      obsidian-vault/paperPDFs/           │
+│                      source PDFs                         │
+└─────────────────────────────────────────────────────────┘
 ```
-00_Home/           导航 + 阅读顺序建议
-10_Lineages/       L__ 方法演化链 (ASCII 树)
-20_Concepts/       C__ 机制 + 标准思想合并
-30_Bottlenecks/    B__ 跨论文综合 (症状 → 根因 → 解法分层)
-40_Papers/
-  A__Baselines/    必读 baseline (struct ≥ 0.7)
-  B__Structural/   结构性改进 (struct ≥ 0.5)
-  C__Plugins/      插件型改进 (struct ≥ 0.3)
-  D__Peripheral/   外围参考
-80_Assets/         PDF 提取的图表
-90_Views/          静态 Markdown 表格 (不依赖 Dataview)
-```
 
-### 候选队列 + 多 Agent 管线 (V6)
-5 级吸收：`new → shallow → reference_done → deep → graph_ready`。16 个专用 LLM Agent（12 个 prompt 文件）配合 Context Pack Builder。4 层评分引擎（DiscoveryScore → DeepIngestScore → GraphPromotionScore → AnchorScore）。节点/边 profile 用于知识图谱实体画像。冷启动工作流与增量同步（7 个函数）。
+- `obsidian-vault/paperPDFs/` 存放原始 PDF。
+- `obsidian-vault/analysis/` 存放每篇论文的结构化分析笔记和日志。这是 Agent
+  最应该读取的证据层。
+- `obsidian-vault/index/` 存放生成的检索索引和导航页面。规模较大时，
+  Agent 应先读 `index.jsonl` 过滤候选，再读取对应 analysis notes。
+- `obsidian-vault/ideas/` 存放后续研究输出，例如 brainstorm notes、聚焦计划、
+  reviewer critiques 和 daily logs。
+- Obsidian 是可选的，只是浏览和 backlink 层；仓库作为普通本地文件夹也能工作。
 
-### MCP 集成 (35 个工具)
-完整 MCP 服务器：35 个工具 + 6 个资源 + 4 个提示模板。Claude Code 自动发现 — 用自然语言交互：
+## Agent 兼容
 
-```
-> 搜索 "reward hacking in RLHF" 相关论文
-> 对前 3 个结果跑完整分析管线
-> 比较这些论文的方法
-> 导出 vault 到 Obsidian
-```
+ResearchFlow 有意保持朴素：文件夹、Markdown、JSONL、CSV 和 `SKILL.md`。因此同一
+份 research memory 可以被多个 Agent 共享：
 
-### 21 个 Claude Code Skills
-研究工作流自动化：从 GitHub/Web/Zotero 收集论文、分析 PDF、查询知识库、头脑风暴、聚焦假设、审稿压力测试、生成公式推导深度报告、写日志。
-
-### 交互式研究探索
-多跳认知迭代：搜索 → 分类（结构性 vs 插件型）→ gap 分析 → pivot → 拓展。系统记住拒绝模式并建议新方向。
-
-### Web 控制台
-Next.js 15 前端：论文管理、搜索、图谱可视化、演化链查看、审核队列、摘要阅读、瓶颈探索、导入工具。
-
-## 系统规模
-
-| 组件 | 数量 |
-|------|------|
-| 数据库表 | 58 + 4 物化视图 |
-| API 端点 | 130 (16 个路由器) |
-| MCP | 35 工具 + 6 资源 + 4 提示模板 |
-| Service 模块 | 55 |
-| Worker 任务 | 22 |
-| ORM 模型文件 | 24 (含 15 个 V6 类) |
-| Agent Prompt | 12 |
-| Claude Code Skills | 21 |
-| 元数据 API | 8 (arXiv/Crossref/OpenAlex/S2/DBLP/OpenReview/GitHub/HF) |
-| 内置范式 | 4 (RL/VLM/Agent/MotionGen) + LLM 动态发现 |
-| 数据库迁移 | 16 个版本 |
-| 枚举类型 | 9 个 (PaperState 15 个状态值等) |
+- Claude Code / Cursor 可以直接读取 `.claude/skills`。
+- Codex CLI 可以用 `scripts/setup_shared_skills.py` 生成本地 alias。
+- 其他能读取文件的 Agent 可以直接读取 `obsidian-vault/index/index.jsonl`
+  和 `obsidian-vault/analysis/`，无需特殊集成。
 
 ## 快速开始
 
-```bash
-# 1. 启动系统
-cd researchflow-backend && cp .env.example .env  # 设置 ANTHROPIC_API_KEY
-docker compose up -d
-docker compose exec api alembic upgrade head
+ResearchFlow 的用户可能在 macOS、Windows 或 Linux 上工作。默认分析 workflow
+不强依赖 `jq`、`curl`、`make` 这类系统命令。PDF 相关的 Poppler、Ghostscript
+已经写在 Conda 环境中，不需要在 README 里按某个系统单独安装。
 
-# 2. 初始化领域
-curl -X POST localhost:8000/api/v1/pipeline/init-domain \
-  -H "Content-Type: application/json" \
-  -d '{"domain": "RLHF for VLM"}'
-
-# 3. 批量分析优先论文
-curl -X POST localhost:8000/api/v1/pipeline/batch?limit=10
-
-# 4. 导出 Obsidian vault
-curl -X POST localhost:8000/api/v1/pipeline/export/obsidian-vault
-```
-
-API 文档: `http://localhost:8000/api/v1/docs`
-
-## 通过 MCP 连接 Claude Code
-
-### 远程连接
-
-```json
-{
-  "mcpServers": {
-    "researchflow": {
-      "url": "https://your-domain/sse"
-    }
-  }
-}
-```
-
-### 本地运行
-
-```json
-{
-  "mcpServers": {
-    "researchflow-local": {
-      "command": "python",
-      "args": ["-m", "backend.mcp.server"],
-      "cwd": "researchflow-backend",
-      "env": {"PYTHONPATH": "."}
-    }
-  }
-}
-```
-
-## 同步 Obsidian Vault
+### 1. 创建 conda 环境
 
 ```bash
-# 服务器上导出
-curl -X POST localhost:8000/api/v1/pipeline/export/obsidian-vault
+git clone https://github.com/<your-username>/ResearchFlow.git
+cd ResearchFlow
 
-# rsync 到本地
-rsync -avz --delete -e ssh \
-  root@your-server:/opt/researchflow/obsidian-vault/ \
-  ./obsidian-vault/
-
-# 用 Obsidian 打开 → Graph View (Cmd+G)
-# 推荐颜色: Papers=蓝, Concepts=绿, Bottlenecks=红, Lineages=橙
+conda env create -f environment/environment.yml
+conda activate researchflow
 ```
+
+### 2. 配置模型和解析工具
+
+大多数本地操作不需要提交配置文件。需要设置模型密钥、模型名或 parser override
+时，在仓库根目录创建自己的 `.env`，并参考
+[environment/.env.example](environment/.env.example)。不要把密钥写进
+`.env.example`。
+
+常见 OpenAI-compatible 变量：
+
+```dotenv
+OPENAI_API_KEY=
+OPENAI_BASE_URL=https://api.deepseek.com
+OPENAI_MODEL=deepseek-chat
+```
+
+### 3. 安装或配置 MinerU
+
+正式论文分析推荐使用 MinerU。请让 Agent 根据你的机器安装、配置并验证 MinerU，
+不要在 README 中按长篇手工步骤操作。
+
+最小验证方式：`mineru --help` 能运行，或在 `.env` 中设置 `MINERU_CLI_PATH`
+指向 MinerU 可执行文件。
+
+### 4. 准备 Agent Skills
+
+Claude Code 和 Cursor 可以直接读取 `.claude/skills`。如果需要 Codex 兼容路径，
+运行：
+
+```bash
+python3 scripts/setup_shared_skills.py
+```
+
+然后从统一 workflow skill 开始：
+
+```text
+/research-workflow
+我想从 PDF 构建 controllable motion generation 的论文知识库。
+请告诉我下一步应该做什么，以及会生成哪些结果。
+```
+
+默认 workflow 不需要启动任何服务。使用 `obsidian-vault/` 下的本地文件夹作为工作
+状态即可。
+
+## 使用示例
+
+从零构建一个主题知识库：
+
+```text
+/research-workflow
+我想构建 text-driven reactive motion generation 的论文知识库。
+请从候选论文收集开始，告诉我每个阶段应该使用哪个 skill。
+```
+
+从 GitHub 论文列表收集候选论文：
+
+```text
+/papers-collect-from-github-repo
+从这个 GitHub repository 收集 controllable human motion generation 相关论文：<URL>
+只保留 diffusion、controllability、real-time generation 或 long-form motion 相关条目。
+输出适合后续下载 workflow 使用的候选列表。
+```
+
+从本地 PDF 文件夹导入 PDF：
+
+```text
+/research-workflow
+我已经有一批 PDF 放在 /path/to/pdf-folder。
+请按 category Motion_Generation、venue CVPR、year 2026
+注册到 obsidian-vault/paperPDFs/，然后告诉我应该先分析哪篇。
+```
+
+根据候选列表下载 PDF：
+
+```text
+/papers-download-from-list
+下载当前候选列表中仍标记为 Wait 的论文。
+报告成功下载、失败和跳过的数量。
+```
+
+为准备好的 PDF 生成深度报告：
+
+```text
+/paper-report
+为 obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf 生成 deep report。
+将报告保存在 obsidian-vault/analysis/ 下，并保留 source anchors。
+```
+
+需要真实流水线产物和带图表导出的 vault 笔记时，直接运行正式本地分析链：
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault
+```
+
+如果 MinerU 输出已经存在，复用它而不是重新解析：
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --mineru-output "<mineru_output_dir>" \
+  --paper-pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault
+```
+
+如果有规范化的 MinerU 缓存，可以让 runner 按 PDF stem 自动发现单篇解析目录：
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --mineru-output-root "<mineru_output_root>" \
+  --require-existing-mineru-output \
+  --export-vault
+```
+
+做受控实验时，保留真实 venue/year 元数据，只用 `--vault-note-dir`
+重定向 Markdown 输出目录。
+
+正式本地 runner 是生成流水线产物的默认分析路线。
+
+从论文列表批量分析：
+
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded \
+  --limit 25 \
+  --mineru-output-root "<mineru_output_root>" \
+  --require-existing-mineru-output
+```
+
+更大规模运行时，用 `papers-batch-analyze` 切分列表，并行启动最多 4 个 worker agent。
+
+必要时也可以手动刷新索引：
+
+```bash
+python3 .claude/skills/papers-build-index/scripts/build_paper_index.py
+```
+
+询问文献问题：
+
+```text
+/papers-query-knowledge-base
+对比 DART、OmniControl 和 MoMask 在 long-horizon controllable generation 上的设计。
+重点看表示方式、控制接口和实验证据。
+```
+
+基于本地知识库生成想法：
+
+```text
+/research-brainstorm-from-kb
+我想研究 text-driven reactive motion generation。
+请基于已经分析的论文提出 3 个方向。
+```
+
+把宽泛想法收敛成可执行计划：
+
+```text
+/idea-focus-coach
+我的想法是用 diffusion model 做 reactive motion generation，
+但我不确定范围应该多大，也不确定第一个实验应该是什么。
+请把它收敛成一个可执行 MVP。
+```
+
+像 reviewer 一样压力测试想法：
+
+```text
+/reviewer-stress-test
+请从 ICLR reviewer 的角度 review 我的想法：
+[粘贴 idea 描述，或指向 obsidian-vault/ideas/ 下的文件]
+重点关注 novelty、实验设计和与 SOTA 的差异。
+```
+
+## Skills
+
+维护中的 skill 库位于 `.claude/skills`。
+
+| 需求                       | Skill                                         |
+| -------------------------- | --------------------------------------------- |
+| 判断下一步 pipeline        | `research-workflow`                         |
+| 从本地文件夹导入 PDF       | 把 PDF 文件夹路径提供给 `research-workflow` |
+| 从网页收集候选论文         | `papers-collect-from-web`                   |
+| 从 GitHub 论文列表收集候选 | `papers-collect-from-github-repo`           |
+| 根据 triage list 下载 PDF  | `papers-download-from-list`                 |
+| 生成单篇深度报告           | `paper-report`                              |
+| 重建本地索引               | `papers-build-index`                        |
+| 基于本地笔记查询/对比论文  | `papers-query-knowledge-base`               |
+| 基于知识库生成研究想法     | `research-brainstorm-from-kb`               |
+| 把想法收敛为可执行计划     | `idea-focus-coach`                          |
+| 做 reviewer 风格压力测试   | `reviewer-stress-test`                      |
+| 导出可分享 Markdown        | `notes-export-share-version`                |
+
+完整 skill 地图见 [.claude/skills/README.md](.claude/skills/README.md)。
 
 ## 仓库结构
 
-```
-researchflow-backend/            # 核心后端 (唯一写入目标)
-  backend/
-    api/                         #   16 个路由器 (130 端点)
-    models/                      #   24 个 ORM 模型文件 (58 张表)
-    services/                    #   55 个服务模块
-    mcp/                         #   MCP 服务器 (35 工具 + 6 资源 + 4 提示)
-    workers/                     #   ARQ 后台任务队列
-    utils/                       #   PDF 提取、GROBID 客户端、frontmatter
-  alembic/                       #   16 次数据库迁移
-  frontend/                      #   Next.js 15 + Tailwind Web 控制台
-  ARCHITECTURE.md                #   完整技术文档 (v6)
-  DEPLOY.md                      #   生产部署指南
-obsidian-vault/                  # 自动生成的 Obsidian vault (只读)
-paperAnalysis/                   # 导出的分析笔记 (只读)
-paperCollection/                 # 收集索引 + 导航 (只读)
-paperIDEAs/                      # 研究想法笔记 (只读)
-scripts/                         # 维护和工具脚本
-.claude/skills/                  # 21 个 Claude Code 技能定义
-.mcp.json                       # MCP 服务器配置
-AGENTS.md                       # Agent/MCP 接入指南
+```text
+ResearchFlow/
+├── .claude/skills/                 维护中的 Agent skill library
+├── assets/                         公开 logo 和 README 素材
+├── environment/                    conda、dotenv 和本地环境文件
+├── linkedCodebases/                可选：链接相关本地代码仓库
+├── obsidian-vault/
+│   ├── paperPDFs/                  待分析 PDF
+│   ├── analysis/                   每篇论文的结构化分析笔记
+│   ├── index/                      生成的 JSONL 索引和导航页面
+│   └── ideas/                      ideas、plans、reviews 和 logs
+├── scripts/                        设置、维护和审计工具
+├── tests/                          本地/私有 regression tests，如存在
+├── AGENTS.md                       面向 Agent 的本地 workflow 规则
+├── STRUCTURE.md                    一级目录和文件策略
+├── README.md                       英文入口
+└── README_CN.md                    中文入口
 ```
 
-## 技术栈
+生成语料、私人笔记、本地凭据、缓存和大型研究产物不应进入 Git。每个一级文件和
+目录的策略见 [STRUCTURE.md](STRUCTURE.md)。
 
-| 层 | 技术 |
-|----|------|
-| 后端 | FastAPI (async) + SQLAlchemy 2.0 (async) |
-| 数据库 | PostgreSQL 16 + pgvector (1536d 向量) |
-| 任务队列 | ARQ + Redis 7 |
-| 前端 | Next.js 15 + Tailwind CSS |
-| PDF 解析 | PyMuPDF + GROBID 0.8.1 (ensemble) |
-| VLM | Claude Vision (图表分类 + 公式 OCR) |
-| LLM | Anthropic Claude / OpenAI (streaming) |
-| 元数据 | arXiv + Crossref + OpenAlex + S2 + DBLP + OpenReview + GitHub + HuggingFace |
-| MCP | Python MCP SDK (stdio + SSE) |
-| 存储 | Tencent COS / Alibaba OSS / Local |
-| 部署 | Docker Compose + Caddy (自动 HTTPS) |
+## 高级配置
 
-## 文档
+`<a id="codex-cli-compat"></a>`
 
-| 文档 | 读者 | 内容 |
-|------|------|------|
-| [ARCHITECTURE.md](researchflow-backend/ARCHITECTURE.md) | 开发者 | 数据模型 · 四层提取 · 6 步管线 · DB Schema · 全部 API · 55 个 Service |
-| [AGENTS.md](AGENTS.md) | Agent 开发 | 35 MCP 工具 · 6 资源 · 4 提示 · 21 Skills · 使用规则 |
-| [DEPLOY.md](researchflow-backend/DEPLOY.md) | 运维 | Docker 配置 · 容器架构 · 日常部署 · 代理 · 故障排查 |
+<details>
+<summary>Codex CLI compatibility</summary>
+
+Claude Code / Cursor 不需要这一步；Codex CLI 需要。
+
+仓库不跟踪 `.codex/`。clone 后，在本机生成 `.codex/skills` 和
+`.codex/skills-config.json`：
+
+```bash
+python3 scripts/setup_shared_skills.py
+```
+
+只检查 alias 是否存在、不改动文件：
+
+```bash
+python3 scripts/setup_shared_skills.py --check
+```
+
+</details>
+
+`<a id="obsidian-config"></a>`
+
+<details>
+<summary>Obsidian setup</summary>
+
+- Obsidian 是可选的可视化层，但推荐配置。
+- 如果需要 graph view、backlinks 和人工浏览，可以把 `obsidian-vault/` 作为
+  Obsidian vault 打开。
+- 不要把 Obsidian 页面当作独立 source of truth；它们只是 workflow 生成或维护的
+  本地文件。
+
+</details>
+
+ResearchFlow 当前只支持通过 conda 环境和本地命令运行本地文件工作流。
+
+## 数据卫生
+
+- `.env` 只保留在本地，只提交 `environment/.env.example`。
+- PDF、生成的分析笔记、生成索引、vault 页面、缓存、模型输出和私有实验不应进入
+  源码历史，除非你有意发布经过整理的示例。
+- 保持标准 `obsidian-vault/` 布局，这样 Agent 和脚本才能找到预期输入输出。
+- 不要把无关论文组混在同一个 category，除非你希望它们在检索时一起出现。
+- 发布 fork 或 release 前，建议做一次敏感信息扫描。
+
+## Citation
+
+如果 ResearchFlow 对你的研究有帮助，请直接引用本仓库：
+
+```bibtex
+@misc{lin2026researchflow,
+  title        = {{ResearchFlow}: A Structured Paper Analysis Framework for Knowledge-Grounded Research},
+  author       = {Jingzhong Lin and Ziheng Huang},
+  year         = {2026},
+  howpublished = {\url{https://github.com/RipeMangoBox/ResearchFlow}},
+  note         = {GitHub repository}
+}
+```
 
 ## License
 

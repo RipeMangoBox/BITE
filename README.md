@@ -1,248 +1,452 @@
+<p align="center">
+  <img src="./assets/LOGO.png" alt="ResearchFlow logo" width="280"/>
+</p>
 
+<h1 align="center">ResearchFlow</h1>
 
-# ResearchFlow
+<p align="center"><strong>Structured Paper Analysis and Research Memory for Knowledge-Grounded Research Agents</strong></p>
 
-**One paper in, a domain knowledge graph out.**
+<p align="center">
+  <a href="README.md">English</a> |
+  <a href="README_CN.md">中文</a>
+</p>
 
-[English](README.md) · [中文](README_CN.md)
+<p align="center">
+  <img alt="Local first" src="https://img.shields.io/badge/Local--first-Research%20Workflow-0f766e?style=flat-square"/>
+  <img alt="MinerU powered" src="https://img.shields.io/badge/MinerU-PDF%20Parsing-0891b2?style=flat-square"/>
+  <img alt="Agent skills" src="https://img.shields.io/badge/Agent-Skills-7c3aed?style=flat-square"/>
+  <img alt="Obsidian optional" src="https://img.shields.io/badge/Obsidian-optional-475569?style=flat-square"/>
+  <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
+</p>
 
----
+> **Knowledge first, not execution first.** Research agents are most useful
+> when they can ground decisions in structured paper evidence before they write
+> code, design experiments, or draft related work.
 
-ResearchFlow is a research operating system that transforms academic papers into a structured, evolving knowledge graph. Give it a seed paper or a research topic — it discovers related work, analyzes each paper through a 6-step LLM pipeline with built-in skepticism, tracks how methods improve upon each other as a DAG (not a flat list), and exports everything as a navigable Obsidian vault.
+ResearchFlow organizes paper PDFs and paper lists into local research memory:
+structured analysis notes, lightweight indexes, Obsidian-friendly navigation
+pages, and downstream idea or review notes. It is built for a
+human-in-the-loop research workflow, helping agents find what a paper changed,
+which evidence supports that conclusion, and where the method may fail.
 
-**What makes it different:** ResearchFlow doesn't just summarize papers. It reads methods and experiments *before* trusting abstracts, auto-builds comparison sets from its database (not from what papers claim), requires evidence anchors for high-value conclusions, and maintains consistency across the entire knowledge graph when new papers arrive.
+The default workflow is **local files only**. PDFs, Markdown notes, JSONL
+indexes, and idea notes all live under `obsidian-vault/`. Normal use does not
+require an API server, database, or service deployment.
 
-## What's Built
+ResearchFlow is a methodology and local knowledge workflow, not a closed
+platform. The valuable artifact is the research memory you keep accumulating.
 
-### Domain Cold Start
+## Current Goals
 
-Give a research topic → GitHub awesome-list discovery → auto-import 50-100 papers → triage + score → batch analyze → full knowledge graph. One API call to start.
+- [X] Release a stronger paper analysis template for structured, comparable,
+  and reusable paper understanding.
+- [ ] Improve automation from candidate papers to a maintained index.
+- [ ] Release a high-quality paper analysis knowledge base for
+  human-in-the-loop research.
+- [ ] Improve structured metadata for retrieval, filtering, and cross-paper
+  comparison.
 
-### 6-Step Analysis Pipeline
+## What ResearchFlow Does
 
-Each paper goes through 6 independently retryable analysis steps, not one monolithic LLM call:
-
-
-| Step                    | What it does                                  | Why it matters                                                    |
-| ----------------------- | --------------------------------------------- | ----------------------------------------------------------------- |
-| **extract_evidence**    | Equations, figures, evidence spans            | Reads method/experiments FIRST, then cross-checks abstract claims |
-| **build_delta_card**    | Baseline comparison, changed slots, mechanism | Grounded by Step 1 evidence — can't hallucinate                   |
-| **build_compare_set**   | Auto-fill comparison papers from DB           | 4 sources, not just paper's self-reported baselines               |
-| **propose_lineage**     | builds_on / extends / replaces edges          | Methods form a DAG with multi-inheritance                         |
-| **synthesize_concept**  | Update cross-paper CanonicalIdea              | Concepts accumulate across papers, not isolated                   |
-| **reconcile_neighbors** | Reverse-update related papers                 | Knowledge graph stays globally consistent                         |
-
-
-### 10-Step Metadata Enrichment (8 APIs)
-
-arXiv → Crossref → OpenAlex → Semantic Scholar → DBLP → OpenReview → GitHub → HuggingFace. Results stored in an observation ledger with authority ranking — conflicts resolved automatically, not overwritten blindly.
-
-### Parser Ensemble (L2)
-
-GROBID (authors, affiliations, references, formula coordinates) + PyMuPDF (sections, figures, captions) + VLM (figure classification, formula OCR → LaTeX). Deterministic extraction first, LLM only for what machines can't parse.
-
-### Method Evolution DAG
-
-Papers aren't a flat list — they form a directed acyclic graph tracking how methods build on each other:
-
-```
-GRPO (baseline, depth=0, 7 downstream)
-├── GRPO+LP (plugin, depth=1)
-│   └── GRPO-LP+sampling (depth=2)
-├── GDPO (structural, depth=1, parents=[GRPO, DPO])  ← multi-inheritance
-│   └── GDPO+image_thinking (depth=2)
-```
-
-When 3+ papers use a method as baseline → auto-promoted to established baseline → can evolve into new paradigm version. All promotions go through a review gate.
-
-### Faceted Taxonomy (15 dimensions, 75 seed nodes)
-
-Papers tagged across domain, modality, task, learning paradigm, mechanism, method baseline, model family, dataset, benchmark, metric, lab, venue — not just one category. DAG structure with `is_a`, `part_of`, `uses`, `optimizes` relations.
-
-### Obsidian Vault Export
-
-One-click export to a structured Obsidian vault with controlled wikilinks (6-10 per paper, not a hairball):
-
-```
-00_Home/           Navigation + reading order guide
-10_Lineages/       L__ Method evolution chains with ASCII trees
-20_Concepts/       C__ Mechanism + CanonicalIdea merged
-30_Bottlenecks/    B__ Cross-paper synthesis (symptom → root cause → solutions)
-40_Papers/
-  A__Baselines/    Must-read foundational papers (struct ≥ 0.7)
-  B__Structural/   Structural improvements (struct ≥ 0.5)
-  C__Plugins/      Plugin-type changes (struct ≥ 0.3)
-  D__Peripheral/   Peripheral references
-80_Assets/         Extracted figures from PDFs
-90_Views/          Static Markdown tables (no Dataview dependency)
+```text
+collect candidate papers / import local PDFs
+  -> download when needed
+  -> MinerU PDF parse
+  -> structured paper analysis
+  -> index
+  -> query / ideate / review / export
 ```
 
-### Candidate Queue + Multi-Agent Pipeline (V6)
+You can use it in four common modes:
 
-5-level absorption: `new → shallow → reference_done → deep → graph_ready`. 16 specialized LLM agents (12 prompt files) with Context Pack Builder. 4-tier scoring engine (DiscoveryScore → DeepIngestScore → GraphPromotionScore → AnchorScore). Node/edge profiles for knowledge graph entities. Cold start workflow and incremental sync (7 functions).
+| Mode     | Purpose                                                                                   | Typical entry                                                                   |
+| -------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Build    | Collect candidates, download PDFs, analyze papers, and refresh the index                  | `research-workflow`                                                           |
+| Query    | Retrieve papers by topic, task, method, venue, year, title, or technique tags             | `papers-query-knowledge-base`                                                 |
+| Decision | Compare methods before choosing baselines, changing a design, or writing related work     | `papers-query-knowledge-base`                                                 |
+| Idea     | Generate, focus, and stress-test research directions grounded in the local knowledge base | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
 
-### MCP Integration (35 tools)
+ResearchFlow is useful when you want to:
 
-Full MCP server with 35 tools + 6 resources + 4 prompt templates. Claude Code auto-discovers it — just talk naturally:
+- Build a topic-specific paper knowledge base from web pages, GitHub paper
+  lists, or local PDF folders.
+- Convert PDFs into structured notes with comparable fields, evidence anchors,
+  formulas, tables, figure/table metadata, and reading-order context.
+- Compare methods before selecting baselines, writing related work, or changing
+  a research design.
+- Generate research ideas, focus them into executable plans, and stress-test
+  them from a reviewer perspective.
+- Export share-ready Markdown or browse the knowledge base in Obsidian.
 
+## Architecture
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  Output layer        obsidian-vault/ideas/              │
+│                      ideas, plans, review notes          │
+├─────────────────────────────────────────────────────────┤
+│  Index layer         obsidian-vault/index/              │
+│                      JSONL index + Obsidian pages        │
+├─────────────────────────────────────────────────────────┤
+│  Evidence layer      obsidian-vault/analysis/           │
+│                      structured notes + logs             │
+│                      obsidian-vault/paperPDFs/           │
+│                      source PDFs                         │
+└─────────────────────────────────────────────────────────┘
 ```
-> Search for papers about "reward hacking in RLHF"
-> Analyze the top 3 results with full pipeline
-> Compare methods across these papers
-> Export the vault to Obsidian
-```
 
-### 21 Claude Code Skills
+- `obsidian-vault/paperPDFs/` stores the source PDFs.
+- `obsidian-vault/analysis/` stores per-paper analysis notes and logs. This is
+  the main evidence layer agents should read.
+- `obsidian-vault/index/` stores generated retrieval indexes and
+  navigation pages. At scale, agents should start from `index.jsonl`, filter
+  candidates, then read matching analysis notes.
+- `obsidian-vault/ideas/` stores downstream research outputs such as brainstorm
+  notes, focused plans, reviewer critiques, and daily logs.
+- Obsidian is optional. It is only a browsing and backlink layer; the repository
+  still works as a normal local folder.
 
-Research workflow automation: collect papers from GitHub/web/Zotero, analyze PDFs, query knowledge base, brainstorm ideas, focus hypotheses, run reviewer stress tests, generate deep reports with formula derivation, write daily logs.
+## Agent Compatibility
 
-### Interactive Research Exploration
+ResearchFlow intentionally stays plain: folders, Markdown, JSONL, CSV, and
+`SKILL.md`. The same research memory can therefore be shared by multiple agents:
 
-Multi-hop cognitive iteration: search → classify results (structural vs plugin) → gap analysis → pivot → broaden. System remembers rejection patterns and suggests new directions.
-
-### Web Dashboard
-
-Next.js 15 frontend with paper management, search, graph visualization, lineage viewer, review queue, digest reader, bottleneck explorer, and import tools.
-
-## System Scale
-
-
-| Component          | Count                                                           |
-| ------------------ | --------------------------------------------------------------- |
-| Database tables    | 58 + 4 materialized views                                       |
-| API endpoints      | 130 across 16 routers                                           |
-| MCP                | 35 tools + 6 resources + 4 prompts                              |
-| Services           | 55 modules                                                      |
-| Worker tasks       | 22                                                              |
-| ORM model files    | 24 (15 V6 classes)                                              |
-| Agent prompts      | 12                                                              |
-| Claude Code skills | 21                                                              |
-| Metadata APIs      | 8 (arXiv, Crossref, OpenAlex, S2, DBLP, OpenReview, GitHub, HF) |
-| Built-in paradigms | 4 (RL, VLM, Agent, MotionGen) + LLM dynamic discovery           |
-| DB migrations      | 16 versions                                                     |
-| Enums              | 9 types (PaperState with 15 states, Tier, Importance, etc.)     |
-
+- Claude Code / Cursor can read `.claude/skills` directly.
+- Codex CLI can use `scripts/setup_shared_skills.py` to generate local aliases.
+- Other agents that can read files can read `obsidian-vault/index/index.jsonl`
+  and `obsidian-vault/analysis/` directly, without special integration.
 
 ## Quick Start
 
-```bash
-# 1. Start the system
-cd researchflow-backend && cp .env.example .env  # set ANTHROPIC_API_KEY
-docker compose up -d
-docker compose exec api alembic upgrade head
+ResearchFlow is used across macOS, Windows, and Linux. The default analysis
+workflow does not require OS-specific tools such as `jq`, `curl`, or `make`.
+PDF helper libraries such as Poppler and Ghostscript are already declared in the
+Conda environment, so the README does not list OS-specific installation steps.
 
-# 2. Bootstrap a domain from scratch
-curl -X POST localhost:8000/api/v1/pipeline/init-domain \
-  -H "Content-Type: application/json" \
-  -d '{"domain": "RLHF for VLM"}'
-
-# 3. Batch analyze top-priority papers
-curl -X POST localhost:8000/api/v1/pipeline/batch?limit=10
-
-# 4. Export Obsidian vault
-curl -X POST localhost:8000/api/v1/pipeline/export/obsidian-vault
-```
-
-API docs at `http://localhost:8000/api/v1/docs`
-
-## Connect Claude Code via MCP
-
-ResearchFlow exposes an MCP server. Claude Code auto-discovers `.mcp.json` in the project root.
-
-### Remote (connect to deployed server)
-
-```json
-{
-  "mcpServers": {
-    "researchflow": {
-      "url": "https://your-domain/sse"
-    }
-  }
-}
-```
-
-### Local (run alongside backend)
-
-```json
-{
-  "mcpServers": {
-    "researchflow-local": {
-      "command": "python",
-      "args": ["-m", "backend.mcp.server"],
-      "cwd": "researchflow-backend",
-      "env": {"PYTHONPATH": "."}
-    }
-  }
-}
-```
-
-## Sync Obsidian Vault
+### 1. Create the conda environment
 
 ```bash
-# Export on server
-curl -X POST localhost:8000/api/v1/pipeline/export/obsidian-vault
+git clone https://github.com/<your-username>/ResearchFlow.git
+cd ResearchFlow
 
-# Sync to local machine
-rsync -avz --delete -e ssh \
-  root@your-server:/opt/researchflow/obsidian-vault/ \
-  ./obsidian-vault/
-
-# Open in Obsidian → Graph View (Cmd+G)
-# Recommended colors: Papers=blue, Concepts=green, Bottlenecks=red, Lineages=orange
+conda env create -f environment/environment.yml
+conda activate researchflow
 ```
 
-## Repository Layout
+### 2. Configure model and parser access
 
-```
-researchflow-backend/            # Core backend (single source of truth)
-  backend/
-    api/                         #   16 routers (130 endpoints)
-    models/                      #   24 ORM model files (58 tables)
-    services/                    #   55 service modules
-    mcp/                         #   MCP server (35 tools + 6 resources + 4 prompts)
-    workers/                     #   ARQ background task queue
-    utils/                       #   PDF extraction, GROBID client, frontmatter
-  alembic/                       #   16 database migrations
-  frontend/                      #   Next.js 15 + Tailwind web dashboard
-  ARCHITECTURE.md                #   Complete technical reference (v6)
-  DEPLOY.md                      #   Production deployment guide
-obsidian-vault/                  # Auto-generated Obsidian vault (read-only)
-paperAnalysis/                   # Exported analysis Markdown (read-only)
-paperCollection/                 # Collection index + navigation (read-only)
-paperIDEAs/                      # Research idea notes (read-only)
-scripts/                         # Maintenance & utility scripts
-.claude/skills/                  # 21 Claude Code skill definitions
-.mcp.json                       # MCP server configuration
-AGENTS.md                       # Agent/MCP integration guide
+Most local operations work without a checked-in config file. When you need to
+set model keys, model names, or parser overrides, create a repo-root `.env` and
+use [environment/.env.example](environment/.env.example) as a reference. Do not
+put secrets into `.env.example`.
+
+Common OpenAI-compatible variables:
+
+```dotenv
+OPENAI_API_KEY=
+OPENAI_BASE_URL=https://api.deepseek.com
+OPENAI_MODEL=deepseek-chat
 ```
 
-## Tech Stack
+### 3. Install or configure MinerU
 
+MinerU is the recommended parser for formal paper analysis. Ask the agent to
+install, configure, and verify MinerU for your machine instead of following a
+long manual setup in the README.
 
-| Layer       | Technology                                                                  |
-| ----------- | --------------------------------------------------------------------------- |
-| Backend     | FastAPI (async) + SQLAlchemy 2.0 (async)                                    |
-| Database    | PostgreSQL 16 + pgvector (1536d embeddings)                                 |
-| Task Queue  | ARQ + Redis 7                                                               |
-| Frontend    | Next.js 15 + Tailwind CSS                                                   |
-| PDF Parsing | PyMuPDF + GROBID 0.8.1 (ensemble)                                           |
-| VLM         | Claude Vision (figure classification + formula OCR)                         |
-| LLM         | Anthropic Claude / OpenAI (streaming)                                       |
-| Metadata    | arXiv + Crossref + OpenAlex + S2 + DBLP + OpenReview + GitHub + HuggingFace |
-| MCP         | Python MCP SDK (stdio + SSE transports)                                     |
-| Storage     | Tencent COS / Alibaba OSS / Local                                           |
-| Deployment  | Docker Compose + Caddy (auto HTTPS)                                         |
+Minimal verification: `mineru --help` should run, or `.env` should set
+`MINERU_CLI_PATH` to the MinerU executable.
 
+### 4. Prepare agent skills
 
-## Documentation
+Claude Code and Cursor can read `.claude/skills` directly. For Codex-compatible
+skill paths, generate local aliases:
 
+```bash
+python3 scripts/setup_shared_skills.py
+```
 
-| Document                                                | Audience       | Content                                                                           |
-| ------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------- |
-| [ARCHITECTURE.md](researchflow-backend/ARCHITECTURE.md) | Developers     | Data model, 4-layer extraction, 6-step pipeline, DB schema, all APIs, 55 services |
-| [AGENTS.md](AGENTS.md)                                  | Agent builders | 35 MCP tools, 6 resources, 4 prompts, 21 skills, working rules                    |
-| [DEPLOY.md](researchflow-backend/DEPLOY.md)             | Ops            | Docker setup, container architecture, daily deployment, proxy, troubleshooting    |
+Then start from the workflow skill:
 
+```text
+/research-workflow
+I want to build a knowledge base for controllable motion generation from PDFs.
+Please tell me the next step and the expected outputs.
+```
+
+The default workflow does not require starting any service. Use the local
+folders under `obsidian-vault/` as the working state.
+
+## Usage Examples
+
+Build a topic knowledge base from scratch:
+
+```text
+/research-workflow
+I want to build a knowledge base for text-driven reactive motion generation.
+Start by collecting candidate papers and tell me which skill to use at each stage.
+```
+
+Collect candidate papers from a GitHub paper list:
+
+```text
+/papers-collect-from-github-repo
+Collect papers related to controllable human motion generation from this GitHub repository: <URL>
+Keep only items related to diffusion, controllability, real-time generation, or long-form motion.
+Write a candidate list suitable for the downstream download workflow.
+```
+
+Import PDFs from a local folder:
+
+```text
+/research-workflow
+I already have PDFs under /path/to/pdf-folder.
+Please register them under obsidian-vault/paperPDFs/ using category Motion_Generation,
+venue CVPR, and year 2026, then tell me which paper to analyze first.
+```
+
+Download PDFs from a curated candidate list:
+
+```text
+/papers-download-from-list
+Download the papers that are still marked as Wait in the current candidate list.
+Report successful downloads, failures, and skipped items.
+```
+
+Generate a deep report for a prepared PDF:
+
+```text
+/paper-report
+Generate a deep report for obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf.
+Save the report under obsidian-vault/analysis/ with source anchors preserved.
+```
+
+Run the formal local analysis chain directly when you need the actual pipeline
+artifacts and figure/table-aware vault export:
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault
+```
+
+If MinerU output already exists, reuse it instead of reparsing:
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --mineru-output "<mineru_output_dir>" \
+  --paper-pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault
+```
+
+For a normalized MinerU cache, keep one paper output per directory and let the
+runner discover it from the PDF stem:
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --mineru-output-root "<mineru_output_root>" \
+  --require-existing-mineru-output \
+  --export-vault
+```
+
+For controlled experiments, keep the real venue/year metadata and redirect only
+the Markdown note path with `--vault-note-dir`.
+
+The formal local runner is the default analysis route for pipeline artifacts.
+
+Analyze a batch from a paper list:
+
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded \
+  --limit 25 \
+  --mineru-output-root "<mineru_output_root>" \
+  --require-existing-mineru-output
+```
+
+For larger runs, split the list with `papers-batch-analyze` and run up to four
+worker agents in parallel.
+
+For long-running runs where agent disconnection is a bigger risk than automatic
+repair, run four script-only shards instead. Each process writes its own queue
+results and its own analysis work directory:
+
+```bash
+RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
+for shard in 0 1 2 3; do
+  python3 scripts/run_paper_list_analysis.py \
+    --source obsidian-vault/paper_list.csv \
+    --state Downloaded \
+    --run-id "${RUN_ID}_shard${shard}" \
+    --shard-index "$shard" \
+    --shard-count 4 \
+    --analysis-output-root "_private/local_analysis_runs/${RUN_ID}_shard${shard}" \
+    --mineru-output-root "_private/iclr26_batch/mineru_outputs" \
+    --require-existing-mineru-output \
+    > "_private/local_analysis_runs/${RUN_ID}_shard${shard}.log" 2>&1 &
+done
+wait
+```
+
+After the scripts finish, inspect `obsidian-vault/batches/<run_id>/summary.json`
+and `results.jsonl`, then run post-hoc repair or index refresh.
+
+Refresh the index manually when needed:
+
+```bash
+python3 .claude/skills/papers-build-index/scripts/build_paper_index.py
+```
+
+Ask a literature question:
+
+```text
+/papers-query-knowledge-base
+Compare DART, OmniControl, and MoMask for long-horizon controllable generation.
+Focus on representation design, control interface, and experimental evidence.
+```
+
+Generate an idea grounded in your local knowledge base:
+
+```text
+/research-brainstorm-from-kb
+I want to study text-driven reactive motion generation.
+Propose 3 directions grounded in the papers already analyzed.
+```
+
+Narrow an idea into an executable plan:
+
+```text
+/idea-focus-coach
+My idea is to use a diffusion model for reactive motion generation,
+but I am not sure how large the scope should be or what the first experiment should be.
+Please narrow it into an executable MVP.
+```
+
+Pressure-test an idea:
+
+```text
+/reviewer-stress-test
+Review my idea from the perspective of an ICLR reviewer:
+[paste the idea description or point to a file under obsidian-vault/ideas/]
+Focus on novelty, experimental design, and differentiation from SOTA.
+```
+
+## Skills
+
+The maintained skill library lives in `.claude/skills`.
+
+| Need                                       | Skill                               |
+| ------------------------------------------ | ----------------------------------- |
+| Decide the next pipeline step              | `research-workflow`               |
+| Import PDFs from a local folder            | Provide the folder path to `research-workflow` |
+| Collect candidates from web pages          | `papers-collect-from-web`         |
+| Collect candidates from GitHub paper lists | `papers-collect-from-github-repo` |
+| Download PDFs from a triage list           | `papers-download-from-list`       |
+| Generate a deep single-paper report        | `paper-report`                 |
+| Rebuild the local index                    | `papers-build-index`              |
+| Query or compare papers from local notes   | `papers-query-knowledge-base`     |
+| Generate grounded research ideas           | `research-brainstorm-from-kb`     |
+| Focus an idea into an executable plan      | `idea-focus-coach`                |
+| Run reviewer-style stress tests            | `reviewer-stress-test`            |
+| Export share-ready Markdown                | `notes-export-share-version`      |
+
+See [.claude/skills/README.md](.claude/skills/README.md) for the full skill map.
+
+## Repository Structure
+
+```text
+ResearchFlow/
+├── .claude/skills/                 maintained agent skill library
+├── assets/                         public logo and README assets
+├── environment/                    conda, dotenv, and local Python tooling files
+├── linkedCodebases/                optional links to related local codebases
+├── obsidian-vault/
+│   ├── paperPDFs/                  source PDFs for analysis
+│   ├── analysis/                   structured per-paper analysis notes
+│   ├── index/                      generated JSONL index and navigation pages
+│   └── ideas/                      ideas, plans, reviews, and logs
+├── scripts/                        setup, maintenance, and audit utilities
+├── tests/                          local/private regression tests when present
+├── AGENTS.md                       agent-facing local workflow rules
+├── STRUCTURE.md                    top-level directory and file policy
+├── README.md                       English entry point
+└── README_CN.md                    Chinese entry point
+```
+
+Generated corpora, private notes, local credentials, caches, and large research
+artifacts should stay out of Git. See [STRUCTURE.md](STRUCTURE.md) for the
+policy for every top-level file and directory.
+
+## Advanced Config
+
+`<a id="codex-cli-compat"></a>`
+
+<details>
+<summary>Codex CLI compatibility</summary>
+
+Claude Code / Cursor does not need this step. Codex CLI does.
+
+The repository does not track `.codex/`. After clone, generate
+`.codex/skills` and `.codex/skills-config.json` locally:
+
+```bash
+python3 scripts/setup_shared_skills.py
+```
+
+Verify aliases without changing them:
+
+```bash
+python3 scripts/setup_shared_skills.py --check
+```
+
+</details>
+
+`<a id="obsidian-config"></a>`
+
+<details>
+<summary>Obsidian setup</summary>
+
+- Obsidian is optional but strongly recommended. It is only a visualization layer.
+- Open `obsidian-vault/` as an Obsidian vault if you want graph view,
+  backlinks, and manual browsing.
+- Do not treat Obsidian pages as a separate source of truth; they are local
+  files generated or maintained by the workflow.
+
+</details>
+
+ResearchFlow currently supports the local file workflow through the conda
+environment and local commands only.
+
+## Data Hygiene
+
+- Keep `.env` local and commit `environment/.env.example` only.
+- Keep PDFs, generated analysis notes, generated indexes, vault pages, caches,
+  model outputs, and private experiments out of source history unless you are
+  intentionally publishing a curated example.
+- Preserve the standard `obsidian-vault/` layout so agents and scripts can find
+  the expected inputs and outputs.
+- Avoid mixing unrelated paper sets in the same category unless you want
+  them retrieved together.
+- Run a sensitive-token scan before publishing a fork or release.
+
+## Citation
+
+If ResearchFlow helps your research, please cite the repository directly:
+
+```bibtex
+@misc{lin2026researchflow,
+  title        = {{ResearchFlow}: A Structured Paper Analysis Framework for Knowledge-Grounded Research},
+  author       = {Jingzhong Lin and Ziheng Huang},
+  year         = {2026},
+  howpublished = {\url{https://github.com/RipeMangoBox/ResearchFlow}},
+  note         = {GitHub repository}
+}
+```
 
 ## License
 

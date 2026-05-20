@@ -1,7 +1,10 @@
 # obsidian-vault
 
-Current Obsidian exports are generated from PostgreSQL and are intentionally not
-tracked here.
+This directory is the optional Obsidian view of a ResearchFlow knowledge base.
 
-Run the backend vault exporter to rebuild the human-facing paper, dataset,
-method, and domain navigation pages.
+Use it when you want a human-browsable layer over the same paper memory:
+overview pages, paper pages, method pages, backlinks, and graph navigation.
+
+The source material remains your PDFs and structured analysis notes. Vault
+pages are generated views and can be rebuilt when the analysis notes or index
+change.
