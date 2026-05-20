@@ -12,36 +12,38 @@
 </p>
 
 <p align="center">
-  <img alt="Local first" src="https://img.shields.io/badge/Local--first-Research%20Workflow-0f766e?style=flat-square"/>
+  <img alt="Semi-automated" src="https://img.shields.io/badge/Semi--automated-Research%20Workflow-1f6feb?style=flat-square"/>
+  <img alt="Markdown first" src="https://img.shields.io/badge/Markdown--first-Local%20Files-0f766e?style=flat-square"/>
+  <img alt="Knowledge base" src="https://img.shields.io/badge/Local-Knowledge%20Base-0891b2?style=flat-square"/>
   <img alt="MinerU powered" src="https://img.shields.io/badge/MinerU-PDF%20Parsing-0891b2?style=flat-square"/>
-  <img alt="Agent skills" src="https://img.shields.io/badge/Agent-Skills-7c3aed?style=flat-square"/>
+  <img alt="Claude Code compatible" src="https://img.shields.io/badge/Claude%20Code-compatible-d97706?style=flat-square"/>
+  <img alt="Codex CLI compatible" src="https://img.shields.io/badge/Codex%20CLI-compatible-7c3aed?style=flat-square"/>
   <img alt="Obsidian optional" src="https://img.shields.io/badge/Obsidian-optional-475569?style=flat-square"/>
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> **先构建知识，再让 Agent 行动。** 研究 Agent 在写代码、设计实验或起草 related
-> work 之前，应该先能从结构化论文证据中找到支撑决策的依据。
+> 🔥 **ResearchFlow 社区交流** | 微信交流 / ResearchFlow 微信交流群
 
-ResearchFlow 会把论文 PDF 和论文列表整理成本地 research memory：结构化分析笔记、
-轻量索引、Obsidian 友好的导航页面，以及后续 idea 或 review notes。它面向
-human-in-the-loop 的研究流程，帮助 Agent 找到一篇论文改变了什么、哪些证据支撑
-这个结论，以及方法可能在哪里失效。
+---
 
-当前默认 workflow 是 **local files only**。PDF、Markdown 笔记、JSONL 索引和
-idea notes 都放在 `obsidian-vault/` 下。正常使用不需要 API server、数据库或服务
-部署。
+> 🧠 **先构建知识，再让 Agent 行动。** 大多数 AI 科研工具关注“帮你跑实验、写论文”。ResearchFlow 更关注上游问题：**你的 agent 在做决策时，手里有没有足够的、结构化的、可检索的论文证据？**
+>
+> 🧩 **把结构化论文分析沉淀为可复用的 research memory。** ResearchFlow 会把论文 PDF 和论文列表整理成本地知识库：结构化分析笔记、轻量索引、Obsidian 友好的导航页面，以及后续 idea 或 review notes。
+>
+> 🪶 **本地优先，低锁定。** 当前默认 workflow 是 **local files only**：PDF、Markdown 笔记、JSONL 索引和 idea notes 都放在 `obsidian-vault/` 下。正常使用不需要 API server、数据库或服务部署。
 
-ResearchFlow 是一种方法论和本地知识工作流，不是封闭平台。真正有价值的是你持续
-积累的 research memory。
+💡 _ResearchFlow 是一种方法论和本地知识工作流，不是封闭平台。真正有价值的是你持续积累的 research memory。_
 
-## 当前目标
+## 🔭 当前目标
 
 - [X] 发布更强的论文分析模板，让论文理解更结构化、可比较、可复用。
 - [ ] 提升从候选论文到维护索引的自动化程度。
 - [ ] 发布高质量论文分析知识库，支持 human-in-the-loop 研究。
 - [ ] 改进结构化 metadata，支持检索、过滤和跨论文对比。
 
-## ResearchFlow 能做什么
+## 🎯 不只是 prompt，而是完整的知识管线
+
+给 ResearchFlow 一个研究方向，它可以帮你把知识库逐步建起来：
 
 ```text
 collect candidate papers / import local PDFs
@@ -70,7 +72,7 @@ collect candidate papers / import local PDFs
 - 基于已有论文生成研究想法，收敛为可执行计划，并用 reviewer 视角做压力测试。
 - 导出可分享 Markdown，或在 Obsidian 中浏览知识库。
 
-## 架构
+## 🏗️ 三层架构
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
@@ -96,7 +98,7 @@ collect candidate papers / import local PDFs
   reviewer critiques 和 daily logs。
 - Obsidian 是可选的，只是浏览和 backlink 层；仓库作为普通本地文件夹也能工作。
 
-## Agent 兼容
+## 🤖 Agent 兼容
 
 ResearchFlow 有意保持朴素：文件夹、Markdown、JSONL、CSV 和 `SKILL.md`。因此同一
 份 research memory 可以被多个 Agent 共享：
@@ -106,7 +108,7 @@ ResearchFlow 有意保持朴素：文件夹、Markdown、JSONL、CSV 和 `SKILL.
 - 其他能读取文件的 Agent 可以直接读取 `obsidian-vault/index/index.jsonl`
   和 `obsidian-vault/analysis/`，无需特殊集成。
 
-## 快速开始
+## 🚀 快速开始
 
 ResearchFlow 的用户可能在 macOS、Windows 或 Linux 上工作。默认分析 workflow
 不强依赖 `jq`、`curl`、`make` 这类系统命令。PDF 相关的 Poppler、Ghostscript
@@ -165,7 +167,7 @@ python3 scripts/setup_shared_skills.py
 默认 workflow 不需要启动任何服务。使用 `obsidian-vault/` 下的本地文件夹作为工作
 状态即可。
 
-## 使用示例
+## 📖 使用示例
 
 从零构建一个主题知识库：
 
@@ -297,7 +299,7 @@ python3 .claude/skills/papers-build-index/scripts/build_paper_index.py
 重点关注 novelty、实验设计和与 SOTA 的差异。
 ```
 
-## Skills
+## ✨ 核心能力
 
 维护中的 skill 库位于 `.claude/skills`。
 
@@ -327,22 +329,20 @@ ResearchFlow/
 ├── environment/                    conda、dotenv 和本地环境文件
 ├── linkedCodebases/                可选：链接相关本地代码仓库
 ├── obsidian-vault/
-│   ├── paperPDFs/                  待分析 PDF
+│   ├── paperPDFs/                  本地 PDF
 │   ├── analysis/                   每篇论文的结构化分析笔记
 │   ├── index/                      生成的 JSONL 索引和导航页面
 │   └── ideas/                      ideas、plans、reviews 和 logs
 ├── scripts/                        设置、维护和审计工具
 ├── tests/                          本地/私有 regression tests，如存在
 ├── AGENTS.md                       面向 Agent 的本地 workflow 规则
-├── STRUCTURE.md                    一级目录和文件策略
 ├── README.md                       英文入口
 └── README_CN.md                    中文入口
 ```
 
-生成语料、私人笔记、本地凭据、缓存和大型研究产物不应进入 Git。每个一级文件和
-目录的策略见 [STRUCTURE.md](STRUCTURE.md)。
+生成语料、私人笔记、本地凭据、缓存和大型研究产物不应进入 Git。
 
-## 高级配置
+## 补充配置
 
 `<a id="codex-cli-compat"></a>`
 

@@ -12,31 +12,39 @@
 </p>
 
 <p align="center">
-  <img alt="Local first" src="https://img.shields.io/badge/Local--first-Research%20Workflow-0f766e?style=flat-square"/>
+  <img alt="Semi-automated" src="https://img.shields.io/badge/Semi--automated-Research%20Workflow-1f6feb?style=flat-square"/>
+  <img alt="Markdown first" src="https://img.shields.io/badge/Markdown--first-Local%20Files-0f766e?style=flat-square"/>
+  <img alt="Knowledge base" src="https://img.shields.io/badge/Local-Knowledge%20Base-0891b2?style=flat-square"/>
   <img alt="MinerU powered" src="https://img.shields.io/badge/MinerU-PDF%20Parsing-0891b2?style=flat-square"/>
-  <img alt="Agent skills" src="https://img.shields.io/badge/Agent-Skills-7c3aed?style=flat-square"/>
+  <img alt="Claude Code compatible" src="https://img.shields.io/badge/Claude%20Code-compatible-d97706?style=flat-square"/>
+  <img alt="Codex CLI compatible" src="https://img.shields.io/badge/Codex%20CLI-compatible-7c3aed?style=flat-square"/>
   <img alt="Obsidian optional" src="https://img.shields.io/badge/Obsidian-optional-475569?style=flat-square"/>
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> **Knowledge first, not execution first.** Research agents are most useful
-> when they can ground decisions in structured paper evidence before they write
-> code, design experiments, or draft related work.
+> 🔥 **ResearchFlow Community** | WeChat discussion group for Chinese users
 
-ResearchFlow organizes paper PDFs and paper lists into local research memory:
-structured analysis notes, lightweight indexes, Obsidian-friendly navigation
-pages, and downstream idea or review notes. It is built for a
-human-in-the-loop research workflow, helping agents find what a paper changed,
-which evidence supports that conclusion, and where the method may fail.
+---
 
-The default workflow is **local files only**. PDFs, Markdown notes, JSONL
-indexes, and idea notes all live under `obsidian-vault/`. Normal use does not
-require an API server, database, or service deployment.
+> 🧠 **Knowledge first, not execution first.** Many AI research tools focus on
+> helping you run experiments or draft papers. ResearchFlow focuses on the
+> upstream question: **when an agent makes a research decision, does it have
+> enough structured, searchable paper evidence in hand?**
+>
+> 🧩 **Turn structured paper analysis into reusable research memory.**
+> ResearchFlow organizes paper PDFs and paper lists into a local knowledge base:
+> structured analysis notes, lightweight indexes, Obsidian-friendly navigation
+> pages, and downstream idea or review notes.
+>
+> 🪶 **Local-first with low lock-in.** The default workflow is **local files
+> only**: PDFs, Markdown notes, JSONL indexes, and idea notes all live under
+> `obsidian-vault/`. Normal use does not require an API server, database, or
+> service deployment.
 
-ResearchFlow is a methodology and local knowledge workflow, not a closed
-platform. The valuable artifact is the research memory you keep accumulating.
+💡 _ResearchFlow is a methodology and local knowledge workflow, not a closed
+platform. The valuable artifact is the research memory you keep accumulating._
 
-## Current Goals
+## 🔭 Current Goals
 
 - [X] Release a stronger paper analysis template for structured, comparable,
   and reusable paper understanding.
@@ -46,7 +54,10 @@ platform. The valuable artifact is the research memory you keep accumulating.
 - [ ] Improve structured metadata for retrieval, filtering, and cross-paper
   comparison.
 
-## What ResearchFlow Does
+## 🎯 More Than A Prompt: A Knowledge Pipeline
+
+Give ResearchFlow a research direction, and it helps you build the knowledge
+base step by step:
 
 ```text
 collect candidate papers / import local PDFs
@@ -78,7 +89,7 @@ ResearchFlow is useful when you want to:
   them from a reviewer perspective.
 - Export share-ready Markdown or browse the knowledge base in Obsidian.
 
-## Architecture
+## 🏗️ Three-Layer Architecture
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
@@ -106,7 +117,7 @@ ResearchFlow is useful when you want to:
 - Obsidian is optional. It is only a browsing and backlink layer; the repository
   still works as a normal local folder.
 
-## Agent Compatibility
+## 🤖 Agent Compatibility
 
 ResearchFlow intentionally stays plain: folders, Markdown, JSONL, CSV, and
 `SKILL.md`. The same research memory can therefore be shared by multiple agents:
@@ -116,7 +127,7 @@ ResearchFlow intentionally stays plain: folders, Markdown, JSONL, CSV, and
 - Other agents that can read files can read `obsidian-vault/index/index.jsonl`
   and `obsidian-vault/analysis/` directly, without special integration.
 
-## Quick Start
+## 🚀 Quick Start
 
 ResearchFlow is used across macOS, Windows, and Linux. The default analysis
 workflow does not require OS-specific tools such as `jq`, `curl`, or `make`.
@@ -177,7 +188,7 @@ Please tell me the next step and the expected outputs.
 The default workflow does not require starting any service. Use the local
 folders under `obsidian-vault/` as the working state.
 
-## Usage Examples
+## 📖 Usage Examples
 
 Build a topic knowledge base from scratch:
 
@@ -336,7 +347,7 @@ Review my idea from the perspective of an ICLR reviewer:
 Focus on novelty, experimental design, and differentiation from SOTA.
 ```
 
-## Skills
+## ✨ Core Capabilities
 
 The maintained skill library lives in `.claude/skills`.
 
@@ -373,14 +384,12 @@ ResearchFlow/
 ├── scripts/                        setup, maintenance, and audit utilities
 ├── tests/                          local/private regression tests when present
 ├── AGENTS.md                       agent-facing local workflow rules
-├── STRUCTURE.md                    top-level directory and file policy
 ├── README.md                       English entry point
 └── README_CN.md                    Chinese entry point
 ```
 
 Generated corpora, private notes, local credentials, caches, and large research
-artifacts should stay out of Git. See [STRUCTURE.md](STRUCTURE.md) for the
-policy for every top-level file and directory.
+artifacts should stay out of Git.
 
 ## Advanced Config
 
