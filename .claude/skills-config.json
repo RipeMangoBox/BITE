@@ -1,8 +1,12 @@
 {
  "skills": {
   "code-context-paper-retrieval": {
-   "description": "Alias for papers-query-knowledge-base in code-context mode. Retrieves code-context-relevant papers from local knowledge base in two modes (brief/deep), using paperAnalysis as the primary retrieval source. When paperCollection/index.jsonl is present, reads it first for fast filtering. Trigger timing: BEFORE code modification. Environment detection prioritizes codebase environment files; asks user if none found.",
+   "description": "Retrieves code-context-relevant papers from the local knowledge base before code modifications. Compatibility alias for papers-query-knowledge-base code-context mode.",
    "path": ".claude/skills/code-context-paper-retrieval/SKILL.md"
+  },
+  "domain-fork": {
+   "description": "Adapts ResearchFlow workflow concepts, skills, and folder structure to another professional domain. Explicit trigger only.",
+   "path": ".claude/skills/domain-fork/SKILL.md"
   },
   "idea-focus-coach": {
    "description": "Guides research ideation from broad thoughts to a focused, testable plan with explicit scope cuts, prioritized hypotheses, and immediate next experiments. Calls papers-query-knowledge-base for local KB evidence and web search for frontier context. Use when the user wants co-creation and step-by-step narrowing, not review verdicts. Can be used independently from reviewer-stress-test.",
@@ -12,69 +16,61 @@
    "description": "Converts internal research notes into shareable Obsidian-friendly Markdown files. Use when the user explicitly asks to make a share version, export a note for sharing, hide knowledge base traces, replace internal wiki links with public paper links, rewrite internal wording for external readers, or generate a content-driven share filename.",
    "path": ".claude/skills/notes-export-share-version/SKILL.md"
   },
-  "papers-analyze-pdf": {
-   "description": "Analyzes academic PDFs into structured Markdown under paperAnalysis. Reads local PDFs only (no network, no image generation). Use when the user asks to analyze one PDF or a folder of PDFs, or to run paper analysis for the local knowledge base. Handles path resolution so that if the PDF is already under paperPDFs/<Category>/<Venue_Year>/, the .md is written to paperAnalysis in the same structure; otherwise infers category and venue (e.g. CVPR_2025), copies the PDF into paperPDFs, and writes the .md to paperAnalysis.",
-   "path": ".claude/skills/papers-analyze-pdf/SKILL.md"
+  "paper-report": {
+   "description": "Generates deep structured reports for single papers with formula derivation, pipeline module decomposition, experiment analysis, and recursive related work. Use when the user asks for a deep report, detailed paper analysis, or 公式推导 for a specific paper.",
+   "path": ".claude/skills/paper-report/SKILL.md"
   },
   "papers-audit-metadata-consistency": {
-   "description": "Runs a unified metadata consistency audit across paperAnalysis logs and analysis notes, checking title/venue/year/category consistency, link/pdf_ref completeness, duplicates, and structure anomalies; writes quality_report_*.md under paperAnalysis.",
+   "description": "Runs a unified metadata consistency audit across obsidian-vault/analysis logs and analysis notes, checking title/venue/year/category consistency, link/pdf_ref completeness, duplicates, and structure anomalies; writes quality_report_*.md under obsidian-vault/analysis.",
    "path": ".claude/skills/papers-audit-metadata-consistency/SKILL.md"
   },
-  "papers-build-collection-index": {
-   "description": "Builds/refreshes `paperCollection/index.jsonl` (agent index) and `paperCollection/` Obsidian navigation pages from `paperAnalysis/` frontmatter. Use when the user asks to update/rebuild indexes, regenerate navigation pages (by task/technique/venue), or after adding/editing analysis notes and PDF refs.",
-   "path": ".claude/skills/papers-build-collection-index/SKILL.md"
+  "papers-batch-analyze": {
+   "description": "Batch-analyzes papers from a user-provided CSV or `obsidian-vault/paper_list.csv`. Splits the list into `obsidian-vault/batches/<run_id>/batch_0001.csv` files, coordinates 4 parallel worker agents over 4 batches by default, writes analysis notes under `obsidian-vault/analysis/`, isolates failures per batch, and runs `papers-build-index` after completed batches.",
+   "path": ".claude/skills/papers-batch-analyze/SKILL.md"
   },
-  "papers-collect-from-github-awesome": {
-   "description": "Collects paper candidates from a GitHub awesome / curated repo README. Agent fetches the README, analyzes its format, writes a one-off parser, and outputs rows aligned with analysis_log.csv. No pre-built scripts — agent adapts to each repo's format on the fly.",
-   "path": ".claude/skills/papers-collect-from-github-awesome/SKILL.md"
+  "papers-build-index": {
+   "description": "Builds/refreshes `obsidian-vault/index/index.jsonl` and aggregate Obsidian navigation pages from `obsidian-vault/paper_list.csv` when present, enriched by `obsidian-vault/analysis/` frontmatter when available. Use after completed analysis batches or when users ask to rebuild the local paper index.",
+   "path": ".claude/skills/papers-build-index/SKILL.md"
+  },
+  "papers-collect-from-github-repo": {
+   "description": "Collects paper candidates from any GitHub repository README or docs. Agent fetches the relevant Markdown, analyzes its format, writes a one-off parser, and outputs rows aligned with `obsidian-vault/paper_list.csv`. No pre-built scripts — agent adapts to each repo's format on the fly.",
+   "path": ".claude/skills/papers-collect-from-github-repo/SKILL.md"
   },
   "papers-collect-from-web": {
-   "description": "Collects paper candidates from web URLs by fetching and storing pages locally, then appending rows to `paperAnalysis/analysis_log.csv`. Use when the user provides URLs + keyword constraints + venue/year and wants candidates added to the unified log.",
+   "description": "Collects paper candidates from web URLs by fetching and storing pages locally, then appending rows to `obsidian-vault/paper_list.csv`. Use when the user provides URLs + keyword constraints + venue/year and wants candidates added to the unified paper list.",
    "path": ".claude/skills/papers-collect-from-web/SKILL.md"
   },
   "papers-download-from-list": {
-   "description": "Uses colocated paper download tools to download, verify, and repair local PDFs according to triage logs (e.g., ICLR_2026.txt) so that `paperPDFs/` stays complete and deduplicated. Use when you have a curated candidate list under `paperAnalysis/` and want all corresponding PDFs downloaded/checked before analysis or collection rebuild.",
+   "description": "Uses colocated paper download tools to download, verify, and repair local PDFs from curated candidate lists so that `obsidian-vault/paperPDFs/` stays complete and deduplicated. Use when you have a curated paper list and want all corresponding PDFs downloaded/checked before analysis or index rebuild.",
    "path": ".claude/skills/papers-download-from-list/SKILL.md"
   },
   "papers-query-knowledge-base": {
-   "description": "Queries the local paperAnalysis notes for research. Finds papers by title, task path, technique tags, venue, or year; summarizes methods and evidence across papers; cites core_operator and primary_logic from analysis frontmatter. Includes code-context mode (mode: code-context) for retrieving paper evidence before code modifications. Also handles comparison requests with honest text-based analysis. When paperCollection/index.jsonl is present, reads it first for fast filtering.",
+   "description": "Queries the local obsidian-vault/analysis notes for research. Finds papers by title, topic, method, dataset, venue, or year; summarizes methods and evidence across papers; cites core_operator and primary_logic from analysis frontmatter. Includes code-context mode for retrieving paper evidence before code modifications. When obsidian-vault/index/index.jsonl is present, reads it first for fast filtering.",
    "path": ".claude/skills/papers-query-knowledge-base/SKILL.md"
   },
-  "papers-sync-from-zotero": {
-   "description": "Syncs papers from a Zotero library into RF's structured layout via pyzotero / Zotero API (primary) or flat PDF folder import (fallback). Copies PDFs into `paperPDFs/<Category>/<Venue_Year>/`, writes rich metadata to `paperAnalysis/processing/zotero/manifest.jsonl`, and appends lightweight rows to `analysis_log.csv`. Supports incremental sync. Use when the user wants to import papers from Zotero into the ResearchFlow pipeline.",
-   "path": ".claude/skills/papers-sync-from-zotero/SKILL.md"
-  },
   "research-brainstorm-from-kb": {
-   "description": "Explores and structures research ideas into `paperIDEAs/` notes using the paper knowledge base and frontier techniques. Use when the user provides research questions or ideas and wants decomposed candidate directions, related-work analysis based primarily on paperAnalysis, with paperCollection used as the generated index/navigation support layer when helpful, plus cross-domain support from image/video generation, MLLM, Agent, or RL.",
+   "description": "Explores and structures research ideas into `obsidian-vault/ideas/` notes using the paper knowledge base and frontier techniques. Use when the user provides research questions or ideas and wants decomposed candidate directions, related-work analysis based primarily on obsidian-vault/analysis, with obsidian-vault/index used as the generated index/navigation support layer when helpful, plus cross-domain support from image/video generation, MLLM, Agent, or RL.",
    "path": ".claude/skills/research-brainstorm-from-kb/SKILL.md"
   },
   "research-workflow": {
-   "description": "Unified entry for the research pipeline. Maps current work to one stage (sync/collect/download/analyze/build/query/ideate/focus/review/audit/export), recommends the right existing skill/command, supports step-by-step and end-to-end guidance, and keeps stage boundaries clear without duplicating underlying capabilities.",
+   "description": "Unified entry for the research pipeline. Maps current work to one stage (import-local-pdfs/collect/download/analyze/build/query/ideate/focus/review/audit/export), recommends the right existing skill/command, supports step-by-step and end-to-end guidance, and keeps stage boundaries clear without duplicating underlying capabilities.",
    "path": ".claude/skills/research-workflow/SKILL.md"
   },
   "reviewer-stress-test": {
    "description": "Runs a strict-but-fair ICLR/CVPR/SIGGRAPH reviewer challenge on idea, roadmap, or full paper, with major-risk diagnostics and actionable repair paths. Use when the user wants high-pressure review questioning instead of brainstorming. Can be used independently from idea-focus-coach.",
    "path": ".claude/skills/reviewer-stress-test/SKILL.md"
   },
-  "skill-fit-guard": {
-   "description": "Detects post-invocation skill mismatch patterns, summarizes why they may recur, and asks whether to revise the skill now. Use when a called .claude skill output is clearly unfit for the user intent and similar mismatch is likely to happen again.",
-   "path": ".claude/skills/skill-fit-guard/SKILL.md"
-  },
-  "write-daily-log": {
-   "description": "Generates or updates a structured daily research log by collecting evidence from git diffs, artifacts, and conversation context, then compressing into a decision-oriented summary. Use when the user says \"写日志\", \"write daily log\", \"日报\", \"update daily summary\", or asks to summarize today's research progress.",
-   "path": ".claude/skills/write-daily-log/SKILL.md"
-  },
-  "domain-fork": {
-   "description": "Migrates ResearchFlow's architecture to a new professional domain (e.g. frontend dev, accounting, journalism). Interactive session: confirms domain, generates concept mapping, adapts all skills and folder structure. Explicit trigger only — must be directly invoked by the user.",
-   "path": ".claude/skills/domain-fork/SKILL.md"
-  },
   "rf-obsidian-markdown": {
    "description": "Obsidian Flavored Markdown conventions for ResearchFlow. Defines wikilink, embed, callout, frontmatter, and tag rules that all .md-generating skills must follow. Ensures output renders correctly in Obsidian reading view, graph view, and backlink panels. Adapted from kepano/obsidian-skills.",
    "path": ".claude/skills/rf-obsidian-markdown/SKILL.md"
   },
-  "ppt-master": {
-   "description": "AI-driven presentation generation system. Converts source documents (PDF/DOCX/URL/Markdown) into high-quality natively editable PPTX with real PowerPoint shapes through multi-role collaboration (Strategist → Image_Generator → Executor). Use when user asks to create PPT, make presentation, 生成PPT, 做PPT, or 制作演示文稿.",
-   "path": ".claude/skills/ppt-master/SKILL.md"
+  "skill-fit-guard": {
+   "description": "Detects recurring skill mismatch patterns after a skill call and asks whether to revise the skill spec.",
+   "path": ".claude/skills/skill-fit-guard/SKILL.md"
+  },
+  "write-daily-log": {
+   "description": "Generates or updates a structured daily research log from git diffs, artifacts, and conversation context.",
+   "path": ".claude/skills/write-daily-log/SKILL.md"
   }
  }
 }

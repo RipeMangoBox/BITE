@@ -8,7 +8,7 @@ from typing import Dict, List, Tuple
 
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
-PAPER_ANALYSIS_DIR = REPO_ROOT / "paperAnalysis"
+PAPER_ANALYSIS_DIR = REPO_ROOT / "obsidian-vault/analysis"
 
 KEY_LINE_RE = re.compile(r"^([A-Za-z0-9_\-]+):(?:\s*(.*))?$")
 BOUNDARY_RE = re.compile(r"^---\s*$")
@@ -17,7 +17,7 @@ WORD_RE = re.compile(r"[A-Za-z0-9_]{3,}")
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Retrieve code-context-related papers from local KB (paperAnalysis -> optional paperPDFs; paperCollection optional for navigation)."
+        description="Retrieve code-context-related papers from local KB (obsidian-vault/analysis -> optional obsidian-vault/paperPDFs; obsidian-vault/index optional for navigation)."
     )
     p.add_argument("--mode", choices=["brief", "deep"], default="brief")
     p.add_argument("--query", default="", help="Natural-language coding task or context")
@@ -256,7 +256,7 @@ def render_brief(items: List[Dict[str, str]], keywords: List[str], query: str, c
     lines: List[str] = []
     lines.append("## Code Context Paper Retrieval (brief)")
     lines.append("")
-    lines.append("- Retrieval order: paperAnalysis -> paperPDFs (as needed); paperCollection is for statistics/navigation support only")
+    lines.append("- Retrieval order: obsidian-vault/analysis -> obsidian-vault/paperPDFs (as needed); obsidian-vault/index is for statistics/navigation support only")
     lines.append(f"- Keywords: {', '.join(keywords) if keywords else 'N/A'}")
     if query:
         lines.append(f"- Query: {query}")
@@ -288,7 +288,7 @@ def render_deep(items: List[Dict[str, str]], keywords: List[str], query: str, ch
     lines: List[str] = []
     lines.append("## Code Context Paper Retrieval (deep)")
     lines.append("")
-    lines.append("- Retrieval order: paperAnalysis -> paperPDFs (as needed); paperCollection is for statistics/navigation support only")
+    lines.append("- Retrieval order: obsidian-vault/analysis -> obsidian-vault/paperPDFs (as needed); obsidian-vault/index is for statistics/navigation support only")
     lines.append(f"- Keywords: {', '.join(keywords) if keywords else 'N/A'}")
     if query:
         lines.append(f"- Query: {query}")

@@ -1,9 +1,10 @@
 ---
 name: code-context-paper-retrieval
+status: compatibility-alias
 description: >
   Retrieves code-context-relevant papers from the local knowledge base in two
-  modes (brief/deep), using `paperAnalysis/` as the primary retrieval source
-  and `paperPDFs/` for optional deeper reading. `paperCollection/` is optional
+  modes (brief/deep), using `obsidian-vault/analysis/` as the primary retrieval source
+  and `obsidian-vault/paperPDFs/` for optional deeper reading. `obsidian-vault/index/` is optional
   and mainly serves statistics, Obsidian navigation, and backlink exploration.
   Environment detection prioritizes codebase environment files; asks user if
   none found. Trigger timing: BEFORE code modification, not after.
@@ -11,7 +12,9 @@ description: >
 
 # Code Context Paper Retrieval
 
-This skill is a compatibility alias for `papers-query-knowledge-base` in `mode: code-context`.
+This skill is a compatibility alias for `papers-query-knowledge-base` in
+`mode: code-context`. Prefer that query mode for new routing and keep this
+skill for older prompts that call it by name.
 
 ## What this skill does
 
@@ -19,9 +22,9 @@ For code implementation/refactor/planning tasks, this skill provides the most re
 
 Fixed retrieval order:
 
-1. `paperAnalysis/` (primary retrieval and evidence layer)
-2. `paperPDFs/` (recommend deeper reading only when necessary)
-3. `paperCollection/` (use `index.jsonl` for fast filtering when present; otherwise reference the Markdown pages only when statistics, overview pages, Obsidian jumps, or backlink support are needed)
+1. `obsidian-vault/analysis/` (primary retrieval and evidence layer)
+2. `obsidian-vault/paperPDFs/` (recommend deeper reading only when necessary)
+3. `obsidian-vault/index/` (use `index.jsonl` for fast filtering when present; otherwise reference the Markdown pages only when statistics, overview pages, Obsidian jumps, or backlink support are needed)
 
 Two output levels:
 
@@ -33,11 +36,11 @@ Two output levels:
 Before running any script, the Python environment must be confirmed. Check in this priority order:
 
 1. **Environment files in the target codebase** (high to low):
-   - `environment.yml` / `environment.yaml` (conda)
-   - `requirements.txt` / `requirements*.txt`
-   - `pyproject.toml` (check `[project.dependencies]` or `[tool.poetry.dependencies]`)
+   - `environment/environment.yml` / `environment.yaml` (conda)
+   - `environment/requirements.txt` / `requirements*.txt`
+   - `environment/pyproject.toml` (check `[project.dependencies]` or `[tool.poetry.dependencies]`)
    - `setup.py` / `setup.cfg`
-2. **Infer conda env name from environment files**: read `name:` in `environment.yml` and check whether that env exists (`conda env list`).
+2. **Infer conda env name from environment files**: read `name:` in `environment/environment.yml` and check whether that env exists (`conda env list`).
 3. **If none found or still uncertain**: **proactively ask the user**, stating no environment file was found, and request one of:
    - conda environment name, or
    - Python interpreter path, or
@@ -58,7 +61,7 @@ In the following scenarios, the agent should proactively ask **before code edits
 > "This task appears related to [motion diffusion / attention mechanism / ...], and the local KB may contain supporting papers. Retrieve first? (brief / deep / skip)"
 
 Trigger when any of these is true:
-- user task text contains task/technique keywords likely appearing in `paperAnalysis` paths, frontmatter, or body
+- user task text contains task/technique keywords likely appearing in `obsidian-vault/analysis` paths, frontmatter, or body
 - target file paths involve core model modules (for example `model/`, `network/`, `loss/`, `train/`)
 - user explicitly mentions a method or paper name
 
@@ -90,9 +93,9 @@ conda run -n <env_name> python ".claude/skills/code-context-paper-retrieval/scri
 
 1. **Environment detection** (see section above).
 2. Extract keywords from task description / target files.
-3. Run first-pass recall in `paperAnalysis/**/*.md` by title/path/tags/venue/year/`core_operator`/`primary_logic`.
+3. Run first-pass recall in `obsidian-vault/analysis/**/*.md` by title/path/tags/venue/year/`core_operator`/`primary_logic`.
 4. Read `core_operator`, `primary_logic`, and TL;DR summary from matched papers.
-5. If needed, reference `paperCollection/` for statistics/overview/Obsidian jump support.
+5. If needed, reference `obsidian-vault/index/` for statistics/overview/Obsidian jump support.
 6. Output brief/deep results and recommend PDF reading only when evidence is weak.
 7. **Start code changes only after user confirmation.**
 

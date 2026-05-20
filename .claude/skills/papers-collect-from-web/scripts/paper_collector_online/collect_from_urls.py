@@ -300,7 +300,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--include", default="", help="Include keywords (all must match). Separator: ';' or ','.")
     ap.add_argument("--exclude", default="", help="Exclude keywords (any match filters out). Separator: ';' or ','.")
     ap.add_argument("--venue-time", required=True, help='Venue/time label, e.g. "ICLR 2026".')
-    ap.add_argument("--out", default="paperAnalysis/analysis_log.csv", help='Output CSV path (default: "paperAnalysis/analysis_log.csv").')
+    ap.add_argument("--out", default="obsidian-vault/paper_list.csv", help='Output CSV path (default: "obsidian-vault/paper_list.csv").')
     ap.add_argument("--append", action="store_true", help="Append to existing output file instead of overwriting.")
     ap.add_argument("--status", default="Wait", help='Default status value for new entries (default: "Wait").')
     ap.add_argument(

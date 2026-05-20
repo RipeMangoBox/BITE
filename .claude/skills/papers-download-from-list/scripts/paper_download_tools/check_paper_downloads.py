@@ -13,7 +13,7 @@ except ImportError:  # graceful fallback if dependency not installed yet
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[4]
-PAPER_ROOT = REPO_ROOT / "paperPDFs"
+PAPER_ROOT = REPO_ROOT / "obsidian-vault/paperPDFs"
 LOG_PATH = PAPER_ROOT / "download_log_updated.txt"
 WRONG_LOG_PATH = PAPER_ROOT / "wrong_download.txt"
 
@@ -92,7 +92,7 @@ def parse_log(path: Path = LOG_PATH) -> List[LogEntry]:
 
 
 def scan_pdfs(root: Path = PAPER_ROOT) -> List[Path]:
-    """Scan paperPDFs/** for all PDF files."""
+    """Scan obsidian-vault/paperPDFs/** for all PDF files."""
     if not root.is_dir():
         return []
     return sorted(root.rglob("*.pdf"))

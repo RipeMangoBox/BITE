@@ -2,7 +2,7 @@
 
 ## Quick start
 
-Append paper candidates to `paperAnalysis/analysis_log.csv`:
+Append paper candidates to `obsidian-vault/paper_list.csv`:
 
 ```bash
 python3 ".claude/skills/papers-collect-from-web/scripts/paper_collector_online/collect_from_urls.py" \
@@ -13,14 +13,14 @@ python3 ".claude/skills/papers-collect-from-web/scripts/paper_collector_online/c
   --append
 ```
 
-## Output columns (CSV, same as analysis_log.csv)
+## Output columns (CSV, same as paper_list.csv)
 
 `state,importance,paper_title,venue,project_link_or_github_link,paper_link,sort,pdf_path`
 
 Notes:
 - `state` defaults to `Wait`. Use `--status checked` if needed.
 - `importance`, `sort`, `pdf_path` are left blank for later manual fill.
-- Output is now unified with `papers-collect-from-github-awesome`.
+- Output is now unified with `papers-collect-from-github-repo`.
 
 ## Where HTML is stored
 

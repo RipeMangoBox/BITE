@@ -8,9 +8,9 @@ from typing import Dict, List
 
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
-PAPER_ANALYSIS = REPO_ROOT / "paperAnalysis"
-PAPER_COLLECTION = REPO_ROOT / "paperCollection"
-PAPER_PDFS = REPO_ROOT / "paperPDFs"
+PAPER_ANALYSIS = REPO_ROOT / "obsidian-vault/analysis"
+PAPER_COLLECTION = REPO_ROOT / "obsidian-vault/index"
+PAPER_PDFS = REPO_ROOT / "obsidian-vault/paperPDFs"
 
 STAGES = ["collect", "download", "analyze", "build", "query", "ideate"]
 
@@ -20,7 +20,7 @@ def parse_args() -> argparse.Namespace:
         description="Unified research workflow entry (advisor): detect/choose stage and print suggested next commands."
     )
     p.add_argument("--stage", choices=STAGES + ["auto"], default="auto")
-    p.add_argument("--log-file", default="", help="Optional triage/log file under paperAnalysis (e.g. ICLR_2026.txt)")
+    p.add_argument("--log-file", default="", help="Optional triage/log file or paper_list.csv path")
     p.add_argument("--mode", choices=["brief", "deep"], default="brief", help="Query mode hint")
     return p.parse_args()
 
@@ -77,7 +77,7 @@ def detect_stage(preferred_log: Path | None) -> str:
     if total_wait > 0:
         return "download"
 
-    # query can run directly from paperAnalysis; build is optional
+    # query can run directly from obsidian-vault/analysis; build is optional
     return "query"
 
 
@@ -85,40 +85,43 @@ def stage_spec(stage: str, mode: str, log_hint: str) -> Dict[str, object]:
     if stage == "collect":
         return {
             "inputs": "URLs or GitHub repo URL + venue/year + include/exclude",
-            "outputs": "paperAnalysis/*.txt or paperAnalysis/github_awesome_*.xlsx",
+            "outputs": "obsidian-vault/paper_list.csv candidate rows",
             "commands": [
-                "Use /papers-collect-from-web or /papers-collect-from-github-awesome",
+                "Use /papers-collect-from-web or /papers-collect-from-github-repo",
             ],
             "next": "download",
         }
     if stage == "download":
-        log = log_hint or "paperAnalysis/ICLR_2026.txt"
+        log = log_hint or "<triage-log>.txt"
         return {
             "inputs": "triage/log file (contains Wait entries)",
-            "outputs": "paperPDFs/** + log state updates",
+            "outputs": "obsidian-vault/paperPDFs/** + log state updates",
             "commands": [
                 "Use /papers-download-from-list",
-                f'Or run: python3 ".claude/skills/papers-download-from-list/scripts/paper_download_tools/download_wait_papers.py" --log "{log}" --out-root "paperPDFs"',
+                f'Or run: python3 ".claude/skills/papers-download-from-list/scripts/paper_download_tools/download_wait_papers.py" --log "{log}" --out-root "obsidian-vault/paperPDFs"',
             ],
             "next": "analyze",
         }
     if stage == "analyze":
         return {
-            "inputs": "PDF path or Wait queue",
-            "outputs": "paperAnalysis/**/*.md",
+            "inputs": "PDF path, existing MinerU output directory, or Downloaded queue",
+            "outputs": "_private/local_analysis_runs/** + obsidian-vault/analysis/**/*.md",
             "commands": [
-                "Use /papers-analyze-pdf",
+                'Default single-paper chain: python3 "scripts/run_local_paper_analysis.py" --pdf "<pdf>" --conf-year "<Venue_Year>" --export-vault',
+                'Reuse existing MinerU output: python3 "scripts/run_local_paper_analysis.py" --mineru-output "<mineru_output_dir>" --paper-pdf "<pdf>" --conf-year "<Venue_Year>" --export-vault',
+                'Downloaded queue: python3 "scripts/run_paper_list_analysis.py" --source "obsidian-vault/paper_list.csv" --state Downloaded --limit 25',
+                "Use /paper-report when the user asks for a deep report or formula derivation",
                 "Note: after analyze you can go directly to query; run build only if statistics/navigation pages are needed",
             ],
             "next": "query (or optional build)",
         }
     if stage == "build":
         return {
-            "inputs": "paperAnalysis already has structured markdown notes",
-            "outputs": "paperCollection/README.md, _AllPapers.md, by_task/, by_technique/, by_venue/ (statistics/navigation pages)",
+            "inputs": "obsidian-vault/analysis already has structured markdown notes",
+            "outputs": "obsidian-vault/index/README.md, _AllPapers.md, by_topic/, by_method/, by_dataset/, by_venue/, by_year/ (statistics/navigation pages)",
             "commands": [
-                "Use /papers-build-collection-index",
-                'Or run: python3 ".claude/skills/papers-build-collection-index/scripts/build_paper_collection.py"',
+                "Use /papers-build-index",
+                'Or run: python3 ".claude/skills/papers-build-index/scripts/build_paper_index.py"',
             ],
             "next": "query",
         }
@@ -134,7 +137,7 @@ def stage_spec(stage: str, mode: str, log_hint: str) -> Dict[str, object]:
         }
     return {
         "inputs": "research question",
-        "outputs": "paperIDEAs/YYYY-MM-DD_<topic>.md",
+        "outputs": "obsidian-vault/ideas/YYYY-MM-DD_<topic>.md",
         "commands": [
             "Use /research-brainstorm-from-kb",
         ],

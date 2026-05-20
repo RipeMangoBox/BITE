@@ -10,8 +10,8 @@ from pathlib import Path
 import requests
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
-LOG_PATH = REPO_ROOT / "paperAnalysis" / "CVPR_2026.txt"
-PDF_ROOT = REPO_ROOT / "paperPDFs"
+LOG_PATH = REPO_ROOT / "obsidian-vault/analysis" / "CVPR_2026.txt"
+PDF_ROOT = REPO_ROOT / "obsidian-vault/paperPDFs"
 
 
 def parse_log(path: Path):
@@ -40,7 +40,7 @@ def resolve_pdf_path(entry: dict) -> Path:
     """Use the pdf_path column if present, else derive from sort/venue/title."""
     if entry["pdf_path"]:
         p = Path(entry["pdf_path"])
-        # pdf_path is relative to repo root (for example: paperPDFs/...).
+        # pdf_path is relative to repo root (for example: obsidian-vault/paperPDFs/...).
         if not p.is_absolute():
             p = REPO_ROOT / p
         return p

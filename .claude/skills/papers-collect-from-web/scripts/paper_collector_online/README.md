@@ -4,14 +4,14 @@ updated: 2026-03-17T19:54
 ---
 # paper_collector_online
 
-Generate triage lists like `paperAnalysis/ICLR_2026.txt` by fetching web pages, saving HTML locally, extracting paper candidates, and writing a pipe-delimited list.
+Generate triage lists like `obsidian-vault/analysis/ICLR_2026.txt` by fetching web pages, saving HTML locally, extracting paper candidates, and writing a pipe-delimited list.
 
 ## Quick start
 
 ```bash
 python3 ".claude/skills/papers-collect-from-web/scripts/paper_collector_online/collect_from_urls.py" \
   --venue-time "ICLR 2026" \
-  --out "paperAnalysis/ICLR_2026.txt" \
+  --out "obsidian-vault/analysis/ICLR_2026.txt" \
   --urls "https://example.com/papers.html" "https://another.example.org/list" \
   --include "motion;diffusion" \
   --exclude "workshop;dataset" \

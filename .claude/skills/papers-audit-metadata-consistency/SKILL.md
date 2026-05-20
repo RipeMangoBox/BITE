@@ -1,7 +1,8 @@
 ---
 name: papers-audit-metadata-consistency
 follows: rf-obsidian-markdown
-description: Runs a unified metadata consistency audit across paperAnalysis logs and analysis notes, checking title/venue/year/category consistency, link/pdf_ref completeness, duplicates, and structure anomalies; writes quality_report_*.md under paperAnalysis.
+status: local-export-audit
+description: Runs a unified metadata consistency audit across obsidian-vault/analysis logs and analysis notes, checking title/venue/year consistency, link/pdf_ref completeness, duplicates, and structure anomalies; writes quality_report_*.md under obsidian-vault/analysis.
 ---
 
 # Metadata Consistency Audit
@@ -10,16 +11,16 @@ description: Runs a unified metadata consistency audit across paperAnalysis logs
 
 Runs one unified audit entry for step5 quality governance:
 
-- checks `paperAnalysis/*.txt` list/log entries;
-- checks `paperAnalysis/**/*.md` analysis notes;
+- checks `obsidian-vault/analysis/*.txt` list/log entries;
+- checks `obsidian-vault/analysis/**/*.md` analysis notes;
 - checks cross-layer consistency between log/list and analysis notes;
-- outputs `paperAnalysis/quality_report_*.md` (optionally `.json`).
+- outputs `obsidian-vault/analysis/quality_report_*.md` (optionally `.json`).
 
 ## Coverage
 
 This skill covers **structural and metadata hygiene only**.
 
-- title / venue / year / category consistency
+- title / venue / year consistency
 - link completeness (`paper_link`, `project_link`/`github_link`, `pdf_ref`)
 - duplicate paper detection in txt logs
 - analysis note structure anomalies (missing frontmatter keys, missing Part I/II/III)
@@ -49,11 +50,11 @@ python3 .claude/skills/papers-audit-metadata-consistency/scripts/audit_metadata_
 
 ## Output
 
-- `paperAnalysis/quality_report_<YYYY-MM-DD_HHMM>.md`
-- optional `paperAnalysis/quality_report_<YYYY-MM-DD_HHMM>.json`
+- `obsidian-vault/analysis/quality_report_<YYYY-MM-DD_HHMM>.md`
+- optional `obsidian-vault/analysis/quality_report_<YYYY-MM-DD_HHMM>.json`
 
 ## When to use
 
 - after collect/download/analyze batches
-- before rebuilding collection indexes
+- before rebuilding indexes
 - periodic KB quality checks for open-source readiness

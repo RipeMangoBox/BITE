@@ -6,9 +6,9 @@ from typing import Dict, List, Tuple
 
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
-ANALYSIS_LOG_PATH = REPO_ROOT / "paperAnalysis" / "analysis_log.csv"
-PAPER_LIST_PATH = REPO_ROOT / "paperPDFs" / "paper_list.txt"
-PDF_ROOT = REPO_ROOT / "paperPDFs"
+ANALYSIS_LOG_PATH = REPO_ROOT / "obsidian-vault/paper_list.csv"
+PAPER_LIST_PATH = REPO_ROOT / "obsidian-vault/paperPDFs" / "paper_list.txt"
+PDF_ROOT = REPO_ROOT / "obsidian-vault/paperPDFs"
 LOG_HEADER = [
     "state",
     "importance",
@@ -92,7 +92,7 @@ def load_paper_list() -> Dict[Tuple[str, str, str, str], str]:
 
 def load_rows() -> List[List[str]]:
     if not ANALYSIS_LOG_PATH.exists():
-        raise FileNotFoundError(f"analysis_log.csv not found: {ANALYSIS_LOG_PATH}")
+        raise FileNotFoundError(f"paper_list.csv not found: {ANALYSIS_LOG_PATH}")
 
     with ANALYSIS_LOG_PATH.open("r", encoding="utf-8", newline="") as f:
         rows = [row for row in csv.reader(f)]
@@ -131,8 +131,8 @@ def update_analysis_log() -> None:
         pdf_path = pdf_path.strip()
 
         rel_pdf_path = ""
-        if pdf_path.startswith("paperPDFs/"):
-            rel_pdf_path = pdf_path.replace("paperPDFs/", "", 1)
+        if pdf_path.startswith("obsidian-vault/paperPDFs/"):
+            rel_pdf_path = pdf_path.replace("obsidian-vault/paperPDFs/", "", 1)
         else:
             conf_name, year = parse_venue(venue)
             if conf_name and year:
