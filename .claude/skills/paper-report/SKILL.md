@@ -1,0 +1,153 @@
+---
+name: paper-report
+follows: rf-obsidian-markdown
+description: Generates deep structured reports for single papers with formula derivation, pipeline module decomposition, experiment analysis, and recursive related work. Use when the user asks for a "deep report", "detailed paper analysis", or "公式推导" for a specific paper. Requires a PDF path or paper title as input.
+---
+
+# PaperReport — Deep Structured Paper Report
+
+This skill is the user-facing spec for a deep single-paper report. In the
+current local workflow, use it as the writing contract when a user asks for a
+deep report, detailed paper analysis, or formula derivation.
+
+A deep report is a single linear narrative that a reader can scroll
+top-to-bottom and finish with a complete understanding of the paper:
+background → core insight → framework → formulas → experiments → position.
+
+---
+
+## Input
+
+- A PDF path under `obsidian-vault/paperPDFs/` (preferred), OR
+- A paper title already present in the knowledge base.
+
+Useful upstream artifacts before this skill runs:
+- A readable PDF or extracted paper text.
+- Figure/table captions when available.
+- Existing local analysis notes or related-work notes when available.
+
+## Output
+
+- A local Markdown report following the seven-section structure below.
+- If saved into the vault, place it under `obsidian-vault/analysis/` using the
+  current repository naming convention.
+
+---
+
+## Section Spec (exactly 7 sections, in this order)
+
+| # | section_type          | title             | length (chars) | must contain                                  |
+|---|-----------------------|-------------------|----------------|-----------------------------------------------|
+| 1 | `metadata_overview`   | 概览              | 300-500        | 元数据表 + `> [!abstract]` TL;DR + 性能要点 |
+| 2 | `background_motivation` | 背景与动机     | 800-1200       | 问题 + 2-3 个具体 baseline + 局限 + 1 句预告; `{{FIG:motivation}}` 若有动机图 |
+| 3 | `core_innovation`     | 核心创新          | 400-700        | 一句话核心洞察 + 与 baseline 差异 3 列表 |
+| 4 | `framework_overview`  | 整体框架          | 700-1100       | **必须以 `{{FIG:pipeline}}` 或 `{{FIG:architecture}}` 起头** + 数据流 + 模块清单 |
+| 5 | `module_formulas`     | 核心模块与公式推导 | 1200-2200     | 每模块: 直觉 → baseline 公式 → 变化点 → 推导步骤 → 最终公式 → 对应消融 |
+| 6 | `experiment_analysis` | 实验与分析        | 800-1400       | 主表 + `{{FIG:result}}` + 消融 + 公平性检查 |
+| 7 | `lineage_positioning` | 方法谱系与知识库定位 | 400-700     | 方法族 + 父方法 + 改了哪些 slot + 后续方向 + facets |
+
+Total length: 4000-7000 Chinese characters.
+
+### Section 1 (metadata_overview) detailed format
+
+```markdown
+| 中文题名 | {title_zh} |
+|----------|------------|
+| 英文题名 | {title_en} |
+| 会议/期刊 | {venue} ({acceptance_type}) |
+| 链接 | [arXiv]({arxiv_url}) · [Code]({code_url}) ⭐{stars} · [Project]({project_url}) |
+| 主要任务 | {tasks} |
+| 主要 baseline | {baselines} |
+
+> [!abstract] TL;DR
+> 因为「{problem}」，作者在「{baseline}」基础上改了「{change}」，在「{benchmark}」上取得「{result}」
+
+**关键性能**:
+- {benchmark1}: {metric1} {value1} (vs {baseline}: +{delta})
+- {benchmark2}: {metric2} {value2}
+```
+
+This section's `body_md` is rendered WITHOUT a `## 概览` heading so it sits
+naturally at the top of the page below the title.
+
+---
+
+## Formula Derivation Rules (Section 5, CRITICAL)
+
+The archived legacy Markdown fallback avoided formula derivation. This skill
+does the **opposite** — formula derivation is the core deliverable of section 5.
+
+For each of the 2-3 most important modules:
+
+```
+### 模块 N: {名称}（对应框架图 {位置标注}）
+
+**直觉**: 一句话为什么这样设计
+
+**Baseline 公式** ({baseline_name}): $$L_{base} = \mathbb{E}[\dots]$$
+符号: $\theta$ = ..., $A_t$ = ...   (only key symbols)
+
+**变化点**: 为什么 baseline 不够 → 改了什么假设/项/权重
+
+**本文公式（推导）**:
+$$\text{Step 1}: \dots \quad \text{加入 X 项以解决 Y}$$
+$$\text{Step 2}: \dots \quad \text{重归一化以保证 Z}$$
+$$\text{最终}: L_{final} = \dots$$
+
+**对应消融**: Table N 显示移除该项 ΔX%
+```
+
+Rules:
+1. Always show the baseline formula first when one exists.
+2. Each derivation step must explain WHY (not just WHAT) changed.
+3. Tie every formula to the framework module and an ablation row.
+4. Pick the 2-3 most important formulas — quality over quantity.
+
+---
+
+## Figure Placement Rules
+
+The agent must:
+
+1. Inspect the `figures_available` list passed in the prompt context (each
+   entry has `label`, `semantic_role`, `caption`).
+2. Use `{{FIG:xxx}}` markers ONLY for figures that exist in that list.
+3. For each marker, output a `figure_placements` entry:
+   ```json
+   {"marker": "{{FIG:pipeline}}",
+    "preferred_labels": ["Figure 1", "Figure 2"],
+    "semantic_role": "pipeline",
+    "section_hint": "framework_overview"}
+   ```
+4. Distribute markers across the narrative — never cluster all figures in
+   one place, never dump them at the end.
+
+Required markers when a matching figure exists:
+- `framework_overview` → `{{FIG:pipeline}}` or `{{FIG:architecture}}`
+- `experiment_analysis` → `{{FIG:result}}`
+
+The Obsidian exporter (`vault_export_v6._resolve_figure_markers`) resolves
+each marker by:
+1. Looking up `preferred_labels` in the figure list (exact label match);
+2. Falling back to `semantic_role` match;
+3. Dropping the marker if nothing fits.
+
+If the report has NO markers at all (legacy reports), figures are
+auto-injected by `_autoinject_figures_by_role` at the end of the matching
+section block — never as a "## 论文图表" trailer.
+
+---
+
+## Quality Checklist
+
+Before finalizing the report, the agent should verify:
+
+- [ ] Section 1 metadata table has venue, links, baselines.
+- [ ] TL;DR is one因果sentence, not bullet points.
+- [ ] Section 4 starts with a framework figure marker.
+- [ ] Section 5 derives at least one formula from a baseline.
+- [ ] Section 5 ties each formula to an ablation row.
+- [ ] Section 6 has main results as a markdown table with Δ column.
+- [ ] Section 7 names the parent method explicitly.
+- [ ] Every `{{FIG:xxx}}` marker has a matching `figure_placements` entry.
+- [ ] Total length 4000-7000 Chinese characters.

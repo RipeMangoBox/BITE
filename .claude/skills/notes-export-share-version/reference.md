@@ -48,7 +48,7 @@ Do not expose local wiki paths.
 
 Resolve paper links in this order:
 
-1. `paperAnalysis/analysis_log.csv`
+1. `obsidian-vault/paper_list.csv`
 2. existing public links already present in the relevant analysis note
 3. web search as fallback
 
@@ -66,12 +66,12 @@ Remove or rewrite anything that reveals the internal knowledge base or local not
 
 Typical items to remove or rewrite:
 
-- `[[paperAnalysis/...|...]]`
+- `[[obsidian-vault/analysis/...|...]]`
 - internal folder paths
 - `Local Reading`
 - `local PDF`
-- `paperAnalysis`
-- `paperCollection`
+- `obsidian-vault/analysis`
+- `obsidian-vault/index`
 - `knowledge base`
 - wording like `path:`, `local index:`, `local paper mapping:`
 
@@ -174,7 +174,7 @@ Never leave internal wiki links in the share version.
 Before:
 
 ```md
-[[paperAnalysis/Motion_Generation_Text_Speech_Music_Driven/CVPR_2024/2024_MoMask_Generative_Masked_Modeling_of_3D_Human_Motions|MoMask]]
+[[obsidian-vault/analysis/Motion_Generation_Text_Speech_Music_Driven/CVPR_2024/2024_MoMask_Generative_Masked_Modeling_of_3D_Human_Motions|MoMask]]
 ```
 
 After:

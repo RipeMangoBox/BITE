@@ -1,5 +1,6 @@
 ---
 name: domain-fork
+status: design-only-legacy
 description: Migrates ResearchFlow's architecture to a new professional domain (e.g. frontend development, accounting, journalism). Interactive session with the user to map research concepts to domain equivalents, then generates a complete set of adapted skills and folder structure. Explicit trigger only.
 ---
 
@@ -7,7 +8,9 @@ description: Migrates ResearchFlow's architecture to a new professional domain (
 
 ## Purpose
 
-Migrate the core ResearchFlow architecture (sync/collect → download → analyze → build index → query → ideate → focus → review) into a user-specified professional domain, and generate a complete domain-adapted skill set plus folder structure in one pass.
+Migrate the core ResearchFlow architecture (collect/import local sources → download when needed → analyze → build index → query → ideate → focus → review) into a user-specified professional domain, and generate a complete domain-adapted skill set plus folder structure in one pass.
+This is a design-only legacy workflow. It is not part of the active paper
+analysis pipeline.
 
 ## Trigger
 
@@ -40,13 +43,13 @@ Generate a ResearchFlow → target-domain concept mapping table for user confirm
 | paper | (domain equivalent) | e.g., technical article, regulation document, news story |
 | PDF | (domain equivalent) | e.g., webpage article, regulation PDF, manuscript document |
 | venue | (domain equivalent) | e.g., technical blog/framework version, regulator source, media source |
-| paperAnalysis | (domain equivalent) | e.g., technical notes, regulation interpretation, editorial analysis |
-| paperCollection | (domain equivalent) | e.g., technical index, regulation index, topic index |
-| paperPDFs | (domain equivalent) | e.g., original articles, source regulations, source manuscripts |
-| paperIDEAs | (domain equivalent) | e.g., project proposals, audit strategies, topic plans |
+| obsidian-vault/analysis | (domain equivalent) | e.g., technical notes, regulation interpretation, editorial analysis |
+| obsidian-vault/index | (domain equivalent) | e.g., technical index, regulation index, topic index |
+| obsidian-vault/paperPDFs | (domain equivalent) | e.g., original articles, source regulations, source manuscripts |
+| obsidian-vault/ideas | (domain equivalent) | e.g., project proposals, audit strategies, topic plans |
 | core_operator | (domain equivalent) | e.g., core technical strategy, core regulation clause, core news angle |
 | primary_logic | (domain equivalent) | e.g., implementation flow, compliance-check flow, editorial flow |
-| analysis_log.csv | keep | main tracking log, with domain-adjusted columns |
+| paper_list.csv | keep | main tracking log, with domain-adjusted columns |
 | state: Wait→Downloaded→checked | keep or adapt | state machine may need domain adaptation |
 
 ### Step 3: Skill mapping confirmation
@@ -55,13 +58,13 @@ Show how ResearchFlow's 17 routed skills map to target-domain skills (the shared
 
 | ResearchFlow Skill | Target-domain Skill | Keep? | Adjustment |
 |-------------------|---------------|---------|---------|
-| papers-sync-from-zotero | `<domain>-sync-from-source` | ✅/❌ | keep when the target domain has a source-of-truth library or inbox |
+| local source import | `<domain>-import-local-sources` | ✅/❌ | keep when users already have local source files or a source inbox |
 | papers-collect-from-web | `<domain>-collect-from-web` | ✅ | source websites become domain-specific |
-| papers-collect-from-github-awesome | `<domain>-collect-from-curated-list` | ✅/❌ | depends on whether curated lists exist |
+| papers-collect-from-github-repo | `<domain>-collect-from-curated-list` | ✅/❌ | depends on whether curated lists exist |
 | papers-download-from-list | `<domain>-download-from-list` | ✅ | download objects become domain documents |
-| papers-analyze-pdf | `<domain>-analyze-document` | ✅ | analysis template rewritten for domain |
+| scripts/run_local_paper_analysis.py / paper-report | `<domain>-analyze-document` | ✅ | analysis template rewritten for domain |
 | papers-audit-metadata-consistency | `<domain>-audit-metadata` | ✅ | metadata fields adjusted for domain |
-| papers-build-collection-index | `<domain>-build-index` | ✅ | index dimensions adjusted for domain |
+| papers-build-index | `<domain>-build-index` | ✅ | index dimensions adjusted for domain |
 | papers-query-knowledge-base | `<domain>-query-kb` | ✅ | query dimensions adjusted for domain; handles comparison requests |
 | code-context-paper-retrieval | `code-context-<domain>-retrieval` | ✅/❌ | keep only for code-related domains |
 | research-brainstorm-from-kb | `<domain>-brainstorm-from-kb` | ✅ | ideation dimensions adjusted for domain |
@@ -93,14 +96,14 @@ After user confirmation, generate in one pass:
 │       ├── README.md
 │       ├── STATE_CONVENTION.md
 │       └── <all mapped skills>/
-├── <AnalysisDir>/          # maps from paperAnalysis
-│   └── tracking_log.csv    # maps from analysis_log.csv
-├── <CollectionDir>/        # maps from paperCollection
+├── <AnalysisDir>/          # maps from obsidian-vault/analysis
+│   └── tracking_log.csv    # maps from paper_list.csv
+├── <CollectionDir>/        # maps from obsidian-vault/index
 │   ├── by_<dim1>/
 │   ├── by_<dim2>/
 │   └── by_<dim3>/
-├── <SourceDir>/            # maps from paperPDFs
-├── <IdeaDir>/              # maps from paperIDEAs
+├── <SourceDir>/            # maps from obsidian-vault/paperPDFs
+├── <IdeaDir>/              # maps from obsidian-vault/ideas
 └── README.md
 ```
 
@@ -123,7 +126,7 @@ After user confirmation, generate in one pass:
 
 - Generate skill definitions and folder structure only; do not generate real content data
 - Do not auto-populate `tracking_log.csv` (that happens when users use the new repository)
-- Do not copy ResearchFlow `paperAnalysis` / `paperCollection` / `paperPDFs` data
+- Do not copy ResearchFlow `obsidian-vault/analysis` / `obsidian-vault/index` / `obsidian-vault/paperPDFs` data
 - Do not copy `.obsidian.zip` (user can copy/adjust it manually if needed)
 
 ## Example
@@ -139,15 +142,15 @@ Step 2 mapping:
 - paper → technical article/spec document
 - PDF → webpage article/PDF spec
 - venue → technical blog/framework version/W3C standard
-- paperAnalysis → articleAnalysis
-- paperCollection → articleCollection
-- paperPDFs → articleSources
+- obsidian-vault/analysis → articleAnalysis
+- obsidian-vault/index → articleCollection
+- obsidian-vault/paperPDFs → articleSources
 - core_operator → core technical strategy
 - primary_logic → implementation flow
 
 Step 3 skill mapping:
 - `papers-collect-from-web` → `articles-collect-from-web`
-- `papers-collect-from-github-awesome` → `articles-collect-from-curated-list`
+- `papers-collect-from-github-repo` → `articles-collect-from-curated-list`
 - `code-context-paper-retrieval` → `code-context-article-retrieval` (kept; frontend is code-centric)
 - `reviewer-stress-test` → `code-review-stress-test` (mapped to code review perspective)
 - ...

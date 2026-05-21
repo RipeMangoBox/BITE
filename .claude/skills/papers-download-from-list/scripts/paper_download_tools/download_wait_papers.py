@@ -30,7 +30,7 @@ def extract_year(venue: str) -> str:
 def build_target_path(entry: LogEntry) -> Path:
     """
     Build a target local PDF path for a WAIT entry, following
-    paperPDFs/<category>/<venue_year>/<year>_<title>.pdf
+    obsidian-vault/paperPDFs/<category>/<venue_year>/<year>_<title>.pdf
     """
     category = entry.category or "Uncategorized"
     venue = entry.venue or "Unknown"

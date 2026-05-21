@@ -12,17 +12,18 @@ from typing import Dict, List, Optional, Tuple
 
 
 VAULT_ROOT = Path(__file__).resolve().parents[4]
-PAPER_ANALYSIS_DIR = VAULT_ROOT / "paperAnalysis"
+PAPER_ANALYSIS_DIR = VAULT_ROOT / "obsidian-vault/analysis"
 
 REQUIRED_FRONTMATTER_KEYS = {
     "title",
     "venue",
     "year",
     "tags",
+    "aliases",
     "core_operator",
     "primary_logic",
     "pdf_ref",
-    "category",
+    "claims",
 }
 
 PART_PATTERNS = {
@@ -75,7 +76,7 @@ class MdRecord:
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Audit metadata consistency across paperAnalysis logs and notes")
+    p = argparse.ArgumentParser(description="Audit metadata consistency across obsidian-vault/analysis logs and notes")
     p.add_argument("--report-dir", default=str(PAPER_ANALYSIS_DIR), help="Directory for quality reports")
     p.add_argument("--json", action="store_true", help="Also write JSON report")
     return p.parse_args()
@@ -199,11 +200,14 @@ def extract_h1(body: str) -> str:
 
 def looks_like_analysis_note(path: Path) -> bool:
     rel = path.relative_to(PAPER_ANALYSIS_DIR)
-    if len(rel.parts) != 3:
-        return False
-    top_dir, venue_dir, file_name = rel.parts
-    top_dir_l = top_dir.lower()
-    if top_dir_l in {"processing", "emergentmind_paper_analysis"}:
+    if len(rel.parts) == 2:
+        venue_dir, file_name = rel.parts
+    elif len(rel.parts) == 3:
+        top_dir, venue_dir, file_name = rel.parts
+        top_dir_l = top_dir.lower()
+        if top_dir_l in {"processing", "emergentmind_paper_analysis"}:
+            return False
+    else:
         return False
     if not file_name.lower().endswith(".md"):
         return False

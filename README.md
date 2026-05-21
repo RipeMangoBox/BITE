@@ -4,7 +4,7 @@
 
 <h1 align="center">ResearchFlow</h1>
 
-<p align="center"><strong>Structured Paper Analysis and Research Memory for Knowledge-Grounded Research</strong></p>
+<p align="center"><strong>Structured Paper Analysis and Research Memory for Knowledge-Grounded Research Agents</strong></p>
 
 <p align="center">
   <a href="README.md">English</a> |
@@ -13,404 +13,339 @@
 
 <p align="center">
   <img alt="Semi-automated" src="https://img.shields.io/badge/Semi--automated-Research%20Workflow-1f6feb?style=flat-square"/>
-  <img alt="Automation tool extensible" src="https://img.shields.io/badge/Automation--tool-extensible-0891b2?style=flat-square"/>
-  <img alt="Knowledge base" src="https://img.shields.io/badge/Local-Knowledge%20Base-0f766e?style=flat-square"/>
+  <img alt="Markdown first" src="https://img.shields.io/badge/Markdown--first-Local%20Files-0f766e?style=flat-square"/>
+  <img alt="Knowledge base" src="https://img.shields.io/badge/Local-Knowledge%20Base-0891b2?style=flat-square"/>
+  <img alt="MinerU powered" src="https://img.shields.io/badge/MinerU-PDF%20Parsing-0891b2?style=flat-square"/>
   <img alt="Claude Code compatible" src="https://img.shields.io/badge/Claude%20Code-compatible-d97706?style=flat-square"/>
   <img alt="Codex CLI compatible" src="https://img.shields.io/badge/Codex%20CLI-compatible-7c3aed?style=flat-square"/>
-  <img alt="Zotero compatible" src="https://img.shields.io/badge/Zotero-compatible-cc2936?style=flat-square"/>
   <img alt="Obsidian optional" src="https://img.shields.io/badge/Obsidian-optional-475569?style=flat-square"/>
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> 🔥 **ResearchFlow Community** | **[💬 WeChat / ResearchFlow WeChat Group](./WECHAT.md)**
+> 🔥 **ResearchFlow Community** | WeChat discussion group for Chinese users
 
 ---
 
-> **Knowledge first, not execution first.** Most AI research tools focus on "help me run experiments" or "help me write the paper." ResearchFlow focuses one layer earlier: **when your agent makes a decision, does it already have enough structured, retrievable paper evidence?** Without that layer, ideas stay vague, code changes lack grounding, and reviewer concerns are harder to answer.
+> 🧠 **Knowledge first, not execution first.** Many AI research tools focus on
+> helping you run experiments or draft papers. ResearchFlow focuses on the
+> upstream question: **when an agent makes a research decision, does it have
+> enough structured, searchable paper evidence in hand?**
 >
-> **Structured paper analysis as reusable research memory.** ResearchFlow is a structured paper analysis framework that converts academic PDFs into metadata-rich, retrievable analysis notes, building a reusable research memory for human-in-the-loop, knowledge-grounded research.
+> 🧩 **Turn structured paper analysis into reusable research memory.**
+> ResearchFlow organizes paper PDFs and paper lists into a local knowledge base:
+> structured analysis notes, lightweight indexes, Obsidian-friendly navigation
+> pages, and downstream idea or review notes.
 >
-> **Pure Markdown, zero lock-in.** The whole system is just local folders + Markdown + CSV. No database, no Docker, no backend service. Every skill is a `SKILL.md` file that Claude Code, Codex CLI, Cursor, or your own agent can read.
->
-> *ResearchFlow is a methodology, not a platform. The valuable part is the research memory you accumulate.*
+> 🪶 **Local-first with low lock-in.** The default workflow is **local files
+> only**: PDFs, Markdown notes, JSONL indexes, and idea notes all live under
+> `obsidian-vault/`. Normal use does not require an API server, database, or
+> service deployment.
 
----
+💡 _ResearchFlow is a methodology and local knowledge workflow, not a closed
+platform. The valuable artifact is the research memory you keep accumulating._
 
 ## 🔭 Current Goals
 
-- [ ] Release a stronger paper analysis template for more structured, comparable, and reusable paper understanding.
-- [ ] Release structured paper-analysis metadata that supports efficient retrieval, filtering, and cross-paper comparison.
-- [ ] Release a high-quality paper analysis knowledge base that supports human-in-the-loop research.
+- [X] Release a stronger paper analysis template for structured, comparable,
+  and reusable paper understanding.
+- [ ] Improve automation from candidate papers to a maintained index.
+- [ ] Release a high-quality paper analysis knowledge base for
+  human-in-the-loop research.
+- [ ] Improve structured metadata for retrieval, filtering, and cross-paper
+  comparison.
 
----
+## 🎯 More Than A Prompt: A Knowledge Pipeline
 
-## 🎯 Not Just Prompts, But a Full Knowledge Pipeline
-
-Give ResearchFlow a research topic and it can help you build the knowledge base step by step:
-
-```text
-collect → download → analyze → build index → research assist
-```
-
-You can use it in four modes:
-
-**Build mode**: collect candidate papers from webpages, conference lists, or GitHub awesome repositories.
+Give ResearchFlow a research direction, and it helps you build the knowledge
+base step by step:
 
 ```text
-/papers-collect-from-github-awesome
-Collect motion generation papers from https://github.com/Foruck/Awesome-Human-Motion
-and keep only diffusion, controllability, and real-time related entries.
+collect candidate papers / import local PDFs
+  -> download when needed
+  -> MinerU PDF parse
+  -> structured paper analysis
+  -> index
+  -> query / ideate / review / export
 ```
 
-**Query mode**: once the knowledge base exists, retrieve papers by task, method, tags, or title.
+You can use it in four common modes:
 
-```text
-/papers-query-knowledge-base
-Which papers use diffusion + spatial control, and what are their core_operator fields?
-```
+| Mode     | Purpose                                                                                   | Typical entry                                                                   |
+| -------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Build    | Collect candidates, download PDFs, analyze papers, and refresh the index                  | `research-workflow`                                                           |
+| Query    | Retrieve papers by topic, task, method, venue, year, title, or technique tags             | `papers-query-knowledge-base`                                                 |
+| Decision | Compare methods before choosing baselines, changing a design, or writing related work     | `papers-query-knowledge-base`                                                 |
+| Idea     | Generate, focus, and stress-test research directions grounded in the local knowledge base | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
 
-**Decision mode**: compare methods before changing a design, choosing baselines, or writing related work.
+ResearchFlow is useful when you want to:
 
-```text
-/papers-query-knowledge-base
-Compare the representation design of DART, OmniControl, and MoMask,
-with a focus on whether they can support long-horizon generation.
-```
-
-**Idea mode**: generate candidate directions grounded in the local knowledge base.
-
-```text
-/research-brainstorm-from-kb
-I want to study text-driven reactive motion generation.
-Please propose 3 directions grounded in the local knowledge base.
-```
-
-> Already have PDFs? Jump straight to analyze. Already have an idea? Jump to focus or reviewer stress testing. Not sure which skill to use? Start with `research-workflow`.
-
-> Analysis language: the default note language is **Chinese** (`analysis_language: zh`). To switch new analysis notes to English, change `analysis_language` to `en` in `AGENTS.md`, or explicitly ask for English output in the current prompt.
-
----
-
-## ✨ Core Capabilities
-
-| Capability              | What it does                                                                                                                             | Skill                                                                 |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Workflow entry          | Detects whether you are in sync / collect / download / analyze / build / query / ideate / focus / review and recommends the next step | `research-workflow`                                                 |
-| Paper collection        | Collects candidate papers from web pages or GitHub awesome repositories and writes them into `analysis_log.csv`                        | `papers-collect-from-web` · `papers-collect-from-github-awesome` |
-| PDF download            | Downloads, deduplicates, and repairs PDFs from triage lists                                                                              | `papers-download-from-list`                                         |
-| Structured analysis     | Converts PDFs into Markdown notes with structured frontmatter                                                                            | `papers-analyze-pdf`                                                |
-| Index building          | Builds `paperCollection/index.jsonl` (agent index) and Obsidian navigation pages from analysis notes                                    | `papers-build-collection-index`                                     |
-| Knowledge retrieval     | Retrieves papers by title, task, technique tag, venue, or year and summarizes the evidence; includes code-context mode for pre-coding retrieval | `papers-query-knowledge-base`                                       |
-| Idea generation         | Produces research directions grounded in the knowledge base                                                                              | `research-brainstorm-from-kb`                                       |
-| Idea focusing           | Narrows a broad idea into a scoped, executable plan with MVPs                                                                            | `idea-focus-coach`                                                  |
-| Reviewer stress test    | Challenges an idea from a reviewer perspective and surfaces major risks                                                                  | `reviewer-stress-test`                                              |
-| Metadata audit          | Checks title / venue / year / link consistency and produces a quality report                                                             | `papers-audit-metadata-consistency`                                 |
-| Share-ready export      | Converts internal notes into outward-facing share versions                                                                               | `notes-export-share-version`                                        |
-| Domain migration        | Migrates the architecture into another professional domain                                                                               | `domain-fork`                                                       |
-
-> For the full skill map and usage guide, see `[.claude/skills/User_README.md](.claude/skills/User_README.md)`.
-
----
+- Build a topic-specific paper knowledge base from web pages, GitHub paper
+  lists, or local PDF folders.
+- Convert PDFs into structured notes with comparable fields, evidence anchors,
+  formulas, tables, figure/table metadata, and reading-order context.
+- Compare methods before selecting baselines, writing related work, or changing
+  a research design.
+- Generate research ideas, focus them into executable plans, and stress-test
+  them from a reviewer perspective.
+- Export share-ready Markdown or browse the knowledge base in Obsidian.
 
 ## 🏗️ Three-Layer Architecture
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
-│  Output layer   paperIDEAs/                             │
-│                 ideas, plans, review notes               │
+│  Output layer        obsidian-vault/ideas/              │
+│                      ideas, plans, review notes          │
 ├─────────────────────────────────────────────────────────┤
-│  Index layer    paperCollection/                        │
-│                 index.jsonl (agent) + Obsidian pages    │
+│  Index layer         obsidian-vault/index/              │
+│                      JSONL index + Obsidian pages        │
 ├─────────────────────────────────────────────────────────┤
-│  Retrieval      paperAnalysis/ + paperPDFs/             │
-│  layer          structured notes + raw PDFs             │
+│  Evidence layer      obsidian-vault/analysis/           │
+│                      structured notes + logs             │
+│                      obsidian-vault/paperPDFs/           │
+│                      source PDFs                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
-- `**paperAnalysis/**` is the core of the system. Each paper gets one `.md` note with structured fields such as `core_operator`, `primary_logic`, `dataset`, `metrics`, and `venue`. Retrieval, comparison, ideation, and code-context steps all start here.
-- `**paperCollection/**` is the index and navigation layer, serving both agents and humans:
-  - `index.jsonl` — one JSONL line per paper for fast agent retrieval at scale (5 000 notes → 20–50 candidates), generated after the first `papers-build-collection-index` run.
-  - `by_task/`, `by_technique/`, `by_venue/` — Obsidian navigation pages for graph view, backlinks, and human exploration.
-  - Both are generated by `papers-build-collection-index`.
-- `**paperPDFs/**` keeps the raw papers for deeper reading when the structured evidence is not enough.
-- `**paperIDEAs/**` stores downstream outputs such as brainstorm notes, focused plans, and reviewer-style critiques.
+- `obsidian-vault/paperPDFs/` stores the source PDFs.
+- `obsidian-vault/analysis/` stores per-paper analysis notes and logs. This is
+  the main evidence layer agents should read.
+- `obsidian-vault/index/` stores generated retrieval indexes and
+  navigation pages. At scale, agents should start from `index.jsonl`, filter
+  candidates, then read matching analysis notes.
+- `obsidian-vault/ideas/` stores downstream research outputs such as brainstorm
+  notes, focused plans, reviewer critiques, and daily logs.
+- Obsidian is optional. It is only a browsing and backlink layer; the repository
+  still works as a normal local folder.
 
-A practical rule of thumb:
+The public repository ships with placeholder vault files only. A fresh clone is
+expected to build an empty `index.jsonl` until you add `paper_list.csv` rows,
+local PDFs, or analysis notes. This is intentional: personal PDFs, generated
+analysis notes, and generated index pages stay out of Git.
 
-- At scale, after the first build, agents start from `paperCollection/index.jsonl` → filter → read matching `paperAnalysis/` notes
-- Humans browse `paperCollection/` in Obsidian for overview and graph exploration
-- Open `paperPDFs/` when you need deeper verification
-- Write outputs into `paperIDEAs/` or your linked code repository
+## 🤖 Agent Compatibility
 
----
+ResearchFlow intentionally stays plain: folders, Markdown, JSONL, CSV, and
+`SKILL.md`. The same research memory can therefore be shared by multiple agents:
 
-## 🤖 Claude Code, Codex CLI, and Other Agents
-
-ResearchFlow supports three access modes:
-
-- **Claude Code / Cursor**: use the built-in `.claude/skills` directly.
-- **Codex CLI**: after clone, run `scripts/setup_shared_skills.py` locally to generate `.codex/skills` and `.codex/skills-config.json` from the same `.claude/skills` source of truth.
-- **Other AI agents**: even without skill support, they can still use the repository as a local knowledge base by reading `paperAnalysis/`, `paperPDFs/`, and `paperIDEAs/`.
-
-This lets multiple agents share the same research memory instead of rebuilding the literature context separately in each tool.
-
----
+- Claude Code / Cursor can read `.claude/skills` directly.
+- Codex CLI can use `scripts/setup_shared_skills.py` to generate local aliases.
+- Other agents that can read files can read `obsidian-vault/index/index.jsonl`
+  and `obsidian-vault/analysis/` directly, without special integration.
 
 ## 🚀 Quick Start
 
-### Prerequisites
+ResearchFlow is used across macOS, Windows, and Linux. The default analysis
+workflow does not require OS-specific tools such as `jq`, `curl`, or `make`.
+PDF helper libraries such as Poppler and Ghostscript are already declared in the
+Conda environment, so the README does not list OS-specific installation steps.
 
-- Claude Code, Codex CLI, or any LLM agent that can read `SKILL.md`
-- Python 3.10+ for PDF download, analysis, and index scripts
-- Obsidian if you want visual browsing of the knowledge base
-
-### 1. Clone the repository
+### 1. Create the conda environment
 
 ```bash
 git clone https://github.com/<your-username>/ResearchFlow.git
 cd ResearchFlow
+
+conda env create -f environment/environment.yml
+conda activate researchflow
 ```
 
-### 2. Prepare the skill entry
+### 2. Configure model and parser access
 
-- Claude Code / Cursor: use the existing `.claude/skills`
-- Codex CLI: after clone, generate the local `.codex` compatibility layer; see [Codex CLI compatibility](#codex-cli-compat)
+Most local operations work without a checked-in config file. When you need to
+set model keys, model names, or parser overrides, create a repo-root `.env` and
+use [environment/.env.example](environment/.env.example) as a reference. Do not
+put secrets into `.env.example`.
 
-### 3. Start using it
+Common OpenAI-compatible variables:
 
-You can describe the task directly, or explicitly name a skill.
+```dotenv
+OPENAI_API_KEY=
+OPENAI_BASE_URL=https://api.deepseek.com
+OPENAI_MODEL=deepseek-chat
+```
 
-The most general entry point is:
+### 3. Install or configure MinerU
+
+MinerU is the recommended parser for formal paper analysis. Ask the agent to
+install, configure, and verify MinerU for your machine instead of following a
+long manual setup in the README.
+
+Minimal verification: `mineru --help` should run, or `.env` should set
+`MINERU_CLI_PATH` to the MinerU executable.
+
+### 4. Prepare agent skills
+
+Claude Code and Cursor can read `.claude/skills` directly. For Codex-compatible
+skill paths, generate local aliases:
+
+```bash
+python3 scripts/setup_shared_skills.py
+```
+
+Then start from the workflow skill:
 
 ```text
 /research-workflow
-I want to build a knowledge base for controllable motion generation from scratch.
+I want to build a knowledge base for controllable motion generation from PDFs.
+Please tell me the next step and the expected outputs.
 ```
 
-Or jump straight to a concrete task:
+The default workflow does not require starting any service. Use the local
+folders under `obsidian-vault/` as the working state.
 
-```text
-Collect motion generation papers from https://github.com/Foruck/Awesome-Human-Motion
-```
-
-### 4. Optional: Obsidian visualization
-
-If you want to browse the knowledge base in Obsidian, see [Obsidian setup](#obsidian-config).
-
----
-
-<a id="usage-examples"></a>
 ## 📖 Usage Examples
 
-A few practical rules before the examples:
-
-- Prefer one main skill per prompt.
-- For staged work, separate prompts are usually more stable than a giant combined prompt.
-- Paths, venues, and topics in the examples are templates; replace them with your own.
-- Longer prompts are not always better. Usually the best prompt clearly states the goal, scope, input path, and expected output.
-- For skills that do not require extra input, calling the skill alone is often enough, for example `/papers-build-collection-index`.
-
-### A. Build and maintain the knowledge base
-
-<details>
-<summary>1. Build a topic-specific knowledge base from scratch</summary>
-
-The best first step is often the unified entry:
+Build a topic knowledge base from scratch:
 
 ```text
 /research-workflow
-I want to build a knowledge base for controllable motion generation from scratch.
-Please start from awesome repositories and the ICLR 2026 accepted list,
-then tell me whether the next best step is collect, download, analyze, or build.
+I want to build a knowledge base for text-driven reactive motion generation.
+Start by collecting candidate papers and tell me which skill to use at each stage.
 ```
 
-If you prefer to control each stage yourself, split the process manually.
-
-Optional pre-step without naming a skill directly:
+Collect candidate papers from a GitHub paper list:
 
 ```text
-I want to build a knowledge base for controllable human motion generation.
-Please search for relevant GitHub awesome repositories or curated paper lists first,
-and recommend the 2 most suitable options.
-```
-
-Prompt 1: collect candidate papers
-
-```text
-/papers-collect-from-github-awesome
-Collect papers related to controllable human motion generation from this GitHub awesome repository: <URL>
+/papers-collect-from-github-repo
+Collect papers related to controllable human motion generation from this GitHub repository: <URL>
 Keep only items related to diffusion, controllability, real-time generation, or long-form motion.
-Organize the result into a candidate list suitable for the downstream download workflow, and mark which entries should be kept or skipped.
+Write a candidate list suitable for the downstream download workflow.
 ```
 
-Prompt 2: download local PDFs
+Import PDFs from a local folder:
+
+```text
+/research-workflow
+I already have PDFs under /path/to/pdf-folder.
+Please register them under obsidian-vault/paperPDFs/ using category Motion_Generation,
+venue CVPR, and year 2026, then tell me which paper to analyze first.
+```
+
+Download PDFs from a curated candidate list:
 
 ```text
 /papers-download-from-list
 Download the papers that are still marked as Wait in the current candidate list.
-If a link is broken or a download fails, mark it as Missing and provide a short failure reason.
-After finishing, return the counts of successful downloads, failures, and skipped items.
+Report successful downloads, failures, and skipped items.
 ```
 
-Prompt 3: analyze PDFs into `paperAnalysis/`
+Generate a deep report for a prepared PDF:
 
 ```text
-/papers-analyze-pdf
-Analyze the PDFs under paperPDFs/ that were newly downloaded but do not yet have corresponding analysis notes.
-Write the analysis results into paperAnalysis/, and make sure the frontmatter includes title, venue, year, tags, core_operator, and primary_logic.
-When finished, tell me which papers were newly added into the knowledge base in this round.
+/paper-report
+Generate a deep report for obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf.
+Save the report under obsidian-vault/analysis/ with source anchors preserved.
 ```
 
-Prompt 4: rebuild indexes
-
-```text
-/papers-build-collection-index
-```
-
-</details>
-
-<details>
-<summary>2. Import papers from Zotero</summary>
-
-ResearchFlow includes a registered `papers-sync-from-zotero` skill and a runnable sync script at `.claude/skills/papers-sync-from-zotero/scripts/zotero_to_rf.py`. The script filters to paper-like Zotero items, deduplicates against `analysis_log.csv` + Zotero manifest, copies PDFs into RF's canonical layout, and can append Zotero highlights/notes into existing analysis notes.
-
-```text
-/papers-sync-from-zotero
-Please guide me through connecting Zotero to ResearchFlow.
-```
-
-Local Zotero API example:
+Run the formal local analysis chain directly when you need the actual pipeline
+artifacts and figure/table-aware vault export:
 
 ```bash
-python .claude/skills/papers-sync-from-zotero/scripts/zotero_to_rf.py sync \
-  --repo-root /path/to/isolated/Zotero \
-  --local-api \
-  --library-type user \
-  --library-id 0 \
-  --append-annotations-to-md
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault
 ```
 
-Web API example:
+If MinerU output already exists, reuse it instead of reparsing:
 
 ```bash
-python .claude/skills/papers-sync-from-zotero/scripts/zotero_to_rf.py sync \
-  --repo-root /path/to/isolated/Zotero \
-  --library-type user \
-  --library-id <YOUR_LIBRARY_ID> \
-  --api-key <READ_ONLY_KEY> \
-  --collection "Video Generation"
+python3 scripts/run_local_paper_analysis.py \
+  --mineru-output "<mineru_output_dir>" \
+  --paper-pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault
 ```
 
-If PDFs have already been analyzed and you only want to backfill Zotero highlights/comments into the Markdown notes:
+For a normalized MinerU cache, keep one paper output per directory and let the
+runner discover it from the PDF stem:
 
 ```bash
-python .claude/skills/papers-sync-from-zotero/scripts/zotero_to_rf.py append-annotations
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --mineru-output-root "<mineru_output_root>" \
+  --require-existing-mineru-output \
+  --export-vault
 ```
 
-See `.claude/skills/papers-sync-from-zotero/README.md` for workflow details and category mapping notes.
+For controlled experiments, keep the real venue/year metadata and redirect only
+the Markdown note path with `--vault-note-dir`.
 
-</details>
+The formal local runner is the default analysis route for pipeline artifacts.
 
-<details>
-<summary>3. Incrementally refresh the knowledge base after new PDFs arrive</summary>
+Analyze a batch from a paper list:
 
-Minimal version:
-
-```text
-/papers-analyze-pdf
-Analyze newly added PDFs under paperPDFs/Human_Motion_Generation/CVPR_2026/
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded \
+  --limit 25 \
+  --mineru-output-root "<mineru_output_root>" \
+  --require-existing-mineru-output
 ```
 
-```text
-/papers-build-collection-index
+For larger runs, split the list with `papers-batch-analyze` and run up to four
+worker agents in parallel.
+
+For long-running runs where agent disconnection is a bigger risk than automatic
+repair, run four script-only shards instead. Each process writes its own queue
+results and its own analysis work directory:
+
+```bash
+RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
+for shard in 0 1 2 3; do
+  python3 scripts/run_paper_list_analysis.py \
+    --source obsidian-vault/paper_list.csv \
+    --state Downloaded \
+    --run-id "${RUN_ID}_shard${shard}" \
+    --shard-index "$shard" \
+    --shard-count 4 \
+    --analysis-output-root "_private/local_analysis_runs/${RUN_ID}_shard${shard}" \
+    --mineru-output-root "_private/iclr26_batch/mineru_outputs" \
+    --require-existing-mineru-output \
+    > "_private/local_analysis_runs/${RUN_ID}_shard${shard}.log" 2>&1 &
+done
+wait
 ```
 
-If you want the agent to summarize the changes as well:
+After the scripts finish, inspect `obsidian-vault/batches/<run_id>/summary.json`
+and `results.jsonl`, then run post-hoc repair or index refresh.
 
-```text
-/papers-analyze-pdf
-Process the items in paperAnalysis/analysis_log.csv that still need analysis work.
-Write new analysis notes into paperAnalysis/ and report which papers were added in this round.
+Refresh the index manually when needed:
+
+```bash
+python3 .claude/skills/papers-build-index/scripts/build_paper_index.py
 ```
 
-`/papers-build-collection-index` can usually run by itself. If you care about what changed in this round, ask a follow-up question after it finishes about new method tags, technique tags, and venue / task pages.
+The generated home page is `obsidian-vault/index/_Index.md`. The tracked
+`obsidian-vault/index/README.md` remains a public placeholder and is not
+overwritten by the builder.
 
-</details>
+To verify the index/workflow chain on your machine without using private paper
+data:
 
-<details>
-<summary>4. Run a knowledge base health check</summary>
-
-```text
-/papers-audit-metadata-consistency
+```bash
+python3 scripts/smoke_index_workflow.py
 ```
 
-This is especially useful after large collection or analysis batches. By default it scans the current `paperAnalysis/` and outputs a quality report.
-
-</details>
-
-### B. Make knowledge-driven research decisions
-
-<details>
-<summary>5. Compare papers for a design decision</summary>
-
-When you need to choose between multiple design alternatives, write a Related Work table, pick baselines, or present a method overview:
+Ask a literature question:
 
 ```text
 /papers-query-knowledge-base
-Compare DART, OmniControl, MoMask, and ReactDance, with a focus on their representation design.
-Based on the core thinking, applicable scenarios, and capability characteristics of each design,
-analyze whether they can support <XXX>.
-Save the comparison result into paperIDEAs/compare_motion_designs.md.
+Compare DART, OmniControl, and MoMask for long-horizon controllable generation.
+Focus on representation design, control interface, and experimental evidence.
 ```
 
-</details>
-
-<details>
-<summary>6. Run targeted retrieval from the knowledge base</summary>
-
-```text
-/papers-query-knowledge-base
-Find all papers in the local knowledge base related to reactive motion generation, diffusion, and spatial control.
-Prioritize papers relevant to controllability and long-horizon consistency,
-and summarize their core_operator, primary_logic, and main limitations.
-```
-
-This is a good entry point when you want to understand the evidence landscape before deciding whether to compare or brainstorm.
-
-</details>
-
-<details>
-<summary>7. Generate candidate ideas from the knowledge base</summary>
-
-Short version:
+Generate an idea grounded in your local knowledge base:
 
 ```text
 /research-brainstorm-from-kb
 I want to study text-driven reactive motion generation.
-Please propose 3 candidate directions grounded in the local knowledge base and frontier evidence when needed.
+Propose 3 directions grounded in the papers already analyzed.
 ```
 
-If you want more execution-ready output:
-
-```text
-/research-brainstorm-from-kb
-I want to study long-audio-driven reactive motion generation.
-Please identify the first-principles challenges of this task, ground the discussion in the local knowledge base,
-add external search only when needed, and propose 3 viable directions.
-For each direction, include:
-- the problem entry point
-- why it is feasible
-- which existing papers provide technical support
-- the minimum viable experiment
-Write the final result into paperIDEAs/.
-```
-
-</details>
-
-<details>
-<summary>8. Turn a broad idea into an executable plan</summary>
-
-If you want to narrow the scope interactively:
+Narrow an idea into an executable plan:
 
 ```text
 /idea-focus-coach
@@ -419,210 +354,110 @@ but I am not sure how large the scope should be or what the first experiment sho
 Please narrow it into an executable MVP.
 ```
 
-If you already have an idea note:
-
-```text
-/idea-focus-coach
-I designed a new motion representation in @paperIDEAs/2026-10-08_new_motion_representation_raw.md,
-and the goal is to support high generation quality, strong instruction following, and long-horizon consistency at the same time.
-Please narrow it into a focused plan with:
-- scope cuts
-- prioritized hypotheses
-- 1-2 MVP experiments for this week
-Write the result back into the markdown file.
-```
-
-</details>
-
-<details>
-<summary>9. Pressure-test an idea like a reviewer</summary>
-
-Short version:
+Pressure-test an idea:
 
 ```text
 /reviewer-stress-test
 Review my idea from the perspective of an ICLR reviewer:
-[paste the idea description or point to a file under paperIDEAs/]
+[paste the idea description or point to a file under obsidian-vault/ideas/]
 Focus on novelty, experimental design, and differentiation from SOTA.
 ```
 
-If you already have a more detailed plan:
+## ✨ Core Capabilities
 
-```text
-/reviewer-stress-test
-I designed a new motion representation in @paperIDEAs/2026-10-10_new_motion_representation.md,
-and the goal is to support high generation quality, strong instruction following, and long-horizon consistency at the same time.
-Please act like a top-tier conference reviewer, point out the main weaknesses of the current plan,
-its overlap with related work, the core evaluation criteria, and the major rejection risks.
-Write the result back into the markdown file.
-```
+The maintained skill library lives in `.claude/skills`.
 
-</details>
+| Need                                       | Skill                               |
+| ------------------------------------------ | ----------------------------------- |
+| Decide the next pipeline step              | `research-workflow`               |
+| Import PDFs from a local folder            | Provide the folder path to `research-workflow` |
+| Collect candidates from web pages          | `papers-collect-from-web`         |
+| Collect candidates from GitHub paper lists | `papers-collect-from-github-repo` |
+| Download PDFs from a triage list           | `papers-download-from-list`       |
+| Generate a deep single-paper report        | `paper-report`                 |
+| Rebuild the local index                    | `papers-build-index`              |
+| Query or compare papers from local notes   | `papers-query-knowledge-base`     |
+| Generate grounded research ideas           | `research-brainstorm-from-kb`     |
+| Focus an idea into an executable plan      | `idea-focus-coach`                |
+| Run reviewer-style stress tests            | `reviewer-stress-test`            |
+| Export share-ready Markdown                | `notes-export-share-version`      |
 
-### C. Work with code and multi-agent systems
+See [.claude/skills/README.md](.claude/skills/README.md) for the full skill map.
 
-<details>
-<summary>10. Retrieve paper support before coding</summary>
-
-Short version:
-
-```text
-/code-context-paper-retrieval
-I am about to modify the attention mechanism in the motion decoder.
-Please retrieve relevant attention designs and experimental conclusions from the knowledge base first.
-```
-
-If you want the output to directly support implementation planning:
-
-```text
-/code-context-paper-retrieval
-Before editing the implementation for @paperIDEAs/2026-10-12_new_motion_representation_roadmap.md,
-retrieve relevant papers from the local knowledge base first.
-Summarize:
-- transferable operators
-- key implementation constraints
-- points that may conflict with the current code structure
-- which designs best match the current roadmap
-If the current knowledge base does not provide enough evidence, point that out clearly.
-```
-
-After this retrieval step, continue the actual code change in a separate coding prompt. That is usually more stable.
-
-</details>
-
-<details>
-<summary>11. Use ResearchFlow as a shared knowledge layer for automation</summary>
-
-ResearchFlow is a plain file-based knowledge layer, so any agent that can read files can use it:
-
-```text
-ResearchFlow/              ← shared knowledge layer
-├── paperCollection/
-│   └── index.jsonl        ← agent index (generated after first build; read first to filter)
-├── paperAnalysis/         ← evidence source for all agents
-├── paperPDFs/             ← raw papers
-└── paperIDEAs/            ← research outputs written by agents
-
-Agent A (Claude Code)  ── reads index.jsonl → paperAnalysis/ ──→ generates ideas
-Agent B (Codex CLI)    ── reads index.jsonl → paperAnalysis/ ──→ assists code changes
-Agent C (custom)       ── reads index.jsonl → paperAnalysis/ ──→ designs automated experiments
-```
-
-If you want to give explicit coordination rules to an agent, you can paste this:
-
-```text
-Treat ResearchFlow/ as the shared research memory and evidence layer for multiple agents in this project.
-Follow these conventions while working:
-- if `paperCollection/index.jsonl` exists, start retrieval there to narrow candidates; otherwise search `paperAnalysis/` directly, then read matching notes
-- use paperCollection/ Obsidian pages only when you want navigation / backlink exploration
-- write new research ideas into paperIDEAs/
-- if the local knowledge base already covers the relevant papers, do not restate the whole literature chain from scratch
-- before proposing a new idea or code change, first check whether the local knowledge base already contains reusable operators, baselines, or reviewer concerns
-- when returning results to the automation system, prioritize concise, traceable, evidence-based summaries instead of generic brainstorming
-```
-
-</details>
-
----
-
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 ResearchFlow/
-├── .claude/skills/             # skill definitions (source of truth)
-├── .claude/skills-config.json  # skill routing metadata
-├── .codex/
-│   └── README.md               # local Codex aliases are generated here by setup_shared_skills.py
-├── paperAnalysis/              # structured paper notes (core data source)
-│   └── analysis_log.csv        # candidate list and status tracking
-├── paperCollection/            # index & navigation layer
-│   ├── index.jsonl             # agent index: generated after the first build
-│   ├── by_task/                # Obsidian navigation by task
-│   ├── by_technique/           # Obsidian navigation by technique
-│   └── by_venue/               # Obsidian navigation by venue
-├── paperPDFs/                  # raw PDFs
-├── paperIDEAs/                 # downstream outputs: ideas, plans, reviews
-├── scripts/                    # helper scripts
-└── .obsidian/                  # optional Obsidian setup
+├── .claude/skills/                 maintained agent skill library
+├── assets/                         public logo and README assets
+├── environment/                    conda, dotenv, and local Python tooling files
+├── linkedCodebases/                optional links to related local codebases
+├── obsidian-vault/
+│   ├── paperPDFs/                  source PDFs for analysis
+│   ├── analysis/                   structured per-paper analysis notes
+│   ├── index/                      generated JSONL index and navigation pages
+│   └── ideas/                      ideas, plans, reviews, and logs
+├── scripts/                        setup, maintenance, and audit utilities
+├── tests/                          local/private regression tests when present
+├── AGENTS.md                       agent-facing local workflow rules
+├── README.md                       English entry point
+└── README_CN.md                    Chinese entry point
 ```
 
-- `paperAnalysis/` is the primary agent-facing evidence layer.
-- `paperCollection/` is the generated index and navigation layer — `index.jsonl` for agent retrieval after build, Obsidian pages for human browsing.
-- `paperIDEAs/` stores downstream research outputs.
-- `.claude/skills` is the only source of truth.
-- `.codex/` is optional local generated state for Codex CLI compatibility and is not tracked by git.
-- For the fastest bilingual skill overview, see `.claude/skills/User_README.md` and `.claude/skills/User_README_CN.md`.
+Generated corpora, private notes, local credentials, caches, and large research
+artifacts should stay out of Git.
 
----
+## Advanced Config
 
-<a id="advanced-config"></a>
-## 🔧 Advanced Config
+`<a id="codex-cli-compat"></a>`
 
-<a id="codex-cli-compat"></a>
 <details>
 <summary>Codex CLI compatibility</summary>
 
 Claude Code / Cursor does not need this step. Codex CLI does.
 
-The repository does not track `.codex/`. After clone, generate `.codex/skills` and `.codex/skills-config.json` locally on the current platform:
-
-macOS / Linux:
+The repository does not track `.codex/`. After clone, generate
+`.codex/skills` and `.codex/skills-config.json` locally:
 
 ```bash
 python3 scripts/setup_shared_skills.py
 ```
 
-Windows:
-
-```powershell
-py -3 scripts\setup_shared_skills.py
-```
-
-If you only want to verify that the compatibility aliases are present:
+Verify aliases without changing them:
 
 ```bash
 python3 scripts/setup_shared_skills.py --check
 ```
 
-If `.codex/skills` or `.codex/skills-config.json` disappears, rerun the same script.
-
 </details>
 
-<a id="obsidian-config"></a>
+`<a id="obsidian-config"></a>`
+
 <details>
 <summary>Obsidian setup</summary>
 
-- Obsidian is optional. It is only a visualization layer.
-- If you have a shared Obsidian package, extract it at the repository root and rename it to `.obsidian`.
-- If the extracted folder is named `obsidian setting`, rename it to `.obsidian`.
+- Obsidian is optional but strongly recommended. It is only a visualization layer.
+- Open `obsidian-vault/` as an Obsidian vault if you want graph view,
+  backlinks, and manual browsing.
+- Do not treat Obsidian pages as a separate source of truth; they are local
+  files generated or maintained by the workflow.
 
 </details>
 
-<details>
-<summary>Domain Fork</summary>
+ResearchFlow currently supports the local file workflow through the conda
+environment and local commands only.
 
-ResearchFlow is not limited to academic research. With the `domain-fork` skill, you can migrate the architecture into another professional domain:
+## Data Hygiene
 
-```text
-/domain-fork
-I want to migrate ResearchFlow into a frontend engineering workflow
-for tracking framework evolution, design patterns, and performance optimization knowledge.
-```
-
-If you want to keep the methodology but use a more neutral framing, you can also treat it as a general local knowledge workflow template.
-
-</details>
-
----
-
-## 📝 Notes
-
-- The main state flow in `analysis_log.csv` is `Wait → Downloaded → checked`. Abnormal states: `analysis_mismatch` (incomplete analysis template) and `too_large` (PDF exceeds size limit). Side states: `Missing` and `Skip`. See `.claude/skills/STATE_CONVENTION.md` for full definitions.
-- If analysis notes are added or modified and you want refreshed indexes, rebuild with `papers-build-collection-index` (generates or updates both `paperCollection/index.jsonl` and Obsidian navigation pages).
-- Obsidian is optional; the repository still works as a normal local folder for agents.
-- `.claude/skills` is the only maintained source.
-- `.codex/` is local generated state; Codex users should run `scripts/setup_shared_skills.py` after clone.
-- `build index` is optional for agents when the knowledge base is small. At scale (1 000+ notes), run one build first, then read `paperCollection/index.jsonl` for efficient retrieval.
+- Keep `.env` local and commit `environment/.env.example` only.
+- Keep PDFs, generated analysis notes, generated indexes, vault pages, caches,
+  model outputs, and private experiments out of source history unless you are
+  intentionally publishing a curated example.
+- Preserve the standard `obsidian-vault/` layout so agents and scripts can find
+  the expected inputs and outputs.
+- Avoid mixing unrelated paper sets in the same category unless you want
+  them retrieved together.
+- Run a sensitive-token scan before publishing a fork or release.
 
 ## Citation
 

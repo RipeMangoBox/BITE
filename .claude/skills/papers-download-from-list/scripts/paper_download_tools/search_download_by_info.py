@@ -17,8 +17,8 @@ from typing import Any, Iterable, Optional
 
 SCRIPT_DIR = Path(__file__).absolute().parent
 REPO_ROOT = SCRIPT_DIR.parents[4]
-DEFAULT_LOG_PATH = REPO_ROOT / "paperAnalysis" / "analysis_log.csv"
-PAPER_ROOT = REPO_ROOT / "paperPDFs"
+DEFAULT_LOG_PATH = REPO_ROOT / "obsidian-vault/paper_list.csv"
+PAPER_ROOT = REPO_ROOT / "obsidian-vault/paperPDFs"
 
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "

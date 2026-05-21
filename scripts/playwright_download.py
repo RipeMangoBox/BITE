@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 import requests
 from playwright.async_api import async_playwright
 
-LOG_PATH = Path("paperPDFs/download_log_updated.txt")
+LOG_PATH = Path("obsidian-vault/paperPDFs/download_log_updated.txt")
 ENC = "utf-8"
 
 
@@ -123,12 +123,12 @@ async def try_download_with_playwright(entries, lines):
 
             # download found
             if found:
-                # build outpath: paperPDFs/<topic>/<venue>/<YEAR_Title>.pdf
+                # build outpath: obsidian-vault/paperPDFs/<topic>/<venue>/<YEAR_Title>.pdf
                 topic = safe_name(e['topic'])
                 venue = safe_name(e['venue'] or 'Unknown')
                 m = re.search(r"(19|20)\d{2}", e['venue'] or '')
                 year = m.group(0) if m else 'unknown'
-                folder = Path('paperPDFs') / topic / venue
+                folder = Path('obsidian-vault/paperPDFs') / topic / venue
                 folder.mkdir(parents=True, exist_ok=True)
                 fname = safe_name(f"{year}_{title}") + '.pdf'
                 outpath = folder / fname

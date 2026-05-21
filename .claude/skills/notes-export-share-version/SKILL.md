@@ -1,6 +1,7 @@
 ---
 name: notes-export-share-version
 follows: rf-obsidian-markdown
+status: export-only
 description: Converts internal research notes into shareable Obsidian-friendly Markdown files. Use when the user explicitly asks to make a share version, export a note for sharing, hide knowledge base traces, replace internal wiki links with public paper links, rewrite internal wording for external readers, or generate a content-driven share filename.
 ---
 
@@ -9,6 +10,8 @@ description: Converts internal research notes into shareable Obsidian-friendly M
 ## What this skill does
 
 Converts an internal research note into a shareable Markdown note for external readers.
+This is an export-only skill: it creates a local share artifact and should not
+be treated as a service data write.
 
 Default behavior:
 

@@ -13,7 +13,7 @@ from pathlib import Path
 import requests
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
-LOG_PATH = REPO_ROOT / "paperAnalysis" / "ICLR_2026.txt"
+LOG_PATH = REPO_ROOT / "obsidian-vault/analysis" / "ICLR_2026.txt"
 
 HEADERS = {
     "User-Agent": (

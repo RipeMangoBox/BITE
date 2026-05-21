@@ -4,8 +4,8 @@ from typing import Dict, List, Tuple
 
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PAPER_ANALYSIS_DIR = os.path.join(ROOT_DIR, "paperAnalysis")
-LOG_PATH = os.path.join(PAPER_ANALYSIS_DIR, "analysis_log.csv")
+PAPER_ANALYSIS_DIR = os.path.join(ROOT_DIR, "obsidian-vault/analysis")
+LOG_PATH = os.path.join(ROOT_DIR, "obsidian-vault/paper_list.csv")
 
 
 class AnalysisFile:
@@ -84,7 +84,7 @@ def build_analysis_index() -> Dict[str, AnalysisFile]:
         for fname in files:
             if not fname.endswith(".md"):
                 continue
-            if fname in {"paper_analysis_check_task.txt", "analysis_log_updated.txt", "analysis_log.csv"}:
+            if fname == "README.md":
                 continue
 
             path = os.path.join(root, fname)

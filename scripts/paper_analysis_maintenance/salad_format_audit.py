@@ -249,10 +249,10 @@ def simple_similarity(a: str, b: str) -> float:
 
 def find_pdf_for_md(md_path: Path, repo_root: Path) -> Optional[Path]:
     try:
-        rel = md_path.relative_to(repo_root / "paperAnalysis")
+        rel = md_path.relative_to(repo_root / "obsidian-vault/analysis")
     except Exception:
         return None
-    pdf_path = repo_root / "paperPDFs" / rel.with_suffix(".pdf")
+    pdf_path = repo_root / "obsidian-vault/paperPDFs" / rel.with_suffix(".pdf")
     if pdf_path.exists():
         return pdf_path
     alt_name = pdf_path.name.replace("-", " ")
@@ -321,14 +321,14 @@ def build_md_path(repo_root: Path, category: str, venue: str, year: str, title: 
     category_dir = normalize_category_dir(category)
     venue_dir = normalize_venue_dir(venue)
     safe_title = sanitize_title_for_filename(title)
-    return repo_root / "paperAnalysis" / category_dir / venue_dir / f"{year}_{safe_title}.md"
+    return repo_root / "obsidian-vault/analysis" / category_dir / venue_dir / f"{year}_{safe_title}.md"
 
 
 def build_pdf_path(repo_root: Path, category: str, venue: str, year: str, title: str) -> Optional[Path]:
     category_dir = normalize_category_dir(category)
     venue_dir = normalize_venue_dir(venue)
     safe_title = sanitize_title_for_filename(title)
-    candidate = repo_root / "paperPDFs" / category_dir / venue_dir / f"{year}_{safe_title}.pdf"
+    candidate = repo_root / "obsidian-vault/paperPDFs" / category_dir / venue_dir / f"{year}_{safe_title}.pdf"
     if candidate.exists():
         return candidate
     alt = candidate.with_name(candidate.name.replace("-", " "))
@@ -343,7 +343,7 @@ def build_pdf_path_strict(repo_root: Path, category: str, venue: str, title: str
     venue_dir = normalize_venue_dir(venue)
     safe_title = sanitize_title_for_filename(title)
 
-    pdf_dir = repo_root / "paperPDFs" / category_dir / venue_dir
+    pdf_dir = repo_root / "obsidian-vault/paperPDFs" / category_dir / venue_dir
     candidate = pdf_dir / f"{year}_{safe_title}.pdf"
     if candidate.exists():
         return candidate
@@ -375,10 +375,10 @@ def build_pdf_path_strict(repo_root: Path, category: str, venue: str, title: str
 
 def md_path_from_pdf_path(repo_root: Path, pdf_path: Path) -> Optional[Path]:
     try:
-        rel = pdf_path.relative_to(repo_root / "paperPDFs")
+        rel = pdf_path.relative_to(repo_root / "obsidian-vault/paperPDFs")
     except Exception:
         return None
-    return (repo_root / "paperAnalysis" / rel).with_suffix(".md")
+    return (repo_root / "obsidian-vault/analysis" / rel).with_suffix(".md")
 
 
 def extract_abstract(pdf_text: str) -> str:
@@ -523,8 +523,8 @@ category: {tags[0]}
 
 
 def run_batch(repo_root: Path, batch_size: int) -> Tuple[List[SaladCheckResult], int]:
-    paper_root = repo_root / "paperAnalysis"
-    log_path = paper_root / "analysis_log.csv"
+    paper_root = repo_root / "obsidian-vault/analysis"
+    log_path = repo_root / "obsidian-vault/paper_list.csv"
 
     with log_path.open("r", encoding="utf-8", newline="") as f:
         rows = [r for r in csv.reader(f)]
@@ -562,7 +562,7 @@ def run_batch(repo_root: Path, batch_size: int) -> Tuple[List[SaladCheckResult],
             results.append(
                 SaladCheckResult(
                     ok=False,
-                    reasons=["unable to map PDF path to MD path (paperPDFs -> paperAnalysis)"],
+                    reasons=["unable to map PDF path to MD path (obsidian-vault/paperPDFs -> obsidian-vault/analysis)"],
                     md_path=pdf_path.with_suffix(".md"),
                     status="Wait",
                 )
@@ -597,7 +597,7 @@ def run_batch(repo_root: Path, batch_size: int) -> Tuple[List[SaladCheckResult],
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Batch SALAD-format audit for paperAnalysis markdowns.")
+    parser = argparse.ArgumentParser(description="Batch SALAD-format audit for obsidian-vault/analysis markdowns.")
     parser.add_argument("--root", type=str, default=".", help="Repository root (default: current directory)")
     parser.add_argument("--batch-size", type=int, default=6, help="Number of Wait entries to process in this batch.")
     args = parser.parse_args()
@@ -635,4 +635,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

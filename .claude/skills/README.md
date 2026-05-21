@@ -1,90 +1,139 @@
-## ResearchFlow Skills Overview
+# ResearchFlow Skills
 
-Single source of truth: keep the maintained skill library in `.claude/skills`.
-If you also want Codex-compatible paths, run `python3 scripts/setup_shared_skills.py` on macOS/Linux or `py -3 scripts\setup_shared_skills.py` on Windows to generate `.codex/skills` aliases without copying.
+This directory is the maintained skill library for ResearchFlow agents. Each
+skill is a `SKILL.md` file that tells an agent how to perform one bounded part
+of the research workflow.
 
-This skills directory supports the local paper workflow covering **sync -> collect -> download -> analyze -> build -> query -> emerge -> ideate -> focus -> review**.
+If your tool expects Codex-compatible skill paths, generate local aliases from
+the repository root:
 
-### 1. Workflow entry
+```bash
+python3 scripts/setup_shared_skills.py
+```
+
+## Workflow
+
+```text
+collect candidate papers / import local PDFs
+  -> download when needed
+  -> MinerU parse
+  -> analyze
+  -> build index
+  -> query / ideate / focus / review / export
+```
+
+## Current Status
+
+The current default workflow is local-file based. The skills below operate on
+`obsidian-vault/` and related local logs. Archived legacy skills live under
+`_private/.archives/` for audit only and are not part of the default route.
+
+| Skill | Status | Guidance |
+|---|---|---|
+| `research-workflow` | active router | Start here when the next stage is unclear. |
+| `papers-collect-from-web` | active local collect | Collect candidate rows from web pages. |
+| `papers-collect-from-github-repo` | active local collect | Collect candidate rows from GitHub paper lists. |
+| `papers-download-from-list` | active local download | Download and repair PDFs into `obsidian-vault/paperPDFs`. |
+| `papers-build-index` | local index | Regenerates `obsidian-vault/index` from local notes. |
+| `papers-query-knowledge-base` | active local query | Search and compare papers from local notes and indexes. |
+| `papers-audit-metadata-consistency` | local audit | Audits local exported notes and logs. |
+| `paper-report` | active deep report | Use for deep single-paper reports. |
+| `rf-obsidian-markdown` | Markdown convention | Applies to generated/local Markdown output. |
+| `notes-export-share-version` | export utility | Creates shareable Markdown from local notes. |
+
+## Entry Point
 
 - **research-workflow**
-  - Routes work to one stage among sync / collect / download / analyze / build / query / emerge / ideate / focus / review / audit / export.
-  - Returns the current stage, required inputs, suggested command or skill, expected outputs, and next step.
+  - Routes a request to one stage among local PDF import, collect, download,
+    analyze, build, query, ideate, focus, review, audit, and export.
+  - Use this first when you are not sure which skill should handle the next
+    step.
 
-### 2. Paper pipeline skills
+## Paper Pipeline
 
-- **papers-sync-from-zotero**
-  - Sync papers from a Zotero library (via pyzotero / Zotero API) or import from a flat PDF folder (fallback).
-  - Copies PDFs into `paperPDFs/`, writes rich metadata to `paperAnalysis/processing/zotero/manifest.jsonl`, appends lightweight rows to `analysis_log.csv`.
-  - Supports incremental sync.
 - **papers-collect-from-web**
-  - Collect candidate papers from non-GitHub web pages (conference sites, lab homepages, proceedings) and generate a triage list under `paperAnalysis/`.
-- **papers-collect-from-github-awesome**
-  - Parse any GitHub repository (awesome lists, survey companion repos, lab paper lists, conference accepted-paper repos, etc.) into an `analysis_log.csv`-aligned candidate list.
+  - Collect candidate papers from non-GitHub web pages such as conference pages,
+    lab pages, proceedings, and paper lists.
+- **papers-collect-from-github-repo**
+  - Collect candidate papers from GitHub repositories, including awesome lists,
+    survey companion repos, lab paper lists, accepted-paper repos, and benchmark
+    repos.
 - **papers-download-from-list**
-  - Download, verify, repair, and deduplicate PDFs into `paperPDFs/`.
-- **papers-analyze-pdf**
-  - Convert local PDFs into structured `paperAnalysis/*.md` notes.
-  - Default output language is Chinese. Change `analysis_language` in `AGENTS.md` to `en`, or explicitly request English output in the current prompt if needed.
+  - Download, verify, repair, and deduplicate PDFs from a curated triage list.
+- **Local PDF folder import**
+  - No dedicated library-sync skill is maintained. If you already have PDFs,
+    provide the folder path to `research-workflow` or directly to the agent.
+  - The agent should copy/register PDFs under `obsidian-vault/paperPDFs/` and
+    align any batch rows with `obsidian-vault/paper_list.csv`.
+- **Batch analysis from a paper list**
+  - Provide `obsidian-vault/paper_list.csv` or a similar paper list to
+    `research-workflow`.
+  - Default batch size is 25 papers.
+  - Default parallelism is 4 agents for 4 batches.
+  - After completed batches, refresh `obsidian-vault/index/` automatically.
 - **papers-audit-metadata-consistency**
-  - Audit consistency between logs and analysis notes.
-- **papers-build-collection-index**
-  - Rebuild `paperCollection/index.jsonl` (agent index) and `paperCollection/` Obsidian navigation pages from `paperAnalysis/` frontmatter.
+  - Check title, venue, year, link, PDF reference, and note-structure
+    consistency across generated analysis notes.
+- **papers-build-index**
+  - Rebuild `obsidian-vault/index/index.jsonl` and human navigation pages from
+    analysis note frontmatter.
 
-### 3. KB query and code context
+## Query, Ideation, and Review
 
 - **papers-query-knowledge-base**
-  - Query the knowledge base primarily from `paperAnalysis/`; when present, reads `paperCollection/index.jsonl` first for fast filtering. Includes code-context mode for pre-coding paper retrieval. Also handles comparison requests with honest text-based analysis.
-- **code-context-paper-retrieval** *(alias — routes to papers-query-knowledge-base code-context mode)*
-  - Retrieve paper evidence relevant to a coding task. Triggers before code modification.
-
-### 4. Research ideation and review
-
-- **idea-emerge**
-  - Generate research idea candidates from local KB evidence, domain bottleneck diagnosis, task-core web papers, cross-domain operators, explicit decision rules, implementation traces, and task constraints.
-  - Outputs domain bottleneck diagnosis, evidence ledger, cards, candidate score breakdown, `S3` hard gates, rejected or parked ideas, and next-skill handoff.
-  - Use this before open-ended brainstorming when the input is evidence and constraints rather than a cleanly stated research question.
+  - Query papers by title, task, technique tag, venue, year, or method. Uses
+    `obsidian-vault/index/index.jsonl` as the fast filter layer when present, then
+    reads matching analysis notes for evidence.
 - **research-brainstorm-from-kb**
-  - Turn a research question into structured idea notes using the local knowledge base.
-- **idea-focus-coach** (independent)
-  - Co-create and narrow broad ideas into focused goals, scope cuts, and next experiments.
-- **reviewer-stress-test** (independent)
-  - Run strict-but-fair ICLR/CVPR/SIGGRAPH reviewer-style questioning on an idea, roadmap, or full paper.
+  - Generate research directions grounded in the local paper knowledge base.
+- **idea-focus-coach**
+  - Narrow a broad research idea into a scoped, executable plan.
+- **reviewer-stress-test**
+  - Challenge an idea, roadmap, or paper draft from a strict reviewer
+    perspective and surface repair paths.
 
-### 5. Utility skills
+## Reports, Markdown, and Export
 
+- **paper-report**
+  - Generate a seven-section paper report: overview, background, core
+    contribution, framework, formulas, experiments, and lineage.
+- **scripts/run_local_paper_analysis.py**
+  - Formal single-paper analysis chain for the default local workflow. It
+    produces `_private/local_analysis_runs/**` artifacts and exports
+    figure/table-aware notes into `obsidian-vault/analysis/`.
+- **rf-obsidian-markdown**
+  - Apply Obsidian-friendly Markdown conventions to generated notes.
 - **notes-export-share-version**
-  - Convert internal notes into external-share Markdown versions.
+  - Convert internal notes into share-ready Markdown.
+
+## Utilities
+
+- **code-context-paper-retrieval**
+  - Legacy compatibility alias. Prefer `papers-query-knowledge-base` with a
+    code-context request.
 - **skill-fit-guard**
-  - Diagnose recurring skill mismatch after a skill call and ask whether that skill should be revised.
+  - Diagnose recurring skill mismatch after a skill call and suggest whether the
+    skill should be revised.
 - **write-daily-log**
-  - Generate or update a structured daily research log from git diffs, artifacts, and conversation context.
-  - Core logic: collect evidence that changes future judgment (not activity logs), then compress into a fixed template.
-  - Evidence channels: (A) current session context, (B) cross-session git diffs and filesystem artifact scan across all workspace repos.
-  - Output sections: 今日进展 / 核心结论 / 问题与思考 / 明日任务.
-  - Built-in consistency check: numbers must cite artifacts, old/new env results must not be mixed, 明日任务 must follow from conclusions.
-
-### 6. Domain migration
-
+  - Generate or update a structured daily research log from current artifacts
+    and decisions.
 - **domain-fork**
-  - Migrate ResearchFlow's architecture to any professional domain, such as frontend development, accounting, or journalism.
-  - Interactive flow: confirm the target domain -> define concept mapping -> adapt skills -> generate folders and README.
+  - Adapt the ResearchFlow workflow to another professional domain.
 
-### 7. Choosing a skill
+## Choosing a Skill
 
-- Need to import papers from Zotero or a local PDF folder -> `papers-sync-from-zotero`
-- Need candidate papers from sites or review pages -> `papers-collect-from-web`
-- Need candidate papers from a GitHub repository (awesome lists, survey repos, etc.) -> `papers-collect-from-github-awesome`
-- Already have candidate rows and need PDFs -> `papers-download-from-list`
-- Already have PDFs and need analysis notes -> `papers-analyze-pdf`
-- Changed or added notes and want refreshed indexes → `papers-build-collection-index`
-- Need a metadata quality pass -> `papers-audit-metadata-consistency`
-- Need to search, summarize, compare, or cite papers in prose -> `papers-query-knowledge-base`
-- Need paper suggestions before coding -> `papers-query-knowledge-base` (code-context mode)
-- Need to turn KB evidence, domain bottleneck diagnosis, task-core papers, cross-domain operators, and decision rules into idea candidates -> `idea-emerge`
-- Need idea generation backed by the knowledge base while the direction is still open-ended -> `research-brainstorm-from-kb`
-- Need collaborative narrowing from a broad-but-real idea to an executable plan -> `idea-focus-coach`
-- Need strict reviewer-mode challenge with repair paths -> `reviewer-stress-test`
-- A recently used skill seems repeatedly unfit -> `skill-fit-guard`
-- Need to write or update a daily research log -> `write-daily-log`
-- Want to create a domain-adapted version of ResearchFlow -> `domain-fork`
+| Need | Skill |
+|---|---|
+| Unsure which stage you are in | `research-workflow` |
+| Import a local PDF folder | Provide the folder path to `research-workflow` or the agent |
+| Collect candidates from web pages | `papers-collect-from-web` |
+| Collect candidates from a GitHub paper list | `papers-collect-from-github-repo` |
+| Download PDFs from candidate rows | `papers-download-from-list` |
+| Generate a deep single-paper report | `paper-report` |
+| Rebuild the local index | `papers-build-index` |
+| Audit metadata consistency | `papers-audit-metadata-consistency` |
+| Search, summarize, or compare papers | `papers-query-knowledge-base` |
+| Generate research ideas | `research-brainstorm-from-kb` |
+| Focus an idea into a plan | `idea-focus-coach` |
+| Run reviewer-style pressure tests | `reviewer-stress-test` |
+| Export share-ready Markdown | `notes-export-share-version` |

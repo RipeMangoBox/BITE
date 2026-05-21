@@ -1,7 +1,7 @@
 ---
 name: research-brainstorm-from-kb
 follows: rf-obsidian-markdown
-description: Explores and structures research ideas into `paperIDEAs/` notes using the local paper knowledge base and frontier techniques. Use when the user provides research questions or ideas and wants decomposed candidate directions, related-work analysis based primarily on `paperAnalysis`, and cross-domain support from image/video generation, MLLM, Agent, or RL, automatically saved as dated idea notes under `paperIDEAs/`.
+description: Explores and structures research ideas into `obsidian-vault/ideas/` notes using the local paper knowledge base and frontier techniques. Use when the user provides research questions or ideas and wants decomposed candidate directions, related-work analysis based primarily on `obsidian-vault/analysis`, and cross-domain support from image/video generation, MLLM, Agent, or RL, automatically saved as dated idea notes under `obsidian-vault/ideas/`.
 ---
 
 # Research Idea Brainstorming
@@ -11,16 +11,16 @@ description: Explores and structures research ideas into `paperIDEAs/` notes usi
 Use this skill in the following scenarios:
 
 - **Research question / idea input**: the user describes a research question, direction, or fragmented ideas in natural language and wants systematic brainstorming plus lightweight synthesis.
-- **Need local knowledge-base grounding**: rely primarily on retrieval from `paperAnalysis`, and use generated `paperCollection` indexes/navigation pages when they help produce "related-work support + research opportunity".
-- **Need reusable idea notes**: automatically write outputs as structured Markdown under local `paperIDEAs/` for later writing, experiments, and project management.
+- **Need local knowledge-base grounding**: rely primarily on retrieval from `obsidian-vault/analysis`, and use generated `obsidian-vault/index` indexes/navigation pages when they help produce "related-work support + research opportunity".
+- **Need reusable idea notes**: automatically write outputs as structured Markdown under local `obsidian-vault/ideas/` for later writing, experiments, and project management.
 
 ## 2. Dependencies and paths (Dependencies & paths)
 
 This skill depends on the local paper knowledge base and the `papers-query-knowledge-base` skill:
 
-- **Paper index and analysis**: see `papers-query-knowledge-base` skill (`paperCollection/` + `paperAnalysis/`)
-- **Primary paper retrieval and analysis**: see `papers-query-knowledge-base` skill (`paperAnalysis/` for evidence, generated `paperCollection/` for fast filtering/navigation when useful)
-- **Idea note directory**: `paperIDEAs/`
+- **Paper index and analysis**: see `papers-query-knowledge-base` skill (`obsidian-vault/index/` + `obsidian-vault/analysis/`)
+- **Primary paper retrieval and analysis**: see `papers-query-knowledge-base` skill (`obsidian-vault/analysis/` for evidence, generated `obsidian-vault/index/` for fast filtering/navigation when useful)
+- **Idea note directory**: `obsidian-vault/ideas/`
 
 Path convention:
 
@@ -29,7 +29,7 @@ Path convention:
 
 ## 3. File naming and storage rules
 
-When generating brainstorming results, **always write/update Markdown files in `paperIDEAs/`** using this naming rule:
+When generating brainstorming results, **always write/update Markdown files in `obsidian-vault/ideas/`** using this naming rule:
 
 - **Filename pattern**: `YYYY-MM-DD_<core-slug>.md`
   - `YYYY-MM-DD`: user local date (for example `2025-03-09`)
@@ -39,7 +39,7 @@ When generating brainstorming results, **always write/update Markdown files in `
 Behavior convention:
 
 - If a file with the same date and core slug already exists, **append a new brainstorming subsection** instead of creating a new file.
-- If the user explicitly specifies a target file in `paperIDEAs`, follow the user-specified filename.
+- If the user explicitly specifies a target file in `obsidian-vault/ideas`, follow the user-specified filename.
 
 ## 4. Brainstorming process and output structure
 
@@ -77,11 +77,11 @@ In generated notes:
 Always use the local KB through `papers-query-knowledge-base`:
 
 1. **Locate related tasks/techniques**:
-   - Prioritize title, task path, tags, venue, year, `core_operator`, and `primary_logic` in `paperAnalysis/`.
-   - If fast filtering or overview/statistics/Obsidian navigation aid is needed, reference `paperCollection/index.jsonl`, `by_task/`, `by_technique/`, `by_venue/`.
+   - Prioritize title, task path, tags, venue, year, `core_operator`, and `primary_logic` in `obsidian-vault/analysis/`.
+   - If fast filtering or overview/statistics/Obsidian navigation aid is needed, reference `obsidian-vault/index/index.jsonl`, `by_topic/`, `by_method/`, `by_dataset/`, `by_venue/`, and `by_year/`.
 2. **Select representative papers**:
    - Choose 3-8 papers highly related to the idea.
-   - For each paper, read `core_operator`, `primary_logic`, and TL;DR from the `paperAnalysis` note frontmatter.
+   - For each paper, read `core_operator`, `primary_logic`, and TL;DR from the `obsidian-vault/analysis` note frontmatter.
    - Summarize in 1-2 sentences what it does and how it relates to the current idea.
 3. **Summarize support and gaps**:
    - **Support**: where these works validate the idea's feasibility or value.
@@ -139,7 +139,7 @@ In generated notes:
 
 ## 5. Recommended note template
 
-When generating `paperIDEAs` notes, you can use this template (slight adjustments allowed by context):
+When generating `obsidian-vault/ideas` notes, you can use this template (slight adjustments allowed by context):
 
 ```markdown
 ---
@@ -149,7 +149,7 @@ updated: {{ISO_DATETIME_NOW}}
 
 # {{YYYY-MM-DD}} {{Brief core problem description}}
 
-> Systematic retrieval and brainstorming primarily grounded in `paperAnalysis`, using generated `paperCollection` index/navigation support when helpful, with frontier cross-domain support from image/video/MLLM/Agent/RL.
+> Systematic retrieval and brainstorming primarily grounded in `obsidian-vault/analysis`, using generated `obsidian-vault/index` index/navigation support when helpful, with frontier cross-domain support from image/video/MLLM/Agent/RL.
 
 ---
 
@@ -189,7 +189,7 @@ updated: {{ISO_DATETIME_NOW}}
 - **Always prioritize `papers-query-knowledge-base`** to locate existing local analyses, then supplement with frontier web search.
 - **Ensure structured Markdown output** following the section structure above for later retrieval/recomposition.
 - When citing external resources, **always use Markdown links** and avoid bare URLs.
-- If the user already opened a specific `paperIDEAs` file and explicitly asks to brainstorm there, append the structured subsection in that file instead of creating a new one.
+- If the user already opened a specific `obsidian-vault/ideas` file and explicitly asks to brainstorm there, append the structured subsection in that file instead of creating a new one.
 
 ## 7. Boundaries
 

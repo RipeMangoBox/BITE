@@ -22,7 +22,7 @@ def export_pdf_structure(root_dir, output_file):
     print(f"处理完成！共找到 {count} 个 PDF 文件，结果已存入 {output_file}")
 
 # --- 配置区域 ---
-target_folder = 'paperPDFs'  # 替换为你的论文根目录
-output_txt = 'paperPDFs/paper_list.txt'           # 输出文件名
+target_folder = 'obsidian-vault/paperPDFs'  # 替换为你的论文根目录
+output_txt = 'obsidian-vault/paperPDFs/paper_list.txt'           # 输出文件名
 
 export_pdf_structure(target_folder, output_txt)

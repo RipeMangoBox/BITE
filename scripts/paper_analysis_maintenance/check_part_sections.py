@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PAPER_ANALYSIS_DIR = REPO_ROOT / "paperAnalysis"
-LOG_PATH = PAPER_ANALYSIS_DIR / "analysis_log.csv"
+PAPER_ANALYSIS_DIR = REPO_ROOT / "obsidian-vault/analysis"
+LOG_PATH = REPO_ROOT / "obsidian-vault/paper_list.csv"
 
 
 PART_PATTERNS = {
