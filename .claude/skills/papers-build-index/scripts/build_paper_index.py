@@ -42,6 +42,7 @@ class Paper:
     year: str = ""
     topics: List[str] = field(default_factory=list)
     methods: List[str] = field(default_factory=list)
+    method_groups: List[str] = field(default_factory=list)
     datasets: List[str] = field(default_factory=list)
     tags: List[str] = field(default_factory=list)
     core_operator: str = ""
@@ -148,7 +149,7 @@ def split_delimited(text: str, delimiters: Set[str]) -> List[str]:
             if ch == quote:
                 quote = ""
             continue
-        if ch in ("'", '"'):
+        if ch == '"':
             quote = ch
             buf.append(ch)
             continue
@@ -182,7 +183,7 @@ def split_values(value: object, *, comma_split: bool = True) -> List[str]:
         if inline is not None:
             raw = inline
         elif comma_split:
-            raw = split_delimited(text, {",", ";", "；"})
+            raw = split_delimited(text, {",", "，", ";", "；"})
         else:
             raw = split_delimited(text, {";", "；"})
 
@@ -196,6 +197,60 @@ def split_values(value: object, *, comma_split: bool = True) -> List[str]:
             continue
         seen.add(s)
         out.append(s)
+    return out
+
+
+def clean_dataset_name(value: str) -> str:
+    s = str(value or "").strip().strip("\"'")
+    if not s:
+        return ""
+    s = unicodedata.normalize("NFKC", s)
+    s = s.translate(str.maketrans({"‑": "-", "‐": "-", "‑": "-", "–": "-", "—": "-", "−": "-"}))
+    s = clean_wikilinks(s)
+    s = re.sub(r"\[[^\]]+\]\([^)]+\)", " ", s)
+    s = re.sub(r"#[A-Za-z0-9_\-/]+", lambda m: m.group(0)[1:], s)
+    for open_ch, close_ch in (("(", ")"), ("（", "）"), ("[", "]"), ("【", "】")):
+        s = re.sub(rf"\s*{re.escape(open_ch)}[^{re.escape(close_ch)}]*{re.escape(close_ch)}", "", s)
+    s = re.split(
+        r"\s*[，,;；:：]\s*(?=(?:d|n|k|m|v)\s*=|\d|"
+        r"变量|节点|边|层级|训练|测试|干预|反事实|关联|难度|硬干预|"
+        r"seed|split|shot|sparsity|resolution|prompt|sample|task|accuracy|acc)",
+        s,
+        maxsplit=1,
+        flags=re.IGNORECASE,
+    )[0]
+    s = re.sub(r"\s+", " ", s)
+    return s.strip(" ,;；:/")
+
+
+DATASET_SETTING_FRAGMENT = re.compile(
+    r"^(?:"
+    r"(?:d|n|k|m|v)\s*=|"
+    r"\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?(?:%|[kKmMbB])?|"
+    r"(?:高|低|中等|简单|困难)?(?:数量|标签|特征|概念|干预|反事实|关联|跨层级|层级|"
+    r"难度|硬干预|训练|测试|验证|准确率|功效|依赖强度|样本量|变量|随机选择变量|"
+    r"潜在混淆因子|混淆因子|节点|边|模型|"
+    r"seed|split|shot|sparsity|resolution|prompt|sample|task|accuracy|acc)"
+    r")",
+    re.IGNORECASE,
+)
+
+
+def clean_dataset_values(values: List[str]) -> List[str]:
+    out: List[str] = []
+    seen = set()
+    for value in values:
+        cleaned = clean_dataset_name(value)
+        if not cleaned:
+            continue
+        if DATASET_SETTING_FRAGMENT.search(cleaned):
+            continue
+        key = unicodedata.normalize("NFKC", cleaned).casefold()
+        key = key.translate(str.maketrans({"‑": "-", "‐": "-", "‑": "-", "–": "-", "—": "-", "−": "-"}))
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(cleaned)
     return out
 
 
@@ -241,6 +296,286 @@ def clean_scalar(value: object) -> str:
     return str(value or "").strip().strip("\"'")
 
 
+TOPIC_SYNONYMS = {
+    "benchmarks_datasets_evaluation": "Benchmarks / Datasets / Evaluation",
+    "generative_models_diffusion": "Generative Models / Diffusion",
+    "optimization_theory_probabilistic": "Optimization / Theory / Probabilistic ML",
+    "other_unclear": "Other / Unclear",
+    "reinforcement_learning_planning_agents": "Reinforcement Learning / Planning / Agents",
+    "representation_self_supervised_transfer": "Representation / Self-Supervised / Transfer",
+    "safety_alignment_fairness_privacy": "Safety / Alignment / Fairness / Privacy",
+    "time_series_dynamical_systems": "Time Series / Dynamical Systems",
+    "vision_multimodal_applications": "Vision / Multimodal / Applications",
+}
+
+METHOD_GROUP_RULES: List[Tuple[str, Tuple[str, ...]]] = [
+    (
+        "Benchmark / Evaluation",
+        (
+            "benchmark",
+            "bench",
+            "evaluation",
+            "evaluating",
+            "evaluate",
+            "evaluator",
+            "metric",
+            "leaderboard",
+            "dataset",
+            "arena",
+        ),
+    ),
+    (
+        "LLM / Reasoning / Alignment",
+        (
+            "llm",
+            "large language model",
+            "language model",
+            "reasoning",
+            "prompt",
+            "decoding",
+            "preference",
+            "dpo",
+            "alignment",
+            "instruction",
+            "rag",
+            "retrieval",
+            "question answering",
+            "qa",
+            "chain-of-thought",
+            "cot",
+        ),
+    ),
+    (
+        "Agent / RL / Planning",
+        (
+            "agent",
+            "reinforcement",
+            "rl",
+            "grpo",
+            "reward",
+            "policy",
+            "planning",
+            "mcts",
+            "bandit",
+            "exploration",
+            "tool",
+            "multi-agent",
+            "vla",
+        ),
+    ),
+    (
+        "Generative / Diffusion / Flow",
+        (
+            "diffusion",
+            "flow matching",
+            "score",
+            "denoise",
+            "denoising",
+            "generative",
+            "text-to-image",
+            "text-to-video",
+            "video generation",
+            "image generation",
+            "autoencoder",
+            "vae",
+            "gan",
+            "gaussian splatting",
+        ),
+    ),
+    (
+        "Vision / Multimodal / 3D",
+        (
+            "vision",
+            "multimodal",
+            "multi-modal",
+            "vlm",
+            "video",
+            "image",
+            "point cloud",
+            "3d",
+            "segmentation",
+            "detection",
+            "rendering",
+            "reconstruction",
+            "visual",
+        ),
+    ),
+    (
+        "Representation / Self-Supervised / Transfer",
+        (
+            "representation",
+            "self-supervised",
+            "self supervised",
+            "contrastive",
+            "embedding",
+            "pretrain",
+            "pretraining",
+            "pre-training",
+            "transfer",
+            "latent",
+            "masked modeling",
+        ),
+    ),
+    (
+        "Optimization / Theory",
+        (
+            "optimization",
+            "optimisation",
+            "bayesian optimization",
+            "theorem",
+            "theory",
+            "convergence",
+            "gradient",
+            "ntk",
+            "scaling law",
+            "calibration",
+            "combinatorial",
+            "solver",
+        ),
+    ),
+    (
+        "Graph / Geometric / Structured Data",
+        (
+            "graph",
+            "gnn",
+            "geometric",
+            "molecular",
+            "protein",
+            "biomolecular",
+            "chemistry",
+            "drug",
+        ),
+    ),
+    (
+        "Safety / Privacy / Robustness",
+        (
+            "safety",
+            "privacy",
+            "fair",
+            "fairness",
+            "robust",
+            "adversarial",
+            "watermark",
+            "uncertainty",
+            "trustworthy",
+            "jailbreak",
+            "secure",
+        ),
+    ),
+    (
+        "Systems / Efficiency / Compression",
+        (
+            "efficient",
+            "efficiency",
+            "compression",
+            "pruning",
+            "quantization",
+            "sparsity",
+            "token",
+            "inference",
+            "latency",
+            "scaling",
+            "distillation",
+            "memory",
+        ),
+    ),
+    (
+        "Data Curation / Synthesis",
+        (
+            "data synthesis",
+            "synthetic",
+            "augmentation",
+            "data curation",
+            "active learning",
+            "annotation",
+            "label",
+            "curriculum",
+        ),
+    ),
+]
+
+
+def display_topic(raw: str) -> str:
+    s = str(raw or "").strip()
+    if not s:
+        return ""
+    if s.startswith("topic/"):
+        top = s.split("/", 2)[1]
+    else:
+        top = s.split("/", 1)[0]
+    return TOPIC_SYNONYMS.get(top, top.replace("_", " ").replace("-", " ").title())
+
+
+def derive_topics(raw_topics: List[str], tags: List[str], category: List[str], md_path: Path) -> List[str]:
+    candidates: List[str] = []
+    if category:
+        candidates.extend(category)
+    if raw_topics:
+        candidates.extend(raw_topics)
+    candidates.extend(t for t in tags if t.startswith("topic/"))
+
+    if not candidates:
+        rel_parts = md_path.relative_to(ANALYSIS_DIR).parts
+        if len(rel_parts) > 2 and not infer_venue_year(rel_parts[0])[1]:
+            candidates = [rel_parts[0]]
+        elif len(rel_parts) > 1 and not infer_venue_year(rel_parts[0])[1]:
+            candidates = [rel_parts[0]]
+
+    out: List[str] = []
+    seen = set()
+    for candidate in candidates:
+        topic = display_topic(candidate)
+        if not topic or topic in seen:
+            continue
+        seen.add(topic)
+        out.append(topic)
+    return out
+
+
+def normalize_search_text(*parts: object) -> str:
+    text = " ".join(str(part or "") for part in parts)
+    text = re.sub(r"[_/\\-]+", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.lower()
+
+
+def keyword_matches(search_text: str, keyword: str) -> bool:
+    normalized_keyword = normalize_search_text(keyword)
+    if not normalized_keyword:
+        return False
+    pattern = re.escape(normalized_keyword).replace(r"\ ", r"\s+")
+    return re.search(rf"(?<![a-z0-9]){pattern}(?![a-z0-9])", search_text) is not None
+
+
+def derive_method_groups(paper: Paper) -> List[str]:
+    search_text = normalize_search_text(
+        paper.title,
+        " ".join(paper.methods),
+        " ".join(paper.tags),
+        paper.core_operator,
+        paper.primary_logic,
+        " ".join(paper.topics),
+    )
+    scored: List[Tuple[int, int, str]] = []
+    for idx, (label, keywords) in enumerate(METHOD_GROUP_RULES):
+        score = sum(1 for keyword in keywords if keyword_matches(search_text, keyword))
+        if score:
+            scored.append((-score, idx, label))
+
+    groups: List[str] = []
+    for _, _, label in sorted(scored):
+        if label not in groups:
+            groups.append(label)
+        if len(groups) >= 2:
+            break
+
+    if groups:
+        return groups
+    if paper.methods:
+        return ["Other Method Family"]
+    return []
+
+
 def clean_generated_dirs() -> None:
     INDEX_DIR.mkdir(parents=True, exist_ok=True)
     for dirname in ("by_dataset", "by_method", "by_topic", "by_venue", "by_year"):
@@ -284,22 +619,28 @@ def load_csv_inventory() -> List[Paper]:
                 inferred_venue, inferred_year = infer_venue_year(venue, pdf_ref, title)
                 venue = venue or inferred_venue
                 year = year or inferred_year
-            papers.append(
-                Paper(
-                    title=title,
-                    analysis_path=first_present(row, ("analysis_path", "analysis", "note_path", "md_path")),
-                    pdf_ref=pdf_ref,
-                    venue=venue,
-                    year=year,
-                    topics=split_values(first_present(row, ("topic", "topics", "task", "category"))),
-                    methods=split_values(first_present(row, ("method", "methods", "technique", "techniques"))),
-                    datasets=split_values(first_present(row, ("dataset", "datasets", "benchmark", "benchmarks"))),
-                    tags=split_values(first_present(row, ("tags", "tag"))),
-                    paper_link=first_present(row, ("paper_link", "url", "link", "openreview", "arxiv")),
-                    project_link=first_present(row, ("project_link", "project_link_or_github_link", "github", "code")),
-                    source="paper_list.csv",
-                )
+            paper = Paper(
+                title=title,
+                analysis_path=first_present(row, ("analysis_path", "analysis", "note_path", "md_path")),
+                pdf_ref=pdf_ref,
+                venue=venue,
+                year=year,
+                topics=[
+                    display_topic(t)
+                    for t in split_values(first_present(row, ("topic", "topics", "task", "category")))
+                    if display_topic(t)
+                ],
+                methods=split_values(first_present(row, ("method", "methods", "technique", "techniques"))),
+                datasets=clean_dataset_values(
+                    split_values(first_present(row, ("dataset", "datasets", "benchmark", "benchmarks")))
+                ),
+                tags=split_values(first_present(row, ("tags", "tag"))),
+                paper_link=first_present(row, ("paper_link", "url", "link", "openreview", "arxiv")),
+                project_link=first_present(row, ("project_link", "project_link_or_github_link", "github", "code")),
+                source="paper_list.csv",
             )
+            paper.method_groups = derive_method_groups(paper)
+            papers.append(paper)
     return papers
 
 
@@ -382,23 +723,16 @@ def load_analysis_notes() -> List[Paper]:
             continue
 
         tags = split_values(fm.get("tags"))
-        topics = split_values(fm.get("topics")) or [t for t in tags if t.startswith("topic/")]
+        raw_topics = split_values(fm.get("topics"))
         category = split_values(fm.get("category"))
-        if not topics and category:
-            topics = category
-        if not topics:
-            rel_parts = md_path.relative_to(ANALYSIS_DIR).parts
-            if len(rel_parts) > 2 and not infer_venue_year(rel_parts[0])[1]:
-                topics = [rel_parts[0]]
-            elif len(rel_parts) > 1:
-                topics = [rel_parts[0]]
+        topics = derive_topics(raw_topics, tags, category, md_path)
 
         methods = split_values(fm.get("methods") or fm.get("method"))
-        datasets = split_values(fm.get("datasets") or fm.get("dataset"))
+        datasets = clean_dataset_values(split_values(fm.get("datasets") or fm.get("dataset")))
         if not methods:
             methods = extract_table_values(text, "Method", limit=6)
         if not datasets:
-            datasets = extract_table_values(text, "Dataset", limit=20)
+            datasets = clean_dataset_values(extract_table_values(text, "Dataset", limit=20))
         pdf_ref = normalize_pdf_ref(fm.get("pdf_ref"))
         venue = clean_scalar(fm.get("venue"))
         year = clean_scalar(fm.get("year"))
@@ -414,24 +748,24 @@ def load_analysis_notes() -> List[Paper]:
             fm.get("project_link") or fm.get("project_link_or_github_link") or fm.get("github") or fm.get("code")
         ) or project_link
 
-        papers.append(
-            Paper(
-                title=title,
-                analysis_path=repo_rel(md_path),
-                pdf_ref=pdf_ref,
-                venue=venue,
-                year=year,
-                topics=topics,
-                methods=methods,
-                datasets=datasets,
-                tags=tags,
-                core_operator=clean_scalar(fm.get("core_operator")),
-                primary_logic=clean_scalar(fm.get("primary_logic") or fm.get("paradigm")),
-                paper_link=paper_link,
-                project_link=project_link,
-                source="analysis",
-            )
+        paper = Paper(
+            title=title,
+            analysis_path=repo_rel(md_path),
+            pdf_ref=pdf_ref,
+            venue=venue,
+            year=year,
+            topics=topics,
+            methods=methods,
+            datasets=datasets,
+            tags=tags,
+            core_operator=clean_scalar(fm.get("core_operator")),
+            primary_logic=clean_scalar(fm.get("primary_logic") or fm.get("paradigm")),
+            paper_link=paper_link,
+            project_link=project_link,
+            source="analysis",
         )
+        paper.method_groups = derive_method_groups(paper)
+        papers.append(paper)
     return papers
 
 
@@ -475,6 +809,7 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
         base.year = base.year or ana.year
         base.topics = merge_values(base.topics, ana.topics)
         base.methods = merge_values(base.methods, ana.methods)
+        base.method_groups = merge_values(base.method_groups, ana.method_groups)
         base.datasets = merge_values(base.datasets, ana.datasets)
         base.tags = merge_values(base.tags, ana.tags)
         base.core_operator = base.core_operator or ana.core_operator
@@ -482,6 +817,7 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
         base.paper_link = base.paper_link or ana.paper_link
         base.project_link = base.project_link or ana.project_link
         base.source = "paper_list.csv+analysis"
+        base.method_groups = derive_method_groups(base)
         merged.append(base)
 
     for ana in analysis_papers:
@@ -508,6 +844,7 @@ def build_jsonl(papers: List[Paper]) -> str:
             "year": year_json_value(p.year),
             "topics": p.topics,
             "methods": p.methods,
+            "method_groups": p.method_groups,
             "datasets": p.datasets,
             "tags": p.tags,
             "core_operator": p.core_operator,
@@ -529,16 +866,18 @@ def paper_bullet(paper: Paper) -> str:
         head = note_link(paper.analysis_path, label)
     else:
         head = label
-    parts = [head]
+    lines = [f"- {head}"]
     if paper.pdf_ref:
-        parts.append(note_link(paper.pdf_ref, "PDF"))
+        lines.append(f"\t- {note_link(paper.pdf_ref, 'PDF')}")
     if paper.topics:
-        parts.append("topics: " + ", ".join(paper.topics))
+        lines.append("\t- topics: " + ", ".join(paper.topics))
+    if paper.method_groups:
+        lines.append("\t- method groups: " + ", ".join(paper.method_groups[:2]))
     if paper.methods:
-        parts.append("methods: " + ", ".join(paper.methods[:3]))
+        lines.append("\t- methods: " + ", ".join(paper.methods[:3]))
     if paper.datasets:
-        parts.append("datasets: " + ", ".join(paper.datasets[:3]))
-    return "- " + " · ".join(parts)
+        lines.append("\t- datasets: " + ", ".join(paper.datasets[:3]))
+    return "\n".join(lines)
 
 
 def frontmatter(title: str, dimension: str, now: str) -> List[str]:
@@ -643,7 +982,7 @@ def main() -> int:
         write_text(INDEX_DIR / "_Index.md", build_home_index(papers, now))
 
         write_dimension("by_dataset", "dataset", group_by_dimension(papers, "datasets"), now, min_count=2)
-        write_dimension("by_method", "method", group_by_dimension(papers, "methods"), now)
+        write_dimension("by_method", "method", group_by_dimension(papers, "method_groups"), now)
         write_dimension("by_topic", "topic", group_by_dimension(papers, "topics"), now)
         write_dimension("by_venue", "venue", group_by_dimension(papers, "venue"), now)
         write_dimension("by_year", "year", group_by_dimension(papers, "year"), now)

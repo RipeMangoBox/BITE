@@ -31,9 +31,21 @@ Outputs:
 The builder does not require the platform database.
 `obsidian-vault/index/README.md` is a public placeholder for the generated
 directory and should not be overwritten with local/private index contents.
+`by_topic/` uses coarse top-level research areas derived from `category`,
+`topics`, `topic/...` tags, or path hints. Nested topic tags are intentionally
+folded into their first segment so the navigation does not fragment.
+`by_method/` uses normalized method-family labels derived from method names,
+tags, title, `core_operator`, and `primary_logic`. Exact per-paper method names
+remain in `index.jsonl` under `methods` for precise search and comparison.
 `by_dataset/` lists only dataset values that appear in at least two papers so
 single-paper experiment slices do not dominate Obsidian navigation. The full
-per-paper dataset field remains in `index.jsonl`.
+per-paper dataset field remains in `index.jsonl`. Dataset display values are
+normalized to dataset names; parenthesized model, split, seed, resolution, and
+other experiment-setting details are stripped.
+Generated paper entries are nested Obsidian list items, not one-line entries
+joined with punctuation separators. Each entry places the analysis note link on
+the parent bullet and PDF/topics/method groups/methods/datasets on child
+bullets.
 
 ## When to run
 
@@ -58,7 +70,7 @@ Each `index.jsonl` line is one paper record with stable, retrieval-oriented
 fields:
 
 ```json
-{"title":"...","analysis_path":"obsidian-vault/analysis/...md","pdf_ref":"obsidian-vault/paperPDFs/...pdf","venue":"ICLR","year":2026,"topics":["..."],"methods":["..."],"datasets":["..."],"tags":["..."],"core_operator":"...","primary_logic":"...","paper_link":"...","project_link":"...","source":"analysis"}
+{"title":"...","analysis_path":"obsidian-vault/analysis/...md","pdf_ref":"obsidian-vault/paperPDFs/...pdf","venue":"ICLR","year":2026,"topics":["..."],"methods":["..."],"method_groups":["..."],"datasets":["..."],"tags":["..."],"core_operator":"...","primary_logic":"...","paper_link":"...","project_link":"...","source":"analysis"}
 ```
 
 The exact set of optional fields may grow, but the builder must keep records

@@ -17,10 +17,10 @@ Use the matching absolute repository path for your machine when invoking from an
 | `obsidian-vault/index/README.md` | Public placeholder explaining generated index files; tracked and not overwritten |
 | `obsidian-vault/index/_Index.md` | Generated home: links to _AllPapers, by_topic, by_method, by_dataset, by_venue, by_year |
 | `obsidian-vault/index/_AllPapers.md` | All papers grouped by topic, then venue/year |
-| `obsidian-vault/index/by_topic/_Index.md` | List of all topics |
-| `obsidian-vault/index/by_topic/<topic>.md` | Papers for one topic |
-| `obsidian-vault/index/by_method/_Index.md` | List of all methods |
-| `obsidian-vault/index/by_method/<method>.md` | Papers that have this method |
+| `obsidian-vault/index/by_topic/_Index.md` | List of coarse top-level topics |
+| `obsidian-vault/index/by_topic/<topic>.md` | Papers for one coarse topic |
+| `obsidian-vault/index/by_method/_Index.md` | List of normalized method families |
+| `obsidian-vault/index/by_method/<method>.md` | Papers mapped to this method family |
 | `obsidian-vault/index/by_dataset/_Index.md` | List of all datasets |
 | `obsidian-vault/index/by_dataset/<dataset>.md` | Papers that use or report this dataset |
 | `obsidian-vault/index/by_venue/_Index.md` | List of all venues |
@@ -31,7 +31,7 @@ Use the matching absolute repository path for your machine when invoking from an
 | `obsidian-vault/index/domain/_overview.md` | Generated domain/task/dataset overview |
 | `obsidian-vault/index/dataset/D__<name>.md` | Generated dataset graph pages |
 
-Topic, method, dataset, venue, and year filenames are sanitized (e.g. spaces -> single space, unsafe chars -> underscore).
+Topic, method-family, dataset, venue, and year filenames are sanitized (e.g. spaces -> single space, unsafe chars -> underscore). Exact method names remain in `index.jsonl` under `methods`; method navigation uses the lower-cardinality `method_groups` field.
 
 ## obsidian-vault/index page frontmatter
 

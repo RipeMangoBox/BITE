@@ -3018,6 +3018,20 @@ def resolve_mineru_config(args: argparse.Namespace) -> None:
     mineru_cli_path = os.environ.get("MINERU_CLI_PATH", "").strip()
     if mineru_cli_path and args.mineru_bin == "mineru":
         args.mineru_bin = mineru_cli_path
+        return
+    if args.mineru_bin != "mineru":
+        return
+    discovered = shutil.which("mineru")
+    if discovered:
+        args.mineru_bin = discovered
+        return
+    for candidate in (
+        Path.home() / "miniconda3" / "bin" / "mineru",
+        Path.home() / ".local" / "bin" / "mineru",
+    ):
+        if candidate.exists() and candidate.is_file():
+            args.mineru_bin = str(candidate)
+            return
 
 
 def resolve_writer_llm_config(args: argparse.Namespace) -> None:
