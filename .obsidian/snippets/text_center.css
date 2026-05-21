@@ -1,0 +1,14 @@
+.center-menu {
+    display: block;
+    text-align: center;
+  }
+  
+  .right-menu {
+    display: block;
+    text-align: right;
+  }
+  
+  .left-menu {
+    display: block;
+    text-align: left;
+  }

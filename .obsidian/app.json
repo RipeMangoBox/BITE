@@ -1,0 +1,14 @@
+{
+  "alwaysUpdateLinks": true,
+  "attachmentFolderPath": "obsidian-vault/_attachments",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "obsidian-vault/ideas",
+  "promptDelete": true,
+  "trashOption": "local",
+  "userIgnoreFilters": [
+    "linkedCodebases/",
+    "platform/",
+    "_private/",
+    "obsidian-vault/paperPDFs/"
+  ]
+}

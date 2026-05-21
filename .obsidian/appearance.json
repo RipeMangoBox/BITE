@@ -1,0 +1,12 @@
+{
+  "accentColor": "#4e9fca",
+  "cssTheme": "Blue Topaz",
+  "enabledCssSnippets": [
+    "supercharged-links-gen",
+    "coffeebean-补充图片对齐语法",
+    "text_center",
+    "bold"
+  ],
+  "baseFontSize": 17,
+  "baseFontSizeAction": true
+}

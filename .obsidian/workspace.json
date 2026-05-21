@@ -1,0 +1,232 @@
+{
+  "main": {
+    "id": "857280dcfd205d39",
+    "type": "split",
+    "children": [
+      {
+        "id": "b0382dda1d832c2a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d1ddefa2503b2610",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "obsidian-vault/analysis/README.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
+              },
+              "icon": "lucide-file",
+              "title": "README"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5a4636aaf8c1d05c",
+    "type": "split",
+    "children": [
+      {
+        "id": "481ffc87a9869fcb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ad14aa852a92e125",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "458ff395d06cc497",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "bb05c5597bd51f3c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-ghost",
+              "title": "bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 590.5
+  },
+  "right": {
+    "id": "e6cf879c4942e890",
+    "type": "split",
+    "children": [
+      {
+        "id": "a3b857944abe98ca",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "71e166d5577e9920",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "ACM MM审稿.md",
+                "collapseAll": true,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for ACM MM审稿"
+            }
+          },
+          {
+            "id": "26d1d765618f1140",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "AGENTS.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from AGENTS"
+            }
+          },
+          {
+            "id": "098c8f8499ff8ded",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "655ade3fbecfcb63",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-ghost",
+              "title": "all-properties"
+            }
+          },
+          {
+            "id": "9a9abc9de2ca911d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "obsidian-vault/analysis/README.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of README"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 430.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "d1ddefa2503b2610",
+  "lastOpenFiles": [
+    "obsidian-vault/analysis/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras.md",
+    "obsidian-vault/analysis/ICLR_2026/Actions_Speak_Louder_than_Prompts_A_Large-Scale_Study_of_LLMs_for_Graph_Inference.md",
+    "obsidian-vault/analysis/ICLR_2026/A2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation.md",
+    "obsidian-vault/analysis/ICLR_2026/AgentGym-RL_An_Open-Source_Framework_to_Train_LLM_Agents_for_Long-Horizon_Decision_Making_via_Multi-Turn_RL.md",
+    "obsidian-vault/analysis/ICLR_2026/Beyond_Text-to-Image_Liberating_Generation_with_a_Unified_Discrete_Diffusion_Model.md",
+    "obsidian-vault/analysis/ICLR_2026/DiffusionBlocks_Block_wise_Neural_Network_Training_via_Diffusion_Interpretation.md",
+    "obsidian-vault/analysis/ICLR_2026/Forest-Based_Graph_Learning_for_Semi-Supervised_Node_Classification.md",
+    "obsidian-vault/analysis/ICLR_2026/HGNet_Scalable_Foundation_Model_for_Automated_Knowledge_Graph_Generation_from_Scientific_Literature.md",
+    "obsidian-vault/analysis/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.md",
+    "obsidian-vault/analysis/ICLR_2026/Flock_A_Knowledge_Graph_Foundation_Model_via_Learning_on_Random_Walks.md",
+    "obsidian-vault/assets/figures/papers/86c8fa7c-7e04-4d85-b896-b3a320e2a1b2/figures/005_Table_2.jpg",
+    "obsidian-vault/assets/figures/papers/86c8fa7c-7e04-4d85-b896-b3a320e2a1b2/figures/002_Figure_2.jpg",
+    "obsidian-vault/assets/figures/papers/iclr26_0014_5asbtzIVpS_Forest-Based_Graph_Learning_for_Semi-Supervised/figures/002_Figure_2.jpg",
+    "obsidian-vault/assets/figures/papers/iclr26_0014_5asbtzIVpS_Forest-Based_Graph_Learning_for_Semi-Supervised/figures/001_Figure_1.jpg",
+    "obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/010_Table_3.jpg",
+    "obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/009_Figure_5.jpg",
+    "obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/008_Table_2.jpg",
+    "obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/002_Figure_2.jpg",
+    "obsidian-vault/assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/001_Figure_1.jpg",
+    "obsidian-vault/batches/20260521T080724Z/summary.json",
+    "obsidian-vault/batches/20260521T080724Z/manifest.json",
+    "obsidian-vault/batches/20260521T080724Z",
+    "obsidian-vault/batches",
+    "scripts/__pycache__/run_paper_list_analysis.cpython-310.pyc",
+    "scripts/__pycache__/setup_shared_skills.cpython-310.pyc",
+    "scripts/researchflow_local/__pycache__/topic_tags.cpython-310.pyc",
+    "scripts/researchflow_local/__pycache__/__init__.cpython-310.pyc",
+    "scripts/researchflow_local/__pycache__",
+    "obsidian-vault/assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/278_Figure_45.jpg",
+    "obsidian-vault/assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures",
+    "obsidian-vault/index/by_method/Optimization _ Theory.md",
+    "obsidian-vault/index/by_dataset/SST-2.md",
+    "obsidian-vault/index/by_dataset/合成数据集.md",
+    "obsidian-vault/index/by_dataset/合成数据.md",
+    "obsidian-vault/index/by_dataset/WikiText-2.md",
+    "obsidian-vault/index/by_dataset/VideoMME.md",
+    "obsidian-vault/index/by_dataset/SVHN.md",
+    "obsidian-vault/index/by_dataset/ScanObjectNN.md",
+    "obsidian-vault/index/by_dataset/ScanNet++.md",
+    "obsidian-vault/index/by_dataset/S3DIS.md",
+    "obsidian-vault/index/by_dataset/Reddit.md",
+    "obsidian-vault/index/by_dataset/QM9.md",
+    "obsidian-vault/index/by_dataset/Planar.md",
+    "obsidian-vault/index/by_dataset/ogbn-arxiv.md",
+    "obsidian-vault/index/by_dataset/MT-Bench.md",
+    "obsidian-vault/index/by_dataset/MMMU.md"
+  ]
+}
