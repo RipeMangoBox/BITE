@@ -98,10 +98,6 @@ collect candidate papers / import local PDFs
   reviewer critiques 和 daily logs。
 - Obsidian 是可选的，只是浏览和 backlink 层；仓库作为普通本地文件夹也能工作。
 
-公开仓库只包含 vault 占位文件。全新 clone 在没有 `paper_list.csv` 行、本地 PDF
-或 analysis notes 时，构建出空的 `index.jsonl` 是预期行为：个人 PDF、生成的
-analysis notes 和生成的 index 页面默认不进 Git。
-
 ## 🤖 Agent 兼容
 
 ResearchFlow 有意保持朴素：文件夹、Markdown、JSONL、CSV 和 `SKILL.md`。因此同一
@@ -347,7 +343,6 @@ ResearchFlow/
 │   ├── index/                      生成的 JSONL 索引和导航页面
 │   └── ideas/                      ideas、plans、reviews 和 logs
 ├── scripts/                        设置、维护和审计工具
-├── tests/                          本地/私有 regression tests，如存在
 ├── AGENTS.md                       面向 Agent 的本地 workflow 规则
 ├── README.md                       英文入口
 └── README_CN.md                    中文入口

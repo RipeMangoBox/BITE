@@ -117,11 +117,6 @@ ResearchFlow is useful when you want to:
 - Obsidian is optional. It is only a browsing and backlink layer; the repository
   still works as a normal local folder.
 
-The public repository ships with placeholder vault files only. A fresh clone is
-expected to build an empty `index.jsonl` until you add `paper_list.csv` rows,
-local PDFs, or analysis notes. This is intentional: personal PDFs, generated
-analysis notes, and generated index pages stay out of Git.
-
 ## 🤖 Agent Compatibility
 
 ResearchFlow intentionally stays plain: folders, Markdown, JSONL, CSV, and
@@ -398,7 +393,6 @@ ResearchFlow/
 │   ├── index/                      generated JSONL index and navigation pages
 │   └── ideas/                      ideas, plans, reviews, and logs
 ├── scripts/                        setup, maintenance, and audit utilities
-├── tests/                          local/private regression tests when present
 ├── AGENTS.md                       agent-facing local workflow rules
 ├── README.md                       English entry point
 └── README_CN.md                    Chinese entry point
