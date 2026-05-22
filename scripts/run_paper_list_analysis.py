@@ -9,10 +9,12 @@ obsidian-vault/batches/<run_id>/.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import shlex
 import subprocess
 import sys
 import time
@@ -32,9 +34,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--offset", type=int, default=0)
     parser.add_argument("--shard-index", type=int, default=-1, help="Zero-based shard index for script-only parallel runs")
     parser.add_argument("--shard-count", type=int, default=0, help="Total shard count for script-only parallel runs")
+    parser.add_argument("--jobs", type=int, default=1, help="Number of child analysis processes to run concurrently")
     parser.add_argument("--run-id", default="")
     parser.add_argument("--out-dir", default="")
     parser.add_argument("--analysis-output-root", default="", help="Output root passed to run_local_paper_analysis.py")
+    parser.add_argument(
+        "--vault-root",
+        default="",
+        help="Vault root passed to child runs. With named variants, each variant writes under <vault-root>/<variant>.",
+    )
     parser.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--mock-llm", action="store_true")
@@ -51,6 +59,12 @@ def parse_args() -> argparse.Namespace:
         help="Comma-separated writer reasoning efforts for a controlled A/B run, e.g. max,medium. "
         "Each effort gets a distinct task id and output root. Pair with --extra-arg=--writer-thinking --extra-arg=enabled.",
     )
+    parser.add_argument(
+        "--variant",
+        action="append",
+        default=[],
+        help="Named child-arg variant in NAME=ARGS form, e.g. current= or secw2='--section-workers 2'. Repeat for a matrix run.",
+    )
     parser.add_argument("--extra-arg", action="append", default=[], help="Extra arg passed to run_local_paper_analysis.py; repeat as needed.")
     return parser.parse_args()
 
@@ -66,12 +80,25 @@ def venue_to_conf_year(venue: str) -> str:
     return ""
 
 
+def row_matches_state(row: dict[str, str], state: str) -> bool:
+    row_state = (row.get("state") or "").strip()
+    if row_state:
+        return row_state == state
+    analysis_status = (row.get("analysis_status") or "").strip().lower()
+    if analysis_status:
+        requested = state.strip().lower()
+        if requested in {"downloaded", "pending"}:
+            return analysis_status != "completed" and (row.get("pdf_exists") or "True").strip().lower() == "true"
+        return analysis_status == requested
+    return not state
+
+
 def selected_rows(source: Path, state: str) -> list[dict[str, str]]:
     with source.open(encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         rows: list[dict[str, str]] = []
         for index, row in enumerate(reader, start=2):
-            if (row.get("state") or "").strip() != state:
+            if not row_matches_state(row, state):
                 continue
             row["_csv_line"] = str(index)
             rows.append(row)
@@ -88,12 +115,29 @@ def load_done(results_path: Path) -> set[tuple[str, str]]:
                 continue
             row = json.loads(line)
             if row.get("status") == "done" and row.get("row_key"):
-                done.add((str(row["row_key"]), str(row.get("writer_reasoning_effort") or "")))
+                variant_id = str(row.get("variant_id") or "")
+                if not variant_id:
+                    writer_effort = str(row.get("writer_reasoning_effort") or "")
+                    variant_id = f"writer_{writer_effort}" if writer_effort else ""
+                done.add((str(row["row_key"]), variant_id))
     return done
 
 
+def row_value(row: dict[str, str], *names: str) -> str:
+    for name in names:
+        value = str(row.get(name) or "").strip()
+        if value:
+            return value
+    return ""
+
+
 def row_key(row: dict[str, str]) -> str:
-    return row.get("paper_link") or row.get("paper_title") or row.get("_csv_line", "")
+    return (
+        paper_link_for_row(row)
+        or row_value(row, "paper_title", "title")
+        or row_value(row, "openreview_forum_id", "forum_id")
+        or row.get("_csv_line", "")
+    )
 
 
 def row_task_id(row: dict[str, str], suffix: str = "") -> str:
@@ -109,32 +153,115 @@ def safe_variant(value: str) -> str:
     return "_".join(part for part in safe.split("_") if part) or "variant"
 
 
+def parse_named_variants(items: list[str]) -> list[dict[str, Any]]:
+    variants: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for item in items:
+        if "=" not in item:
+            raise SystemExit(f"--variant must use NAME=ARGS form: {item}")
+        raw_name, raw_args = item.split("=", 1)
+        label = raw_name.strip()
+        variant_id = safe_variant(label)
+        if variant_id in seen:
+            raise SystemExit(f"duplicate --variant name after normalization: {label}")
+        seen.add(variant_id)
+        variants.append({
+            "id": variant_id,
+            "label": label,
+            "extra_args": shlex.split(raw_args),
+            "writer_effort": "",
+        })
+    return variants
+
+
 def resolve_pdf_path(row: dict[str, str]) -> Path:
     raw = row.get("pdf_path") or ""
+    if not raw:
+        raw = row.get("path") or ""
     path = Path(raw).expanduser()
     if not path.is_absolute():
         path = REPO_ROOT / path
     return path.resolve()
 
 
-def command_for_row(args: argparse.Namespace, row: dict[str, str], *, writer_effort: str = "") -> list[str]:
+def paper_link_for_row(row: dict[str, str]) -> str:
+    link = row_value(row, "paper_link", "pdf_url", "url")
+    if link:
+        return link
+    forum_id = row_value(row, "openreview_forum_id", "forum_id")
+    return f"https://openreview.net/forum?id={forum_id}" if forum_id else ""
+
+
+def acceptance_for_row(args: argparse.Namespace, row: dict[str, str]) -> str:
+    return row_value(row, "acceptance", "acceptance_type") or args.acceptance
+
+
+def writer_effort_variants(args: argparse.Namespace) -> list[str]:
+    efforts: list[str] = []
+    for item in args.writer_reasoning_ab_efforts.split(","):
+        effort = item.strip()
+        if effort and effort not in efforts:
+            efforts.append(effort)
+    return efforts or [""]
+
+
+def configured_variants(args: argparse.Namespace) -> list[dict[str, Any]]:
+    named_variants = parse_named_variants(args.variant) or [{
+        "id": "",
+        "label": "",
+        "extra_args": [],
+        "writer_effort": "",
+    }]
+    writer_efforts = writer_effort_variants(args)
+    variants: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for base_variant in named_variants:
+        for writer_effort in writer_efforts:
+            id_parts = [str(base_variant["id"])] if base_variant["id"] else []
+            label_parts = [str(base_variant["label"])] if base_variant["label"] else []
+            if writer_effort:
+                id_parts.append(safe_variant(f"writer_{writer_effort}"))
+                label_parts.append(f"writer_reasoning_{writer_effort}")
+            variant_id = "_".join(id_parts)
+            label = "+".join(label_parts)
+            if variant_id in seen:
+                raise SystemExit(f"duplicate variant id: {variant_id or '<default>'}")
+            seen.add(variant_id)
+            variants.append({
+                "id": variant_id,
+                "label": label,
+                "extra_args": list(base_variant["extra_args"]),
+                "writer_effort": writer_effort,
+            })
+    return variants
+
+
+def command_for_row(args: argparse.Namespace, row: dict[str, str], *, variant: dict[str, Any] | None = None) -> list[str]:
+    variant = variant or {"id": "", "label": "", "extra_args": [], "writer_effort": ""}
     pdf_path = resolve_pdf_path(row)
     conf_year = args.conf_year or venue_to_conf_year(row.get("venue", ""))
-    variant = safe_variant(f"writer_{writer_effort}") if writer_effort else ""
+    variant_id = str(variant.get("id") or "")
+    variant_extra_args = [str(item) for item in (variant.get("extra_args") or [])]
+    writer_effort = str(variant.get("writer_effort") or "")
     experiment_label = args.experiment_label or ""
-    if writer_effort and not experiment_label:
-        experiment_label = f"writer_reasoning_{writer_effort}"
+    if variant.get("label") and not experiment_label:
+        experiment_label = str(variant["label"])
     cmd = [
         sys.executable,
         str(REPO_ROOT / "scripts" / "run_local_paper_analysis.py"),
         "--pdf", str(pdf_path),
-        "--acceptance", args.acceptance,
-        "--task-id", row_task_id(row, suffix=variant),
+        "--acceptance", acceptance_for_row(args, row),
+        "--task-id", row_task_id(row, suffix=variant_id),
     ]
-    if row.get("paper_title"):
-        cmd += ["--paper-title", row["paper_title"]]
-    if row.get("paper_link"):
-        cmd += ["--paper-link", row["paper_link"]]
+    paper_title = row_value(row, "paper_title", "title")
+    if paper_title:
+        cmd += ["--paper-title", paper_title]
+    paper_link = paper_link_for_row(row)
+    if paper_link:
+        cmd += ["--paper-link", paper_link]
+    openreview_forum_id = row_value(row, "openreview_forum_id", "forum_id")
+    if openreview_forum_id:
+        cmd += ["--openreview-forum-id", openreview_forum_id]
     if conf_year:
         cmd += ["--conf-year", conf_year]
     if args.export_vault:
@@ -149,28 +276,53 @@ def command_for_row(args: argparse.Namespace, row: dict[str, str], *, writer_eff
         cmd.append("--require-existing-mineru-output")
     if args.analysis_output_root:
         output_root = Path(args.analysis_output_root)
-        if variant:
-            output_root = output_root / variant
+        if variant_id:
+            output_root = output_root / variant_id
         cmd += ["--output-root", str(output_root)]
+    if args.export_vault and args.vault_root:
+        vault_root = Path(args.vault_root)
+        if variant_id:
+            vault_root = vault_root / variant_id
+        cmd += ["--vault-root", str(vault_root)]
     if experiment_label:
         cmd += ["--experiment-label", experiment_label]
     if writer_effort:
         cmd += ["--writer-reasoning-effort", writer_effort]
     cmd.extend(args.extra_arg)
+    cmd.extend(variant_extra_args)
     return cmd
 
 
-def writer_effort_variants(args: argparse.Namespace) -> list[str]:
-    efforts: list[str] = []
-    for item in args.writer_reasoning_ab_efforts.split(","):
-        effort = item.strip()
-        if effort and effort not in efforts:
-            efforts.append(effort)
-    return efforts or [""]
+def run_child(args: argparse.Namespace, row: dict[str, str], variant: dict[str, Any]) -> dict[str, Any]:
+    key = row_key(row)
+    pdf_path = resolve_pdf_path(row)
+    started = time.monotonic()
+    if not pdf_path.exists():
+        record = {"row_key": key, "status": "failed", "error": f"missing pdf: {pdf_path}", "row": row}
+    else:
+        cmd = command_for_row(args, row, variant=variant)
+        proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
+        status = "done" if proc.returncode == 0 else "failed"
+        record = {
+            "row_key": key,
+            "status": status,
+            "returncode": proc.returncode,
+            "duration_seconds": round(time.monotonic() - started, 3),
+            "stdout_tail": proc.stdout[-4000:],
+            "stderr_tail": proc.stderr[-4000:],
+            "command": cmd,
+            "row": row,
+        }
+    record["variant_id"] = str(variant.get("id") or "")
+    record["variant_label"] = str(variant.get("label") or "")
+    record["variant_extra_args"] = list(variant.get("extra_args") or [])
+    record["writer_reasoning_effort"] = str(variant.get("writer_effort") or "") or None
+    return record
 
 
 def main() -> None:
     args = parse_args()
+    args.jobs = max(1, args.jobs)
     source = Path(args.source).expanduser().resolve()
     if not source.exists():
         raise SystemExit(f"paper list not found: {source}")
@@ -193,16 +345,15 @@ def main() -> None:
     if args.limit:
         rows = rows[:args.limit]
 
-    variants = writer_effort_variants(args)
+    variants = configured_variants(args)
     completed = load_done(results_path) if args.resume else set()
-    planned: list[dict[str, Any]] = []
-    planned_child_runs = 0
+    planned_items: list[tuple[dict[str, str], dict[str, Any]]] = []
     for row in rows:
         key = row_key(row)
-        pending_variants = [(key, writer_effort) for writer_effort in variants if (key, writer_effort) not in completed]
-        if pending_variants:
-            planned.append(row)
-            planned_child_runs += len(pending_variants)
+        for variant in variants:
+            if (key, str(variant.get("id") or "")) not in completed:
+                planned_items.append((row, variant))
+    planned_rows = {row_key(row) for row, _ in planned_items}
 
     manifest = {
         "run_id": run_id,
@@ -210,59 +361,50 @@ def main() -> None:
         "state": args.state,
         "shard_index": args.shard_index,
         "shard_count": args.shard_count,
+        "jobs": args.jobs,
         "selected": len(rows),
-        "planned": len(planned),
-        "planned_child_runs": planned_child_runs,
-        "writer_reasoning_ab_efforts": variants,
+        "planned": len(planned_rows),
+        "planned_child_runs": len(planned_items),
+        "variants": variants,
         "out_dir": str(out_dir),
         "analysis_output_root": args.analysis_output_root,
+        "vault_root": args.vault_root,
         "experiment_label": args.experiment_label,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     if args.dry_run:
-        for row in planned:
-            for writer_effort in variants:
-                if (row_key(row), writer_effort) in completed:
-                    continue
-                print(json.dumps({
-                    "row_key": row_key(row),
-                    "writer_reasoning_effort": writer_effort or None,
-                    "command": command_for_row(args, row, writer_effort=writer_effort),
-                }, ensure_ascii=False))
+        for row, variant in planned_items:
+            print(json.dumps({
+                "row_key": row_key(row),
+                "variant_id": variant.get("id") or None,
+                "variant_label": variant.get("label") or None,
+                "writer_reasoning_effort": variant.get("writer_effort") or None,
+                "command": command_for_row(args, row, variant=variant),
+            }, ensure_ascii=False))
         summary_path.write_text(json.dumps({**manifest, "status": "planned"}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         return
 
     counts = {"done": 0, "failed": 0, "skipped": 0}
+
+    def write_record(handle: Any, record: dict[str, Any]) -> None:
+        counts[record["status"]] = counts.get(record["status"], 0) + 1
+        handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+        handle.flush()
+
     with results_path.open("a", encoding="utf-8") as results:
-        for row in planned:
-            key = row_key(row)
-            pdf_path = resolve_pdf_path(row)
-            for writer_effort in variants:
-                if (key, writer_effort) in completed:
-                    continue
-                started = time.monotonic()
-                if not pdf_path.exists():
-                    record = {"row_key": key, "status": "failed", "error": f"missing pdf: {pdf_path}", "row": row}
-                else:
-                    cmd = command_for_row(args, row, writer_effort=writer_effort)
-                    proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
-                    status = "done" if proc.returncode == 0 else "failed"
-                    record = {
-                        "row_key": key,
-                        "status": status,
-                        "returncode": proc.returncode,
-                        "duration_seconds": round(time.monotonic() - started, 3),
-                        "stdout_tail": proc.stdout[-4000:],
-                        "stderr_tail": proc.stderr[-4000:],
-                        "command": cmd,
-                        "row": row,
-                    }
-                record["writer_reasoning_effort"] = writer_effort or None
-                counts[record["status"]] = counts.get(record["status"], 0) + 1
-                results.write(json.dumps(record, ensure_ascii=False) + "\n")
-                results.flush()
+        if args.jobs == 1:
+            for row, variant in planned_items:
+                write_record(results, run_child(args, row, variant))
+        else:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
+                futures = [
+                    executor.submit(run_child, args, row, variant)
+                    for row, variant in planned_items
+                ]
+                for future in concurrent.futures.as_completed(futures):
+                    write_record(results, future.result())
 
     summary = {**manifest, **counts, "results_path": str(results_path), "finished_at": datetime.now(timezone.utc).isoformat()}
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

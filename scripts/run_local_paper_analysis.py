@@ -76,7 +76,10 @@ SECTION_SPECS: tuple[tuple[str, str], ...] = (
     ("整体框架", "描述整体 pipeline、模块关系、输入输出流。"),
     ("核心模块与公式推导", "只写关键模块、关键公式、公式变量含义，禁止猜公式。"),
     ("实验与分析", "写主结果、消融、失败模式、重要图表结论。"),
-    ("方法谱系与知识库定位", "写与 baseline/follow-up 的关系、适用边界、局限与开放问题。"),
+    (
+        "方法谱系与知识库定位",
+        "写与 baseline/follow-up 的关系、适用边界、局限与开放问题；若提到具体基线工作，保留或补充论文中可验证的作者、会议和年份，例如 **MPGD** (He et al., CVPR 2023)。",
+    ),
 )
 
 DISCOUNTED_PRICES_PER_MTOKEN_USD: dict[str, dict[str, float]] = {
@@ -298,7 +301,7 @@ Return exactly one valid JSON object:
   },
   "method": {
     "proposed_method_name": str,
-    "baseline_methods": [{"name": str, "role": str}],
+    "baseline_methods": [{"name": str, "role": str, "citation": str | null}],
     "changed_slots": [{"slot_name": str, "baseline_value": str, "proposed_value": str, "evidence_anchor": str, "confidence": float}],
     "pipeline_modules": [{"name": str, "role": str, "evidence_anchor": str}]
   },
@@ -323,7 +326,10 @@ Rules:
 5. Natural-language explanations MUST be Simplified Chinese. Keep the original
    language only for caption text, formulas, symbols, code identifiers, exact
    anchors, and method, dataset, metric, paper names.
-6. Output ONLY valid JSON, with no markdown fences."""
+6. For each concrete baseline method, fill citation when the paper provides
+   verifiable author/year/venue metadata, e.g. "He et al., CVPR 2023"; otherwise
+   use null instead of guessing.
+7. Output ONLY valid JSON, with no markdown fences."""
 
 MAIN_ANALYSIS_PROMPT_CONTRACT = """Fixed merge contract for prompt-cache reuse.
 
@@ -346,7 +352,7 @@ Return exactly one valid JSON object:
   },
   "method": {
     "proposed_method_name": str,
-    "baseline_methods": [{"name": str, "role": str}],
+    "baseline_methods": [{"name": str, "role": str, "citation": str | null}],
     "changed_slots": [{"slot_name": str, "baseline_value": str, "proposed_value": str, "evidence_anchor": str, "confidence": float}],
     "pipeline_modules": [{"name": str, "role": str, "evidence_anchor": str}]
   },
@@ -371,7 +377,10 @@ Rules:
 5. Natural-language explanations MUST be Simplified Chinese. Keep the original
    language only for caption text, formulas, symbols, code identifiers, exact
    anchors, and method, dataset, metric, paper names.
-6. Output ONLY valid JSON, with no markdown fences."""
+6. For each concrete baseline method, fill citation when the paper provides
+   verifiable author/year/venue metadata, e.g. "He et al., CVPR 2023"; otherwise
+   use null instead of guessing.
+7. Output ONLY valid JSON, with no markdown fences."""
 
 WRITER_SYSTEM = """You are ResearchFlow's local writer agent.
 
@@ -394,8 +403,11 @@ Return Markdown only, with these sections:
 Use exact table, figure, and equation labels when available. Do not embed
 images yourself; the deterministic vault exporter will insert local MinerU
 figure/table images. Use `$...$` for inline LaTeX and `$$...$$` for block
-LaTeX; do not use `\\(...\\)` or `\\[...\\]`. Do not output JSON or markdown
-fences around the whole report."""
+LaTeX; do not use `\\(...\\)` or `\\[...\\]`. In 方法谱系与知识库定位, when
+you mention a concrete baseline work, include verified author/year/venue
+metadata if supplied by the analysis or source context, e.g. **MPGD** (He et
+al., CVPR 2023); omit the citation rather than guessing. Do not output JSON or
+markdown fences around the whole report."""
 
 SECTION_WRITER_SYSTEM = """You are ResearchFlow's local section writer.
 
@@ -416,6 +428,10 @@ Rules:
 5. For formulas, preserve exact LaTeX if provided. Use `$...$` for inline
    formulas and `$$...$$` for block formulas; do not use `\\(...\\)` or
    `\\[...\\]`. Do not derive unseen formulas.
+6. In 方法谱系与知识库定位, when you mention a concrete baseline work, include
+   verified author/year/venue metadata if supplied by the analysis or source
+   context, e.g. **MPGD** (He et al., CVPR 2023); omit the citation rather than
+   guessing.
 """
 
 FIGURE_PLACEMENT_SYSTEM = """You are ResearchFlow's local note image placement reviewer.
@@ -4463,7 +4479,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--export-vault", action="store_true", help="Copy PDF/assets and write Obsidian note")
     parser.add_argument("--vault-root", default=str(DEFAULT_VAULT_ROOT))
     parser.add_argument("--vault-note-dir", default="", help="Override output directory for exported Markdown notes")
-    parser.add_argument("--vault-asset-root", default=str(DEFAULT_ASSET_ROOT))
+    parser.add_argument(
+        "--vault-asset-root",
+        default="",
+        help="Override figure/table asset root. Defaults to <vault-root>/assets/figures/papers.",
+    )
     parser.add_argument("--max-note-images", type=int, default=6)
     parser.add_argument("--mock-llm", action="store_true", help="Use deterministic local mock outputs")
     parser.add_argument("--dry-run", action="store_true", help="Parse and chunk only")
@@ -4473,8 +4493,14 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def normalize_vault_args(args: argparse.Namespace) -> argparse.Namespace:
+    if not args.vault_asset_root:
+        args.vault_asset_root = str(Path(args.vault_root).expanduser().resolve() / "assets" / "figures" / "papers")
+    return args
+
+
 def main() -> None:
-    args = build_parser().parse_args()
+    args = normalize_vault_args(build_parser().parse_args())
     result = asyncio.run(run_pipeline(args))
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
