@@ -255,6 +255,30 @@ Rules:
 4. Use [] only when that evidence type is absent.
 5. Output no markdown fences, no prose, no reference list."""
 
+PART_ANALYSIS_PROMPT_CONTRACT = """Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Output no markdown fences, no prose, no reference list."""
+
 MAIN_ANALYSIS_SYSTEM = """You are ResearchFlow's local main analysis agent.
 
 Merge the part-analysis JSON files with the compact paper context. Produce a
@@ -262,6 +286,54 @@ verified analysis object for local file output. 正文/分析内容必须使用�
 translate generated explanatory fields into Chinese, while preserving original
 caption text, formulas, symbols, code identifiers, exact evidence anchors, and
 method, dataset, metric, paper names.
+
+Return exactly one valid JSON object:
+{
+  "paper_metadata": {"title": str, "title_zh": str, "venue": str | null, "year": int | null},
+  "analysis_truth": {
+    "real_bottleneck": str,
+    "causal_knob": str,
+    "core_insight": str,
+    "decisive_evidence": [{"claim": str, "anchor": str, "confidence": float}]
+  },
+  "method": {
+    "proposed_method_name": str,
+    "baseline_methods": [{"name": str, "role": str}],
+    "changed_slots": [{"slot_name": str, "baseline_value": str, "proposed_value": str, "evidence_anchor": str, "confidence": float}],
+    "pipeline_modules": [{"name": str, "role": str, "evidence_anchor": str}]
+  },
+  "experiments": {
+    "main_results": [{"benchmark": str, "metric": str, "proposed": str, "baseline": str, "delta": str, "anchor": str, "confidence": float}],
+    "ablations": [{"claim": str, "anchor": str, "confidence": float}],
+    "fairness_notes": [str]
+  },
+  "formulas": [{"name": str, "latex": str, "meaning": str, "anchor": str}],
+  "figures_tables": [{"label": str, "role": str, "caption": str}],
+  "limitations": [str],
+  "open_questions": [str]
+}
+
+Rules:
+1. Do not add unsupported claims.
+2. Resolve conflicts by preferring directly anchored evidence.
+3. If evidence is weak or absent, keep the field empty or use open_questions.
+4. Set paper_metadata.title to the original paper title. Set
+   paper_metadata.title_zh to a concise Chinese title when a faithful
+   translation is possible; otherwise repeat the original title.
+5. Natural-language explanations MUST be Simplified Chinese. Keep the original
+   language only for caption text, formulas, symbols, code identifiers, exact
+   anchors, and method, dataset, metric, paper names.
+6. Output ONLY valid JSON, with no markdown fences."""
+
+MAIN_ANALYSIS_PROMPT_CONTRACT = """Fixed merge contract for prompt-cache reuse.
+
+Task: merge chunk-level anchors, compact paper context, and figure/table
+metadata into one verified ResearchFlow analysis object. The variable paper
+payload appears after this fixed contract.
+
+正文/分析内容必须使用简体中文：translate generated explanatory fields into Chinese,
+while preserving original caption text, formulas, symbols, code identifiers,
+exact evidence anchors, and method, dataset, metric, paper names.
 
 Return exactly one valid JSON object:
 {
@@ -3316,6 +3388,8 @@ def resolve_kimi_llm_config(args: argparse.Namespace) -> None:
 
 def part_prompt(chunk: Chunk, title: str) -> str:
     return (
+        f"{PART_ANALYSIS_PROMPT_CONTRACT}\n\n"
+        "=== VARIABLE PART PAYLOAD ===\n"
         f"Paper title: {title}\n"
         f"Part: {chunk.index}/{chunk.total}\n"
         f"Character span: {chunk.start}-{chunk.end}\n\n"
@@ -3552,13 +3626,17 @@ async def run_main_analysis(
     if args.resume and out_path.exists() and not args.force:
         return json.loads(out_path.read_text(encoding="utf-8"))
 
-    prompt_obj = {
+    prompt_payload = {
         "paper_title": title,
         "paper_context": compact_paper_context(markdown, max_chars=args.main_context_chars),
         "part_analyses": part_results,
         "figures_tables": figures_tables,
     }
-    prompt = json.dumps(prompt_obj, ensure_ascii=False, indent=2)
+    prompt = (
+        f"{MAIN_ANALYSIS_PROMPT_CONTRACT}\n\n"
+        "=== VARIABLE PAPER PAYLOAD ===\n"
+        f"{json.dumps(prompt_payload, ensure_ascii=False, indent=2)}"
+    )
     atomic_write_text(prompt_path, prompt)
     started = time.monotonic()
     usage: dict[str, Any] = {}
@@ -4326,7 +4404,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--chunk-chars", type=int, default=8_000)
     parser.add_argument("--overlap-chars", type=int, default=800)
     parser.add_argument("--part-workers", type=int, default=2)
-    parser.add_argument("--section-workers", type=int, default=0, help="Concurrent section writers. Defaults to --part-workers; use 1 to maximize prefix-cache reuse.")
+    parser.add_argument("--section-workers", type=int, default=1, help="Concurrent section writers. Default 1 preserves prefix-cache reuse; raise only for latency/cost A/B tests.")
     parser.add_argument(
         "--provider",
         choices=["deepseek", "kimi"],
@@ -4336,7 +4414,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model", default="")
     parser.add_argument("--thinking", choices=THINKING_CHOICES, default="enabled", help="DeepSeek thinking mode for main analysis and repairs.")
     parser.add_argument("--reasoning-effort", default="max", help="Reasoning effort for compatible providers.")
-    parser.add_argument("--part-thinking", choices=THINKING_CHOICES, default="enabled", help="DeepSeek thinking mode for chunk-level anchor extraction.")
+    parser.add_argument("--part-thinking", choices=THINKING_CHOICES, default="disabled", help="DeepSeek thinking mode for chunk-level anchor extraction.")
     parser.add_argument("--part-reasoning-effort", default="", help="Reasoning effort for part analysis. Defaults to --reasoning-effort.")
     parser.add_argument("--base-url", default="")
     parser.add_argument("--api-key-env", default="")
@@ -4351,7 +4429,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--writer-base-url", default="")
     parser.add_argument("--writer-api-key-env", default="")
     parser.add_argument("--writer-temperature", type=float, default=KIMI_DEFAULT_TEMPERATURE)
-    parser.add_argument("--writer-thinking", choices=THINKING_CHOICES, default="enabled", help="DeepSeek thinking mode for section writers.")
+    parser.add_argument("--writer-thinking", choices=THINKING_CHOICES, default="disabled", help="DeepSeek thinking mode for section writers.")
     parser.add_argument("--writer-reasoning-effort", default="max")
     parser.add_argument("--kimi-model", default="")
     parser.add_argument("--kimi-base-url", default="")
