@@ -127,4 +127,5 @@ For each stage, return:
 ```
 Main pipeline: Wait → Downloaded → checked
 Out-of-band states: Skip (manually skipped), Missing (download failed)
+Analyze exceptions: analysis_mismatch, too_large
 ```
