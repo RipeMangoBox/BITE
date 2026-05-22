@@ -22,7 +22,7 @@
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> 🔥 **ResearchFlow 社区交流** | 微信交流 / ResearchFlow 微信交流群
+> 🔥 **ResearchFlow 社区交流** | **[💬 微信交流 / ResearchFlow微信交流群](./WECHAT_CN.md)**
 
 ---
 
@@ -62,6 +62,9 @@ collect candidate papers / import local PDFs
 - 主分析阶段合并 anchors、紧凑论文上下文和图表信息，生成 verified JSON。
 - Section writers 基于 verified evidence 生成七个报告章节。
 - Vault 导出、图片放置、索引刷新和 audit 在适用时作为确定性的本地检查执行。
+
+每个阶段的细节、reasoning 设置、validation 规则和实测成本/耗时见
+[正式本地分析链详情](docs/formal-analysis-chain.md)。
 
 你可以用四种常见模式使用它：
 

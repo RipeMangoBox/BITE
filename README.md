@@ -22,7 +22,7 @@
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> 🔥 **ResearchFlow Community** | WeChat discussion group for Chinese users
+> 🔥 **ResearchFlow Community** | **[💬 WeChat / ResearchFlow WeChat Group](./WECHAT.md)**
 
 ---
 
@@ -78,6 +78,9 @@ collect candidate papers / import local PDFs
 - Section writers generate the seven report sections from verified evidence.
 - Vault export, figure placement, index refresh, and audit steps are
   deterministic local checks where applicable.
+
+For stage-by-stage details, reasoning settings, validation rules, and measured
+cost/latency, see [Formal Local Analysis Chain](docs/formal-analysis-chain.md).
 
 You can use it in four common modes:
 
