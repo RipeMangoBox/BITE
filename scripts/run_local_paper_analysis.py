@@ -1517,7 +1517,7 @@ def discover_mineru_output(args: argparse.Namespace, pdf_path: Path) -> Path | N
         stems.append(note_file_stem(args.paper_title))
 
     direct_candidates = [base / stem for base in search_roots for stem in stems]
-    valid_direct = [path.resolve() for path in direct_candidates if complete_mineru_output(path)]
+    valid_direct = sorted({path.resolve() for path in direct_candidates if complete_mineru_output(path)})
     if len(valid_direct) == 1:
         return valid_direct[0]
     if len(valid_direct) > 1:
