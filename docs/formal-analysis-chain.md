@@ -65,14 +65,17 @@ from scratch.
 - `--overlap-chars 800`
 - `--part-workers 2`
 - `--part-thinking disabled`
-- `--part-reasoning-effort high`
+- `--part-reasoning-effort max`
 
 **Reasoning effort rationale.**
 
 Chunk extraction is an evidence-harvesting stage, not the final synthesis
 stage. Disabling thinking reduces latency and cost while still preserving
-anchors, because each chunk has limited local context. `high` reasoning effort
-is kept as the API-level quality hint for difficult chunks and repairs.
+anchors, because each chunk has limited local context. `max` reasoning effort
+is kept at the provider's strongest setting for difficult chunks and repairs.
+The chunk prompt starts with a fixed task contract before variable chunk text so
+parallel part calls can reuse a stable prefix when the provider cache supports
+it.
 
 **Outputs.**
 
@@ -94,7 +97,7 @@ reasoning stage.
 **Default settings.**
 
 - `--thinking enabled`
-- `--reasoning-effort high`
+- `--reasoning-effort max`
 - Adaptive main context and token budgets enabled.
 
 **Reasoning effort rationale.**
@@ -102,6 +105,9 @@ reasoning stage.
 This stage decides the paper-level causal story: bottleneck, changed slot,
 method logic, decisive evidence, limitations, and open questions. It has the
 highest risk of semantic compression error, so thinking is enabled here.
+The main-analysis user prompt also starts with a fixed merge contract before
+the variable paper payload; this keeps the schema and rules cacheable while the
+paper-specific context remains explicit.
 
 **Outputs.**
 
@@ -124,7 +130,7 @@ part/figure context.
 
 - `--section-workers 1`
 - `--writer-thinking disabled`
-- `--writer-reasoning-effort high`
+- `--writer-reasoning-effort max`
 
 **Reasoning effort rationale.**
 
@@ -216,6 +222,12 @@ The highest-value next optimizations are:
 
 1. Improve main-analysis prompt cacheability.
 2. A/B test lower writer reasoning effort while holding main analysis fixed.
+   This is intentionally not the production default until paired quality checks
+   show that factuality, cross-section consistency, and readability do not
+   regress. Because production section writers run with
+   `--writer-thinking disabled`, writer-reasoning A/B runs must explicitly pass
+   `--writer-thinking enabled`; otherwise `--writer-reasoning-effort` is only a
+   recorded setting and does not affect DeepSeek calls.
 3. Improve part prompt fixed-prefix reuse without losing parallel throughput.
 
 ## Reproducible Command
@@ -225,11 +237,26 @@ python3 scripts/run_local_paper_analysis.py \
   --pdf "obsidian-vault/paperPDFs/<Venue_Year>/<Paper>.pdf" \
   --conf-year "<Venue_Year>" \
   --export-vault \
-  --reasoning-effort high \
-  --part-reasoning-effort high \
+  --reasoning-effort max \
+  --part-reasoning-effort max \
   --part-thinking disabled \
-  --writer-reasoning-effort high \
+  --writer-reasoning-effort max \
   --writer-thinking disabled \
   --section-workers 1 \
   --thinking enabled
+```
+
+For controlled writer-reasoning A/B tests over `paper_list.csv`, keep main and
+part settings fixed and let the batch runner create separate child task ids and
+output roots per writer effort:
+
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded \
+  --limit 5 \
+  --analysis-output-root obsidian-vault/analysis_runs/writer_reasoning_ab \
+  --writer-reasoning-ab-efforts max,medium \
+  --extra-arg=--writer-thinking \
+  --extra-arg=enabled
 ```

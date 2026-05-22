@@ -82,6 +82,11 @@ The command prints the run directory and writes `manifest.json`.
      chunk/writer thinking disabled, and serialized section writers for
      prompt-cache reuse. Do not raise `--section-workers` above `1` during
      production batches unless the user asks for a latency/cost A/B test.
+     For writer-reasoning A/B tests, use
+     `--writer-reasoning-ab-efforts ...` and explicitly pass
+     `--extra-arg=--writer-thinking --extra-arg=enabled`; changing only
+     `--writer-reasoning-effort` has no effect while writer thinking remains
+     disabled.
    - Use the current frontmatter schema: no `category`; `aliases` must be short
      English/model aliases; no `modalities`; no `frontier`.
   - For the formal local analysis runner, keep default token limits for normal
