@@ -4031,6 +4031,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             "mineru_output_root": args.mineru_output_root,
             "mineru_batch_id": args.mineru_batch_id,
             "theme_bucket": args.theme_bucket,
+            "experiment_label": args.experiment_label,
         }
         atomic_write_json(work_dir / "manifest.json", manifest)
         append_jsonl(progress_path, {"event": "started", "at": now_iso(), "task_id": task_id})
@@ -4344,6 +4345,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 "report_chars": len(report),
                 "vault_export": vault_export,
                 "token_budget": token_budget,
+                "experiment_label": args.experiment_label,
                 "usage": usage_summary,
                 "timing": {
                     "parse_seconds": parse_info["duration_seconds"],
@@ -4390,6 +4392,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--openreview-forum-id", default="", help="OpenReview forum id for note metadata")
     parser.add_argument("--topic-assignments", default="", help="Optional JSONL topic assignment file keyed by OpenReview forum id")
     parser.add_argument("--theme-bucket", default="", help="Manifest theme bucket for lightweight metadata")
+    parser.add_argument("--experiment-label", default="", help="Optional label for controlled analysis-chain experiments.")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT))
     parser.add_argument("--env-file", default=str(DEFAULT_ENV_FILE))
     parser.add_argument("--mineru-bin", default=DEFAULT_MINERU_BIN)
