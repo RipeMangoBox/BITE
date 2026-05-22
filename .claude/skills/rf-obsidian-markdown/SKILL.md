@@ -60,7 +60,13 @@ research data.
 ResearchFlow convention for PDF embeds in analysis notes:
 
 ```markdown
-![[obsidian-vault/paperPDFs/Category/Venue_Year/Year_Title.pdf]]
+![[paperPDFs/Category/Venue_Year/Year_Title.pdf]]
+```
+
+ResearchFlow convention for image embeds in analysis notes:
+
+```markdown
+![[assets/figures/papers/<task_id>/figures/<figure_file>.jpg]]
 ```
 
 ---
@@ -150,7 +156,8 @@ tags:
 ### Analysis notes (`obsidian-vault/analysis/`)
 - Frontmatter: full schema (title, venue, year, tags, aliases, core_operator, primary_logic, pdf_ref, claims)
 - Body: Part I / Part II / Part III structure
-- Bottom: `![[obsidian-vault/paperPDFs/...]]` PDF embed
+- Bottom: `![[paperPDFs/...]]` PDF embed
+- Figures/tables: `![[assets/...]]` embeds, without `../../` prefixes.
 - Related papers linked via `[[obsidian-vault/analysis/.../Year_Title|Display]]`
 
 ### Collection indexes (`obsidian-vault/index/`)

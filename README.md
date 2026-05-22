@@ -68,6 +68,17 @@ collect candidate papers / import local PDFs
   -> query / ideate / review / export
 ```
 
+### Formal Analysis Chain
+
+- MinerU parses each PDF once; existing extraction is reused when available.
+- Parsed Markdown is chunked, then chunk-level anchor extraction collects
+  grounded evidence instead of summarizing the full paper at once.
+- Main analysis merges anchors, compact paper context, and figure/table data
+  into verified JSON.
+- Section writers generate the seven report sections from verified evidence.
+- Vault export, figure placement, index refresh, and audit steps are
+  deterministic local checks where applicable.
+
 You can use it in four common modes:
 
 | Mode     | Purpose                                                                                   | Typical entry                                                                   |

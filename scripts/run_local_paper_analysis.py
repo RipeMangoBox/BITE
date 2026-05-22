@@ -80,10 +80,12 @@ SECTION_SPECS: tuple[tuple[str, str], ...] = (
 )
 
 DISCOUNTED_PRICES_PER_MTOKEN_USD: dict[str, dict[str, float]] = {
-    "deepseek-v4-pro": {"input": 0.435, "output": 0.87},
+    "deepseek-v4-pro": {"input": 0.435, "input_cache_hit": 0.003625, "output": 0.87},
     "deepseek-chat": {"input": 0.14, "output": 0.28},
     "deepseek-reasoner": {"input": 0.14, "output": 0.28},
 }
+
+THINKING_CHOICES = ("enabled", "disabled")
 
 
 @dataclass(frozen=True)
@@ -110,6 +112,66 @@ def estimate_cost_usd(model: str, prompt_tokens: int, completion_tokens: int) ->
     )
 
 
+def estimate_cost_usd_from_usage(model: str, usage: dict[str, Any]) -> float | None:
+    price = DISCOUNTED_PRICES_PER_MTOKEN_USD.get(model)
+    if not price:
+        return None
+    prompt_tokens = int(usage.get("prompt_tokens") or usage.get("prompt_tokens_est") or 0)
+    completion_tokens = int(usage.get("completion_tokens") or usage.get("completion_tokens_est") or 0)
+    cache_hit = int(usage.get("prompt_cache_hit_tokens") or 0)
+    cache_miss = int(usage.get("prompt_cache_miss_tokens") or 0)
+    if cache_hit or cache_miss:
+        if not cache_miss:
+            cache_miss = max(0, prompt_tokens - cache_hit)
+        input_cost = (
+            cache_hit * (price.get("input_cache_hit", price["input"]) / 1_000_000)
+            + cache_miss * (price["input"] / 1_000_000)
+        )
+    else:
+        input_cost = prompt_tokens * (price["input"] / 1_000_000)
+    return round(
+        input_cost + completion_tokens * (price["output"] / 1_000_000),
+        6,
+    )
+
+
+def usage_to_dict(value: Any) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if isinstance(value, dict):
+        return value
+    if hasattr(value, "model_dump"):
+        return value.model_dump()
+    if hasattr(value, "dict"):
+        return value.dict()
+    return {}
+
+
+def normalized_api_usage(value: Any) -> dict[str, Any]:
+    raw = usage_to_dict(value)
+    if not raw:
+        return {}
+    prompt_details = usage_to_dict(raw.get("prompt_tokens_details"))
+    completion_details = usage_to_dict(raw.get("completion_tokens_details"))
+    prompt_tokens = int(raw.get("prompt_tokens") or 0)
+    cached_tokens = int(prompt_details.get("cached_tokens") or 0)
+    reasoning_tokens = int(completion_details.get("reasoning_tokens") or 0)
+    cache_hit = int(raw.get("prompt_cache_hit_tokens") or cached_tokens or 0)
+    cache_miss = int(raw.get("prompt_cache_miss_tokens") or 0)
+    if cache_hit and not cache_miss:
+        cache_miss = max(0, prompt_tokens - cache_hit)
+    return {
+        "prompt_tokens_api": prompt_tokens,
+        "completion_tokens_api": int(raw.get("completion_tokens") or 0),
+        "total_tokens_api": int(raw.get("total_tokens") or 0),
+        "reasoning_tokens_api": reasoning_tokens,
+        "prompt_cache_hit_tokens": cache_hit,
+        "prompt_cache_miss_tokens": cache_miss,
+        "cached_tokens_api": cached_tokens,
+        "api_usage_raw": raw,
+    }
+
+
 def merge_usage_totals(base: dict[str, Any], extra: dict[str, Any], *, cost_basis: str) -> dict[str, Any]:
     merged = dict(base)
     for key in [
@@ -118,6 +180,13 @@ def merge_usage_totals(base: dict[str, Any], extra: dict[str, Any], *, cost_basi
         "reasoning_tokens_est",
         "total_tokens_est",
         "total_with_reasoning_tokens_est",
+        "prompt_tokens_api",
+        "completion_tokens_api",
+        "reasoning_tokens_api",
+        "total_tokens_api",
+        "prompt_cache_hit_tokens",
+        "prompt_cache_miss_tokens",
+        "cached_tokens_api",
     ]:
         merged[key] = int(base.get(key) or 0) + int(extra.get(key) or 0)
     merged["estimated_cost_usd"] = round(
@@ -125,8 +194,21 @@ def merge_usage_totals(base: dict[str, Any], extra: dict[str, Any], *, cost_basi
         + float(extra.get("estimated_cost_usd") or 0.0),
         6,
     )
+    if base.get("estimated_cost_usd_api") is not None or extra.get("estimated_cost_usd_api") is not None:
+        merged["estimated_cost_usd_api"] = round(
+            float(base.get("estimated_cost_usd_api") or 0.0)
+            + float(extra.get("estimated_cost_usd_api") or 0.0),
+            6,
+        )
     merged["cost_basis"] = cost_basis
     return merged
+
+
+def cache_hit_rate(hit_tokens: int, miss_tokens: int) -> float | None:
+    total = hit_tokens + miss_tokens
+    if total <= 0:
+        return None
+    return round(hit_tokens / total, 6)
 
 
 def usage_from_result(result: LLMCallResult) -> dict[str, Any]:
@@ -312,7 +394,9 @@ Check and lightly repair an Obsidian paper note for:
 4. broken JSON-like or malformed table text
 5. LaTeX delimiter style: inline math must use `$...$`, display math must use
    `$$...$$`, and `\\(...\\)` / `\\[...\\]` must not remain
-6. ResearchFlow frontmatter schema: keep `aliases` as short English/model
+6. Image embeds must use Obsidian wikilinks like `![[assets/...]]`, never
+   Markdown image links or `../../assets/...` prefixes
+7. ResearchFlow frontmatter schema: keep `aliases` as short English/model
    aliases; do not add `category`, `modalities`, or `frontier`
 
 Do not rewrite analytical claims, do not add new claims, and do not make the
@@ -514,6 +598,50 @@ def infer_conf_year_from_pdf_path(pdf_path: str) -> str:
         if re.match(r"^[A-Za-z][A-Za-z0-9-]*_\d{4}$", part):
             return part
     return ""
+
+
+def resolve_existing_pdf_path(path_value: str, *, conf_year: str = "") -> tuple[Path | None, dict[str, Any]]:
+    raw = str(path_value or "").strip()
+    attempts: list[str] = []
+    if not raw:
+        return None, {"input": raw, "attempts": attempts}
+
+    path = Path(raw).expanduser()
+    candidates: list[Path] = []
+    if path.is_absolute():
+        candidates.append(path)
+    else:
+        candidates.extend([Path.cwd() / path, REPO_ROOT / path])
+
+    filename = path.name
+    search_roots = [
+        REPO_ROOT / "_private" / "resmax_downloads" / "pdfs",
+        REPO_ROOT / "obsidian-vault" / "paperPDFs",
+    ]
+    if filename:
+        for root in search_roots:
+            if conf_year:
+                candidates.append(root / conf_year / filename)
+            if root.exists():
+                candidates.extend(root.rglob(filename))
+
+    seen: set[str] = set()
+    unique_candidates: list[Path] = []
+    for candidate in candidates:
+        key = str(candidate)
+        if key not in seen:
+            seen.add(key)
+            unique_candidates.append(candidate)
+
+    for candidate in unique_candidates:
+        attempts.append(str(candidate))
+        if candidate.is_file():
+            return candidate.resolve(), {
+                "input": raw,
+                "resolved": str(candidate.resolve()),
+                "attempts": attempts,
+            }
+    return None, {"input": raw, "attempts": attempts}
 
 
 def resolved_conf_year(args: argparse.Namespace) -> str:
@@ -1596,7 +1724,7 @@ def title_aliases(title: str, method: str) -> list[str]:
     return out[:3] or [safe_slug(title, max_len=16)]
 
 
-def claims_for_frontmatter(analysis: dict[str, Any], *, max_items: int = 4) -> list[str]:
+def claims_for_frontmatter(analysis: dict[str, Any], *, max_items: int = 4, fallback: str = "") -> list[str]:
     claims: list[str] = []
     truth = analysis.get("analysis_truth") or {}
     for item in truth.get("decisive_evidence") or []:
@@ -1615,7 +1743,52 @@ def claims_for_frontmatter(analysis: dict[str, Any], *, max_items: int = 4) -> l
     core = compact_text(truth.get("core_insight"), max_len=180)
     if core and core not in claims:
         claims.append(core)
-    return claims[:max_items] or ["待人工复核。"]
+    fallback_claim = compact_text(fallback, max_len=180)
+    if fallback_claim and fallback_claim not in claims:
+        claims.append(fallback_claim)
+    return claims[:max_items]
+
+
+def first_sentence(text: str, *, max_len: int = 220) -> str:
+    text = compact_text(text, max_len=max_len * 2)
+    if not text:
+        return ""
+    match = re.search(r"(.+?[。.!?])(?:\s|$)", text)
+    return compact_text(match.group(1) if match else text, max_len=max_len)
+
+
+def fallback_method_name(title: str, analysis: dict[str, Any]) -> str:
+    metadata = analysis.get("paper_metadata") or {}
+    source = compact_text(metadata.get("title") or title, max_len=180)
+    if ":" in source:
+        prefix = source.split(":", 1)[0].strip()
+        if 2 <= len(prefix) <= 80:
+            return prefix
+    tokens = re.findall(r"[A-Za-z][A-Za-z0-9-]*", source)
+    for token in tokens:
+        if 2 <= len(token) <= 32 and any(ch.isupper() for ch in token):
+            return token
+    return source
+
+
+def frontmatter_metadata_values(title: str, analysis: dict[str, Any]) -> dict[str, str]:
+    method = compact_text((analysis.get("method") or {}).get("proposed_method_name"), max_len=180)
+    method = method or fallback_method_name(title, analysis)
+    truth = analysis.get("analysis_truth") or {}
+    core = compact_text(truth.get("core_insight"), max_len=420)
+    causal_knob = compact_text(truth.get("causal_knob"), max_len=180)
+    real_bottleneck = compact_text(truth.get("real_bottleneck"), max_len=260)
+    claims = claims_for_frontmatter(analysis)
+    claim_sentence = first_sentence(claims[0], max_len=180) if claims else ""
+    core_operator = compact_text(causal_knob or method or claim_sentence or title, max_len=180)
+    primary_logic = compact_text(core or real_bottleneck or method or claim_sentence or title, max_len=420)
+    paradigm = compact_text(core or method or primary_logic, max_len=180)
+    return {
+        "method": method,
+        "core_operator": core_operator,
+        "primary_logic": primary_logic,
+        "paradigm": paradigm,
+    }
 
 
 def preferred_chinese_title(title: str, analysis: dict[str, Any]) -> str:
@@ -1838,9 +2011,17 @@ def copy_vault_figures(
         copied_item = dict(item)
         copied_item["item_id"] = str(item.get("item_id") or f"item_{index:03d}")
         copied_item["vault_asset_path"] = target.resolve()
-        copied_item["note_image_path"] = f"../../assets/figures/papers/{task_id}/figures/{filename}"
+        copied_item["note_image_path"] = format_note_image_path(task_id, filename)
         copied.append(copied_item)
     return copied
+
+
+def format_note_image_path(task_id: str, filename: str) -> str:
+    return f"assets/figures/papers/{task_id}/figures/{filename}"
+
+
+def format_obsidian_image_embed(path: str) -> str:
+    return f"![[{path}]]"
 
 
 def image_block(item: dict[str, Any]) -> str:
@@ -1850,8 +2031,8 @@ def image_block(item: dict[str, Any]) -> str:
     if not path:
         return ""
     if caption:
-        return f"![{label}]({path})\n*{label}: {caption}*"
-    return f"![{label}]({path})"
+        return f"{format_obsidian_image_embed(path)}\n*{label}: {caption}*"
+    return format_obsidian_image_embed(path)
 
 
 def placement_candidates(figures_tables: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -2233,17 +2414,14 @@ def render_frontmatter(
     analysis: dict[str, Any],
     theme_bucket: str,
     acceptance: str,
+    openreview_forum_id: str = "",
     topic_text: str | None = None,
 ) -> str:
     venue, year = infer_conf_parts(conf_year)
-    method = (analysis.get("method") or {}).get("proposed_method_name") or ""
-    truth = analysis.get("analysis_truth") or {}
-    core = truth.get("core_insight") or ""
-    causal_knob = truth.get("causal_knob") or ""
-    real_bottleneck = truth.get("real_bottleneck") or ""
-    primary_logic = compact_text(core or real_bottleneck or method, max_len=420)
+    metadata = frontmatter_metadata_values(title, analysis)
+    method = metadata["method"]
     tags = topic_tags_for_frontmatter(topic_text, conf_year)
-    claims = claims_for_frontmatter(analysis)
+    claims = claims_for_frontmatter(analysis, fallback=metadata["primary_logic"] or title)
     aliases = title_aliases(title, method)
     lines = [
         "---",
@@ -2261,14 +2439,16 @@ def render_frontmatter(
         "tags:",
     ])
     lines.extend(f"- {yaml_scalar(tag)}" for tag in tags)
+    if openreview_forum_id:
+        lines.append(f"openreview_forum_id: {yaml_scalar(openreview_forum_id)}")
     lines.extend([
-        f"core_operator: {yaml_scalar(compact_text(causal_knob or method or core, max_len=180))}",
-        f"primary_logic: {yaml_scalar(primary_logic)}",
+        f"core_operator: {yaml_scalar(metadata['core_operator'])}",
+        f"primary_logic: {yaml_scalar(metadata['primary_logic'])}",
         "claims:",
     ])
     lines.extend(f"- {yaml_scalar(claim)}" for claim in claims)
     lines.extend([
-        f"paradigm: {yaml_scalar(compact_text(core or method, max_len=180))}",
+        f"paradigm: {yaml_scalar(metadata['paradigm'])}",
         "---",
         "",
     ])
@@ -2346,6 +2526,8 @@ def compose_vault_note(
     figure_placements: list[dict[str, Any]] | None = None,
 ) -> str:
     core = compact_text((analysis.get("analysis_truth") or {}).get("core_insight"), max_len=900)
+    if not core:
+        core = frontmatter_metadata_values(title, analysis)["primary_logic"]
     body = normalize_report_markdown(report)
     framework_blocks, experiment_blocks = figure_blocks_for_note(
         copied_figures,
@@ -2359,6 +2541,7 @@ def compose_vault_note(
             title=title,
             conf_year=conf_year,
             pdf_ref=pdf_ref,
+            openreview_forum_id=openreview_forum_id,
             analysis=analysis,
             theme_bucket=theme_bucket,
             acceptance=acceptance,
@@ -2367,7 +2550,7 @@ def compose_vault_note(
         f"# {title}",
         "",
         "> [!tip] 核心洞察",
-        f"> {core or '待人工复核。'}",
+        f"> {core}",
         "",
         render_info_table(
             title=title,
@@ -2417,8 +2600,10 @@ def table_rows_with_aliased_wikilinks(note: str) -> list[int]:
 
 def dangling_numeric_refs(note: str, *, max_items: int = 12) -> list[str]:
     scan = re.sub(r"`[^`\n]*`", "", note)
+    scan = re.sub(r"\$\$.*?\$\$", "", scan, flags=re.DOTALL)
+    scan = re.sub(r"\$[^$\n]*\$", "", scan)
     refs = sorted(
-        set(match.group(1) for match in re.finditer(r"(?<![\w\)'!\]])\[(\d{1,3})\]", scan)),
+        set(match.group(1) for match in re.finditer(r"(?<![\w\}'!\]])\[(\d{1,3})\]", scan)),
         key=lambda value: int(value),
     )
     if not refs:
@@ -2432,6 +2617,7 @@ def validate_vault_note(
     note: str,
     *,
     pdf_ref: str,
+    openreview_forum_id: str = "",
     copied_figures: list[dict[str, Any]],
     figure_placements: list[dict[str, Any]] | None = None,
     max_images: int = 0,
@@ -2466,7 +2652,13 @@ def validate_vault_note(
             note_image_paths.append(image_path)
         if max_images > 0 and len(note_image_paths) >= max_images:
             break
-    missing_images = [path for path in note_image_paths if path not in note]
+    expected_image_embeds = [format_obsidian_image_embed(path) for path in note_image_paths]
+    missing_images = [
+        path for path, embed in zip(note_image_paths, expected_image_embeds, strict=False)
+        if embed not in note
+    ]
+    legacy_markdown_image_links = re.findall(r"!\[[^\]]*\]\((?:\.\./\.\./)?assets/[^)]+\)", note)
+    legacy_relative_wikilink_images = re.findall(r"!\[\[\.\./\.\./assets/[^\]]+\]\]", note)
     scalar_metadata_keys = set(required_frontmatter) - {"aliases", "tags", "claims"}
     fallback_frontmatter_values = {
         key: value
@@ -2478,11 +2670,20 @@ def validate_vault_note(
         f"{key}: {value}"
         for key, value in fallback_frontmatter_values.items()
     ]
+    fallback_markers.extend(
+        f"line {line_no}: {line.strip()}"
+        for line_no, line in enumerate(note.splitlines()[:80], 1)
+        if "待人工复核" in line
+    )
+    forum_id_value = frontmatter.get("openreview_forum_id", "").strip().strip("\"'")
+    forum_id_ok = not openreview_forum_id or forum_id_value == openreview_forum_id
     checks = {
         "frontmatter_valid": has_frontmatter and not missing_frontmatter,
+        "openreview_forum_id_present": forum_id_ok,
         "required_sections_present": not missing_sections,
         "pdf_embed_present": not pdf_ref or expected_pdf_embed in note,
         "image_embeds_present": not note_image_paths or not missing_images,
+        "no_legacy_markdown_image_links": not legacy_markdown_image_links and not legacy_relative_wikilink_images,
         "no_pdf_file_label": "PDF 文件：" not in note,
         "no_table_cell_aliased_wikilinks": not table_rows_with_aliased_wikilinks(note),
         "no_fallback_metadata_markers": not fallback_markers,
@@ -2494,11 +2695,15 @@ def validate_vault_note(
         "checks": checks,
         "note_chars": len(note),
         "missing_frontmatter": missing_frontmatter,
+        "expected_openreview_forum_id": openreview_forum_id,
+        "openreview_forum_id": forum_id_value,
         "missing_sections": missing_sections,
         "pdf_ref": pdf_ref,
-        "image_embed_count": len(re.findall(r"!\[[^\]]*\]\([^)]+\)", note)),
+        "image_embed_count": len(re.findall(r"!\[\[assets/figures/papers/[^\]]+\]\]", note)),
         "expected_image_count": len(note_image_paths),
         "missing_image_paths": missing_images[:12],
+        "legacy_markdown_image_links": legacy_markdown_image_links[:12],
+        "legacy_relative_wikilink_images": legacy_relative_wikilink_images[:12],
         "pdf_file_label_count": note.count("PDF 文件："),
         "table_cell_aliased_wikilink_lines": table_rows_with_aliased_wikilinks(note),
         "fallback_markers": fallback_markers,
@@ -2599,15 +2804,18 @@ def export_to_vault(
     asset_root = Path(args.vault_asset_root).expanduser().resolve()
     stem = note_file_stem(title)
     note_path = paper_dir / f"{stem}.md"
-    pdf_ref = ""
     source_pdf_arg = args.paper_pdf or args.pdf
-    source_pdf = Path(source_pdf_arg).resolve() if source_pdf_arg else None
-    if source_pdf and source_pdf.exists():
-        pdf_target = pdf_dir / f"{stem}.pdf"
-        pdf_target.parent.mkdir(parents=True, exist_ok=True)
-        if not (pdf_target.exists() and source_pdf.samefile(pdf_target)):
-            shutil.copy2(source_pdf, pdf_target)
-        pdf_ref = f"paperPDFs/{conf_year}/{pdf_target.name}"
+    source_pdf, pdf_resolution = resolve_existing_pdf_path(source_pdf_arg, conf_year=conf_year)
+    if not source_pdf:
+        raise FileNotFoundError(
+            "Vault export requires an existing PDF. "
+            f"input={source_pdf_arg!r}; attempts={pdf_resolution.get('attempts') or []}"
+        )
+    pdf_target = pdf_dir / f"{stem}.pdf"
+    pdf_target.parent.mkdir(parents=True, exist_ok=True)
+    if not (pdf_target.exists() and source_pdf.samefile(pdf_target)):
+        shutil.copy2(source_pdf, pdf_target)
+    pdf_ref = f"paperPDFs/{conf_year}/{pdf_target.name}"
 
     copied_figures = copy_vault_figures(
         figures_tables,
@@ -2633,6 +2841,7 @@ def export_to_vault(
     validation = validate_vault_note(
         note,
         pdf_ref=pdf_ref,
+        openreview_forum_id=args.openreview_forum_id,
         copied_figures=copied_figures,
         figure_placements=figure_placements,
         max_images=args.max_note_images,
@@ -2640,6 +2849,8 @@ def export_to_vault(
     export_info = {
         "note_path": str(note_path),
         "pdf_ref": pdf_ref,
+        "source_pdf": str(source_pdf),
+        "source_pdf_resolution": pdf_resolution,
         "figure_count": len(copied_figures),
         "figure_placements": figure_placements or [],
         "asset_root": str(asset_root),
@@ -2822,6 +3033,7 @@ async def call_openai_compatible(
     max_tokens: int,
     temperature: float,
     reasoning_effort: str,
+    thinking: str,
 ) -> LLMCallResult:
     from openai import AsyncOpenAI
 
@@ -2847,16 +3059,21 @@ async def call_openai_compatible(
             request["extra_body"] = {"thinking": {"type": "disabled"}}
         else:
             request["temperature"] = temperature
+            request["stream_options"] = {"include_usage": True}
             if deepseek_uses_reasoning(model):
-                request["reasoning_effort"] = reasoning_effort
-                request["extra_body"] = {"thinking": {"type": "enabled"}}
+                request["extra_body"] = {"thinking": {"type": thinking}}
+                if thinking == "enabled" and reasoning_effort:
+                    request["reasoning_effort"] = reasoning_effort
         stream = await client.chat.completions.create(**request)
         chunks: list[str] = []
         reasoning_chunks: list[str] = []
         finish_reasons: list[str] = []
         stream_chunk_count = 0
+        api_usage: dict[str, Any] = {}
         async for chunk in stream:
             stream_chunk_count += 1
+            if getattr(chunk, "usage", None) is not None:
+                api_usage = normalized_api_usage(getattr(chunk, "usage", None))
             if not chunk.choices:
                 continue
             choice = chunk.choices[0]
@@ -2880,6 +3097,8 @@ async def call_openai_compatible(
     usage = {
         "provider": provider,
         "model": model,
+        "thinking": thinking if provider != "kimi" and deepseek_uses_reasoning(model) else "disabled",
+        "reasoning_effort": reasoning_effort if provider != "kimi" and deepseek_uses_reasoning(model) and thinking == "enabled" else "",
         "prompt_tokens_est": prompt_tokens,
         "completion_tokens_est": completion_tokens,
         "reasoning_tokens_est": reasoning_tokens,
@@ -2888,12 +3107,24 @@ async def call_openai_compatible(
         "estimated_cost_usd": estimate_cost_usd(model, prompt_tokens, completion_tokens),
         "cost_basis": "discounted_estimate_from_local_text_lengths",
     }
+    if api_usage:
+        usage.update(api_usage)
+        api_cost = estimate_cost_usd_from_usage(model, {
+            "prompt_tokens": api_usage.get("prompt_tokens_api"),
+            "completion_tokens": api_usage.get("completion_tokens_api"),
+            "prompt_cache_hit_tokens": api_usage.get("prompt_cache_hit_tokens"),
+            "prompt_cache_miss_tokens": api_usage.get("prompt_cache_miss_tokens"),
+        })
+        if api_cost is not None:
+            usage["estimated_cost_usd_api"] = api_cost
+            usage["cost_basis_api"] = "discounted_estimate_from_api_usage_with_prompt_cache"
     diagnostics = {
         "content_chars": len(text),
         "reasoning_chars": len(reasoning_text),
         "finish_reason": finish_reasons[-1] if finish_reasons else "",
         "finish_reasons": finish_reasons,
         "stream_chunk_count": stream_chunk_count,
+        "api_usage_present": bool(api_usage),
     }
     return LLMCallResult(text=text, usage=usage, diagnostics=diagnostics)
 
@@ -2909,6 +3140,7 @@ async def llm_text_with_config(
     max_tokens: int,
     temperature: float,
     reasoning_effort: str,
+    thinking: str,
 ) -> LLMCallResult:
     api_key = os.environ.get(api_key_env, "")
     if not api_key:
@@ -2923,10 +3155,19 @@ async def llm_text_with_config(
         max_tokens=max_tokens,
         temperature=temperature,
         reasoning_effort=reasoning_effort,
+        thinking=thinking,
     )
 
 
-async def llm_text(args: argparse.Namespace, *, system: str, prompt: str, max_tokens: int) -> LLMCallResult:
+async def llm_text(
+    args: argparse.Namespace,
+    *,
+    system: str,
+    prompt: str,
+    max_tokens: int,
+    reasoning_effort: str | None = None,
+    thinking: str | None = None,
+) -> LLMCallResult:
     if args.mock_llm:
         raise RuntimeError("mock_llm should be handled by the caller")
     return await llm_text_with_config(
@@ -2938,7 +3179,8 @@ async def llm_text(args: argparse.Namespace, *, system: str, prompt: str, max_to
         api_key_env=args.api_key_env,
         max_tokens=max_tokens,
         temperature=args.temperature,
-        reasoning_effort=args.reasoning_effort,
+        reasoning_effort=reasoning_effort if reasoning_effort is not None else args.reasoning_effort,
+        thinking=thinking if thinking is not None else args.thinking,
     )
 
 
@@ -2955,6 +3197,7 @@ async def writer_llm_text(args: argparse.Namespace, *, system: str, prompt: str,
         max_tokens=max_tokens,
         temperature=args.writer_temperature,
         reasoning_effort=args.writer_reasoning_effort,
+        thinking=args.writer_thinking,
     )
 
 
@@ -2971,6 +3214,7 @@ async def kimi_llm_text(args: argparse.Namespace, *, system: str, prompt: str, m
         max_tokens=max_tokens,
         temperature=args.kimi_temperature,
         reasoning_effort="",
+        thinking="disabled",
     )
 
 
@@ -2992,6 +3236,10 @@ def normalize_provider_base_url(provider: str, base_url: str) -> str:
 
 
 def resolve_llm_config(args: argparse.Namespace) -> None:
+    if not args.part_reasoning_effort:
+        args.part_reasoning_effort = args.reasoning_effort
+    if args.section_workers <= 0:
+        args.section_workers = args.part_workers
     if args.provider == "kimi":
         api_key_env, _ = first_env(["KIMI_API_KEY", "MOONSHOT_API_KEY", "KIMI_AUTH_TOKEN"])
         _, model = first_env(["KIMI_MODEL", "MOONSHOT_MODEL"])
@@ -3112,7 +3360,14 @@ async def run_part_analysis(
             "cost_basis": "local_appendix_figure_table_anchor_extraction",
         }
     else:
-        llm_result = await llm_text(args, system=PART_ANALYSIS_SYSTEM, prompt=prompt, max_tokens=args.part_max_tokens)
+        llm_result = await llm_text(
+            args,
+            system=PART_ANALYSIS_SYSTEM,
+            prompt=prompt,
+            max_tokens=args.part_max_tokens,
+            reasoning_effort=args.part_reasoning_effort,
+            thinking=args.part_thinking,
+        )
         raw = llm_result.text
         usage = usage_from_result(llm_result)
         if usage_has_finish_reason(usage, "length"):
@@ -3123,7 +3378,14 @@ async def run_part_analysis(
                 append_jsonl(progress_path, {"event": "part_analysis_length_accepted", "part_id": part_id, "at": now_iso(), "usage": usage})
             else:
                 retry_tokens = args.adaptive_long_part_max_tokens
-                retry_result = await llm_text(args, system=PART_ANALYSIS_SYSTEM, prompt=prompt, max_tokens=retry_tokens)
+                retry_result = await llm_text(
+                    args,
+                    system=PART_ANALYSIS_SYSTEM,
+                    prompt=prompt,
+                    max_tokens=retry_tokens,
+                    reasoning_effort=args.part_reasoning_effort,
+                    thinking=args.part_thinking,
+                )
                 retry_raw_path = work_dir / "part_analysis" / f"{part_id}.length_retry.raw.txt"
                 atomic_write_text(retry_raw_path, retry_result.text)
                 retry_usage = usage_from_result(retry_result)
@@ -3174,6 +3436,8 @@ async def run_part_analysis(
                         system=PART_ANALYSIS_REPAIR_SYSTEM,
                         prompt=repair_prompt,
                         max_tokens=min(args.part_max_tokens, 4096),
+                        reasoning_effort=args.part_reasoning_effort,
+                        thinking=args.part_thinking,
                     )
                     repair_raw = repair_result.text
                     atomic_write_text(repair_raw_path, repair_raw)
@@ -3303,7 +3567,14 @@ async def run_main_analysis(
         parsed["paper_metadata"]["title"] = title
         raw = json.dumps(parsed, ensure_ascii=False)
     else:
-        llm_result = await llm_text(args, system=MAIN_ANALYSIS_SYSTEM, prompt=prompt, max_tokens=args.main_max_tokens)
+        llm_result = await llm_text(
+            args,
+            system=MAIN_ANALYSIS_SYSTEM,
+            prompt=prompt,
+            max_tokens=args.main_max_tokens,
+            reasoning_effort=args.reasoning_effort,
+            thinking=args.thinking,
+        )
         raw = llm_result.text
         usage = usage_from_result(llm_result)
         atomic_write_text(raw_path, raw)
@@ -3315,6 +3586,8 @@ async def run_main_analysis(
                 system=MAIN_ANALYSIS_REPAIR_SYSTEM,
                 prompt=main_repair_prompt(raw),
                 max_tokens=min(args.main_max_tokens, 4096),
+                reasoning_effort=args.reasoning_effort,
+                thinking=args.thinking,
             )
             repair_raw = repair_result.text
             atomic_write_text(work_dir / "analysis" / "main_analysis.repair.raw.txt", repair_raw)
@@ -3399,12 +3672,12 @@ def build_section_prompt(
     focused_parts = focused_part_analyses(section_title, part_results)
     focused_figures = focused_figures_tables(section_title, figures_tables)
     prompt_obj = {
-        "section_title": section_title,
-        "section_goal": section_goal,
         "verified_analysis": analysis,
         "focused_part_analyses": focused_parts,
         "focused_figures_tables": focused_figures,
         "context_note": "Part and figure/table context is filtered for this section; use verified_analysis for global facts.",
+        "section_title": section_title,
+        "section_goal": section_goal,
     }
     return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
 
@@ -3551,7 +3824,7 @@ async def run_section_writers(
     work_dir: Path,
     progress_path: Path,
 ) -> tuple[list[str], float, float, dict[str, Any]]:
-    sem = asyncio.Semaphore(max(1, args.part_workers))
+    sem = asyncio.Semaphore(max(1, args.section_workers))
 
     async def one(spec: tuple[str, str]) -> tuple[str, float, dict[str, Any]]:
         title, goal = spec
@@ -3577,10 +3850,31 @@ async def run_section_writers(
         "model": args.writer_model,
         "prompt_tokens_est": sum((usage.get("prompt_tokens_est") or 0) for _, _, usage in results),
         "completion_tokens_est": sum((usage.get("completion_tokens_est") or 0) for _, _, usage in results),
+        "reasoning_tokens_est": sum((usage.get("reasoning_tokens_est") or 0) for _, _, usage in results),
         "total_tokens_est": sum((usage.get("total_tokens_est") or 0) for _, _, usage in results),
+        "total_with_reasoning_tokens_est": sum((usage.get("total_with_reasoning_tokens_est") or 0) for _, _, usage in results),
+        "prompt_tokens_api": sum((usage.get("prompt_tokens_api") or 0) for _, _, usage in results),
+        "completion_tokens_api": sum((usage.get("completion_tokens_api") or 0) for _, _, usage in results),
+        "reasoning_tokens_api": sum((usage.get("reasoning_tokens_api") or 0) for _, _, usage in results),
+        "total_tokens_api": sum((usage.get("total_tokens_api") or 0) for _, _, usage in results),
+        "prompt_cache_hit_tokens": sum((usage.get("prompt_cache_hit_tokens") or 0) for _, _, usage in results),
+        "prompt_cache_miss_tokens": sum((usage.get("prompt_cache_miss_tokens") or 0) for _, _, usage in results),
+        "cached_tokens_api": sum((usage.get("cached_tokens_api") or 0) for _, _, usage in results),
         "estimated_cost_usd": round(sum((usage.get("estimated_cost_usd") or 0.0) for _, _, usage in results), 6),
         "cost_basis": "sum_of_section_writer_estimates",
     }
+    if any(usage.get("estimated_cost_usd_api") is not None for _, _, usage in results):
+        usage_rollup["estimated_cost_usd_api"] = round(
+            sum((usage.get("estimated_cost_usd_api") or 0.0) for _, _, usage in results),
+            6,
+        )
+        usage_rollup["cost_basis_api"] = "sum_of_section_writer_api_usage_with_prompt_cache"
+    rate = cache_hit_rate(
+        int(usage_rollup["prompt_cache_hit_tokens"]),
+        int(usage_rollup["prompt_cache_miss_tokens"]),
+    )
+    if rate is not None:
+        usage_rollup["prompt_cache_hit_rate"] = rate
     return sections, wall, total_llm, usage_rollup
 
 
@@ -3607,6 +3901,16 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     if sum(bool(x) for x in (args.pdf, args.mineru_output, args.source_md)) != 1:
         raise SystemExit("Pass exactly one of --pdf, --mineru-output, or --source-md")
 
+    pdf_preflight: dict[str, Any] = {}
+    if args.export_vault:
+        source_pdf_arg = args.paper_pdf or args.pdf
+        source_pdf, pdf_preflight = resolve_existing_pdf_path(source_pdf_arg, conf_year=resolved_conf_year(args))
+        if not source_pdf:
+            raise FileNotFoundError(
+                "Vault export requires an existing PDF before LLM analysis starts. "
+                f"input={source_pdf_arg!r}; attempts={pdf_preflight.get('attempts') or []}"
+            )
+
     task_id = safe_slug(args.task_id or default_task_id(args), max_len=96)
     work_dir = Path(args.output_root).resolve() / task_id
     progress_path = work_dir / "progress.jsonl"
@@ -3623,6 +3927,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 "mineru_output": args.mineru_output,
                 "source_md": args.source_md,
                 "paper_pdf": args.paper_pdf,
+                "paper_pdf_resolution": pdf_preflight,
             },
             "model": "mock" if args.mock_llm else args.model,
             "provider": "mock" if args.mock_llm else args.provider,
@@ -3633,6 +3938,11 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             "base_url": "" if args.mock_llm else args.base_url,
             "writer_base_url": "" if args.mock_llm else args.writer_base_url,
             "kimi_base_url": "" if args.mock_llm else args.kimi_base_url,
+            "thinking": "mock" if args.mock_llm else args.thinking,
+            "part_thinking": "mock" if args.mock_llm else args.part_thinking,
+            "part_reasoning_effort": "mock" if args.mock_llm else args.part_reasoning_effort,
+            "writer_thinking": "mock" if args.mock_llm else args.writer_thinking,
+            "writer_reasoning_effort": "mock" if args.mock_llm else args.writer_reasoning_effort,
             "mineru_model_source": args.mineru_model_source,
             "mineru_config": str(Path(args.mineru_config).expanduser()),
             "conf_year": resolved_conf_year(args),
@@ -3783,6 +4093,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                         repaired_validation = validate_vault_note(
                             note_path.read_text(encoding="utf-8"),
                             pdf_ref=str(vault_export.get("pdf_ref") or ""),
+                            openreview_forum_id=args.openreview_forum_id,
                             copied_figures=copied_figures,
                             figure_placements=figure_placements,
                             max_images=args.max_note_images,
@@ -3807,24 +4118,52 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 })
             part_prompt_tokens = sum(int(item.get("_meta", {}).get("usage", {}).get("prompt_tokens_est") or 0) for item in part_results)
             part_completion_tokens = sum(int(item.get("_meta", {}).get("usage", {}).get("completion_tokens_est") or 0) for item in part_results)
+            part_reasoning_tokens = sum(int(item.get("_meta", {}).get("usage", {}).get("reasoning_tokens_est") or 0) for item in part_results)
             part_total_tokens = sum(int(item.get("_meta", {}).get("usage", {}).get("total_tokens_est") or 0) for item in part_results)
             part_cost = round(sum(float(item.get("_meta", {}).get("usage", {}).get("estimated_cost_usd") or 0.0) for item in part_results), 6)
+            part_prompt_tokens_api = sum(int(item.get("_meta", {}).get("usage", {}).get("prompt_tokens_api") or 0) for item in part_results)
+            part_completion_tokens_api = sum(int(item.get("_meta", {}).get("usage", {}).get("completion_tokens_api") or 0) for item in part_results)
+            part_reasoning_tokens_api = sum(int(item.get("_meta", {}).get("usage", {}).get("reasoning_tokens_api") or 0) for item in part_results)
+            part_cache_hit_tokens = sum(int(item.get("_meta", {}).get("usage", {}).get("prompt_cache_hit_tokens") or 0) for item in part_results)
+            part_cache_miss_tokens = sum(int(item.get("_meta", {}).get("usage", {}).get("prompt_cache_miss_tokens") or 0) for item in part_results)
+            part_cost_api = round(sum(float(item.get("_meta", {}).get("usage", {}).get("estimated_cost_usd_api") or 0.0) for item in part_results), 6)
             main_usage = analysis.get("_meta", {}).get("usage", {}) if isinstance(analysis.get("_meta"), dict) else {}
             usage_summary = {
                 "provider": args.provider,
                 "model": args.model,
                 "part_prompt_tokens_est": part_prompt_tokens,
                 "part_completion_tokens_est": part_completion_tokens,
+                "part_reasoning_tokens_est": part_reasoning_tokens,
                 "part_total_tokens_est": part_total_tokens,
                 "part_estimated_cost_usd": part_cost,
+                "part_prompt_tokens_api": part_prompt_tokens_api,
+                "part_completion_tokens_api": part_completion_tokens_api,
+                "part_reasoning_tokens_api": part_reasoning_tokens_api,
+                "part_prompt_cache_hit_tokens": part_cache_hit_tokens,
+                "part_prompt_cache_miss_tokens": part_cache_miss_tokens,
+                "part_estimated_cost_usd_api": part_cost_api,
                 "main_prompt_tokens_est": int(main_usage.get("prompt_tokens_est") or 0),
                 "main_completion_tokens_est": int(main_usage.get("completion_tokens_est") or 0),
+                "main_reasoning_tokens_est": int(main_usage.get("reasoning_tokens_est") or 0),
                 "main_total_tokens_est": int(main_usage.get("total_tokens_est") or 0),
                 "main_estimated_cost_usd": float(main_usage.get("estimated_cost_usd") or 0.0),
+                "main_prompt_tokens_api": int(main_usage.get("prompt_tokens_api") or 0),
+                "main_completion_tokens_api": int(main_usage.get("completion_tokens_api") or 0),
+                "main_reasoning_tokens_api": int(main_usage.get("reasoning_tokens_api") or 0),
+                "main_prompt_cache_hit_tokens": int(main_usage.get("prompt_cache_hit_tokens") or 0),
+                "main_prompt_cache_miss_tokens": int(main_usage.get("prompt_cache_miss_tokens") or 0),
+                "main_estimated_cost_usd_api": float(main_usage.get("estimated_cost_usd_api") or 0.0),
                 "writer_prompt_tokens_est": int(writer_usage.get("prompt_tokens_est") or 0),
                 "writer_completion_tokens_est": int(writer_usage.get("completion_tokens_est") or 0),
+                "writer_reasoning_tokens_est": int(writer_usage.get("reasoning_tokens_est") or 0),
                 "writer_total_tokens_est": int(writer_usage.get("total_tokens_est") or 0),
                 "writer_estimated_cost_usd": float(writer_usage.get("estimated_cost_usd") or 0.0),
+                "writer_prompt_tokens_api": int(writer_usage.get("prompt_tokens_api") or 0),
+                "writer_completion_tokens_api": int(writer_usage.get("completion_tokens_api") or 0),
+                "writer_reasoning_tokens_api": int(writer_usage.get("reasoning_tokens_api") or 0),
+                "writer_prompt_cache_hit_tokens": int(writer_usage.get("prompt_cache_hit_tokens") or 0),
+                "writer_prompt_cache_miss_tokens": int(writer_usage.get("prompt_cache_miss_tokens") or 0),
+                "writer_estimated_cost_usd_api": float(writer_usage.get("estimated_cost_usd_api") or 0.0),
                 "figure_placement_prompt_tokens_est": int(figure_placement_usage.get("prompt_tokens_est") or 0),
                 "figure_placement_completion_tokens_est": int(figure_placement_usage.get("completion_tokens_est") or 0),
                 "figure_placement_total_tokens_est": int(figure_placement_usage.get("total_tokens_est") or 0),
@@ -3834,6 +4173,51 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 "figure_visual_summary_total_tokens_est": int(visual_summary_usage.get("total_tokens_est") or 0),
                 "figure_visual_summary_estimated_cost_usd": float(visual_summary_usage.get("estimated_cost_usd") or 0.0),
             }
+            usage_summary["prompt_tokens_api"] = (
+                usage_summary["part_prompt_tokens_api"]
+                + usage_summary["main_prompt_tokens_api"]
+                + usage_summary["writer_prompt_tokens_api"]
+            )
+            usage_summary["completion_tokens_api"] = (
+                usage_summary["part_completion_tokens_api"]
+                + usage_summary["main_completion_tokens_api"]
+                + usage_summary["writer_completion_tokens_api"]
+            )
+            usage_summary["reasoning_tokens_api"] = (
+                usage_summary["part_reasoning_tokens_api"]
+                + usage_summary["main_reasoning_tokens_api"]
+                + usage_summary["writer_reasoning_tokens_api"]
+            )
+            usage_summary["prompt_cache_hit_tokens"] = (
+                usage_summary["part_prompt_cache_hit_tokens"]
+                + usage_summary["main_prompt_cache_hit_tokens"]
+                + usage_summary["writer_prompt_cache_hit_tokens"]
+            )
+            usage_summary["prompt_cache_miss_tokens"] = (
+                usage_summary["part_prompt_cache_miss_tokens"]
+                + usage_summary["main_prompt_cache_miss_tokens"]
+                + usage_summary["writer_prompt_cache_miss_tokens"]
+            )
+            usage_summary["estimated_cost_usd_api"] = round(
+                usage_summary["part_estimated_cost_usd_api"]
+                + usage_summary["main_estimated_cost_usd_api"]
+                + usage_summary["writer_estimated_cost_usd_api"],
+                6,
+            )
+            usage_summary["cost_basis_api"] = "sum_of_stage_api_usage_with_prompt_cache"
+            for stage in ("part", "main", "writer"):
+                rate = cache_hit_rate(
+                    int(usage_summary.get(f"{stage}_prompt_cache_hit_tokens") or 0),
+                    int(usage_summary.get(f"{stage}_prompt_cache_miss_tokens") or 0),
+                )
+                if rate is not None:
+                    usage_summary[f"{stage}_prompt_cache_hit_rate"] = rate
+            overall_cache_rate = cache_hit_rate(
+                int(usage_summary["prompt_cache_hit_tokens"]),
+                int(usage_summary["prompt_cache_miss_tokens"]),
+            )
+            if overall_cache_rate is not None:
+                usage_summary["prompt_cache_hit_rate"] = overall_cache_rate
             usage_summary["prompt_tokens_est"] = (
                 usage_summary["part_prompt_tokens_est"]
                 + usage_summary["main_prompt_tokens_est"]
@@ -3848,12 +4232,21 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 + usage_summary["figure_placement_completion_tokens_est"]
                 + usage_summary["figure_visual_summary_completion_tokens_est"]
             )
+            usage_summary["reasoning_tokens_est"] = (
+                usage_summary["part_reasoning_tokens_est"]
+                + usage_summary["main_reasoning_tokens_est"]
+                + usage_summary["writer_reasoning_tokens_est"]
+            )
             usage_summary["total_tokens_est"] = (
                 usage_summary["part_total_tokens_est"]
                 + usage_summary["main_total_tokens_est"]
                 + usage_summary["writer_total_tokens_est"]
                 + usage_summary["figure_placement_total_tokens_est"]
                 + usage_summary["figure_visual_summary_total_tokens_est"]
+            )
+            usage_summary["total_tokens_api"] = (
+                usage_summary["prompt_tokens_api"]
+                + usage_summary["completion_tokens_api"]
             )
             usage_summary["estimated_cost_usd"] = round(
                 usage_summary["part_estimated_cost_usd"]
@@ -3933,6 +4326,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--chunk-chars", type=int, default=8_000)
     parser.add_argument("--overlap-chars", type=int, default=800)
     parser.add_argument("--part-workers", type=int, default=2)
+    parser.add_argument("--section-workers", type=int, default=0, help="Concurrent section writers. Defaults to --part-workers; use 1 to maximize prefix-cache reuse.")
     parser.add_argument(
         "--provider",
         choices=["deepseek", "kimi"],
@@ -3940,7 +4334,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="LLM provider. DeepSeek is the default; Kimi is used only when explicitly selected.",
     )
     parser.add_argument("--model", default="")
+    parser.add_argument("--thinking", choices=THINKING_CHOICES, default="enabled", help="DeepSeek thinking mode for main analysis and repairs.")
     parser.add_argument("--reasoning-effort", default="max", help="Reasoning effort for compatible providers.")
+    parser.add_argument("--part-thinking", choices=THINKING_CHOICES, default="enabled", help="DeepSeek thinking mode for chunk-level anchor extraction.")
+    parser.add_argument("--part-reasoning-effort", default="", help="Reasoning effort for part analysis. Defaults to --reasoning-effort.")
     parser.add_argument("--base-url", default="")
     parser.add_argument("--api-key-env", default="")
     parser.add_argument("--temperature", type=float, default=0.1)
@@ -3954,6 +4351,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--writer-base-url", default="")
     parser.add_argument("--writer-api-key-env", default="")
     parser.add_argument("--writer-temperature", type=float, default=KIMI_DEFAULT_TEMPERATURE)
+    parser.add_argument("--writer-thinking", choices=THINKING_CHOICES, default="enabled", help="DeepSeek thinking mode for section writers.")
     parser.add_argument("--writer-reasoning-effort", default="max")
     parser.add_argument("--kimi-model", default="")
     parser.add_argument("--kimi-base-url", default="")
