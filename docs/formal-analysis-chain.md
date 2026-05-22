@@ -224,7 +224,10 @@ The highest-value next optimizations are:
 2. A/B test lower writer reasoning effort while holding main analysis fixed.
    This is intentionally not the production default until paired quality checks
    show that factuality, cross-section consistency, and readability do not
-   regress.
+   regress. Because production section writers run with
+   `--writer-thinking disabled`, writer-reasoning A/B runs must explicitly pass
+   `--writer-thinking enabled`; otherwise `--writer-reasoning-effort` is only a
+   recorded setting and does not affect DeepSeek calls.
 3. Improve part prompt fixed-prefix reuse without losing parallel throughput.
 
 ## Reproducible Command
@@ -241,4 +244,19 @@ python3 scripts/run_local_paper_analysis.py \
   --writer-thinking disabled \
   --section-workers 1 \
   --thinking enabled
+```
+
+For controlled writer-reasoning A/B tests over `paper_list.csv`, keep main and
+part settings fixed and let the batch runner create separate child task ids and
+output roots per writer effort:
+
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded \
+  --limit 5 \
+  --analysis-output-root obsidian-vault/analysis_runs/writer_reasoning_ab \
+  --writer-reasoning-ab-efforts max,medium \
+  --extra-arg=--writer-thinking \
+  --extra-arg=enabled
 ```

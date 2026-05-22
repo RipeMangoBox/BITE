@@ -44,6 +44,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mineru-output-root", default="")
     parser.add_argument("--mineru-batch-id", default="")
     parser.add_argument("--require-existing-mineru-output", action="store_true")
+    parser.add_argument("--experiment-label", default="", help="Optional label passed to each child analysis run.")
+    parser.add_argument(
+        "--writer-reasoning-ab-efforts",
+        default="",
+        help="Comma-separated writer reasoning efforts for a controlled A/B run, e.g. max,medium. "
+        "Each effort gets a distinct task id and output root. Pair with --extra-arg=--writer-thinking --extra-arg=enabled.",
+    )
     parser.add_argument("--extra-arg", action="append", default=[], help="Extra arg passed to run_local_paper_analysis.py; repeat as needed.")
     return parser.parse_args()
 
@@ -71,8 +78,8 @@ def selected_rows(source: Path, state: str) -> list[dict[str, str]]:
         return rows
 
 
-def load_done(results_path: Path) -> set[str]:
-    done: set[str] = set()
+def load_done(results_path: Path) -> set[tuple[str, str]]:
+    done: set[tuple[str, str]] = set()
     if not results_path.exists():
         return done
     with results_path.open(encoding="utf-8") as handle:
@@ -81,7 +88,7 @@ def load_done(results_path: Path) -> set[str]:
                 continue
             row = json.loads(line)
             if row.get("status") == "done" and row.get("row_key"):
-                done.add(str(row["row_key"]))
+                done.add((str(row["row_key"]), str(row.get("writer_reasoning_effort") or "")))
     return done
 
 
@@ -89,11 +96,17 @@ def row_key(row: dict[str, str]) -> str:
     return row.get("paper_link") or row.get("paper_title") or row.get("_csv_line", "")
 
 
-def row_task_id(row: dict[str, str]) -> str:
+def row_task_id(row: dict[str, str], suffix: str = "") -> str:
     key = row_key(row) or "row"
     safe = "".join(ch if ch.isalnum() else "_" for ch in key).strip("_")
     safe = "_".join(part for part in safe.split("_") if part)
-    return f"paper_list_l{row.get('_csv_line', 'unknown')}_{safe[:72]}"
+    base = f"paper_list_l{row.get('_csv_line', 'unknown')}_{safe[:72]}"
+    return f"{base}_{suffix}" if suffix else base
+
+
+def safe_variant(value: str) -> str:
+    safe = "".join(ch if ch.isalnum() else "_" for ch in value).strip("_").lower()
+    return "_".join(part for part in safe.split("_") if part) or "variant"
 
 
 def resolve_pdf_path(row: dict[str, str]) -> Path:
@@ -104,15 +117,19 @@ def resolve_pdf_path(row: dict[str, str]) -> Path:
     return path.resolve()
 
 
-def command_for_row(args: argparse.Namespace, row: dict[str, str]) -> list[str]:
+def command_for_row(args: argparse.Namespace, row: dict[str, str], *, writer_effort: str = "") -> list[str]:
     pdf_path = resolve_pdf_path(row)
     conf_year = args.conf_year or venue_to_conf_year(row.get("venue", ""))
+    variant = safe_variant(f"writer_{writer_effort}") if writer_effort else ""
+    experiment_label = args.experiment_label or ""
+    if writer_effort and not experiment_label:
+        experiment_label = f"writer_reasoning_{writer_effort}"
     cmd = [
         sys.executable,
         str(REPO_ROOT / "scripts" / "run_local_paper_analysis.py"),
         "--pdf", str(pdf_path),
         "--acceptance", args.acceptance,
-        "--task-id", row_task_id(row),
+        "--task-id", row_task_id(row, suffix=variant),
     ]
     if row.get("paper_title"):
         cmd += ["--paper-title", row["paper_title"]]
@@ -131,9 +148,25 @@ def command_for_row(args: argparse.Namespace, row: dict[str, str]) -> list[str]:
     if args.require_existing_mineru_output:
         cmd.append("--require-existing-mineru-output")
     if args.analysis_output_root:
-        cmd += ["--output-root", args.analysis_output_root]
+        output_root = Path(args.analysis_output_root)
+        if variant:
+            output_root = output_root / variant
+        cmd += ["--output-root", str(output_root)]
+    if experiment_label:
+        cmd += ["--experiment-label", experiment_label]
+    if writer_effort:
+        cmd += ["--writer-reasoning-effort", writer_effort]
     cmd.extend(args.extra_arg)
     return cmd
+
+
+def writer_effort_variants(args: argparse.Namespace) -> list[str]:
+    efforts: list[str] = []
+    for item in args.writer_reasoning_ab_efforts.split(","):
+        effort = item.strip()
+        if effort and effort not in efforts:
+            efforts.append(effort)
+    return efforts or [""]
 
 
 def main() -> None:
@@ -160,13 +193,16 @@ def main() -> None:
     if args.limit:
         rows = rows[:args.limit]
 
+    variants = writer_effort_variants(args)
     completed = load_done(results_path) if args.resume else set()
     planned: list[dict[str, Any]] = []
+    planned_child_runs = 0
     for row in rows:
         key = row_key(row)
-        if key in completed:
-            continue
-        planned.append(row)
+        pending_variants = [(key, writer_effort) for writer_effort in variants if (key, writer_effort) not in completed]
+        if pending_variants:
+            planned.append(row)
+            planned_child_runs += len(pending_variants)
 
     manifest = {
         "run_id": run_id,
@@ -176,15 +212,25 @@ def main() -> None:
         "shard_count": args.shard_count,
         "selected": len(rows),
         "planned": len(planned),
+        "planned_child_runs": planned_child_runs,
+        "writer_reasoning_ab_efforts": variants,
         "out_dir": str(out_dir),
         "analysis_output_root": args.analysis_output_root,
+        "experiment_label": args.experiment_label,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     if args.dry_run:
         for row in planned:
-            print(json.dumps({"row_key": row_key(row), "command": command_for_row(args, row)}, ensure_ascii=False))
+            for writer_effort in variants:
+                if (row_key(row), writer_effort) in completed:
+                    continue
+                print(json.dumps({
+                    "row_key": row_key(row),
+                    "writer_reasoning_effort": writer_effort or None,
+                    "command": command_for_row(args, row, writer_effort=writer_effort),
+                }, ensure_ascii=False))
         summary_path.write_text(json.dumps({**manifest, "status": "planned"}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         return
 
@@ -192,27 +238,31 @@ def main() -> None:
     with results_path.open("a", encoding="utf-8") as results:
         for row in planned:
             key = row_key(row)
-            started = time.monotonic()
             pdf_path = resolve_pdf_path(row)
-            if not pdf_path.exists():
-                record = {"row_key": key, "status": "failed", "error": f"missing pdf: {pdf_path}", "row": row}
-            else:
-                cmd = command_for_row(args, row)
-                proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
-                status = "done" if proc.returncode == 0 else "failed"
-                record = {
-                    "row_key": key,
-                    "status": status,
-                    "returncode": proc.returncode,
-                    "duration_seconds": round(time.monotonic() - started, 3),
-                    "stdout_tail": proc.stdout[-4000:],
-                    "stderr_tail": proc.stderr[-4000:],
-                    "command": cmd,
-                    "row": row,
-                }
-            counts[record["status"]] = counts.get(record["status"], 0) + 1
-            results.write(json.dumps(record, ensure_ascii=False) + "\n")
-            results.flush()
+            for writer_effort in variants:
+                if (key, writer_effort) in completed:
+                    continue
+                started = time.monotonic()
+                if not pdf_path.exists():
+                    record = {"row_key": key, "status": "failed", "error": f"missing pdf: {pdf_path}", "row": row}
+                else:
+                    cmd = command_for_row(args, row, writer_effort=writer_effort)
+                    proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
+                    status = "done" if proc.returncode == 0 else "failed"
+                    record = {
+                        "row_key": key,
+                        "status": status,
+                        "returncode": proc.returncode,
+                        "duration_seconds": round(time.monotonic() - started, 3),
+                        "stdout_tail": proc.stdout[-4000:],
+                        "stderr_tail": proc.stderr[-4000:],
+                        "command": cmd,
+                        "row": row,
+                    }
+                record["writer_reasoning_effort"] = writer_effort or None
+                counts[record["status"]] = counts.get(record["status"], 0) + 1
+                results.write(json.dumps(record, ensure_ascii=False) + "\n")
+                results.flush()
 
     summary = {**manifest, **counts, "results_path": str(results_path), "finished_at": datetime.now(timezone.utc).isoformat()}
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
