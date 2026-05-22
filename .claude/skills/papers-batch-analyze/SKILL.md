@@ -77,9 +77,11 @@ The command prints the run directory and writes `manifest.json`.
     and, when known, `--mineru-batch-id` so the runner can locate the one
     normalized paper directory for that PDF. If no unique MinerU output is
     found and preprocessed MinerU is required, record the row as failed.
-   - Unless the user explicitly overrides it, use DeepSeek max reasoning for
-     both analysis and writing: `--reasoning-effort max` and
-     `--writer-reasoning-effort max`.
+   - Unless the user explicitly overrides it, use the runner's current formal
+     defaults: main reasoning enabled with `--reasoning-effort max`,
+     chunk/writer thinking disabled, and serialized section writers for
+     prompt-cache reuse. Do not raise `--section-workers` above `1` during
+     production batches unless the user asks for a latency/cost A/B test.
    - Use the current frontmatter schema: no `category`; `aliases` must be short
      English/model aliases; no `modalities`; no `frontier`.
   - For the formal local analysis runner, keep default token limits for normal
