@@ -99,7 +99,7 @@ def write_sample_note(root: Path, rel_path: str, title: str) -> None:
                 "| Field | Value |",
                 "|---|---|",
                 "| Method | SmokeMethod |",
-                "| Dataset | SmokeDataset |",
+                "| Dataset | SmokeDataset (seed=1, V=128), SmokeDataset (LDA α'=0.25), OtherDataset, OtherDataset，干预层级中等难度, SyntheticData:20个变量,n=2000 |",
                 "",
                 "[paper](https://example.com/paper)",
                 "",
@@ -156,8 +156,23 @@ def main() -> int:
         ]
         if len(rows) != 1 or rows[0]["title"] != "Sample Paper":
             raise AssertionError(f"expected exactly Sample Paper in index, got {rows!r}")
+        if rows[0].get("methods") != ["SmokeMethod"]:
+            raise AssertionError(f"expected exact method name to remain in index.jsonl, got {rows[0]!r}")
+        if rows[0].get("method_groups") != ["Other Method Family"]:
+            raise AssertionError(f"expected by_method to use method family labels, got {rows[0]!r}")
         if not (root / "obsidian-vault/index/_Index.md").exists():
             raise AssertionError("build should generate obsidian-vault/index/_Index.md")
+        if (root / "obsidian-vault/index/by_method/SmokeMethod.md").exists():
+            raise AssertionError("exact method names should not get standalone method navigation pages")
+        if rows[0].get("datasets") != ["SmokeDataset", "OtherDataset", "SyntheticData"]:
+            raise AssertionError(f"expected dataset details to be stripped, got {rows[0]!r}")
+        all_papers = (root / "obsidian-vault/index/_AllPapers.md").read_text(encoding="utf-8")
+        if " · " in all_papers:
+            raise AssertionError("paper index entries should use nested list lines, not middle-dot separators")
+        if "\n\t- [[obsidian-vault/paperPDFs/ICLR_2026/sample.pdf|PDF]]" not in all_papers:
+            raise AssertionError("paper index entries should render PDF links as nested list items")
+        if "\n\t- datasets: SmokeDataset, OtherDataset" not in all_papers:
+            raise AssertionError("paper index entries should render cleaned datasets as nested list items")
         if (root / "obsidian-vault/index/by_dataset/SmokeDataset.md").exists():
             raise AssertionError("single-paper dataset slices should not get standalone navigation pages")
         print("[OK] analysis build: 1 paper, test directory excluded")

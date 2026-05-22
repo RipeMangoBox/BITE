@@ -54,6 +54,15 @@ collect candidate papers / import local PDFs
   -> query / ideate / review / export
 ```
 
+### 正式分析链
+
+- MinerU 对每篇 PDF 解析一次；已有解析结果会优先复用。
+- 解析出的 Markdown 会被切分成 chunks，再做 chunk-level anchor extraction，
+  收集有出处的证据，而不是直接做整篇摘要。
+- 主分析阶段合并 anchors、紧凑论文上下文和图表信息，生成 verified JSON。
+- Section writers 基于 verified evidence 生成七个报告章节。
+- Vault 导出、图片放置、索引刷新和 audit 在适用时作为确定性的本地检查执行。
+
 你可以用四种常见模式使用它：
 
 | 模式     | 用途                                                    | 常用入口                                                                        |
