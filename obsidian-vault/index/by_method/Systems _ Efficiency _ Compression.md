@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-05-21T15:50
+generated: 2026-05-23T00:00
 ---
 
 # Method: Systems / Efficiency / Compression
@@ -14,4 +14,4 @@ generated: 2026-05-21T15:50
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: 3DGEER
-	- datasets: ScanNet++, Mip-NeRF360, ZipNeRF
+	- datasets: ScanNet++, MipNeRF360

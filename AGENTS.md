@@ -14,6 +14,16 @@ The active working layout is:
 - `obsidian-vault/index/` stores generated indexes and Obsidian navigation.
 - `obsidian-vault/ideas/` stores local idea, focus, and review notes.
 
+Worktree ownership:
+- `ResearchFlow_Process/obsidian-vault/` is the development vault.
+- `ResearchFlow_Main/obsidian-vault/` is kept in the main worktree to preserve
+  the open-source ResearchFlow repository structure.
+- `PaperBite` is a separate repository at the `On_Process/PaperBite` level.
+  Do not nest it inside either ResearchFlow worktree, and do not add a
+  `PaperBite/` directory under `ResearchFlow_Process/`.
+- PaperBite icons and project assets belong inside the PaperBite repository
+  (for example `assets/icon/`), not under ResearchFlow `_private/`.
+
 ## Local Pipeline
 
 ```text

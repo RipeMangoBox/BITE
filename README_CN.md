@@ -277,7 +277,7 @@ python3 scripts/run_paper_list_analysis.py \
 python3 .claude/skills/papers-build-index/scripts/build_paper_index.py
 ```
 
-生成的索引首页是 `obsidian-vault/index/_Index.md`。被 Git 跟踪的
+生成的索引首页是 `obsidian-vault/index/paper_index.md`。被 Git 跟踪的
 `obsidian-vault/index/README.md` 只作为公开占位说明，builder 不会覆盖它。
 
 如果想在不使用私人论文数据的情况下验证 index/workflow 链路：

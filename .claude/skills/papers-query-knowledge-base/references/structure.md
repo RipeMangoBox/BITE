@@ -15,17 +15,17 @@ Use the matching absolute repository path for your machine when invoking from an
 | Path | Description |
 | ------ | ------ |
 | `obsidian-vault/index/README.md` | Public placeholder explaining generated index files; tracked and not overwritten |
-| `obsidian-vault/index/_Index.md` | Generated home: links to _AllPapers, by_topic, by_method, by_dataset, by_venue, by_year |
+| `obsidian-vault/index/paper_index.md` | Generated home: links to _AllPapers, by_topic, by_method, by_dataset, by_venue, by_year |
 | `obsidian-vault/index/_AllPapers.md` | All papers grouped by topic, then venue/year |
-| `obsidian-vault/index/by_topic/_Index.md` | List of coarse top-level topics |
+| `obsidian-vault/index/by_topic/topic_index.md` | List of coarse top-level topics |
 | `obsidian-vault/index/by_topic/<topic>.md` | Papers for one coarse topic |
-| `obsidian-vault/index/by_method/_Index.md` | List of normalized method families |
+| `obsidian-vault/index/by_method/method_index.md` | List of normalized method families |
 | `obsidian-vault/index/by_method/<method>.md` | Papers mapped to this method family |
-| `obsidian-vault/index/by_dataset/_Index.md` | List of all datasets |
+| `obsidian-vault/index/by_dataset/dataset_index.md` | List of all datasets |
 | `obsidian-vault/index/by_dataset/<dataset>.md` | Papers that use or report this dataset |
-| `obsidian-vault/index/by_venue/_Index.md` | List of all venues |
+| `obsidian-vault/index/by_venue/venue_index.md` | List of all venues |
 | `obsidian-vault/index/by_venue/<venue>.md` | Papers for one venue, grouped by year |
-| `obsidian-vault/index/by_year/_Index.md` | List of all years |
+| `obsidian-vault/index/by_year/year_index.md` | List of all years |
 | `obsidian-vault/index/by_year/<year>.md` | Papers for one year |
 | `obsidian-vault/index/domain/T__<name>.md` | Generated task/domain graph pages |
 | `obsidian-vault/index/domain/_overview.md` | Generated domain/task/dataset overview |

@@ -327,7 +327,7 @@ Refresh the index manually when needed:
 python3 .claude/skills/papers-build-index/scripts/build_paper_index.py
 ```
 
-The generated home page is `obsidian-vault/index/_Index.md`. The tracked
+The generated home page is `obsidian-vault/index/paper_index.md`. The tracked
 `obsidian-vault/index/README.md` remains a public placeholder and is not
 overwritten by the builder.
 

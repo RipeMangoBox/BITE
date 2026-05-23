@@ -589,6 +589,9 @@ def derive_method_groups(paper: Paper) -> List[str]:
 
 def clean_generated_dirs() -> None:
     INDEX_DIR.mkdir(parents=True, exist_ok=True)
+    legacy_home = INDEX_DIR / ("_" + "Index.md")
+    if legacy_home.exists():
+        legacy_home.unlink()
     for dirname in ("by_dataset", "by_method", "by_topic", "by_venue", "by_year"):
         dir_path = INDEX_DIR / dirname
         dir_path.mkdir(parents=True, exist_ok=True)
@@ -941,7 +944,7 @@ def write_dimension(
     for key in keys:
         index_lines.append(f"- {note_link(f'obsidian-vault/index/{dirname}/{sanitize_filename(key)}.md', key)} ({len(grouped[key])})")
     index_lines.append("")
-    write_text(base / "_Index.md", "\n".join(index_lines))
+    write_text(base / f"{dimension}_index.md", "\n".join(index_lines))
 
     for key in keys:
         lines = frontmatter(f"{dimension.title()}: {key}", dimension, now)
@@ -963,11 +966,11 @@ def build_home_index(papers: List[Paper], now: str) -> str:
             "## Entry Points",
             "",
             f"- {note_link('obsidian-vault/index/_AllPapers.md', 'All papers')}",
-            f"- {note_link('obsidian-vault/index/by_topic/_Index.md', 'By topic')}",
-            f"- {note_link('obsidian-vault/index/by_method/_Index.md', 'By method')}",
-            f"- {note_link('obsidian-vault/index/by_dataset/_Index.md', 'By dataset')}",
-            f"- {note_link('obsidian-vault/index/by_venue/_Index.md', 'By venue')}",
-            f"- {note_link('obsidian-vault/index/by_year/_Index.md', 'By year')}",
+            f"- {note_link('obsidian-vault/index/by_topic/topic_index.md', 'By topic')}",
+            f"- {note_link('obsidian-vault/index/by_method/method_index.md', 'By method')}",
+            f"- {note_link('obsidian-vault/index/by_dataset/dataset_index.md', 'By dataset')}",
+            f"- {note_link('obsidian-vault/index/by_venue/venue_index.md', 'By venue')}",
+            f"- {note_link('obsidian-vault/index/by_year/year_index.md', 'By year')}",
             "",
             "## Counts",
             "",
@@ -990,7 +993,7 @@ def main() -> int:
         clean_generated_dirs()
         write_text(INDEX_DIR / "index.jsonl", build_jsonl(papers))
         write_text(INDEX_DIR / "_AllPapers.md", build_all_papers(papers, now))
-        write_text(INDEX_DIR / "_Index.md", build_home_index(papers, now))
+        write_text(INDEX_DIR / "paper_index.md", build_home_index(papers, now))
 
         write_dimension("by_dataset", "dataset", group_by_dimension(papers, "datasets"), now, min_count=2)
         write_dimension("by_method", "method", group_by_dimension(papers, "method_groups"), now)

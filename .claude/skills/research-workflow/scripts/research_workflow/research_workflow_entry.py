@@ -234,7 +234,7 @@ def stage_spec(stage: str, mode: str, log_hint: str) -> Dict[str, object]:
     if stage == "build":
         return {
             "inputs": "obsidian-vault/analysis already has structured markdown notes",
-            "outputs": "obsidian-vault/index/index.jsonl, _Index.md, _AllPapers.md, by_topic/, by_method/, by_dataset/, by_venue/, by_year/ (statistics/navigation pages)",
+            "outputs": "obsidian-vault/index/index.jsonl, paper_index.md, _AllPapers.md, by_topic/, by_method/, by_dataset/, by_venue/, by_year/ (statistics/navigation pages)",
             "commands": [
                 "Use /papers-build-index",
                 'Or run: python3 ".claude/skills/papers-build-index/scripts/build_paper_index.py"',

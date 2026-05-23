@@ -160,8 +160,8 @@ def main() -> int:
             raise AssertionError(f"expected exact method name to remain in index.jsonl, got {rows[0]!r}")
         if rows[0].get("method_groups") != ["Other Method Family"]:
             raise AssertionError(f"expected by_method to use method family labels, got {rows[0]!r}")
-        if not (root / "obsidian-vault/index/_Index.md").exists():
-            raise AssertionError("build should generate obsidian-vault/index/_Index.md")
+        if not (root / "obsidian-vault/index/paper_index.md").exists():
+            raise AssertionError("build should generate obsidian-vault/index/paper_index.md")
         if (root / "obsidian-vault/index/by_method/SmokeMethod.md").exists():
             raise AssertionError("exact method names should not get standalone method navigation pages")
         if rows[0].get("datasets") != ["SmokeDataset", "OtherDataset", "SyntheticData"]:

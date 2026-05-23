@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-05-21T15:50
+generated: 2026-05-23T00:00
 ---
 
 # Method: Optimization / Theory
@@ -13,5 +13,5 @@ generated: 2026-05-21T15:50
 	- [[obsidian-vault/paperPDFs/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning, Optimization / Theory
-	- methods: AGENTFLOW, Flow-GRPO
-	- datasets: Bamboogle, HotpotQA, Musique
+	- methods: AGENTFLOW
+	- datasets: Search-intensive avg., Agentic, Math Reasoning avg.

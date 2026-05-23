@@ -6,257 +6,307 @@ venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.pdf
 aliases:
+- AFG
 - FASOEPTU
 acceptance: accepted
 tags:
 - topic/reinforcement_learning_planning_agents
 - topic/reinforcement_learning_planning_agents/multi_agent
-core_operator: Flow-GRPO 将轨迹级最终奖励广播至每个推理步骤，把多轮强化学习转化为一系列可处理的单步更新，结合组归一化优势实现稳定的在线信用分配，从而在智能体流程中直接优化规划器。
-primary_logic: 通过将多轮交互分解为共享全局成功信号的独立单步优化，配合组归一化降低方差，使智能体系统能够在仅依靠稀疏最终奖励的情况下，高效学习长程规划与工具协调策略。
+openreview_forum_id: Mf5AleTUVK
+core_operator: 采用模块化智能体系统，并将 planner 模块置于系统循环中在线优化，通过将轨迹级稀疏奖励广播到每一轮，实现有效的多轮信用分配。
+primary_logic: 将多轮强化学习问题转化为一系列单轮策略更新：在每一轮，planner 基于完整的记忆上下文接收相同的全局成功信号，利用组标准化优势稳定训练，从而从稀疏反馈中学习有效的长程策略。
 claims:
-- Flow-GRPO 在6个基准上比冻结规划器平均提升17.2%，而离线SFT反而导致19.0%的下降，证明了在线流程内训练的必要性。
-- AGENTFLOW (w/ Flow-GRPO) 在搜索、智能体、数学和科学四类任务上分别超越最强专用基线 14.9%、14.0%、14.5% 和 4.1%，7B 模型甚至优于 GPT-4o。
-- 将最终奖励广播到每个动作，形式上把全局多轮目标等价于期望单步局部目标的优化，并在附录 B 中提供了严格证明。
-- 案例研究表明 Flow-GRPO 赋予规划器自适应规划与自修复能力：经过训练的智能体能够在失败后主动切换到新解决路径，而未训练的智能体则陷入重复错误。
-paradigm: 通过将多轮交互分解为共享全局成功信号的独立单步优化，配合组归一化降低方差，使智能体系统能够在仅依靠稀疏最终奖励的情况下，高效学习长程规划与工具协调策略。
+- Flow-GRPO 通过广播单一可验证的轨迹级奖励到每一轮，将多轮 RL 转化为单轮更新。
+- 组标准化优势减少方差，增强信用分配。
+- 单轮更新的等价性及单调改进保证。
+- 在线 Flow-GRPO 大幅超越离线 SFT 和冻结 planner。
+paradigm: 将多轮强化学习问题转化为一系列单轮策略更新：在每一轮，planner 基于完整的记忆上下文接收相同的全局成功信号，利用组标准化优势稳定训练，从而从稀疏反馈中学习有效的长程策略。
 ---
 
 # In-the-Flow Agentic System Optimization for Effective Planning and Tool Use
 
 > [!tip] 核心洞察
-> 通过将多轮交互分解为共享全局成功信号的独立单步优化，配合组归一化降低方差，使智能体系统能够在仅依靠稀疏最终奖励的情况下，高效学习长程规划与工具协调策略。
+> 将多轮强化学习问题转化为一系列单轮策略更新：在每一轮，planner 基于完整的记忆上下文接收相同的全局成功信号，利用组标准化优势稳定训练，从而从稀疏反馈中学习有效的长程策略。
 
 | 字段 | 内容 |
 |------|------|
-| 中文题名 | 流程内智能体系统优化以实现有效规划与工具使用 |
+| 中文题名 | 在线智能体系统优化以实现有效的规划与工具使用 |
 | 英文题名 | In-the-Flow Agentic System Optimization for Effective Planning and Tool Use |
 | 会议/期刊 | ICLR 2026 (accepted) |
 | Links | [paper](https://openreview.net/forum?id=Mf5AleTUVK) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/multi_agent |
-| Method | AGENTFLOW |
-| Dataset | Search-intensive avg. (Bamboogle, 2Wiki, HotpotQA, Musique), Agentic (GAIA), Math Reasoning avg. (AIME24, AMC23, GameOf24), Scientific Reasoning avg. (GPQA, MedQA) |
+| Method | AGENTFLOW (with Flow-GRPO) |
+| Dataset | Bamboogle (Search Intensive), 2Wiki (Search Intensive), HotpotQA (Search Intensive), Musique (Search Intensive) |
 
 > [!tip] 效果简介
-> - Search-intensive avg. (Bamboogle, 2Wiki, HotpotQA, Musique) 上，Accuracy 为 57.3%，对比 42.4% (AutoGen)，变化 +14.9%。
-> - Agentic (GAIA) 上，Accuracy 为 33.1%，对比 19.1% (Search-R1)，变化 +14.0%。
-> - Math Reasoning avg. (AIME24, AMC23, GameOf24) 上，Accuracy 为 51.5%，对比 37.0% (ToRL)，变化 +14.5%。
+> - Bamboogle (Search Intensive) 上，Accuracy (%) 为 69.6，对比 59.6 (AutoGen)，变化 +10.0。
+> - 2Wiki (Search Intensive) 上，Accuracy (%) 为 77.2，对比 44.0 (AutoGen)，变化 +33.2。
+> - HotpotQA (Search Intensive) 上，Accuracy (%) 为 57.0，对比 54.0 (GPT-4o)，变化 +3.0。
 
 ## 概述
 
-现有大型语言模型在工具增强推理中存在两大范式瓶颈：整体式工具集成强化学习（如 Search-R1、TIR）在长序列多步交互下因稀疏奖励和信用分配困难导致训练不稳定；而训练自由的多智能体系统（如 AutoGen）依赖静态提示，无法在动态执行回路中自适应优化规划策略。如何在多轮工具调用中实现高效的在线信用分配与稳定策略更新，是提升智能体长程规划与工具协调能力的关键挑战。
+现有工具增强的大语言模型推理方法通常采用一体化策略：在完整的上下文轨迹中交替进行“思考”与工具调用。这种范式在长程规划、多样化工具组合和动态工具反馈面前难以稳定扩展，且推理时对未见任务和工具的泛化能力有限。与此同时，多模块智能体系统虽然结构上更灵活，却普遍缺乏在线训练机制，无法从实时交互中学习，导致在仅有最终成功信号的稀疏奖励场景下，信用分配极为困难。
 
-本文提出 **AGENTFLOW**，一种可训练的流程内智能体系统。系统由四个模块——**Action Planner**、**Tool Executor**、**Execution Verifier** 和 **Solution Generator**——通过可演化的共享记忆协调，仅规划器参与训练。核心优化算法 **Flow-GRPO** 将单一轨迹的最终验证奖励广播至每一个动作步，并借助同组轨迹归一化优势显著降低方差，从而将多轮信用分配转化为一系列可处理的单步策略更新。该机制在仅依赖稀疏最终奖励的条件下，使规划器能够高效学习长距离规划与自适应工具选择。
+针对上述瓶颈，本文提出 **AGENTFLOW**——一种可训练的“在环”智能体系统，并配套设计了 **Flow-GRPO** 在线优化算法。其核心思路是：将多轮强化学习问题转化为一系列可处理的单轮策略更新。具体而言，Flow-GRPO 将轨迹级别的单一可验证奖励广播至每一轮交互，使规划器在每一轮都能接收到相同的全局成功信号；同时引入组标准化优势来降低方差、增强信用分配，从而在稀疏反馈下稳定地学习长程策略。
 
-主要结果：
-- **在线训练的必要性**：Flow-GRPO 在 6 个基准上使冻结规划器准确率平均提升 **17.2 个百分点**，而离线 SFT 反而造成 19.0 个百分点的下降（Table 3）。
-- **多任务全面领先**：以 7B 骨干的 AGENTFLOW 在搜索、智能体、数学和科学推理四类任务上分别超越最强专用基线 **+14.9%、+14.0%、+14.5% 和 +4.1%**，且整体性能优于 GPT-4o（Table 1、Table 2）。
-- **质性能力涌现**：经过 Flow-GRPO 训练的规划器展现出自适应工具偏好切换与自修复能力，能够在失败后主动探索新的解题路径（Figure 5、Figure 8）。
+在系统架构上，AGENTFLOW 由四个专门模块协作构成：**Action Planner**（可训练的策略核心，负责制定子目标并选择工具）、**Tool Executor**（执行选定工具并返回观察）、**Execution Verifier**（评估执行有效性并决定继续或终止）以及 **Solution Generator**（在循环终止时生成最终答案）。四个模块通过共享的演化记忆在多轮交互中迭代配合，仅有 Planner 模块通过 Flow-GRPO 在线优化，其余模块保持冻结。
+
+实验覆盖搜索密集型、智能体、数学推理和科学推理四类共十个基准。以 7B 规模的 Qwen2.5-7B-Instruct 为基座，AGENTFLOW 在搜索任务上平均超越最强基线 14.9%，在智能体任务上平均超越 14.0%，在数学推理任务上平均超越 14.5%。消融实验进一步表明：Flow-GRPO 在线训练相比冻结 Planner 带来平均 17.2% 的绝对提升，而离线监督微调（SFT）则导致性能崩溃；即使将冻结 Planner 替换为更强的 GPT-4o，其增益也远不及 Flow-GRPO 训练的 7B Planner。
+
+> **注意**：以下各节将依次展开问题背景、方法设计、实验分析及局限性讨论。本节仅做全局概览，具体细节请参见对应章节。
 
 ## 背景与动机
 
-大型语言模型（LLM）在复杂推理任务中的成功，越来越多地依赖于外部工具的辅助。然而，当前将 LLM 与工具结合的两类主流范式均面临显著瓶颈。
+### 大语言模型推理的瓶颈：从单一策略到工具增强
 
-- **单体工具集成推理模型**（如 Search-R1、ReSearch、TIR、ToRL 等）将推理链与工具调用交替编织在单一自回归策略中，通过强化学习（RL）直接优化。这种设计将长序列下的多步推理、工具调用和终止信号压缩到一个策略内，导致**训练极不稳定**：轨迹长度随工具调用次数线性增长，而仅最终答案正确性提供的稀疏奖励使得信用分配（credit assignment）高度困难，模型往往难以分辨哪些步骤或工具选择对成功真正关键。
-- **免训练多智能体系统**（如 AutoGen）虽然通过解耦的模块（规划器、执行器等）提供结构化协作，但各模块通常由冻结的 LLM 和提示工程驱动，**完全缺乏在线训练能力**。它们无法在与环境交互的实时反馈中调整自身的规划或工具选择策略，因此在动态、需要自适应长程协作的场景下表现受限。
+大语言模型（LLM）在推理任务上取得了显著进展，但面对需要长程规划、多步搜索和复杂工具调用的任务时，其能力仍受限于模型内部知识的边界。工具增强推理（Tool-Integrated Reasoning, TIR）被广泛视为突破这一瓶颈的关键路径——通过让模型在推理过程中调用外部工具（如搜索引擎、代码解释器），可以动态获取新信息并验证中间结果。
 
-上述两类方法的根本瓶颈可以归结为：**现有方案要么面临长程稀疏奖励下的不稳定单策略优化，要么完全放弃训练机会，无法在流程中自适应学习**。这意味着，即便智能体系统具备正确的模块划分，若不能在其真实运行回路中根据最终结果持续优化关键模块（尤其是规划器），系统的整体能力将停留在预训练或提示设计的上限。
+然而，当前主流的 TIR 实践存在一个深层结构性缺陷：**单一策略的全上下文交错范式**。如图 3 所示，现有方法通常训练一个一体化（monolithic）策略模型，将推理步骤（如 `<think>` 块）与工具调用（如 `<tool_call>`）在单一轨迹中交错生成。这种范式面临三个根本性挑战：
 
-本文的核心动机正是弥合这一鸿沟：**我们探索在智能体系统内部的实际多轮交互流程中，直接对规划策略进行在线强化学习**。直观上，智能体系统每轮的动作（子目标、工具选择）均服务于同一最终目标的求解；因此，将最终的轨迹级奖励广播到每一个动作，在形式上可将原本难以优化的全局多轮目标等价转化为一系列可处理的单步局部更新。结合组归一化优势以降低方差，就能使规划器在仅有稀疏最终奖励的条件下，稳定地学会长程规划与工具协调策略。
+1. **长程规划的稳定性问题**：随着规划步数增加，单一策略需要同时维护推理链、工具调用序列和反馈整合，上下文窗口迅速膨胀，导致策略在长程任务上容易发散。
+2. **多工具协调的复杂性**：不同工具具有不同的调用接口、返回格式和可靠性特征，一体化策略难以对多样化工具进行有效编排。
+3. **动态反馈的泛化困难**：工具返回的实际内容往往与训练分布存在偏差，冻结策略在推理时难以自适应调整，导致对未见任务和工具的泛化性较差。
 
-这一思路不仅解决了单体 RL 中的训练困难，也克服了传统智能体系统无法从经验中进化的缺陷。如 **Figure 3** 所示，现有两大范式各有优势与局限，而本文提出的 AGENTFLOW 框架借助 Flow-GRPO 算法首次将流程内训练引入模块化智能体系统，通过只训练规划器并利用确定性模块（执行器、验证器、生成器）的协作，在保持系统稳定性的同时赋予其自适应优化的能力。后续实验（**Table 3**）将验证：在线流程内训练带来的规划能力提升显著超越离线 SFT（甚至 SFT 会导致性能倒退），而案例研究（**Figure 5**）则进一步揭示训练后的规划器能够从失败中自修复，主动切换解决路径——这正是传统提示工程所无法实现的。
+### 模块化智能体系统的困境：在线训练的缺失
+
+为缓解一体化范式的压力，研究者提出了模块化智能体系统（如 AutoGen），将任务分解为多个专门模块（规划器、执行器、验证器等）协同工作。这种架构天然适合处理多工具、多轮交互的场景，但现有系统普遍存在一个关键瓶颈：**缺乏在线训练能力**。
+
+具体而言，现有智能体系统的各个模块通常以冻结的指令微调模型部署，无法从实时交互中学习和改进。这导致两个严重后果：
+
+- **信用分配（Credit Assignment）困难**：在多轮交互中，最终成功或失败的信号需要回溯到每一轮的具体决策。长程稀疏奖励下，缺乏有效机制将全局信号合理分配到各个中间步骤。
+- **策略固化与次优行为**：冻结的规划器无法根据执行反馈调整策略偏好，容易陷入重复性错误或低效的工具使用模式。例如，在搜索任务中，规划器可能反复调用相同的搜索词，即使前几次返回的信息已经充分。
+
+### 核心动机：在系统执行流中优化规划器
+
+本文的核心动机源于一个关键洞察：**将多轮强化学习问题转化为一系列单轮策略更新**。如果能在每一轮向规划器广播相同的全局成功信号，并利用组标准化优势稳定训练，就可以从稀疏的最终奖励中学习有效的长程策略。
+
+基于这一动机，本文提出 AGENTFLOW——一个可训练的在线智能体系统，以及配套的 Flow-GRPO 算法。该框架直接在系统执行循环内优化规划器模块，使智能体能够从实际交互的成败中持续改进其规划和工具使用策略，从而突破冻结系统的性能天花板。
 
 ## 核心创新
 
-现有的工具增强推理方法面临两个主要瓶颈：单策略交织思考与工具调用的范式在长序列和多工具环境下训练不稳定，难以处理稀疏奖励和信用分配；而基于提示工程的智能体系统无法在线适应动态交互，缺乏自优化能力。AGENTFLOW 围绕三个关键维度进行了根本性变革，通过 **流程内在线训练（Flow-GRPO）**、**广播式信用分配**与**解耦模块化架构**，实现了显著提升。
+AGENTFLOW 的核心创新在于将多模块智能体系统与在线强化学习深度融合，从根本上改变了工具增强推理的训练范式。其关键突破体现在三个维度。
 
-**训练范式的转变：从离线模仿到在线流程优化。**
-传统方法依赖离线监督微调（SFT）或冻结的提示模板，而 AGENTFLOW 将规划器的优化直接嵌入多轮交互回路，根据真实的执行结果在线更新。这一改变将训练与推理环境对齐，避免了离线 SFT 带来的性能退化。实验表明，Flow-GRPO 在线训练使规划器准确率平均提高 17.2 个百分点，而相同的离线 SFT 反而导致 19.0 个百分点的下降（Table 3），验证了流内训练的必要性。
+**从一体式策略到模块化智能体系统。** 现有工具增强推理方法（如 TIR、Search-R1）通常训练单一、一体化的策略模型，在全上下文下交错进行思考与工具调用（Figure 3a）。这种范式在长规划、多样工具和动态反馈下难以稳定扩展，且推理时对未见任务的泛化性较差。AGENTFLOW 将系统分解为四个专门模块——Action Planner、Tool Executor、Execution Verifier 和 Solution Generator——通过共享的演化记忆协同工作（Figure 2）。这一模块化设计使每个组件专注于特定功能，planner 负责子目标规划与工具选择，executor 执行工具调用，verifier 评估执行有效性并输出终止信号，generator 在循环终止时基于完整记忆生成最终答案。系统的联合生成过程为：
 
-**信用分配的革新：全局奖励广播与组归一化。**
-多轮强化学习固有的信用分配难题被转化为一系列可处理的单步更新。Flow-GRPO 将轨迹级最终验证奖励广播至每一个动作，使得所有步骤共享同一成功信号，并借助组归一化优势函数降低方差（Eq. 4, Eq. 7）。理论证明该广播等价于最大化期望单步局部目标（§B.2），从而在仅依赖稀疏最终奖励的情况下实现稳定优化。
+$$p_{\theta}\Big(\{a^t, e^t, v^t\}_{t=1}^T, o \mid q, K\Big) = \left[\prod_{t=1}^T \pi_{\theta}\big(a^t \mid q, K, M^t\big) \mathcal{E}(e^t \mid a^t, K) \mathcal{V}(v^t \mid q, e^t, M^t)\right] \mathcal{G}(o \mid q, M^T)$$
 
-**系统架构的解耦：四模块协同与可训练规划器。**
-不同于单策略模型将推理与工具调用交叉生成，AGENTFLOW 将系统拆分为四个专业化模块：规划器、执行器、验证器和生成器，通过确定性演化记忆协调（Figure 2, §3.1）。其中只有规划器经过 Flow-GRPO 训练，其余模块保持冻结，这既降低了训练复杂度，又保留了各模块的独立能力。这种解耦设计使规划器能够专注于子目标生成与工具选择，从而在搜索、智能体、数学和科学四类任务上相较于最强专用基线分别取得 14.9%、14.0%、14.5% 和 4.1% 的绝对优势（Table 1, Table 2），并且 7B 模型在多个任务上超过 GPT-4o。
+**从离线训练到在线 in-the-flow 优化。** 多模块智能体系统（如 AutoGen）通常缺乏在线训练能力，各模块保持冻结，无法适应实时交互动态。AGENTFLOW 首次将 planner 模块置于系统执行循环中直接优化：在每一轮，系统使用当前策略 rollout 完整的 AGENTFLOW 流程，收集实际轨迹，并利用可验证的最终结果信号更新策略。这一"in-the-flow"训练范式使 planner 能够从真实的多轮交互反馈中学习，而非依赖静态的离线数据。
 
-**自适应能力的涌现。**
-Flow-GRPO 训练后，规划器展现出强自适应行为：案例研究表明，经过训练的智能体能够在失败后主动切换至全新解决路径，而未训练版本则陷入重复错误（Figure 5）。此外，工具使用分布发生显著改变，例如在 MedQA 上 Wikipedia Search 调用比例从 0% 升至 59.8%，而 Google Search 则从 66.2% 降至 10.9%，体现出模型根据任务需求动态选择最优工具的能力（Figure 8）。这些结果表明，所提创新不仅提升了基准分数，更赋予了系统在开放环境下的自修复与自适应策略。
+**从稀疏奖励困境到单轮信用分配。** 多轮交互中，最终奖励信号稀疏且难以分配到每一轮的具体动作，这是长程智能体优化的核心瓶颈。Flow-GRPO 算法通过两个关键机制解决此问题：首先，将单一可验证的轨迹级奖励广播到每一轮的所有动作，即 $r = R(a^t) = \bar{R}(o, q, y^*), \forall t = 1, \ldots, T$，从而将多轮 RL 问题转化为一系列可处理的单轮策略更新；其次，引入组标准化优势来减少方差并增强信用分配：
+
+$$A_i^t = \frac{\bar{R}(o_i, q, y^*) - \mathrm{mean}\left(\{\bar{R}(o_k, q, y^*)\}_{k=1}^G\right)}{\mathrm{std}\left(\{\bar{R}(o_k, q, y^*)\}_{k=1}^G\right)}$$
+
+这一设计使得即使在长程稀疏奖励下，planner 也能有效学习。理论分析进一步证明了单轮更新的等价性（Theorem B.1）和单调改进保证（Theorem B.3），为方法的有效性提供了形式化支撑。
+
+消融实验（Table 3）直接验证了上述创新的关键作用：Flow-GRPO 在线训练相比冻结 planner 平均提升 17.2%，而离线 SFT 因 token 级模仿目标与轨迹级任务成功之间的错位导致性能崩溃（平均仅 19.5%）。即使使用更强的 GPT-4o 作为冻结 planner，也仅带来 5.8% 的平均增益，远低于 Flow-GRPO 训练的 7B planner（55.7% vs 44.3%），表明系统循环内的在线优化本身比模型规模更为关键。
 
 ## 整体框架
 
-![Figure 2](../../assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/002_Figure_2.jpg)
+![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/002_Figure_2.jpg]]
 
-AGENTFLOW 是一个可训练的在流程内（in-the-flow）智能体系统，通过四个专用模块的协同与共享演化记忆（evolving memory）来解决需要长程规划与多工具推理的任务。系统接收一个查询 $q$，在一个固定的工具集 $K$ 的支撑下进行多轮交互，最终输出答案 $o$。其核心思路是将智能体的规划器直接嵌入多轮执行回路中进行在线策略优化，从而在真实交互轨迹上学习自适应规划与工具协调能力。
+![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/005_Figure_3.jpg]]
+*Figure 3: Comparison of two paradigms of LLMs with tool use. (a) Monolithic tool-integrated reasoning models train a single policy to interleave reasoning (e.g., <think>) and tool calls (e.g., < \mathrm { t o o l . c a l 1 > } ) within a single, full-context trajectory. (b) Agentic systems decompose tasks across multiple specialized modules (e.g., planner, coder) that collaborate. These systems are typically training-free, orchestrated by handcrafted logic or prompting*
 
-系统由四个模块构成：
+![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/006_Figure_4.jpg]]
+*Figure 4: Optimization for our proposed agentic system AGENTFLOW. Given a query q, an evolving memory M, and a toolset K, the policy model generates actions that target sub-goals and select tools. It is trained via Flow-based Group Refined Policy Optimization (Flow-GRPO), which enables multi-turn reinforcement learning and stable optimization under collaborative dynamics*
 
-- **动作规划器（Action Planner）**：可训练的策略模型 $\pi_\theta$。根据查询 $q$、工具集 $K$ 以及当前记忆 $M^t$，决定下一步的子目标并选择要调用的工具，产生动作 $a^t$。该模块是整个系统中唯一可训练的部分，是优化的核心。
-- **工具执行器（Tool Executor）**：确定性模块 $\mathcal{E}$，根据规划器的动作 $a^t$ 调用对应工具，并返回执行结果 $e^t$。
-- **执行验证器（Execution Verifier）**：确定性模块 $\mathcal{V}$，评估当前的记忆和查询是否已经足够解决问题，输出一个信号 $v^t$ 指示"终止"（STOP）或"继续"（CONTINUE）。
-- **答案生成器（Solution Generator）**：确定性模块 $\mathcal{G}$，当验证器发出终止信号时，它根据最终的累积记忆 $M^T$ 生成最终答案 $o$。
+AGENTFLOW 是一个可训练的在线智能体系统，由四个专门模块通过共享的演化记忆协同工作：**Action Planner**（可训练的策略 $\pi_\theta$）、**Tool Executor**、**Execution Verifier** 和 **Solution Generator**。系统在多轮交互中迭代运行，每轮的状态转移遵循统一的范式：Planner 基于当前记忆 $M^t$ 和工具集 $K$ 规划子目标并选择工具，Executor 执行工具返回观察 $e^t$，Verifier 评估执行结果并输出终止/继续信号 $v^t$，循环终止后 Generator 基于完整记忆生成最终答案 $o$。
 
-整个多轮过程可以被形式化为一个概率生成过程（式 (2)）：每一步的动作、执行结果和验证信号以条件概率依次生成，规划器策略 $\pi_\theta$ 在每个时间步根据记忆和工具集进行响应。这四个模块通过共享的演化记忆 $M^t$ 和固定工具集 $K$ 紧密耦合，形成一个闭环的"规划—执行—验证—累积"流（参见 Figure 2 的状态转换示意）。
+核心设计在于将多轮工具增强推理分解为显式的模块化联合生成过程：
 
-在线训练采用 Flow-GRPO（Flow-based Group Refined Policy Optimization）。关键设计是将多轮强化学习转化为一系列可处理的单步策略更新：同一轨迹中所有动作均共享基于最终答案正确性的全局奖励（式 (4)），从而将稀疏的轨迹级奖励广播至每一个推理步骤；同时，通过组归一化优势（group-normalized advantage）降低方差，实现稳定的信用分配。Flow-GRPO 直接在系统运行回路中对规划器进行在线优化，其他模块（执行器、验证器、生成器）保持冻结。这种在流程内训练的方式使得规划器能够根据工具调用、验证信号和记忆更新的实际动态自主调整行为，避免了离线监督微调与执行环境脱节带来的严重性能退化（例如离线 SFT 使平均准确率下降 19.0 个百分点，而在线 Flow-GRPO 提升 17.2 个百分点，见 Table 3）。
+$$p_{\theta}\Big(\{a^t, e^t, v^t\}_{t=1}^T, o \mid q, K\Big) = \left[\prod_{t=1}^T \pi_{\theta}\big(a^t \mid q, K, M^t\big) \mathcal{E}(e^t \mid a^t, K) \mathcal{V}(v^t \mid q, e^t, M^t)\right] \mathcal{G}(o \mid q, M^T)$$
+
+与一体式工具集成推理模型（Monolithic TIR）在全上下文下交错思考与工具调用的范式不同，AGENTFLOW 将推理链显式记录为可审计的记忆 $M$，使规划、执行和验证各阶段解耦。Planner 的指令模板（Table 5）引导其从工具集（Base Generator、Python Coder、Google Search、Wikipedia Search、Web Search）中选择最优工具；Verifier 的指令模板（Table 6）则评估累积记忆是否足以回答问题或需要继续调用工具。
+
+训练时，仅优化 Planner 模块——系统完整 rollout 生成轨迹 $\tau = \{a^t, e^t, v^t\}_{t=1}^T$，基于最终答案正确性计算全局奖励 $r = \bar{R}(o, q, y^*)$，并将同一奖励广播到轨迹内所有轮次，通过 Flow-GRPO 算法将多轮 RL 转化为一系列单轮策略更新。Executor、Verifier 和 Generator 保持冻结，这种非对称优化设计在保证系统稳定性的同时，使 Planner 从稀疏的轨迹级反馈中学习有效的长程规划策略。
 
 ## 核心模块与公式推导
 
-AGENTFLOW 将智能体系统形式化为一个由四个专用模块构成、通过共享演化记忆 $M$ 和工具集 $K$ 协同工作的可训练框架：
-- **Action Planner（动作规划器）**：根据查询 $q$、当前记忆 $M^t$ 和工具信息，输出子目标与工具选择动作 $a^t$。该策略 $\pi_\theta$ 是唯一可训练模块。
-- **Tool Executor（工具执行器）**：接收 $a^t$，调用指定工具并返回执行结果 $e^t$。
-- **Execution Verifier（执行验证器）**：判断当前记忆是否足以求解，输出终止/继续信号 $v^t$。
-- **Solution Generator（答案生成器）**：当验证器发出终止信号后，基于累积记忆 $M^T$ 生成最终答案 $o$。
+### 系统模块架构
 
-整个多轮交互的联合生成过程由 Eq. (2) 刻画：
+AGENTFLOW 由四个专门模块组成，通过共享的演化记忆 $M$ 在多轮交互中协同工作：
 
-$$
-p_{\theta}\Big(\{a^t, e^t, v^t\}_{t=1}^{T}, o \mid q, K\Big) = \left[\prod_{t=1}^{T} \pi_{\theta}\big(a^t \mid q, K, M^t\big)\, \mathcal{E}(e^t \mid a^t, K)\, \mathcal{V}(v^t \mid q, e^t, M^t)\right] \mathcal{G}(o \mid q, M^{T}),
-$$
+- **Action Planner ($P$)**：可训练的策略模块 $\pi_\theta$，基于当前记忆 $M^t$ 和工具集 $K$ 制定子目标、选择工具 $k \in K$ 并提取相关上下文，输出动作 $a^t$。
+- **Tool Executor ($E$)**：调用选定工具并返回执行观察 $e^t$。
+- **Execution Verifier ($V$)**：评估 $e^t$ 的有效性和记忆充分性，输出二值验证信号 $v^t$，决定继续或终止循环。
+- **Solution Generator ($G$)**：循环终止时基于完整记忆 $M^T$ 生成最终答案 $o$。
 
-其中 $M^{t+1}$ 由上一轮记忆、动作、执行结果和验证信号确定性更新得到。该分解将复杂的多工具长程推理显式建模为规划器决策序列，为后续在线策略优化提供了必要的概率结构。
-
-若直接最大化轨迹级期望回报 $\mathcal{I}(\theta)=\mathbb{E}_{\tau\sim\pi_\theta}[R(\tau)]$，会面临稀疏奖励与信用分配的严峻挑战：单条轨迹仅获得一个基于最终答案正确性的验证信号 $\bar{R}(o,q,y^*)$，而规划器的每一轮动作贡献难以区分，导致训练不稳定。Flow-GRPO 的核心思路是将这一全局多轮优化问题转化为一连串可处理的单步更新。它首先通过 **奖励广播（reward broadcast）** 将轨迹级奖励直接赋予每一轮动作：
+整个系统的联合生成过程为：
 
 $$
-r = R(a^t) = \bar{R}(o, q, y^*), \quad \forall t = 1,\dots,T.
+p_{\theta}\Big(\{a^t, e^t, v^t\}_{t=1}^T, o \mid q, K\Big) = \left[\prod_{t=1}^T \pi_{\theta}(a^t \mid q, K, M^t) \, \mathcal{E}(e^t \mid a^t, K) \, \mathcal{V}(v^t \mid q, e^t, M^t)\right] \mathcal{G}(o \mid q, M^T)
 $$
 
-随后，在采样一组 $G$ 条轨迹后，Flow-GRPO 在 token 级别最小化以下裁剪目标（Eq. 5）：
+其中 $q$ 为查询，$K$ 为工具集，$T$ 为总交互轮数。记忆 $M^t$ 显式记录了规划、执行和验证的完整历史，这与一体式模型中隐式推理链形成本质区别。
+
+### Flow-GRPO 核心公式
+
+#### 信用分配机制
+
+Flow-GRPO 的核心创新是将多轮强化学习转化为一系列单轮策略更新。其关键操作是将轨迹级稀疏奖励广播到每一轮：
 
 $$
-\begin{aligned}
-\mathcal{T}_{\mathrm{flow-GRPO}}(\theta) = \mathbb{E}_{(q,y^*)\sim\mathcal{D},\{\tau_i\}_{i=1}^{G}\sim\pi_{\theta_{\mathrm{old}}}}\Bigg[ \frac{1}{G}\sum_{i=1}^{G}\frac{1}{T_i}\sum_{t=1}^{T_i}\frac{1}{|a_i^t|}\sum_{j=1}^{|a_i^t|} \min\Big\{&\rho_{i,j}^t A_i^t,\; \mathrm{clip}(\rho_{i,j}^t, 1-\epsilon, 1+\epsilon)A_i^t\Big\} \\
- &\quad -\beta\,\mathbb{D}_{\mathrm{KL}}(\pi_{\theta} \parallel \pi_{\mathrm{ref}})\Bigg],
-\end{aligned}
+r = R(a^t) = \bar{R}(o, q, y^*), \quad \forall t = 1, \ldots, T
 $$
 
-其中 $\rho_{i,j}^t = \pi_{\theta}(a_{i,j}^t\mid s_i^t,\dots)/\pi_{\theta_{\mathrm{old}}}(a_{i,j}^t\mid s_i^t,\dots)$ 为 token 级新旧策略概率比，$\epsilon$ 为 PPO 裁剪系数，$\beta$ 控制对固定参考策略 $\pi_{\mathrm{ref}}$ 的 KL 散度惩罚。该目标在保留 PPO 稳定性的同时，将信用分配的核心依赖浓缩在优势函数 $A_i^t$ 上。
+即轨迹内所有动作获得相同的全局奖励，该奖励仅取决于最终答案 $o$ 与标准答案 $y^*$ 的可验证正确性。这解决了长程交互中信用分配的难题。
 
-Flow-GRPO 使用 **组归一化优势（group-normalized advantage）** 进一步降低方差并强化跨轨迹的信用比较（Eq. 7）：
+#### 组标准化优势
+
+为减少方差并增强信用分配，Flow-GRPO 对组内轨迹奖励进行标准化：
 
 $$
-A_i^t = \frac{\bar{R}(o_i, q, y^*) - \mathrm{mean}\left(\{\bar{R}(o_k, q, y^*)\}_{k=1}^{G}\right)}{\mathrm{std}\left(\{\bar{R}(o_k, q, y^*)\}_{k=1}^{G}\right)}.
+A_i^t = \frac{\bar{R}(o_i, q, y^*) - \text{mean}\big(\{\bar{R}(o_k, q, y^*)\}_{k=1}^G\big)}{\text{std}\big(\{\bar{R}(o_k, q, y^*)\}_{k=1}^G\big)}
 $$
 
-对同一查询采样的 $G$ 条轨迹，所有轮次内的全部 token 共享同一个基于最终答案奖励经组级标准化得到的优势值。这意味着：一条高质量轨迹中的每一个动作都会被整体正向强化，而低质量轨迹中的动作则被整体抑制，从而在不引入逐步奖励工程的前提下，实现了对长程决策的有效信用分配。
+其中 $G$ 为每组采样的轨迹数。该优势值在轨迹内所有时间步保持恒定（$A_i^t \equiv A_i$），这是 Flow-GRPO 将多轮问题分解为单轮更新的理论基础。
 
-上述设计保证了 Flow-GRPO 的优化过程具有严格的单调改进性质（Theorem B.3），并成功将多轮智能体系统的在线训练稳定在单一规划器的 token 级更新上。消融实验（Table 3）直接验证了这种"流程内训练"的必要性：Flow-GRPO 使规划器平均准确率提升 17.2 个百分点，而离线 SFT 反而导致 19.0% 的下降，说明信用分配与在线交互环境紧密耦合，必须在真实执行回路中同时进行探索和策略更新。
+#### 完整优化目标
+
+Flow-GRPO 的完整目标函数为：
+
+$$
+\mathcal{T}_{\text{Flow-GRPO}}(\theta) = \mathbb{E}_{(q, y^*) \sim \mathcal{D},\, \{\tau_i\}_{i=1}^G \sim \pi_{\theta_{\text{old}}}} \left[ \frac{1}{G} \sum_{i=1}^G \frac{1}{T_i} \sum_{t=1}^{T_i} \frac{1}{|a_i^t|} \sum_{j=1}^{|a_i^t|} \min\Big\{\rho_{i,j}^t A_i^t,\; \text{clip}(\rho_{i,j}^t, 1-\epsilon, 1+\epsilon) A_i^t\Big\} - \beta \, \mathbb{D}_{\text{KL}}(\pi_\theta \parallel \pi_{\text{ref}}) \right]
+$$
+
+其中 token 级重要性比率定义为：
+
+$$
+\rho_{i,j}^t = \frac{\pi_\theta(a_{i,j}^t \mid s_i^t, a_{i,1:j-1}^t)}{\pi_{\theta_{\text{old}}}(a_{i,j}^t \mid s_i^t, a_{i,1:j-1}^t)}
+$$
+
+该目标在 token 级别进行 PPO 风格的裁剪更新，并通过 KL 散度惩罚项 $\beta \, \mathbb{D}_{\text{KL}}(\pi_\theta \parallel \pi_{\text{ref}})$ 约束策略不偏离参考策略过远。
+
+#### 理论保证
+
+附录 B 提供了两个关键理论结果（Theorem B.1 和 Theorem B.3）：全局多轮优化目标等价于期望 token 级局部目标，且 Flow-GRPO 满足策略单调改进保证。这些结果为广播奖励到每轮并采用组标准化优势的做法提供了形式化支撑。
 
 ## 实验与分析
 
-![Table 1](../../assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/007_Table_1.jpg)
-*Table 1: Accuracy comparison on search-intensive and agentic tasks. 7B-Base refers to Qwen-2.5-7B-Base and 7B-Inst refers to Qwen-2.5-7B-Instruct. AutoGen and our AGENTFLOW method are agentic systems, which use Qwen-2.5-7B-Instruct for the LLM-powered agents and tools for fair comparison. We visualize the gains of AGENTFLOW to the each baseline in the ∆ columns*
-
-![Table 2](../../assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/008_Table_2.jpg)
-*Table 2: Accuracy comparison of mathematical and scientific reasoning tasks*
-
-![Table 3](../../assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/010_Table_3.jpg)
-*Table 3: Performance comparison of AGENTFLOW across different training methods*
-
-![Figure 1](../../assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/003_Figure_1.jpg)
+![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/003_Figure_1.jpg]]
 *Figure 1: Left: Performance of AGENTFLOW with a 7B-scale backbone before and after Flow-GRPO tuning across ten diverse reasoning benchmarks. Flow-GRPO substantially improves performance by enhancing planning quality and tool-calling reliability. Right: AGENTFLOW achieves consistent gains over top baselines, including base LLMs, tool-integrated RL models, and trainingfree agentic systems. All 7B results use Qwen2.5-7B-Base/Instruct as the backbone and tools*
 
-![Figure 5](../../assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/009_Figure_5.jpg)
-*Figure 5: One case study example. Initially failed with repetitive errors (left), AGENTFLOW, trained with Flow-GRPO, explores a new solution pathway at turn 4 after two failed attempts (right)*
+![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/007_Table_1.jpg]]
+*Table 1: Accuracy comparison on search-intensive and agentic tasks. 7B-Base refers to Qwen-2.5-7B-Base and 7B-Inst refers to Qwen-2.5-7B-Instruct. AutoGen and our AGENTFLOW method are agentic systems, which use Qwen-2.5-7B-Instruct for the LLM-powered agents and tools for fair comparison. We visualize the gains of AGENTFLOW to the each baseline in the ∆ columns*
 
-本节围绕「流程内训练」这一核心机制展开：系统仅接收基于最终答案正确性的稀疏轨迹级奖励，却需要通过多轮工具交互学习有效规划。我们首先汇总 10 个基准上的主结果，然后通过消融实验揭示训练策略、回合预算、工具后端的因果效应，最后结合案例与局限分析讨论失败模式与自适应能力的来源。
+![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/008_Table_2.jpg]]
+*Table 2: Accuracy comparison of mathematical and scientific reasoning tasks*
 
-### 主结果：跨领域显著提升，7B 规模超越 GPT-4o
+### 核心瓶颈与解决路径
 
-在搜索密集（Bamboogle, 2Wiki, HotpotQA, Musique）、智能体（GAIA）、数学推理（AIME24, AMC23, GameOf24）和科学推理（GPQA, MedQA）四类任务上，经过 Flow-GRPO 训练的 AGENTFLOW（7B 骨干）均大幅优于所有对比基线。关键数值如下：
+现有工具增强推理方法存在两个结构性缺陷。其一，主流范式采用单一、一体化的策略模型，在全上下文下交错进行思考与工具调用，难以随长程规划、多样工具和动态工具反馈稳定扩展（Figure 3）。其二，多模块智能体系统虽能解耦任务，但缺乏在线训练机制，无法适应实时交互动态，导致长程稀疏奖励下的信用分配困难。AGENTFLOW 通过将 planner 模块置于系统循环中在线优化，并利用 Flow-GRPO 将轨迹级稀疏奖励广播到每一轮，实现了有效的多轮信用分配。
 
-- **搜索密集**：平均准确率 57.3%，较训练免费智能体系统 AutoGen 提升 14.9%（Table 1）。
-- **智能体**：GAIA 准确率 33.1%，较工具集成强化学习模型 Search-R1 提升 14.0%（Table 1）。
-- **数学推理**：平均 51.5%，较工具代码模型 ToRL 提升 14.5%，其中 AIME24 准确率 40.0%，领先于不调用工具的推理模型 Luffy（30.7%）（Table 2）。
-- **科学推理**：平均 63.5%，较 TIR 提升 4.1%（Table 2）。
+### 主实验结果
 
-更值得注意的是，AGENTFLOW（7B）在所有领域均超过未经过特别训练的 GPT-4o（Table 1, Table 2），例如在搜索密集任务上高出 8.2%，在数学推理上高出 16.4%。这一结果挑战了"小模型必须依赖更大容量方能胜过私有模型"的假设，其根本原因在于 **Flow-GRPO 将轨迹级奖励广播至每一步动作**（Eq. 4），使长程规划的可信分配变得可处理，从而在仅靠稀疏成功信号的前提下高效优化规划器策略。
+#### 搜索密集型与智能体任务
 
-性能增益并非来自工具或 LLM 容量的单点强化，而是规划质量的系统性提升：在 Figure 1 的左图中，未经训练的 AGENTFLOW 已经受益于模块化设计，但 Flow-GRPO 调优使准确率再获大幅跃升，表明 **在线交互中动态适应工具调用与子目标分解能力** 是核心杠杆。
+Table 1 展示了搜索密集型和智能体任务上的准确率对比。AGENTFLOW（w/ Flow-GRPO）在搜索密集型任务上平均达到 57.3%，较 AutoGen 等最优基线提升 14.9 个百分点。具体而言：在 Bamboogle 上达到 69.6%（+10.0 vs AutoGen），在 2Wiki 上达到 77.2%（+33.2 vs AutoGen），在 HotpotQA 上达到 57.0%（+3.0 vs GPT-4o），在 Musique 上达到 25.3%（+1.3 vs GPT-4o）。在智能体任务 GAIA 上达到 33.1%，较 Search-R1 提升 14.0 个百分点。
 
-### 消融实验：训练策略、回合预算、工具后端的因果效应
+值得注意的是，AGENTFLOW 在所有搜索密集型任务上均超越了 GPT-4o，增益范围在 8.2% 至 18.0% 之间。这验证了模块化架构配合在线强化学习在长程规划与工具调用上的优势。
 
-| 消融变量 | 关键发现 | 锚点 |
-|----------|----------|------|
-| 训练策略（冻结 vs SFT vs Flow-GRPO） | Flow-GRPO 在线训练使规划器平均准确率提升 **+17.2** 个百分点，而离线 SFT 反而导致 **−19.0** 个百分点下降 | Table 3 |
-| 最大推理轮数 $T_{\max}$ | 从 3 增至 10 时，所有基准准确率单调提升，平均轮数同步增加（Table 4） | Figure 7, Table 4 |
-| 工具后端（Qwen2.5-7B-Instruct→GPT-4o） | GAIA、AMC23、HotpotQA 上分别获得 +1.0%、+6.0%、+13.0% 的增益 | Figure 10 |
-| 工具选择偏好 | 训练后 2Wiki 的 Google Search 调用比例增加 42.0%，MedQA 的 Wikipedia Search 从 0% 升至 59.8% | Figure 8 |
+#### 数学与科学推理任务
 
-**训练策略的因果分析**（Table 3）：离线 SFT 利用历史正确轨迹进行监督训练，却使准确率大幅退化。原因是 SFT 将静态数据中的行为模式不加检验地灌输，而这些模式在真实工具交互中高度不确定，导致策略依赖过时或错误的先验。与此相反，Flow-GRPO 在系统运行回路中直接采样轨迹并将全局成功信号广播至各步，迫使规划器学会根据实际工具返回和验证信号调整策略。这一差异验证了「**流程内训练（in-the-flow）**」的必要性：在长程、多工具条件下，仅靠最终结果无法分解出正确步骤的启发式分配，而广播奖励配合组归一化优势（Eq. 7）将多轮更新转化为等价于单步局部目标的优化（§3.2，附录 B.2），从而实现稳定且高效的在线信用分配。
+Table 2 展示了数学和科学推理任务的准确率对比。AGENTFLOW（w/ Flow-GRPO）在数学任务上平均提升 14.5%：AIME24 达到 40.0%（+9.3 vs Luffy），AMC23 达到 61.5%（+1.5 vs ToRL），GameOf24 达到 53.0%（+20.0 vs 最优基线）。在科学推理任务 GPQA 和 MedQA 上分别达到 47.0%（+2.0 vs SimpleRL-reason）和 80.0%（+3.2 vs TIR），平均提升 4.1%。
 
-**回合预算的影响**（Figure 7, Table 4）：增加最大允许轮数直接扩展了可探索的规划空间。在 $T_{\max}=10$ 时达到饱和，与 7B 模型的计算能力匹配。更长的回合不仅允许更细致的检索与验证（如 GAIA 任务），还赋予了规划器在初步尝试失败后重试并切换工具的机会——这正是后续案例中展现的自修复能力的基础。
+Figure 1 汇总了 Flow-GRPO 训练前后 AGENTFLOW 的性能对比。训练后的 7B 模型在十个多样化推理基准上均取得显著提升，且一致超越包括 GPT-4o 在内的更大规模专有模型。
 
-**工具后端升级**（Figure 10）：当工具 LLM 从 Qwen2.5-7B-Instruct 换为 GPT-4o 后，AGENTFLOW 的整体准确率进一步提升。这表明 Flow-GRPO 训练出的规划器可以在不改变自身参数的情况下，充分利用更强大的执行器，呈现「规划-执行解耦」的良好扩展性。
+### 消融实验
 
-**工具选择演化**（Figure 8）：训练前，规划器倾向于单一、固定的工具使用模式；训练后，不同领域的关键工具调用比例发生显著且合理的变化。例如 2Wiki 需要更广的网络检索，Google Search 调用急剧上升；而 MedQA 的专业医学问题则从 Google Search 转向权威的 Wikipedia Search。这一自适应行为并非来自显式的奖励塑形，而是**广播奖励将任务整体的成功压力自然地传递至每一步工具选择**，驱动策略学习到与下游任务需求匹配的检索行为。
+#### 训练范式对比
 
-### 失败模式与局限性
+Table 3 的消融实验揭示了训练范式的决定性影响。Flow-GRPO 在线训练的平均准确率达到 55.7%，而冻结 planner 仅为 38.5%，提升幅度达 17.2 个百分点。关键发现包括：
 
-尽管 Flow-GRPO 在多数基准上实现突破，其成功边界与典型失败模式可通过案例研究和系统假设被揭示。
+- **离线 SFT 导致性能崩溃**：SFT 的平均准确率仅为 19.5%，远低于冻结基线。这是因为 token 级别的模仿学习目标与轨迹级别的任务成功之间存在根本性错位，导致 planner 无法适应动态工具反馈或从复合错误中恢复。
+- **更强模型不等于更好 planner**：使用 GPT-4o 作为冻结 planner 仅带来 5.8% 的平均增益（44.3% vs 38.5%），远低于 Flow-GRPO 训练的 7B planner。这表明 in-the-flow 在线优化比单纯扩大模型规模更有效。
 
-**案例中的失败与自修复**（Figure 5）：给出一项涉及多步搜索的百科类问题，未经训练的规划器在第一次调用搜索工具返回不完整结果后，反复执行相同或信息增益极低的调用，陷入"重复错误"循环，最终判定失败。而经过 Flow-GRPO 训练的规划器，在同样初始失败后，于第 4 轮主动切换至一条全新的求解路径（如更换搜索关键词、尝试不同工具），最终获得正确答案。这表明**未训练的规划器缺乏依据工具反馈修正策略的元认知能力**，而广播奖励驱动的在线训练等效于迫使规划器在每个状态上最大化期望最终成功概率，从而习得"当记忆未能满足求解条件时大幅改换动作"的鲁棒策略。
+#### 推理轮次扩展性
 
-**结构性局限**：当前设计仅训练 Action Planner，执行器、验证器、生成器保持冻结，可能束缚系统在复杂开放环境中的适应性。其次，训练假设问题可被分解为顺序子目标，对需要高度并行规划的任务（如多工具同时调用再汇总）可能产生次优解。此外，训练和评估均限定于五种固定工具，未验证在动态工具集或全新工具下的泛化能力，在实际部署中可能出现工具选择错配。最后，奖励函数由 LLM 裁判（GPT-4o）自动判定，虽然设计了标准化比对流程（附录 E.3），仍存在奖励黑客或被偏置的风险，尤其当规范匹配规则不足以覆盖的开放问答场景时。
+Figure 7 展示了最大交互轮数 $T_{\max}$ 的影响。将 $T_{\max}$ 从 3 增加到 10，平均准确率持续提升，证明 in-the-flow 优化具有良好的可扩展性。Table 4 进一步显示，实际使用的轮数随 $T_{\max}$ 增加而增长，GAIA 任务需要的轮数最多。
 
-### 图表核心结论汇总
+#### 工具调用行为变化
 
-| 图表 | 核心结论 |
-|------|----------|
-| Figure 1 | 训练前/后性能对比表明 Flow-GRPO 是规划器大幅提升的关键驱动力；7B 模型全面超越 GPT-4o。 |
-| Table 1, Table 2 | 在搜索、智能体、数学、科学四领域分别超越最强专用基线 14.9%/14.0%/14.5%/4.1%。 |
-| Table 3 | 离线 SFT 导致性能崩溃（−19.0%），而 Flow-GRPO 在线训练实现 +17.2% 提升，验证流程内训练的必要性。 |
-| Figure 7, Table 4 | 最大轮数从 3 增至 10 单调提升准确率，表明长程规划空间的有效利用是增益的重要来源。 |
-| Figure 8 | Flow-GRPO 驱动工具选择策略发生质变，不同领域自发涌现出专业化工具使用模式。 |
-| Figure 10 | 工具能力提升可被规划器有效吸收，展现规划-执行解耦的扩展优势。 |
-| Figure 5 | 训练后规划器具备自修复能力，能够在失败后主动探索新路径；未训练策略则陷入重复错误。 |
+Figure 8 揭示了 Flow-GRPO 训练后工具调用比率的显著变化。优化后的 planner 更偏好使用 Google Search 和 Web Search，在 2Wiki 上 Google Search 的调用比率增加了 42.0%。这表明在线强化学习使 planner 学会了根据任务需求选择更有效的工具。
 
-整体而言，实验证据一致支持核心因果机制：**通过广播最终奖励和组归一化优势，Flow-GRPO 把稀疏、长程的多轮信策分配转化为可处理的单步优化**，使智能体系统能够在实际工具交互中自主学习规划与协调策略，从而在多个复杂推理基准上实现跨领域、跨规模的性能跃升。
+#### 训练动态
+
+Figure 9 展示了训练过程中的奖励和响应长度变化。奖励稳步上升，响应长度先下降后稳定，表明 Flow-GRPO 在样本效率和训练稳定性方面表现良好。
+
+### 缩放与泛化
+
+Figure 6 展示了模型规模缩放实验。Flow-GRPO 在 3B 和 7B 基座模型上均提供一致的性能增益，证明该方法在不同模型容量下均有效。Figure 10 的工具缩放研究表明，将工具后端从 Qwen2.5-7B-Instruct 升级到 GPT-4o 可进一步提升性能，在 HotpotQA 上增益达 13.0 个百分点。
+
+### 失败模式与定性分析
+
+Figure 5 的案例研究展示了 Flow-GRPO 带来的策略转变。冻结 planner 在遭遇重复错误后陷入循环，而经 Flow-GRPO 训练的 planner 在两次失败尝试后于第 4 轮探索出新的解决路径。这表明在线优化使 planner 学会了从错误中恢复并调整策略。
+
+### 实验公平性说明
+
+所有 7B 系统均使用 Qwen2.5-7B-Instruct 作为模块基座，工具也基于该模型，与 AutoGen 等系统保持可比性。评估使用统一的 judge 模型（GPT-4o），通过语义、数值和选项级别等价判断确保公平。所有结果报告三次试验的平均准确率以降低随机性影响。
+
+### 局限性
+
+当前方法存在以下局限：仅优化 planner 模块，executor、verifier 和 generator 保持冻结，可能限制了性能上限；工具集合主要围绕搜索和代码执行，尚未扩展到数据库、API 调用等更多样化工具；仅在最多 10 轮交互内评估，超长程任务需要进一步验证；奖励信号完全依赖最终答案的可验证正确性，不适用于开放式生成任务；所有实验基于 Qwen2.5 架构，向其他模型家族的迁移有待验证。
 
 ## 方法谱系与知识库定位
 
-### 与 baseline 和 follow-up 工作的关系
+### 与基线方法的关系
 
-AGENTFLOW 定位为**可训练、流程内优化的多模块智能体系统**，其设计直接回应了当前工具增强推理的两类主导范式所暴露的瓶颈。
+AGENTFLOW 处于两类主流范式的交叉点上：**一体式工具集成推理模型**（Monolithic Tool-Integrated Reasoning, TIR）与**多智能体系统**。理解其定位需要首先厘清这两条技术路线的本质差异。
 
-- **与单体工具集成推理模型（monolithic tool-integrated RL models）的对比**
-  现有工作，如 Search-R1、ReSearch、VerlTool（搜索工具）和 TIR、ToRL（代码执行工具），均将工具调用与思维过程交织在单一策略的同一次生成中（如 `<think> … <tool call>`）。这类方法的致命弱点是：**长序列、多工具轨迹的训练信噪比极低**——稀疏的最终奖励难以沿着数十步的动作序列反向传播，导致信用分配困难、训练不稳定。AGENTFLOW 通过**将多轮交互分解为独立规划步的显式马尔可夫决策过程**（Eq. 2），并借助 Flow-GRPO 将轨迹级的唯一最终奖励**广播至每一步**（Eq. 4），结合组归一化优势（Eq. 7）降低方差，从而将棘手的多轮优化转化为一系列可控的单步策略更新。实验表明，这种架构与训练策略的组合在搜索、智能体、数学和科学四类任务上分别超越最强单体基线 **14.9%、14.0%、14.5% 和 4.1%**（Table 1, Table 2），7B 骨干甚至优于未经额外训练的 GPT-4o。
+**一体式 TIR 模型**（如 Search-R1、TIR、ToRL、Luffy 等）训练单一策略在全上下文下交错生成推理过程与工具调用。这种范式将“思考”与“行动”压缩到同一个自回归生成过程中，优势在于端到端可微、实现简单；但瓶颈同样明显：随着规划长度增长、工具种类增多、工具反馈动态变化，单一策略难以稳定扩展，且推理时对未见任务和工具的泛化性较差。AGENTFLOW 的模块化设计正是对这一瓶颈的直接回应——通过将规划、执行、验证、生成四个环节解耦为专门模块，使每个模块只需关注自身职责，从而降低单点复杂度。
 
-- **与训练无损智能体系统（training-free agentic systems）的对比**
-  以 AutoGen 为代表的工作通过提示工程与手工逻辑编排多个冻结模块，虽能在简单场景工作，但**缺乏从环境反馈中在线学习的能力**，面对动态交互、反复试错的任务时性能严重受限。AGENTFLOW 直接在其固有的**多轮运行回路内对规划器（Action Planner）进行策略在线的强化学习**，使系统能够根据真实工具调用结果、验证器信号和记忆演化自适应地调整规划与工具选择策略。Table 3 的消融实验提供了铁证：离线 SFT 导致平均准确率**下降 19.0%**，而 Flow-GRPO 在线训练带来 **17.2% 的提升**，说明脱离执行环境的监督信号非但无益，反而造成灾难性干扰。
+**多智能体系统**（以 AutoGen 为代表）同样采用模块分解思路，但其核心缺陷在于缺乏在线训练能力。AutoGen 依赖冻结的 LLM 模块通过预定义协议协作，无法从交互动态中学习改进。AGENTFLOW 的关键突破在于将 planner 模块置于系统循环中在线优化，使模块化系统的优势得以通过强化学习被放大而非被冻结限制。实验数据验证了这一判断：使用相同 Qwen2.5-7B-Instruct 基座的 AutoGen 在搜索密集型任务上的平均准确率仅为 51.2%，而经 Flow-GRPO 训练后的 AGENTFLOW 达到 57.3%（Table 1）。
 
-- **与无工具推理 LLM 的对比**
-  纯推理增强模型（如 SimpleRL-reason、Luffy）仅依靠思维链训练，未能利用外部知识库与代码执行带来的**事实查证与计算能力**。AGENTFLOW 集成了网页搜索、维基搜索及代码执行等五种工具，并通过 Flow-GRPO **自适应地调整工具调用偏好**——例如训练后 2Wiki 中 Google Search 调用比例增加 42.0%，MedQA 中 Wikipedia Search 从 0% 骤升至 59.8%（Figure 8）。这种对工具可获性的高效利用是纯推理模型无法企及的。
+**纯推理 RL 模型**（SimpleRL-reason、Open-Reasoner-Zero、General-Reasoner 等）代表了另一条技术路线：通过强化学习激发 LLM 的推理能力，但不涉及工具使用。这类方法在数学和科学推理上表现强劲，但面对需要外部知识检索的任务时能力受限。AGENTFLOW 在继承 GRPO 族算法（Group Relative Policy Optimization）的组标准化优势思想基础上，将其扩展到多轮工具交互场景，实现了推理能力与工具使用能力的联合优化。
 
-综上，AGENTFLOW 与现有工作的谱系位置可概括为：**它将单体模型的训练不稳定问题通过模块化与流程内强化学习转化为每步可优化的局部问题，同时为静态的智能体系统注入了基于最终奖励函数的在线自适应能力**，在方法空间上占据了"可训练、可闭环演化的智能体系统"这一空白区域。
+### 核心区分机制：Flow-GRPO 的信用分配策略
 
-### 适用边界与假设
+AGENTFLOW 与所有基线方法最根本的区分在于**信用分配**机制。这一机制直接回应了长程稀疏奖励下的核心难题：当系统经过多轮交互后才获得一个最终的二元成功/失败信号，如何判断每一轮决策的贡献？
 
-尽管效果显著，AGENTFLOW 目前基于以下明确假设与设计约束：
+- **离线 SFT** 试图通过模仿理想轨迹的 token 级交叉熵来规避信用分配问题，但 token 级模仿目标与轨迹级任务成功之间存在根本性错位。实验显示 SFT 导致性能崩溃（平均准确率仅 19.5%，Table 3），原因在于它无法让 planner 适应动态工具反馈或从累积错误中恢复。
 
-- **顺序子目标分解假设**：系统将推理过程建模为"规划器 → 执行器 → 验证器 → 生成器"的**顺序多轮流程**（Figure 2）。对于需要高度并行规划、多路搜索或实时多目标协调的任务，当前顺序化框架可能无法高效覆盖。
-- **固定工具集假设**：整个训练与评测均基于预定义的五个工具（网页搜索、维基搜索、计算器等）。**未知工具出现时的动态扩展或工具学习能力未被验证**，因此在开放式或实时变化的工具生态中可能失效。
-- **仅规划器可训练的设计约束**：执行器、验证器与生成器均以 Qwen2.5-7B-Instruct 冻结，系统的整体适应性受限于此。若其他模块存在系统性失误，规划器可能被迫学习"对抗性"策略以补偿，而非全部模块协同进化。
-- **对环境交互的高度依赖**：在线训练必须运行完整的智能体 rollout，涉及实际工具调用与验证器信号，其计算开销远大于纯文本的离线训练。这在预算敏感或工具 API 受限的场景下可能构成障碍。
-- **奖励函数的潜在偏置**：训练依赖 LLM-as-judge（GPT-4o）的最终答案判别（详见 §E.3），即便采用两步"分析-判定"范式，仍存在**奖励黑客行为**风险（即系统学会生成符合法官偏好但实际错误的答案）。
+- **冻结 planner（含 GPT-4o）** 完全放弃了信用分配，依赖预训练能力的静态迁移。即使使用更强的 GPT-4o 作为 planner，平均准确率也仅 44.3%，远低于 Flow-GRPO 训练的 7B planner（55.7%，Table 3）。这表明**在线优化比模型规模更重要**。
 
-### 局限
+- **Flow-GRPO** 的策略是将同一轨迹级最终奖励广播到所有轮次，配合组标准化优势进行方差缩减。这一设计的理论依据在于：在最终奖励仅取决于最终答案正确性的设定下，轨迹内所有动作共享相同的全局信号是合理的；组标准化则在采样组内对奖励进行归一化，使优势估计更稳定。附录 B 中的定理 B.1 和 B.3 分别给出了单轮更新与全局目标的等价性证明及单调改进保证，为这一策略提供了形式化支撑。
 
-- 只有 Action Planner 接受训练，其他模块冻结，**限制了系统端到端的适应性**；例如执行器对工具 API 的误用可能无法通过规划器完全修正。
-- **固定工具集下的训练无法应对工具本身演化或新增工具**，实际部署中可能需要重新训练或引入适应机制。
-- LLM 裁判的奖励信号可能**引入系统性偏置或导致奖励黑客**；尽管论文提供了组归一化来提高鲁棒性，但未对奖励函数的校准与一致性进行严格敏感性分析。
-- 当前实验**限于 7B 骨干规模**；虽然 Figure 12 显示 3B→7B 的提升趋势，但更大的模型（如 70B+）在 Flow-GRPO 下的训练稳定性、收敛速度及计算开销尚未报告。
-- 轨迹级奖励广播虽然简化了信用分配，但可能导致**"搭便车"问题**：某些劣质动作可能因同次尝试中的优秀动作而获得正向梯度，长期可能稀释有效策略的信号。
+### 适用边界
 
-### 开放问题
+AGENTFLOW 的设计隐含了若干适用前提，超出这些边界时方法的有效性需要审慎评估：
 
-- **动态工具集的扩展与工具学习**：能否在工具集变化时零镜头泛化？是否可能对工具执行器进行联合微调以适应规划器的决策？
-- **多模块协同在线训练**：若能同时微调验证器和生成器，系统是否能在闭环中实现更强的自我修复与策略自适应？这要求设计面向多模块的、结构化的信用分配机制。
-- **更大规模骨干上的可扩展性**：在 70B 甚至 100B+ 模型上，Flow-GRPO 的训练开销与 KL 惩罚系数 β 等超参数的调优规律如何？是否需要新的方差缩减技术？
-- **更精细的信用分配机制**：未来可探索引入状态依赖的奖励塑造或动态痕迹分配，以缓解广播式奖励可能带来的信号衰减与搭便车效应，并与理论上的单调改进保证（Theorem B.3）进行结合。
-- **最优超参数的普适性**：KL 惩罚系数 β、PPO 裁剪参数 ε、组大小 G 的最佳取值是否随任务类型和工具复杂度变化？需要更系统的分析以提供实用的调参指南。
+1. **可验证的最终奖励**：Flow-GRPO 完全依赖最终答案的二元正确性作为奖励信号。这适用于数学计算、事实问答、代码执行等有明确对错的任务，但不适用于开放式生成（如创意写作、对话系统），因为后者缺乏可自动验证的客观标准。
 
-上述开放问题直接指向 AGENTFLOW 从当前"规划器在线训练"走向"全模块协同进化、适应开放工具生态"的下一步演进路径。
+2. **工具可调用且反馈明确**：系统的 executor 模块依赖工具返回结构化或半结构化的执行结果供 verifier 评估。如果工具反馈模糊、延迟或不可靠，整个循环的稳定性会受到影响。当前实验中的工具集主要为搜索引擎和代码解释器，反馈形式相对规整。
+
+3. **任务可分解为多轮子目标**：AGENTFLOW 的规划-执行-验证循环假定任务可以通过逐步的子目标分解来完成。对于需要一次性全局推理的任务，多轮交互可能引入不必要的开销。
+
+4. **模块基座模型能力下限**：虽然 Flow-GRPO 训练带来了显著提升，但 executor、verifier 和 generator 模块保持冻结，其基础能力构成了系统性能的上限。实验显示 3B 和 7B 基座均能受益于 Flow-GRPO 训练（Figure 6），但在更小或更弱的基座上，冻结模块可能成为瓶颈。
+
+### 已知局限与开放问题
+
+**当前局限**（论文已明确指出的约束）：
+
+- **仅优化 planner 模块**：executor、verifier 和 generator 保持冻结，限制了系统整体性能的天花板。当 planner 学会更优的规划策略后，执行或验证环节的固定能力可能成为新的瓶颈。
+- **工具集范围有限**：当前工具主要围绕搜索（Google Search、Web Search、Wikipedia）和代码执行（Python Interpreter），尚未扩展到数据库查询、API 调用、文件操作等更丰富的工具类型。
+- **交互轮数上限**：实验在最多 10 轮的设定下评估，超长程任务（如多文件软件开发、复杂数据分析流水线）的性能表现未知。
+- **模型架构依赖**：所有实验基于 Qwen2.5 架构，向 Llama、Mistral 等其他模型家族的迁移效果有待验证。
+
+**开放研究问题**（从方法设计和实验结果中自然引申的方向）：
+
+- **端到端联合优化**：能否将 Flow-GRPO 的在线训练框架扩展到所有四个模块，实现 planner、executor、verifier、generator 的协同进化？这涉及非平稳环境下的多智能体 RL 问题，信用分配的复杂度将显著上升。
+
+- **动态工具环境的适应**：当工具集动态变化（新工具加入、旧工具失效、工具行为改变）时，Flow-GRPO 能否快速适应？这需要研究在线 RL 的持续学习能力与灾难性遗忘之间的平衡。
+
+- **奖励信号的丰富化**：当前二元奖励丢弃了大量中间信息。能否设计部分正确性奖励、效率奖励（如最少轮数完成）、或基于过程的验证信号，在保持可自动验证的前提下提供更细粒度的反馈？
+
+- **更大规模的 scaling 行为**：Figure 6 展示了 3B 到 7B 的 scaling 趋势，但 32B、70B 乃至更大模型的 scaling law 尚不明确。特别是，当基座模型本身已具备较强规划能力时，Flow-GRPO 的边际收益是否会递减？
+
+- **超长程任务的收敛性**：当交互轮数从 10 扩展到 50 或 100 时，广播同一奖励到所有轮次的策略是否仍然有效？更靠前的轮次与最终结果之间的因果链变长，信用分配的信噪比可能恶化，可能需要引入折扣因子或分层奖励结构。
 
 ## 原文 PDF
 
-![[paperPDFs/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.pdf]]
+## 相关样本
+
+- [[obsidian-vault/analysis/ICLR_2026/Agentic_Reinforcement_Learning_with_Implicit_Step_Rewards.md|Agentic RL with Implicit Step Rewards]]：同属 agentic RL 样本，可对照 planner 优化与隐式 step reward。
+- [[obsidian-vault/analysis/ICLR_2026/AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning.md|AdaReasoner]]：同属工具使用与规划优化样本，可对照通用 agent flow 和视觉工具编排。
+
+![[obsidian-vault/paperPDFs/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.pdf]]

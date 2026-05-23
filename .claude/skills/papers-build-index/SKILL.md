@@ -19,7 +19,7 @@ Inputs:
 Outputs:
 
 - `obsidian-vault/index/index.jsonl`
-- `obsidian-vault/index/_Index.md`
+- `obsidian-vault/index/paper_index.md`
 - `obsidian-vault/index/_AllPapers.md`
 - aggregate pages under:
   - `by_dataset/`
@@ -31,6 +31,10 @@ Outputs:
 The builder does not require the platform database.
 `obsidian-vault/index/README.md` is a public placeholder for the generated
 directory and should not be overwritten with local/private index contents.
+Aggregate navigation entry files use explicit dimension names:
+`by_topic/topic_index.md`, `by_method/method_index.md`,
+`by_dataset/dataset_index.md`, `by_venue/venue_index.md`, and
+`by_year/year_index.md`.
 `by_topic/` uses coarse top-level research areas derived from `category`,
 `topics`, `topic/...` tags, or path hints. Nested topic tags are intentionally
 folded into their first segment so the navigation does not fragment.
