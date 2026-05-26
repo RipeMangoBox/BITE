@@ -40,6 +40,7 @@ class Paper:
     pdf_ref: str = ""
     venue: str = ""
     year: str = ""
+    venue_year: str = ""
     topics: List[str] = field(default_factory=list)
     methods: List[str] = field(default_factory=list)
     method_groups: List[str] = field(default_factory=list)
@@ -296,6 +297,27 @@ def clean_scalar(value: object) -> str:
     return str(value or "").strip().strip("\"'")
 
 
+def venue_year_label(venue: object, year: object) -> str:
+    venue_text = clean_scalar(venue)
+    year_text = clean_scalar(year)
+    inferred_venue, inferred_year = infer_venue_year(venue_text)
+    if inferred_year and (not year_text or year_text == inferred_year):
+        venue_text = inferred_venue
+        year_text = year_text or inferred_year
+    if not venue_text or not year_text:
+        return ""
+    venue_part = re.sub(r"\s+", "_", venue_text)
+    venue_part = re.sub(r"[^A-Za-z0-9_.-]+", "_", venue_part).strip("_")
+    return f"{venue_part}_{year_text}" if venue_part else ""
+
+
+def is_venue_year_tag(value: str) -> bool:
+    text = str(value or "").strip()
+    if text.startswith("topic/"):
+        text = text.split("/", 1)[1]
+    return bool(re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]*_(?:19|20)\d{2}", text))
+
+
 TOPIC_SYNONYMS = {
     "benchmarks_datasets_evaluation": "Benchmarks / Datasets / Evaluation",
     "generative_models_diffusion": "Generative Models / Diffusion",
@@ -512,7 +534,7 @@ def derive_topics(raw_topics: List[str], tags: List[str], category: List[str], m
         candidates.extend(category)
     if raw_topics:
         candidates.extend(raw_topics)
-    candidates.extend(t for t in tags if t.startswith("topic/"))
+    candidates.extend(t for t in tags if t.startswith("topic/") and not is_venue_year_tag(t))
 
     if not candidates:
         rel_parts = md_path.relative_to(ANALYSIS_DIR).parts
@@ -578,7 +600,19 @@ def derive_method_groups(paper: Paper) -> List[str]:
 
 def clean_generated_dirs() -> None:
     INDEX_DIR.mkdir(parents=True, exist_ok=True)
-    for dirname in ("by_dataset", "by_method", "by_topic", "by_venue", "by_year"):
+    legacy_home = INDEX_DIR / ("_" + "Index.md")
+    if legacy_home.exists():
+        legacy_home.unlink()
+    for dirname in ("by_venue", "by_year"):
+        dir_path = INDEX_DIR / dirname
+        if dir_path.exists():
+            for md in dir_path.glob("*.md"):
+                md.unlink()
+            try:
+                dir_path.rmdir()
+            except OSError:
+                pass
+    for dirname in ("by_dataset", "by_method", "by_topic", "by_venue_year"):
         dir_path = INDEX_DIR / dirname
         dir_path.mkdir(parents=True, exist_ok=True)
         for md in dir_path.glob("*.md"):
@@ -625,6 +659,7 @@ def load_csv_inventory() -> List[Paper]:
                 pdf_ref=pdf_ref,
                 venue=venue,
                 year=year,
+                venue_year=venue_year_label(venue, year),
                 topics=[
                     display_topic(t)
                     for t in split_values(first_present(row, ("topic", "topics", "task", "category")))
@@ -754,6 +789,7 @@ def load_analysis_notes() -> List[Paper]:
             pdf_ref=pdf_ref,
             venue=venue,
             year=year,
+            venue_year=venue_year_label(venue, year),
             topics=topics,
             methods=methods,
             datasets=datasets,
@@ -807,6 +843,7 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
         base.pdf_ref = base.pdf_ref or ana.pdf_ref
         base.venue = base.venue or ana.venue
         base.year = base.year or ana.year
+        base.venue_year = venue_year_label(base.venue, base.year)
         base.topics = merge_values(base.topics, ana.topics)
         base.methods = merge_values(base.methods, ana.methods)
         base.method_groups = merge_values(base.method_groups, ana.method_groups)
@@ -842,6 +879,7 @@ def build_jsonl(papers: List[Paper]) -> str:
             "pdf_ref": p.pdf_ref,
             "venue": p.venue,
             "year": year_json_value(p.year),
+            "venue_year": p.venue_year,
             "topics": p.topics,
             "methods": p.methods,
             "method_groups": p.method_groups,
@@ -930,7 +968,7 @@ def write_dimension(
     for key in keys:
         index_lines.append(f"- {note_link(f'obsidian-vault/index/{dirname}/{sanitize_filename(key)}.md', key)} ({len(grouped[key])})")
     index_lines.append("")
-    write_text(base / "_Index.md", "\n".join(index_lines))
+    write_text(base / f"{dimension}_index.md", "\n".join(index_lines))
 
     for key in keys:
         lines = frontmatter(f"{dimension.title()}: {key}", dimension, now)
@@ -952,11 +990,10 @@ def build_home_index(papers: List[Paper], now: str) -> str:
             "## Entry Points",
             "",
             f"- {note_link('obsidian-vault/index/_AllPapers.md', 'All papers')}",
-            f"- {note_link('obsidian-vault/index/by_topic/_Index.md', 'By topic')}",
-            f"- {note_link('obsidian-vault/index/by_method/_Index.md', 'By method')}",
-            f"- {note_link('obsidian-vault/index/by_dataset/_Index.md', 'By dataset')}",
-            f"- {note_link('obsidian-vault/index/by_venue/_Index.md', 'By venue')}",
-            f"- {note_link('obsidian-vault/index/by_year/_Index.md', 'By year')}",
+            f"- {note_link('obsidian-vault/index/by_topic/topic_index.md', 'By topic')}",
+            f"- {note_link('obsidian-vault/index/by_method/method_index.md', 'By method')}",
+            f"- {note_link('obsidian-vault/index/by_dataset/dataset_index.md', 'By dataset')}",
+            f"- {note_link('obsidian-vault/index/by_venue_year/venue_year_index.md', 'By venue/year')}",
             "",
             "## Counts",
             "",
@@ -979,13 +1016,12 @@ def main() -> int:
         clean_generated_dirs()
         write_text(INDEX_DIR / "index.jsonl", build_jsonl(papers))
         write_text(INDEX_DIR / "_AllPapers.md", build_all_papers(papers, now))
-        write_text(INDEX_DIR / "_Index.md", build_home_index(papers, now))
+        write_text(INDEX_DIR / "paper_index.md", build_home_index(papers, now))
 
         write_dimension("by_dataset", "dataset", group_by_dimension(papers, "datasets"), now, min_count=2)
         write_dimension("by_method", "method", group_by_dimension(papers, "method_groups"), now)
         write_dimension("by_topic", "topic", group_by_dimension(papers, "topics"), now)
-        write_dimension("by_venue", "venue", group_by_dimension(papers, "venue"), now)
-        write_dimension("by_year", "year", group_by_dimension(papers, "year"), now)
+        write_dimension("by_venue_year", "venue_year", group_by_dimension(papers, "venue_year"), now)
 
     print(f"[OK] papers: {len(papers)}")
     print(f"[OK] source paper_list.csv: {len(csv_papers)}")

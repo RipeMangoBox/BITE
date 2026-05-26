@@ -26,7 +26,7 @@ for Obsidian jumps and backlink-friendly browsing.
 Relative to the repository root:
 
 - **Analysis notes**: `obsidian-vault/analysis/<Topic>/<Venue_Year>/<Year>_<Title>.md` or flat venue folders such as `obsidian-vault/analysis/ICLR_2026/<Title>.md`; PDF path in frontmatter `pdf_ref`.
-- **Generated index / navigation**: `obsidian-vault/index/index.jsonl`, `obsidian-vault/index/_Index.md`, `_AllPapers.md`, `by_topic/`, `by_method/`, `by_dataset/`, `by_venue/`, `by_year/`.
+- **Generated index / navigation**: `obsidian-vault/index/index.jsonl`, `obsidian-vault/index/paper_index.md`, `_AllPapers.md`, `by_topic/`, `by_method/`, `by_dataset/`, `by_venue/`, `by_year/`.
 - **Public placeholder**: `obsidian-vault/index/README.md` is tracked as a stable explanation file and is not overwritten by index generation.
 
 All paths use forward slashes.

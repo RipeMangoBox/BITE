@@ -49,6 +49,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--export-vault", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--conf-year", default="", help="Override venue/year folder. Defaults to venue column normalized as VENUE_YEAR.")
     parser.add_argument("--acceptance", default="unknown")
+    parser.add_argument("--max-note-images", type=int, default=12)
     parser.add_argument("--mineru-output-root", default="")
     parser.add_argument("--mineru-batch-id", default="")
     parser.add_argument("--require-existing-mineru-output", action="store_true")
@@ -266,6 +267,7 @@ def command_for_row(args: argparse.Namespace, row: dict[str, str], *, variant: d
         cmd += ["--conf-year", conf_year]
     if args.export_vault:
         cmd.append("--export-vault")
+    cmd += ["--max-note-images", str(args.max_note_images)]
     if args.mock_llm:
         cmd.append("--mock-llm")
     if args.mineru_output_root:

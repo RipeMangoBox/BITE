@@ -43,6 +43,11 @@ from typing import Any
 import certifi
 import httpx
 
+try:
+    import fitz
+except ImportError:  # pragma: no cover - optional dependency
+    fitz = None
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -55,6 +60,7 @@ from scripts.researchflow_local.topic_tags import (
 )
 
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "_private" / "local_analysis_runs"
+DEFAULT_MINERU_LOCK = REPO_ROOT / "_private" / "local_analysis_runs" / "locks" / "mineru_parse.lock"
 DEFAULT_ENV_FILE = REPO_ROOT / ".env"
 PRIVATE_ENV_FILE = REPO_ROOT / "_private" / "local_analysis" / ".env"
 DEFAULT_VAULT_ROOT = REPO_ROOT / "obsidian-vault"
@@ -63,12 +69,14 @@ DEFAULT_MINERU_BIN = shutil.which("mineru") or "mineru"
 DEFAULT_MINERU_CONFIG = REPO_ROOT / "_private" / "mineru_local" / "mineru.json"
 DEFAULT_MINERU_HF_CACHE = Path.home() / ".cache" / "huggingface" / "hub"
 MINERU_PIPELINE_CACHE = DEFAULT_MINERU_HF_CACHE / "models--opendatalab--PDF-Extract-Kit-1.0"
+DEFAULT_MINERU_CONTENT_COORD_SIZE = (1000.0, 1000.0)
 DEFAULT_CONF_YEAR = ""
 DEFAULT_TOPIC_ASSIGNMENTS = os.environ.get("RF_TOPIC_ASSIGNMENTS", "").strip()
 DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-pro"
 KIMI_DEFAULT_BASE_URL = "https://api.moonshot.ai/v1"
 KIMI_DEFAULT_TEMPERATURE = 0.6
 DEFAULT_KIMI_MODEL = "kimi-k2.6"
+DEFAULT_OPENAI_FIGURE_MODEL = "gpt-5.4"
 SECTION_SPECS: tuple[tuple[str, str], ...] = (
     ("概述", "概括问题、核心结论、方法定位与主要结果，不要展开细节。"),
     ("背景与动机", "说明问题背景、现有方法缺口、本文动机。"),
@@ -530,6 +538,13 @@ class MinerUArtifacts:
     root: Path
 
 
+@dataclass(frozen=True)
+class MinerUSidecarArtifacts:
+    origin_pdf_path: Path | None
+    middle_json_path: Path | None
+    model_json_path: Path | None
+
+
 class RunLock:
     def __init__(self, path: Path):
         self.path = path
@@ -575,6 +590,29 @@ class RunLock:
             self.path.unlink(missing_ok=True)
         except PermissionError:
             return
+
+
+class BlockingFileLock:
+    def __init__(self, path: Path):
+        self.path = path
+        self.fd: int | None = None
+
+    def __enter__(self) -> "BlockingFileLock":
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.fd = os.open(str(self.path), os.O_CREAT | os.O_RDWR)
+        fcntl.flock(self.fd, fcntl.LOCK_EX)
+        os.ftruncate(self.fd, 0)
+        os.write(self.fd, json.dumps({"pid": os.getpid(), "created_at": now_iso()}).encode("utf-8"))
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        if self.fd is None:
+            return
+        try:
+            fcntl.flock(self.fd, fcntl.LOCK_UN)
+        finally:
+            os.close(self.fd)
+            self.fd = None
 
 
 def now_iso() -> str:
@@ -1568,33 +1606,36 @@ def run_mineru_cli(
     model_source: str,
     config_path: Path,
 ) -> MinerUArtifacts:
-    output_dir.mkdir(parents=True, exist_ok=True)
-    command = [mineru_bin, "-p", str(pdf_path), "-o", str(output_dir), "-b", backend]
-    env = os.environ.copy()
-    if model_source:
-        env["MINERU_MODEL_SOURCE"] = model_source
-    if config_path:
-        env["MINERU_TOOLS_CONFIG_JSON"] = str(config_path)
-    started = time.monotonic()
-    try:
-        proc = subprocess.run(command, capture_output=True, text=True, timeout=timeout, env=env)
-    except subprocess.TimeoutExpired as exc:
-        atomic_write_text(output_dir / "mineru_stdout.log", exc.stdout or "")
-        atomic_write_text(output_dir / "mineru_stderr.log", exc.stderr or "")
-        raise RuntimeError(f"MinerU timed out after {timeout}s") from exc
-    atomic_write_text(output_dir / "mineru_stdout.log", proc.stdout or "")
-    atomic_write_text(output_dir / "mineru_stderr.log", proc.stderr or "")
-    atomic_write_json(output_dir / "mineru_command.json", {
-        "command": command,
-        "env": {
-            "MINERU_MODEL_SOURCE": env.get("MINERU_MODEL_SOURCE"),
-            "MINERU_TOOLS_CONFIG_JSON": env.get("MINERU_TOOLS_CONFIG_JSON"),
-        },
-        "returncode": proc.returncode,
-        "duration_seconds": round(time.monotonic() - started, 3),
-    })
-    if proc.returncode != 0:
-        raise RuntimeError(f"MinerU failed with exit code {proc.returncode}: {(proc.stderr or '')[-500:]}")
+    with BlockingFileLock(DEFAULT_MINERU_LOCK):
+        output_dir.mkdir(parents=True, exist_ok=True)
+        command = [mineru_bin, "-p", str(pdf_path), "-o", str(output_dir), "-b", backend]
+        env = os.environ.copy()
+        if model_source:
+            env["MINERU_MODEL_SOURCE"] = model_source
+        if config_path:
+            env["MINERU_TOOLS_CONFIG_JSON"] = str(config_path)
+        env.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+        started = time.monotonic()
+        try:
+            proc = subprocess.run(command, capture_output=True, text=True, timeout=timeout, env=env)
+        except subprocess.TimeoutExpired as exc:
+            atomic_write_text(output_dir / "mineru_stdout.log", exc.stdout or "")
+            atomic_write_text(output_dir / "mineru_stderr.log", exc.stderr or "")
+            raise RuntimeError(f"MinerU timed out after {timeout}s") from exc
+        atomic_write_text(output_dir / "mineru_stdout.log", proc.stdout or "")
+        atomic_write_text(output_dir / "mineru_stderr.log", proc.stderr or "")
+        atomic_write_json(output_dir / "mineru_command.json", {
+            "command": command,
+            "env": {
+                "MINERU_MODEL_SOURCE": env.get("MINERU_MODEL_SOURCE"),
+                "MINERU_TOOLS_CONFIG_JSON": env.get("MINERU_TOOLS_CONFIG_JSON"),
+                "PYTORCH_CUDA_ALLOC_CONF": env.get("PYTORCH_CUDA_ALLOC_CONF"),
+            },
+            "returncode": proc.returncode,
+            "duration_seconds": round(time.monotonic() - started, 3),
+        })
+        if proc.returncode != 0:
+            raise RuntimeError(f"MinerU failed with exit code {proc.returncode}: {(proc.stderr or '')[-500:]}")
     return find_mineru_artifacts(output_dir)
 
 
@@ -1645,6 +1686,50 @@ def flatten_content_items(payload: Any) -> list[dict[str, Any]]:
     return items
 
 
+PAGE_INDEX_KEYS = ("page_idx", "page", "page_num")
+
+
+def parse_page_index(value: Any) -> int | None:
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.strip().isdigit():
+        return int(value.strip())
+    return None
+
+
+def item_page_index(item: dict[str, Any], *, fallback: int | None = None) -> int | None:
+    for key in PAGE_INDEX_KEYS:
+        parsed = parse_page_index(item.get(key))
+        if parsed is not None:
+            return parsed
+    return fallback
+
+
+def iter_content_items_with_page(
+    payload: Any,
+    *,
+    page_hint: int | None = None,
+    top_level: bool = False,
+):
+    if isinstance(payload, dict):
+        local_page = item_page_index(payload, fallback=page_hint)
+        if isinstance(payload.get("content"), list):
+            yield from iter_content_items_with_page(payload["content"], page_hint=local_page, top_level=False)
+            return
+        item = dict(payload)
+        if local_page is not None and item_page_index(item) is None:
+            item["page_idx"] = local_page
+        yield item
+        return
+    if isinstance(payload, list):
+        if top_level and payload and all(isinstance(entry, list) for entry in payload):
+            for index, entry in enumerate(payload):
+                yield from iter_content_items_with_page(entry, page_hint=index, top_level=False)
+            return
+        for entry in payload:
+            yield from iter_content_items_with_page(entry, page_hint=page_hint, top_level=False)
+
+
 def caption_text(value: Any) -> str:
     if isinstance(value, str):
         return value.strip()
@@ -1659,12 +1744,653 @@ def caption_text(value: Any) -> str:
     return ""
 
 
-def extract_label(caption: str, fallback_type: str, index: int) -> str:
+def explicit_label_from_caption(caption: str) -> str:
     match = re.search(r"\b(Figure|Fig\.?|Table)\s*([0-9]+[A-Za-z]?)", caption, flags=re.IGNORECASE)
     if match:
         kind = "Table" if match.group(1).lower().startswith("table") else "Figure"
         return f"{kind} {match.group(2)}"
+    return ""
+
+
+def extract_label(caption: str, fallback_type: str, index: int) -> str:
+    explicit = explicit_label_from_caption(caption)
+    if explicit:
+        return explicit
     return f"{fallback_type.title()} {index}"
+
+
+def find_mineru_sidecar_artifacts(content_path: Path | None, *, source_root: Path) -> MinerUSidecarArtifacts:
+    if content_path is None:
+        return MinerUSidecarArtifacts(origin_pdf_path=None, middle_json_path=None, model_json_path=None)
+
+    content_file = content_path.resolve()
+    search_dirs: list[Path] = []
+    for candidate in [content_file.parent, source_root.resolve(), source_root.resolve() / "auto"]:
+        if candidate.exists() and candidate not in search_dirs:
+            search_dirs.append(candidate)
+
+    base_name = content_file.name
+    suffixes = ("_content_list_v2.json", "_content_list.json")
+    stem = base_name
+    for suffix in suffixes:
+        if base_name.endswith(suffix):
+            stem = base_name[: -len(suffix)]
+            break
+
+    def first_existing(paths: list[Path]) -> Path | None:
+        for path in paths:
+            if path.exists():
+                return path
+        return None
+
+    origin_candidates: list[Path] = []
+    middle_candidates: list[Path] = []
+    model_candidates: list[Path] = []
+    for directory in search_dirs:
+        origin_candidates.extend([
+            directory / f"{stem}_origin.pdf",
+            directory / f"{content_file.stem}_origin.pdf",
+        ])
+        middle_candidates.extend([
+            directory / f"{stem}_middle.json",
+            directory / f"{content_file.stem}_middle.json",
+        ])
+        model_candidates.extend([
+            directory / f"{stem}_model.json",
+            directory / f"{content_file.stem}_model.json",
+        ])
+        if not stem:
+            continue
+        origin_candidates.extend(sorted(directory.glob("*_origin.pdf")))
+        middle_candidates.extend(sorted(directory.glob("*_middle.json")))
+        model_candidates.extend(sorted(directory.glob("*_model.json")))
+
+    return MinerUSidecarArtifacts(
+        origin_pdf_path=first_existing(origin_candidates),
+        middle_json_path=first_existing(middle_candidates),
+        model_json_path=first_existing(model_candidates),
+    )
+
+
+def load_json_file(path: Path | None) -> Any:
+    if path is None or not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8", errors="ignore"))
+    except json.JSONDecodeError:
+        return None
+
+
+def resolve_sidecar_page_info(payload: Any) -> dict[int, dict[str, Any]]:
+    pages: dict[int, dict[str, Any]] = {}
+    if isinstance(payload, list):
+        for index, page in enumerate(payload):
+            if isinstance(page, dict):
+                pages[index] = page
+        return pages
+    if not isinstance(payload, dict):
+        return pages
+    pdf_info = payload.get("pdf_info")
+    if not isinstance(pdf_info, list):
+        return pages
+    for index, page in enumerate(pdf_info):
+        if not isinstance(page, dict):
+            continue
+        pages[index] = page
+    return pages
+
+
+def page_pdf_size(middle_page: dict[str, Any] | None) -> tuple[float, float] | None:
+    if isinstance(middle_page, dict):
+        page_size = middle_page.get("page_size")
+        if isinstance(page_size, (list, tuple)) and len(page_size) == 2:
+            try:
+                width = float(page_size[0])
+                height = float(page_size[1])
+            except (TypeError, ValueError):
+                width = height = 0.0
+            if width > 0.0 and height > 0.0:
+                return width, height
+    return None
+
+
+def page_render_size(model_page: dict[str, Any] | None) -> tuple[float, float] | None:
+    if not isinstance(model_page, dict):
+        return None
+    page_info = model_page.get("page_info")
+    if not isinstance(page_info, dict):
+        return None
+    try:
+        width = float(page_info.get("width") or 0.0)
+        height = float(page_info.get("height") or 0.0)
+    except (TypeError, ValueError):
+        return None
+    if width <= 0.0 or height <= 0.0:
+        return None
+    return width, height
+
+
+def infer_content_page_size(
+    *,
+    content_extent: list[float] | None,
+    model_page: dict[str, Any] | None,
+    pdf_page_size: tuple[float, float] | None,
+) -> tuple[float, float] | None:
+    if content_extent is not None:
+        right = float(content_extent[2])
+        bottom = float(content_extent[3])
+        if right <= DEFAULT_MINERU_CONTENT_COORD_SIZE[0] * 1.08 and bottom <= DEFAULT_MINERU_CONTENT_COORD_SIZE[1] * 1.08:
+            return DEFAULT_MINERU_CONTENT_COORD_SIZE
+    render_size = page_render_size(model_page)
+    if render_size is not None and content_extent is not None:
+        if content_extent[2] <= render_size[0] * 1.05 and content_extent[3] <= render_size[1] * 1.05:
+            return render_size
+    if pdf_page_size is not None and content_extent is not None:
+        if content_extent[2] <= pdf_page_size[0] * 1.05 and content_extent[3] <= pdf_page_size[1] * 1.05:
+            return pdf_page_size
+    return DEFAULT_MINERU_CONTENT_COORD_SIZE
+
+
+def scale_bbox_between_spaces(
+    bbox: tuple[float, float, float, float] | None,
+    *,
+    from_size: tuple[float, float] | None,
+    to_size: tuple[float, float] | None,
+) -> tuple[float, float, float, float] | None:
+    if bbox is None:
+        return None
+    if from_size is None or to_size is None:
+        return bbox
+    from_width, from_height = from_size
+    to_width, to_height = to_size
+    if from_width <= 0.0 or from_height <= 0.0 or to_width <= 0.0 or to_height <= 0.0:
+        return bbox
+    scale_x = to_width / from_width
+    scale_y = to_height / from_height
+    return (
+        bbox[0] * scale_x,
+        bbox[1] * scale_y,
+        bbox[2] * scale_x,
+        bbox[3] * scale_y,
+    )
+
+
+def padded_bbox(
+    bbox: tuple[float, float, float, float],
+    *,
+    page_size: tuple[float, float] | None,
+) -> tuple[float, float, float, float]:
+    if page_size is None:
+        pad_x = pad_y = 8.0
+        page_width = page_height = None
+    else:
+        page_width, page_height = page_size
+        pad_x = max(4.0, page_width * 0.008)
+        pad_y = max(4.0, page_height * 0.006)
+    left = bbox[0] - pad_x
+    top = bbox[1] - pad_y
+    right = bbox[2] + pad_x
+    bottom = bbox[3] + pad_y
+    if page_width is not None and page_height is not None:
+        left = max(0.0, left)
+        top = max(0.0, top)
+        right = min(page_width, right)
+        bottom = min(page_height, bottom)
+    return left, top, right, bottom
+
+
+def bbox_iou(first: tuple[float, float, float, float] | None, second: tuple[float, float, float, float] | None) -> float:
+    if first is None or second is None:
+        return 0.0
+    left = max(first[0], second[0])
+    top = max(first[1], second[1])
+    right = min(first[2], second[2])
+    bottom = min(first[3], second[3])
+    if right <= left or bottom <= top:
+        return 0.0
+    intersection = (right - left) * (bottom - top)
+    union = bbox_area(first) + bbox_area(second) - intersection
+    if union <= 0.0:
+        return 0.0
+    return intersection / union
+
+
+def middle_visual_blocks_by_page(
+    middle_payload: Any,
+    *,
+    source_root: Path,
+) -> dict[int, list[dict[str, Any]]]:
+    pages = resolve_sidecar_page_info(middle_payload)
+    blocks_by_page: dict[int, list[dict[str, Any]]] = {}
+    for page_index, page in pages.items():
+        para_blocks = page.get("para_blocks")
+        if not isinstance(para_blocks, list):
+            continue
+        page_blocks: list[dict[str, Any]] = []
+        for block in para_blocks:
+            if not isinstance(block, dict):
+                continue
+            block_type = str(block.get("type") or block.get("block_type") or "").lower()
+            if block_type not in {"image", "chart", "table"}:
+                continue
+            bbox = normalize_bbox(block.get("bbox"))
+            if bbox is None:
+                continue
+            source_candidates = [
+                block.get("image_path"),
+                block.get("img_path"),
+                block.get("path"),
+            ]
+            source_path = ""
+            for candidate in source_candidates:
+                if not candidate:
+                    continue
+                resolved = (source_root / str(candidate)).resolve()
+                source_path = str(resolved if resolved.exists() else candidate)
+                break
+            page_blocks.append({
+                "page": page_index,
+                "type": block_type,
+                "bbox": [round(value, 3) for value in bbox],
+                "caption": caption_text(block.get("caption")),
+                "source_path": source_path,
+            })
+        if page_blocks:
+            blocks_by_page[page_index] = page_blocks
+    return blocks_by_page
+
+
+def figure_table_item_size(payload: Any) -> tuple[float, float] | None:
+    if not isinstance(payload, dict):
+        return None
+    page_info = payload.get("page_info")
+    if not isinstance(page_info, dict):
+        return None
+    try:
+        width = float(page_info.get("width") or 0.0)
+        height = float(page_info.get("height") or 0.0)
+    except (TypeError, ValueError):
+        return None
+    if width <= 0.0 or height <= 0.0:
+        return None
+    return width, height
+
+
+def crop_box_for_cluster(
+    cluster_bbox: tuple[float, float, float, float] | None,
+    *,
+    page_rect: Any,
+    content_page_size: tuple[float, float] | None,
+    pdf_page_size: tuple[float, float] | None,
+) -> Any:
+    if fitz is None or cluster_bbox is None or page_rect is None:
+        return None
+    cluster_bbox = padded_bbox(cluster_bbox, page_size=content_page_size)
+    scaled = scale_bbox_between_spaces(
+        cluster_bbox,
+        from_size=content_page_size,
+        to_size=pdf_page_size,
+    )
+    if scaled is None:
+        return None
+    crop = fitz.Rect(*scaled)
+    page_bounds = fitz.Rect(page_rect)
+    crop = crop & page_bounds
+    if crop.is_empty or crop.width <= 1 or crop.height <= 1:
+        return None
+    return crop
+
+
+def write_full_region_crop(
+    *,
+    doc: Any,
+    image_root: Path,
+    page_index: int,
+    crop_box: Any,
+    cluster_kind: str,
+    cluster_label: str,
+    cluster_bbox: list[float],
+    pdf_page_size: tuple[float, float] | None,
+    render_page_size: tuple[float, float] | None,
+) -> Path | None:
+    if fitz is None:
+        return None
+    output_dir = image_root / "images" / "rf_full_regions"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    digest_input = "|".join([
+        str(getattr(doc, "name", "") or ""),
+        str(page_index),
+        json.dumps(cluster_bbox),
+        json.dumps([round(value, 3) for value in crop_box]),
+        cluster_kind,
+        cluster_label,
+    ])
+    digest = hashlib.sha256(digest_input.encode("utf-8")).hexdigest()[:12]
+    filename = f"page_{page_index + 1:03d}_{safe_slug(cluster_label or cluster_kind, max_len=40)}_{digest}.jpg"
+    out_path = output_dir / filename
+    if out_path.exists():
+        return out_path
+    if page_index < 0 or page_index >= len(doc):
+        return None
+    page = doc.load_page(page_index)
+    if (
+        pdf_page_size is not None
+        and render_page_size is not None
+        and pdf_page_size[0] > 0.0
+        and pdf_page_size[1] > 0.0
+        and render_page_size[0] > 0.0
+        and render_page_size[1] > 0.0
+    ):
+        matrix = fitz.Matrix(render_page_size[0] / pdf_page_size[0], render_page_size[1] / pdf_page_size[1])
+    else:
+        matrix = fitz.Matrix(2, 2)
+    pix = page.get_pixmap(matrix=matrix, clip=crop_box, alpha=False)
+    pix.save(out_path)
+    return out_path
+
+
+def full_region_cluster_key(cluster: dict[str, Any]) -> tuple[Any, ...] | None:
+    page = item_page_index(cluster)
+    cluster_bbox = normalize_bbox(cluster.get("cluster_bbox") or cluster.get("bbox"))
+    if page is None or cluster_bbox is None:
+        return None
+    source_paths = tuple(sorted(str(path) for path in cluster.get("source_paths") or [] if str(path)))
+    return (
+        page,
+        str(cluster.get("type") or ""),
+        tuple(round(value, 3) for value in cluster_bbox),
+        source_paths,
+    )
+
+
+def full_region_caption(records: list[dict[str, Any]]) -> str:
+    captions: list[str] = []
+    raw_items = records[0].get("raw_items") if records and isinstance(records[0].get("raw_items"), list) else []
+    for item in raw_items:
+        caption = str(item.get("caption") or "").strip()
+        if caption and caption not in captions:
+            captions.append(caption)
+    for record in records:
+        caption = str(record.get("caption") or "").strip()
+        if caption and caption not in captions:
+            captions.append(caption)
+    explicit = [caption for caption in captions if explicit_label_from_caption(caption)]
+    if explicit:
+        return max(explicit, key=len)
+    if len(captions) <= 4:
+        return " ".join(captions)
+    return max(captions, key=len) if captions else ""
+
+
+def full_region_label(records: list[dict[str, Any]], fallback: str) -> str:
+    for record in records:
+        label = str(record.get("label") or "").strip()
+        if explicit_label_from_caption(label):
+            return label
+    caption = full_region_caption(records)
+    explicit = explicit_label_from_caption(caption)
+    if explicit:
+        return explicit
+    return fallback
+
+
+def maybe_replace_clusters_with_full_region_crops(
+    figures_tables: list[dict[str, Any]],
+    *,
+    content_path: Path | None,
+    source_root: Path,
+) -> list[dict[str, Any]]:
+    if not figures_tables or content_path is None or fitz is None:
+        return figures_tables
+    sidecars = find_mineru_sidecar_artifacts(content_path, source_root=source_root)
+    if sidecars.origin_pdf_path is None or sidecars.middle_json_path is None:
+        return figures_tables
+
+    middle_payload = load_json_file(sidecars.middle_json_path)
+    model_payload = load_json_file(sidecars.model_json_path)
+    middle_pages = resolve_sidecar_page_info(middle_payload)
+    model_pages = resolve_sidecar_page_info(model_payload)
+    image_root = content_path.parent
+    middle_blocks = middle_visual_blocks_by_page(middle_payload, source_root=image_root)
+
+    content_payload = load_json_file(content_path)
+    content_items = list(iter_content_items_with_page(content_payload, top_level=True)) if content_payload is not None else []
+    content_page_sizes: dict[int, tuple[float, float]] = {}
+    content_page_extents: dict[int, list[float]] = {}
+    for item in content_items:
+        page = item_page_index(item)
+        if page is None:
+            continue
+        if page not in content_page_sizes:
+            size = figure_table_item_size(item)
+            if size is not None:
+                content_page_sizes[page] = size
+        bbox = normalize_bbox(item.get("bbox"))
+        if bbox is not None:
+            extent = content_page_extents.setdefault(page, [bbox[0], bbox[1], bbox[2], bbox[3]])
+            extent[0] = min(extent[0], bbox[0])
+            extent[1] = min(extent[1], bbox[1])
+            extent[2] = max(extent[2], bbox[2])
+            extent[3] = max(extent[3], bbox[3])
+
+    try:
+        with fitz.open(sidecars.origin_pdf_path) as doc:
+            crop_cache: dict[tuple[Any, ...], tuple[Path, list[dict[str, Any]], list[float]]] = {}
+            pending_by_key: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+            ungrouped: list[dict[str, Any]] = []
+            for cluster in figures_tables:
+                cluster_key = full_region_cluster_key(cluster)
+                if cluster_key is None:
+                    ungrouped.append(cluster)
+                    continue
+                pending_by_key.setdefault(cluster_key, []).append(cluster)
+
+            rewritten: list[dict[str, Any]] = list(ungrouped)
+            for cluster_key, cluster_records in pending_by_key.items():
+                cluster = cluster_records[0]
+                cluster_size = int(cluster.get("cluster_size") or 0)
+                source_paths = [str(path) for path in cluster.get("source_paths") or [] if str(path)]
+                page = item_page_index(cluster)
+                cluster_bbox_list = cluster.get("cluster_bbox") or cluster.get("bbox")
+                cluster_bbox = normalize_bbox(cluster_bbox_list)
+                if page is None or page < 0 or page >= len(doc) or cluster_bbox is None:
+                    rewritten.extend(cluster_records)
+                    continue
+                if cluster_size <= 1:
+                    rewritten.extend(cluster_records)
+                    continue
+
+                page_middle = middle_pages.get(page)
+                page_model = model_pages.get(page)
+                pdf_page_size = page_pdf_size(page_middle) or (
+                    float(doc[page].rect.width),
+                    float(doc[page].rect.height),
+                )
+                content_page_size = content_page_sizes.get(page) or infer_content_page_size(
+                    content_extent=content_page_extents.get(page),
+                    model_page=page_model,
+                    pdf_page_size=pdf_page_size,
+                )
+                page_rect = doc[page].rect
+                crop_box = crop_box_for_cluster(
+                    cluster_bbox,
+                    page_rect=page_rect,
+                    content_page_size=content_page_size,
+                    pdf_page_size=pdf_page_size,
+                )
+                if crop_box is None:
+                    rewritten.extend(cluster_records)
+                    continue
+
+                raw_items = cluster.get("raw_items") if isinstance(cluster.get("raw_items"), list) else []
+                if cluster_key in crop_cache:
+                    crop_path, matched_middle, crop_box_list = crop_cache[cluster_key]
+                else:
+                    crop_box_list = [round(value, 3) for value in crop_box]
+                    crop_box_pdf = normalize_bbox(crop_box_list)
+                    matched_middle = []
+                    for block in middle_blocks.get(page, []):
+                        block_bbox = normalize_bbox(block.get("bbox"))
+                        if bbox_iou(block_bbox, crop_box_pdf) > 0:
+                            matched_middle.append(block)
+                    crop_path = write_full_region_crop(
+                        doc=doc,
+                        image_root=image_root,
+                        page_index=page,
+                        crop_box=crop_box,
+                        cluster_kind=str(cluster.get("type") or "figure"),
+                        cluster_label=str(next(
+                            (str(item.get("label") or "").strip() for item in raw_items if str(item.get("label") or "").strip()),
+                            str(cluster.get("label") or ""),
+                        )),
+                        cluster_bbox=[round(value, 3) for value in cluster_bbox],
+                        pdf_page_size=pdf_page_size,
+                        render_page_size=page_render_size(page_model),
+                    )
+                    if crop_path is None:
+                        rewritten.extend(cluster_records)
+                        continue
+                    crop_cache[cluster_key] = (crop_path, matched_middle, crop_box_list)
+
+                updated = dict(cluster)
+                updated["caption"] = full_region_caption(cluster_records) or str(cluster.get("caption") or "")
+                updated["label"] = full_region_label(cluster_records, str(cluster.get("label") or ""))
+                updated["source_path"] = str(crop_path.resolve())
+                updated["bbox"] = [round(value, 3) for value in cluster_bbox]
+                updated["full_region_source"] = "pdf_crop"
+                updated["full_region_origin_pdf"] = str(sidecars.origin_pdf_path.resolve())
+                updated["full_region_bbox_pdf"] = crop_box_list
+                updated["full_region_bbox_content"] = [round(value, 3) for value in cluster_bbox]
+                if raw_items:
+                    updated["raw_items"] = raw_items
+                if matched_middle:
+                    updated["middle_visual_blocks"] = matched_middle
+                rewritten.append(updated)
+            return sorted(
+                rewritten,
+                key=lambda item: (
+                    item.get("page") is None,
+                    item.get("page") if item.get("page") is not None else 10**9,
+                    (item.get("bbox") or [0.0, 0.0])[1],
+                    (item.get("bbox") or [0.0, 0.0])[0],
+                    str(item.get("label") or ""),
+                ),
+            )
+    except Exception:  # noqa: BLE001
+        return figures_tables
+
+
+def markdown_image_ref_candidates(source_path: str, *, source_root: Path) -> set[str]:
+    if not source_path:
+        return set()
+    path = Path(source_path)
+    candidates = {str(source_path).replace("\\", "/")}
+    if path.is_absolute():
+        try:
+            candidates.add(path.resolve().relative_to(source_root.resolve()).as_posix())
+        except ValueError:
+            pass
+    else:
+        candidates.add(path.as_posix())
+    if path.name:
+        candidates.add(path.name)
+        candidates.add(f"images/{path.name}")
+    return {candidate for candidate in candidates if candidate}
+
+
+def full_region_markdown_ref(source_path: str, *, source_root: Path) -> str | None:
+    if not source_path:
+        return None
+    path = Path(source_path)
+    if not path.exists():
+        return None
+    try:
+        return path.resolve().relative_to(source_root.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def normalize_markdown_full_region_image_refs(
+    markdown: str,
+    figures_tables: list[dict[str, Any]],
+    *,
+    source_root: Path,
+) -> str:
+    ref_to_group: dict[str, str] = {}
+    group_to_full_ref: dict[str, str] = {}
+    group_to_anchor_texts: dict[str, list[str]] = {}
+    for index, item in enumerate(figures_tables):
+        if item.get("full_region_source") != "pdf_crop":
+            continue
+        full_ref = full_region_markdown_ref(str(item.get("source_path") or ""), source_root=source_root)
+        if not full_ref:
+            continue
+        source_paths = [str(path) for path in item.get("source_paths") or [] if str(path)]
+        if not source_paths:
+            continue
+        group_id = f"full_region_{index}"
+        group_to_full_ref[group_id] = full_ref
+        anchors: list[str] = []
+        for raw_item in item.get("raw_items") or []:
+            if not isinstance(raw_item, dict):
+                continue
+            caption = compact_text(raw_item.get("caption"), max_len=180)
+            if len(caption) >= 8 and caption not in anchors:
+                anchors.append(caption)
+        caption = compact_text(item.get("caption"), max_len=220)
+        if len(caption) >= 8 and caption not in anchors:
+            anchors.append(caption)
+        group_to_anchor_texts[group_id] = anchors
+        for source_path in source_paths:
+            for candidate in markdown_image_ref_candidates(source_path, source_root=source_root):
+                ref_to_group[candidate] = group_id
+
+    if not group_to_full_ref:
+        return markdown
+
+    seen_groups = {
+        group_id
+        for group_id, full_ref in group_to_full_ref.items()
+        if full_ref in markdown
+    }
+    out_lines: list[str] = []
+    image_pattern = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
+    for line in markdown.splitlines():
+        replacements: list[tuple[int, int, str]] = []
+        for match in image_pattern.finditer(line):
+            target = match.group(1).strip().replace("\\", "/")
+            group_id = ref_to_group.get(target) or ref_to_group.get(Path(target).name)
+            if group_id:
+                replacement = ""
+                if group_id not in seen_groups:
+                    replacement = f"![]({group_to_full_ref[group_id]})"
+                    seen_groups.add(group_id)
+                replacements.append((match.start(), match.end(), replacement))
+        if not replacements:
+            out_lines.append(line)
+            continue
+        new_line = line
+        for start, end, replacement in reversed(replacements):
+            new_line = new_line[:start] + replacement + new_line[end:]
+        if new_line.strip():
+            out_lines.append(new_line)
+    for group_id, full_ref in group_to_full_ref.items():
+        if group_id in seen_groups:
+            continue
+        block = f"![]({full_ref})"
+        anchors = group_to_anchor_texts.get(group_id) or []
+        inserted = False
+        for line_index, line in enumerate(out_lines):
+            if any(anchor and anchor in line for anchor in anchors):
+                out_lines.insert(line_index, block)
+                inserted = True
+                break
+        if not inserted:
+            if out_lines and out_lines[-1].strip():
+                out_lines.append("")
+            out_lines.append(block)
+        seen_groups.add(group_id)
+    return "\n".join(out_lines) + ("\n" if markdown.endswith("\n") else "")
 
 
 def extract_figures_tables(content_path: Path | None, *, source_root: Path) -> list[dict[str, Any]]:
@@ -1674,25 +2400,42 @@ def extract_figures_tables(content_path: Path | None, *, source_root: Path) -> l
         payload = json.loads(content_path.read_text(encoding="utf-8", errors="ignore"))
     except json.JSONDecodeError:
         return []
-    out: list[dict[str, Any]] = []
-    counters = {"figure": 0, "table": 0}
-    for item in flatten_content_items(payload):
+    all_items = list(iter_content_items_with_page(payload, top_level=True))
+    page_extents: dict[int, list[float]] = {}
+    for item in all_items:
+        page = item_page_index(item)
+        bbox = normalize_bbox(item.get("bbox"))
+        if page is None or bbox is None:
+            continue
+        extent = page_extents.setdefault(page, [bbox[0], bbox[1], bbox[2], bbox[3]])
+        extent[0] = min(extent[0], bbox[0])
+        extent[1] = min(extent[1], bbox[1])
+        extent[2] = max(extent[2], bbox[2])
+        extent[3] = max(extent[3], bbox[3])
+
+    figure_items: list[dict[str, Any]] = []
+    for order, item in enumerate(all_items):
         item_type = str(item.get("type") or "").lower()
         content = item.get("content") if isinstance(item.get("content"), dict) else {}
         if item_type in {"image", "chart", "figure"}:
             kind = "figure"
             caption = (
                 caption_text(content.get("image_caption"))
+                or caption_text(item.get("image_caption"))
                 or caption_text(content.get("chart_caption"))
+                or caption_text(item.get("chart_caption"))
                 or caption_text(item.get("caption"))
             )
         elif item_type == "table":
             kind = "table"
-            caption = caption_text(content.get("table_caption")) or caption_text(item.get("caption"))
+            caption = (
+                caption_text(content.get("table_caption"))
+                or caption_text(item.get("table_caption"))
+                or caption_text(item.get("caption"))
+            )
         else:
             continue
 
-        counters[kind] += 1
         image_source = content.get("image_source") if isinstance(content.get("image_source"), dict) else {}
         src = item.get("img_path") or image_source.get("path") or item.get("image_path")
         src_path = None
@@ -1702,15 +2445,326 @@ def extract_figures_tables(content_path: Path | None, *, source_root: Path) -> l
                 candidate = (source_root / src).resolve()
             if candidate.exists():
                 src_path = candidate
-        out.append({
-            "label": extract_label(caption, kind, counters[kind]),
-            "type": kind,
+        figure_items.append({
+            "kind": kind,
+            "item_type": item_type,
             "caption": caption,
+            "explicit_label": explicit_label_from_caption(caption),
             "source_path": str(src_path) if src_path else str(src or ""),
-            "page": item.get("page_idx") or item.get("page") or item.get("page_num"),
-            "bbox": item.get("bbox"),
+            "page": item_page_index(item),
+            "bbox": normalize_bbox(item.get("bbox")),
+            "order": order,
         })
-    return out
+
+    figures_tables = cluster_figure_table_items(figure_items, page_extents=page_extents)
+    return maybe_replace_clusters_with_full_region_crops(
+        figures_tables,
+        content_path=content_path,
+        source_root=source_root,
+    )
+
+
+def normalize_bbox(value: Any) -> tuple[float, float, float, float] | None:
+    if not isinstance(value, (list, tuple)) or len(value) != 4:
+        return None
+    try:
+        x0, y0, x1, y1 = (float(part) for part in value)
+    except (TypeError, ValueError):
+        return None
+    left, right = sorted((x0, x1))
+    top, bottom = sorted((y0, y1))
+    return left, top, right, bottom
+
+
+def bbox_width(bbox: tuple[float, float, float, float] | None) -> float:
+    if bbox is None:
+        return 0.0
+    return max(0.0, bbox[2] - bbox[0])
+
+
+def bbox_height(bbox: tuple[float, float, float, float] | None) -> float:
+    if bbox is None:
+        return 0.0
+    return max(0.0, bbox[3] - bbox[1])
+
+
+def bbox_area(bbox: tuple[float, float, float, float] | None) -> float:
+    return bbox_width(bbox) * bbox_height(bbox)
+
+
+def bbox_center(bbox: tuple[float, float, float, float] | None) -> tuple[float, float]:
+    if bbox is None:
+        return 0.0, 0.0
+    return (bbox[0] + bbox[2]) / 2.0, (bbox[1] + bbox[3]) / 2.0
+
+
+def bbox_union(items: list[dict[str, Any]]) -> list[float] | None:
+    boxes = [item.get("bbox") for item in items if item.get("bbox") is not None]
+    if not boxes:
+        return None
+    left = min(box[0] for box in boxes)
+    top = min(box[1] for box in boxes)
+    right = max(box[2] for box in boxes)
+    bottom = max(box[3] for box in boxes)
+    return [round(left, 3), round(top, 3), round(right, 3), round(bottom, 3)]
+
+
+def axis_gap(a0: float, a1: float, b0: float, b1: float) -> float:
+    if a1 < b0:
+        return b0 - a1
+    if b1 < a0:
+        return a0 - b1
+    return 0.0
+
+
+def axis_overlap(a0: float, a1: float, b0: float, b1: float) -> float:
+    return max(0.0, min(a1, b1) - max(a0, b0))
+
+
+def bboxes_are_connected(
+    first: tuple[float, float, float, float] | None,
+    second: tuple[float, float, float, float] | None,
+    *,
+    page_extent: list[float] | None,
+) -> bool:
+    if first is None or second is None:
+        return False
+    x_gap = axis_gap(first[0], first[2], second[0], second[2])
+    y_gap = axis_gap(first[1], first[3], second[1], second[3])
+    x_overlap = axis_overlap(first[0], first[2], second[0], second[2])
+    y_overlap = axis_overlap(first[1], first[3], second[1], second[3])
+    min_width = max(1.0, min(bbox_width(first), bbox_width(second)))
+    min_height = max(1.0, min(bbox_height(first), bbox_height(second)))
+    page_width = max(1.0, (page_extent[2] - page_extent[0]) if page_extent else max(first[2], second[2]))
+    page_height = max(1.0, (page_extent[3] - page_extent[1]) if page_extent else max(first[3], second[3]))
+    horizontal_gap_limit = max(24.0, min_width * 0.16, page_width * 0.03)
+    vertical_gap_limit = max(28.0, min_height * 0.28, page_height * 0.06)
+    vertical_overlap_ratio = y_overlap / min_height
+    horizontal_overlap_ratio = x_overlap / min_width
+    if x_gap == 0.0 and y_gap == 0.0:
+        return True
+    if vertical_overlap_ratio >= 0.45 and x_gap <= horizontal_gap_limit:
+        return True
+    if horizontal_overlap_ratio >= 0.55 and y_gap <= vertical_gap_limit:
+        return True
+    return False
+
+
+def connected_components_for_visual_items(
+    items: list[dict[str, Any]],
+    *,
+    page_extent: list[float] | None,
+) -> list[list[dict[str, Any]]]:
+    if not items:
+        return []
+    remaining = list(items)
+    components: list[list[dict[str, Any]]] = []
+    while remaining:
+        seed = remaining.pop(0)
+        component = [seed]
+        stack = [seed]
+        while stack:
+            current = stack.pop()
+            next_remaining: list[dict[str, Any]] = []
+            for candidate in remaining:
+                if bboxes_are_connected(current.get("bbox"), candidate.get("bbox"), page_extent=page_extent):
+                    component.append(candidate)
+                    stack.append(candidate)
+                else:
+                    next_remaining.append(candidate)
+            remaining = next_remaining
+        components.append(sorted(component, key=lambda item: item.get("order", 0)))
+    return components
+
+
+def component_anchor_bbox(items: list[dict[str, Any]]) -> tuple[float, float, float, float] | None:
+    cluster_bbox = bbox_union(items)
+    return normalize_bbox(cluster_bbox)
+
+
+def split_component_by_labels(items: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
+    labels: list[str] = []
+    anchors_by_label: dict[str, list[dict[str, Any]]] = {}
+    for item in items:
+        label = str(item.get("explicit_label") or "").strip()
+        if not label:
+            continue
+        if label not in anchors_by_label:
+            labels.append(label)
+            anchors_by_label[label] = []
+        anchors_by_label[label].append(item)
+    if len(labels) <= 1:
+        return [items]
+
+    anchor_boxes = {
+        label: component_anchor_bbox(anchor_items)
+        for label, anchor_items in anchors_by_label.items()
+    }
+    assigned: dict[str, list[dict[str, Any]]] = {label: [] for label in labels}
+    for item in items:
+        if str(item.get("explicit_label") or "").strip() in assigned:
+            assigned[str(item.get("explicit_label") or "").strip()].append(item)
+            continue
+        best_label = labels[0]
+        best_score: float | None = None
+        item_bbox = item.get("bbox")
+        item_center = bbox_center(item_bbox)
+        for label in labels:
+            anchor_bbox = anchor_boxes.get(label)
+            anchor_center = bbox_center(anchor_bbox)
+            x_gap = axis_gap(item_bbox[0], item_bbox[2], anchor_bbox[0], anchor_bbox[2]) if item_bbox and anchor_bbox else 0.0
+            y_gap = axis_gap(item_bbox[1], item_bbox[3], anchor_bbox[1], anchor_bbox[3]) if item_bbox and anchor_bbox else 0.0
+            center_score = ((item_center[0] - anchor_center[0]) ** 2 + (item_center[1] - anchor_center[1]) ** 2) ** 0.5
+            score = x_gap * 2.0 + y_gap * 2.0 + center_score
+            if best_score is None or score < best_score:
+                best_label = label
+                best_score = score
+        assigned[best_label].append(item)
+    return [
+        sorted(cluster, key=lambda item: item.get("order", 0))
+        for label, cluster in assigned.items()
+        if cluster
+    ]
+
+
+def cluster_primary_caption(items: list[dict[str, Any]]) -> str:
+    captions = [str(item.get("caption") or "").strip() for item in items if str(item.get("caption") or "").strip()]
+    if not captions:
+        return ""
+    explicit_captions = [caption for caption in captions if explicit_label_from_caption(caption)]
+    if explicit_captions:
+        return max(explicit_captions, key=len)
+    return max(captions, key=lambda caption: (len(caption) >= 24, len(caption)))
+
+
+def generic_cluster_label(kind: str) -> str:
+    return "Table" if kind == "table" else "Figure"
+
+
+def representative_source_path(items: list[dict[str, Any]]) -> str:
+    ranked = sorted(
+        items,
+        key=lambda item: (
+            0 if item.get("explicit_label") else 1,
+            -bbox_area(item.get("bbox")),
+            item.get("order", 0),
+        ),
+    )
+    for item in ranked:
+        source_path = str(item.get("source_path") or "")
+        if source_path:
+            return source_path
+    return ""
+
+
+def cluster_item_label(item: dict[str, Any], *, kind: str, cluster_label: str) -> str:
+    explicit = str(item.get("explicit_label") or "").strip()
+    if explicit:
+        return explicit
+    return generic_cluster_label(kind)
+
+
+def source_preserving_cluster_records(
+    *,
+    kind: str,
+    page: int | None,
+    cluster_items: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    cluster_caption = cluster_primary_caption(cluster_items)
+    cluster_label = next(
+        (str(item.get("explicit_label") or "").strip() for item in cluster_items if str(item.get("explicit_label") or "").strip()),
+        "",
+    ) or generic_cluster_label(kind)
+    source_paths: list[str] = []
+    for item in cluster_items:
+        source_path = str(item.get("source_path") or "")
+        if source_path and source_path not in source_paths:
+            source_paths.append(source_path)
+    raw_items = [
+        {
+            "type": str(item.get("item_type") or ""),
+            "page": item.get("page"),
+            "bbox": [round(value, 3) for value in item["bbox"]] if item.get("bbox") is not None else None,
+            "caption": str(item.get("caption") or ""),
+            "label": str(item.get("explicit_label") or ""),
+            "source_path": str(item.get("source_path") or ""),
+        }
+        for item in cluster_items
+    ]
+    cluster_bbox = bbox_union(cluster_items)
+    shared = {
+        "source_paths": source_paths,
+        "page": page,
+        "cluster_size": len(cluster_items),
+        "raw_items": raw_items,
+    }
+    if len(source_paths) <= 1:
+        return [{
+            "label": cluster_label,
+            "type": kind,
+            "caption": cluster_caption,
+            "source_path": representative_source_path(cluster_items),
+            "bbox": cluster_bbox,
+            **shared,
+        }]
+
+    records: list[dict[str, Any]] = []
+    for item in cluster_items:
+        source_path = str(item.get("source_path") or "")
+        if not source_path:
+            continue
+        item_bbox = bbox_union([item])
+        records.append({
+            "label": cluster_item_label(item, kind=kind, cluster_label=cluster_label),
+            "type": kind,
+            "caption": str(item.get("caption") or "").strip(),
+            "source_path": source_path,
+            "bbox": item_bbox,
+            "cluster_bbox": cluster_bbox,
+            **shared,
+        })
+    return records
+
+
+def cluster_figure_table_items(
+    items: list[dict[str, Any]],
+    *,
+    page_extents: dict[int, list[float]],
+) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, int | None], list[dict[str, Any]]] = {}
+    for item in items:
+        page = item.get("page")
+        key = (
+            str(item.get("kind") or ""),
+            page,
+            item.get("order") if page is None else None,
+        )
+        grouped.setdefault(key, []).append(item)
+
+    clusters: list[dict[str, Any]] = []
+    for (kind, page, _), group_items in grouped.items():
+        page_extent = page_extents.get(page) if page is not None else None
+        for component in connected_components_for_visual_items(
+            sorted(group_items, key=lambda item: item.get("order", 0)),
+            page_extent=page_extent,
+        ):
+            for cluster_items in split_component_by_labels(component):
+                clusters.extend(source_preserving_cluster_records(
+                    kind=kind,
+                    page=page,
+                    cluster_items=cluster_items,
+                ))
+
+    return sorted(
+        clusters,
+        key=lambda item: (
+            item.get("page") is None,
+            item.get("page") if item.get("page") is not None else 10**9,
+            (item.get("bbox") or [0.0, 0.0])[1],
+            (item.get("bbox") or [0.0, 0.0])[0],
+            str(item.get("label") or ""),
+        ),
+    )
 
 
 def table_cell(value: Any) -> str:
@@ -2084,6 +3138,19 @@ def copy_vault_figures(
 ) -> list[dict[str, Any]]:
     copied: list[dict[str, Any]] = []
     target_dir = asset_root / task_id / "figures"
+    source_paths = {
+        Path(str(item.get("source_path"))).expanduser().resolve()
+        for item in figures_tables
+        if item.get("source_path")
+    }
+    if target_dir.exists():
+        for stale in target_dir.iterdir():
+            if (
+                stale.is_file()
+                and stale.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}
+                and stale.resolve() not in source_paths
+            ):
+                stale.unlink()
     for index, item in enumerate(figures_tables, 1):
         source_value = item.get("source_path") or ""
         if not source_value:
@@ -2095,7 +3162,8 @@ def copy_vault_figures(
         filename = f"{index:03d}_{label}{source_extension(source)}"
         target = target_dir / filename
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+        if source.resolve() != target.resolve():
+            shutil.copy2(source, target)
         copied_item = dict(item)
         copied_item["item_id"] = str(item.get("item_id") or f"item_{index:03d}")
         copied_item["vault_asset_path"] = target.resolve()
@@ -2126,6 +3194,11 @@ def image_block(item: dict[str, Any]) -> str:
 def placement_candidates(figures_tables: list[dict[str, Any]]) -> list[dict[str, Any]]:
     candidates = []
     for index, item in enumerate(figures_tables, 1):
+        try:
+            cluster_size = int(item.get("cluster_size") or 0)
+        except (TypeError, ValueError):
+            cluster_size = 0
+        full_region_source = str(item.get("full_region_source") or "")
         candidates.append({
             "item_id": str(item.get("item_id") or f"item_{index:03d}"),
             "label": str(item.get("label") or ""),
@@ -2135,6 +3208,9 @@ def placement_candidates(figures_tables: list[dict[str, Any]]) -> list[dict[str,
             "visual_type": str(item.get("visual_type") or ""),
             "placement_hint": str(item.get("placement_hint") or ""),
             "is_sample_only": bool(item.get("is_sample_only")),
+            "cluster_size": cluster_size,
+            "full_region_source": full_region_source,
+            "is_full_region": full_region_source == "pdf_crop" and cluster_size > 1,
         })
     return candidates
 
@@ -2156,8 +3232,31 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
     placements: list[dict[str, str]] = []
     used: set[str] = set()
 
-    for item in candidates:
+    full_region_candidates = [item for item in candidates if item.get("is_full_region")]
+    full_region_candidates.sort(key=lambda item: (sample_only_figure(item), item["item_id"]))
+    for item in full_region_candidates:
+        if len(placements) >= max_images:
+            break
         text = f"{item.get('label') or ''} {item.get('caption') or ''}".lower()
+        section = (
+            "整体框架"
+            if item.get("type", "").lower() == "figure"
+            and re.search(r"\b(framework|pipeline|architecture|overview|method)\b", text)
+            else "实验与分析"
+        )
+        placements.append({
+            "item_id": item["item_id"],
+            "section": section,
+            "reason": "complete multi-panel crop from MinerU PDF recrop",
+        })
+        used.add(item["item_id"])
+
+    for item in candidates:
+        if len(placements) >= max_images:
+            break
+        text = f"{item.get('label') or ''} {item.get('caption') or ''}".lower()
+        if item["item_id"] in used:
+            continue
         if sample_only_figure(item):
             continue
         if item.get("type", "").lower() == "figure" and re.search(r"\b(framework|pipeline|architecture|overview|method)\b", text):
@@ -2307,23 +3406,26 @@ def caption_only_visual_summary(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-async def kimi_visual_summary(
+async def figure_visual_summary_llm(
     args: argparse.Namespace,
     *,
     item: dict[str, Any],
 ) -> LLMCallResult:
     from openai import AsyncOpenAI
 
-    api_key = os.environ.get(args.kimi_api_key_env, "")
+    if args.figure_provider == "none":
+        raise RuntimeError("figure provider is disabled")
+    api_key = os.environ.get(args.figure_api_key_env, "")
     if not api_key:
-        raise RuntimeError(f"Missing API key env var: {args.kimi_api_key_env}")
+        raise RuntimeError(f"Missing API key env var: {args.figure_api_key_env}")
     source = Path(str(item.get("source_path") or ""))
     if not source.exists() or not source.is_file():
         raise FileNotFoundError(f"figure image not found: {source}")
     client_kwargs: dict[str, Any] = {"api_key": api_key}
-    if args.kimi_base_url:
-        client_kwargs["base_url"] = args.kimi_base_url
-    client_kwargs["default_headers"] = {"User-Agent": "claude-code/1.0"}
+    if args.figure_base_url:
+        client_kwargs["base_url"] = args.figure_base_url
+    if args.figure_provider == "kimi":
+        client_kwargs["default_headers"] = {"User-Agent": "claude-code/1.0"}
     client, http_client = build_async_openai_client(AsyncOpenAI, **client_kwargs)
     try:
         encoded = base64.b64encode(source.read_bytes()).decode("ascii")
@@ -2350,19 +3452,26 @@ async def kimi_visual_summary(
                 ],
             },
         ]
-        stream = await client.chat.completions.create(
-            model=args.kimi_model,
-            messages=messages,
-            max_tokens=args.figure_visual_summary_max_tokens,
-            temperature=args.kimi_temperature,
-            stream=True,
-            extra_body={"thinking": {"type": "disabled"}},
-        )
+        request: dict[str, Any] = {
+            "model": args.figure_model,
+            "messages": messages,
+            "max_tokens": args.figure_visual_summary_max_tokens,
+            "temperature": args.figure_temperature,
+            "stream": True,
+        }
+        if args.figure_provider == "kimi":
+            request["extra_body"] = {"thinking": {"type": "disabled"}}
+        else:
+            request["stream_options"] = {"include_usage": True}
+        stream = await client.chat.completions.create(**request)
         chunks: list[str] = []
         finish_reasons: list[str] = []
         stream_chunk_count = 0
+        api_usage: dict[str, Any] = {}
         async for chunk in stream:
             stream_chunk_count += 1
+            if getattr(chunk, "usage", None) is not None:
+                api_usage = normalized_api_usage(getattr(chunk, "usage", None))
             if not chunk.choices:
                 continue
             choice = chunk.choices[0]
@@ -2378,22 +3487,34 @@ async def kimi_visual_summary(
     prompt_tokens = estimate_tokens(FIGURE_VISUAL_SUMMARY_SYSTEM) + estimate_tokens(prompt)
     completion_tokens = estimate_tokens(text)
     usage = {
-        "provider": "kimi",
-        "model": args.kimi_model,
+        "provider": args.figure_provider,
+        "model": args.figure_model,
         "prompt_tokens_est": prompt_tokens,
         "completion_tokens_est": completion_tokens,
         "reasoning_tokens_est": 0,
         "total_tokens_est": prompt_tokens + completion_tokens,
         "total_with_reasoning_tokens_est": prompt_tokens + completion_tokens,
-        "estimated_cost_usd": estimate_cost_usd(args.kimi_model, prompt_tokens, completion_tokens),
+        "estimated_cost_usd": estimate_cost_usd(args.figure_model, prompt_tokens, completion_tokens),
         "cost_basis": "discounted_estimate_from_local_text_lengths",
     }
+    if api_usage:
+        usage.update(api_usage)
+        api_cost = estimate_cost_usd_from_usage(args.figure_model, {
+            "prompt_tokens": api_usage.get("prompt_tokens_api"),
+            "completion_tokens": api_usage.get("completion_tokens_api"),
+            "prompt_cache_hit_tokens": api_usage.get("prompt_cache_hit_tokens"),
+            "prompt_cache_miss_tokens": api_usage.get("prompt_cache_miss_tokens"),
+        })
+        if api_cost is not None:
+            usage["estimated_cost_usd_api"] = api_cost
+            usage["cost_basis_api"] = "discounted_estimate_from_api_usage_with_prompt_cache"
     diagnostics = {
         "content_chars": len(text),
         "reasoning_chars": 0,
         "finish_reason": finish_reasons[-1] if finish_reasons else "",
         "finish_reasons": finish_reasons,
         "stream_chunk_count": stream_chunk_count,
+        "api_usage_present": bool(api_usage),
     }
     return LLMCallResult(text=text, usage=usage, diagnostics=diagnostics)
 
@@ -2411,19 +3532,42 @@ async def enrich_figure_visual_summaries(
         cached = json.loads(out_path.read_text(encoding="utf-8"))
         return cached.get("figures_tables", figures_tables), cached.get("usage", {})
     items = figure_items_with_ids(figures_tables)
-    if args.mock_llm or args.figure_visual_summary_max_items <= 0:
-        atomic_write_json(out_path, {"figures_tables": items, "usage": {}})
-        return items, {}
+    if args.mock_llm or args.figure_visual_summary_max_items <= 0 or args.figure_provider == "none":
+        enriched = []
+        for item in items:
+            copied = dict(item)
+            copied.update(caption_only_visual_summary(copied))
+            enriched.append(copied)
+        usage = {
+            "provider": "none" if args.figure_provider == "none" else "mock",
+            "model": "",
+            "prompt_tokens_est": 0,
+            "completion_tokens_est": 0,
+            "reasoning_tokens_est": 0,
+            "total_tokens_est": 0,
+            "total_with_reasoning_tokens_est": 0,
+            "estimated_cost_usd": 0.0,
+            "cost_basis": "caption_only_no_llm",
+        }
+        atomic_write_json(out_path, {"figures_tables": enriched, "usage": usage})
+        append_jsonl(progress_path, {"event": "figure_visual_summaries_skipped", "at": now_iso(), "provider": usage["provider"]})
+        return enriched, usage
 
     by_id = {item["item_id"]: item for item in items}
     usage_totals = {
-        "provider": "kimi",
-        "model": args.kimi_model,
+        "provider": args.figure_provider,
+        "model": args.figure_model,
         "prompt_tokens_est": 0,
         "completion_tokens_est": 0,
         "reasoning_tokens_est": 0,
         "total_tokens_est": 0,
         "total_with_reasoning_tokens_est": 0,
+        "prompt_tokens_api": 0,
+        "completion_tokens_api": 0,
+        "reasoning_tokens_api": 0,
+        "total_tokens_api": 0,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 0,
         "estimated_cost_usd": 0.0,
         "cost_basis": "sum_of_visual_summary_estimates",
     }
@@ -2431,22 +3575,38 @@ async def enrich_figure_visual_summaries(
         item_id = item["item_id"]
         raw_path = raw_dir / f"{item_id}.raw.txt"
         try:
-            result = await kimi_visual_summary(args, item=item)
+            result = await figure_visual_summary_llm(args, item=item)
             atomic_write_text(raw_path, result.text)
             parsed = parse_json_object(result.text, label=f"visual_summary_{item_id}")
             summary = normalize_visual_summary(parsed)
-            summary["visual_summary_provider"] = "kimi"
+            summary["visual_summary_provider"] = args.figure_provider
             summary["visual_stream_diagnostics"] = result.diagnostics or {}
             by_id[item_id].update(summary)
             usage = result.usage
-            for key in ["prompt_tokens_est", "completion_tokens_est", "reasoning_tokens_est", "total_tokens_est", "total_with_reasoning_tokens_est"]:
+            for key in [
+                "prompt_tokens_est",
+                "completion_tokens_est",
+                "reasoning_tokens_est",
+                "total_tokens_est",
+                "total_with_reasoning_tokens_est",
+                "prompt_tokens_api",
+                "completion_tokens_api",
+                "reasoning_tokens_api",
+                "total_tokens_api",
+                "prompt_cache_hit_tokens",
+                "prompt_cache_miss_tokens",
+            ]:
                 usage_totals[key] += int(usage.get(key) or 0)
             usage_totals["estimated_cost_usd"] += float(usage.get("estimated_cost_usd") or 0.0)
+            usage_totals["estimated_cost_usd_api"] = usage_totals.get("estimated_cost_usd_api", 0.0) + float(usage.get("estimated_cost_usd_api") or 0.0)
         except Exception as exc:  # noqa: BLE001
             by_id[item_id].update(caption_only_visual_summary(item))
             by_id[item_id]["visual_summary_error"] = str(exc)
             append_jsonl(progress_path, {"event": "figure_visual_summary_fallback", "at": now_iso(), "item_id": item_id, "error": str(exc)})
     usage_totals["estimated_cost_usd"] = round(usage_totals["estimated_cost_usd"], 6)
+    if "estimated_cost_usd_api" in usage_totals:
+        usage_totals["estimated_cost_usd_api"] = round(float(usage_totals["estimated_cost_usd_api"]), 6)
+        usage_totals["cost_basis_api"] = "sum_of_visual_summary_api_usage_with_prompt_cache"
     enriched = [by_id[item["item_id"]] for item in items]
     atomic_write_json(out_path, {"figures_tables": enriched, "usage": usage_totals})
     append_jsonl(progress_path, {"event": "figure_visual_summaries_done", "at": now_iso(), "count": len([item for item in enriched if item.get("visual_summary")]), "usage": usage_totals})
@@ -2686,10 +3846,22 @@ def table_rows_with_aliased_wikilinks(note: str) -> list[int]:
     return rows
 
 
+def strip_figure_caption_lines(note: str) -> str:
+    return "\n".join(
+        line
+        for line in note.splitlines()
+        if not (
+            line.startswith("*")
+            and re.search(r"^\*(?:Figure|Fig\.?|Table)\s+\d+", line, flags=re.IGNORECASE)
+        )
+    )
+
+
 def dangling_numeric_refs(note: str, *, max_items: int = 12) -> list[str]:
     scan = re.sub(r"`[^`\n]*`", "", note)
     scan = re.sub(r"\$\$.*?\$\$", "", scan, flags=re.DOTALL)
     scan = re.sub(r"\$[^$\n]*\$", "", scan)
+    scan = strip_figure_caption_lines(scan)
     refs = sorted(
         set(match.group(1) for match in re.finditer(r"(?<![\w\}'!\]])\[(\d{1,3})\]", scan)),
         key=lambda value: int(value),
@@ -2748,12 +3920,14 @@ def validate_vault_note(
     legacy_markdown_image_links = re.findall(r"!\[[^\]]*\]\((?:\.\./\.\./)?assets/[^)]+\)", note)
     legacy_relative_wikilink_images = re.findall(r"!\[\[\.\./\.\./assets/[^\]]+\]\]", note)
     scalar_metadata_keys = set(required_frontmatter) - {"aliases", "tags", "claims"}
-    fallback_frontmatter_values = {
-        key: value
-        for key, value in frontmatter.items()
-        if key in scalar_metadata_keys
-        if value in {"", '""', "null", "unknown", "Unknown"} or "待人工" in value
-    }
+    fallback_frontmatter_values = {}
+    for key, value in frontmatter.items():
+        if key not in scalar_metadata_keys:
+            continue
+        if value in {"", '""', "null"} or "待人工" in value:
+            fallback_frontmatter_values[key] = value
+        elif key != "acceptance" and value in {"unknown", "Unknown"}:
+            fallback_frontmatter_values[key] = value
     fallback_markers = [
         f"{key}: {value}"
         for key, value in fallback_frontmatter_values.items()
@@ -3012,8 +4186,9 @@ def prepare_parse(args: argparse.Namespace, work_dir: Path) -> dict[str, Any]:
     else:
         raise ValueError("Pass exactly one of --pdf, --mineru-output, or --source-md")
 
-    atomic_write_text(parse_dir / "full.md", markdown)
     figures_tables = extract_figures_tables(content_path, source_root=source_root)
+    markdown = normalize_markdown_full_region_image_refs(markdown, figures_tables, source_root=source_root)
+    atomic_write_text(parse_dir / "full.md", markdown)
     atomic_write_json(parse_dir / "figures_tables.json", figures_tables)
     return {
         "source_type": source_type,
@@ -3400,6 +4575,33 @@ def resolve_kimi_llm_config(args: argparse.Namespace) -> None:
     args.kimi_api_key_env = args.kimi_api_key_env or api_key_env or "KIMI_API_KEY"
     args.kimi_model = args.kimi_model or model or DEFAULT_KIMI_MODEL
     args.kimi_base_url = normalize_provider_base_url("kimi", args.kimi_base_url or base_url or KIMI_DEFAULT_BASE_URL)
+
+
+def resolve_figure_llm_config(args: argparse.Namespace) -> None:
+    provider = args.figure_provider or "none"
+    args.figure_provider = provider
+    if provider == "none":
+        args.figure_model = ""
+        args.figure_base_url = ""
+        args.figure_api_key_env = ""
+        return
+    if provider == "kimi":
+        api_key_env, _ = first_env(["KIMI_API_KEY", "MOONSHOT_API_KEY", "KIMI_AUTH_TOKEN"])
+        _, model = first_env(["KIMI_MODEL", "MOONSHOT_MODEL"])
+        _, base_url = first_env(["KIMI_BASE_URL", "MOONSHOT_BASE_URL"])
+        args.figure_api_key_env = args.figure_api_key_env or api_key_env or "KIMI_API_KEY"
+        args.figure_model = args.figure_model or model or DEFAULT_KIMI_MODEL
+        args.figure_base_url = normalize_provider_base_url("kimi", args.figure_base_url or base_url or KIMI_DEFAULT_BASE_URL)
+        if args.figure_temperature == 0.1:
+            args.figure_temperature = KIMI_DEFAULT_TEMPERATURE
+        return
+
+    api_key_env, _ = first_env(["GPT_API_KEY", "gpt_OPENAI_API_KEY", "OPENAI_API_KEY"])
+    _, model = first_env(["GPT_MODEL", "gpt_OPENAI_MODEL", "OPENAI_MODEL"])
+    _, base_url = first_env(["GPT_BASE_URL", "gpt_OPENAI_BASE_URL", "OPENAI_BASE_URL"])
+    args.figure_api_key_env = args.figure_api_key_env or api_key_env or "OPENAI_API_KEY"
+    args.figure_model = args.figure_model or model or DEFAULT_OPENAI_FIGURE_MODEL
+    args.figure_base_url = args.figure_base_url or base_url
 
 
 def part_prompt(chunk: Chunk, title: str) -> str:
@@ -3823,15 +5025,21 @@ async def run_figure_placement(
     raw = ""
     usage: dict[str, Any] = {}
     placements: list[dict[str, str]] = []
-    if args.mock_llm:
+    if args.mock_llm or args.figure_provider == "none":
         placements = fallback_figure_placements(copied_figures, max_images=args.max_note_images)
     else:
         try:
-            llm_result = await kimi_llm_text(
-                args,
+            llm_result = await llm_text_with_config(
                 system=FIGURE_PLACEMENT_SYSTEM,
                 prompt=prompt,
+                provider=args.figure_provider,
+                model=args.figure_model,
+                base_url=args.figure_base_url,
+                api_key_env=args.figure_api_key_env,
                 max_tokens=args.figure_placement_max_tokens,
+                temperature=args.figure_temperature,
+                reasoning_effort="",
+                thinking="disabled",
             )
             raw = llm_result.text
             usage = usage_from_result(llm_result)
@@ -3991,6 +5199,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     resolve_llm_config(args)
     resolve_writer_llm_config(args)
     resolve_kimi_llm_config(args)
+    resolve_figure_llm_config(args)
 
     if sum(bool(x) for x in (args.pdf, args.mineru_output, args.source_md)) != 1:
         raise SystemExit("Pass exactly one of --pdf, --mineru-output, or --source-md")
@@ -4028,10 +5237,13 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             "writer_model": "mock" if args.mock_llm else args.writer_model,
             "writer_provider": "mock" if args.mock_llm else args.writer_provider,
             "kimi_model": "mock" if args.mock_llm else args.kimi_model,
+            "figure_provider": "mock" if args.mock_llm else args.figure_provider,
+            "figure_model": "mock" if args.mock_llm else args.figure_model,
             "reasoning_effort": "mock" if args.mock_llm else args.reasoning_effort,
             "base_url": "" if args.mock_llm else args.base_url,
             "writer_base_url": "" if args.mock_llm else args.writer_base_url,
             "kimi_base_url": "" if args.mock_llm else args.kimi_base_url,
+            "figure_base_url": "" if args.mock_llm else args.figure_base_url,
             "thinking": "mock" if args.mock_llm else args.thinking,
             "part_thinking": "mock" if args.mock_llm else args.part_thinking,
             "part_reasoning_effort": "mock" if args.mock_llm else args.part_reasoning_effort,
@@ -4458,6 +5670,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--kimi-check-repair", dest="kimi_check_repair", action="store_true", help="Opt into final Kimi note check/repair after mechanical validation")
     parser.add_argument("--no-kimi-check-repair", dest="kimi_check_repair", action="store_false", help="Disable final Kimi note check/repair")
     parser.add_argument("--kimi-check-repair-max-tokens", type=int, default=16384)
+    parser.add_argument(
+        "--figure-provider",
+        choices=["none", "openai", "kimi"],
+        default="none",
+        help="Optional figure/table visual-summary and placement LLM. Default none uses deterministic caption/placement fallback.",
+    )
+    parser.add_argument("--figure-model", default="")
+    parser.add_argument("--figure-base-url", default="")
+    parser.add_argument("--figure-api-key-env", default="")
+    parser.add_argument("--figure-temperature", type=float, default=0.1)
     parser.add_argument("--part-max-tokens", type=int, default=16384)
     parser.add_argument("--main-max-tokens", type=int, default=16384)
     parser.add_argument("--writer-max-tokens", type=int, default=16384)
@@ -4484,12 +5706,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Override figure/table asset root. Defaults to <vault-root>/assets/figures/papers.",
     )
-    parser.add_argument("--max-note-images", type=int, default=6)
+    parser.add_argument("--max-note-images", type=int, default=12)
     parser.add_argument("--mock-llm", action="store_true", help="Use deterministic local mock outputs")
     parser.add_argument("--dry-run", action="store_true", help="Parse and chunk only")
     parser.add_argument("--force", action="store_true", help="Overwrite existing stage outputs")
     parser.add_argument("--no-resume", dest="resume", action="store_false", help="Do not reuse existing stage outputs")
-    parser.set_defaults(resume=True, kimi_repair=True, kimi_check_repair=False)
+    parser.set_defaults(resume=True, kimi_repair=False, kimi_check_repair=False)
     return parser
 
 

@@ -19,21 +19,29 @@ Inputs:
 Outputs:
 
 - `obsidian-vault/index/index.jsonl`
-- `obsidian-vault/index/_Index.md`
+- `obsidian-vault/index/paper_index.md`
 - `obsidian-vault/index/_AllPapers.md`
 - aggregate pages under:
   - `by_dataset/`
   - `by_method/`
   - `by_topic/`
-  - `by_venue/`
-  - `by_year/`
+  - `by_venue_year/`
 
 The builder does not require the platform database.
 `obsidian-vault/index/README.md` is a public placeholder for the generated
 directory and should not be overwritten with local/private index contents.
+Aggregate navigation entry files use explicit dimension names:
+`by_topic/topic_index.md`, `by_method/method_index.md`,
+`by_dataset/dataset_index.md`, and
+`by_venue_year/venue_year_index.md`.
+Venue and year navigation is merged into `venue_year` labels such as
+`ICLR_2026`; the builder does not generate separate `by_venue/` or `by_year/`
+indexes.
 `by_topic/` uses coarse top-level research areas derived from `category`,
 `topics`, `topic/...` tags, or path hints. Nested topic tags are intentionally
 folded into their first segment so the navigation does not fragment.
+`topic/<venue_year>` tags in analysis frontmatter are treated as venue/year
+metadata, not research-topic taxonomy.
 `by_method/` uses normalized method-family labels derived from method names,
 tags, title, `core_operator`, and `primary_logic`. Exact per-paper method names
 remain in `index.jsonl` under `methods` for precise search and comparison.
@@ -70,7 +78,7 @@ Each `index.jsonl` line is one paper record with stable, retrieval-oriented
 fields:
 
 ```json
-{"title":"...","analysis_path":"obsidian-vault/analysis/...md","pdf_ref":"obsidian-vault/paperPDFs/...pdf","venue":"ICLR","year":2026,"topics":["..."],"methods":["..."],"method_groups":["..."],"datasets":["..."],"tags":["..."],"core_operator":"...","primary_logic":"...","paper_link":"...","project_link":"...","source":"analysis"}
+{"title":"...","analysis_path":"obsidian-vault/analysis/...md","pdf_ref":"obsidian-vault/paperPDFs/...pdf","venue":"ICLR","year":2026,"venue_year":"ICLR_2026","topics":["..."],"methods":["..."],"method_groups":["..."],"datasets":["..."],"tags":["..."],"core_operator":"...","primary_logic":"...","paper_link":"...","project_link":"...","source":"analysis"}
 ```
 
 The exact set of optional fields may grow, but the builder must keep records

@@ -90,6 +90,7 @@ def write_sample_note(root: Path, rel_path: str, title: str) -> None:
                 "pdf_ref: paperPDFs/ICLR_2026/sample.pdf",
                 "tags:",
                 "  - topic/smoke",
+                "  - topic/iclr_2026",
                 "core_operator: smoke operator",
                 "primary_logic: smoke logic",
                 "---",
@@ -160,8 +161,18 @@ def main() -> int:
             raise AssertionError(f"expected exact method name to remain in index.jsonl, got {rows[0]!r}")
         if rows[0].get("method_groups") != ["Other Method Family"]:
             raise AssertionError(f"expected by_method to use method family labels, got {rows[0]!r}")
-        if not (root / "obsidian-vault/index/_Index.md").exists():
-            raise AssertionError("build should generate obsidian-vault/index/_Index.md")
+        if rows[0].get("venue_year") != "ICLR_2026":
+            raise AssertionError(f"expected venue_year field to merge venue/year, got {rows[0]!r}")
+        if "Iclr 2026" in rows[0].get("topics", []):
+            raise AssertionError(f"venue_year tags should not become research topics, got {rows[0]!r}")
+        if not (root / "obsidian-vault/index/paper_index.md").exists():
+            raise AssertionError("build should generate obsidian-vault/index/paper_index.md")
+        if not (root / "obsidian-vault/index/by_venue_year/venue_year_index.md").exists():
+            raise AssertionError("build should generate obsidian-vault/index/by_venue_year/venue_year_index.md")
+        if (root / "obsidian-vault/index/by_venue/venue_index.md").exists():
+            raise AssertionError("build should not generate standalone by_venue navigation")
+        if (root / "obsidian-vault/index/by_year/year_index.md").exists():
+            raise AssertionError("build should not generate standalone by_year navigation")
         if (root / "obsidian-vault/index/by_method/SmokeMethod.md").exists():
             raise AssertionError("exact method names should not get standalone method navigation pages")
         if rows[0].get("datasets") != ["SmokeDataset", "OtherDataset", "SyntheticData"]:

@@ -1,15 +1,19 @@
 # Agent Guide
 
 Public agent-facing usage starts from [README.md](README.md) and
-[.claude/skills/README.md](.claude/skills/README.md). Internal architecture and
-deployment notes live under `_private/`.
+[.claude/skills/README.md](.claude/skills/README.md). Internal deployment notes
+stay under `_private/`.
 
-## Current Mode
+ResearchFlow is a local-first research workflow for structured paper analysis.
+Its goal is to turn academic PDFs into machine-actionable evidence notes,
+retrieval indexes, and downstream idea or review artifacts. PaperBite acts as
+the upstream public evidence layer: it helps batch-prepare parsed paper assets,
+while ResearchFlow focuses on structured analysis, retrieval, comparison, and
+research decision support.
 
-Use ResearchFlow as a local file workflow.
+## Working Surface
 
-The active working layout is:
-- `obsidian-vault/paperPDFs/` stores source PDFs for local analysis.
+- `obsidian-vault/paperPDFs/` stores source PDFs.
 - `obsidian-vault/analysis/` stores structured local analysis notes.
 - `obsidian-vault/index/` stores generated indexes and Obsidian navigation.
 - `obsidian-vault/ideas/` stores local idea, focus, and review notes.
@@ -18,12 +22,28 @@ The active working layout is:
 
 ```text
 collect candidate papers / import local PDFs
-  -> download when needed
-  -> MinerU PDF parse
+  -> batch MinerU PDF parse
   -> structured paper analysis
   -> index
   -> query / ideate / focus / review / export
 ```
+
+## Branch Sync Policy
+
+This branch is the canonical place for changes that should later appear in the
+public `main` worktree. Make shared README, public docs, public assets, and
+public workflow updates here first, then sync them to `main` after review.
+
+Keep branch-specific and local-development material out of `main`:
+
+- `_private/` local notes, archives, deployment notes, and operation history
+- Obsidian workspace/runtime state
+- provider-specific defaults or private model choices
+- internal branch/worktree coordination notes
+
+`AGENTS.md` itself is branch-specific. Do not blindly sync this file to
+`main`; the public `main` copy should contain only project background and
+public agent-facing guidance.
 
 ## Rules
 
@@ -31,8 +51,13 @@ collect candidate papers / import local PDFs
 2. Write only through the skill that owns the target output path.
 3. Analysis language defaults to `zh` unless the request overrides it.
 4. Pipeline steps are idempotent; already-completed steps should be skipped.
-5. Planned analysis batches must declare goal, source, selection rule, budget, and output target before agents run.
+5. Planned analysis batches must declare goal, source, selection rule, budget,
+   and output target before agents run.
 6. Agents must preserve source anchors in notes, logs, and generated outputs.
-7. Reports and profiles must be generated from available evidence, not new unsupported claims.
-8. In Markdown tables, do not use aliased Obsidian wikilinks such as `[[full/path|abbr]]`; use plain text inside table cells and place full wikilinks in surrounding prose or frontmatter.
-9. Generated exports, snapshots, backups, local storage, and symlinks stay out of Git.
+7. Reports and profiles must be generated from available evidence, not new
+   unsupported claims.
+8. In Markdown tables, do not use aliased Obsidian wikilinks such as
+   `[[full/path|abbr]]`; use plain text inside table cells and place full
+   wikilinks in surrounding prose or frontmatter.
+9. Generated exports, snapshots, backups, local storage, and symlinks stay out
+   of Git.
