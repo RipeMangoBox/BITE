@@ -31,7 +31,7 @@
 ---
 
 <p align="center">
-  <img src="./assets/researchflow-core-slide-3-en.png" alt="ResearchFlow core idea in English" width="960"/>
+  <img src="./assets/researchflow-core-slide-3-en.png" alt="ResearchFlow core idea in English" width="720"/>
 </p>
 
 > **What is ResearchFlow?** ResearchFlow is a local-first workflow framework that transforms paper analysis into structured notes and builds a persistent, reusable research memory.
@@ -66,7 +66,7 @@ traceable evidence base, then be stress-tested before execution.
 ## 🗂️ Asset Levels
 
 <p align="center">
-  <img src="./assets/researchflow-asset-levels.png" alt="ResearchFlow asset hierarchy" width="960"/>
+  <img src="./assets/researchflow-asset-levels.png" alt="ResearchFlow asset hierarchy" width="480"/>
 </p>
 
 This diagram shows ResearchFlow's six-layer asset hierarchy: `L0-L3` (knowledge building, powered by PaperBite), `L4` (emergence), and `L5` (validation).
