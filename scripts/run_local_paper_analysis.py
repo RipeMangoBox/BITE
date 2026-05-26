@@ -65,7 +65,7 @@ DEFAULT_MINERU_HF_CACHE = Path.home() / ".cache" / "huggingface" / "hub"
 MINERU_PIPELINE_CACHE = DEFAULT_MINERU_HF_CACHE / "models--opendatalab--PDF-Extract-Kit-1.0"
 DEFAULT_CONF_YEAR = ""
 DEFAULT_TOPIC_ASSIGNMENTS = os.environ.get("RF_TOPIC_ASSIGNMENTS", "").strip()
-DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-pro"
+DEFAULT_MODEL = ""
 KIMI_DEFAULT_BASE_URL = "https://api.moonshot.ai/v1"
 KIMI_DEFAULT_TEMPERATURE = 0.6
 DEFAULT_KIMI_MODEL = "kimi-k2.6"
@@ -488,7 +488,7 @@ Check and lightly repair an Obsidian paper note for:
    aliases; do not add `category`, `modalities`, or `frontier`
 
 Do not rewrite analytical claims, do not add new claims, and do not make the
-style more paper-like. Preserve the DeepSeek analysis content unless a local
+style more paper-like. Preserve the analysis content unless a local
 format or image-caption mismatch is obvious from the supplied placement data.
 
 Return Markdown only."""
@@ -3105,7 +3105,7 @@ def mock_report() -> str:
     )
 
 
-def deepseek_uses_reasoning(model: str) -> bool:
+def _provider_uses_reasoning(model: str) -> bool:
     lowered = model.lower()
     return "reasoner" in lowered or "v4" in lowered
 
@@ -3148,7 +3148,7 @@ async def call_openai_compatible(
         else:
             request["temperature"] = temperature
             request["stream_options"] = {"include_usage": True}
-            if deepseek_uses_reasoning(model):
+            if _provider_uses_reasoning(model):
                 request["extra_body"] = {"thinking": {"type": thinking}}
                 if thinking == "enabled" and reasoning_effort:
                     request["reasoning_effort"] = reasoning_effort
@@ -3185,8 +3185,8 @@ async def call_openai_compatible(
     usage = {
         "provider": provider,
         "model": model,
-        "thinking": thinking if provider != "kimi" and deepseek_uses_reasoning(model) else "disabled",
-        "reasoning_effort": reasoning_effort if provider != "kimi" and deepseek_uses_reasoning(model) and thinking == "enabled" else "",
+        "thinking": thinking if provider != "kimi" and _provider_uses_reasoning(model) else "disabled",
+        "reasoning_effort": reasoning_effort if provider != "kimi" and _provider_uses_reasoning(model) and thinking == "enabled" else "",
         "prompt_tokens_est": prompt_tokens,
         "completion_tokens_est": completion_tokens,
         "reasoning_tokens_est": reasoning_tokens,
@@ -3346,8 +3346,8 @@ def resolve_llm_config(args: argparse.Namespace) -> None:
     _, base_url = first_env(["DEEPSEEK_BASE_URL"])
     api_key_env, _ = first_env(["DEEPSEEK_API_KEY", "OPENAI_API_KEY"])
     args.api_key_env = args.api_key_env or api_key_env or "DEEPSEEK_API_KEY"
-    args.model = args.model or model or DEFAULT_DEEPSEEK_MODEL
-    args.base_url = args.base_url or base_url or "https://api.deepseek.com/v1"
+    args.model = args.model or model or DEFAULT_MODEL
+    args.base_url = args.base_url or base_url or ""
 
 
 def resolve_mineru_config(args: argparse.Namespace) -> None:
@@ -3389,8 +3389,8 @@ def resolve_writer_llm_config(args: argparse.Namespace) -> None:
     _, base_url = first_env(["DEEPSEEK_BASE_URL"])
     api_key_env, _ = first_env(["DEEPSEEK_API_KEY", "OPENAI_API_KEY"])
     args.writer_api_key_env = args.writer_api_key_env or api_key_env or "DEEPSEEK_API_KEY"
-    args.writer_model = args.writer_model or model or DEFAULT_DEEPSEEK_MODEL
-    args.writer_base_url = args.writer_base_url or base_url or "https://api.deepseek.com/v1"
+    args.writer_model = args.writer_model or model or DEFAULT_MODEL
+    args.writer_base_url = args.writer_base_url or base_url or ""
 
 
 def resolve_kimi_llm_config(args: argparse.Namespace) -> None:
@@ -3539,7 +3539,7 @@ async def run_part_analysis(
                     repair_attempts.append(repair_attempt_summary(args.provider, repair_usage))
                     parsed = parse_json_object(repair_raw, label=f"{part_id}_repair")
             except Exception as second_exc:  # noqa: BLE001
-                repair_errors.append(f"deepseek repair: {second_exc}")
+                repair_errors.append(f"repair: {second_exc}")
                 repair_attempts.append(repair_attempt_summary(args.provider, usage.get("repair_usage"), second_exc))
                 usage["repair_used"] = True
                 usage["repair_failed"] = True
@@ -4428,12 +4428,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--provider",
         choices=["deepseek", "kimi"],
         default="deepseek",
-        help="LLM provider. DeepSeek is the default; Kimi is used only when explicitly selected.",
+        help="LLM provider for main analysis and repairs.",
     )
     parser.add_argument("--model", default="")
-    parser.add_argument("--thinking", choices=THINKING_CHOICES, default="enabled", help="DeepSeek thinking mode for main analysis and repairs.")
+    parser.add_argument("--thinking", choices=THINKING_CHOICES, default="enabled", help="Thinking mode for main analysis and repairs (provider-dependent).")
     parser.add_argument("--reasoning-effort", default="max", help="Reasoning effort for compatible providers.")
-    parser.add_argument("--part-thinking", choices=THINKING_CHOICES, default="disabled", help="DeepSeek thinking mode for chunk-level anchor extraction.")
+    parser.add_argument("--part-thinking", choices=THINKING_CHOICES, default="disabled", help="Thinking mode for chunk-level anchor extraction (provider-dependent).")
     parser.add_argument("--part-reasoning-effort", default="", help="Reasoning effort for part analysis. Defaults to --reasoning-effort.")
     parser.add_argument("--base-url", default="")
     parser.add_argument("--api-key-env", default="")
@@ -4442,13 +4442,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--writer-provider",
         choices=["deepseek", "kimi"],
         default="deepseek",
-        help="Writer provider. Defaults to DeepSeek; Kimi is reserved for visual/check-repair stages.",
+        help="Writer provider for section generation and check-repair stages.",
     )
     parser.add_argument("--writer-model", default="")
     parser.add_argument("--writer-base-url", default="")
     parser.add_argument("--writer-api-key-env", default="")
     parser.add_argument("--writer-temperature", type=float, default=KIMI_DEFAULT_TEMPERATURE)
-    parser.add_argument("--writer-thinking", choices=THINKING_CHOICES, default="disabled", help="DeepSeek thinking mode for section writers.")
+    parser.add_argument("--writer-thinking", choices=THINKING_CHOICES, default="disabled", help="Thinking mode for section writers (provider-dependent).")
     parser.add_argument("--writer-reasoning-effort", default="max")
     parser.add_argument("--kimi-model", default="")
     parser.add_argument("--kimi-base-url", default="")

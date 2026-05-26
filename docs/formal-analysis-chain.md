@@ -1,24 +1,28 @@
 # Formal Local Analysis Chain
 
-This page documents the default ResearchFlow paper analysis chain in more
-detail than the README overview. It explains what each stage does, which
-reasoning settings are used, and why those settings are currently the default.
+This page describes the default public-facing ResearchFlow analysis chain in
+more detail than the README overview. It clarifies where MinerU-based document
+preparation ends and where ResearchFlow's structured analysis begins.
 
-The current production profile was selected after a 100-paper ICLR 2026 batch
-run:
+## Overview
 
-- Completion: 100/100 papers reached `DONE`.
-- Median note length: about 17k characters.
-- Median end-to-end time: about 655 seconds per paper.
-- API cost: about 0.067 USD per paper in the measured run.
-- Image export: Obsidian embeds use `![[assets/...]]`; PDF embeds use
-  `![[paperPDFs/...]]`.
+ResearchFlow separates PDF preparation from semantic analysis:
+
+- **Stage 0: MinerU preparation** converts batches of PDFs into reusable parsed
+  assets.
+- **Stage 1 onward: ResearchFlow analysis** consumes those parsed assets and
+  turns them into structured evidence, verified analysis objects, sectioned
+  reports, and vault notes.
+
+This separation matters because MinerU parsing is an upstream document
+preparation stage, while ResearchFlow is the downstream reasoning and knowledge
+structuring stage.
 
 ## Pipeline
 
 ```text
-PDF / MinerU output
-  -> MinerU parse or cached parse reuse
+PDF batch
+  -> batch MinerU parse or cached parse reuse
   -> Markdown chunking
   -> chunk-level anchor extraction
   -> main analysis JSON
@@ -28,36 +32,35 @@ PDF / MinerU output
   -> deterministic validation
 ```
 
-## 1. Parse / Reuse
+## Stage 0. Batch MinerU Preparation
 
-**Purpose.** Convert the source PDF into Markdown, figure/table metadata, and
-image assets. If a compatible MinerU output already exists, the runner reuses it
-instead of parsing the PDF again.
+**Purpose.** Convert source PDFs into Markdown, figure/table metadata, and
+image assets before structured analysis starts.
 
 **Inputs.**
 
-- `--pdf`: source PDF to parse.
-- `--mineru-output`: existing single-paper MinerU output.
-- `--mineru-output-root` plus `--require-existing-mineru-output`: normalized
-  cache mode for batch runs.
+- PDF batches under `obsidian-vault/paperPDFs/`
+- existing MinerU output directories when available
+- normalized MinerU cache roots such as `--mineru-output-root`
 
 **Outputs.**
 
-- `parse/full.md`
-- `parse/content_list.json` when available
-- `parse/figures_tables.json`
+- parsed Markdown
+- content lists when available
+- figure/table metadata
+- local MinerU image assets
 
-**Reasoning effort.** None. This stage is deterministic local parsing.
+**Properties.**
 
-**Why.** Parsing should not consume LLM budget, and idempotent reuse keeps batch
-runs stable.
+- deterministic local parsing
+- no LLM budget consumption
+- reusable across repeated analysis runs
 
-## 2. Chunk-Level Anchor Extraction
+## Stage 1. Chunk-Level Anchor Extraction
 
 **Purpose.** Split parsed Markdown into chunks and extract grounded anchors:
 method claims, experiment evidence, formula evidence, figure/table roles, and
-open questions. This avoids asking one model call to summarize the whole paper
-from scratch.
+open questions.
 
 **Default settings.**
 
@@ -67,64 +70,30 @@ from scratch.
 - `--part-thinking disabled`
 - `--part-reasoning-effort max`
 
-**Reasoning effort rationale.**
-
-Chunk extraction is an evidence-harvesting stage, not the final synthesis
-stage. Disabling thinking reduces latency and cost while still preserving
-anchors, because each chunk has limited local context. `max` reasoning effort
-is kept at the provider's strongest setting for difficult chunks and repairs.
-The chunk prompt starts with a fixed task contract before variable chunk text so
-parallel part calls can reuse a stable prefix when the provider cache supports
-it.
-
 **Outputs.**
 
 - `part_analysis/part_XXX.json`
 - `part_analysis/part_XXX.raw.txt`
 
-**Validation expectations.**
-
-- Every chunk should produce a normalized part-analysis JSON.
-- Empty or malformed outputs are repaired or replaced with source-visible local
-  fallback anchors.
-
-## 3. Main Analysis JSON
+## Stage 2. Main Analysis JSON
 
 **Purpose.** Merge chunk anchors, compact paper context, and figure/table
-metadata into a single verified analysis object. This is the main semantic
-reasoning stage.
+metadata into one verified analysis object.
 
 **Default settings.**
 
 - `--thinking enabled`
 - `--reasoning-effort max`
-- Adaptive main context and token budgets enabled.
-
-**Reasoning effort rationale.**
-
-This stage decides the paper-level causal story: bottleneck, changed slot,
-method logic, decisive evidence, limitations, and open questions. It has the
-highest risk of semantic compression error, so thinking is enabled here.
-The main-analysis user prompt also starts with a fixed merge contract before
-the variable paper payload; this keeps the schema and rules cacheable while the
-paper-specific context remains explicit.
 
 **Outputs.**
 
 - `analysis/main_analysis.json`
 - `analysis/main_analysis.raw.txt`
 
-**Validation expectations.**
+## Stage 3. Section Writers
 
-- Required JSON fields are normalized.
-- Malformed JSON is repaired.
-- Key metrics and method terms from chunk evidence are preserved where possible.
-
-## 4. Section Writers
-
-**Purpose.** Generate the final report sections from verified analysis and
-focused evidence. Each section receives the global analysis plus filtered
-part/figure context.
+**Purpose.** Generate final report sections from verified analysis and focused
+evidence.
 
 **Default settings.**
 
@@ -132,37 +101,21 @@ part/figure context.
 - `--writer-thinking disabled`
 - `--writer-reasoning-effort max`
 
-**Reasoning effort rationale.**
-
-Writers should synthesize verified evidence rather than rediscover the paper.
-Thinking is disabled to reduce latency and avoid over-generation. Section
-workers are serialized by default because this gave strong prompt-cache reuse in
-batch tests; the writer cache-hit median was about 0.60 with
-`section_workers=1`.
-
-Increasing `section_workers` can reduce wall time, but it should be tested
-against cache hit rate, writer cost, and cross-section consistency before
-becoming the default.
-
 **Outputs.**
 
 - `report/sections/<section>.md`
 - `report/final_report.md`
 
-## 5. Figure/Table Visual Summary and Placement
+## Stage 4. Figure/Table Summary and Placement
 
-**Purpose.** Enrich selected MinerU figure/table items and place the most useful
-ones into the note. The placement target is either `整体框架` or `实验与分析`.
+**Purpose.** Enrich selected MinerU figure/table items and place the most
+useful ones into the note.
 
 **Default behavior.**
 
-- Kimi is used for visual summary and placement when enabled.
-- Caption-only fallback is available.
-- `--max-note-images 6` keeps notes readable and avoids turning reports into
-  image dumps.
-
-**Reasoning effort.** Kimi visual calls run with thinking disabled. This is a
-local relevance/routing task, not a paper-level reasoning task.
+- visual summary and placement are enabled when configured
+- caption-only fallback remains available
+- `--max-note-images 6` keeps notes readable
 
 **Outputs.**
 
@@ -170,7 +123,7 @@ local relevance/routing task, not a paper-level reasoning task.
 - `report/figure_placements.json`
 - copied assets under `obsidian-vault/assets/figures/papers/...`
 
-## 6. Vault Export
+## Stage 5. Vault Export
 
 **Purpose.** Write the Obsidian analysis note, copy the source PDF into the
 vault, and copy selected figure/table assets.
@@ -183,52 +136,34 @@ vault, and copy selected figure/table assets.
 - PDF embeds: `![[paperPDFs/...]]`
 - Image embeds: `![[assets/...]]`
 
-The image embed deliberately omits `../../`. Obsidian can resolve partial vault
-paths, and the shorter vault-relative path is less fragile if users move or
-reorganize note folders.
+## Stage 6. Deterministic Validation
 
-## 7. Deterministic Validation
+The export validator checks:
 
-The export validator currently checks:
+- YAML frontmatter exists and required keys are present
+- required report sections are present
+- PDF embed exists
+- expected image embeds exist and use `![[assets/...]]`
+- aliased wikilinks do not appear inside Markdown tables
+- fallback markers do not remain in metadata or the top summary
+- note length is not obviously truncated
 
-- YAML frontmatter exists and required keys are present.
-- OpenReview forum id matches when provided.
-- Required report sections are present.
-- PDF embed exists.
-- Expected image embeds exist and use `![[assets/...]]`.
-- Legacy image links such as `![...](../../assets/...)` are rejected.
-- `PDF 文件：` labels are not emitted.
-- Aliased wikilinks do not appear inside Markdown tables.
-- fallback markers such as `待人工复核` do not remain in metadata or the top
-  note summary.
-- dangling numeric references are avoided outside formulas.
-- note length is not obviously truncated.
+Validation is structural. It does not prove semantic correctness; semantic
+audits should be handled by sampling, LLM-as-judge checks, or human review.
 
-Validation is structural. It does not prove that every claim is semantically
-correct; semantic audits should be handled by sampling, LLM-as-judge checks, or
-human review.
+## Data Contract
 
-## Current Bottlenecks
+ResearchFlow can start from any of these inputs:
 
-Measured on the 100-paper ICLR 2026 run:
+- `--pdf`
+- `--mineru-output`
+- `--source-md`
 
-| Stage | Median wall time | Cost share | Cache behavior |
-| --- | ---: | ---: | --- |
-| part extraction | 78 s | about 35% | low median cache hit, parallelized |
-| main analysis | 223 s | about 36% | very low cache hit |
-| section writing | 234 s | about 29% | high cache hit with `section_workers=1` |
+For public batch workflows, the recommended pattern is:
 
-The highest-value next optimizations are:
-
-1. Improve main-analysis prompt cacheability.
-2. A/B test lower writer reasoning effort while holding main analysis fixed.
-   This is intentionally not the production default until paired quality checks
-   show that factuality, cross-section consistency, and readability do not
-   regress. Because production section writers run with
-   `--writer-thinking disabled`, writer-reasoning A/B runs must explicitly pass
-   `--writer-thinking enabled`; otherwise `--writer-reasoning-effort` is only a
-   recorded setting and does not affect DeepSeek calls.
-3. Improve part prompt fixed-prefix reuse without losing parallel throughput.
+```text
+batch MinerU parse -> normalized MinerU outputs -> ResearchFlow analysis
+```
 
 ## Reproducible Command
 
@@ -244,19 +179,4 @@ python3 scripts/run_local_paper_analysis.py \
   --writer-thinking disabled \
   --section-workers 1 \
   --thinking enabled
-```
-
-For controlled writer-reasoning A/B tests over `paper_list.csv`, keep main and
-part settings fixed and let the batch runner create separate child task ids and
-output roots per writer effort:
-
-```bash
-python3 scripts/run_paper_list_analysis.py \
-  --source obsidian-vault/paper_list.csv \
-  --state Downloaded \
-  --limit 5 \
-  --analysis-output-root obsidian-vault/analysis_runs/writer_reasoning_ab \
-  --writer-reasoning-ab-efforts max,medium \
-  --extra-arg=--writer-thinking \
-  --extra-arg=enabled
 ```

@@ -1,35 +1,28 @@
 # Agent Guide
 
 Public agent-facing usage starts from [README.md](README.md) and
-[.claude/skills/README.md](.claude/skills/README.md). Internal architecture and
-deployment notes live under `_private/`.
+[.claude/skills/README.md](.claude/skills/README.md). Internal deployment notes
+stay under `_private/`.
 
-## Current Mode
+ResearchFlow is a local-first research workflow for structured paper analysis.
+Its goal is to turn academic PDFs into machine-actionable evidence notes,
+retrieval indexes, and downstream idea or review artifacts. PaperBite acts as
+the upstream public evidence layer: it helps batch-prepare parsed paper assets,
+while ResearchFlow focuses on structured analysis, retrieval, comparison, and
+research decision support.
 
-Use ResearchFlow as a local file workflow.
+## Working Surface
 
-The active working layout is:
-- `obsidian-vault/paperPDFs/` stores source PDFs for local analysis.
+- `obsidian-vault/paperPDFs/` stores source PDFs.
 - `obsidian-vault/analysis/` stores structured local analysis notes.
 - `obsidian-vault/index/` stores generated indexes and Obsidian navigation.
 - `obsidian-vault/ideas/` stores local idea, focus, and review notes.
-
-Worktree ownership:
-- `ResearchFlow_Process/obsidian-vault/` is the development vault.
-- `ResearchFlow_Main/obsidian-vault/` is kept in the main worktree to preserve
-  the open-source ResearchFlow repository structure.
-- `PaperBite` is a separate repository at the `On_Process/PaperBite` level.
-  Do not nest it inside either ResearchFlow worktree, and do not add a
-  `PaperBite/` directory under `ResearchFlow_Process/`.
-- PaperBite icons and project assets belong inside the PaperBite repository
-  (for example `assets/icon/`), not under ResearchFlow `_private/`.
 
 ## Local Pipeline
 
 ```text
 collect candidate papers / import local PDFs
-  -> download when needed
-  -> MinerU PDF parse
+  -> batch MinerU PDF parse
   -> structured paper analysis
   -> index
   -> query / ideate / focus / review / export
@@ -41,8 +34,13 @@ collect candidate papers / import local PDFs
 2. Write only through the skill that owns the target output path.
 3. Analysis language defaults to `zh` unless the request overrides it.
 4. Pipeline steps are idempotent; already-completed steps should be skipped.
-5. Planned analysis batches must declare goal, source, selection rule, budget, and output target before agents run.
+5. Planned analysis batches must declare goal, source, selection rule, budget,
+   and output target before agents run.
 6. Agents must preserve source anchors in notes, logs, and generated outputs.
-7. Reports and profiles must be generated from available evidence, not new unsupported claims.
-8. In Markdown tables, do not use aliased Obsidian wikilinks such as `[[full/path|abbr]]`; use plain text inside table cells and place full wikilinks in surrounding prose or frontmatter.
-9. Generated exports, snapshots, backups, local storage, and symlinks stay out of Git.
+7. Reports and profiles must be generated from available evidence, not new
+   unsupported claims.
+8. In Markdown tables, do not use aliased Obsidian wikilinks such as
+   `[[full/path|abbr]]`; use plain text inside table cells and place full
+   wikilinks in surrounding prose or frontmatter.
+9. Generated exports, snapshots, backups, local storage, and symlinks stay out
+   of Git.
