@@ -4,13 +4,13 @@
 
 <h1 align="center">ResearchFlow</h1>
 
-<p align="center"><strong>Structured Paper Analysis and Research Memory for Knowledge-Grounded Research Agents</strong></p>
+<p align="center"><strong>面向研究 Agent 的结构化论文分析与 Research Memory</strong></p>
 
-<p align="center"><strong>Let every idea have a <mark>source</mark>, and every judgment have an <mark>anchor</mark>.</strong></p>
+<p align="center"><strong>让每一个 idea 都有 <mark>出处</mark>，让每一个判断都有 <mark>锚点</mark>。</strong></p>
 
 <p align="center">
-  <a href="README.md">English</a> |
-  <a href="README_CN.md">中文</a>
+  <a href="README.md">中文</a> |
+  <a href="README_EN.md">English</a>
 </p>
 
 <p align="center">
@@ -24,68 +24,58 @@
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> 🔥 **ResearchFlow Community** | **[💬 WeChat / ResearchFlow WeChat Group](./WECHAT.md)**
+> 🔥 **ResearchFlow 社区交流** | **[💬 微信交流 / ResearchFlow微信交流群](./WECHAT_CN.md)**
 >
-> 🔥 **News**: [PaperBite](https://github.com/RipeMangoBox/PaperBite) is the public evidence vault derived from the ResearchFlow analysis framework, primarily covering `L0-L3`. If you work on AI-related research, it is a strong starting point for building your own evidence vault.
+> 🔥 **News**：[PaperBite](https://github.com/RipeMangoBox/PaperBite) 是由 ResearchFlow 分析框架沉淀出的多级资产证据，主要覆盖 `L0-L3` 的证据资产。它提供了开箱即用的公开 evidence vault；如果你本身做 AI 相关研究，建议直接在 PaperBite 之上继续构建自己的 evidence vault。
 
 ---
 
 <p align="center">
-  <img src="./assets/researchflow-core-slide-3-en.png" alt="ResearchFlow core idea in English" width="720"/>
+  <img src="./assets/researchflow-core-slide-2.png" alt="ResearchFlow 核心思想示意图" width="720"/>
 </p>
 
-> **What is ResearchFlow?** ResearchFlow is a local-first workflow framework that transforms paper analysis into structured notes and builds a persistent, reusable research memory.
+> **ResearchFlow 是什么？** ResearchFlow 是一个本地优先的研究工作流框架，帮助你将论文分析转化为结构化笔记，并构建可复用的个人 research memory。
 
-> **Who is this for?** Researchers building paper-grounded knowledge bases,
-> agent-assisted literature workflows, or evidence-backed idea generation.
+> **适合谁？** 适合想构建论文知识库、证据驱动研究 workflow、或让 agent 参与文献理解与 idea 生成的研究者。
 
-> 🧠 **Knowledge first, not execution first.** Many AI research tools focus on
-> helping you run experiments or draft papers. ResearchFlow focuses on the
-> upstream question: **when an agent makes a research decision, does it have
-> enough structured, searchable paper evidence in hand?**
+> 🧠 **先构建知识，再让 Agent 行动。** 大多数 AI 科研工具关注“帮你跑实验、写论文”。
+> ResearchFlow 更关注上游问题：**你的 agent 在做决策时，手里有没有足够的、结构化的、可检索的论文证据？**
 >
-> 🧩 **Turn structured paper analysis into reusable research memory.**
-> ResearchFlow organizes paper PDFs and paper lists into layered local assets:
-> source literature, single-paper evidence units, domain knowledge surfaces,
-> cross-domain evidence accumulation, and downstream idea or experiment records.
+> 🧩 **把结构化论文分析沉淀为可复用的 research memory。**
+> ResearchFlow 把论文 PDF 和论文列表组织成**层次化的本地资产**：原始文献、单点分析、领域知识面构建、跨领域资产沉淀与碰撞，从而支持智能的涌现与溯源。
 >
-> 🪶 **Local-first with low lock-in.** The default workflow is local files only:
-> PDFs, Markdown notes, JSONL indexes, and idea notes all live under
-> `obsidian-vault/`. Normal use does not require a server, database, or service
-> deployment.
+> 🪶 **本地优先，低锁定。** 默认 workflow 完全基于本地文件：
+> PDF、Markdown、JSONL 索引和 idea notes 都位于 `obsidian-vault/` 下。正常使用不需要数据库、后端服务或在线部署。
 
-💡 _ResearchFlow is a methodology and local knowledge workflow, not a closed
-platform. What matters is the layered research assets you keep accumulating._
+💡 _ResearchFlow 是一种方法论和本地知识工作流，不是封闭平台。真正有价值的是你持续积累的**多级科研资产**。_
 
-## 🧠 Core Idea
+## 🧠 核心思想
 
-ResearchFlow is not centered on idea generation in isolation. The core claim is
-that research directions should emerge from an accumulated, structured, and
-traceable evidence base, then be stress-tested before execution.
+ResearchFlow 的核心不在于“先产出一个看起来合理的 idea”，而在于先沉淀结构化证据，
+再让研究方向从证据中自然涌现，最后用审稿视角做压力测试，避免在证据薄弱时过早推进实验。
 
-## 🗂️ Asset Levels
+## 🗂️ 资产层级
 
 <p align="center">
-  <img src="./assets/researchflow-asset-levels.png" alt="ResearchFlow asset hierarchy" width="480"/>
+  <img src="./assets/researchflow-asset-levels.png" alt="ResearchFlow 资产层级示意图" width="480"/>
 </p>
 
-This diagram shows ResearchFlow's six-layer asset hierarchy: `L0-L3` (knowledge building, powered by PaperBite), `L4` (emergence), and `L5` (validation).
+本图展示 ResearchFlow 的六层资产结构：`L0-L3` 由 PaperBite 驱动，完成知识积累与建库；`L4` 是观点涌现层；`L5` 是实验验证层。
 
-The table below follows the diagram **from bottom to top**:
+下表按**自底向上**顺序对应图片中的六层结构：
 
-| Level | Output | Role |
+| 层级 | 产物 | 作用 |
 | --- | --- | --- |
-| `L0` | paper PDFs | preserve source literature |
-| `L1` | single-paper analysis | extract idea, design, and evidence |
-| `L2` | Domain Research Vault | support domain-level induction and deduction |
-| `L3` | Cross-Domain Research Vault | support transfer and idea emergence |
-| `L4` | Idea Vault | emergence layer |
-| `L5` | Experiment Vault | validation layer |
+| `L0` | 论文 PDF | 保留原始文献 |
+| `L1` | 单篇论文分析 | 提取 main idea、core design、experiment proofs |
+| `L2` | 单领域 Research Vault | 支持领域内归纳、演绎与对比 |
+| `L3` | 多领域 Research Vault | 支持跨领域启发与方向涌现 |
+| `L4` | Idea Vault | 涌现层 |
+| `L5` | Experiment Vault | 验证层 |
 
-## 🎯 How It Works
+## 🎯 工作方式
 
-Give ResearchFlow a research direction, and it helps you build the knowledge
-base step by step:
+给 ResearchFlow 一个研究方向，它可以帮你把知识库逐步建起来：
 
 ```text
 collect candidate papers / import local PDFs
@@ -95,18 +85,18 @@ collect candidate papers / import local PDFs
   -> query / ideate / review / export
 ```
 
-You can use it in four common modes:
+你可以用四种常见模式使用它：
 
-| Mode | Purpose | Typical entry |
+| 模式 | 用途 | 常用入口 |
 | --- | --- | --- |
-| Build | Collect candidates, batch-parse PDFs, analyze papers, and refresh the index | `research-workflow` |
-| Query | Retrieve papers by topic, task, method, venue, year, title, or technique tags | `papers-query-knowledge-base` |
-| Decision | Compare methods before choosing baselines, changing a design, or writing related work | `papers-query-knowledge-base` |
-| Idea | Generate, focus, and stress-test research directions grounded in the local knowledge base | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
+| Build | 收集候选论文、批量解析 PDF、分析论文并刷新索引 | `research-workflow` |
+| Query | 按主题、任务、方法、venue、年份、标题或技术标签检索论文 | `papers-query-knowledge-base` |
+| Decision | 在选择 baseline、修改方案或写 related work 前对比方法 | `papers-query-knowledge-base` |
+| Idea | 基于本地知识库生成、收敛并压力测试研究方向 | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-### 1. Create the conda environment
+### 1. 创建 conda 环境
 
 ```bash
 git clone https://github.com/<your-username>/ResearchFlow.git
@@ -115,63 +105,62 @@ conda env create -f environment/environment.yml
 conda activate researchflow
 ```
 
-### 2. Configure model and parser access
+### 2. 配置模型和解析工具
 
-Create a repo-root `.env` when you need model keys, model names, or parser
-overrides. Use [environment/.env.example](environment/.env.example) as a
-reference.
+需要设置模型密钥、模型名或 parser override 时，在仓库根目录创建自己的 `.env`，
+并参考 [environment/.env.example](environment/.env.example)。
 
-### 3. Install or configure MinerU
+### 3. 安装或配置 MinerU
 
-MinerU is the upstream batch PDF parsing stage, not the structured analysis stage itself. ResearchFlow is designed to reuse MinerU outputs before running analysis. Minimal verification: `mineru --help` should run, or `.env` should set `MINERU_CLI_PATH`.
+MinerU 是前置的 PDF 批量解析阶段，不属于 ResearchFlow 的结构化分析本体。ResearchFlow 推荐先完成 MinerU 批量解析，再复用其输出进入后续分析。最小验证方式：`mineru --help` 能运行，或在 `.env` 中设置 `MINERU_CLI_PATH`。
 
-### 4. Batch-prepare MinerU outputs first
+### 4. 先完成批量 MinerU 解析
 
-For medium and large paper collections, batch MinerU parsing should happen before structured analysis. ResearchFlow analysis should preferentially reuse prepared MinerU outputs through `--mineru-output` or `--mineru-output-root` instead of reparsing PDFs during analysis.
+对于中大规模论文集合，建议先批量完成 MinerU 解析，并把结果整理到可复用的 `--mineru-output-root` 下。后续 ResearchFlow 分析应优先复用这些解析结果，而不是在分析阶段重复解析 PDF。
 
-### 5. Start from the workflow skill
+### 5. 从 workflow skill 开始
 
 ```text
 /research-workflow
-I want to build a knowledge base for controllable motion generation from PDFs.
-Please tell me the next step and the expected outputs.
+我想从 PDF 构建 controllable motion generation 的论文知识库。
+请告诉我下一步应该做什么，以及会生成哪些结果。
 ```
 
-## 📚 Further Reading
+## 📚 延伸简介
 
-- [Asset Architecture](docs/asset-architecture.md)
-- [System Architecture](docs/system-architecture.md)
-- [Formal Local Analysis Chain](docs/formal-analysis-chain.md)
+- [资产架构](docs/asset-architecture.md)
+- [系统架构](docs/system-architecture.md)
+- [正式本地分析链](docs/formal-analysis-chain.md)
 
-## 📖 Usage Examples
+## 📖 使用示例
 
 <details>
-<summary>Build a topic knowledge base from scratch</summary>
+<summary>从零构建一个主题知识库</summary>
 
 ```text
 /research-workflow
-I want to build a knowledge base for text-driven reactive motion generation.
-Start by collecting candidate papers and tell me which skill to use at each stage.
+我想构建 text-driven reactive motion generation 的论文知识库。
+请从候选论文收集开始，告诉我每个阶段应该使用哪个 skill。
 ```
 
 </details>
 
 <details>
-<summary>Collect candidate papers from a GitHub paper list</summary>
+<summary>从 GitHub 论文列表收集候选论文</summary>
 
 ```text
 /papers-collect-from-github-repo
-Collect papers related to controllable human motion generation from this GitHub repository: <URL>
-Keep only items related to diffusion, controllability, real-time generation, or long-form motion.
-Write a candidate list suitable for the downstream download workflow.
+从这个 GitHub repository 收集 controllable human motion generation 相关论文：<URL>
+只保留 diffusion、controllability、real-time generation 或 long-form motion 相关条目。
+输出适合后续下载 workflow 使用的候选列表。
 ```
 
 </details>
 
 <details>
-<summary>Run the formal local analysis chain</summary>
+<summary>运行正式本地分析链</summary>
 
-Reuse existing MinerU output first when available:
+先复用已有的 MinerU 输出进入分析：
 
 ```bash
 python3 scripts/run_local_paper_analysis.py \
@@ -181,8 +170,7 @@ python3 scripts/run_local_paper_analysis.py \
   --export-vault
 ```
 
-If no cached parse exists, the runner can also invoke MinerU during a
-single-paper run:
+如果没有现成输出，也可以在单篇运行时由脚本触发 MinerU：
 
 ```bash
 python3 scripts/run_local_paper_analysis.py \
@@ -191,7 +179,7 @@ python3 scripts/run_local_paper_analysis.py \
   --export-vault
 ```
 
-For batch analysis, require reuse of prepared MinerU outputs:
+批量分析时，建议要求复用已有 MinerU 输出：
 
 ```bash
 python3 scripts/run_paper_list_analysis.py \
@@ -203,42 +191,42 @@ python3 scripts/run_paper_list_analysis.py \
 
 </details>
 
-## ✨ Core Capabilities
+## ✨ 核心能力
 
-| Need | Skill |
+| 需求 | Skill |
 | --- | --- |
-| Decide the next pipeline step | `research-workflow` |
-| Collect candidates from web pages | `papers-collect-from-web` |
-| Collect candidates from GitHub paper lists | `papers-collect-from-github-repo` |
-| Download PDFs from a triage list | `papers-download-from-list` |
-| Generate a deep single-paper report | `paper-report` |
-| Rebuild the local index | `papers-build-index` |
-| Query or compare papers from local notes | `papers-query-knowledge-base` |
-| Generate grounded research ideas | `research-brainstorm-from-kb` |
-| Focus an idea into an executable plan | `idea-focus-coach` |
-| Run reviewer-style stress tests | `reviewer-stress-test` |
-| Export share-ready Markdown | `notes-export-share-version` |
+| 判断下一步 pipeline | `research-workflow` |
+| 从网页收集候选论文 | `papers-collect-from-web` |
+| 从 GitHub 论文列表收集候选论文 | `papers-collect-from-github-repo` |
+| 根据 triage list 下载 PDF | `papers-download-from-list` |
+| 生成单篇深度报告 | `paper-report` |
+| 重建本地索引 | `papers-build-index` |
+| 基于本地笔记查询 / 对比论文 | `papers-query-knowledge-base` |
+| 基于知识库生成研究想法 | `research-brainstorm-from-kb` |
+| 把想法收敛为可执行计划 | `idea-focus-coach` |
+| 做 reviewer 风格压力测试 | `reviewer-stress-test` |
+| 导出可分享 Markdown | `notes-export-share-version` |
 
-See [.claude/skills/README.md](.claude/skills/README.md) for the full skill map.
+完整 skill 地图见 [.claude/skills/README.md](.claude/skills/README.md)。
 
-## 🤖 Agent Compatibility
+## 🤖 Agent 兼容
 
-ResearchFlow intentionally stays plain: folders, Markdown, JSONL, CSV, and
-`SKILL.md`. The same research memory can therefore be shared by multiple agents:
+ResearchFlow 有意保持朴素：文件夹、Markdown、JSONL、CSV 和 `SKILL.md`。因此同一
+份 research memory 可以被多个 Agent 共享：
 
-- Claude Code / Cursor can read `.claude/skills` directly.
-- Codex CLI can use `scripts/setup_shared_skills.py` to generate local aliases.
-- Other agents can read `obsidian-vault/index/index.jsonl` and
-  `obsidian-vault/analysis/` directly.
+- Claude Code / Cursor 可以直接读取 `.claude/skills`。
+- Codex CLI 可以用 `scripts/setup_shared_skills.py` 生成本地 alias。
+- 其他能读取文件的 Agent 可以直接读取 `obsidian-vault/index/index.jsonl`
+  和 `obsidian-vault/analysis/`。
 
-## Advanced Config
+## 补充配置
 
 `<a id="codex-cli-compat"></a>`
 
 <details>
 <summary>Codex CLI compatibility</summary>
 
-Claude Code / Cursor does not need this step. Codex CLI does.
+Claude Code / Cursor 不需要这一步；Codex CLI 需要。
 
 ```bash
 python3 scripts/setup_shared_skills.py
@@ -252,10 +240,10 @@ python3 scripts/setup_shared_skills.py --check
 <details>
 <summary>Obsidian setup</summary>
 
-- Obsidian is optional but recommended as a visualization layer.
-- Open `obsidian-vault/` as an Obsidian vault if you want graph view,
-  backlinks, and manual browsing.
-- Do not treat Obsidian pages as a separate source of truth.
+- Obsidian 是可选但推荐的可视化层。
+- 如果需要 graph view、backlinks 和人工浏览，可以把 `obsidian-vault/`
+  作为 Obsidian vault 打开。
+- 不要把 Obsidian 页面当作独立 source of truth。
 
 </details>
 

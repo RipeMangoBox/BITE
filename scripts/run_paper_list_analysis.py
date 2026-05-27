@@ -25,6 +25,16 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = REPO_ROOT / "obsidian-vault" / "paper_list.csv"
 DEFAULT_BATCH_ROOT = REPO_ROOT / "obsidian-vault" / "batches"
 
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from scripts.researchflow_local.paper_list_queue import (  # noqa: E402
+    classify_child_failure,
+    resolve_row_pdf_path,
+    validate_paper_list_row,
+    venue_to_conf_year,
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -38,6 +48,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run-id", default="")
     parser.add_argument("--out-dir", default="")
     parser.add_argument("--analysis-output-root", default="", help="Output root passed to run_local_paper_analysis.py")
+    parser.add_argument(
+        "--pdf-search-root",
+        action="append",
+        default=[],
+        help="Extra root for resolving legacy/external PDF paths; repeat as needed.",
+    )
     parser.add_argument(
         "--vault-root",
         default="",
@@ -72,13 +88,6 @@ def parse_args() -> argparse.Namespace:
 
 def now_id() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-
-def venue_to_conf_year(venue: str) -> str:
-    parts = str(venue or "").strip().split()
-    if len(parts) >= 2 and parts[-1].isdigit() and len(parts[-1]) == 4:
-        return "_".join(parts[:-1] + [parts[-1]]).replace("-", "_")
-    return ""
 
 
 def row_matches_state(row: dict[str, str], state: str) -> bool:
@@ -239,7 +248,11 @@ def configured_variants(args: argparse.Namespace) -> list[dict[str, Any]]:
 
 def command_for_row(args: argparse.Namespace, row: dict[str, str], *, variant: dict[str, Any] | None = None) -> list[str]:
     variant = variant or {"id": "", "label": "", "extra_args": [], "writer_effort": ""}
-    pdf_path = resolve_pdf_path(row)
+    pdf_path = resolve_row_pdf_path(
+        row,
+        repo_root=REPO_ROOT,
+        search_roots=[Path(root) for root in args.pdf_search_root],
+    ) or resolve_pdf_path(row)
     conf_year = args.conf_year or venue_to_conf_year(row.get("venue", ""))
     variant_id = str(variant.get("id") or "")
     variant_extra_args = [str(item) for item in (variant.get("extra_args") or [])]
@@ -281,6 +294,8 @@ def command_for_row(args: argparse.Namespace, row: dict[str, str], *, variant: d
         if variant_id:
             output_root = output_root / variant_id
         cmd += ["--output-root", str(output_root)]
+    for root in args.pdf_search_root:
+        cmd += ["--pdf-search-root", str(root)]
     if args.export_vault and args.vault_root:
         vault_root = Path(args.vault_root)
         if variant_id:
@@ -297,10 +312,21 @@ def command_for_row(args: argparse.Namespace, row: dict[str, str], *, variant: d
 
 def run_child(args: argparse.Namespace, row: dict[str, str], variant: dict[str, Any]) -> dict[str, Any]:
     key = row_key(row)
-    pdf_path = resolve_pdf_path(row)
     started = time.monotonic()
-    if not pdf_path.exists():
-        record = {"row_key": key, "status": "failed", "error": f"missing pdf: {pdf_path}", "row": row}
+    preflight = validate_paper_list_row(
+        row,
+        repo_root=REPO_ROOT,
+        search_roots=[Path(root) for root in args.pdf_search_root],
+    )
+    if not preflight.ok:
+        record = {
+            "row_key": key,
+            "status": "failed",
+            "failure_kind": preflight.failure_kind,
+            "error": preflight.reason,
+            "duration_seconds": round(time.monotonic() - started, 3),
+            "row": row,
+        }
     else:
         cmd = command_for_row(args, row, variant=variant)
         proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
@@ -315,6 +341,8 @@ def run_child(args: argparse.Namespace, row: dict[str, str], variant: dict[str, 
             "command": cmd,
             "row": row,
         }
+        if status == "failed":
+            record["failure_kind"] = classify_child_failure(record)
     record["variant_id"] = str(variant.get("id") or "")
     record["variant_label"] = str(variant.get("label") or "")
     record["variant_extra_args"] = list(variant.get("extra_args") or [])

@@ -281,7 +281,7 @@ def stage_spec(stage: str, mode: str, log_hint: str) -> Dict[str, object]:
     if stage == "audit":
         return {
             "inputs": "no extra input; scans obsidian-vault/analysis",
-            "outputs": "obsidian-vault/analysis/quality_report_*.md",
+            "outputs": "obsidian-vault/batches/reports/quality_report_*.md",
             "commands": [
                 "Use /papers-audit-metadata-consistency",
             ],

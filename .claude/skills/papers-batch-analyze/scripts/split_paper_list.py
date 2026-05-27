@@ -37,6 +37,11 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional output run directory. Defaults to obsidian-vault/batches/<run_id>.",
     )
+    parser.add_argument(
+        "--state",
+        default="Downloaded",
+        help="Only include rows with this state. Use --state '' to include all rows. Defaults to Downloaded.",
+    )
     return parser.parse_args()
 
 
@@ -56,6 +61,12 @@ def read_rows(source: Path) -> tuple[list[str], list[dict[str, str]]]:
         return list(reader.fieldnames), list(reader)
 
 
+def filter_rows_by_state(rows: list[dict[str, str]], state: str) -> list[dict[str, str]]:
+    if not state:
+        return rows
+    return [row for row in rows if (row.get("state") or "").strip() == state]
+
+
 def write_batch(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
@@ -71,7 +82,8 @@ def main() -> None:
     if not source.is_file():
         raise SystemExit(f"Input CSV not found: {source}")
 
-    fieldnames, rows = read_rows(source)
+    fieldnames, all_rows = read_rows(source)
+    rows = filter_rows_by_state(all_rows, args.state)
     run_id, run_dir = make_run_dir(args.out_dir)
     run_dir.mkdir(parents=True, exist_ok=False)
     (run_dir / "results").mkdir()
@@ -87,7 +99,9 @@ def main() -> None:
         "run_id": run_id,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "source_path": str(source),
+        "state": args.state,
         "batch_size": args.batch_size,
+        "source_rows": len(all_rows),
         "total_rows": len(rows),
         "batch_count": len(batch_paths),
         "batches": batch_paths,
@@ -97,6 +111,8 @@ def main() -> None:
 
     print(f"[OK] run_dir: {run_dir}")
     print(f"[OK] manifest: {manifest_path}")
+    print(f"[OK] state: {args.state or '<all>'}")
+    print(f"[OK] source_rows: {len(all_rows)}")
     print(f"[OK] total_rows: {len(rows)}")
     print(f"[OK] batch_count: {len(batch_paths)}")
 

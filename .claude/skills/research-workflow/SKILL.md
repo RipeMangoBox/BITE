@@ -46,6 +46,9 @@ Support chain:
 - import local PDFs
   - Ask the user for the PDF folder path, category/sort hint, and venue/year
     hint. Use the local vault layout and `paper_list.csv` convention.
+  - External libraries such as resmax are imported through an adapter/migration
+    step. Keep their roots explicit; do not add repository-specific defaults to
+    the core analysis runner.
 - collect
   - `papers-collect-from-web`
   - `papers-collect-from-github-repo`
@@ -57,6 +60,9 @@ Support chain:
     section writers → deterministic vault export with figures/tables)
   - `paper-report` supplies the deep-report writing contract for single-paper
     reports and formula derivation
+  - batch queue route: `scripts/run_paper_list_analysis.py --state Downloaded`
+    writes per-row results under `obsidian-vault/batches/<run_id>/` and leaves
+    `paper_list.csv` unchanged until reviewed consolidation.
   - note: after analyze, you can go directly to query; run build only if you need refreshed indexes
 - build
   - `papers-build-index` (refreshes both `obsidian-vault/index/index.jsonl` for agents and Obsidian navigation pages)
@@ -129,3 +135,8 @@ Main pipeline: Wait → Downloaded → checked
 Out-of-band states: Skip (manually skipped), Missing (download failed)
 Analyze exceptions: analysis_mismatch, too_large
 ```
+
+Import/download/migration must preflight a row before setting `Downloaded`:
+the local PDF resolves, is readable as a PDF, and venue/year normalizes to
+`VENUE_YYYY` or `arXiv_YYYY`. For external PDF libraries, pass roots explicitly
+with adapter tooling, `--pdf-search-root`, or `RF_PDF_SEARCH_ROOTS`.

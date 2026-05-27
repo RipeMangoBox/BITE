@@ -726,7 +726,28 @@ def infer_conf_year_from_pdf_path(pdf_path: str) -> str:
     return ""
 
 
-def resolve_existing_pdf_path(path_value: str, *, conf_year: str = "") -> tuple[Path | None, dict[str, Any]]:
+def pdf_search_roots_from_env() -> list[Path]:
+    raw = os.environ.get("RF_PDF_SEARCH_ROOTS", "").strip()
+    if not raw:
+        return []
+    return [
+        Path(item).expanduser()
+        for item in raw.split(os.pathsep)
+        if item.strip()
+    ]
+
+
+def pdf_search_roots_from_args(args: argparse.Namespace) -> list[Path]:
+    roots = getattr(args, "pdf_search_root", []) or []
+    return [Path(item).expanduser() for item in roots if str(item).strip()]
+
+
+def resolve_existing_pdf_path(
+    path_value: str,
+    *,
+    conf_year: str = "",
+    search_roots: list[Path] | None = None,
+) -> tuple[Path | None, dict[str, Any]]:
     raw = str(path_value or "").strip()
     attempts: list[str] = []
     if not raw:
@@ -740,12 +761,10 @@ def resolve_existing_pdf_path(path_value: str, *, conf_year: str = "") -> tuple[
         candidates.extend([Path.cwd() / path, REPO_ROOT / path])
 
     filename = path.name
-    search_roots = [
-        REPO_ROOT / "_private" / "resmax_downloads" / "pdfs",
-        REPO_ROOT / "obsidian-vault" / "paperPDFs",
-    ]
+    configured_roots = list(search_roots or []) + pdf_search_roots_from_env()
+    configured_roots.append(REPO_ROOT / "obsidian-vault" / "paperPDFs")
     if filename:
-        for root in search_roots:
+        for root in configured_roots:
             if conf_year:
                 candidates.append(root / conf_year / filename)
             if root.exists():
@@ -4067,7 +4086,11 @@ def export_to_vault(
     stem = note_file_stem(title)
     note_path = paper_dir / f"{stem}.md"
     source_pdf_arg = args.paper_pdf or args.pdf
-    source_pdf, pdf_resolution = resolve_existing_pdf_path(source_pdf_arg, conf_year=conf_year)
+    source_pdf, pdf_resolution = resolve_existing_pdf_path(
+        source_pdf_arg,
+        conf_year=conf_year,
+        search_roots=pdf_search_roots_from_args(args),
+    )
     if not source_pdf:
         raise FileNotFoundError(
             "Vault export requires an existing PDF. "
@@ -4119,6 +4142,8 @@ def export_to_vault(
         "validation": validation,
     }
     atomic_write_json(work_dir / "report" / "vault_export.json", export_info)
+    if not validation.get("ok"):
+        raise RuntimeError(f"vault note validation failed: {validation}")
     return export_info
 
 
@@ -5207,7 +5232,11 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     pdf_preflight: dict[str, Any] = {}
     if args.export_vault:
         source_pdf_arg = args.paper_pdf or args.pdf
-        source_pdf, pdf_preflight = resolve_existing_pdf_path(source_pdf_arg, conf_year=resolved_conf_year(args))
+        source_pdf, pdf_preflight = resolve_existing_pdf_path(
+            source_pdf_arg,
+            conf_year=resolved_conf_year(args),
+            search_roots=pdf_search_roots_from_args(args),
+        )
         if not source_pdf:
             raise FileNotFoundError(
                 "Vault export requires an existing PDF before LLM analysis starts. "
@@ -5612,6 +5641,12 @@ def build_parser() -> argparse.ArgumentParser:
     source.add_argument("--mineru-output", help="Existing MinerU output directory")
     source.add_argument("--source-md", help="Existing markdown source, mainly for tests/recovery")
     parser.add_argument("--paper-pdf", default="", help="Original PDF to copy into vault when input is not --pdf")
+    parser.add_argument(
+        "--pdf-search-root",
+        action="append",
+        default=[],
+        help="Extra root for resolving legacy/external PDF paths; repeat as needed. RF_PDF_SEARCH_ROOTS also works.",
+    )
     parser.add_argument("--task-id", default="", help="Stable task id under output root")
     parser.add_argument("--paper-title", default="", help="Canonical paper title for vault export")
     parser.add_argument("--conf-year", default=DEFAULT_CONF_YEAR, help="Vault venue/year folder, e.g. CVPR_2026")

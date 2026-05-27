@@ -21,7 +21,7 @@
    "path": ".claude/skills/paper-report/SKILL.md"
   },
   "papers-audit-metadata-consistency": {
-   "description": "Runs a unified metadata consistency audit across obsidian-vault/analysis logs and analysis notes, checking title/venue/year/category consistency, link/pdf_ref completeness, duplicates, and structure anomalies; writes quality_report_*.md under obsidian-vault/analysis.",
+   "description": "Runs a unified metadata consistency audit across paper_list.csv and analysis notes, checking title/venue/year consistency, link/pdf_ref completeness, duplicates, and structure anomalies; writes quality_report_*.md under obsidian-vault/batches/reports.",
    "path": ".claude/skills/papers-audit-metadata-consistency/SKILL.md"
   },
   "papers-batch-analyze": {

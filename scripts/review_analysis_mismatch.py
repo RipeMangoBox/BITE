@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Optional
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAPER_ANALYSIS_DIR = os.path.join(ROOT_DIR, "obsidian-vault/analysis")
 LOG_PATH = os.path.join(ROOT_DIR, "obsidian-vault/paper_list.csv")
-REPORT_PATH = os.path.join(PAPER_ANALYSIS_DIR, "analysis_mismatch_report.txt")
+REPORT_PATH = os.path.join(ROOT_DIR, "obsidian-vault/batches/reports/analysis_mismatch_report.txt")
 
 
 class AnalysisFile:
@@ -228,6 +228,7 @@ def review_all_analysis_mismatch() -> None:
 
     save_log_rows(rows)
 
+    os.makedirs(os.path.dirname(REPORT_PATH), exist_ok=True)
     with open(REPORT_PATH, "w", encoding="utf-8") as f:
         f.write("\n".join(report_rows) + "\n")
 

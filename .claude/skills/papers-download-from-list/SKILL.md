@@ -8,9 +8,9 @@ description: Uses colocated paper download tools to download, verify, and repair
 
 ## What this skill does
 
-Connects **online triage lists** to **local PDFs** by orchestrating utilities in the colocated paper download tools directory:
+Connects **paper_list.csv / online triage lists** to **local PDFs** by orchestrating utilities in the colocated paper download tools directory:
 
-- read candidate papers from `obsidian-vault/analysis/*.txt` (for example `ICLR_2026.txt`);
+- read candidate papers from `obsidian-vault/paper_list.csv` when available, or legacy triage files under `obsidian-vault/analysis/*.txt`;
 - download missing PDFs into `obsidian-vault/paperPDFs/...`;
 - repair common download errors (bad links, wrong version downloads);
 - deduplicate, verify download integrity, and mark entries that remain missing for manual follow-up.
@@ -37,8 +37,9 @@ Script directory (relative to this skill directory):
 
 Typical execution order (from candidate list to clean PDF set):
 
-1. **Prerequisite: triage list exists**
-   - `obsidian-vault/analysis/*.txt` triage file with schema:
+1. **Prerequisite: queue exists**
+   - Preferred source: `obsidian-vault/paper_list.csv` with `state=Wait` rows.
+   - Legacy source: `obsidian-vault/analysis/*.txt` triage file with schema:
      - `state | title | venue&time | paper link | project/github link | category`
 
 2. **Batch download `Wait` entries**
@@ -53,7 +54,8 @@ Typical execution order (from candidate list to clean PDF set):
      - infers/creates target subdirectories from `category` and `venue&time`;
      - downloads PDFs into corresponding `obsidian-vault/paperPDFs/...` paths;
      - automatically compresses oversized PDFs (>20MB) using Ghostscript `/ebook` (fallback `/screen`);
-     - updates log state to `Downloaded` on success.
+     - preflights the local file before success: PDF path resolves, the file is readable as a PDF, and venue/year normalizes to `VENUE_YYYY` or `arXiv_YYYY`;
+     - updates queue/log state to `Downloaded` on success and records `pdf_path`; long-term failures remain `Wait` or become `Missing`.
 
 3. **Check missing and broken files**
    - ```bash

@@ -66,6 +66,22 @@ python3 .claude/skills/papers-batch-analyze/scripts/split_paper_list.py \
 ```
 
 The command prints the run directory and writes `manifest.json`.
+By default the splitter includes only `state=Downloaded` rows. Use
+`--state ''` only for a deliberate full-list split.
+
+For script-only execution without worker agents:
+
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded
+```
+
+`run_paper_list_analysis.py` preflights each row before launching a child run:
+`pdf_path` must resolve to a readable PDF and `venue` must normalize to
+`VENUE_YYYY` or `arXiv_YYYY`. External PDF libraries, including resmax exports,
+should be passed explicitly with `--pdf-search-root <root>` or
+`RF_PDF_SEARCH_ROOTS`; do not rely on repository-specific defaults.
 
 3. Spawn up to 4 worker agents at a time. Each worker receives exactly one
    `batch_XXXX.csv`, the run directory, and these instructions:
@@ -116,6 +132,17 @@ The command prints the run directory and writes `manifest.json`.
    - Defer detection and repair until after all shards finish; inspect
      `obsidian-vault/batches/<run_id>/results.jsonl`, `summary.json`, and each
      child run `.state`.
+   - After review, consolidate successful rows back to `paper_list.csv` with:
+
+```bash
+python3 scripts/consolidate_paper_list_results.py \
+  --results obsidian-vault/batches/<run_id>/results.jsonl
+```
+
+The consolidation command dry-runs by default and only advances
+`Downloaded -> checked`; add `--no-dry-run` after reviewing the printed changes.
+Use `--allow-failures` only when you intentionally want reviewed
+`analysis_mismatch` / `too_large` failures written back.
 6. After all completed batches finish, automatically run `papers-build-index`
    via the index builder:
 
