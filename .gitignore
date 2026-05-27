@@ -18,7 +18,7 @@ obsidian setting
 .obsidian/.trash/
 .obsidian/plugins/
 .obsidian/snippets/
-.obsidian/themes/
+.obsidian/graph.json
 
 # === Virtual environments ===
 .venv/
