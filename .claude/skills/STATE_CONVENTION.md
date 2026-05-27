@@ -54,6 +54,18 @@ Wait → Downloaded → checked
    - download processes `Wait`
    - analyze processes `Downloaded`
    - build/query/index processes `checked`
+8. Import, download, and external migration adapters must preflight the row
+   before writing `Downloaded`: local PDF path resolves, file is readable as a
+   PDF, and `venue` contains a 4-digit year that can normalize to
+   `VENUE_YYYY` or `arXiv_YYYY`.
+9. External repositories such as resmax are adapter inputs, not RF core paths.
+   Pass their PDF roots explicitly through import/migration tooling or
+   `--pdf-search-root` / `RF_PDF_SEARCH_ROOTS`; do not add repository-specific
+   fallbacks to the core analysis runner.
+10. Process reports, repair logs, and audit outputs belong under
+   `obsidian-vault/batches/` or another report directory, not under
+   `obsidian-vault/analysis/`. The analysis directory should contain only
+   paper notes and stable documentation such as `README.md`.
 
 ## Field fallback values
 

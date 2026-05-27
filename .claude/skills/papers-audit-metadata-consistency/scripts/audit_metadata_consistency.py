@@ -13,6 +13,7 @@ from typing import Dict, List, Optional, Tuple
 
 VAULT_ROOT = Path(__file__).resolve().parents[4]
 PAPER_ANALYSIS_DIR = VAULT_ROOT / "obsidian-vault/analysis"
+DEFAULT_REPORT_DIR = VAULT_ROOT / "obsidian-vault/batches/reports"
 
 REQUIRED_FRONTMATTER_KEYS = {
     "title",
@@ -77,7 +78,7 @@ class MdRecord:
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Audit metadata consistency across obsidian-vault/analysis logs and notes")
-    p.add_argument("--report-dir", default=str(PAPER_ANALYSIS_DIR), help="Directory for quality reports")
+    p.add_argument("--report-dir", default=str(DEFAULT_REPORT_DIR), help="Directory for quality reports")
     p.add_argument("--json", action="store_true", help="Also write JSON report")
     return p.parse_args()
 

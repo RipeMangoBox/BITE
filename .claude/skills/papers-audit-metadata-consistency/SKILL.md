@@ -2,7 +2,7 @@
 name: papers-audit-metadata-consistency
 follows: rf-obsidian-markdown
 status: local-export-audit
-description: Runs a unified metadata consistency audit across obsidian-vault/analysis logs and analysis notes, checking title/venue/year consistency, link/pdf_ref completeness, duplicates, and structure anomalies; writes quality_report_*.md under obsidian-vault/analysis.
+description: Runs a unified metadata consistency audit across obsidian-vault/analysis logs and analysis notes, checking title/venue/year consistency, link/pdf_ref completeness, duplicates, and structure anomalies; writes quality_report_*.md under obsidian-vault/batches/reports.
 ---
 
 # Metadata Consistency Audit
@@ -11,10 +11,10 @@ description: Runs a unified metadata consistency audit across obsidian-vault/ana
 
 Runs one unified audit entry for step5 quality governance:
 
-- checks `obsidian-vault/analysis/*.txt` list/log entries;
+- checks `obsidian-vault/paper_list.csv` and legacy list/log entries when present;
 - checks `obsidian-vault/analysis/**/*.md` analysis notes;
 - checks cross-layer consistency between log/list and analysis notes;
-- outputs `obsidian-vault/analysis/quality_report_*.md` (optionally `.json`).
+- outputs `obsidian-vault/batches/reports/quality_report_*.md` (optionally `.json`).
 
 ## Coverage
 
@@ -50,8 +50,8 @@ python3 .claude/skills/papers-audit-metadata-consistency/scripts/audit_metadata_
 
 ## Output
 
-- `obsidian-vault/analysis/quality_report_<YYYY-MM-DD_HHMM>.md`
-- optional `obsidian-vault/analysis/quality_report_<YYYY-MM-DD_HHMM>.json`
+- `obsidian-vault/batches/reports/quality_report_<YYYY-MM-DD_HHMM>.md`
+- optional `obsidian-vault/batches/reports/quality_report_<YYYY-MM-DD_HHMM>.json`
 
 ## When to use
 

@@ -28,6 +28,23 @@ collect candidate papers / import local PDFs
   -> query / ideate / focus / review / export
 ```
 
+## Branch Sync Policy
+
+This branch is the canonical place for changes that should later appear in the
+public `main` worktree. Make shared README, public docs, public assets, and
+public workflow updates here first, then sync them to `main` after review.
+
+Keep branch-specific and local-development material out of `main`:
+
+- `_private/` local notes, archives, deployment notes, and operation history
+- Obsidian workspace/runtime state
+- provider-specific defaults or private model choices
+- internal branch/worktree coordination notes
+
+`AGENTS.md` itself is branch-specific. Do not blindly sync this file to
+`main`; the public `main` copy should contain only project background and
+public agent-facing guidance.
+
 ## Rules
 
 1. Treat the local vault paths above as the current working surface.

@@ -11,6 +11,7 @@ from typing import Dict, List, Optional, Tuple
 VAULT_ROOT = Path(__file__).resolve().parents[1]
 PAPER_ANALYSIS_DIR = VAULT_ROOT / "obsidian-vault/analysis"
 PAPER_PDFS_DIR = VAULT_ROOT / "obsidian-vault/paperPDFs"
+DEFAULT_REPORT_DIR = VAULT_ROOT / "obsidian-vault/batches/reports"
 
 REQUIRED_KEYS = [
     "title",
@@ -35,7 +36,7 @@ KEY_LINE = re.compile(r"^([A-Za-z0-9_\-]+):(?:\s*(.*))?$")
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Fix analysis markdown metadata issues")
-    p.add_argument("--report-dir", default=str(PAPER_ANALYSIS_DIR), help="Directory for fix reports")
+    p.add_argument("--report-dir", default=str(DEFAULT_REPORT_DIR), help="Directory for fix reports")
     return p.parse_args()
 
 
