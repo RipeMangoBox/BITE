@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="./assets/LOGO.png" alt="ResearchFlow logo" width="280"/>
+  <img src="./assets/paperbite_icon.png" alt="BITE logo" width="240"/>
 </p>
 
-<h1 align="center">ResearchFlow</h1>
+<h1 align="center">BITE</h1>
 
-<p align="center"><strong>Structured Paper Analysis and Research Memory for Knowledge-Grounded Research Agents</strong></p>
+<p align="center"><strong>Bibliographic Intelligence for Thought Emergence</strong></p>
 
 <p align="center"><strong>Let every idea have a <mark>source</mark>, and every judgment have an <mark>anchor</mark>.</strong></p>
 
@@ -24,28 +24,30 @@
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> 🔥 **ResearchFlow Community** | **[💬 WeChat / ResearchFlow WeChat Group](./WECHAT.md)**
+> This project was formerly known as **ResearchFlow**. It has been renamed to **BITE** (Bibliographic Intelligence for Thought Emergence).
 >
-> 🔥 **News**: [PaperBite](https://github.com/RipeMangoBox/PaperBite) is the public evidence vault derived from the ResearchFlow analysis framework, primarily covering `L0-L3`. If you work on AI-related research, it is a strong starting point for building your own evidence vault.
+> 🔥 **BITE Community** | **[💬 WeChat / BITE WeChat Group](./WECHAT.md)**
+>
+> 🔥 **News**: BITE's public evidence layer is published on HuggingFace dataset [PaperBite-Assets](https://huggingface.co/datasets/RipeMangoBox/PaperBite-Assets), covering `L0-L3` structured paper assets (Markdown analysis notes + figures + manifests). Incrementally sync with `scripts/sync_assets_from_hf.py`; if you work on AI-related research, it is a strong starting point for building your own evidence vault.
 
 ---
 
 <p align="center">
-  <img src="./assets/researchflow-core-slide-3-en.png" alt="ResearchFlow core idea in English" width="720"/>
+  <img src="./assets/researchflow-core-slide-3-en.png" alt="BITE core idea in English" width="720"/>
 </p>
 
-> **What is ResearchFlow?** ResearchFlow is a local-first workflow framework that transforms paper analysis into structured notes and builds a persistent, reusable research memory.
+> **What is BITE?** BITE is a local-first workflow framework for structured paper analysis and research memory, purpose-built for knowledge-grounded research agents. It transforms paper analysis into structured notes and builds a persistent, reusable research memory.
 
 > **Who is this for?** Researchers building paper-grounded knowledge bases,
 > agent-assisted literature workflows, or evidence-backed idea generation.
 
 > 🧠 **Knowledge first, not execution first.** Many AI research tools focus on
-> helping you run experiments or draft papers. ResearchFlow focuses on the
+> helping you run experiments or draft papers. BITE focuses on the
 > upstream question: **when an agent makes a research decision, does it have
 > enough structured, searchable paper evidence in hand?**
 >
 > 🧩 **Turn structured paper analysis into reusable research memory.**
-> ResearchFlow organizes paper PDFs and paper lists into layered local assets:
+> BITE organizes paper PDFs and paper lists into layered local assets:
 > source literature, single-paper evidence units, domain knowledge surfaces,
 > cross-domain evidence accumulation, and downstream idea or experiment records.
 >
@@ -54,22 +56,22 @@
 > `obsidian-vault/`. Normal use does not require a server, database, or service
 > deployment.
 
-💡 _ResearchFlow is a methodology and local knowledge workflow, not a closed
+💡 _BITE is a methodology and local knowledge workflow, not a closed
 platform. What matters is the layered research assets you keep accumulating._
 
 ## 🧠 Core Idea
 
-ResearchFlow is not centered on idea generation in isolation. The core claim is
+BITE is not centered on idea generation in isolation. The core claim is
 that research directions should emerge from an accumulated, structured, and
 traceable evidence base, then be stress-tested before execution.
 
 ## 🗂️ Asset Levels
 
 <p align="center">
-  <img src="./assets/researchflow-asset-levels.png" alt="ResearchFlow asset hierarchy" width="480"/>
+  <img src="./assets/researchflow-asset-levels.png" alt="BITE asset hierarchy" width="480"/>
 </p>
 
-This diagram shows ResearchFlow's six-layer asset hierarchy: `L0-L3` (knowledge building, powered by PaperBite), `L4` (emergence), and `L5` (validation).
+This diagram shows BITE's six-layer asset hierarchy: `L0-L3` (knowledge building, powered by PaperBite), `L4` (emergence), and `L5` (validation).
 
 The table below follows the diagram **from bottom to top**:
 
@@ -84,7 +86,7 @@ The table below follows the diagram **from bottom to top**:
 
 ## 🎯 How It Works
 
-Give ResearchFlow a research direction, and it helps you build the knowledge
+Give BITE a research direction, and it helps you build the knowledge
 base step by step:
 
 ```text
@@ -109,8 +111,8 @@ You can use it in four common modes:
 ### 1. Create the conda environment
 
 ```bash
-git clone https://github.com/<your-username>/ResearchFlow.git
-cd ResearchFlow
+git clone https://github.com/<your-username>/BITE.git
+cd BITE
 conda env create -f environment/environment.yml
 conda activate researchflow
 ```
@@ -123,11 +125,11 @@ reference.
 
 ### 3. Install or configure MinerU
 
-MinerU is the upstream batch PDF parsing stage, not the structured analysis stage itself. ResearchFlow is designed to reuse MinerU outputs before running analysis. Minimal verification: `mineru --help` should run, or `.env` should set `MINERU_CLI_PATH`.
+MinerU is the upstream batch PDF parsing stage, not the structured analysis stage itself. BITE is designed to reuse MinerU outputs before running analysis. Minimal verification: `mineru --help` should run, or `.env` should set `MINERU_CLI_PATH`.
 
 ### 4. Batch-prepare MinerU outputs first
 
-For medium and large paper collections, batch MinerU parsing should happen before structured analysis. ResearchFlow analysis should preferentially reuse prepared MinerU outputs through `--mineru-output` or `--mineru-output-root` instead of reparsing PDFs during analysis.
+For medium and large paper collections, batch MinerU parsing should happen before structured analysis. BITE analysis should preferentially reuse prepared MinerU outputs through `--mineru-output` or `--mineru-output-root` instead of reparsing PDFs during analysis.
 
 ### 5. Start from the workflow skill
 
@@ -135,6 +137,24 @@ For medium and large paper collections, batch MinerU parsing should happen befor
 /research-workflow
 I want to build a knowledge base for controllable motion generation from PDFs.
 Please tell me the next step and the expected outputs.
+```
+
+### 6. Optional: Sync Public Evidence Layer
+
+To use BITE's pre-built structured paper assets, sync from HuggingFace by layer:
+
+```bash
+pip install huggingface_hub
+
+# Text only: analysis notes + indexes (~43 MB)
+python scripts/sync_assets_from_hf.py --mode text
+
+# Assets only: figures and tables (~1.8 GB)
+python scripts/sync_assets_from_hf.py --mode assets
+
+# Everything (default)
+python scripts/sync_assets_from_hf.py --mode all --dry-run   # preview first
+python scripts/sync_assets_from_hf.py                        # full sync
 ```
 
 ## 📚 Further Reading
@@ -223,7 +243,7 @@ See [.claude/skills/README.md](.claude/skills/README.md) for the full skill map.
 
 ## 🤖 Agent Compatibility
 
-ResearchFlow intentionally stays plain: folders, Markdown, JSONL, CSV, and
+BITE intentionally stays plain: folders, Markdown, JSONL, CSV, and
 `SKILL.md`. The same research memory can therefore be shared by multiple agents:
 
 - Claude Code / Cursor can read `.claude/skills` directly.
