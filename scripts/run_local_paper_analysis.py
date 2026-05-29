@@ -3122,13 +3122,19 @@ def part_matches_section(part: dict[str, Any], section_title: str) -> bool:
     return any(keyword in text for keyword in keywords)
 
 
-def focused_part_analyses(section_title: str, part_results: list[dict[str, Any]], *, max_parts: int = 8) -> list[dict[str, Any]]:
+def focused_part_analyses(
+    section_title: str,
+    part_results: list[dict[str, Any]],
+    *,
+    max_parts: int = 6,
+    max_evidence_items: int = 2,
+) -> list[dict[str, Any]]:
     selected = [part for part in part_results if part_matches_section(part, section_title)]
     if section_title == "概述":
         selected = (part_results[:4] + part_results[-2:]) if len(part_results) > 6 else part_results
     if not selected:
         selected = part_results[:max_parts]
-    return [slim_part_analysis(part) for part in selected[:max_parts]]
+    return [slim_part_analysis(part, max_items=max_evidence_items) for part in selected[:max_parts]]
 
 
 def source_extension(path: Path) -> str:
@@ -3363,7 +3369,7 @@ def visual_summary_candidates(figures_tables: list[dict[str, Any]], *, max_items
     return [item for _, _, item in scored[:max_items]]
 
 
-def focused_figures_tables(section_title: str, figures_tables: list[dict[str, Any]], *, max_items: int = 16) -> list[dict[str, Any]]:
+def focused_figures_tables(section_title: str, figures_tables: list[dict[str, Any]], *, max_items: int = 10) -> list[dict[str, Any]]:
     candidates = placement_candidates(figures_tables)
     if section_title == "整体框架":
         filtered = [
@@ -3876,20 +3882,89 @@ def strip_figure_caption_lines(note: str) -> str:
     )
 
 
-def dangling_numeric_refs(note: str, *, max_items: int = 12) -> list[str]:
+def dangling_numeric_refs(note: str, *, max_items: int | None = 12) -> list[str]:
     scan = re.sub(r"`[^`\n]*`", "", note)
     scan = re.sub(r"\$\$.*?\$\$", "", scan, flags=re.DOTALL)
     scan = re.sub(r"\$[^$\n]*\$", "", scan)
     scan = strip_figure_caption_lines(scan)
     refs = sorted(
-        set(match.group(1) for match in re.finditer(r"(?<![\w\}'!\]])\[(\d{1,3})\]", scan)),
+        set(match.group(1) for match in re.finditer(r"(?<![\w\}'!\]])\[(\d{1,3})\](?!\()", scan)),
         key=lambda value: int(value),
     )
     if not refs:
         return []
     defined = set(re.findall(r"^\s*\[(\d{1,3})\]:", scan, flags=re.MULTILINE))
     bibliography = set(re.findall(r"^\s*\[(\d{1,3})\]\s+", scan, flags=re.MULTILINE))
-    return [ref for ref in refs if ref not in defined and ref not in bibliography][:max_items]
+    dangling = [ref for ref in refs if ref not in defined and ref not in bibliography]
+    return dangling if max_items is None else dangling[:max_items]
+
+
+def remove_dangling_numeric_refs_from_segment(
+    segment: str,
+    refs: set[str],
+    counts: dict[str, int],
+) -> str:
+    if not refs:
+        return segment
+
+    def ref_repl(match: re.Match[str]) -> str:
+        ref = match.group(1)
+        if ref not in refs:
+            return match.group(0)
+        counts[ref] = counts.get(ref, 0) + 1
+        return ""
+
+    cleaned = re.sub(r"(?<![\w\}'!\]])\[(\d{1,3})\](?!\()", ref_repl, segment)
+    if cleaned != segment:
+        cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+        cleaned = re.sub(r"\s+([,.;:，。；：])", r"\1", cleaned)
+        cleaned = re.sub(r"([（(])\s*([）)])", "", cleaned)
+    return cleaned
+
+
+def sanitize_dangling_numeric_refs(note: str) -> tuple[str, dict[str, Any]]:
+    refs = set(dangling_numeric_refs(note, max_items=None))
+    counts: dict[str, int] = {}
+    if not refs:
+        return note, {"changed": False, "removed_refs": [], "removed_count": 0}
+
+    sanitized_lines: list[str] = []
+    in_fence = False
+    in_math_block = False
+    for line in note.splitlines(keepends=True):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            sanitized_lines.append(line)
+            in_fence = not in_fence
+            continue
+        if stripped == "$$":
+            sanitized_lines.append(line)
+            in_math_block = not in_math_block
+            continue
+        if in_fence or in_math_block or (
+            line.startswith("*")
+            and re.search(r"^\*(?:Figure|Fig\.?|Table)\s+\d+", line, flags=re.IGNORECASE)
+        ):
+            sanitized_lines.append(line)
+            continue
+
+        parts = re.split(r"(`[^`\n]*`|\$[^$\n]*\$)", line)
+        sanitized_lines.append(
+            "".join(
+                part
+                if part.startswith(("`", "$"))
+                else remove_dangling_numeric_refs_from_segment(part, refs, counts)
+                for part in parts
+            )
+        )
+
+    sanitized = "".join(sanitized_lines)
+    removed_refs = sorted(counts, key=lambda value: int(value))
+    return sanitized, {
+        "changed": sanitized != note,
+        "removed_refs": removed_refs,
+        "removed_count": sum(counts.values()),
+    }
 
 
 def validate_vault_note(
@@ -4122,6 +4197,7 @@ def export_to_vault(
         topic_text=topic_text_for_note(args.openreview_forum_id, conf_year, args.topic_assignments),
         figure_placements=figure_placements,
     )
+    note, numeric_ref_sanitizer = sanitize_dangling_numeric_refs(note)
     atomic_write_text(note_path, note)
     validation = validate_vault_note(
         note,
@@ -4139,6 +4215,7 @@ def export_to_vault(
         "figure_count": len(copied_figures),
         "figure_placements": figure_placements or [],
         "asset_root": str(asset_root),
+        "numeric_ref_sanitizer": numeric_ref_sanitizer,
         "validation": validation,
     }
     atomic_write_json(work_dir / "report" / "vault_export.json", export_info)
@@ -4989,9 +5066,21 @@ def build_section_prompt(
     analysis: dict[str, Any],
     part_results: list[dict[str, Any]],
     figures_tables: list[dict[str, Any]],
+    max_part_contexts: int = 6,
+    max_evidence_items: int = 2,
+    max_figure_contexts: int = 10,
 ) -> str:
-    focused_parts = focused_part_analyses(section_title, part_results)
-    focused_figures = focused_figures_tables(section_title, figures_tables)
+    focused_parts = focused_part_analyses(
+        section_title,
+        part_results,
+        max_parts=max(1, max_part_contexts),
+        max_evidence_items=max(1, max_evidence_items),
+    )
+    focused_figures = focused_figures_tables(
+        section_title,
+        figures_tables,
+        max_items=max(1, max_figure_contexts),
+    )
     prompt_obj = {
         "verified_analysis": analysis,
         "focused_part_analyses": focused_parts,
@@ -5104,6 +5193,9 @@ async def run_section_writer(
         analysis=analysis,
         part_results=part_results,
         figures_tables=figures_tables,
+        max_part_contexts=args.writer_context_max_parts,
+        max_evidence_items=args.writer_context_max_items,
+        max_figure_contexts=args.writer_figure_context_max_items,
     )
     atomic_write_text(prompt_path, prompt)
     started = time.monotonic()
@@ -5717,7 +5809,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--figure-temperature", type=float, default=0.1)
     parser.add_argument("--part-max-tokens", type=int, default=16384)
     parser.add_argument("--main-max-tokens", type=int, default=16384)
-    parser.add_argument("--writer-max-tokens", type=int, default=16384)
+    parser.add_argument("--writer-max-tokens", type=int, default=4096)
+    parser.add_argument("--writer-context-max-parts", type=int, default=6)
+    parser.add_argument("--writer-context-max-items", type=int, default=2)
+    parser.add_argument("--writer-figure-context-max-items", type=int, default=10)
     parser.add_argument("--figure-placement-max-tokens", type=int, default=4096)
     parser.add_argument("--figure-visual-summary-max-items", type=int, default=8)
     parser.add_argument("--figure-visual-summary-max-tokens", type=int, default=1024)
