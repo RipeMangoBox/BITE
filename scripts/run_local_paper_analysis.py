@@ -647,10 +647,10 @@ def yaml_scalar(value: Any) -> str:
 
 
 def infer_conf_parts(conf_year: str) -> tuple[str, int | None]:
-    match = re.match(r"([A-Za-z]+)_(\d{4})$", conf_year or "")
+    match = re.match(r"(.+?)_(\d{4})$", conf_year or "")
     if not match:
         return conf_year or "Unknown", None
-    return match.group(1), int(match.group(2))
+    return match.group(1).replace("_", " "), int(match.group(2))
 
 
 def atomic_write_text(path: Path, text: str) -> None:
