@@ -202,8 +202,13 @@ def paper_link_for_row(row: dict[str, str]) -> str:
     return f"https://openreview.net/forum?id={forum_id}" if forum_id else ""
 
 
+def normalize_acceptance(acceptance: str) -> str:
+    value = str(acceptance or "").strip()
+    return "accepted" if not value or value.lower() == "unknown" else value
+
+
 def acceptance_for_row(args: argparse.Namespace, row: dict[str, str]) -> str:
-    return row_value(row, "acceptance", "acceptance_type") or args.acceptance
+    return normalize_acceptance(row_value(row, "acceptance", "acceptance_type") or args.acceptance)
 
 
 def writer_effort_variants(args: argparse.Namespace) -> list[str]:

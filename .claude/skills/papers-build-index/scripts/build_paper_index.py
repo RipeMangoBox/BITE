@@ -19,7 +19,7 @@ INDEX_DIR = VAULT_DIR / "index"
 
 FRONTMATTER_BOUNDARY = re.compile(r"^---\s*$")
 KEY_LINE = re.compile(r"^([A-Za-z0-9_\-]+):(?:\s*(.*))?$")
-VENUE_YEAR = re.compile(r"\b([A-Za-z][A-Za-z0-9_.-]*)[_ -]((?:19|20)\d{2})\b")
+VENUE_YEAR = re.compile(r"\b([A-Za-z0-9][A-Za-z0-9_.-]*)[_ -]((?:19|20)\d{2})\b")
 NON_PAPER_NOTE_NAMES = {"readme.md", "_index.md"}
 NON_PAPER_NOTE_PREFIXES = ("quality_report_",)
 NON_PAPER_NOTE_DIRS = {"test", "_test", "tests", "_tests"}
@@ -299,7 +299,7 @@ def infer_venue_year(*values: object) -> Tuple[str, str]:
     for value in values:
         text = str(value or "")
         match = VENUE_YEAR.search(text)
-        if match:
+        if match and re.search(r"[A-Za-z]", match.group(1)):
             return match.group(1).replace(".", ""), match.group(2)
     return "", ""
 

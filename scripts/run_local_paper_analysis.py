@@ -647,10 +647,10 @@ def yaml_scalar(value: Any) -> str:
 
 
 def infer_conf_parts(conf_year: str) -> tuple[str, int | None]:
-    match = re.match(r"([A-Za-z]+)_(\d{4})$", conf_year or "")
+    match = re.match(r"(.+?)_(\d{4})$", conf_year or "")
     if not match:
         return conf_year or "Unknown", None
-    return match.group(1), int(match.group(2))
+    return match.group(1).replace("_", " "), int(match.group(2))
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -3122,13 +3122,19 @@ def part_matches_section(part: dict[str, Any], section_title: str) -> bool:
     return any(keyword in text for keyword in keywords)
 
 
-def focused_part_analyses(section_title: str, part_results: list[dict[str, Any]], *, max_parts: int = 8) -> list[dict[str, Any]]:
+def focused_part_analyses(
+    section_title: str,
+    part_results: list[dict[str, Any]],
+    *,
+    max_parts: int = 6,
+    max_evidence_items: int = 2,
+) -> list[dict[str, Any]]:
     selected = [part for part in part_results if part_matches_section(part, section_title)]
     if section_title == "概述":
         selected = (part_results[:4] + part_results[-2:]) if len(part_results) > 6 else part_results
     if not selected:
         selected = part_results[:max_parts]
-    return [slim_part_analysis(part) for part in selected[:max_parts]]
+    return [slim_part_analysis(part, max_items=max_evidence_items) for part in selected[:max_parts]]
 
 
 def source_extension(path: Path) -> str:
@@ -3363,7 +3369,7 @@ def visual_summary_candidates(figures_tables: list[dict[str, Any]], *, max_items
     return [item for _, _, item in scored[:max_items]]
 
 
-def focused_figures_tables(section_title: str, figures_tables: list[dict[str, Any]], *, max_items: int = 16) -> list[dict[str, Any]]:
+def focused_figures_tables(section_title: str, figures_tables: list[dict[str, Any]], *, max_items: int = 10) -> list[dict[str, Any]]:
     candidates = placement_candidates(figures_tables)
     if section_title == "整体框架":
         filtered = [
@@ -3645,12 +3651,110 @@ def inject_after_heading(markdown: str, heading: str, blocks: list[str]) -> str:
     return markdown[:insert_at] + injection + markdown[insert_at:]
 
 
-def figure_blocks_for_note(
+def figure_reference_patterns(item: dict[str, Any]) -> list[re.Pattern[str]]:
+    text = f"{item.get('label') or ''} {item.get('caption') or ''}"
+    patterns: list[re.Pattern[str]] = []
+    seen: set[str] = set()
+    for match in re.finditer(r"\b(Fig(?:ure)?\.?|Table)\s*([A-Za-z0-9]+)", text, flags=re.IGNORECASE):
+        kind = match.group(1).lower()
+        number = match.group(2)
+        key = f"{kind}:{number.lower()}"
+        if key in seen:
+            continue
+        seen.add(key)
+        if kind.startswith("fig"):
+            patterns.append(re.compile(rf"\b(?:Fig\.?|Figure)\s*{re.escape(number)}\b", flags=re.IGNORECASE))
+        else:
+            patterns.append(re.compile(rf"\bTable\s*{re.escape(number)}\b", flags=re.IGNORECASE))
+    return patterns
+
+
+def section_line_bounds(lines: list[str], heading: str) -> tuple[int, int] | None:
+    start = -1
+    for index, line in enumerate(lines):
+        if re.match(rf"^##\s+{re.escape(heading)}\s*$", line):
+            start = index
+            break
+    if start < 0:
+        return None
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if re.match(r"^##\s+\S", lines[index]):
+            end = index
+            break
+    return start, end
+
+
+def block_insert_lines(block: str) -> list[str]:
+    return ["", *block.strip().splitlines(), ""]
+
+
+def find_reference_insert_index(lines: list[str], start: int, end: int, item: dict[str, Any]) -> int | None:
+    patterns = figure_reference_patterns(item)
+    if not patterns:
+        return None
+    for index in range(start + 1, end):
+        stripped = lines[index].strip()
+        if not stripped or stripped.startswith("*") or "![[assets/figures" in stripped:
+            continue
+        if not any(pattern.search(lines[index]) for pattern in patterns):
+            continue
+        insert_at = index + 1
+        while insert_at < end and lines[insert_at].strip() and not re.match(r"^#{2,6}\s+\S", lines[insert_at]):
+            insert_at += 1
+        return insert_at
+    return None
+
+
+def inject_figure_items(markdown: str, heading: str, items: list[dict[str, Any]]) -> str:
+    items = [item for item in items if str(item.get("note_image_path") or "")]
+    if not items:
+        return markdown
+    lines = markdown.splitlines()
+    bounds = section_line_bounds(lines, heading)
+    if not bounds:
+        blocks = [image_block(item) for item in items]
+        return inject_after_heading(markdown, heading, blocks)
+
+    start, end = bounds
+    matched: dict[int, list[dict[str, Any]]] = {}
+    unmatched: list[dict[str, Any]] = []
+    for item in items:
+        path = str(item.get("note_image_path") or "")
+        if path and any(path in line for line in lines):
+            continue
+        insert_at = find_reference_insert_index(lines, start, end, item)
+        if insert_at is None:
+            unmatched.append(item)
+            continue
+        matched.setdefault(insert_at, []).append(item)
+
+    for insert_at in sorted(matched, reverse=True):
+        block_lines: list[str] = []
+        for item in matched[insert_at]:
+            block = image_block(item)
+            if block.strip():
+                block_lines.extend(block_insert_lines(block))
+        if block_lines:
+            lines[insert_at:insert_at] = block_lines
+
+    if unmatched:
+        bounds = section_line_bounds(lines, heading)
+        if bounds:
+            _, end = bounds
+            blocks = [image_block(item) for item in unmatched if image_block(item).strip()]
+            if blocks:
+                supplement = ["", "### 补充图表", "", *("\n\n".join(blocks)).splitlines(), ""]
+                lines[end:end] = supplement
+    return "\n".join(lines)
+
+
+def figure_items_for_note(
     copied: list[dict[str, Any]],
     *,
     max_images: int,
     placements: list[dict[str, Any]] | None = None,
-) -> tuple[list[str], list[str]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     if max_images <= 0:
         return [], []
     selected = placements if placements is not None else fallback_figure_placements(copied, max_images=max_images)
@@ -3667,10 +3771,17 @@ def figure_blocks_for_note(
         used.add(item_id)
         if len(used) >= max_images:
             break
-    return (
-        [image_block(item) for item in framework_items],
-        [image_block(item) for item in experiment_items],
-    )
+    return framework_items, experiment_items
+
+
+def figure_blocks_for_note(
+    copied: list[dict[str, Any]],
+    *,
+    max_images: int,
+    placements: list[dict[str, Any]] | None = None,
+) -> tuple[list[str], list[str]]:
+    framework_items, experiment_items = figure_items_for_note(copied, max_images=max_images, placements=placements)
+    return [image_block(item) for item in framework_items], [image_block(item) for item in experiment_items]
 
 
 def render_frontmatter(
@@ -3722,6 +3833,11 @@ def render_frontmatter(
     return "\n".join(lines)
 
 
+def normalize_acceptance(acceptance: str) -> str:
+    value = str(acceptance or "").strip()
+    return "accepted" if not value or value.lower() == "unknown" else value
+
+
 def render_info_table(
     *,
     title: str,
@@ -3742,10 +3858,14 @@ def render_info_table(
         if openreview_forum_id else ""
     )
     topic = topic_text or topic_text_for_note(openreview_forum_id, conf_year)
+    venue_text = f"{venue} {year}" if year else venue
+    acceptance_label = acceptance_info_table_label(acceptance)
+    if acceptance_label and venue_text:
+        venue_text = f"{venue_text} ({acceptance_label})"
     rows = [
         ("中文题名", title_zh),
         ("英文题名", title),
-        ("会议/期刊", f"{venue} {year} ({acceptance})" if year and acceptance else f"{venue} {year}" if year else venue),
+        ("会议/期刊", venue_text),
         ("Links", link),
         ("Topic", topic),
         ("Method", method),
@@ -3756,15 +3876,37 @@ def render_info_table(
     return "\n".join(out)
 
 
-def render_effect_callout(analysis: dict[str, Any]) -> str:
-    results = ((analysis.get("experiments") or {}).get("main_results") or [])[:3]
-    if not results:
+def acceptance_info_table_label(acceptance: str) -> str:
+    value = str(acceptance or "").strip()
+    if not value:
         return ""
+    normalized = value.lower().replace("_", "-")
+    if normalized in {"unknown", "accepted", "accept", "main", "conference"}:
+        return ""
+    special = {
+        "oral",
+        "highlight",
+        "spotlight",
+        "notable",
+        "award",
+        "best-paper",
+        "honorable-mention",
+    }
+    return value if normalized in special else ""
+
+
+def render_effect_callout(analysis: dict[str, Any]) -> str:
     lines = ["> [!tip] 效果简介"]
-    for item in results:
+    results = []
+    for item in (analysis.get("experiments") or {}).get("main_results") or []:
         benchmark = compact_text(item.get("benchmark"), max_len=80)
-        metric = item.get("metric") or "metric"
-        proposed = item.get("proposed") or ""
+        metric = compact_text(item.get("metric"), max_len=80)
+        proposed = compact_text(item.get("proposed"), max_len=80)
+        if benchmark and metric and proposed:
+            results.append((item, benchmark, metric, proposed))
+        if len(results) >= 3:
+            break
+    for item, benchmark, metric, proposed in results:
         baseline = item.get("baseline") or ""
         delta = item.get("delta") or ""
         sentence = f"{benchmark} 上，{metric} 为 {proposed}"
@@ -3773,7 +3915,21 @@ def render_effect_callout(analysis: dict[str, Any]) -> str:
         if delta:
             sentence += f"，变化 {delta}"
         lines.append(f"> - {sentence}。")
-    return "\n".join(lines)
+    if len(lines) > 1:
+        return "\n".join(lines)
+    claim_pattern = re.compile(
+        r"\d|提升|提高|改善|下降|降低|优于|超过|metric|score|accuracy|precision|recall|f1|auc|ap|psnr|ssim|fid|mse|mae",
+        flags=re.IGNORECASE,
+    )
+    for item in (analysis.get("analysis_truth") or {}).get("decisive_evidence") or []:
+        if not isinstance(item, dict):
+            continue
+        claim = compact_text(item.get("claim"), max_len=220)
+        if claim and claim_pattern.search(claim):
+            lines.append(f"> - {claim}")
+        if len(lines) >= 4:
+            break
+    return "\n".join(lines) if len(lines) > 1 else ""
 
 
 def compose_vault_note(
@@ -3792,17 +3948,18 @@ def compose_vault_note(
     topic_text: str | None = None,
     figure_placements: list[dict[str, Any]] | None = None,
 ) -> str:
+    acceptance = normalize_acceptance(acceptance)
     core = compact_text((analysis.get("analysis_truth") or {}).get("core_insight"), max_len=900)
     if not core:
         core = frontmatter_metadata_values(title, analysis)["primary_logic"]
     body = normalize_report_markdown(report)
-    framework_blocks, experiment_blocks = figure_blocks_for_note(
+    framework_items, experiment_items = figure_items_for_note(
         copied_figures,
         max_images=max_images,
         placements=figure_placements,
     )
-    body = inject_after_heading(body, "整体框架", framework_blocks)
-    body = inject_after_heading(body, "实验与分析", experiment_blocks)
+    body = inject_figure_items(body, "整体框架", framework_items)
+    body = inject_figure_items(body, "实验与分析", experiment_items)
     parts = [
         render_frontmatter(
             title=title,
@@ -3865,6 +4022,25 @@ def table_rows_with_aliased_wikilinks(note: str) -> list[int]:
     return rows
 
 
+def incomplete_effect_callout_lines(note: str) -> list[int]:
+    lines = note.splitlines()
+    bad: list[int] = []
+    in_effect = False
+    for line_no, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("> [!tip]"):
+            in_effect = "效果简介" in stripped
+            continue
+        if in_effect:
+            if not stripped:
+                continue
+            if not stripped.startswith(">"):
+                break
+            if re.search(r"\s为\s*(?:[。。，；;]|,(?!\d)|\.(?!\d)|$)", stripped):
+                bad.append(line_no)
+    return bad
+
+
 def strip_figure_caption_lines(note: str) -> str:
     return "\n".join(
         line
@@ -3876,20 +4052,89 @@ def strip_figure_caption_lines(note: str) -> str:
     )
 
 
-def dangling_numeric_refs(note: str, *, max_items: int = 12) -> list[str]:
+def dangling_numeric_refs(note: str, *, max_items: int | None = 12) -> list[str]:
     scan = re.sub(r"`[^`\n]*`", "", note)
     scan = re.sub(r"\$\$.*?\$\$", "", scan, flags=re.DOTALL)
     scan = re.sub(r"\$[^$\n]*\$", "", scan)
     scan = strip_figure_caption_lines(scan)
     refs = sorted(
-        set(match.group(1) for match in re.finditer(r"(?<![\w\}'!\]])\[(\d{1,3})\]", scan)),
+        set(match.group(1) for match in re.finditer(r"(?<![\w\}'!\]])\[(\d{1,3})\](?!\()", scan)),
         key=lambda value: int(value),
     )
     if not refs:
         return []
     defined = set(re.findall(r"^\s*\[(\d{1,3})\]:", scan, flags=re.MULTILINE))
     bibliography = set(re.findall(r"^\s*\[(\d{1,3})\]\s+", scan, flags=re.MULTILINE))
-    return [ref for ref in refs if ref not in defined and ref not in bibliography][:max_items]
+    dangling = [ref for ref in refs if ref not in defined and ref not in bibliography]
+    return dangling if max_items is None else dangling[:max_items]
+
+
+def remove_dangling_numeric_refs_from_segment(
+    segment: str,
+    refs: set[str],
+    counts: dict[str, int],
+) -> str:
+    if not refs:
+        return segment
+
+    def ref_repl(match: re.Match[str]) -> str:
+        ref = match.group(1)
+        if ref not in refs:
+            return match.group(0)
+        counts[ref] = counts.get(ref, 0) + 1
+        return ""
+
+    cleaned = re.sub(r"(?<![\w\}'!\]])\[(\d{1,3})\](?!\()", ref_repl, segment)
+    if cleaned != segment:
+        cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+        cleaned = re.sub(r"\s+([,.;:，。；：])", r"\1", cleaned)
+        cleaned = re.sub(r"([（(])\s*([）)])", "", cleaned)
+    return cleaned
+
+
+def sanitize_dangling_numeric_refs(note: str) -> tuple[str, dict[str, Any]]:
+    refs = set(dangling_numeric_refs(note, max_items=None))
+    counts: dict[str, int] = {}
+    if not refs:
+        return note, {"changed": False, "removed_refs": [], "removed_count": 0}
+
+    sanitized_lines: list[str] = []
+    in_fence = False
+    in_math_block = False
+    for line in note.splitlines(keepends=True):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            sanitized_lines.append(line)
+            in_fence = not in_fence
+            continue
+        if stripped == "$$":
+            sanitized_lines.append(line)
+            in_math_block = not in_math_block
+            continue
+        if in_fence or in_math_block or (
+            line.startswith("*")
+            and re.search(r"^\*(?:Figure|Fig\.?|Table)\s+\d+", line, flags=re.IGNORECASE)
+        ):
+            sanitized_lines.append(line)
+            continue
+
+        parts = re.split(r"(`[^`\n]*`|\$[^$\n]*\$)", line)
+        sanitized_lines.append(
+            "".join(
+                part
+                if part.startswith(("`", "$"))
+                else remove_dangling_numeric_refs_from_segment(part, refs, counts)
+                for part in parts
+            )
+        )
+
+    sanitized = "".join(sanitized_lines)
+    removed_refs = sorted(counts, key=lambda value: int(value))
+    return sanitized, {
+        "changed": sanitized != note,
+        "removed_refs": removed_refs,
+        "removed_count": sum(counts.values()),
+    }
 
 
 def validate_vault_note(
@@ -3969,6 +4214,7 @@ def validate_vault_note(
         "no_table_cell_aliased_wikilinks": not table_rows_with_aliased_wikilinks(note),
         "no_fallback_metadata_markers": not fallback_markers,
         "no_dangling_numeric_refs": not dangling_numeric_refs(note),
+        "no_incomplete_effect_callout": not incomplete_effect_callout_lines(note),
         "note_length_ok": len(note.strip()) >= 1000,
     }
     return {
@@ -3989,6 +4235,7 @@ def validate_vault_note(
         "table_cell_aliased_wikilink_lines": table_rows_with_aliased_wikilinks(note),
         "fallback_markers": fallback_markers,
         "dangling_numeric_refs": dangling_numeric_refs(note),
+        "incomplete_effect_callout_lines": incomplete_effect_callout_lines(note),
     }
 
 
@@ -4122,6 +4369,7 @@ def export_to_vault(
         topic_text=topic_text_for_note(args.openreview_forum_id, conf_year, args.topic_assignments),
         figure_placements=figure_placements,
     )
+    note, numeric_ref_sanitizer = sanitize_dangling_numeric_refs(note)
     atomic_write_text(note_path, note)
     validation = validate_vault_note(
         note,
@@ -4134,11 +4382,13 @@ def export_to_vault(
     export_info = {
         "note_path": str(note_path),
         "pdf_ref": pdf_ref,
+        "acceptance": normalize_acceptance(args.acceptance),
         "source_pdf": str(source_pdf),
         "source_pdf_resolution": pdf_resolution,
         "figure_count": len(copied_figures),
         "figure_placements": figure_placements or [],
         "asset_root": str(asset_root),
+        "numeric_ref_sanitizer": numeric_ref_sanitizer,
         "validation": validation,
     }
     atomic_write_json(work_dir / "report" / "vault_export.json", export_info)
@@ -4898,6 +5148,25 @@ async def run_main_analysis(
         )
         raw = llm_result.text
         usage = usage_from_result(llm_result)
+        if usage_has_finish_reason(usage, "length") and args.main_length_retry_max_tokens > args.main_max_tokens:
+            atomic_write_text(work_dir / "analysis" / "main_analysis.primary_length.raw.txt", raw)
+            retry_result = await llm_text(
+                args,
+                system=MAIN_ANALYSIS_SYSTEM,
+                prompt=prompt,
+                max_tokens=args.main_length_retry_max_tokens,
+                reasoning_effort=args.main_length_retry_reasoning_effort,
+                thinking=args.main_length_retry_thinking,
+            )
+            retry_usage = usage_from_result(retry_result)
+            usage = merge_usage_totals(usage, retry_usage, cost_basis="main_plus_length_retry_estimate")
+            usage["length_retry_used"] = True
+            usage["length_retry_max_tokens"] = args.main_length_retry_max_tokens
+            usage["length_retry_reasoning_effort"] = args.main_length_retry_reasoning_effort
+            usage["primary_stream_diagnostics"] = llm_result.diagnostics or {}
+            usage["length_retry_stream_diagnostics"] = retry_usage.get("stream_diagnostics") or {}
+            raw = retry_result.text
+            atomic_write_text(work_dir / "analysis" / "main_analysis.length_retry.raw.txt", raw)
         atomic_write_text(raw_path, raw)
         try:
             parsed = parse_json_object(raw, label="main_analysis")
@@ -4989,9 +5258,21 @@ def build_section_prompt(
     analysis: dict[str, Any],
     part_results: list[dict[str, Any]],
     figures_tables: list[dict[str, Any]],
+    max_part_contexts: int = 6,
+    max_evidence_items: int = 2,
+    max_figure_contexts: int = 10,
 ) -> str:
-    focused_parts = focused_part_analyses(section_title, part_results)
-    focused_figures = focused_figures_tables(section_title, figures_tables)
+    focused_parts = focused_part_analyses(
+        section_title,
+        part_results,
+        max_parts=max(1, max_part_contexts),
+        max_evidence_items=max(1, max_evidence_items),
+    )
+    focused_figures = focused_figures_tables(
+        section_title,
+        figures_tables,
+        max_items=max(1, max_figure_contexts),
+    )
     prompt_obj = {
         "verified_analysis": analysis,
         "focused_part_analyses": focused_parts,
@@ -5104,6 +5385,9 @@ async def run_section_writer(
         analysis=analysis,
         part_results=part_results,
         figures_tables=figures_tables,
+        max_part_contexts=args.writer_context_max_parts,
+        max_evidence_items=args.writer_context_max_items,
+        max_figure_contexts=args.writer_figure_context_max_items,
     )
     atomic_write_text(prompt_path, prompt)
     started = time.monotonic()
@@ -5717,7 +6001,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--figure-temperature", type=float, default=0.1)
     parser.add_argument("--part-max-tokens", type=int, default=16384)
     parser.add_argument("--main-max-tokens", type=int, default=16384)
-    parser.add_argument("--writer-max-tokens", type=int, default=16384)
+    parser.add_argument("--main-length-retry-max-tokens", type=int, default=32768)
+    parser.add_argument("--main-length-retry-reasoning-effort", default="medium")
+    parser.add_argument("--main-length-retry-thinking", choices=THINKING_CHOICES, default="enabled")
+    parser.add_argument("--writer-max-tokens", type=int, default=4096)
+    parser.add_argument("--writer-context-max-parts", type=int, default=6)
+    parser.add_argument("--writer-context-max-items", type=int, default=2)
+    parser.add_argument("--writer-figure-context-max-items", type=int, default=10)
     parser.add_argument("--figure-placement-max-tokens", type=int, default=4096)
     parser.add_argument("--figure-visual-summary-max-items", type=int, default=8)
     parser.add_argument("--figure-visual-summary-max-tokens", type=int, default=1024)
@@ -5751,6 +6041,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def normalize_vault_args(args: argparse.Namespace) -> argparse.Namespace:
+    args.acceptance = normalize_acceptance(args.acceptance)
     if not args.vault_asset_root:
         args.vault_asset_root = str(Path(args.vault_root).expanduser().resolve() / "assets" / "figures" / "papers")
     return args
