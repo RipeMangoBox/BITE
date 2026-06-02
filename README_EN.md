@@ -253,8 +253,6 @@ BITE intentionally stays plain: folders, Markdown, JSONL, CSV, and
 
 ## Advanced Config
 
-`<a id="codex-cli-compat"></a>`
-
 <details>
 <summary>Codex CLI compatibility</summary>
 
@@ -266,8 +264,6 @@ python3 scripts/setup_shared_skills.py --check
 ```
 
 </details>
-
-`<a id="obsidian-config"></a>`
 
 <details>
 <summary>Obsidian setup</summary>
