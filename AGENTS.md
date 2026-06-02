@@ -56,8 +56,12 @@ public agent-facing guidance.
 6. Agents must preserve source anchors in notes, logs, and generated outputs.
 7. Reports and profiles must be generated from available evidence, not new
    unsupported claims.
-8. In Markdown tables, do not use aliased Obsidian wikilinks such as
-   `[[full/path|abbr]]`; use plain text inside table cells and place full
-   wikilinks in surrounding prose or frontmatter.
-9. Generated exports, snapshots, backups, local storage, and symlinks stay out
+8. When prose needs to mention Markdown or Obsidian reserved characters such as
+   `*`, `[`, `]`, `|`, or `#`, escape them with backslashes or wrap them in
+   inline code so reading view does not reinterpret the text.
+9. In Markdown tables, aliased Obsidian wikilinks are allowed only when the
+   alias separator is escaped as `[[full/path\|abbr]]`; an unescaped `|`
+   splits table columns. Outside tables, normal `[[full/path|abbr]]` links are
+   fine.
+10. Generated exports, snapshots, backups, local storage, and symlinks stay out
    of Git.

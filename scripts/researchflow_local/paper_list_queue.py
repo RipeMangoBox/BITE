@@ -37,7 +37,7 @@ def venue_to_conf_year(venue: str) -> str:
     parts = text.split()
     if len(parts) >= 2 and re.fullmatch(r"\d{4}", parts[-1]):
         return normalize_conf_year_slug("_".join(parts[:-1] + [parts[-1]]))
-    if re.fullmatch(r"[A-Za-z][A-Za-z0-9-]*_\d{4}", text):
+    if re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]*_\d{4}", text):
         return normalize_conf_year_slug(text)
     return ""
 
