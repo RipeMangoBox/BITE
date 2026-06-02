@@ -64,7 +64,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mock-llm", action="store_true")
     parser.add_argument("--export-vault", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--conf-year", default="", help="Override venue/year folder. Defaults to venue column normalized as VENUE_YEAR.")
-    parser.add_argument("--acceptance", default="unknown")
+    parser.add_argument("--acceptance", default="")
     parser.add_argument("--max-note-images", type=int, default=12)
     parser.add_argument("--mineru-output-root", default="")
     parser.add_argument("--mineru-batch-id", default="")
@@ -204,7 +204,10 @@ def paper_link_for_row(row: dict[str, str]) -> str:
 
 def normalize_acceptance(acceptance: str) -> str:
     value = str(acceptance or "").strip()
-    return "accepted" if not value or value.lower() == "unknown" else value
+    normalized = value.lower().replace("_", "-")
+    if normalized in {"", "unknown", "accepted", "accept", "main", "conference", "regular", "arxiv"}:
+        return ""
+    return value
 
 
 def acceptance_for_row(args: argparse.Namespace, row: dict[str, str]) -> str:

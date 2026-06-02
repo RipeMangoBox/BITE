@@ -4,6 +4,7 @@ import argparse
 import csv
 import json
 import re
+import sys
 import unicodedata
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -12,6 +13,11 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from scripts.researchflow_local.venue_slug import normalize_conf_year_slug
+
 VAULT_DIR = REPO_ROOT / "obsidian-vault"
 ANALYSIS_DIR = VAULT_DIR / "analysis"
 PAPER_LIST_CSV = VAULT_DIR / "paper_list.csv"
@@ -289,7 +295,10 @@ def infer_venue_year(*values: object) -> Tuple[str, str]:
         text = str(value or "")
         match = VENUE_YEAR.search(text)
         if match and re.search(r"[A-Za-z]", match.group(1)):
-            return match.group(1).replace(".", ""), match.group(2)
+            venue = match.group(1).replace(".", "")
+            if venue.lower() == "arxiv":
+                venue = "arXiv"
+            return venue, match.group(2)
     return "", ""
 
 
@@ -308,7 +317,7 @@ def venue_year_label(venue: object, year: object) -> str:
         return ""
     venue_part = re.sub(r"\s+", "_", venue_text)
     venue_part = re.sub(r"[^A-Za-z0-9_.-]+", "_", venue_part).strip("_")
-    return f"{venue_part}_{year_text}" if venue_part else ""
+    return normalize_conf_year_slug(f"{venue_part}_{year_text}") if venue_part else ""
 
 
 def is_venue_year_tag(value: str) -> bool:
@@ -795,7 +804,7 @@ def load_analysis_notes() -> List[Paper]:
             datasets=datasets,
             tags=tags,
             core_operator=clean_scalar(fm.get("core_operator")),
-            primary_logic=clean_scalar(fm.get("primary_logic") or fm.get("paradigm")),
+            primary_logic=clean_scalar(fm.get("primary_logic")),
             paper_link=paper_link,
             project_link=project_link,
             source="analysis",

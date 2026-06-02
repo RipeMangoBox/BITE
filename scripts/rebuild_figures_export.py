@@ -78,7 +78,7 @@ def build_runner_args(args: argparse.Namespace, work_dir: Path, manifest: dict[s
         pdf=pdf,
         conf_year=_manifest_value(manifest, "conf_year"),
         paper_link=_manifest_value(manifest, "paper_link"),
-        acceptance=_manifest_value(manifest, "acceptance") or "unknown",
+        acceptance=_manifest_value(manifest, "acceptance"),
         openreview_forum_id=_manifest_value(manifest, "openreview_forum_id"),
         topic_assignments=_manifest_value(manifest, "topic_assignments"),
         theme_bucket=_manifest_value(manifest, "theme_bucket"),
