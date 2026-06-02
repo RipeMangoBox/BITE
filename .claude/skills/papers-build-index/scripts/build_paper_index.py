@@ -25,7 +25,7 @@ INDEX_DIR = VAULT_DIR / "index"
 
 FRONTMATTER_BOUNDARY = re.compile(r"^---\s*$")
 KEY_LINE = re.compile(r"^([A-Za-z0-9_\-]+):(?:\s*(.*))?$")
-VENUE_YEAR = re.compile(r"\b([A-Za-z0-9][A-Za-z0-9_.-]*)[_ -]((?:19|20)\d{2})\b")
+VENUE_YEAR = re.compile(r"\b([A-Za-z0-9][A-Za-z0-9_. -]*?)[_ -]((?:19|20)\d{2})\b")
 NON_PAPER_NOTE_NAMES = {"readme.md", "_index.md"}
 NON_PAPER_NOTE_PREFIXES = ("quality_report_",)
 NON_PAPER_NOTE_DIRS = {"test", "_test", "tests", "_tests"}
@@ -843,14 +843,18 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
 
     analysis_by_title = {normalize_title(p.title): p for p in analysis_papers}
     analysis_by_path = {p.analysis_path: p for p in analysis_papers if p.analysis_path}
+    analysis_by_pdf = {p.pdf_ref: p for p in analysis_papers if p.pdf_ref}
     matched_paths: Set[str] = set()
     matched_titles: Set[str] = set()
+    matched_pdfs: Set[str] = set()
 
     merged: List[Paper] = []
     for base in csv_papers:
         ana = None
         if base.analysis_path:
             ana = analysis_by_path.get(base.analysis_path)
+        if ana is None and base.pdf_ref:
+            ana = analysis_by_pdf.get(base.pdf_ref)
         if ana is None:
             ana = analysis_by_title.get(normalize_title(base.title))
         if ana is None:
@@ -859,6 +863,7 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
 
         matched_paths.add(ana.analysis_path)
         matched_titles.add(normalize_title(ana.title))
+        matched_pdfs.add(ana.pdf_ref)
         base.analysis_path = base.analysis_path or ana.analysis_path
         base.pdf_ref = base.pdf_ref or ana.pdf_ref
         base.venue = base.venue or ana.venue
@@ -878,7 +883,7 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
         merged.append(base)
 
     for ana in analysis_papers:
-        if ana.analysis_path in matched_paths or normalize_title(ana.title) in matched_titles:
+        if ana.analysis_path in matched_paths or normalize_title(ana.title) in matched_titles or ana.pdf_ref in matched_pdfs:
             continue
         merged.append(ana)
 

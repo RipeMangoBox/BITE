@@ -110,6 +110,33 @@ def write_sample_note(root: Path, rel_path: str, title: str) -> None:
     )
 
 
+def write_multiterm_venue_note(root: Path) -> None:
+    path = root / "obsidian-vault/analysis/SIGGRAPH_Asia_2024/Multiword_Venue.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "\n".join(
+            [
+                "---",
+                'title: "Multiword Venue"',
+                "type: paper",
+                "venue: SIGGRAPH Asia",
+                "year: 2024",
+                "pdf_ref: paperPDFs/SIGGRAPH_Asia_2024/multiword.pdf",
+                "tags:",
+                "  - SIGGRAPH_ASIA_2024",
+                "  - topic/smoke",
+                "core_operator: smoke operator",
+                "primary_logic: smoke logic",
+                "---",
+                "",
+                "# Multiword Venue",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
 def main() -> int:
     build = load_module("rf_smoke_build_index", BUILD_SCRIPT)
     workflow = load_module("rf_smoke_research_workflow", WORKFLOW_SCRIPT)
@@ -145,9 +172,20 @@ def main() -> int:
             "state,importance,paper_title,venue,project_link_or_github_link,paper_link,sort,pdf_path\n",
             encoding="utf-8",
         )
+        csv_path.write_text(
+            "\n".join(
+                [
+                    "state,importance,paper_title,venue,project_link_or_github_link,paper_link,sort,pdf_path",
+                    "checked,A,CSV Title Variant,ICLR 2026,N/A,https://example.com/csv,smoke,obsidian-vault/paperPDFs/ICLR_2026/sample.pdf",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
 
         write_sample_note(root, "obsidian-vault/analysis/ICLR_2026/Sample_Paper.md", "Sample Paper")
         write_sample_note(root, "obsidian-vault/analysis/test/Test_Paper.md", "Test Paper")
+        write_multiterm_venue_note(root)
         assert_stage(workflow, "query", "analysis note present")
         run_build(build)
         rows = [
@@ -155,16 +193,21 @@ def main() -> int:
             for line in (root / "obsidian-vault/index/index.jsonl").read_text(encoding="utf-8").splitlines()
             if line.strip()
         ]
-        if len(rows) != 1 or rows[0]["title"] != "Sample Paper":
-            raise AssertionError(f"expected exactly Sample Paper in index, got {rows!r}")
-        if rows[0].get("methods") != ["SmokeMethod"]:
-            raise AssertionError(f"expected exact method name to remain in index.jsonl, got {rows[0]!r}")
-        if rows[0].get("method_groups") != ["Other Method Family"]:
-            raise AssertionError(f"expected by_method to use method family labels, got {rows[0]!r}")
-        if rows[0].get("venue_year") != "ICLR_2026":
-            raise AssertionError(f"expected venue_year field to merge venue/year, got {rows[0]!r}")
-        if "Iclr 2026" in rows[0].get("topics", []):
-            raise AssertionError(f"venue_year tags should not become research topics, got {rows[0]!r}")
+        by_title = {row["title"]: row for row in rows}
+        if set(by_title) != {"CSV Title Variant", "Multiword Venue"}:
+            raise AssertionError(f"expected CSV Title Variant and Multiword Venue in index, got {rows!r}")
+        sample = by_title["CSV Title Variant"]
+        multiword = by_title["Multiword Venue"]
+        if sample.get("methods") != ["SmokeMethod"]:
+            raise AssertionError(f"expected exact method name to remain in index.jsonl, got {sample!r}")
+        if sample.get("method_groups") != ["Other Method Family"]:
+            raise AssertionError(f"expected by_method to use method family labels, got {sample!r}")
+        if sample.get("venue_year") != "ICLR_2026":
+            raise AssertionError(f"expected venue_year field to merge venue/year, got {sample!r}")
+        if multiword.get("venue_year") != "SIGGRAPH_ASIA_2024":
+            raise AssertionError(f"expected multi-word venue/year to be preserved, got {multiword!r}")
+        if "Iclr 2026" in sample.get("topics", []):
+            raise AssertionError(f"venue_year tags should not become research topics, got {sample!r}")
         if not (root / "obsidian-vault/index/paper_index.md").exists():
             raise AssertionError("build should generate obsidian-vault/index/paper_index.md")
         if not (root / "obsidian-vault/index/by_venue_year/venue_year_index.md").exists():
@@ -175,8 +218,8 @@ def main() -> int:
             raise AssertionError("build should not generate standalone by_year navigation")
         if (root / "obsidian-vault/index/by_method/SmokeMethod.md").exists():
             raise AssertionError("exact method names should not get standalone method navigation pages")
-        if rows[0].get("datasets") != ["SmokeDataset", "OtherDataset", "SyntheticData"]:
-            raise AssertionError(f"expected dataset details to be stripped, got {rows[0]!r}")
+        if sample.get("datasets") != ["SmokeDataset", "OtherDataset", "SyntheticData"]:
+            raise AssertionError(f"expected dataset details to be stripped, got {sample!r}")
         all_papers = (root / "obsidian-vault/index/_AllPapers.md").read_text(encoding="utf-8")
         if " · " in all_papers:
             raise AssertionError("paper index entries should use nested list lines, not middle-dot separators")
@@ -186,7 +229,7 @@ def main() -> int:
             raise AssertionError("paper index entries should render cleaned datasets as nested list items")
         if (root / "obsidian-vault/index/by_dataset/SmokeDataset.md").exists():
             raise AssertionError("single-paper dataset slices should not get standalone navigation pages")
-        print("[OK] analysis build: 1 paper, test directory excluded")
+        print("[OK] analysis build: 2 papers, test directory excluded")
 
     print("[OK] index/workflow smoke completed")
     return 0
