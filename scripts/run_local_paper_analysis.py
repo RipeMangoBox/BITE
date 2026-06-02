@@ -56,8 +56,8 @@ if str(REPO_ROOT) not in sys.path:
 from scripts.researchflow_local.topic_tags import (
     format_topic_tags,
     topic_tags_from_assignment,
-    topic_tags_from_names,
 )
+from scripts.researchflow_local.venue_slug import normalize_conf_year_slug
 
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "_private" / "local_analysis_runs"
 DEFAULT_MINERU_LOCK = REPO_ROOT / "_private" / "local_analysis_runs" / "locks" / "mineru_parse.lock"
@@ -446,14 +446,15 @@ FIGURE_PLACEMENT_SYSTEM = """You are ResearchFlow's local note image placement r
 
 Choose which local MinerU figure/table images should be inserted into the
 exported Obsidian note. Use the verified analysis, report text, and captions.
-Prefer summary tables or result plots that directly support the note section.
+Prefer method diagrams cited by the report and summary tables or result plots
+that directly support the note section.
 Do not place sample-only dataset images as the framework image. If no real
 framework/pipeline/method diagram exists, leave 整体框架 empty.
 
 Return JSON only:
 {
   "placements": [
-    {"item_id": str, "section": "整体框架" | "实验与分析", "reason": str}
+    {"item_id": str, "section": "整体框架" | "核心模块与公式推导" | "实验与分析", "reason": str}
   ]
 }
 
@@ -461,7 +462,12 @@ Rules:
 1. Select at most the requested image budget.
 2. Use only supplied item_id values.
 3. Do not duplicate the same item_id.
-4. Prefer Table 1 / benchmark summary tables and decisive result plots over
+4. When the report explicitly cites Figure N / Table N and the candidate
+   exists, include that image unless it is sample-only or decorative.
+5. Put overall pipeline/architecture diagrams in 整体框架; put tokenizer,
+   masking, denoising, sampling, guidance, or other method-module diagrams in
+   核心模块与公式推导.
+6. Prefer Table 1 / benchmark summary tables and decisive result plots over
    decorative or example-only images."""
 
 FIGURE_VISUAL_SUMMARY_SYSTEM = """You are ResearchFlow's local figure/table visual summarizer.
@@ -650,7 +656,10 @@ def infer_conf_parts(conf_year: str) -> tuple[str, int | None]:
     match = re.match(r"(.+?)_(\d{4})$", conf_year or "")
     if not match:
         return conf_year or "Unknown", None
-    return match.group(1).replace("_", " "), int(match.group(2))
+    venue = match.group(1).replace("_", " ")
+    if venue.lower() == "arxiv":
+        venue = "arXiv"
+    return venue, int(match.group(2))
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -722,7 +731,7 @@ def infer_conf_year_from_pdf_path(pdf_path: str) -> str:
         return ""
     for part in reversed(Path(pdf_path).parts):
         if re.match(r"^[A-Za-z][A-Za-z0-9-]*_\d{4}$", part):
-            return part
+            return normalize_conf_year_slug(part)
     return ""
 
 
@@ -792,7 +801,7 @@ def resolve_existing_pdf_path(
 def resolved_conf_year(args: argparse.Namespace) -> str:
     conf_year = (args.conf_year or "").strip()
     if conf_year:
-        return conf_year
+        return normalize_conf_year_slug(conf_year)
     inferred = infer_conf_year_from_pdf_path(args.paper_pdf or args.pdf or "")
     if inferred:
         return inferred
@@ -1115,7 +1124,7 @@ def main_repair_prompt(raw_text: str) -> str:
     return json.dumps({"schema": schema, "raw_output": raw_text}, ensure_ascii=False, indent=2)
 
 
-def normalize_main_analysis(title: str, parsed: dict[str, Any]) -> dict[str, Any]:
+def normalize_main_analysis(title: str, parsed: dict[str, Any], *, source_links: list[dict[str, str]] | None = None) -> dict[str, Any]:
     normalized = dict(parsed)
     metadata = normalized.get("paper_metadata")
     if not isinstance(metadata, dict):
@@ -1150,6 +1159,10 @@ def normalize_main_analysis(title: str, parsed: dict[str, Any]) -> dict[str, Any
     for key in ["formulas", "figures_tables", "limitations", "open_questions"]:
         if not isinstance(normalized.get(key), list):
             normalized[key] = []
+    if source_links is not None:
+        normalized["source_links"] = source_links
+    elif not isinstance(normalized.get("source_links"), list):
+        normalized["source_links"] = []
     return normalized
 
 
@@ -2790,6 +2803,68 @@ def table_cell(value: Any) -> str:
     return str(value or "").replace("\n", " ").replace("|", "/").strip()
 
 
+def markdown_link(label: str, url: str) -> str:
+    return f"[{table_cell(label)}]({table_cell(url)})"
+
+
+def normalize_extracted_url(url: str) -> str:
+    text = str(url or "").strip().strip("<>")
+    while text and text[-1] in ".,;:)]}":
+        text = text[:-1]
+    return text
+
+
+def classify_link(label: str, url: str) -> str:
+    label_l = label.lower()
+    url_l = url.lower()
+    if "project" in label_l or "project" in url_l or "github.io" in url_l:
+        return "Project"
+    if "code" in label_l or "github" in label_l or "github.com" in url_l or "gitlab" in url_l:
+        return "Code"
+    if "arxiv" in label_l or "arxiv.org" in url_l:
+        return "arXiv"
+    return ""
+
+
+def extract_source_links(*texts: Any) -> list[dict[str, str]]:
+    links: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+
+    def add(label: str, url: str) -> None:
+        clean_url = normalize_extracted_url(url)
+        if not clean_url.startswith(("http://", "https://")):
+            return
+        clean_label = label or classify_link(label, clean_url) or "link"
+        key = (clean_label.lower(), clean_url)
+        if key in seen:
+            return
+        seen.add(key)
+        links.append({"label": clean_label, "url": clean_url})
+
+    for value in texts:
+        text = str(value or "")
+        if not text:
+            continue
+        for label, url in re.findall(r"\[([^\]]{1,80})\]\((https?://[^)\s]+)\)", text):
+            add(classify_link(label, url) or label.strip(), url)
+        for label, url in re.findall(r"(?i)\b(project\s+page|project|code|github)\s*[:：]\s*(https?://\S+)", text):
+            add(classify_link(label, url) or label, url)
+        for url in re.findall(r"https?://\S+", text):
+            inferred = classify_link("", url)
+            if inferred:
+                add(inferred, url)
+    return links
+
+
+def link_is_paper_url(url: str, paper_link: str, openreview_forum_id: str) -> bool:
+    clean = normalize_extracted_url(url)
+    if paper_link and clean == normalize_extracted_url(paper_link):
+        return True
+    if openreview_forum_id and openreview_forum_id in clean and "openreview.net" in clean:
+        return True
+    return False
+
+
 def compact_text(value: Any, *, max_len: int = 260) -> str:
     text = re.sub(r"\s+", " ", str(value or "")).strip()
     if len(text) <= max_len:
@@ -2810,12 +2885,28 @@ def dedupe_caption_prefix(label: str, caption: str) -> str:
     return text.strip(" \t\r\n-:;,.")
 
 
+def canonical_name_key(value: str) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    text = re.sub(r"\s*\([^)]*\)", "", text).strip()
+    return re.sub(r"[^a-z0-9]+", "", text.lower())
+
+
+def display_name(value: str) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    parenthetical = re.match(r"^([^()]+?)\s*\([^)]*\)\s*$", text)
+    return parenthetical.group(1).strip() if parenthetical else text
+
+
 def list_names(items: list[dict[str, Any]], key: str, *, max_items: int = 5) -> str:
     names = []
+    seen: set[str] = set()
     for item in items:
         value = item.get(key)
-        if value:
-            names.append(str(value))
+        name = display_name(str(value or ""))
+        name_key = canonical_name_key(name)
+        if name and name_key and name_key not in seen:
+            names.append(name)
+            seen.add(name_key)
         if len(names) >= max_items:
             break
     return ", ".join(names)
@@ -2850,17 +2941,100 @@ def load_topic_assignments(path_value: str = "") -> dict[str, dict[str, str]]:
     return mapping
 
 
+def default_topic_assignments_path(conf_year: str) -> str:
+    if normalize_conf_year_slug(conf_year) != "ICLR_2026":
+        return ""
+    candidates = [
+        REPO_ROOT / "_private" / "topic_priority" / "subtopic_batches" / "iclr26_fine_assignments.jsonl",
+        REPO_ROOT / "_private" / "topic_priority" / "iclr26_topic_assignments.jsonl",
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    return ""
+
+
 def topic_text_for_note(openreview_forum_id: str, conf_year: str, topic_assignments: str = "") -> str:
-    info = load_topic_assignments(topic_assignments).get(openreview_forum_id or "", {})
+    assignments_path = topic_assignments or DEFAULT_TOPIC_ASSIGNMENTS or default_topic_assignments_path(conf_year)
+    info = load_topic_assignments(assignments_path).get(openreview_forum_id or "", {})
     tags = topic_tags_from_assignment(info)
-    if not tags:
-        tags = topic_tags_from_names([conf_year])
-    return format_topic_tags(tags)
+    return format_topic_tags(tags) if tags else ""
+
+
+def venue_year_tag(conf_year: str) -> str:
+    slug = normalize_conf_year_slug(conf_year)
+    match = re.fullmatch(r"(.+?)_((?:19|20)\d{2})", slug)
+    if not match:
+        return safe_slug(slug or conf_year).upper()
+    venue, year = match.groups()
+    venue = "arxiv" if venue.lower() == "arxiv" else venue.upper()
+    return f"{venue}_{year}"
+
+
+def is_venue_year_topic_tag(tag: str) -> bool:
+    text = str(tag or "").strip().removeprefix("#")
+    return bool(re.fullmatch(r"topic/[^/\s]+_((?:19|20)\d{2})", text))
+
+
+def topic_tags_from_text(topic_text: str | None) -> list[str]:
+    tags: list[str] = []
+    seen: set[str] = set()
+    for raw in re.findall(r"#topic/[^\s,;|]+", topic_text or ""):
+        tag = raw.strip().removeprefix("#").strip()
+        if not tag or is_venue_year_topic_tag(tag) or tag in seen:
+            continue
+        seen.add(tag)
+        tags.append(tag)
+    return tags
+
+
+def format_topic_text_for_table(topic_text: str | None) -> str:
+    tags = topic_tags_from_text(topic_text)
+    return " ".join(f"#{tag}" for tag in tags)
 
 
 def topic_tags_for_frontmatter(topic_text: str | None, conf_year: str) -> list[str]:
-    tags = [tag.removeprefix("#") for tag in (topic_text or "").split() if tag.startswith("#")]
-    return tags[:5] if tags else [f"topic/{safe_slug(conf_year).lower()}"]
+    tags: list[str] = []
+    seen: set[str] = set()
+    for tag in [venue_year_tag(conf_year), *topic_tags_from_text(topic_text)]:
+        if not tag or tag in seen:
+            continue
+        seen.add(tag)
+        tags.append(tag)
+        if len(tags) >= 5:
+            break
+    return tags
+
+
+def frontmatter_tags_from_note(note: str) -> list[str]:
+    in_tags = False
+    tags: list[str] = []
+    for line in note.splitlines():
+        if line.strip() == "tags:":
+            in_tags = True
+            continue
+        if in_tags:
+            if line.startswith("- "):
+                tag = line[2:].strip().strip("'\"").removeprefix("#")
+                if tag:
+                    tags.append(tag)
+                continue
+            if line and not line.startswith((" ", "\t")):
+                break
+    return tags
+
+
+def topic_text_from_existing_note(note_path: Path) -> str:
+    if not note_path.exists():
+        return ""
+    try:
+        note = note_path.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    tags = [tag for tag in frontmatter_tags_from_note(note) if tag.startswith("topic/") and not is_venue_year_topic_tag(tag)]
+    if not tags:
+        return ""
+    return " ".join(f"#{tag}" for tag in tags[:4])
 
 
 def title_aliases(title: str, method: str) -> list[str]:
@@ -2943,12 +3117,10 @@ def frontmatter_metadata_values(title: str, analysis: dict[str, Any]) -> dict[st
     claim_sentence = first_sentence(claims[0], max_len=180) if claims else ""
     core_operator = compact_text(causal_knob or method or claim_sentence or title, max_len=180)
     primary_logic = compact_text(core or real_bottleneck or method or claim_sentence or title, max_len=420)
-    paradigm = compact_text(core or method or primary_logic, max_len=180)
     return {
         "method": method,
         "core_operator": core_operator,
         "primary_logic": primary_logic,
-        "paradigm": paradigm,
     }
 
 
@@ -3249,6 +3421,37 @@ def sample_only_figure(item: dict[str, Any]) -> bool:
     return any(word in text for word in sample_words) and not any(word in text for word in result_words)
 
 
+METHOD_FIGURE_PATTERN = re.compile(
+    r"\b("
+    r"framework|pipeline|architecture|overview|method|module|model|tokenizer|"
+    r"representation|mask|masking|denois\w*|sampling|guidance|diffusion|"
+    r"latent|training|train|encoder|decoder|quantiz\w*|hfsq|fsq|blc|ldcfg"
+    r")\b",
+    flags=re.IGNORECASE,
+)
+
+FRAMEWORK_FIGURE_PATTERN = re.compile(
+    r"\b(framework|pipeline|architecture|overall|system)\b",
+    flags=re.IGNORECASE,
+)
+
+EXPERIMENT_FIGURE_PATTERN = re.compile(
+    r"\b(result|estimate|estimation|performance|experiment|benchmark|ablation|study|comparison|metric|jitter|fid|mae|mpjpe|lid)\b",
+    flags=re.IGNORECASE,
+)
+
+ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"整体框架", "核心模块与公式推导", "实验与分析"}
+
+
+def placement_text(item: dict[str, Any]) -> str:
+    return f"{item.get('label') or ''} {item.get('caption') or ''} {item.get('visual_summary') or ''}"
+
+
+def method_figure_section(item: dict[str, Any]) -> str:
+    text = placement_text(item)
+    return "整体框架" if FRAMEWORK_FIGURE_PATTERN.search(text) else "核心模块与公式推导"
+
+
 def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_images: int) -> list[dict[str, str]]:
     if max_images <= 0:
         return []
@@ -3256,17 +3459,18 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
     by_id = {item["item_id"]: item for item in candidates}
     placements: list[dict[str, str]] = []
     used: set[str] = set()
+    method_image_budget = min(max_images, 4)
 
     full_region_candidates = [item for item in candidates if item.get("is_full_region")]
     full_region_candidates.sort(key=lambda item: (sample_only_figure(item), item["item_id"]))
     for item in full_region_candidates:
         if len(placements) >= max_images:
             break
-        text = f"{item.get('label') or ''} {item.get('caption') or ''}".lower()
+        text = placement_text(item)
         section = (
-            "整体框架"
+            method_figure_section(item)
             if item.get("type", "").lower() == "figure"
-            and re.search(r"\b(framework|pipeline|architecture|overview|method)\b", text)
+            and METHOD_FIGURE_PATTERN.search(text)
             else "实验与分析"
         )
         placements.append({
@@ -3279,15 +3483,21 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
     for item in candidates:
         if len(placements) >= max_images:
             break
-        text = f"{item.get('label') or ''} {item.get('caption') or ''}".lower()
+        method_count = sum(1 for placement in placements if placement.get("section") in {"整体框架", "核心模块与公式推导"})
+        if method_count >= method_image_budget:
+            break
+        text = placement_text(item)
         if item["item_id"] in used:
             continue
         if sample_only_figure(item):
             continue
-        if item.get("type", "").lower() == "figure" and re.search(r"\b(framework|pipeline|architecture|overview|method)\b", text):
-            placements.append({"item_id": item["item_id"], "section": "整体框架", "reason": "caption indicates a framework or method overview"})
+        if item.get("type", "").lower() == "figure" and METHOD_FIGURE_PATTERN.search(text):
+            placements.append({
+                "item_id": item["item_id"],
+                "section": method_figure_section(item),
+                "reason": "caption indicates a framework or method-module diagram",
+            })
             used.add(item["item_id"])
-            break
 
     experiment_candidates = [
         item for item in candidates
@@ -3295,7 +3505,7 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
         and not sample_only_figure(item)
         and (
             item.get("type", "").lower() == "table"
-            or re.search(r"\b(result|estimate|estimation|performance|experiment|benchmark|lid)\b", f"{item.get('label') or ''} {item.get('caption') or ''}".lower())
+            or EXPERIMENT_FIGURE_PATTERN.search(placement_text(item))
         )
     ]
     experiment_candidates.sort(key=lambda item: (0 if item.get("type", "").lower() == "table" else 1, item["item_id"]))
@@ -3326,7 +3536,7 @@ def normalize_figure_placements(
             continue
         item_id = str(item.get("item_id") or "")
         section = str(item.get("section") or "")
-        if item_id not in valid_ids or item_id in used or section not in {"整体框架", "实验与分析"}:
+        if item_id not in valid_ids or item_id in used or section not in ALLOWED_FIGURE_PLACEMENT_SECTIONS:
             continue
         placements.append({
             "item_id": item_id,
@@ -3669,6 +3879,106 @@ def figure_reference_patterns(item: dict[str, Any]) -> list[re.Pattern[str]]:
     return patterns
 
 
+def figure_reference_keys_for_item(item: dict[str, Any]) -> set[tuple[str, str]]:
+    keys: set[tuple[str, str]] = set()
+    text = f"{item.get('label') or ''} {item.get('caption') or ''}"
+    for match in re.finditer(r"\b(Fig(?:ure)?\.?|Table)\s*([A-Za-z0-9]+)", text, flags=re.IGNORECASE):
+        kind = "figure" if match.group(1).lower().startswith("fig") else "table"
+        keys.add((kind, match.group(2).lower()))
+    return keys
+
+
+def referenced_figure_table_keys(markdown: str) -> set[tuple[str, str]]:
+    keys: set[tuple[str, str]] = set()
+    for match in re.finditer(r"(?<![A-Za-z])(?:Fig\.?|Figure)\s*([0-9]+[A-Za-z]?)\b", markdown, flags=re.IGNORECASE):
+        keys.add(("figure", match.group(1).lower()))
+    for match in re.finditer(r"(?<![A-Za-z])Table\s*([0-9]+[A-Za-z]?)\b", markdown, flags=re.IGNORECASE):
+        keys.add(("table", match.group(1).lower()))
+    return keys
+
+
+def section_for_referenced_item(markdown: str, item: dict[str, Any]) -> str:
+    lines = markdown.splitlines()
+    current = ""
+    for line in lines:
+        heading = re.match(r"^##\s+(.+?)\s*$", line)
+        if heading:
+            current = heading.group(1).strip()
+        if any(pattern.search(line) for pattern in figure_reference_patterns(item)):
+            if current in ALLOWED_FIGURE_PLACEMENT_SECTIONS:
+                return current
+            break
+    if str(item.get("type") or "").lower() == "table":
+        return "实验与分析"
+    if METHOD_FIGURE_PATTERN.search(placement_text(item)) and not sample_only_figure(item):
+        return method_figure_section(item)
+    return "实验与分析"
+
+
+def ensure_referenced_figure_placements(
+    placements: list[dict[str, str]],
+    *,
+    report: str,
+    copied_figures: list[dict[str, Any]],
+    max_images: int,
+) -> list[dict[str, str]]:
+    if max_images <= 0:
+        return []
+    normalized_report = normalize_report_markdown(report)
+    referenced = referenced_figure_table_keys(normalized_report)
+    if not referenced:
+        return placements[:max_images]
+    by_id = {str(item.get("item_id") or f"item_{index:03d}"): item for index, item in enumerate(copied_figures, 1)}
+    referenced_item_ids = {
+        item_id for item_id, item in by_id.items()
+        if figure_reference_keys_for_item(item).intersection(referenced)
+    }
+    used = {str(item.get("item_id") or "") for item in placements}
+    merged = [
+        placement for placement in placements
+        if str(placement.get("item_id") or "") in by_id
+    ]
+    if len(merged) > max_images:
+        referenced_existing = [
+            placement for placement in merged
+            if str(placement.get("item_id") or "") in referenced_item_ids
+        ]
+        other_existing = [
+            placement for placement in merged
+            if str(placement.get("item_id") or "") not in referenced_item_ids
+        ]
+        merged = (referenced_existing + other_existing)[:max_images]
+        used = {str(item.get("item_id") or "") for item in merged}
+    for index, item in enumerate(copied_figures, 1):
+        item_id = str(item.get("item_id") or f"item_{index:03d}")
+        if item_id in used or item_id not in by_id:
+            continue
+        item_keys = figure_reference_keys_for_item(item)
+        if not item_keys.intersection(referenced):
+            continue
+        if sample_only_figure(item) and str(item.get("type") or "").lower() == "figure":
+            continue
+        merged.append({
+            "item_id": item_id,
+            "section": section_for_referenced_item(normalized_report, item),
+            "reason": "report explicitly references this figure/table",
+        })
+        if len(merged) > max_images:
+            drop_index = next(
+                (
+                    idx for idx in range(len(merged) - 1, -1, -1)
+                    if str(merged[idx].get("item_id") or "") not in referenced_item_ids
+                ),
+                None,
+            )
+            if drop_index is None:
+                merged.pop()
+            else:
+                merged.pop(drop_index)
+        used.add(item_id)
+    return merged[:max_images]
+
+
 def section_line_bounds(lines: list[str], heading: str) -> tuple[int, int] | None:
     start = -1
     for index, line in enumerate(lines):
@@ -3754,34 +4064,25 @@ def figure_items_for_note(
     *,
     max_images: int,
     placements: list[dict[str, Any]] | None = None,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+) -> dict[str, list[dict[str, Any]]]:
     if max_images <= 0:
-        return [], []
+        return {}
     selected = placements if placements is not None else fallback_figure_placements(copied, max_images=max_images)
     by_id = {str(item.get("item_id") or f"item_{index:03d}"): item for index, item in enumerate(copied, 1)}
-    framework_items: list[dict[str, Any]] = []
-    experiment_items: list[dict[str, Any]] = []
+    items_by_section: dict[str, list[dict[str, Any]]] = {section: [] for section in ALLOWED_FIGURE_PLACEMENT_SECTIONS}
     used: set[str] = set()
     for placement in selected:
         item_id = str(placement.get("item_id") or "")
         if item_id in used or item_id not in by_id:
             continue
-        target = framework_items if placement.get("section") == "整体框架" else experiment_items
-        target.append(by_id[item_id])
+        section = str(placement.get("section") or "")
+        if section not in ALLOWED_FIGURE_PLACEMENT_SECTIONS:
+            section = "实验与分析"
+        items_by_section.setdefault(section, []).append(by_id[item_id])
         used.add(item_id)
         if len(used) >= max_images:
             break
-    return framework_items, experiment_items
-
-
-def figure_blocks_for_note(
-    copied: list[dict[str, Any]],
-    *,
-    max_images: int,
-    placements: list[dict[str, Any]] | None = None,
-) -> tuple[list[str], list[str]]:
-    framework_items, experiment_items = figure_items_for_note(copied, max_images=max_images, placements=placements)
-    return [image_block(item) for item in framework_items], [image_block(item) for item in experiment_items]
+    return {section: items for section, items in items_by_section.items() if items}
 
 
 def render_frontmatter(
@@ -3813,7 +4114,6 @@ def render_frontmatter(
     ]
     lines.extend(f"- {yaml_scalar(alias)}" for alias in aliases)
     lines.extend([
-        f"acceptance: {yaml_scalar(acceptance or 'unknown')}",
         "tags:",
     ])
     lines.extend(f"- {yaml_scalar(tag)}" for tag in tags)
@@ -3826,7 +4126,6 @@ def render_frontmatter(
     ])
     lines.extend(f"- {yaml_scalar(claim)}" for claim in claims)
     lines.extend([
-        f"paradigm: {yaml_scalar(metadata['paradigm'])}",
         "---",
         "",
     ])
@@ -3835,7 +4134,10 @@ def render_frontmatter(
 
 def normalize_acceptance(acceptance: str) -> str:
     value = str(acceptance or "").strip()
-    return "accepted" if not value or value.lower() == "unknown" else value
+    normalized = value.lower().replace("_", "-")
+    if normalized in {"", "unknown", "accepted", "accept", "main", "conference", "regular", "arxiv"}:
+        return ""
+    return value
 
 
 def render_info_table(
@@ -3846,6 +4148,7 @@ def render_info_table(
     paper_link: str,
     acceptance: str,
     analysis: dict[str, Any],
+    report: str = "",
     topic_text: str | None = None,
 ) -> str:
     venue, year = infer_conf_parts(conf_year)
@@ -3853,11 +4156,37 @@ def render_info_table(
     experiments = analysis.get("experiments") or {}
     datasets = list_names(experiments.get("main_results") or [], "benchmark", max_items=4)
     title_zh = preferred_chinese_title(title, analysis)
-    link = f"[paper]({paper_link})" if paper_link else (
-        f"[paper](https://openreview.net/forum?id={openreview_forum_id})"
-        if openreview_forum_id else ""
-    )
-    topic = topic_text or topic_text_for_note(openreview_forum_id, conf_year)
+    links: list[str] = []
+    if paper_link:
+        links.append(markdown_link("paper", paper_link))
+    elif openreview_forum_id:
+        links.append(markdown_link("paper", f"https://openreview.net/forum?id={openreview_forum_id}"))
+    all_extra_links = [
+        *(analysis.get("source_links") or []),
+        *extract_source_links(report, json.dumps(analysis, ensure_ascii=False)),
+    ]
+    seen_labels: set[str] = {"paper"} if links else set()
+    seen_urls: set[str] = {
+        normalize_extracted_url(url)
+        for url in [paper_link, f"https://openreview.net/forum?id={openreview_forum_id}" if openreview_forum_id else ""]
+        if url
+    }
+    for item in all_extra_links:
+        if not isinstance(item, dict):
+            continue
+        url = normalize_extracted_url(str(item.get("url") or ""))
+        label = classify_link(str(item.get("label") or ""), url) or str(item.get("label") or "").strip()
+        if label not in {"Project", "Code", "arXiv"}:
+            continue
+        if not url or url in seen_urls or link_is_paper_url(url, paper_link, openreview_forum_id):
+            continue
+        if label.lower() in seen_labels:
+            continue
+        seen_urls.add(url)
+        seen_labels.add(label.lower())
+        links.append(markdown_link(label, url))
+    link = " · ".join(links)
+    topic = format_topic_text_for_table(topic_text or topic_text_for_note(openreview_forum_id, conf_year))
     venue_text = f"{venue} {year}" if year else venue
     acceptance_label = acceptance_info_table_label(acceptance)
     if acceptance_label and venue_text:
@@ -3885,6 +4214,7 @@ def acceptance_info_table_label(acceptance: str) -> str:
         return ""
     special = {
         "oral",
+        "poster",
         "highlight",
         "spotlight",
         "notable",
@@ -3897,24 +4227,25 @@ def acceptance_info_table_label(acceptance: str) -> str:
 
 def render_effect_callout(analysis: dict[str, Any]) -> str:
     lines = ["> [!tip] 效果简介"]
-    results = []
+    grouped: dict[str, list[str]] = {}
     for item in (analysis.get("experiments") or {}).get("main_results") or []:
         benchmark = compact_text(item.get("benchmark"), max_len=80)
         metric = compact_text(item.get("metric"), max_len=80)
         proposed = compact_text(item.get("proposed"), max_len=80)
-        if benchmark and metric and proposed:
-            results.append((item, benchmark, metric, proposed))
-        if len(results) >= 3:
-            break
-    for item, benchmark, metric, proposed in results:
-        baseline = item.get("baseline") or ""
-        delta = item.get("delta") or ""
-        sentence = f"{benchmark} 上，{metric} 为 {proposed}"
+        if not benchmark or not metric or not proposed:
+            continue
+        baseline = compact_text(item.get("baseline"), max_len=80)
+        delta = compact_text(item.get("delta"), max_len=80)
+        metric_text = f"{metric} {proposed}"
         if baseline:
-            sentence += f"，对比 {baseline}"
+            metric_text += f" vs {baseline}"
         if delta:
-            sentence += f"，变化 {delta}"
-        lines.append(f"> - {sentence}。")
+            metric_text += f" ({delta})"
+        grouped.setdefault(benchmark, []).append(metric_text)
+        if len(grouped) >= 3:
+            break
+    for benchmark, metrics in grouped.items():
+        lines.append(f"> - {benchmark} 上，" + "；".join(metrics[:3]) + "。")
     if len(lines) > 1:
         return "\n".join(lines)
     claim_pattern = re.compile(
@@ -3953,13 +4284,13 @@ def compose_vault_note(
     if not core:
         core = frontmatter_metadata_values(title, analysis)["primary_logic"]
     body = normalize_report_markdown(report)
-    framework_items, experiment_items = figure_items_for_note(
+    figure_items_by_section = figure_items_for_note(
         copied_figures,
         max_images=max_images,
         placements=figure_placements,
     )
-    body = inject_figure_items(body, "整体框架", framework_items)
-    body = inject_figure_items(body, "实验与分析", experiment_items)
+    for section in ("整体框架", "核心模块与公式推导", "实验与分析"):
+        body = inject_figure_items(body, section, figure_items_by_section.get(section, []))
     parts = [
         render_frontmatter(
             title=title,
@@ -3983,6 +4314,7 @@ def compose_vault_note(
             paper_link=paper_link,
             acceptance=acceptance,
             analysis=analysis,
+            report=report,
             topic_text=topic_text,
         ),
     ]
@@ -4154,12 +4486,10 @@ def validate_vault_note(
         "venue",
         "year",
         "pdf_ref",
-        "acceptance",
         "tags",
         "core_operator",
         "primary_logic",
         "claims",
-        "paradigm",
     ]
     required_sections = [title for title, _ in SECTION_SPECS] + ["原文 PDF"]
     headings = set(re.findall(r"^##\s+(.+?)\s*$", note, flags=re.MULTILINE))
@@ -4181,6 +4511,21 @@ def validate_vault_note(
         path for path, embed in zip(note_image_paths, expected_image_embeds, strict=False)
         if embed not in note
     ]
+    referenced_keys = referenced_figure_table_keys(note)
+    referenced_assets: list[dict[str, str]] = []
+    for index, item in enumerate(copied_figures, 1):
+        if not figure_reference_keys_for_item(item).intersection(referenced_keys):
+            continue
+        image_path = str(item.get("note_image_path") or "")
+        if image_path:
+            referenced_assets.append({
+                "label": str(item.get("label") or ""),
+                "path": image_path,
+            })
+    missing_referenced_images = [
+        item for item in referenced_assets
+        if format_obsidian_image_embed(item["path"]) not in note
+    ]
     legacy_markdown_image_links = re.findall(r"!\[[^\]]*\]\((?:\.\./\.\./)?assets/[^)]+\)", note)
     legacy_relative_wikilink_images = re.findall(r"!\[\[\.\./\.\./assets/[^\]]+\]\]", note)
     scalar_metadata_keys = set(required_frontmatter) - {"aliases", "tags", "claims"}
@@ -4190,7 +4535,7 @@ def validate_vault_note(
             continue
         if value in {"", '""', "null"} or "待人工" in value:
             fallback_frontmatter_values[key] = value
-        elif key != "acceptance" and value in {"unknown", "Unknown"}:
+        elif value in {"unknown", "Unknown"}:
             fallback_frontmatter_values[key] = value
     fallback_markers = [
         f"{key}: {value}"
@@ -4203,18 +4548,30 @@ def validate_vault_note(
     )
     forum_id_value = frontmatter.get("openreview_forum_id", "").strip().strip("\"'")
     forum_id_ok = not openreview_forum_id or forum_id_value == openreview_forum_id
+    frontmatter_tags = frontmatter_tags_from_note(note)
+    expected_venue_tag = venue_year_tag(pdf_ref.split("/")[-2] if "/" in pdf_ref else "")
+    venue_tag_ok = not expected_venue_tag or expected_venue_tag in frontmatter_tags
+    legacy_venue_topic_tags = [tag for tag in frontmatter_tags if is_venue_year_topic_tag(tag)]
+    missing_referenced_images_blocking = (
+        missing_referenced_images
+        and max_images > 0
+        and len(note_image_paths) < max_images
+    )
     checks = {
         "frontmatter_valid": has_frontmatter and not missing_frontmatter,
         "openreview_forum_id_present": forum_id_ok,
         "required_sections_present": not missing_sections,
         "pdf_embed_present": not pdf_ref or expected_pdf_embed in note,
         "image_embeds_present": not note_image_paths or not missing_images,
+        "referenced_image_embeds_present": not missing_referenced_images_blocking,
         "no_legacy_markdown_image_links": not legacy_markdown_image_links and not legacy_relative_wikilink_images,
         "no_pdf_file_label": "PDF 文件：" not in note,
         "no_table_cell_aliased_wikilinks": not table_rows_with_aliased_wikilinks(note),
         "no_fallback_metadata_markers": not fallback_markers,
         "no_dangling_numeric_refs": not dangling_numeric_refs(note),
         "no_incomplete_effect_callout": not incomplete_effect_callout_lines(note),
+        "venue_year_tag_present": venue_tag_ok,
+        "no_legacy_venue_topic_tags": not legacy_venue_topic_tags,
         "note_length_ok": len(note.strip()) >= 1000,
     }
     return {
@@ -4229,6 +4586,7 @@ def validate_vault_note(
         "image_embed_count": len(re.findall(r"!\[\[assets/figures/papers/[^\]]+\]\]", note)),
         "expected_image_count": len(note_image_paths),
         "missing_image_paths": missing_images[:12],
+        "missing_referenced_images": missing_referenced_images[:12],
         "legacy_markdown_image_links": legacy_markdown_image_links[:12],
         "legacy_relative_wikilink_images": legacy_relative_wikilink_images[:12],
         "pdf_file_label_count": note.count("PDF 文件："),
@@ -4236,6 +4594,9 @@ def validate_vault_note(
         "fallback_markers": fallback_markers,
         "dangling_numeric_refs": dangling_numeric_refs(note),
         "incomplete_effect_callout_lines": incomplete_effect_callout_lines(note),
+        "expected_venue_year_tag": expected_venue_tag,
+        "frontmatter_tags": frontmatter_tags,
+        "legacy_venue_topic_tags": legacy_venue_topic_tags,
     }
 
 
@@ -4354,6 +4715,20 @@ def export_to_vault(
         task_id=task_id,
         asset_root=asset_root,
     )
+    effective_placements = ensure_referenced_figure_placements(
+        figure_placements or [],
+        report=report,
+        copied_figures=copied_figures,
+        max_images=args.max_note_images,
+    )
+    if not analysis.get("source_links"):
+        parse_markdown = work_dir / "parse" / "full.md"
+        if parse_markdown.exists():
+            analysis = dict(analysis)
+            analysis["source_links"] = extract_source_links(parse_markdown.read_text(encoding="utf-8"))
+    topic_text = topic_text_for_note(args.openreview_forum_id, conf_year, args.topic_assignments)
+    if not topic_text:
+        topic_text = topic_text_from_existing_note(note_path)
     note = compose_vault_note(
         title=title,
         conf_year=conf_year,
@@ -4366,8 +4741,8 @@ def export_to_vault(
         report=report,
         copied_figures=copied_figures,
         max_images=args.max_note_images,
-        topic_text=topic_text_for_note(args.openreview_forum_id, conf_year, args.topic_assignments),
-        figure_placements=figure_placements,
+        topic_text=topic_text,
+        figure_placements=effective_placements,
     )
     note, numeric_ref_sanitizer = sanitize_dangling_numeric_refs(note)
     atomic_write_text(note_path, note)
@@ -4376,7 +4751,7 @@ def export_to_vault(
         pdf_ref=pdf_ref,
         openreview_forum_id=args.openreview_forum_id,
         copied_figures=copied_figures,
-        figure_placements=figure_placements,
+        figure_placements=effective_placements,
         max_images=args.max_note_images,
     )
     export_info = {
@@ -4386,7 +4761,7 @@ def export_to_vault(
         "source_pdf": str(source_pdf),
         "source_pdf_resolution": pdf_resolution,
         "figure_count": len(copied_figures),
-        "figure_placements": figure_placements or [],
+        "figure_placements": effective_placements,
         "asset_root": str(asset_root),
         "numeric_ref_sanitizer": numeric_ref_sanitizer,
         "validation": validation,
@@ -5194,7 +5569,7 @@ async def run_main_analysis(
                 error = f"main_analysis repair failed: {first_exc}; repair: {second_exc}"
                 append_jsonl(progress_path, {"event": "main_analysis_fallback", "at": now_iso(), "error": error, "usage": usage})
                 parsed = main_analysis_fallback(title, part_results, figures_tables, error, raw)
-    parsed = normalize_main_analysis(title, parsed)
+    parsed = normalize_main_analysis(title, parsed, source_links=extract_source_links(markdown))
     parsed["_meta"] = {
         "part_count": len(part_results),
         "latency_seconds": round(time.monotonic() - started, 3),
@@ -5315,7 +5690,16 @@ async def run_figure_placement(
     if args.resume and out_path.exists() and not args.force:
         cached = json.loads(out_path.read_text(encoding="utf-8"))
         placements = cached.get("placements") if isinstance(cached, dict) else []
-        return placements if isinstance(placements, list) else [], cached.get("usage", {}) if isinstance(cached, dict) else {}
+        if isinstance(placements, list):
+            placements = ensure_referenced_figure_placements(
+                placements,
+                report=report,
+                copied_figures=copied_figures,
+                max_images=args.max_note_images,
+            )
+        else:
+            placements = []
+        return placements, cached.get("usage", {}) if isinstance(cached, dict) else {}
 
     if args.max_note_images <= 0:
         atomic_write_json(out_path, {"placements": [], "usage": {}})
@@ -5356,6 +5740,12 @@ async def run_figure_placement(
             append_jsonl(progress_path, {"event": "figure_placement_fallback", "at": now_iso(), "error": str(exc)})
     if not placements:
         placements = fallback_figure_placements(copied_figures, max_images=args.max_note_images)
+    placements = ensure_referenced_figure_placements(
+        placements,
+        report=report,
+        copied_figures=copied_figures,
+        max_images=args.max_note_images,
+    )
     atomic_write_json(out_path, {"placements": placements, "usage": usage})
     append_jsonl(progress_path, {"event": "figure_placement_done", "at": now_iso(), "count": len(placements), "usage": usage})
     return placements, usage
@@ -5702,7 +6092,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                     repaired_note, kimi_check_repair_usage = await maybe_kimi_check_repair_note(
                         args,
                         note=note_path.read_text(encoding="utf-8"),
-                        figure_placements=figure_placements,
+                        figure_placements=vault_export.get("figure_placements") or figure_placements,
                         copied_figures=copied_figures,
                         work_dir=work_dir,
                         progress_path=progress_path,
@@ -5715,7 +6105,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                             pdf_ref=str(vault_export.get("pdf_ref") or ""),
                             openreview_forum_id=args.openreview_forum_id,
                             copied_figures=copied_figures,
-                            figure_placements=figure_placements,
+                            figure_placements=vault_export.get("figure_placements") or figure_placements,
                             max_images=args.max_note_images,
                         )
                         vault_export["validation"] = repaired_validation
@@ -5935,7 +6325,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--paper-title", default="", help="Canonical paper title for vault export")
     parser.add_argument("--conf-year", default=DEFAULT_CONF_YEAR, help="Vault venue/year folder, e.g. CVPR_2026")
     parser.add_argument("--paper-link", default="", help="Canonical paper URL for note metadata")
-    parser.add_argument("--acceptance", default="unknown", help="Acceptance/status metadata, e.g. accepted, workshop, arxiv, unknown")
+    parser.add_argument("--acceptance", default="", help="Optional presentation/status metadata, e.g. oral, poster, spotlight")
     parser.add_argument("--openreview-forum-id", default="", help="OpenReview forum id for note metadata")
     parser.add_argument("--topic-assignments", default="", help="Optional JSONL topic assignment file keyed by OpenReview forum id")
     parser.add_argument("--theme-bucket", default="", help="Manifest theme bucket for lightweight metadata")

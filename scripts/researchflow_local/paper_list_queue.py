@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 
+from scripts.researchflow_local.venue_slug import normalize_conf_year_slug
+
 
 PDF_MAGIC = b"%PDF"
 MISSING_VALUES = {"", "unknown", "null", "none", "n/a"}
@@ -34,9 +36,9 @@ def venue_to_conf_year(venue: str) -> str:
     text = text.replace("&", "and")
     parts = text.split()
     if len(parts) >= 2 and re.fullmatch(r"\d{4}", parts[-1]):
-        return "_".join(parts[:-1] + [parts[-1]]).replace("-", "_")
+        return normalize_conf_year_slug("_".join(parts[:-1] + [parts[-1]]))
     if re.fullmatch(r"[A-Za-z][A-Za-z0-9-]*_\d{4}", text):
-        return text.replace("-", "_")
+        return normalize_conf_year_slug(text)
     return ""
 
 

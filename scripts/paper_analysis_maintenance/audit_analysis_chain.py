@@ -21,12 +21,10 @@ REQUIRED_FRONTMATTER = [
     "year",
     "pdf_ref",
     "aliases",
-    "acceptance",
     "tags",
     "core_operator",
     "primary_logic",
     "claims",
-    "paradigm",
 ]
 
 REQUIRED_SECTIONS = [
@@ -210,7 +208,7 @@ def check_note(path: Path, analysis_dir: Path) -> dict[str, Any]:
     if not isinstance(tags, list) or not tags:
         failures.append("tags must be a non-empty YAML list")
 
-    for scalar_key in ["core_operator", "primary_logic", "paradigm"]:
+    for scalar_key in ["core_operator", "primary_logic"]:
         value = str(fm.get(scalar_key, "")).strip()
         if len(value) < 20:
             failures.append(f"{scalar_key} is empty or too short")
