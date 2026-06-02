@@ -13,6 +13,9 @@ def normalize_conf_year_slug(value: object) -> str:
     if not match:
         return text
     venue, year = match.groups()
+    venue = re.sub(r"_+", "_", venue).strip("_")
     if venue.lower() == "arxiv":
         return f"arxiv_{year}"
+    if re.fullmatch(r"(?i)(.+?)_?workshops?", venue):
+        venue = re.sub(r"(?i)_?workshops?$", "W", venue)
     return f"{venue.upper()}_{year}"
