@@ -3037,6 +3037,134 @@ def topic_text_from_existing_note(note_path: Path) -> str:
     return " ".join(f"#{tag}" for tag in tags[:4])
 
 
+def analysis_topic_fallback_text(title: str, analysis: dict[str, Any], conf_year: str) -> str:
+    """Derive topic tags for non-OpenReview papers without prior note metadata."""
+    metadata = frontmatter_metadata_values(title, analysis)
+    method = (analysis.get("method") or {}).get("proposed_method_name") or ""
+    experiments = analysis.get("experiments") or {}
+    datasets = list_names(experiments.get("main_results") or [], "benchmark", max_items=6)
+    source = " ".join(
+        str(part or "")
+        for part in [
+            title,
+            method,
+            metadata.get("core_operator"),
+            metadata.get("primary_logic"),
+            datasets,
+            conf_year,
+        ]
+    ).lower()
+    rules: list[tuple[str, tuple[str, ...]]] = [
+        (
+            "topic/vision_multimodal_applications",
+            (
+                "vision",
+                "visual",
+                "image",
+                "video",
+                "storyboard",
+                "sketch",
+                "cartoon",
+                "character",
+                "human",
+                "motion",
+                "pose",
+                "keyframe",
+                "3d",
+                "camera",
+                "render",
+                "reconstruction",
+            ),
+        ),
+        (
+            "topic/vision_multimodal_applications/image_and_video_generation",
+            (
+                "video generation",
+                "text-to-video",
+                "image-to-video",
+                "storyboard",
+                "multi-shot",
+                "cartoon video",
+                "motion video",
+                "reenactment",
+                "animation",
+            ),
+        ),
+        (
+            "topic/vision_multimodal_applications/3d_rendering_reconstruction",
+            (
+                "3d",
+                "skeleton",
+                "human motion",
+                "motion capture",
+                "mocap",
+                "pose",
+                "keyframe",
+                "root trajectory",
+                "in-betweening",
+                "rendering",
+                "reconstruction",
+            ),
+        ),
+        (
+            "topic/generative_models_diffusion",
+            (
+                "diffusion",
+                "flow matching",
+                "rectified flow",
+                "denoise",
+                "generative",
+                "generation",
+                "latent",
+                "score",
+            ),
+        ),
+        (
+            "topic/generative_models_diffusion/diffusion_image_video",
+            (
+                "video diffusion",
+                "image-to-video",
+                "text-to-video",
+                "diffusion model",
+                "latent diffusion",
+                "mmdm",
+                "motion diffusion",
+            ),
+        ),
+        (
+            "topic/representation_self_supervised_transfer",
+            (
+                "representation",
+                "embedding",
+                "self-supervised",
+                "transfer",
+                "adapter",
+                "disentangle",
+                "alignment",
+                "feature",
+            ),
+        ),
+        (
+            "topic/benchmarks_datasets_evaluation",
+            (
+                "benchmark",
+                "dataset",
+                "evaluation",
+                "metric",
+                "user study",
+                "leaderboard",
+            ),
+        ),
+    ]
+    tags: list[str] = []
+    for tag, keywords in rules:
+        if any(keyword in source for keyword in keywords) and tag not in tags:
+            tags.append(tag)
+    if not tags:
+        tags.append("topic/other_unclear")
+    return " ".join(f"#{tag}" for tag in tags[:4])
+
+
 def title_aliases(title: str, method: str) -> list[str]:
     aliases: list[str] = []
     for value in (method, title):
@@ -4681,6 +4809,7 @@ def export_to_vault(
     report: str,
     figures_tables: list[dict[str, Any]],
     figure_placements: list[dict[str, Any]] | None = None,
+    progress_path: Path,
 ) -> dict[str, Any]:
     vault_root = Path(args.vault_root).expanduser().resolve()
     conf_year = resolved_conf_year(args)
@@ -4729,6 +4858,16 @@ def export_to_vault(
     topic_text = topic_text_for_note(args.openreview_forum_id, conf_year, args.topic_assignments)
     if not topic_text:
         topic_text = topic_text_from_existing_note(note_path)
+    if not topic_text:
+        topic_text = analysis_topic_fallback_text(title, analysis, conf_year)
+        append_jsonl(
+            progress_path,
+            {
+                "event": "topic_fallback_applied",
+                "at": now_iso(),
+                "topic_text": topic_text,
+            },
+        )
     note = compose_vault_note(
         title=title,
         conf_year=conf_year,
@@ -6081,6 +6220,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                     report=report,
                     figures_tables=figures_tables,
                     figure_placements=figure_placements,
+                    progress_path=progress_path,
                 )
                 copied_figures = copy_vault_figures(
                     figures_tables,
