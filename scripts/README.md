@@ -34,7 +34,7 @@ present. They are not part of the current analysis chain.
 | `fix_analysis_md_issues.py` | Repair broken frontmatter |
 | `fix_missing_venue_year.py` | Fill missing venue/year |
 | `review_analysis_mismatch.py` | Compare CSV log rows with Markdown files |
-| `run_local_paper_analysis.py` | Formal single-paper analysis chain: MinerU parse/reuse → anchor extraction → main analysis → section writing → vault export with figures/tables |
+| `run_local_paper_analysis.py` | Formal single-paper analysis chain: MinerU parse/reuse → anchor extraction → main analysis → section writing → DeepSeek figure/table placement → vault export |
 | `run_paper_list_analysis.py` | Script-only queue runner for rows in `obsidian-vault/paper_list.csv` |
 | `rebuild_figures_export.py` | Rebuild figure summaries, placements, and vault exports from completed formal analysis runs |
 | `write_batch_progress.py` | Write batch progress snapshots for `obsidian-vault/batches/<run_id>/` |
@@ -47,7 +47,7 @@ present. They are not part of the current analysis chain.
 | `maintenance/get_missing_md.py` | Find PDFs without analysis notes |
 | `paper_analysis_maintenance/audit_analysis_chain.py` | Audit formal analysis-chain note exports against required frontmatter, sections, PDF embeds, table rules, and placeholder checks |
 | `paper_analysis_maintenance/summarize_analysis_chain_audit.py` | Merge sharded formal analysis-chain audit JSON files into JSON and Markdown reports |
-| `paper_analysis_maintenance/check_part_sections.py` | Audit Part I/II/III headers |
+| `paper_analysis_maintenance/check_analysis_sections.py` | Audit semantic analysis sections |
 | `paper_analysis_maintenance/fill_project_github_in_abstract.py` | Fill project/GitHub links when available |
 | `paper_analysis_maintenance/mark_wait_for_incomplete_parts.py` | Mark incomplete analyses in logs |
 | `paper_analysis_maintenance/salad_format_audit.py` | Strict format compliance check |

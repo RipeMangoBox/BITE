@@ -78,10 +78,11 @@ Always use the local KB through `papers-query-knowledge-base`:
 
 1. **Locate related tasks/techniques**:
    - Prioritize title, task path, tags, venue, year, `core_operator`, and `primary_logic` in `obsidian-vault/analysis/`.
-   - If fast filtering or overview/statistics/Obsidian navigation aid is needed, reference `obsidian-vault/index/index.jsonl`, `by_topic/`, `by_method/`, `by_dataset/`, `by_venue/`, and `by_year/`.
+   - If fast filtering or overview/statistics/Obsidian navigation aid is needed, reference `obsidian-vault/index/index.jsonl`, `by_topic/`, `by_method/`, `by_dataset/`, and `by_venue_year/`.
+   - For venue/year filtering, prefer the structured `venue`, `year`, and `venue_year` fields in `index.jsonl`; the Obsidian navigation layer uses merged labels such as `ICLR_2026` under `by_venue_year/`.
 2. **Select representative papers**:
    - Choose 3-8 papers highly related to the idea.
-   - For each paper, read `core_operator`, `primary_logic`, and TL;DR from the `obsidian-vault/analysis` note frontmatter.
+   - For each paper, read `core_operator` and `primary_logic` from the `obsidian-vault/analysis` note frontmatter, then read `Summary` and `Key Performance` from the note body TL;DR section.
    - Summarize in 1-2 sentences what it does and how it relates to the current idea.
 3. **Summarize support and gaps**:
    - **Support**: where these works validate the idea's feasibility or value.
@@ -143,6 +144,9 @@ When generating `obsidian-vault/ideas` notes, you can use this template (slight 
 
 ```markdown
 ---
+hypothesis: "{{One-sentence research hypothesis}}"
+status: brainstorm
+source_papers: []
 created: {{ISO_DATETIME_NOW}}
 updated: {{ISO_DATETIME_NOW}}
 ---
@@ -165,8 +169,8 @@ updated: {{ISO_DATETIME_NOW}}
 
 ## 3. Related-work support and research opportunities
 ### 3.1 Related-work overview
-- [Paper A]: one-line summary + relation to this idea
-- [Paper B]: one-line summary + relation to this idea
+- Paper A: one-line summary + relation to this idea. Put the full local wikilink in `source_papers` or in a nearby list outside tables.
+- Paper B: one-line summary + relation to this idea. External papers/projects use Markdown links in the body, not `source_papers`.
 
 ### 3.2 Support points
 - ...
@@ -187,6 +191,9 @@ updated: {{ISO_DATETIME_NOW}}
 ## 6. Implementation notes
 
 - **Always prioritize `papers-query-knowledge-base`** to locate existing local analyses, then supplement with frontier web search.
+- **Use current index contract**: `index.jsonl` is the fast filter layer; navigation pages are `by_topic/`, `by_method/`, `by_dataset/`, and `by_venue_year/`. Do not reference legacy `by_venue/` or `by_year/`.
+- **Use current analysis schema**: frontmatter provides `title`, `venue`, `year`, `tags`, `aliases`, `pdf_ref`, `core_operator`, `primary_logic`, and optional `claims`; TL;DR summary and key performance are in the body.
+- **Use current idea schema**: idea notes should include `hypothesis`, `status`, and `source_papers` frontmatter. `source_papers` is only for local KB analysis-note wikilinks actually used as support; external web papers/blogs stay as Markdown links in the body.
 - **Ensure structured Markdown output** following the section structure above for later retrieval/recomposition.
 - When citing external resources, **always use Markdown links** and avoid bare URLs.
 - If the user already opened a specific `obsidian-vault/ideas` file and explicitly asks to brainstorm there, append the structured subsection in that file instead of creating a new one.

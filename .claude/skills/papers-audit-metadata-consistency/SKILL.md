@@ -23,7 +23,7 @@ This skill covers **structural and metadata hygiene only**.
 - title / venue / year consistency
 - link completeness (`paper_link`, `project_link`/`github_link`, `pdf_ref`)
 - duplicate paper detection in txt logs
-- analysis note structure anomalies (missing frontmatter keys, missing Part I/II/III)
+- analysis note structure anomalies (missing frontmatter keys, missing semantic analysis sections)
 - unmatched records (`only-in-txt`, `only-in-md`)
 
 ## Current limits

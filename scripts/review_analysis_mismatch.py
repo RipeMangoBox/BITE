@@ -11,16 +11,15 @@ REPORT_PATH = os.path.join(ROOT_DIR, "obsidian-vault/batches/reports/analysis_mi
 
 class AnalysisFile:
     def __init__(self, path: str, title: str, content: str, has_abstract: bool,
-                 has_part_i: bool, has_part_ii: bool, has_part_iii: bool,
+                 has_method_section: bool, has_experiment_section: bool,
                  has_local_reading: bool, has_metrics_table: bool,
                  has_pdf_ref: bool):
         self.path = path
         self.title = title
         self.content = content
         self.has_abstract = has_abstract
-        self.has_part_i = has_part_i
-        self.has_part_ii = has_part_ii
-        self.has_part_iii = has_part_iii
+        self.has_method_section = has_method_section
+        self.has_experiment_section = has_experiment_section
         self.has_local_reading = has_local_reading
         self.has_metrics_table = has_metrics_table
         self.has_pdf_ref = has_pdf_ref
@@ -29,9 +28,8 @@ class AnalysisFile:
     def is_emergent_style_basic_ok(self) -> bool:
         structural_ok = (
             self.has_abstract
-            and self.has_part_i
-            and self.has_part_ii
-            and self.has_part_iii
+            and self.has_method_section
+            and self.has_experiment_section
             and self.has_local_reading
         )
         depth_ok = self.has_metrics_table
@@ -94,10 +92,12 @@ def build_analysis_index() -> Dict[str, AnalysisFile]:
             lower_body = body.lower()
 
             has_abstract = "[!abstract" in lower_body
-            has_part_i = "part i:" in lower_body
-            has_part_ii = "part ii:" in lower_body
-            has_part_iii = "part iii:" in lower_body
-            has_local_reading = "local reading" in lower_body
+            has_method_section = any(
+                marker in body
+                for marker in ("## 整体框架", "## 核心模块与公式推导", "## 核心创新")
+            )
+            has_experiment_section = "## 实验与分析" in body
+            has_local_reading = "local reading" in lower_body or "## 原文 PDF" in body
 
             has_metrics_table = False
             for line in body.splitlines():
@@ -115,9 +115,8 @@ def build_analysis_index() -> Dict[str, AnalysisFile]:
                 title=title,
                 content=text,
                 has_abstract=has_abstract,
-                has_part_i=has_part_i,
-                has_part_ii=has_part_ii,
-                has_part_iii=has_part_iii,
+                has_method_section=has_method_section,
+                has_experiment_section=has_experiment_section,
                 has_local_reading=has_local_reading,
                 has_metrics_table=has_metrics_table,
                 has_pdf_ref=has_pdf_ref,
@@ -178,8 +177,10 @@ def describe_mismatch(af: Optional[AnalysisFile]) -> str:
     missing = []
     if not af.has_abstract:
         missing.append("Abstract / [!abstract] 区块")
-    if not af.has_part_i or not af.has_part_ii or not af.has_part_iii:
-        missing.append("Part I/II/III 结构")
+    if not af.has_method_section:
+        missing.append("现代方法/框架语义章节")
+    if not af.has_experiment_section:
+        missing.append("实验与分析章节")
     if not af.has_local_reading:
         missing.append("Local Reading / 本地 PDF 引用部分")
     if not af.has_metrics_table:
@@ -188,9 +189,9 @@ def describe_mismatch(af: Optional[AnalysisFile]) -> str:
         missing.append("frontmatter 中的 pdf_ref 字段")
 
     if not missing:
-        return "ok: 结构与技术深度均符合 emergentmind 模板，之前标记为 analysis_mismatch 属于误判。"
+        return "ok: 结构与技术深度均符合当前 ResearchFlow 分析模板，之前标记为 analysis_mismatch 属于误判。"
 
-    return "structure_or_depth: 缺失以下 emergentmind 要求的要素：" + "；".join(missing)
+    return "structure_or_depth: 缺失以下 ResearchFlow 分析要素：" + "；".join(missing)
 
 
 def review_all_analysis_mismatch() -> None:

@@ -66,7 +66,7 @@ Remove or rewrite anything that reveals the internal knowledge base or local not
 
 Typical items to remove or rewrite:
 
-- `[[obsidian-vault/analysis/...|...]]`
+- `[[analysis/...|...]]`
 - internal folder paths
 - `Local Reading`
 - `local PDF`
@@ -174,7 +174,7 @@ Never leave internal wiki links in the share version.
 Before:
 
 ```md
-[[obsidian-vault/analysis/Motion_Generation_Text_Speech_Music_Driven/CVPR_2024/2024_MoMask_Generative_Masked_Modeling_of_3D_Human_Motions|MoMask]]
+[[analysis/Motion_Generation_Text_Speech_Music_Driven/CVPR_2024/2024_MoMask_Generative_Masked_Modeling_of_3D_Human_Motions|MoMask]]
 ```
 
 After:

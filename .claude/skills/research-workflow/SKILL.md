@@ -57,7 +57,7 @@ Support chain:
 - analyze
   - default route: `scripts/run_local_paper_analysis.py` formal analysis chain
     (MinerU parse/reuse → chunk anchor extraction → main analysis JSON →
-    section writers → deterministic vault export with figures/tables)
+    section writers → DeepSeek figure/table placement review → vault export and validation)
   - `paper-report` supplies the deep-report writing contract for single-paper
     reports and formula derivation
   - batch queue route: `scripts/run_paper_list_analysis.py --state Downloaded`

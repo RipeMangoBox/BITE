@@ -35,19 +35,6 @@ REQUIRED_FRONTMATTER_KEYS = {
     "category",
 }
 
-REQUIRED_PART_MARKERS = [
-    "Part I: The \"Skill\" Signature",
-    "Part II: High-Dimensional Insight",
-    "Part III: Technical Deep Dive",
-]
-
-REQUIRED_BULLET_MARKERS = [
-    "Atomic Capability",
-    "Data Interface",
-    "Operational Logic",
-    "Boundary Conditions",
-]
-
 REQUIRED_QUICKLINK_MARKERS = [
     "Quick Links & TL;DR",
     "Links",
@@ -56,12 +43,10 @@ REQUIRED_QUICKLINK_MARKERS = [
 ]
 
 REQUIRED_SECTION_MARKERS = [
-    "The Design Philosophy",
-    "The \"Aha!\" Moment",
-    "Methodological Pipeline",
-    "Empirical Evidence",
-    "Implementation Constraints",
-    "Local Reading",
+    "整体框架",
+    "核心模块与公式推导",
+    "实验与分析",
+    "原文 PDF",
 ]
 
 
@@ -150,29 +135,13 @@ def check_salad_md(md_path: Path) -> Tuple[bool, List[str]]:
         if marker not in body:
             reasons.append(f"missing quick-link marker: {marker}")
 
-    for marker in REQUIRED_PART_MARKERS:
-        if marker not in body:
-            reasons.append(f"missing section marker: {marker}")
-
     for marker in REQUIRED_SECTION_MARKERS:
         if marker not in body:
             reasons.append(f"missing section marker: {marker}")
 
-    for marker in REQUIRED_BULLET_MARKERS:
-        if marker not in body:
-            reasons.append(f"missing bullet/field: {marker}")
-
-    data_interface = get_section_text(body, "Data Interface")
-    if "Input" not in data_interface or "Output" not in data_interface:
-        reasons.append("missing Input/Output in Data Interface")
-
-    operational_logic = get_section_text(body, "Operational Logic")
-    if not any(x in operational_logic for x in ["1)", "1.", "Step", "->"]):
-        reasons.append("Operational Logic lacks stepwise flow")
-
-    empirical = get_section_text(body, "Empirical Evidence")
+    empirical = get_section_text(body, "实验与分析")
     if not has_numeric_signal(empirical):
-        reasons.append("Empirical Evidence lacks numeric results")
+        reasons.append("实验与分析 lacks numeric results")
 
     return (not reasons), reasons
 
@@ -454,69 +423,38 @@ category: {tags[0]}
 
 ---
 
-## Part I: The "Skill" Signature (AI-Readiness)
-*For AI skill indexing and retrieval.*
-
-### Atomic Capability
+## 背景与动机
 {summary}
 
-### Data Interface
+## 核心创新
+- [TODO: key contributions from PDF]
+
+## 整体框架
+
+### 输入输出
 - **Input**: [TODO: from PDF]
 - **Output**: [TODO: from PDF]
 
-### Operational Logic
-1) [TODO] -> 2) [TODO] -> 3) [TODO]
+### Pipeline
+1. [TODO]
+2. [TODO]
+3. [TODO]
 
-### Boundary Conditions
-[TODO]
+## 核心模块与公式推导
 
----
+- [TODO: key modules and formulas from PDF]
 
-## Part II: High-Dimensional Insight (Human-Centric)
-
-### 1. The Design Philosophy
-* **Conventional Wisdom**: [TODO]
-* **The Paradigm Shift**: [TODO]
-* **Why it Matters**: [TODO]
-
-### 2. The "Aha!" Moment
-* **Core Intuition**: [TODO]
-* **Strategic Trade-off**: [TODO]
-
----
-
-## Part III: Technical Deep Dive
-
-### 1. Methodological Pipeline
-1. **[Step A]**: [TODO]
-2. **[Step B]**: [TODO]
-3. **[Step C]**: [TODO]
-
-### 2. Empirical Evidence
+## 实验与分析
 | Metrics | Baseline | **Ours** | Delta |
 | :--- | :--- | :--- | :--- |
 | [Metric Name] | {baseline} | **{metric}** | {delta} |
 
-### 3. Implementation Constraints
-* **Resources**: [TODO]
-* **Dependency**: [TODO]
+## 方法谱系与知识库定位
+- [TODO: relation to baselines and limitations]
 
 ---
 
-## emergentmind-paper-analysis (Required Core Sections)
-
-### Abstract
-{abstract if abstract else "[TODO: abstract]"}
-
-### Technical Innovations
-- [TODO: key contributions from PDF]
-
-### Empirical Evaluation
-- {key_perf}
-
----
-
-## Local Reading
+## 原文 PDF
 ![[{pdf_ref}]]
 """
     md_path.write_text(content, encoding="utf-8")

@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--vault-root", default=str(runner.DEFAULT_VAULT_ROOT))
     parser.add_argument("--vault-note-dir", default="")
     parser.add_argument("--vault-asset-root", default="")
-    parser.add_argument("--figure-provider", choices=["none", "openai", "kimi"], default="openai")
+    parser.add_argument("--figure-provider", choices=["none", "deepseek", "openai", "kimi"], default="deepseek")
     parser.add_argument("--figure-model", default="")
     parser.add_argument("--figure-base-url", default="")
     parser.add_argument("--figure-api-key-env", default="")
@@ -39,6 +39,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--figure-placement-max-tokens", type=int, default=4096)
     parser.add_argument("--max-note-images", type=int, default=12)
     parser.add_argument("--force", action="store_true", help="Overwrite existing figure/export artifacts")
+    parser.add_argument("--continue-on-error", action="store_true", help="Record per-run failures instead of aborting the whole batch")
     parser.add_argument("--jobs", type=int, default=1)
     return parser.parse_args()
 
@@ -53,6 +54,7 @@ def _manifest_value(manifest: dict[str, Any], *keys: str) -> str:
 
 def build_runner_args(args: argparse.Namespace, work_dir: Path, manifest: dict[str, Any]) -> argparse.Namespace:
     inputs = manifest.get("inputs") or {}
+    vault_export = manifest.get("vault_export") if isinstance(manifest.get("vault_export"), dict) else {}
     pdf = str(inputs.get("pdf") or "")
     paper_pdf = str(inputs.get("paper_pdf") or "")
     if not paper_pdf:
@@ -73,6 +75,7 @@ def build_runner_args(args: argparse.Namespace, work_dir: Path, manifest: dict[s
         max_note_images=args.max_note_images,
         vault_root=args.vault_root,
         vault_note_dir=args.vault_note_dir,
+        vault_note_path=str(vault_export.get("note_path") or ""),
         vault_asset_root=args.vault_asset_root,
         paper_pdf=paper_pdf,
         pdf=pdf,
@@ -107,7 +110,19 @@ async def rebuild_one(args: argparse.Namespace, work_dir: Path) -> dict[str, Any
         if not path.exists():
             raise FileNotFoundError(f"missing required artifact: {path}")
 
-    figures_tables = json.loads(figures_path.read_text(encoding="utf-8"))
+    if args.force:
+        mineru_raw = work_dir / "parse" / "mineru_raw"
+        try:
+            artifacts = runner.find_mineru_artifacts(mineru_raw)
+            figures_tables = runner.extract_figures_tables(
+                artifacts.content_list_path,
+                source_root=artifacts.root,
+            )
+            runner.atomic_write_json(figures_path, figures_tables)
+        except Exception:  # noqa: BLE001
+            figures_tables = json.loads(figures_path.read_text(encoding="utf-8"))
+    else:
+        figures_tables = json.loads(figures_path.read_text(encoding="utf-8"))
     analysis = json.loads(analysis_path.read_text(encoding="utf-8"))
     report = report_path.read_text(encoding="utf-8")
     title = str((analysis.get("paper_metadata") or {}).get("title") or manifest.get("paper_title") or task_id)
@@ -149,6 +164,7 @@ async def rebuild_one(args: argparse.Namespace, work_dir: Path) -> dict[str, Any
         report=report,
         figures_tables=figures_tables,
         figure_placements=placements,
+        progress_path=progress_path,
     )
     runner.append_jsonl(progress_path, {
         "event": "figure_export_rebuilt",
@@ -175,7 +191,19 @@ async def main_async() -> None:
 
     async def one(path: Path) -> dict[str, Any]:
         async with sem:
-            return await rebuild_one(args, path)
+            try:
+                result = await rebuild_one(args, path)
+                result["status"] = "done"
+                return result
+            except Exception as exc:  # noqa: BLE001
+                if not args.continue_on_error:
+                    raise
+                return {
+                    "work_dir": str(path),
+                    "status": "failed",
+                    "validation_ok": False,
+                    "error": str(exc),
+                }
 
     results = await asyncio.gather(*(one(path) for path in work_dirs))
     print(json.dumps({"results": results}, ensure_ascii=False, indent=2))

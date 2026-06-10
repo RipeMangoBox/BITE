@@ -28,6 +28,8 @@ research data.
 6. **Tables** — never put aliased wikilinks such as `[[full/path|abbr]]` in
    Markdown table cells. The pipe breaks table parsing; use plain display text
    in the cell and place full wikilinks in surrounding prose or frontmatter.
+7. **Image captions** — escape Obsidian reserved `<` characters in figure/table
+   captions as `\<`, for example `\<MASK>` or `\< 0.05`.
 
 ---
 
@@ -42,7 +44,7 @@ research data.
 ```
 
 > When linking to obsidian-vault/analysis notes from other notes, use the full relative path:
-> `[[obsidian-vault/analysis/Category/Venue_Year/Year_Title|Display Title]]`
+> `[[analysis/Category/Venue_Year/Year_Title|Display Title]]`
 
 ---
 
@@ -155,10 +157,11 @@ tags:
 
 ### Analysis notes (`obsidian-vault/analysis/`)
 - Frontmatter: full schema (title, venue, year, tags, aliases, core_operator, primary_logic, pdf_ref, claims)
-- Body: Part I / Part II / Part III structure
+- Body: semantic sections such as `问题与动机`, `整体框架`, `核心模块与公式推导`, `实验与分析`, and `局限性与启发`
 - Bottom: `![[paperPDFs/...]]` PDF embed
 - Figures/tables: `![[assets/...]]` embeds, without `../../` prefixes.
-- Related papers linked via `[[obsidian-vault/analysis/.../Year_Title|Display]]`
+  Escape `<` in figure/table caption text as `\<`.
+- Related papers linked via `[[analysis/.../Year_Title|Display]]`
 
 ### Collection indexes (`obsidian-vault/index/`)
 - Frontmatter: minimal (title, updated, type)

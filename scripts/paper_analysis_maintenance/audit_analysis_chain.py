@@ -136,6 +136,26 @@ def table_rows_with_aliased_wikilinks(text: str) -> list[int]:
     return rows
 
 
+def image_caption_lines_with_unescaped_lt(text: str) -> list[int]:
+    lines: list[int] = []
+    note_lines = text.splitlines()
+    for index, line in enumerate(note_lines):
+        stripped = line.strip()
+        previous = note_lines[index - 1].strip() if index > 0 else ""
+        if not (
+            previous.startswith("![[assets/figures/papers/")
+            and stripped.startswith("*")
+            and not stripped.startswith("**")
+            and stripped.endswith("*")
+            and re.match(r"^\*(?:Figure|Fig\.?|Table)\s+\S+\s*:", stripped, flags=re.IGNORECASE)
+        ):
+            continue
+        parts = re.split(r"(`[^`\n]*`|\$[^$\n]*\$)", stripped)
+        if any(not part.startswith(("`", "$")) and re.search(r"(?<!\\)<", part) for part in parts):
+            lines.append(index + 1)
+    return lines
+
+
 def dangling_numeric_refs(text: str) -> list[str]:
     scan = re.sub(r"`[^`\n]*`", "", text)
     scan = re.sub(r"\$\$.*?\$\$", "", scan, flags=re.DOTALL)
@@ -245,6 +265,10 @@ def check_note(path: Path, analysis_dir: Path) -> dict[str, Any]:
     table_alias_lines = table_rows_with_aliased_wikilinks(text)
     if table_alias_lines:
         failures.append("aliased wikilinks inside markdown table rows: " + ", ".join(map(str, table_alias_lines[:8])))
+
+    unescaped_caption_lines = image_caption_lines_with_unescaped_lt(text)
+    if unescaped_caption_lines:
+        failures.append("unescaped < inside image caption lines: " + ", ".join(map(str, unescaped_caption_lines[:8])))
 
     dangling_refs = dangling_numeric_refs(text)
     if dangling_refs:
