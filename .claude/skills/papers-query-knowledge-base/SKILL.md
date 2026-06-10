@@ -9,7 +9,7 @@ description: Queries the local `obsidian-vault/analysis/` notes for research. Fi
 
 Use this skill to query the local paper corpus across conversations and projects.
 The main evidence layer is **obsidian-vault/analysis** (analysis notes with
-TL;DR, Part I/II/III, PDF links). When it exists,
+TL;DR, semantic method/evidence sections, and PDF links). When it exists,
 **obsidian-vault/index/index.jsonl** is the fast filter layer for large
 vaults, while the Markdown pages in **obsidian-vault/index/** remain useful
 for Obsidian jumps and backlink-friendly browsing.
@@ -26,7 +26,7 @@ for Obsidian jumps and backlink-friendly browsing.
 Relative to the repository root:
 
 - **Analysis notes**: `obsidian-vault/analysis/<Topic>/<Venue_Year>/<Year>_<Title>.md` or flat venue folders such as `obsidian-vault/analysis/ICLR_2026/<Title>.md`; PDF path in frontmatter `pdf_ref`.
-- **Generated index / navigation**: `obsidian-vault/index/index.jsonl`, `obsidian-vault/index/paper_index.md`, `_AllPapers.md`, `by_topic/`, `by_method/`, `by_dataset/`, `by_venue/`, `by_year/`.
+- **Generated index / navigation**: `obsidian-vault/index/index.jsonl`, `obsidian-vault/index/paper_index.md`, `_AllPapers.md`, `by_topic/`, `by_method/`, `by_dataset/`, `by_venue_year/`.
 - **Public placeholder**: `obsidian-vault/index/README.md` is tracked as a stable explanation file and is not overwritten by index generation.
 
 All paths use forward slashes.
@@ -35,15 +35,15 @@ All paths use forward slashes.
 
 1. **Find papers** — Search `obsidian-vault/analysis/` directly by title, task folder, tags, venue, year, `core_operator`, or `primary_logic`. If `obsidian-vault/index/index.jsonl` is present, use it first to narrow a large candidate set, then read the matching notes for evidence.
 
-2. **Read an analysis** — Open the matched analysis note directly. Each note has: **Frontmatter** (title, venue, year, tags, aliases, pdf_ref, core_operator, primary_logic, claims; no `category`, `modalities`, or `frontier`); **TL;DR** (Summary, Key Performance); **Part I / II / III** sections whose exact headings follow `analysis_language` in `AGENTS.md`; and **Local Reading** (PDF). Older notes may still use legacy mixed headings, so match semantically rather than by one exact title string.
+2. **Read an analysis** — Open the matched analysis note directly. Each note has: **Frontmatter** (title, venue, year, tags, aliases, pdf_ref, core_operator, primary_logic, claims; no `category`, `modalities`, or `frontier`); **Quick Links & TL;DR**; method/problem/evidence sections such as `问题与动机`, `整体框架`, `核心模块与公式推导`, `实验与分析`, and `局限性与启发`; and **Local Reading** (PDF). Older notes may still use legacy mixed headings, so match semantically rather than by one exact title string.
 
-3. **Use `obsidian-vault/index/` when helpful** — `index.jsonl` is for fast filtering; the Markdown pages are for coarse topic / method-family / dataset / venue / year overview pages, statistics, Obsidian jumps, or backlink exploration. Use `methods` for exact method names and `method_groups` for low-cardinality method-family filtering.
+3. **Use `obsidian-vault/index/` when helpful** — `index.jsonl` is for fast filtering; the Markdown pages are for coarse topic / method-family / dataset / merged venue-year overview pages, statistics, Obsidian jumps, or backlink exploration. Use `venue`, `year`, and `venue_year` fields for structured filtering; use `methods` for exact method names and `method_groups` for low-cardinality method-family filtering.
 
-4. **Cite in answers** — Use **core_operator** and **primary_logic** from frontmatter for one-line method summary; **Summary** and **Key Performance** from TL;DR for comparison. Link to note: `[[obsidian-vault/analysis/.../file.md|Title]]`; to PDF: `[[obsidian-vault/paperPDFs/.../file.pdf|PDF]]`.
+4. **Cite in answers** — Use **core_operator** and **primary_logic** from frontmatter for one-line method summary; **Summary** and **Key Performance** from TL;DR for comparison. Link to note: `[[analysis/.../file.md|Title]]`; to PDF: `[[paperPDFs/.../file.pdf|PDF]]`.
 
 ## Index frontmatter (for tooling)
 
-Collection pages: `type: paper-index`, `dimension: topic | method | dataset | venue | year | all`, and optional `topic:` / `method:` / `dataset:` / `venue:` / `year:`.
+Collection pages: `type: paper-index`, `dimension: topic | method | dataset | venue_year | all`, and optional `topic:` / `method:` / `dataset:` / `venue_year:`.
 
 For exact paths and frontmatter schema, see [references/structure.md](references/structure.md).
 

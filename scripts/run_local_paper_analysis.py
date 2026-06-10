@@ -431,7 +431,8 @@ modes. Avoid copying long caption/body prose unless it is an exact short anchor.
 Rules:
 1. Output Markdown only for the requested section body. Do not include the H1 title.
 2. Start with `## <section title>`.
-3. Do not embed images; the assembler/exporter handles that deterministically.
+3. Do not embed images; the assembler/exporter inserts them from the
+   figure-placement reviewer output.
 4. If evidence is weak, explicitly say the point needs manual verification instead of guessing.
 5. For formulas, preserve exact LaTeX if provided. Use `$...$` for inline
    formulas and `$$...$$` for block formulas; do not use `\\(...\\)` or
@@ -463,7 +464,8 @@ Rules:
 2. Use only supplied item_id values.
 3. Do not duplicate the same item_id.
 4. When the report explicitly cites Figure N / Table N and the candidate
-   exists, include that image unless it is sample-only or decorative.
+   exists, include it. If it is sample-only or decorative, place it only in
+   实验与分析 and do not use it as framework or method evidence.
 5. Put overall pipeline/architecture diagrams in 整体框架; put tokenizer,
    masking, denoising, sampling, guidance, or other method-module diagrams in
    核心模块与公式推导.
@@ -1763,8 +1765,13 @@ def iter_content_items_with_page(
 
 
 def caption_text(value: Any) -> str:
+    return " ".join(caption_texts(value))
+
+
+def caption_texts(value: Any) -> list[str]:
     if isinstance(value, str):
-        return value.strip()
+        text = re.sub(r"\s+", " ", value).strip()
+        return [text] if text else []
     if isinstance(value, list):
         parts = []
         for item in value:
@@ -1772,16 +1779,36 @@ def caption_text(value: Any) -> str:
                 parts.append(str(item.get("content") or item.get("text") or ""))
             elif isinstance(item, str):
                 parts.append(item)
-        return " ".join(part.strip() for part in parts if part and part.strip()).strip()
-    return ""
+        return [re.sub(r"\s+", " ", part).strip() for part in parts if part and part.strip()]
+    return []
+
+
+FIGURE_TABLE_LABEL_TOKEN = r"(?:S\.?\s*)?[0-9]+[A-Za-z]?"
+FIGURE_TABLE_CAPTION_START_PATTERN = re.compile(
+    rf"(?<!\w)(Figure|Fig\.?|Table)\s*({FIGURE_TABLE_LABEL_TOKEN})\s*[:.\-–—]\s+",
+    flags=re.IGNORECASE,
+)
+
+
+def normalize_figure_table_label_number(value: str) -> str:
+    text = re.sub(r"\s+", "", str(value or "")).strip()
+    return re.sub(r"(?i)^s\.?", "S.", text)
 
 
 def explicit_label_from_caption(caption: str) -> str:
-    match = re.search(r"\b(Figure|Fig\.?|Table)\s*([0-9]+[A-Za-z]?)", caption, flags=re.IGNORECASE)
+    match = re.search(rf"\b(Figure|Fig\.?|Table)\s*({FIGURE_TABLE_LABEL_TOKEN})", caption, flags=re.IGNORECASE)
     if match:
         kind = "Table" if match.group(1).lower().startswith("table") else "Figure"
-        return f"{kind} {match.group(2)}"
+        return f"{kind} {normalize_figure_table_label_number(match.group(2))}"
     return ""
+
+
+def is_reference_context_before_label(prefix: str) -> bool:
+    tail = re.sub(r"\s+", " ", prefix[-80:]).lower()
+    return bool(re.search(
+        r"\b(as|in|from|see|seen in|shown in|same as|reported in|compared (?:to|with)|similar to|metrics are the same as)\s*$",
+        tail,
+    ))
 
 
 def extract_label(caption: str, fallback_type: str, index: int) -> str:
@@ -1789,6 +1816,94 @@ def extract_label(caption: str, fallback_type: str, index: int) -> str:
     if explicit:
         return explicit
     return f"{fallback_type.title()} {index}"
+
+
+def first_caption_parts(*values: Any) -> list[str]:
+    for value in values:
+        parts = caption_texts(value)
+        if parts:
+            return parts
+    return []
+
+
+def explicit_caption_parts(parts: list[str]) -> list[tuple[str, str]]:
+    out: list[tuple[str, str]] = []
+    for part in parts:
+        label = explicit_label_from_caption(part)
+        if label:
+            out.append((label, part))
+    return out
+
+
+def select_single_caption(parts: list[str]) -> tuple[str, str, list[str]]:
+    explicit = explicit_caption_parts(parts)
+    if explicit:
+        label, caption = explicit[0]
+        return label, caption, [part for _, part in explicit[1:]]
+    caption = " ".join(parts).strip()
+    return "", caption, []
+
+
+def previous_uncaptioned_visual(
+    items: list[dict[str, Any]],
+    index: int,
+) -> dict[str, Any] | None:
+    current = items[index]
+    current_page = current.get("page")
+    current_kind = current.get("kind")
+    current_bbox = current.get("bbox")
+    if current_page is None or current_bbox is None:
+        return None
+    for prev_index in range(index - 1, -1, -1):
+        previous = items[prev_index]
+        if previous.get("page") != current_page:
+            break
+        if previous.get("kind") != current_kind:
+            continue
+        if str(previous.get("caption") or "").strip():
+            continue
+        previous_bbox = previous.get("bbox")
+        if previous_bbox is None:
+            continue
+        if previous_bbox[1] <= current_bbox[1]:
+            return previous
+    return None
+
+
+def repair_split_mineru_captions(items: list[dict[str, Any]]) -> None:
+    """Repair common MinerU caption-list spillover between adjacent figures.
+
+    MinerU sometimes stores captions for two consecutive figures on the later
+    image block. When the immediately preceding same-page visual has no caption,
+    move the first explicit caption there and keep the next explicit caption on
+    the current item. Extra captions without a matching image stay in metadata
+    and are not rendered under the current image.
+    """
+    for index, item in enumerate(items):
+        extra_captions = [
+            str(caption).strip()
+            for caption in item.get("extra_captions") or []
+            if str(caption).strip()
+        ]
+        if not extra_captions:
+            continue
+        previous = previous_uncaptioned_visual(items, index)
+        if previous is None:
+            item["unassigned_extra_captions"] = extra_captions
+            item["extra_captions"] = []
+            continue
+
+        previous["caption"] = str(item.get("caption") or "").strip()
+        previous["explicit_label"] = str(item.get("explicit_label") or "").strip()
+        previous["caption_repair"] = "shifted_from_next_multi_caption"
+
+        next_label, next_caption, remaining = select_single_caption(extra_captions)
+        item["caption"] = next_caption
+        item["explicit_label"] = next_label or explicit_label_from_caption(next_caption)
+        item["extra_captions"] = remaining
+        if remaining:
+            item["unassigned_extra_captions"] = remaining
+        item["caption_repair"] = "kept_next_caption_after_shift"
 
 
 def find_mineru_sidecar_artifacts(content_path: Path | None, *, source_root: Path) -> MinerUSidecarArtifacts:
@@ -2147,8 +2262,10 @@ def full_region_caption(records: list[dict[str, Any]]) -> str:
         if caption and caption not in captions:
             captions.append(caption)
     explicit = [caption for caption in captions if explicit_label_from_caption(caption)]
-    if explicit:
-        return max(explicit, key=len)
+    if len(explicit) == 1:
+        return explicit[0]
+    if len(explicit) > 1:
+        return explicit[0]
     if len(captions) <= 4:
         return " ".join(captions)
     return max(captions, key=len) if captions else ""
@@ -2451,22 +2568,23 @@ def extract_figures_tables(content_path: Path | None, *, source_root: Path) -> l
         content = item.get("content") if isinstance(item.get("content"), dict) else {}
         if item_type in {"image", "chart", "figure"}:
             kind = "figure"
-            caption = (
-                caption_text(content.get("image_caption"))
-                or caption_text(item.get("image_caption"))
-                or caption_text(content.get("chart_caption"))
-                or caption_text(item.get("chart_caption"))
-                or caption_text(item.get("caption"))
+            caption_parts = first_caption_parts(
+                content.get("image_caption"),
+                item.get("image_caption"),
+                content.get("chart_caption"),
+                item.get("chart_caption"),
+                item.get("caption"),
             )
         elif item_type == "table":
             kind = "table"
-            caption = (
-                caption_text(content.get("table_caption"))
-                or caption_text(item.get("table_caption"))
-                or caption_text(item.get("caption"))
+            caption_parts = first_caption_parts(
+                content.get("table_caption"),
+                item.get("table_caption"),
+                item.get("caption"),
             )
         else:
             continue
+        explicit_label, caption, extra_captions = select_single_caption(caption_parts)
 
         image_source = content.get("image_source") if isinstance(content.get("image_source"), dict) else {}
         src = item.get("img_path") or image_source.get("path") or item.get("image_path")
@@ -2481,12 +2599,14 @@ def extract_figures_tables(content_path: Path | None, *, source_root: Path) -> l
             "kind": kind,
             "item_type": item_type,
             "caption": caption,
-            "explicit_label": explicit_label_from_caption(caption),
+            "explicit_label": explicit_label or explicit_label_from_caption(caption),
+            "extra_captions": extra_captions,
             "source_path": str(src_path) if src_path else str(src or ""),
             "page": item_page_index(item),
             "bbox": normalize_bbox(item.get("bbox")),
             "order": order,
         })
+    repair_split_mineru_captions(figure_items)
 
     figures_tables = cluster_figure_table_items(figure_items, page_extents=page_extents)
     return maybe_replace_clusters_with_full_region_crops(
@@ -2720,6 +2840,9 @@ def source_preserving_cluster_records(
             "caption": str(item.get("caption") or ""),
             "label": str(item.get("explicit_label") or ""),
             "source_path": str(item.get("source_path") or ""),
+            "extra_captions": item.get("extra_captions") or [],
+            "unassigned_extra_captions": item.get("unassigned_extra_captions") or [],
+            "caption_repair": str(item.get("caption_repair") or ""),
         }
         for item in cluster_items
     ]
@@ -2872,8 +2995,21 @@ def compact_text(value: Any, *, max_len: int = 260) -> str:
     return text[: max(0, max_len - 1)].rstrip() + "..."
 
 
-def dedupe_caption_prefix(label: str, caption: str) -> str:
+def trim_caption_spillover(caption: str) -> str:
     text = re.sub(r"\s+", " ", str(caption or "")).strip()
+    if not text:
+        return ""
+    current = explicit_label_from_caption(text)
+    for match in list(FIGURE_TABLE_CAPTION_START_PATTERN.finditer(text))[1:]:
+        kind = "Table" if match.group(1).lower().startswith("table") else "Figure"
+        label = f"{kind} {normalize_figure_table_label_number(match.group(2))}"
+        if label != current and not is_reference_context_before_label(text[: match.start()]):
+            return text[: match.start()].rstrip(" \t\r\n-:;,.")
+    return text
+
+
+def dedupe_caption_prefix(label: str, caption: str) -> str:
+    text = trim_caption_spillover(caption)
     if not text:
         return ""
     if label:
@@ -2881,7 +3017,7 @@ def dedupe_caption_prefix(label: str, caption: str) -> str:
         embedded = re.search(rf"\b{re.escape(label)}\s*[:.\-–—]\s*", text, flags=re.IGNORECASE)
         if embedded and embedded.start() < 80:
             text = text[embedded.end():]
-    text = re.sub(r"^(?:(?:Figure|Fig\.|Table)\s*\d+[A-Za-z]?\s*[:.\-–—]?\s*)+", "", text, flags=re.IGNORECASE)
+    text = re.sub(rf"^(?:(?:Figure|Fig\.|Table)\s*{FIGURE_TABLE_LABEL_TOKEN}\s*[:.\-–—]?\s*)+", "", text, flags=re.IGNORECASE)
     return text.strip(" \t\r\n-:;,.")
 
 
@@ -3505,6 +3641,220 @@ def format_obsidian_image_embed(path: str) -> str:
     return f"![[{path}]]"
 
 
+def _caption_has_math(caption: str) -> bool:
+    """Return True if the caption contains LaTeX commands that need $ wrapping."""
+    return bool(re.search(r'\\+[a-zA-Z]+|[A-Za-z0-9]\s*[_^]\s*\{', caption))
+
+
+def _existing_math_spans(text: str) -> list[tuple[int, int]]:
+    spans: list[tuple[int, int]] = []
+    index = 0
+    while index < len(text):
+        if text[index] != "$":
+            index += 1
+            continue
+        marker = "$$" if text.startswith("$$", index) else "$"
+        end = text.find(marker, index + len(marker))
+        if end < 0:
+            index += len(marker)
+            continue
+        spans.append((index, end + len(marker)))
+        index = end + len(marker)
+    return spans
+
+
+def _skip_spaces(text: str, index: int) -> int:
+    while index < len(text) and text[index] in " \t":
+        index += 1
+    return index
+
+
+def _read_braced_group(text: str, index: int) -> int:
+    start = index
+    index = _skip_spaces(text, index)
+    if index >= len(text) or text[index] != "{":
+        return start
+    depth = 1
+    index += 1
+    while index < len(text) and depth > 0:
+        if text[index] == "{":
+            depth += 1
+        elif text[index] == "}":
+            depth -= 1
+        index += 1
+    return index
+
+
+def _read_latex_command(text: str, start: int, end: int) -> tuple[str, int]:
+    command = text[start:end].lstrip("\\")
+    if command == "left":
+        match = re.search(r'\\+right\b', text[end:])
+        if match:
+            index = end + match.end()
+            index = _skip_spaces(text, index)
+            if index < len(text):
+                if text[index] == "\\":
+                    escaped = re.match(r'\\+[A-Za-z{}]+', text[index:])
+                    if escaped:
+                        index += escaped.end()
+                elif text[index] in "()[]{}|.":
+                    index += 1
+            return command, index
+
+    index = end
+    while True:
+        next_index = _read_braced_group(text, index)
+        if next_index == index:
+            break
+        index = next_index
+    return command, index
+
+
+def _math_operand_left(text: str, end: int) -> tuple[int, str] | None:
+    prefix = text[:end]
+    match = re.search(
+        r'([A-Za-z0-9]+(?:\s*[_^]\s*(?:\{[^{}]*\}|[A-Za-z0-9]+))*)\s*$',
+        prefix,
+    )
+    if not match:
+        return None
+    token = match.group(1).strip()
+    if "_" in token or "^" in token or len(token) == 1 or token.isdigit():
+        return match.start(1), token
+    return None
+
+
+def _math_operand_right(text: str, start: int) -> int:
+    index = _skip_spaces(text, start)
+    command = re.match(r'\\+[A-Za-z]+', text[index:])
+    if command:
+        _, end = _read_latex_command(text, index, index + command.end())
+        return end
+    match = re.match(
+        r'[A-Za-z0-9]+(?:\s*[_^]\s*(?:\{[^{}]*\}|[A-Za-z0-9]+))*',
+        text[index:],
+    )
+    if not match:
+        return start
+    token = match.group(0).strip()
+    if "_" in token or "^" in token or len(token) == 1 or token.isdigit():
+        return index + match.end()
+    return start
+
+
+def _expand_math_span(text: str, start: int, end: int, command: str = "") -> tuple[int, int]:
+    left = start
+    infix_commands = {
+        "cdot", "times", "leq", "geq", "neq", "approx", "sim", "in", "notin",
+    }
+    while True:
+        index = left - 1
+        while index >= 0 and text[index] in " \t":
+            index -= 1
+        if index < 0:
+            break
+        if text[index] in "=+-*/([{,":
+            left = index
+            operand = _math_operand_left(text, left)
+            if operand:
+                left = operand[0]
+                continue
+            break
+        if command in infix_commands:
+            operand = _math_operand_left(text, left)
+            if operand:
+                left = operand[0]
+        break
+
+    right = end
+    needs_operand = command in infix_commands
+    while True:
+        index = _skip_spaces(text, right)
+        if index < len(text) and text[index] in "=+-*/)]},":
+            right = index + 1
+            needs_operand = True
+            continue
+        if needs_operand:
+            operand_end = _math_operand_right(text, right)
+            if operand_end > right:
+                right = operand_end
+                needs_operand = False
+                continue
+        break
+    return left, right
+
+
+def _merge_spans(spans: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    merged: list[tuple[int, int]] = []
+    for start, end in sorted(spans):
+        if not merged or start > merged[-1][1]:
+            merged.append((start, end))
+            continue
+        merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+    return merged
+
+
+def _wrap_caption_math_segment(text: str) -> str:
+    spans: list[tuple[int, int]] = []
+    for match in re.finditer(r'\\+[A-Za-z]+', text):
+        command, end = _read_latex_command(text, match.start(), match.end())
+        spans.append(_expand_math_span(text, match.start(), end, command))
+    for match in re.finditer(
+        r'[A-Za-z0-9]+(?:\s*[_^]\s*\{[^{}]*\})+',
+        text,
+    ):
+        spans.append(match.span())
+    spans = _merge_spans(spans)
+    if not spans:
+        return text
+
+    parts: list[str] = []
+    last = 0
+    for start, end in spans:
+        parts.append(text[last:start])
+        math_text = text[start:end].strip()
+        if math_text:
+            parts.append(f"${math_text}$")
+        last = end
+    parts.append(text[last:])
+    return "".join(parts)
+
+
+def _wrap_caption_math(caption: str) -> str:
+    """Wrap individual formula parts in $...$ for Obsidian math rendering.
+
+    MinerU often extracts LaTeX with spaces (``\\\\mathbf { X }``).  This
+    function detects contiguous math regions (LaTeX commands, sub/superscript
+    groups, escaped braces) and wraps *only* those regions in inline ``$…$``.
+    It is a conservative caption formatter, not a general TeX parser.
+    """
+    if not _caption_has_math(caption):
+        return caption
+
+    existing = _existing_math_spans(caption)
+    if not existing:
+        return _wrap_caption_math_segment(caption)
+
+    parts: list[str] = []
+    last = 0
+    for start, end in existing:
+        parts.append(_wrap_caption_math_segment(caption[last:start]))
+        parts.append(caption[start:end])
+        last = end
+    parts.append(_wrap_caption_math_segment(caption[last:]))
+    return "".join(parts)
+
+
+def escape_obsidian_caption_reserved_chars(caption: str) -> str:
+    parts = re.split(r"(`[^`\n]*`|\$[^$\n]*\$)", caption)
+    return "".join(
+        part
+        if part.startswith(("`", "$"))
+        else re.sub(r"(?<!\\)<", r"\\<", part)
+        for part in parts
+    )
+
+
 def image_block(item: dict[str, Any]) -> str:
     label = str(item.get("label") or "Figure")
     caption = compact_text(dedupe_caption_prefix(label, str(item.get("caption") or "")), max_len=700)
@@ -3512,6 +3862,8 @@ def image_block(item: dict[str, Any]) -> str:
     if not path:
         return ""
     if caption:
+        caption = _wrap_caption_math(caption)
+        caption = escape_obsidian_caption_reserved_chars(caption)
         return f"{format_obsidian_image_embed(path)}\n*{label}: {caption}*"
     return format_obsidian_image_embed(path)
 
@@ -3544,6 +3896,10 @@ def sample_only_figure(item: dict[str, Any]) -> bool:
     if str(item.get("type") or "").lower() != "figure":
         return False
     text = f"{item.get('label') or ''} {item.get('caption') or ''}".lower()
+    if re.search(r"\bfigure\s+s\.?\s*\d+", text, flags=re.IGNORECASE):
+        return True
+    if re.search(r"\b(failure case|failure cases|perceptual study samples?)\b", text, flags=re.IGNORECASE):
+        return True
     sample_words = ("sample", "samples", "few samples", "dataset")
     result_words = ("result", "estimate", "performance", "accuracy", "plot")
     return any(word in text for word in sample_words) and not any(word in text for word in result_words)
@@ -3559,12 +3915,17 @@ METHOD_FIGURE_PATTERN = re.compile(
 )
 
 FRAMEWORK_FIGURE_PATTERN = re.compile(
-    r"\b(framework|pipeline|architecture|overall|system)\b",
+    r"\b(illustration|framework|pipeline|architecture|overall|overview|system)\b",
+    flags=re.IGNORECASE,
+)
+
+CORE_PIPELINE_FIGURE_PATTERN = re.compile(
+    r"\b(illustration|framework|pipeline|architecture|overview|system|training pairs?)\b",
     flags=re.IGNORECASE,
 )
 
 EXPERIMENT_FIGURE_PATTERN = re.compile(
-    r"\b(result|estimate|estimation|performance|experiment|benchmark|ablation|study|comparison|metric|jitter|fid|mae|mpjpe|lid)\b",
+    r"\b(result|estimate|estimation|performance|experiment|benchmark|ablation|study|compare|comparison|qualitative|effectiveness|visualization|artifact|metric|jitter|fid|mae|mpjpe|lid)\b",
     flags=re.IGNORECASE,
 )
 
@@ -3580,6 +3941,28 @@ def method_figure_section(item: dict[str, Any]) -> str:
     return "整体框架" if FRAMEWORK_FIGURE_PATTERN.search(text) else "核心模块与公式推导"
 
 
+def figure_label_sort_key(item: dict[str, Any]) -> tuple[int, str]:
+    match = re.search(r"\bFigure\s*([0-9]+)\b", str(item.get("label") or ""), flags=re.IGNORECASE)
+    if match:
+        return int(match.group(1)), str(item.get("item_id") or "")
+    return 10**6, str(item.get("item_id") or "")
+
+
+def core_pipeline_figure_candidates(figures_tables: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    candidates = [
+        item for item in placement_candidates(figures_tables)
+        if item.get("type", "").lower() == "figure"
+        and not sample_only_figure(item)
+        and CORE_PIPELINE_FIGURE_PATTERN.search(placement_text(item))
+    ]
+    candidates.sort(key=figure_label_sort_key)
+    return candidates
+
+
+def core_pipeline_item_ids(figures_tables: list[dict[str, Any]]) -> set[str]:
+    return {str(item.get("item_id") or "") for item in core_pipeline_figure_candidates(figures_tables)}
+
+
 def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_images: int) -> list[dict[str, str]]:
     if max_images <= 0:
         return []
@@ -3587,18 +3970,32 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
     by_id = {item["item_id"]: item for item in candidates}
     placements: list[dict[str, str]] = []
     used: set[str] = set()
-    method_image_budget = min(max_images, 4)
+    core_candidates = core_pipeline_figure_candidates(figures_tables)
+    method_image_budget = min(max_images, max(4, len(core_candidates)))
+
+    for item in core_candidates:
+        if len(placements) >= max_images:
+            break
+        placements.append({
+            "item_id": item["item_id"],
+            "section": method_figure_section(item),
+            "reason": "caption fallback ranks this as a possible framework or training-pair figure",
+        })
+        used.add(item["item_id"])
 
     full_region_candidates = [item for item in candidates if item.get("is_full_region")]
     full_region_candidates.sort(key=lambda item: (sample_only_figure(item), item["item_id"]))
     for item in full_region_candidates:
         if len(placements) >= max_images:
             break
+        if item["item_id"] in used:
+            continue
         text = placement_text(item)
         section = (
             method_figure_section(item)
             if item.get("type", "").lower() == "figure"
             and METHOD_FIGURE_PATTERN.search(text)
+            and not EXPERIMENT_FIGURE_PATTERN.search(text)
             else "实验与分析"
         )
         placements.append({
@@ -3619,7 +4016,11 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
             continue
         if sample_only_figure(item):
             continue
-        if item.get("type", "").lower() == "figure" and METHOD_FIGURE_PATTERN.search(text):
+        if (
+            item.get("type", "").lower() == "figure"
+            and METHOD_FIGURE_PATTERN.search(text)
+            and not EXPERIMENT_FIGURE_PATTERN.search(text)
+        ):
             placements.append({
                 "item_id": item["item_id"],
                 "section": method_figure_section(item),
@@ -3776,8 +4177,8 @@ async def figure_visual_summary_llm(
 ) -> LLMCallResult:
     from openai import AsyncOpenAI
 
-    if args.figure_provider == "none":
-        raise RuntimeError("figure provider is disabled")
+    if args.figure_provider not in {"openai", "kimi"}:
+        raise RuntimeError("figure visual summary requires an image-capable provider")
     api_key = os.environ.get(args.figure_api_key_env, "")
     if not api_key:
         raise RuntimeError(f"Missing API key env var: {args.figure_api_key_env}")
@@ -3895,14 +4296,14 @@ async def enrich_figure_visual_summaries(
         cached = json.loads(out_path.read_text(encoding="utf-8"))
         return cached.get("figures_tables", figures_tables), cached.get("usage", {})
     items = figure_items_with_ids(figures_tables)
-    if args.mock_llm or args.figure_visual_summary_max_items <= 0 or args.figure_provider == "none":
+    if args.mock_llm or args.figure_visual_summary_max_items <= 0 or args.figure_provider not in {"openai", "kimi"}:
         enriched = []
         for item in items:
             copied = dict(item)
             copied.update(caption_only_visual_summary(copied))
             enriched.append(copied)
         usage = {
-            "provider": "none" if args.figure_provider == "none" else "mock",
+            "provider": "mock" if args.mock_llm else args.figure_provider,
             "model": "",
             "prompt_tokens_est": 0,
             "completion_tokens_est": 0,
@@ -3993,7 +4394,7 @@ def figure_reference_patterns(item: dict[str, Any]) -> list[re.Pattern[str]]:
     text = f"{item.get('label') or ''} {item.get('caption') or ''}"
     patterns: list[re.Pattern[str]] = []
     seen: set[str] = set()
-    for match in re.finditer(r"\b(Fig(?:ure)?\.?|Table)\s*([A-Za-z0-9]+)", text, flags=re.IGNORECASE):
+    for match in re.finditer(r"\b(Fig(?:ure)?\.?|Table)\s*([A-Za-z]*[0-9]+[A-Za-z]?)", text, flags=re.IGNORECASE):
         kind = match.group(1).lower()
         number = match.group(2)
         key = f"{kind}:{number.lower()}"
@@ -4010,7 +4411,7 @@ def figure_reference_patterns(item: dict[str, Any]) -> list[re.Pattern[str]]:
 def figure_reference_keys_for_item(item: dict[str, Any]) -> set[tuple[str, str]]:
     keys: set[tuple[str, str]] = set()
     text = f"{item.get('label') or ''} {item.get('caption') or ''}"
-    for match in re.finditer(r"\b(Fig(?:ure)?\.?|Table)\s*([A-Za-z0-9]+)", text, flags=re.IGNORECASE):
+    for match in re.finditer(r"\b(Fig(?:ure)?\.?|Table)\s*([A-Za-z]*[0-9]+[A-Za-z]?)", text, flags=re.IGNORECASE):
         kind = "figure" if match.group(1).lower().startswith("fig") else "table"
         keys.add((kind, match.group(2).lower()))
     return keys
@@ -4018,9 +4419,9 @@ def figure_reference_keys_for_item(item: dict[str, Any]) -> set[tuple[str, str]]
 
 def referenced_figure_table_keys(markdown: str) -> set[tuple[str, str]]:
     keys: set[tuple[str, str]] = set()
-    for match in re.finditer(r"(?<![A-Za-z])(?:Fig\.?|Figure)\s*([0-9]+[A-Za-z]?)\b", markdown, flags=re.IGNORECASE):
+    for match in re.finditer(r"(?<![A-Za-z])(?:Fig\.?|Figure)\s*([A-Za-z]*[0-9]+[A-Za-z]?)\b", markdown, flags=re.IGNORECASE):
         keys.add(("figure", match.group(1).lower()))
-    for match in re.finditer(r"(?<![A-Za-z])Table\s*([0-9]+[A-Za-z]?)\b", markdown, flags=re.IGNORECASE):
+    for match in re.finditer(r"(?<![A-Za-z])Table\s*([A-Za-z]*[0-9]+[A-Za-z]?)\b", markdown, flags=re.IGNORECASE):
         keys.add(("table", match.group(1).lower()))
     return keys
 
@@ -4054,37 +4455,52 @@ def ensure_referenced_figure_placements(
         return []
     normalized_report = normalize_report_markdown(report)
     referenced = referenced_figure_table_keys(normalized_report)
-    if not referenced:
-        return placements[:max_images]
     by_id = {str(item.get("item_id") or f"item_{index:03d}"): item for index, item in enumerate(copied_figures, 1)}
     referenced_item_ids = {
         item_id for item_id, item in by_id.items()
         if figure_reference_keys_for_item(item).intersection(referenced)
     }
-    used = {str(item.get("item_id") or "") for item in placements}
+    core_item_ids = core_pipeline_item_ids(copied_figures)
+    protected_item_ids = referenced_item_ids | core_item_ids
     merged = [
         placement for placement in placements
         if str(placement.get("item_id") or "") in by_id
     ]
-    if len(merged) > max_images:
-        referenced_existing = [
-            placement for placement in merged
-            if str(placement.get("item_id") or "") in referenced_item_ids
+
+    def trim_placements(items: list[dict[str, str]]) -> list[dict[str, str]]:
+        if len(items) <= max_images:
+            return items
+        protected_existing = [
+            placement for placement in items
+            if str(placement.get("item_id") or "") in protected_item_ids
         ]
         other_existing = [
-            placement for placement in merged
-            if str(placement.get("item_id") or "") not in referenced_item_ids
+            placement for placement in items
+            if str(placement.get("item_id") or "") not in protected_item_ids
         ]
-        merged = (referenced_existing + other_existing)[:max_images]
+        return (protected_existing + other_existing)[:max_images]
+
+    merged = trim_placements(merged)
+    used = {str(item.get("item_id") or "") for item in merged}
+    for item in core_pipeline_figure_candidates(copied_figures):
+        item_id = str(item.get("item_id") or "")
+        if not item_id or item_id in used or item_id not in by_id:
+            continue
+        merged.append({
+            "item_id": item_id,
+            "section": method_figure_section(item),
+            "reason": "detected core pipeline/framework figure",
+        })
+        merged = trim_placements(merged)
         used = {str(item.get("item_id") or "") for item in merged}
+    if not referenced:
+        return merged[:max_images]
     for index, item in enumerate(copied_figures, 1):
         item_id = str(item.get("item_id") or f"item_{index:03d}")
         if item_id in used or item_id not in by_id:
             continue
         item_keys = figure_reference_keys_for_item(item)
         if not item_keys.intersection(referenced):
-            continue
-        if sample_only_figure(item) and str(item.get("type") or "").lower() == "figure":
             continue
         merged.append({
             "item_id": item_id,
@@ -4095,7 +4511,7 @@ def ensure_referenced_figure_placements(
             drop_index = next(
                 (
                     idx for idx in range(len(merged) - 1, -1, -1)
-                    if str(merged[idx].get("item_id") or "") not in referenced_item_ids
+                    if str(merged[idx].get("item_id") or "") not in protected_item_ids
                 ),
                 None,
             )
@@ -4512,6 +4928,47 @@ def strip_figure_caption_lines(note: str) -> str:
     )
 
 
+def multi_label_image_caption_lines(note: str) -> list[int]:
+    lines: list[int] = []
+    for line_no, line in enumerate(note.splitlines(), 1):
+        stripped = line.strip()
+        if not (stripped.startswith("*") and stripped.endswith("*")):
+            continue
+        if stripped.startswith("**") or stripped.endswith("**"):
+            continue
+        labels: set[str] = set()
+        for match in FIGURE_TABLE_CAPTION_START_PATTERN.finditer(stripped.strip("*")):
+            if is_reference_context_before_label(stripped[: match.start()]):
+                continue
+            kind = "Table" if match.group(1).lower().startswith("table") else "Figure"
+            labels.add(f"{kind} {normalize_figure_table_label_number(match.group(2))}".lower())
+        if len(labels) > 1:
+            lines.append(line_no)
+    return lines
+
+
+def image_caption_lines_with_unescaped_lt(note: str) -> list[int]:
+    lines: list[int] = []
+    note_lines = note.splitlines()
+    for index, line in enumerate(note_lines):
+        stripped = line.strip()
+        previous = note_lines[index - 1].strip() if index > 0 else ""
+        if not (
+            previous.startswith("![[assets/figures/papers/")
+            and stripped.startswith("*")
+            and not stripped.startswith("**")
+            and stripped.endswith("*")
+            and re.match(r"^\*(?:Figure|Fig\.?|Table)\s+\S+\s*:", stripped, flags=re.IGNORECASE)
+        ):
+            continue
+        if "<" not in stripped:
+            continue
+        parts = re.split(r"(`[^`\n]*`|\$[^$\n]*\$)", stripped)
+        if any(not part.startswith(("`", "$")) and re.search(r"(?<!\\)<", part) for part in parts):
+            lines.append(index + 1)
+    return lines
+
+
 def dangling_numeric_refs(note: str, *, max_items: int | None = 12) -> list[str]:
     scan = re.sub(r"`[^`\n]*`", "", note)
     scan = re.sub(r"\$\$.*?\$\$", "", scan, flags=re.DOTALL)
@@ -4639,6 +5096,24 @@ def validate_vault_note(
         path for path, embed in zip(note_image_paths, expected_image_embeds, strict=False)
         if embed not in note
     ]
+    core_pipeline_ids = core_pipeline_item_ids(copied_figures)
+    core_pipeline_assets = [
+        {
+            "item_id": item_id,
+            "label": str(item.get("label") or ""),
+            "path": str(item.get("note_image_path") or ""),
+        }
+        for item_id, item in by_id.items()
+        if item_id in core_pipeline_ids and str(item.get("note_image_path") or "")
+    ]
+    missing_core_pipeline_images = [
+        item for item in core_pipeline_assets
+        if format_obsidian_image_embed(item["path"]) not in note
+    ]
+    present_core_pipeline_images = [
+        item for item in core_pipeline_assets
+        if format_obsidian_image_embed(item["path"]) in note
+    ]
     referenced_keys = referenced_figure_table_keys(note)
     referenced_assets: list[dict[str, str]] = []
     for index, item in enumerate(copied_figures, 1):
@@ -4691,6 +5166,7 @@ def validate_vault_note(
         "required_sections_present": not missing_sections,
         "pdf_embed_present": not pdf_ref or expected_pdf_embed in note,
         "image_embeds_present": not note_image_paths or not missing_images,
+        "core_pipeline_images_present": not core_pipeline_assets or bool(present_core_pipeline_images),
         "referenced_image_embeds_present": not missing_referenced_images_blocking,
         "no_legacy_markdown_image_links": not legacy_markdown_image_links and not legacy_relative_wikilink_images,
         "no_pdf_file_label": "PDF 文件：" not in note,
@@ -4698,6 +5174,8 @@ def validate_vault_note(
         "no_fallback_metadata_markers": not fallback_markers,
         "no_dangling_numeric_refs": not dangling_numeric_refs(note),
         "no_incomplete_effect_callout": not incomplete_effect_callout_lines(note),
+        "no_multi_label_image_captions": not multi_label_image_caption_lines(note),
+        "no_unescaped_lt_in_image_captions": not image_caption_lines_with_unescaped_lt(note),
         "venue_year_tag_present": venue_tag_ok,
         "no_legacy_venue_topic_tags": not legacy_venue_topic_tags,
         "note_length_ok": len(note.strip()) >= 1000,
@@ -4714,6 +5192,7 @@ def validate_vault_note(
         "image_embed_count": len(re.findall(r"!\[\[assets/figures/papers/[^\]]+\]\]", note)),
         "expected_image_count": len(note_image_paths),
         "missing_image_paths": missing_images[:12],
+        "missing_core_pipeline_images": missing_core_pipeline_images[:12],
         "missing_referenced_images": missing_referenced_images[:12],
         "legacy_markdown_image_links": legacy_markdown_image_links[:12],
         "legacy_relative_wikilink_images": legacy_relative_wikilink_images[:12],
@@ -4722,6 +5201,8 @@ def validate_vault_note(
         "fallback_markers": fallback_markers,
         "dangling_numeric_refs": dangling_numeric_refs(note),
         "incomplete_effect_callout_lines": incomplete_effect_callout_lines(note),
+        "multi_label_image_caption_lines": multi_label_image_caption_lines(note),
+        "unescaped_lt_image_caption_lines": image_caption_lines_with_unescaped_lt(note),
         "expected_venue_year_tag": expected_venue_tag,
         "frontmatter_tags": frontmatter_tags,
         "legacy_venue_topic_tags": legacy_venue_topic_tags,
@@ -4751,7 +5232,7 @@ def note_check_repair_prompt(
             for item in copied_figures
             if any(str(item.get("item_id") or "") == str(placement.get("item_id") or "") for placement in (figure_placements or []))
         ],
-        "repair_scope": "Only fix Markdown formatting, duplicated captions, broken table syntax, and obvious image-placement mismatch.",
+        "repair_scope": "Only fix Markdown formatting, duplicated captions, unescaped < in image captions, broken table syntax, and obvious image-placement mismatch.",
         "frontmatter_schema_guard": "Do not add category, modalities, or frontier. Keep aliases as short English/model aliases.",
     }
     return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
@@ -4821,7 +5302,12 @@ def export_to_vault(
     pdf_dir = vault_root / "paperPDFs" / conf_year
     asset_root = Path(args.vault_asset_root).expanduser().resolve()
     stem = note_file_stem(title)
-    note_path = paper_dir / f"{stem}.md"
+    note_path = (
+        Path(args.vault_note_path).expanduser().resolve()
+        if getattr(args, "vault_note_path", "")
+        else paper_dir / f"{stem}.md"
+    )
+    stem = note_path.stem
     source_pdf_arg = args.paper_pdf or args.pdf
     source_pdf, pdf_resolution = resolve_existing_pdf_path(
         source_pdf_arg,
@@ -5367,12 +5853,20 @@ def resolve_kimi_llm_config(args: argparse.Namespace) -> None:
 
 
 def resolve_figure_llm_config(args: argparse.Namespace) -> None:
-    provider = args.figure_provider or "none"
+    provider = args.figure_provider or "deepseek"
     args.figure_provider = provider
     if provider == "none":
         args.figure_model = ""
         args.figure_base_url = ""
         args.figure_api_key_env = ""
+        return
+    if provider == "deepseek":
+        _, model = first_env(["DEEPSEEK_MODEL"])
+        _, base_url = first_env(["DEEPSEEK_BASE_URL"])
+        api_key_env, _ = first_env(["DEEPSEEK_API_KEY", "OPENAI_API_KEY"])
+        args.figure_api_key_env = args.figure_api_key_env or api_key_env or "DEEPSEEK_API_KEY"
+        args.figure_model = args.figure_model or model or DEFAULT_DEEPSEEK_MODEL
+        args.figure_base_url = args.figure_base_url or base_url or "https://api.deepseek.com/v1"
         return
     if provider == "kimi":
         api_key_env, _ = first_env(["KIMI_API_KEY", "MOONSHOT_API_KEY", "KIMI_AUTH_TOKEN"])
@@ -5876,8 +6370,12 @@ async def run_figure_placement(
             parsed = parse_json_object(raw, label="figure_placement")
             placements = normalize_figure_placements(parsed, copied_figures, max_images=args.max_note_images)
         except Exception as exc:
-            append_jsonl(progress_path, {"event": "figure_placement_fallback", "at": now_iso(), "error": str(exc)})
-    if not placements:
+            append_jsonl(progress_path, {"event": "figure_placement_failed", "at": now_iso(), "error": str(exc)})
+            raise RuntimeError(f"figure placement reviewer failed for provider {args.figure_provider}: {exc}") from exc
+        if not placements:
+            append_jsonl(progress_path, {"event": "figure_placement_failed", "at": now_iso(), "error": "empty placement result"})
+            raise RuntimeError(f"figure placement reviewer returned no usable placements for provider {args.figure_provider}")
+    if not placements and (args.mock_llm or args.figure_provider == "none"):
         placements = fallback_figure_placements(copied_figures, max_images=args.max_note_images)
     placements = ensure_referenced_figure_placements(
         placements,
@@ -6521,9 +7019,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--kimi-check-repair-max-tokens", type=int, default=16384)
     parser.add_argument(
         "--figure-provider",
-        choices=["none", "openai", "kimi"],
-        default="none",
-        help="Optional figure/table visual-summary and placement LLM. Default none uses deterministic caption/placement fallback.",
+        choices=["none", "deepseek", "openai", "kimi"],
+        default="deepseek",
+        help=(
+            "Figure/table placement LLM. Default deepseek uses caption-only visual "
+            "summaries plus DeepSeek placement; openai/kimi also run image visual summaries; "
+            "none uses caption/placement fallback."
+        ),
     )
     parser.add_argument("--figure-model", default="")
     parser.add_argument("--figure-base-url", default="")
@@ -6556,6 +7058,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--export-vault", action="store_true", help="Copy PDF/assets and write Obsidian note")
     parser.add_argument("--vault-root", default=str(DEFAULT_VAULT_ROOT))
     parser.add_argument("--vault-note-dir", default="", help="Override output directory for exported Markdown notes")
+    parser.add_argument("--vault-note-path", default="", help="Override exact output Markdown note path")
     parser.add_argument(
         "--vault-asset-root",
         default="",

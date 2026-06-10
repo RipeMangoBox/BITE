@@ -10,16 +10,15 @@ LOG_PATH = os.path.join(ROOT_DIR, "obsidian-vault/paper_list.csv")
 
 class AnalysisFile:
     def __init__(self, path: str, title: str, content: str, has_abstract: bool,
-                 has_part_i: bool, has_part_ii: bool, has_part_iii: bool,
+                 has_method_section: bool, has_experiment_section: bool,
                  has_local_reading: bool, has_metrics_table: bool,
                  has_pdf_ref: bool):
         self.path = path
         self.title = title
         self.content = content
         self.has_abstract = has_abstract
-        self.has_part_i = has_part_i
-        self.has_part_ii = has_part_ii
-        self.has_part_iii = has_part_iii
+        self.has_method_section = has_method_section
+        self.has_experiment_section = has_experiment_section
         self.has_local_reading = has_local_reading
         self.has_metrics_table = has_metrics_table
         self.has_pdf_ref = has_pdf_ref
@@ -28,9 +27,8 @@ class AnalysisFile:
     def is_emergent_style_basic_ok(self) -> bool:
         structural_ok = (
             self.has_abstract
-            and self.has_part_i
-            and self.has_part_ii
-            and self.has_part_iii
+            and self.has_method_section
+            and self.has_experiment_section
             and self.has_local_reading
         )
         depth_ok = self.has_metrics_table
@@ -112,10 +110,12 @@ def build_analysis_index() -> Dict[str, AnalysisFile]:
             lower_body = body.lower()
 
             has_abstract = "[!abstract" in lower_body
-            has_part_i = "part i:" in lower_body
-            has_part_ii = "part ii:" in lower_body
-            has_part_iii = "part iii:" in lower_body
-            has_local_reading = "local reading" in lower_body
+            has_method_section = any(
+                marker in body
+                for marker in ("## 整体框架", "## 核心模块与公式推导", "## 核心创新")
+            )
+            has_experiment_section = "## 实验与分析" in body
+            has_local_reading = "local reading" in lower_body or "## 原文 PDF" in body
 
             has_metrics_table = False
             for line in body.splitlines():
@@ -133,9 +133,8 @@ def build_analysis_index() -> Dict[str, AnalysisFile]:
                 title=title,
                 content=text,
                 has_abstract=has_abstract,
-                has_part_i=has_part_i,
-                has_part_ii=has_part_ii,
-                has_part_iii=has_part_iii,
+                has_method_section=has_method_section,
+                has_experiment_section=has_experiment_section,
                 has_local_reading=has_local_reading,
                 has_metrics_table=has_metrics_table,
                 has_pdf_ref=has_pdf_ref,
