@@ -27,11 +27,11 @@ REQUIRED_FRONTMATTER_KEYS = {
     "claims",
 }
 
-PART_PATTERNS = {
-    "Part I": re.compile(r"(?i)\bPart\s*I\b"),
-    "Part II": re.compile(r"(?i)\bPart\s*II\b"),
-    "Part III": re.compile(r"(?i)\bPart\s*III\b"),
-}
+REQUIRED_BODY_SECTIONS = (
+    "整体框架",
+    "核心模块与公式推导",
+    "实验与分析",
+)
 
 PAPER_HOST_HINTS = (
     "arxiv.org",
@@ -70,7 +70,7 @@ class MdRecord:
     category: str
     pdf_ref: str
     missing_keys: List[str]
-    missing_parts: List[str]
+    missing_sections: List[str]
     invalid_year: bool
     missing_frontmatter: bool
     pdf_missing: bool
@@ -304,7 +304,11 @@ def load_md_records() -> List[MdRecord]:
 
         invalid_year = bool(year) and not bool(re.fullmatch(r"\d{4}", year))
 
-        missing_parts = [name for name, rx in PART_PATTERNS.items() if not rx.search(body)]
+        missing_sections = [
+            section
+            for section in REQUIRED_BODY_SECTIONS
+            if not re.search(rf"^##\s+{re.escape(section)}\s*$", body, flags=re.MULTILINE)
+        ]
 
         pdf_missing = False
         if pdf_ref:
@@ -320,7 +324,7 @@ def load_md_records() -> List[MdRecord]:
                 category=category,
                 pdf_ref=pdf_ref,
                 missing_keys=missing_keys,
-                missing_parts=missing_parts,
+                missing_sections=missing_sections,
                 invalid_year=invalid_year,
                 missing_frontmatter=missing_frontmatter,
                 pdf_missing=pdf_missing,
@@ -380,8 +384,8 @@ def main() -> int:
             structure_issues.append(f"{where} missing frontmatter keys: {', '.join(md.missing_keys)}")
         if md.invalid_year:
             structure_issues.append(f"{where} invalid year: `{md.year}`")
-        if md.missing_parts:
-            structure_issues.append(f"{where} missing sections: {', '.join(md.missing_parts)}")
+        if md.missing_sections:
+            structure_issues.append(f"{where} missing semantic sections: {', '.join(md.missing_sections)}")
 
         if not md.pdf_ref:
             missing_refs.append(f"{where} missing pdf_ref")

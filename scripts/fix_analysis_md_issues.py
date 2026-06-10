@@ -24,11 +24,11 @@ REQUIRED_KEYS = [
     "category",
 ]
 
-PART_PATTERNS = {
-    "Part I": re.compile(r"(?i)\bPart\s*I\b"),
-    "Part II": re.compile(r"(?i)\bPart\s*II\b"),
-    "Part III": re.compile(r"(?i)\bPart\s*III\b"),
-}
+REQUIRED_BODY_SECTIONS = (
+    "整体框架",
+    "核心模块与公式推导",
+    "实验与分析",
+)
 
 FRONTMATTER_BOUNDARY = re.compile(r"^---\s*$")
 KEY_LINE = re.compile(r"^([A-Za-z0-9_\-]+):(?:\s*(.*))?$")
@@ -237,6 +237,37 @@ def pdf_ref_exists(pdf_ref: str) -> bool:
     return (VAULT_ROOT / rel).exists()
 
 
+def escape_caption_reserved_chars(line: str) -> str:
+    parts = re.split(r"(`[^`\n]*`|\$[^$\n]*\$)", line)
+    return "".join(
+        part
+        if part.startswith(("`", "$"))
+        else re.sub(r"(?<!\\)<", r"\\<", part)
+        for part in parts
+    )
+
+
+def fix_image_caption_reserved_chars(body: str) -> Tuple[str, int]:
+    lines = body.splitlines()
+    changed_count = 0
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        previous = lines[index - 1].strip() if index > 0 else ""
+        if not (
+            previous.startswith("![[assets/figures/papers/")
+            and stripped.startswith("*")
+            and not stripped.startswith("**")
+            and stripped.endswith("*")
+            and re.match(r"^\*(?:Figure|Fig\.?|Table)\s+\S+\s*:", stripped, flags=re.IGNORECASE)
+        ):
+            continue
+        fixed = escape_caption_reserved_chars(line)
+        if fixed != line:
+            lines[index] = fixed
+            changed_count += 1
+    return "\n".join(lines), changed_count
+
+
 def main() -> int:
     args = parse_args()
 
@@ -323,11 +354,21 @@ def main() -> int:
                     f"{md_path.relative_to(VAULT_ROOT)} unresolved pdf_ref ({reason})"
                 )
 
-        missing_parts = [name for name, rx in PART_PATTERNS.items() if not rx.search(body)]
-        if missing_parts:
+        missing_sections = [
+            section
+            for section in REQUIRED_BODY_SECTIONS
+            if not re.search(rf"^##\s+{re.escape(section)}\s*$", body, flags=re.MULTILINE)
+        ]
+        if missing_sections:
             unresolved.append(
-                f"{md_path.relative_to(VAULT_ROOT)} missing sections: {', '.join(missing_parts)}"
+                f"{md_path.relative_to(VAULT_ROOT)} missing semantic sections: {', '.join(missing_sections)}"
             )
+
+        fixed_body, caption_fix_count = fix_image_caption_reserved_chars(body)
+        if caption_fix_count:
+            body = fixed_body
+            file_changed = True
+            applied.append(f"escaped < in {caption_fix_count} image captions")
 
         if file_changed:
             new_frontmatter = dump_frontmatter(fm)

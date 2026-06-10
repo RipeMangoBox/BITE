@@ -27,7 +27,7 @@ PDF batch
   -> chunk-level anchor extraction
   -> main analysis JSON
   -> section writers
-  -> figure/table visual summary and placement
+  -> figure/table visual summary and DeepSeek placement review
   -> vault export
   -> deterministic validation
 ```
@@ -113,8 +113,11 @@ useful ones into the note.
 
 **Default behavior.**
 
-- visual summary and placement are enabled when configured
-- caption-only fallback remains available
+- DeepSeek is the default figure/table placement reviewer.
+- Caption-only visual summaries are used with DeepSeek; image-capable visual
+  summaries are available through `openai` or `kimi`.
+- Caption/placement fallback is available only for explicit offline runs
+  (`--figure-provider none`) or mock runs.
 - `--max-note-images 6` keeps notes readable
 
 **Outputs.**
@@ -135,6 +138,7 @@ vault, and copy selected figure/table assets.
 - Images: `obsidian-vault/assets/figures/papers/<task_id>/figures/...`
 - PDF embeds: `![[paperPDFs/...]]`
 - Image embeds: `![[assets/...]]`
+- Figure/table captions escape Obsidian reserved `<` characters as `\<`.
 
 ## Stage 6. Deterministic Validation
 
@@ -145,6 +149,7 @@ The export validator checks:
 - PDF embed exists
 - expected image embeds exist and use `![[assets/...]]`
 - aliased wikilinks do not appear inside Markdown tables
+- image captions do not contain unescaped `<`
 - fallback markers do not remain in metadata or the top summary
 - note length is not obviously truncated
 

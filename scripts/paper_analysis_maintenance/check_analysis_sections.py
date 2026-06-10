@@ -10,10 +10,10 @@ PAPER_ANALYSIS_DIR = REPO_ROOT / "obsidian-vault/analysis"
 LOG_PATH = REPO_ROOT / "obsidian-vault/paper_list.csv"
 
 
-PART_PATTERNS = {
-    "I": re.compile(r"(?i)\bPart\s*I\b"),
-    "II": re.compile(r"(?i)\bPart\s*II\b"),
-    "III": re.compile(r"(?i)\bPart\s*III\b"),
+REQUIRED_SECTION_PATTERNS = {
+    "framework_or_method": re.compile(r"^##\s+(?:整体框架|核心模块与公式推导|核心创新)\s*$", re.MULTILINE),
+    "experiments": re.compile(r"^##\s+实验与分析\s*$", re.MULTILINE),
+    "pdf": re.compile(r"^##\s+(?:原文 PDF|Local Reading)\s*$", re.MULTILINE),
 }
 
 
@@ -35,9 +35,9 @@ def _extract_md_title(md_text: str, md_path: Path) -> str:
     return stem.replace("_", " ").strip()
 
 
-def _md_missing_parts(md_text: str) -> list[str]:
+def _md_missing_sections(md_text: str) -> list[str]:
     missing = []
-    for k, rx in PART_PATTERNS.items():
+    for k, rx in REQUIRED_SECTION_PATTERNS.items():
         if not rx.search(md_text):
             missing.append(k)
     return missing
@@ -104,7 +104,7 @@ def main() -> int:
             text = p.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             text = p.read_text(encoding="utf-8", errors="ignore")
-        miss = _md_missing_parts(text)
+        miss = _md_missing_sections(text)
         if miss:
             title_guess = _extract_md_title(text, p)
             missing_mds.append((p, miss, title_guess))
@@ -159,7 +159,7 @@ def main() -> int:
         if not hit:
             continue
         p, text = hit
-        if not _md_missing_parts(text):
+        if not _md_missing_sections(text):
             e.set_status("checked")
             restored.append((e.row_idx, str(p.relative_to(REPO_ROOT))))
 
@@ -171,7 +171,7 @@ def main() -> int:
             writer.writerows(rows)
 
     print(f"Scanned md files (excluding emergentmind): {len(md_files)}")
-    print(f"MD missing any Part I/II/III: {len(missing_mds)}")
+    print(f"MD missing required semantic sections: {len(missing_mds)}")
     print(f"Log entries updated to Wait: {len(updates)}")
     print(f"Log entries restored to checked: {len(restored)}")
     for row_idx, old, new, rel, miss, md_title, log_title, score in updates[:60]:
