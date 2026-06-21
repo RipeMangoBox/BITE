@@ -12,9 +12,12 @@ __pycache__/
 
 # === Private workspace ===
 _private/
+obsidian-vault/ideas/
 
 
 # === Obsidian local runtime state ===
+.obsidian/
+obsidian-vault/.obsidian/
 .obsidian/cache/
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
