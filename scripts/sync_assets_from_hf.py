@@ -2,6 +2,7 @@
 """Incrementally download BITE evidence layers from a Hugging Face dataset.
 
 Modes:
+  paper-list — canonical paper_list.csv only
   text   — analysis notes + indexes only (~43 MB)
   assets — figures and tables only (~1.8 GB)
   all    — everything (default)
@@ -49,6 +50,35 @@ def _ensure_manifest(local_root: Path, rel_path: str, repo_id: str, repo_type: s
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(Path(downloaded).read_bytes())
     return target
+
+
+def sync_paper_list(
+    repo_id: str,
+    repo_type: str,
+    local_root: Path,
+    revision: str | None,
+    dry_run: bool,
+    overwrite: bool,
+) -> None:
+    """Download the canonical PaperBite paper_list.csv when explicitly requested."""
+    target = local_root / "paper_list.csv"
+    if target.exists() and not overwrite:
+        print("paper_list.csv exists; pass --overwrite-paper-list to replace it")
+        return
+    if dry_run:
+        action = "replace" if target.exists() else "write"
+        print(f"paper_list.csv would {action}: {target}")
+        return
+
+    downloaded = hf_hub_download(
+        repo_id=repo_id,
+        repo_type=repo_type,
+        filename="paper_list.csv",
+        revision=revision,
+    )
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(Path(downloaded).read_bytes())
+    print("paper_list.csv")
 
 
 def _download_and_extract_shard(
@@ -166,12 +196,32 @@ def main() -> int:
     parser.add_argument("--repo-type", default="dataset")
     parser.add_argument("--revision", default=None)
     parser.add_argument("--local-dir", default="obsidian-vault")
-    parser.add_argument("--mode", default="all", choices=["text", "assets", "all"])
+    parser.add_argument("--mode", default="all", choices=["paper-list", "text", "assets", "all"])
+    parser.add_argument(
+        "--sync-paper-list",
+        action="store_true",
+        help="Also download remote paper_list.csv into <local-dir>/paper_list.csv.",
+    )
+    parser.add_argument(
+        "--overwrite-paper-list",
+        action="store_true",
+        help="Allow --sync-paper-list or --mode paper-list to replace an existing local paper_list.csv.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
     local_root = Path(args.local_dir)
     mode = args.mode
+
+    if mode == "paper-list" or args.sync_paper_list:
+        sync_paper_list(
+            args.repo_id,
+            args.repo_type,
+            local_root,
+            args.revision,
+            args.dry_run,
+            args.overwrite_paper_list,
+        )
 
     if mode in ("text", "all"):
         sync_text_layer(args.repo_id, args.repo_type, local_root, args.revision, args.dry_run)

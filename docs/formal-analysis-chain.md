@@ -1,28 +1,28 @@
 # Formal Local Analysis Chain
 
-This page describes the default public-facing ResearchFlow analysis chain in
-more detail than the README overview. It clarifies where MinerU-based document
-preparation ends and where ResearchFlow's structured analysis begins.
+This page describes the default public-facing BITE analysis chain in more
+detail than the README overview. MinerU is now integrated into the formal local
+runner: existing parse outputs can be reused, but a separate MinerU batch phase
+is no longer required before analysis.
 
 ## Overview
 
-ResearchFlow separates PDF preparation from semantic analysis:
+BITE's formal runner accepts a PDF, an existing MinerU output directory, or a
+Markdown source:
 
-- **Stage 0: MinerU preparation** converts batches of PDFs into reusable parsed
-  assets.
-- **Stage 1 onward: ResearchFlow analysis** consumes those parsed assets and
-  turns them into structured evidence, verified analysis objects, sectioned
-  reports, and vault notes.
+- `--pdf` runs MinerU when no matching cached parse is available.
+- `--mineru-output` reuses an existing parse directory.
+- `--source-md` is reserved for tests and recovery work.
 
-This separation matters because MinerU parsing is an upstream document
-preparation stage, while ResearchFlow is the downstream reasoning and knowledge
-structuring stage.
+The same run then turns parsed paper evidence into structured analysis objects,
+sectioned reports, figure/table-aware notes, and deterministic validation
+records.
 
 ## Pipeline
 
 ```text
 PDF batch
-  -> batch MinerU parse or cached parse reuse
+  -> MinerU parse or cached parse reuse
   -> Markdown chunking
   -> chunk-level anchor extraction
   -> main analysis JSON
@@ -32,15 +32,15 @@ PDF batch
   -> deterministic validation
 ```
 
-## Stage 0. Batch MinerU Preparation
+## Stage 0. MinerU Parse or Reuse
 
-**Purpose.** Convert source PDFs into Markdown, figure/table metadata, and
-image assets before structured analysis starts.
+**Purpose.** Convert a source PDF into Markdown, figure/table metadata, and
+image assets, or reuse an existing parse directory.
 
 **Inputs.**
 
-- PDF batches under `obsidian-vault/paperPDFs/`
-- existing MinerU output directories when available
+- a PDF under `obsidian-vault/paperPDFs/`
+- an existing MinerU output directory via `--mineru-output`
 - normalized MinerU cache roots such as `--mineru-output-root`
 
 **Outputs.**
@@ -55,6 +55,7 @@ image assets before structured analysis starts.
 - deterministic local parsing
 - no LLM budget consumption
 - reusable across repeated analysis runs
+- integrated into the formal analysis runner by default
 
 ## Stage 1. Chunk-Level Anchor Extraction
 
@@ -167,8 +168,12 @@ ResearchFlow can start from any of these inputs:
 For public batch workflows, the recommended pattern is:
 
 ```text
-batch MinerU parse -> normalized MinerU outputs -> ResearchFlow analysis
+paper_list.csv Downloaded rows -> run_paper_list_analysis.py -> per-row formal analysis runs
 ```
+
+If you already have normalized MinerU outputs, pass `--mineru-output-root` to
+reuse them. Use `--require-existing-mineru-output` only for controlled
+maintenance runs where accidental re-parsing should fail.
 
 ## Reproducible Command
 

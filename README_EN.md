@@ -91,9 +91,10 @@ base step by step:
 
 ```text
 collect candidate papers / import local PDFs
-  -> batch MinerU PDF parse
-  -> structured paper analysis
-  -> index
+  -> download when needed
+  -> integrated analysis chain
+     (MinerU parse/reuse -> structured analysis -> vault export)
+  -> optional index refresh
   -> query / ideate / review / export
 ```
 
@@ -101,7 +102,7 @@ You can use it in four common modes:
 
 | Mode | Purpose | Typical entry |
 | --- | --- | --- |
-| Build | Collect candidates, batch-parse PDFs, analyze papers, and refresh the index | `research-workflow` |
+| Build | Collect candidates, download or import PDFs, run the integrated analysis chain, and refresh the index when needed | `research-workflow` |
 | Query | Retrieve papers by topic, task, method, venue, year, title, or technique tags | `papers-query-knowledge-base` |
 | Decision | Compare methods before choosing baselines, changing a design, or writing related work | `papers-query-knowledge-base` |
 | Idea | Generate, focus, and stress-test research directions grounded in the local knowledge base | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
@@ -125,11 +126,19 @@ reference.
 
 ### 3. Install or configure MinerU
 
-MinerU is the upstream batch PDF parsing stage, not the structured analysis stage itself. BITE is designed to reuse MinerU outputs before running analysis. Minimal verification: `mineru --help` should run, or `.env` should set `MINERU_CLI_PATH`.
+MinerU is the PDF parsing component inside BITE's local analysis chain. You no
+longer need a separate MinerU batch-preparation phase before analysis:
+`scripts/run_local_paper_analysis.py` can call MinerU during analysis, or reuse
+existing parse outputs when you already have them. Minimal verification:
+`mineru --help` should run, or `.env` should set `MINERU_CLI_PATH`.
 
-### 4. Batch-prepare MinerU outputs first
+### 4. Run the integrated local analysis chain
 
-For medium and large paper collections, batch MinerU parsing should happen before structured analysis. BITE analysis should preferentially reuse prepared MinerU outputs through `--mineru-output` or `--mineru-output-root` instead of reparsing PDFs during analysis.
+For a single paper, start directly from the PDF. The runner performs MinerU
+parse or cache reuse, chunk evidence extraction, main analysis JSON generation,
+section writing, figure/table placement, vault export, and structural
+validation. Pass `--mineru-output` or `--mineru-output-root` only when you
+already have parse outputs to reuse.
 
 ### 5. Start from the workflow skill
 
@@ -155,7 +164,17 @@ python scripts/sync_assets_from_hf.py --mode assets
 # Everything (default)
 python scripts/sync_assets_from_hf.py --mode all --dry-run   # preview first
 python scripts/sync_assets_from_hf.py                        # full sync
+
+# Explicitly replace your local paper list with the public PaperBite list
+python scripts/sync_assets_from_hf.py --mode paper-list --overwrite-paper-list
 ```
+
+PaperBite shards use vault-relative paths (`analysis/`, `index/`, and
+`assets/`) and extract directly under `obsidian-vault/`. This makes them
+suitable as a drop-in public evidence vault for BITE. `paper_list.csv` is synced
+only when explicitly requested, so your local paper list is not overwritten by
+default. The public assets do not include the full original PDF corpus; keep
+downloading or importing `paperPDFs/` locally when PDFs are needed.
 
 ## 📚 Further Reading
 
@@ -191,34 +210,36 @@ Write a candidate list suitable for the downstream download workflow.
 <details>
 <summary>Run the formal local analysis chain</summary>
 
-Reuse existing MinerU output first when available:
+Run the full chain directly from a PDF:
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault \
+  --reasoning-effort max \
+  --part-thinking disabled \
+  --writer-thinking disabled
+```
+
+Reuse existing MinerU output when available:
 
 ```bash
 python3 scripts/run_local_paper_analysis.py \
   --mineru-output "<mineru_output_dir>" \
-  --paper-pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --paper-pdf "obsidian-vault/paperPDFs/<Venue_Year>/<Paper>.pdf" \
   --conf-year "<Venue_Year>" \
   --export-vault
 ```
 
-If no cached parse exists, the runner can also invoke MinerU during a
-single-paper run:
-
-```bash
-python3 scripts/run_local_paper_analysis.py \
-  --pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
-  --conf-year "<Venue_Year>" \
-  --export-vault
-```
-
-For batch analysis, require reuse of prepared MinerU outputs:
+For batch analysis, the queue runner calls the same formal chain per row:
 
 ```bash
 python3 scripts/run_paper_list_analysis.py \
   --source obsidian-vault/paper_list.csv \
   --state Downloaded \
-  --mineru-output-root "<mineru_output_root>" \
-  --require-existing-mineru-output
+  --jobs 2 \
+  --export-vault
 ```
 
 </details>

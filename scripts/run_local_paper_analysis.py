@@ -72,7 +72,7 @@ MINERU_PIPELINE_CACHE = DEFAULT_MINERU_HF_CACHE / "models--opendatalab--PDF-Extr
 DEFAULT_MINERU_CONTENT_COORD_SIZE = (1000.0, 1000.0)
 DEFAULT_CONF_YEAR = ""
 DEFAULT_TOPIC_ASSIGNMENTS = os.environ.get("RF_TOPIC_ASSIGNMENTS", "").strip()
-DEFAULT_MODEL = ""
+DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-pro"
 KIMI_DEFAULT_BASE_URL = "https://api.moonshot.ai/v1"
 KIMI_DEFAULT_TEMPERATURE = 0.6
 DEFAULT_KIMI_MODEL = "kimi-k2.6"
@@ -255,6 +255,7 @@ Return JSON only:
   "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
   "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
   "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
   "open_questions": [str]
 }
 
@@ -264,7 +265,9 @@ Rules:
 3. If the chunk has visible headings, formulas, figures, tables, or result
    sentences, do not return an all-empty evidence object.
 4. Use [] only when that evidence type is absent.
-5. Output no markdown fences, no prose, no reference list."""
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list."""
 
 PART_ANALYSIS_PROMPT_CONTRACT = """Fixed task contract for prompt-cache reuse.
 
@@ -279,6 +282,7 @@ Return JSON only:
   "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
   "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
   "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
   "open_questions": [str]
 }
 
@@ -288,7 +292,9 @@ Rules:
 3. If the chunk has visible headings, formulas, figures, tables, or result
    sentences, do not return an all-empty evidence object.
 4. Use [] only when that evidence type is absent.
-5. Output no markdown fences, no prose, no reference list."""
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list."""
 
 MAIN_ANALYSIS_SYSTEM = """You are ResearchFlow's local main analysis agent.
 
@@ -300,7 +306,8 @@ method, dataset, metric, paper names.
 
 Return exactly one valid JSON object:
 {
-  "paper_metadata": {"title": str, "title_zh": str, "venue": str | null, "year": int | null},
+  "paper_metadata": {"title": str, "title_zh": str, "venue": str | null, "year": int | null, "project_link": str | null, "code_link": str | null},
+  "source_links": [{"label": "Project" | "Code" | "arXiv", "url": str, "anchor": str | null, "confidence": float | null}],
   "analysis_truth": {
     "real_bottleneck": str,
     "causal_knob": str,
@@ -337,7 +344,11 @@ Rules:
 6. For each concrete baseline method, fill citation when the paper provides
    verifiable author/year/venue metadata, e.g. "He et al., CVPR 2023"; otherwise
    use null instead of guessing.
-7. Output ONLY valid JSON, with no markdown fences."""
+7. Preserve directly visible project page and code repository links in
+   source_links. Also put the best project page in paper_metadata.project_link
+   and the best code repository/GitHub/GitLab link in paper_metadata.code_link.
+   Do not invent links.
+8. Output ONLY valid JSON, with no markdown fences."""
 
 MAIN_ANALYSIS_PROMPT_CONTRACT = """Fixed merge contract for prompt-cache reuse.
 
@@ -351,7 +362,8 @@ exact evidence anchors, and method, dataset, metric, paper names.
 
 Return exactly one valid JSON object:
 {
-  "paper_metadata": {"title": str, "title_zh": str, "venue": str | null, "year": int | null},
+  "paper_metadata": {"title": str, "title_zh": str, "venue": str | null, "year": int | null, "project_link": str | null, "code_link": str | null},
+  "source_links": [{"label": "Project" | "Code" | "arXiv", "url": str, "anchor": str | null, "confidence": float | null}],
   "analysis_truth": {
     "real_bottleneck": str,
     "causal_knob": str,
@@ -388,7 +400,11 @@ Rules:
 6. For each concrete baseline method, fill citation when the paper provides
    verifiable author/year/venue metadata, e.g. "He et al., CVPR 2023"; otherwise
    use null instead of guessing.
-7. Output ONLY valid JSON, with no markdown fences."""
+7. Preserve directly visible project page and code repository links in
+   source_links. Also put the best project page in paper_metadata.project_link
+   and the best code repository/GitHub/GitLab link in paper_metadata.code_link.
+   Do not invent links.
+8. Output ONLY valid JSON, with no markdown fences."""
 
 WRITER_SYSTEM = """You are ResearchFlow's local writer agent.
 
@@ -501,10 +517,11 @@ Check and lightly repair an Obsidian paper note for:
 6. Image embeds must use Obsidian wikilinks like `![[assets/...]]`, never
    Markdown image links or `../../assets/...` prefixes
 7. ResearchFlow frontmatter schema: keep `aliases` as short English/model
-   aliases; do not add `category`, `modalities`, or `frontier`
+   aliases; preserve `project_link` and `code_link` if present; do not add
+   `category`, `modalities`, or `frontier`
 
 Do not rewrite analytical claims, do not add new claims, and do not make the
-style more paper-like. Preserve the analysis content unless a local
+style more paper-like. Preserve the DeepSeek analysis content unless a local
 format or image-caption mismatch is obvious from the supplied placement data.
 
 Return Markdown only."""
@@ -714,6 +731,7 @@ def load_env_file(path: Path) -> None:
             os.environ[key] = value
 
 
+@lru_cache(maxsize=None)
 def file_sha12(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -882,6 +900,7 @@ def part_schema() -> dict[str, Any]:
         "experiment_evidence": [{"claim": "str", "table_or_figure": "str", "metric": "str", "value": "str", "confidence": "float"}],
         "formula_evidence": [{"name": "str", "latex": "str", "meaning": "str", "section": "str", "confidence": "float"}],
         "figure_table_roles": [{"label": "str", "role_hint": "str", "caption": "str", "confidence": "float"}],
+        "source_links": [{"label": "Project|Code", "url": "str", "anchor": "str", "confidence": "float"}],
         "open_questions": ["str"],
     }
 
@@ -891,7 +910,7 @@ def normalize_part_analysis(part_id: str, parsed: dict[str, Any]) -> dict[str, A
         "part_id": part_id,
         "section_role": str(parsed.get("section_role") or ""),
     }
-    for key in ["method_evidence", "experiment_evidence", "formula_evidence", "figure_table_roles", "open_questions"]:
+    for key in ["method_evidence", "experiment_evidence", "formula_evidence", "figure_table_roles", "source_links", "open_questions"]:
         value = parsed.get(key)
         normalized[key] = value if isinstance(value, list) else []
     return normalized
@@ -902,7 +921,7 @@ def part_analysis_has_content(parsed: dict[str, Any]) -> bool:
         return True
     return any(
         parsed.get(key)
-        for key in ["method_evidence", "experiment_evidence", "formula_evidence", "figure_table_roles", "open_questions"]
+        for key in ["method_evidence", "experiment_evidence", "formula_evidence", "figure_table_roles", "source_links", "open_questions"]
     )
 
 
@@ -1001,6 +1020,7 @@ def local_anchor_part_analysis(part_id: str, chunk_text: str) -> dict[str, Any]:
         ],
         "formula_evidence": formula_entries(chunk_text, max_items=3),
         "figure_table_roles": figures,
+        "source_links": extract_source_links(chunk_text),
         "open_questions": [],
     }
 
@@ -1036,6 +1056,7 @@ def fallback_part_analysis_from_chunk(part_id: str, chunk_text: str, raw_text: s
         "experiment_evidence": experiment_evidence,
         "formula_evidence": formula_entries(chunk_text, max_items=3),
         "figure_table_roles": figure_caption_entries(chunk_text, max_items=5),
+        "source_links": extract_source_links(chunk_text),
         "open_questions": [
             f"{part_id} LLM 输出未能形成可用 part JSON，已从 chunk 文本保底抽取锚点。",
             f"解析/质量问题: {error}",
@@ -1055,6 +1076,7 @@ def part_analysis_fallback(part_id: str, raw_text: str, error: str, chunk_text: 
         "experiment_evidence": [],
         "formula_evidence": [],
         "figure_table_roles": [],
+        "source_links": [],
         "open_questions": [
             f"{part_id} 原始输出未能解析为结构化 JSON，需要人工复核。",
             f"解析错误: {error}",
@@ -1100,7 +1122,15 @@ async def repair_part_with_kimi(
 
 def main_repair_prompt(raw_text: str) -> str:
     schema = {
-        "paper_metadata": {"title": "str", "title_zh": "str", "venue": "str|null", "year": "int|null"},
+        "paper_metadata": {
+            "title": "str",
+            "title_zh": "str",
+            "venue": "str|null",
+            "year": "int|null",
+            "project_link": "str|null",
+            "code_link": "str|null",
+        },
+        "source_links": [{"label": "Project|Code|arXiv", "url": "str", "anchor": "str|null", "confidence": "float|null"}],
         "analysis_truth": {
             "real_bottleneck": "str",
             "causal_knob": "str",
@@ -1135,6 +1165,9 @@ def normalize_main_analysis(title: str, parsed: dict[str, Any], *, source_links:
     metadata.setdefault("title_zh", title)
     metadata.setdefault("venue", None)
     metadata.setdefault("year", None)
+    merged_links = merge_source_links(normalized.get("source_links"), source_links or [])
+    metadata["project_link"] = metadata_link_for_label(metadata.get("project_link"), "Project") or preferred_source_link(merged_links, "Project") or None
+    metadata["code_link"] = metadata_link_for_label(metadata.get("code_link"), "Code") or preferred_source_link(merged_links, "Code") or None
     normalized["paper_metadata"] = metadata
 
     for key, default in {
@@ -1161,10 +1194,7 @@ def normalize_main_analysis(title: str, parsed: dict[str, Any], *, source_links:
     for key in ["formulas", "figures_tables", "limitations", "open_questions"]:
         if not isinstance(normalized.get(key), list):
             normalized[key] = []
-    if source_links is not None:
-        normalized["source_links"] = source_links
-    elif not isinstance(normalized.get("source_links"), list):
-        normalized["source_links"] = []
+    normalized["source_links"] = merged_links
     return normalized
 
 
@@ -2940,10 +2970,12 @@ def normalize_extracted_url(url: str) -> str:
 def classify_link(label: str, url: str) -> str:
     label_l = label.lower()
     url_l = url.lower()
-    if "project" in label_l or "project" in url_l or "github.io" in url_l:
+    if "github.io" in url_l:
         return "Project"
     if "code" in label_l or "github" in label_l or "github.com" in url_l or "gitlab" in url_l:
         return "Code"
+    if "project" in label_l or "project" in url_l:
+        return "Project"
     if "arxiv" in label_l or "arxiv.org" in url_l:
         return "arXiv"
     return ""
@@ -2976,6 +3008,89 @@ def extract_source_links(*texts: Any) -> list[dict[str, str]]:
             inferred = classify_link("", url)
             if inferred:
                 add(inferred, url)
+    return links
+
+
+def normalize_source_links(items: Any) -> list[dict[str, str]]:
+    links: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    raw_items = items if isinstance(items, list) else []
+    for item in raw_items:
+        if not isinstance(item, dict):
+            continue
+        url = normalize_extracted_url(str(item.get("url") or ""))
+        label = classify_link(str(item.get("label") or ""), url) or str(item.get("label") or "").strip()
+        if label not in {"Project", "Code", "arXiv"}:
+            continue
+        if not url.startswith(("http://", "https://")):
+            continue
+        key = (label.lower(), url)
+        if key in seen:
+            continue
+        seen.add(key)
+        normalized = {"label": label, "url": url}
+        anchor = compact_text(item.get("anchor"), max_len=220)
+        if anchor:
+            normalized["anchor"] = anchor
+        if item.get("confidence") is not None:
+            try:
+                normalized["confidence"] = float(item.get("confidence"))
+            except (TypeError, ValueError):
+                pass
+        links.append(normalized)
+    return links
+
+
+def merge_source_links(*groups: Any) -> list[dict[str, str]]:
+    merged: list[dict[str, str]] = []
+    seen_urls: set[str] = set()
+    for group in groups:
+        for item in normalize_source_links(group):
+            url = item["url"]
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            merged.append(item)
+    return merged
+
+
+def preferred_source_link(source_links: list[dict[str, str]], label: str) -> str:
+    for item in source_links:
+        url = normalize_extracted_url(str(item.get("url") or ""))
+        if not url:
+            continue
+        if classify_link(str(item.get("label") or ""), url) == label:
+            return url
+    return ""
+
+
+def metadata_link_for_label(value: Any, label: str) -> str:
+    url = normalize_extracted_url(str(value or ""))
+    if not url.startswith(("http://", "https://")):
+        return ""
+    inferred = classify_link("", url)
+    if label == "Code":
+        return url if inferred == "Code" else ""
+    if label == "Project":
+        return "" if inferred in {"Code", "arXiv"} else url
+    return ""
+
+
+def valid_source_url(value: Any) -> str:
+    url = normalize_extracted_url(str(value or ""))
+    return url if url.startswith(("http://", "https://")) else ""
+
+
+def source_links_from_args(args: argparse.Namespace) -> list[dict[str, str]]:
+    raw_values = getattr(args, "source_link", []) or []
+    links = extract_source_links(*raw_values)
+    seen = {item["url"] for item in normalize_source_links(links)}
+    for value in raw_values:
+        url = valid_source_url(value)
+        if not url or url in seen:
+            continue
+        links.append({"label": classify_link("", url) or "Project", "url": url})
+        seen.add(url)
     return links
 
 
@@ -3381,10 +3496,16 @@ def frontmatter_metadata_values(title: str, analysis: dict[str, Any]) -> dict[st
     claim_sentence = first_sentence(claims[0], max_len=180) if claims else ""
     core_operator = compact_text(causal_knob or method or claim_sentence or title, max_len=180)
     primary_logic = compact_text(core or real_bottleneck or method or claim_sentence or title, max_len=420)
+    paper_metadata = analysis.get("paper_metadata") or {}
+    source_links = normalize_source_links(analysis.get("source_links") or [])
+    project_link = metadata_link_for_label(paper_metadata.get("project_link"), "Project") or preferred_source_link(source_links, "Project")
+    code_link = metadata_link_for_label(paper_metadata.get("code_link"), "Code") or preferred_source_link(source_links, "Code")
     return {
         "method": method,
         "core_operator": core_operator,
         "primary_logic": primary_logic,
+        "project_link": project_link,
+        "code_link": code_link,
     }
 
 
@@ -4654,6 +4775,8 @@ def render_frontmatter(
         f"venue: {yaml_scalar(venue)}",
         f"year: {year if year is not None else 'null'}",
         f"pdf_ref: {yaml_scalar(pdf_ref)}",
+        f"project_link: {yaml_scalar(metadata['project_link']) if metadata['project_link'] else 'null'}",
+        f"code_link: {yaml_scalar(metadata['code_link']) if metadata['code_link'] else 'null'}",
         "aliases:",
     ]
     lines.extend(f"- {yaml_scalar(alias)}" for alias in aliases)
@@ -4889,6 +5012,52 @@ def parse_frontmatter_block(note: str) -> tuple[dict[str, str], bool]:
     return values, True
 
 
+@lru_cache(maxsize=None)
+def note_frontmatter_value(note_path: Path, key: str) -> str:
+    try:
+        note = note_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    frontmatter, has_frontmatter = parse_frontmatter_block(note)
+    if not has_frontmatter:
+        return ""
+    return frontmatter.get(key, "").strip().strip("\"'")
+
+
+def vault_pdf_path(vault_root: Path, pdf_ref: str) -> Path | None:
+    if not pdf_ref:
+        return None
+    path = Path(pdf_ref)
+    if path.is_absolute():
+        return path
+    if pdf_ref.startswith("paperPDFs/"):
+        return vault_root / pdf_ref
+    if pdf_ref.startswith("obsidian-vault/paperPDFs/"):
+        return REPO_ROOT / pdf_ref
+    return None
+
+
+def existing_note_for_pdf(vault_root: Path, pdf_path: Path, pdf_ref: str) -> Path | None:
+    try:
+        target_size = pdf_path.stat().st_size
+        target_hash = file_sha12(pdf_path)
+    except OSError:
+        return None
+    for note_path in sorted((vault_root / "analysis").glob("*/*.md")):
+        existing_ref = note_frontmatter_value(note_path, "pdf_ref")
+        if existing_ref == pdf_ref:
+            return note_path
+        existing_pdf = vault_pdf_path(vault_root, existing_ref)
+        if not existing_pdf or not existing_pdf.exists():
+            continue
+        try:
+            if existing_pdf.stat().st_size == target_size and file_sha12(existing_pdf) == target_hash:
+                return note_path
+        except OSError:
+            continue
+    return None
+
+
 def table_rows_with_aliased_wikilinks(note: str) -> list[int]:
     rows: list[int] = []
     for line_no, line in enumerate(note.splitlines(), 1):
@@ -5071,6 +5240,8 @@ def validate_vault_note(
         "venue",
         "year",
         "pdf_ref",
+        "project_link",
+        "code_link",
         "tags",
         "core_operator",
         "primary_logic",
@@ -5131,7 +5302,7 @@ def validate_vault_note(
     ]
     legacy_markdown_image_links = re.findall(r"!\[[^\]]*\]\((?:\.\./\.\./)?assets/[^)]+\)", note)
     legacy_relative_wikilink_images = re.findall(r"!\[\[\.\./\.\./assets/[^\]]+\]\]", note)
-    scalar_metadata_keys = set(required_frontmatter) - {"aliases", "tags", "claims"}
+    scalar_metadata_keys = set(required_frontmatter) - {"aliases", "tags", "claims", "project_link", "code_link"}
     fallback_frontmatter_values = {}
     for key, value in frontmatter.items():
         if key not in scalar_metadata_keys:
@@ -5233,7 +5404,7 @@ def note_check_repair_prompt(
             if any(str(item.get("item_id") or "") == str(placement.get("item_id") or "") for placement in (figure_placements or []))
         ],
         "repair_scope": "Only fix Markdown formatting, duplicated captions, unescaped < in image captions, broken table syntax, and obvious image-placement mismatch.",
-        "frontmatter_schema_guard": "Do not add category, modalities, or frontier. Keep aliases as short English/model aliases.",
+        "frontmatter_schema_guard": "Do not add category, modalities, or frontier. Keep aliases as short English/model aliases. Preserve project_link and code_link.",
     }
     return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
 
@@ -5319,9 +5490,13 @@ def export_to_vault(
             "Vault export requires an existing PDF. "
             f"input={source_pdf_arg!r}; attempts={pdf_resolution.get('attempts') or []}"
         )
-    pdf_target = pdf_dir / f"{stem}.pdf"
-    pdf_target.parent.mkdir(parents=True, exist_ok=True)
-    if not (pdf_target.exists() and source_pdf.samefile(pdf_target)):
+    pdf_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        source_pdf_in_vault_dir = source_pdf.parent.resolve() == pdf_dir.resolve()
+    except OSError:
+        source_pdf_in_vault_dir = False
+    pdf_target = source_pdf if source_pdf_in_vault_dir else pdf_dir / f"{stem}.pdf"
+    if not source_pdf_in_vault_dir and not (pdf_target.exists() and source_pdf.samefile(pdf_target)):
         shutil.copy2(source_pdf, pdf_target)
     pdf_ref = f"paperPDFs/{conf_year}/{pdf_target.name}"
 
@@ -5340,7 +5515,15 @@ def export_to_vault(
         parse_markdown = work_dir / "parse" / "full.md"
         if parse_markdown.exists():
             analysis = dict(analysis)
-            analysis["source_links"] = extract_source_links(parse_markdown.read_text(encoding="utf-8"))
+            source_links = merge_source_links(
+                extract_source_links(parse_markdown.read_text(encoding="utf-8")),
+                source_links_from_args(args),
+            )
+            analysis["source_links"] = source_links
+            metadata = dict(analysis.get("paper_metadata") or {})
+            metadata["project_link"] = metadata.get("project_link") or preferred_source_link(source_links, "Project") or None
+            metadata["code_link"] = metadata.get("code_link") or preferred_source_link(source_links, "Code") or None
+            analysis["paper_metadata"] = metadata
     topic_text = topic_text_for_note(args.openreview_forum_id, conf_year, args.topic_assignments)
     if not topic_text:
         topic_text = topic_text_from_existing_note(note_path)
@@ -5395,6 +5578,35 @@ def export_to_vault(
     if not validation.get("ok"):
         raise RuntimeError(f"vault note validation failed: {validation}")
     return export_info
+
+
+def existing_vault_note_path(args: argparse.Namespace) -> Path | None:
+    if not args.export_vault or args.force:
+        return None
+    if getattr(args, "vault_note_path", ""):
+        note_path = Path(args.vault_note_path).expanduser().resolve()
+        return note_path if note_path.exists() else None
+    conf_year = resolved_conf_year(args)
+    vault_root = Path(args.vault_root).expanduser().resolve()
+    note_dir = (
+        Path(args.vault_note_dir).expanduser().resolve()
+        if args.vault_note_dir
+        else vault_root / "analysis" / conf_year
+    )
+    if args.paper_title:
+        note_path = note_dir / f"{note_file_stem(args.paper_title)}.md"
+        if note_path.exists():
+            return note_path
+    source_pdf_arg = args.paper_pdf or args.pdf
+    source_pdf, _ = resolve_existing_pdf_path(
+        source_pdf_arg,
+        conf_year=conf_year,
+        search_roots=pdf_search_roots_from_args(args),
+    )
+    if not source_pdf:
+        return None
+    pdf_ref = f"paperPDFs/{conf_year}/{source_pdf.name}"
+    return existing_note_for_pdf(vault_root, source_pdf, pdf_ref)
 
 
 def prepare_parse(args: argparse.Namespace, work_dir: Path) -> dict[str, Any]:
@@ -5555,7 +5767,7 @@ def mock_report() -> str:
     )
 
 
-def _provider_uses_reasoning(model: str) -> bool:
+def deepseek_uses_reasoning(model: str) -> bool:
     lowered = model.lower()
     return "reasoner" in lowered or "v4" in lowered
 
@@ -5598,7 +5810,7 @@ async def call_openai_compatible(
         else:
             request["temperature"] = temperature
             request["stream_options"] = {"include_usage": True}
-            if _provider_uses_reasoning(model):
+            if deepseek_uses_reasoning(model):
                 request["extra_body"] = {"thinking": {"type": thinking}}
                 if thinking == "enabled" and reasoning_effort:
                     request["reasoning_effort"] = reasoning_effort
@@ -5635,8 +5847,8 @@ async def call_openai_compatible(
     usage = {
         "provider": provider,
         "model": model,
-        "thinking": thinking if provider != "kimi" and _provider_uses_reasoning(model) else "disabled",
-        "reasoning_effort": reasoning_effort if provider != "kimi" and _provider_uses_reasoning(model) and thinking == "enabled" else "",
+        "thinking": thinking if provider != "kimi" and deepseek_uses_reasoning(model) else "disabled",
+        "reasoning_effort": reasoning_effort if provider != "kimi" and deepseek_uses_reasoning(model) and thinking == "enabled" else "",
         "prompt_tokens_est": prompt_tokens,
         "completion_tokens_est": completion_tokens,
         "reasoning_tokens_est": reasoning_tokens,
@@ -5796,8 +6008,8 @@ def resolve_llm_config(args: argparse.Namespace) -> None:
     _, base_url = first_env(["DEEPSEEK_BASE_URL"])
     api_key_env, _ = first_env(["DEEPSEEK_API_KEY", "OPENAI_API_KEY"])
     args.api_key_env = args.api_key_env or api_key_env or "DEEPSEEK_API_KEY"
-    args.model = args.model or model or DEFAULT_MODEL
-    args.base_url = args.base_url or base_url or ""
+    args.model = args.model or model or DEFAULT_DEEPSEEK_MODEL
+    args.base_url = args.base_url or base_url or "https://api.deepseek.com/v1"
 
 
 def resolve_mineru_config(args: argparse.Namespace) -> None:
@@ -5839,8 +6051,8 @@ def resolve_writer_llm_config(args: argparse.Namespace) -> None:
     _, base_url = first_env(["DEEPSEEK_BASE_URL"])
     api_key_env, _ = first_env(["DEEPSEEK_API_KEY", "OPENAI_API_KEY"])
     args.writer_api_key_env = args.writer_api_key_env or api_key_env or "DEEPSEEK_API_KEY"
-    args.writer_model = args.writer_model or model or DEFAULT_MODEL
-    args.writer_base_url = args.writer_base_url or base_url or ""
+    args.writer_model = args.writer_model or model or DEFAULT_DEEPSEEK_MODEL
+    args.writer_base_url = args.writer_base_url or base_url or "https://api.deepseek.com/v1"
 
 
 def resolve_kimi_llm_config(args: argparse.Namespace) -> None:
@@ -6024,7 +6236,7 @@ async def run_part_analysis(
                     repair_attempts.append(repair_attempt_summary(args.provider, repair_usage))
                     parsed = parse_json_object(repair_raw, label=f"{part_id}_repair")
             except Exception as second_exc:  # noqa: BLE001
-                repair_errors.append(f"repair: {second_exc}")
+                repair_errors.append(f"deepseek repair: {second_exc}")
                 repair_attempts.append(repair_attempt_summary(args.provider, usage.get("repair_usage"), second_exc))
                 usage["repair_used"] = True
                 usage["repair_failed"] = True
@@ -6202,7 +6414,15 @@ async def run_main_analysis(
                 error = f"main_analysis repair failed: {first_exc}; repair: {second_exc}"
                 append_jsonl(progress_path, {"event": "main_analysis_fallback", "at": now_iso(), "error": error, "usage": usage})
                 parsed = main_analysis_fallback(title, part_results, figures_tables, error, raw)
-    parsed = normalize_main_analysis(title, parsed, source_links=extract_source_links(markdown))
+    parsed = normalize_main_analysis(
+        title,
+        parsed,
+        source_links=merge_source_links(
+            extract_source_links(markdown),
+            source_links_from_args(args),
+            *(part.get("source_links") or [] for part in part_results),
+        ),
+    )
     parsed["_meta"] = {
         "part_count": len(part_results),
         "latency_seconds": round(time.monotonic() - started, 3),
@@ -6540,6 +6760,15 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     if sum(bool(x) for x in (args.pdf, args.mineru_output, args.source_md)) != 1:
         raise SystemExit("Pass exactly one of --pdf, --mineru-output, or --source-md")
 
+    existing_note = existing_vault_note_path(args)
+    if existing_note:
+        return {
+            "status": "skipped",
+            "reason": "已存在",
+            "note_path": str(existing_note),
+            "completed_at": now_iso(),
+        }
+
     pdf_preflight: dict[str, Any] = {}
     if args.export_vault:
         source_pdf_arg = args.paper_pdf or args.pdf
@@ -6595,6 +6824,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             "paper_link": args.paper_link,
             "acceptance": args.acceptance,
             "openreview_forum_id": args.openreview_forum_id,
+            "source_link": args.source_link,
             "topic_assignments": args.topic_assignments,
             "mineru_output_root": args.mineru_output_root,
             "mineru_batch_id": args.mineru_batch_id,
@@ -6963,6 +7193,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--paper-title", default="", help="Canonical paper title for vault export")
     parser.add_argument("--conf-year", default=DEFAULT_CONF_YEAR, help="Vault venue/year folder, e.g. CVPR_2026")
     parser.add_argument("--paper-link", default="", help="Canonical paper URL for note metadata")
+    parser.add_argument(
+        "--source-link",
+        action="append",
+        default=[],
+        help="Visible project/code/source URL from the collection row or paper page; repeat as needed.",
+    )
     parser.add_argument("--acceptance", default="", help="Optional presentation/status metadata, e.g. oral, poster, spotlight")
     parser.add_argument("--openreview-forum-id", default="", help="OpenReview forum id for note metadata")
     parser.add_argument("--topic-assignments", default="", help="Optional JSONL topic assignment file keyed by OpenReview forum id")
@@ -6987,12 +7223,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--provider",
         choices=["deepseek", "kimi"],
         default="deepseek",
-        help="LLM provider for main analysis and repairs.",
+        help="LLM provider. DeepSeek is the default; Kimi is used only when explicitly selected.",
     )
     parser.add_argument("--model", default="")
-    parser.add_argument("--thinking", choices=THINKING_CHOICES, default="enabled", help="Thinking mode for main analysis and repairs (provider-dependent).")
+    parser.add_argument("--thinking", choices=THINKING_CHOICES, default="enabled", help="DeepSeek thinking mode for main analysis and repairs.")
     parser.add_argument("--reasoning-effort", default="max", help="Reasoning effort for compatible providers.")
-    parser.add_argument("--part-thinking", choices=THINKING_CHOICES, default="disabled", help="Thinking mode for chunk-level anchor extraction (provider-dependent).")
+    parser.add_argument("--part-thinking", choices=THINKING_CHOICES, default="disabled", help="DeepSeek thinking mode for chunk-level anchor extraction.")
     parser.add_argument("--part-reasoning-effort", default="", help="Reasoning effort for part analysis. Defaults to --reasoning-effort.")
     parser.add_argument("--base-url", default="")
     parser.add_argument("--api-key-env", default="")
@@ -7001,13 +7237,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--writer-provider",
         choices=["deepseek", "kimi"],
         default="deepseek",
-        help="Writer provider for section generation and check-repair stages.",
+        help="Writer provider. Defaults to DeepSeek; Kimi is reserved for visual/check-repair stages.",
     )
     parser.add_argument("--writer-model", default="")
     parser.add_argument("--writer-base-url", default="")
     parser.add_argument("--writer-api-key-env", default="")
     parser.add_argument("--writer-temperature", type=float, default=KIMI_DEFAULT_TEMPERATURE)
-    parser.add_argument("--writer-thinking", choices=THINKING_CHOICES, default="disabled", help="Thinking mode for section writers (provider-dependent).")
+    parser.add_argument("--writer-thinking", choices=THINKING_CHOICES, default="disabled", help="DeepSeek thinking mode for section writers.")
     parser.add_argument("--writer-reasoning-effort", default="max")
     parser.add_argument("--kimi-model", default="")
     parser.add_argument("--kimi-base-url", default="")

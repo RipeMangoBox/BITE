@@ -37,6 +37,7 @@ present. They are not part of the current analysis chain.
 | `run_local_paper_analysis.py` | Formal single-paper analysis chain: MinerU parse/reuse → anchor extraction → main analysis → section writing → DeepSeek figure/table placement → vault export |
 | `run_paper_list_analysis.py` | Script-only queue runner for rows in `obsidian-vault/paper_list.csv` |
 | `rebuild_figures_export.py` | Rebuild figure summaries, placements, and vault exports from completed formal analysis runs |
+| `sync_assets_from_hf.py` | Sync public PaperBite evidence layers from Hugging Face into `obsidian-vault/`; use `--mode paper-list --overwrite-paper-list` only when you want to replace the local paper list |
 | `write_batch_progress.py` | Write batch progress snapshots for `obsidian-vault/batches/<run_id>/` |
 | `smoke_index_workflow.py` | Verify `research-workflow` auto routing and `papers-build-index` behavior on temporary empty and one-note vaults |
 

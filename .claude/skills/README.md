@@ -16,9 +16,9 @@ python3 scripts/setup_shared_skills.py
 ```text
 collect candidate papers / import local PDFs
   -> download when needed
-  -> MinerU parse
-  -> analyze
-  -> build index
+  -> integrated analysis chain
+     (MinerU parse/reuse -> structured analysis -> vault export)
+  -> optional build index
   -> query / ideate / focus / review / export
 ```
 
@@ -68,9 +68,13 @@ The current default workflow is local-file based. The skills below operate on
 - **Batch analysis from a paper list**
   - Provide `obsidian-vault/paper_list.csv` or a similar paper list to
     `research-workflow`.
-  - Default batch size is 25 papers.
-  - Default parallelism is 4 agents for 4 batches.
-  - After completed batches, refresh `obsidian-vault/index/` automatically.
+  - The current default runner is `scripts/run_paper_list_analysis.py`, a thin
+    queue wrapper around `scripts/run_local_paper_analysis.py`.
+  - MinerU parsing is integrated into the child analysis run and cached outputs
+    can be reused with `--mineru-output-root`; a separate parse-only phase is
+    optional maintenance, not the normal public route.
+  - After completed batches, refresh `obsidian-vault/index/` when you need
+    regenerated agent indexes or Obsidian navigation pages.
 - **papers-audit-metadata-consistency**
   - Check title, venue, year, link, PDF reference, and note-structure
     consistency across generated analysis notes.
@@ -98,9 +102,12 @@ The current default workflow is local-file based. The skills below operate on
   - Generate a seven-section paper report: overview, background, core
     contribution, framework, formulas, experiments, and lineage.
 - **scripts/run_local_paper_analysis.py**
-  - Formal single-paper analysis chain for the default local workflow. It
-    produces `_private/local_analysis_runs/**` artifacts and exports
-    figure/table-aware notes into `obsidian-vault/analysis/`.
+  - Formal single-paper analysis chain for the default local workflow:
+    MinerU parse/reuse, chunk anchor extraction, main analysis JSON, section
+    writers, figure/table placement, vault export, and deterministic
+    validation.
+  - It writes self-contained run artifacts under the selected output root and
+    exports figure/table-aware notes into `obsidian-vault/analysis/`.
 - **rf-obsidian-markdown**
   - Apply Obsidian-friendly Markdown conventions to generated notes.
 - **notes-export-share-version**

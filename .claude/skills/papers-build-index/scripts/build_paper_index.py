@@ -28,7 +28,7 @@ KEY_LINE = re.compile(r"^([A-Za-z0-9_\-]+):(?:\s*(.*))?$")
 VENUE_YEAR = re.compile(r"\b([A-Za-z0-9][A-Za-z0-9_. -]*?)[_ -]((?:19|20)\d{2})\b")
 NON_PAPER_NOTE_NAMES = {"readme.md", "_index.md"}
 NON_PAPER_NOTE_PREFIXES = ("quality_report_",)
-NON_PAPER_NOTE_DIRS = {"test", "_test", "tests", "_tests"}
+NON_PAPER_NOTE_DIRS = {"test", "_test", "tests", "_tests", "parse", "report"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -243,16 +243,6 @@ DATASET_SETTING_FRAGMENT = re.compile(
 )
 
 
-DATASET_CANONICAL_NAMES = {
-    "cora": "Cora",
-    "pubmed": "Pubmed",
-    "cornell": "Cornell",
-    "texas": "Texas",
-    "mipnerf360": "Mip-NeRF360",
-    "mip-nerf360": "Mip-NeRF360",
-}
-
-
 def clean_dataset_values(values: List[str]) -> List[str]:
     out: List[str] = []
     seen = set()
@@ -264,7 +254,6 @@ def clean_dataset_values(values: List[str]) -> List[str]:
             continue
         key = unicodedata.normalize("NFKC", cleaned).casefold()
         key = key.translate(str.maketrans({"‑": "-", "‐": "-", "‑": "-", "–": "-", "—": "-", "−": "-"}))
-        cleaned = DATASET_CANONICAL_NAMES.get(key.replace("-", ""), DATASET_CANONICAL_NAMES.get(key, cleaned))
         if key in seen:
             continue
         seen.add(key)
@@ -275,15 +264,23 @@ def clean_dataset_values(values: List[str]) -> List[str]:
 def first_present(row: Dict[str, str], names: Iterable[str]) -> str:
     lower = {k.lower().strip(): v for k, v in row.items()}
     for name in names:
-        val = lower.get(name.lower())
-        if val and val.strip():
-            return val.strip()
+        val = clean_scalar(lower.get(name.lower()))
+        if val:
+            return val
     return ""
 
 
 def normalize_title(title: str) -> str:
     title = unicodedata.normalize("NFKC", title)
     return re.sub(r"\s+", " ", title).strip().lower()
+
+
+def normalize_loose_title(title: str) -> str:
+    title = unicodedata.normalize("NFKC", title)
+    title = title.casefold().replace("&", " and ")
+    title = re.sub(r"[\W_]+", " ", title, flags=re.UNICODE)
+    title = re.sub(r"\s+", " ", title).strip()
+    return re.sub(r"^(?:19|20)\d{2}\s+", "", title)
 
 
 def repo_rel(path: Path) -> str:
@@ -314,7 +311,8 @@ def infer_venue_year(*values: object) -> Tuple[str, str]:
 
 
 def clean_scalar(value: object) -> str:
-    return str(value or "").strip().strip("\"'")
+    text = str(value or "").strip().strip("\"'")
+    return "" if text.casefold() in {"null", "none", "n/a", "na", "-", "--"} else text
 
 
 def venue_year_label(venue: object, year: object) -> str:
@@ -663,6 +661,9 @@ def load_csv_inventory() -> List[Paper]:
     with PAPER_LIST_CSV.open("r", encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            state = first_present(row, ("state", "status")).casefold()
+            if state in {"skip", "skipped"}:
+                continue
             title = first_present(row, ("title", "paper_title", "name"))
             if not title:
                 continue
@@ -691,7 +692,7 @@ def load_csv_inventory() -> List[Paper]:
                 ),
                 tags=split_values(first_present(row, ("tags", "tag"))),
                 paper_link=first_present(row, ("paper_link", "url", "link", "openreview", "arxiv")),
-                project_link=first_present(row, ("project_link", "project_link_or_github_link", "github", "code")),
+                project_link=first_present(row, ("project_link", "project_link_or_github_link")),
                 source="paper_list.csv",
             )
             paper.method_groups = derive_method_groups(paper)
@@ -729,7 +730,7 @@ def extract_links(md_text: str) -> Tuple[str, str]:
         lower = label.lower()
         if not paper_link and any(key in lower for key in ("paper", "openreview", "arxiv", "pdf")):
             paper_link = url
-        if not project_link and any(key in lower for key in ("project", "github", "code")):
+        if not project_link and "project" in lower:
             project_link = url
     return paper_link, project_link
 
@@ -739,6 +740,8 @@ def should_index_analysis_note(md_path: Path, fm: Dict[str, object], md_text: st
     if any(part.lower() in NON_PAPER_NOTE_DIRS for part in relative_parts[:-1]):
         return False
     name = md_path.name.lower()
+    if not md_text.strip() or ".ebook" in name:
+        return False
     if name in NON_PAPER_NOTE_NAMES:
         return False
     if any(name.startswith(prefix) for prefix in NON_PAPER_NOTE_PREFIXES):
@@ -799,9 +802,7 @@ def load_analysis_notes() -> List[Paper]:
         paper_link = clean_scalar(
             fm.get("paper_link") or fm.get("url") or fm.get("link") or fm.get("openreview") or fm.get("arxiv")
         ) or paper_link
-        project_link = clean_scalar(
-            fm.get("project_link") or fm.get("project_link_or_github_link") or fm.get("github") or fm.get("code")
-        ) or project_link
+        project_link = clean_scalar(fm.get("project_link") or fm.get("project_link_or_github_link")) or project_link
 
         paper = Paper(
             title=title,
@@ -837,15 +838,34 @@ def merge_values(base: List[str], extra: List[str]) -> List[str]:
     return out
 
 
+def unique_paper_map(papers: List[Paper], key_fn) -> Dict[object, Paper]:
+    grouped: Dict[object, List[Paper]] = {}
+    for paper in papers:
+        key = key_fn(paper)
+        if not key:
+            continue
+        if isinstance(key, tuple) and not all(key):
+            continue
+        grouped.setdefault(key, []).append(paper)
+    return {key: values[0] for key, values in grouped.items() if len(values) == 1}
+
+
 def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[Paper]:
     if not csv_papers:
         return sorted(analysis_papers, key=lambda p: (str(p.year), p.venue.lower(), p.title.lower()))
 
-    analysis_by_title = {normalize_title(p.title): p for p in analysis_papers}
+    analysis_by_title_venue = unique_paper_map(
+        analysis_papers, lambda p: (normalize_title(p.title), p.venue_year)
+    )
+    analysis_by_title = unique_paper_map(analysis_papers, lambda p: normalize_title(p.title))
+    analysis_by_loose_title_venue = unique_paper_map(
+        analysis_papers, lambda p: (normalize_loose_title(p.title), p.venue_year)
+    )
     analysis_by_path = {p.analysis_path: p for p in analysis_papers if p.analysis_path}
-    analysis_by_pdf = {p.pdf_ref: p for p in analysis_papers if p.pdf_ref}
+    analysis_by_pdf = unique_paper_map(analysis_papers, lambda p: p.pdf_ref)
     matched_paths: Set[str] = set()
     matched_titles: Set[str] = set()
+    matched_loose_title_venues: Set[Tuple[str, str]] = set()
     matched_pdfs: Set[str] = set()
 
     merged: List[Paper] = []
@@ -856,14 +876,20 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
         if ana is None and base.pdf_ref:
             ana = analysis_by_pdf.get(base.pdf_ref)
         if ana is None:
+            ana = analysis_by_title_venue.get((normalize_title(base.title), base.venue_year))
+        if ana is None:
             ana = analysis_by_title.get(normalize_title(base.title))
+        if ana is None:
+            ana = analysis_by_loose_title_venue.get((normalize_loose_title(base.title), base.venue_year))
         if ana is None:
             merged.append(base)
             continue
 
         matched_paths.add(ana.analysis_path)
         matched_titles.add(normalize_title(ana.title))
-        matched_pdfs.add(ana.pdf_ref)
+        matched_loose_title_venues.add((normalize_loose_title(ana.title), ana.venue_year))
+        if ana.pdf_ref:
+            matched_pdfs.add(ana.pdf_ref)
         base.analysis_path = base.analysis_path or ana.analysis_path
         base.pdf_ref = base.pdf_ref or ana.pdf_ref
         base.venue = base.venue or ana.venue
@@ -883,7 +909,12 @@ def merge_papers(csv_papers: List[Paper], analysis_papers: List[Paper]) -> List[
         merged.append(base)
 
     for ana in analysis_papers:
-        if ana.analysis_path in matched_paths or normalize_title(ana.title) in matched_titles or ana.pdf_ref in matched_pdfs:
+        if (
+            ana.analysis_path in matched_paths
+            or normalize_title(ana.title) in matched_titles
+            or (normalize_loose_title(ana.title), ana.venue_year) in matched_loose_title_venues
+            or (ana.pdf_ref and ana.pdf_ref in matched_pdfs)
+        ):
             continue
         merged.append(ana)
 

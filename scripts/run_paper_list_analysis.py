@@ -12,8 +12,11 @@ import argparse
 import concurrent.futures
 import csv
 from datetime import datetime, timezone
+from functools import lru_cache
+import hashlib
 import json
 from pathlib import Path
+import re
 import shlex
 import subprocess
 import sys
@@ -124,7 +127,11 @@ def load_done(results_path: Path) -> set[tuple[str, str]]:
             if not line.strip():
                 continue
             row = json.loads(line)
-            if row.get("status") == "done" and row.get("row_key"):
+            status = row.get("status")
+            already_exists = status == "skipped" and row.get("reason") == "已存在"
+            if status in {"done"} or already_exists:
+                if not row.get("row_key"):
+                    continue
                 variant_id = str(row.get("variant_id") or "")
                 if not variant_id:
                     writer_effort = str(row.get("writer_reasoning_effort") or "")
@@ -161,6 +168,100 @@ def row_task_id(row: dict[str, str], suffix: str = "") -> str:
 def safe_variant(value: str) -> str:
     safe = "".join(ch if ch.isalnum() else "_" for ch in value).strip("_").lower()
     return "_".join(part for part in safe.split("_") if part) or "variant"
+
+
+def safe_slug(value: str, *, max_len: int = 80) -> str:
+    value = re.sub(r"[^\w\s.-]+", "", value, flags=re.UNICODE)
+    value = re.sub(r"\s+", "_", value.strip())
+    value = value.strip("._")
+    return (value or "paper")[:max_len]
+
+
+def note_file_stem(title: str) -> str:
+    return safe_slug(title.replace(":", " "), max_len=160)
+
+
+@lru_cache(maxsize=None)
+def file_sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def vault_pdf_path(vault_root: Path, pdf_ref: str) -> Path | None:
+    if not pdf_ref:
+        return None
+    path = Path(pdf_ref)
+    if path.is_absolute():
+        return path
+    if pdf_ref.startswith("paperPDFs/"):
+        return vault_root / pdf_ref
+    if pdf_ref.startswith("obsidian-vault/paperPDFs/"):
+        return REPO_ROOT / pdf_ref
+    return None
+
+
+@lru_cache(maxsize=None)
+def frontmatter_value(note_path: Path, key: str) -> str:
+    try:
+        text = note_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    if not text.startswith("---\n"):
+        return ""
+    end = text.find("\n---", 4)
+    if end == -1:
+        return ""
+    prefix = f"{key}:"
+    for line in text[4:end].splitlines():
+        if line.startswith(prefix):
+            return line.split(":", 1)[1].strip().strip("\"'")
+    return ""
+
+
+def existing_note_for_pdf(vault_root: Path, pdf_path: Path, pdf_ref: str) -> Path | None:
+    try:
+        target_size = pdf_path.stat().st_size
+        target_hash = file_sha256(pdf_path)
+    except OSError:
+        return None
+    for note_path in sorted((vault_root / "analysis").glob("*/*.md")):
+        existing_ref = frontmatter_value(note_path, "pdf_ref")
+        if existing_ref == pdf_ref:
+            return note_path
+        existing_pdf = vault_pdf_path(vault_root, existing_ref)
+        if not existing_pdf or not existing_pdf.exists():
+            continue
+        try:
+            if existing_pdf.stat().st_size == target_size and file_sha256(existing_pdf) == target_hash:
+                return note_path
+        except OSError:
+            continue
+    return None
+
+
+def existing_vault_note(args: argparse.Namespace, row: dict[str, str], variant: dict[str, Any]) -> Path | None:
+    if not args.export_vault:
+        return None
+    if variant.get("id") or variant.get("writer_effort"):
+        return None
+    title = row_value(row, "paper_title", "title")
+    conf_year = args.conf_year or venue_to_conf_year(row.get("venue", ""))
+    if not title or not conf_year:
+        return None
+    vault_root = Path(args.vault_root).expanduser().resolve() if args.vault_root else REPO_ROOT / "obsidian-vault"
+    note_path = vault_root / "analysis" / conf_year / f"{note_file_stem(title)}.md"
+    if note_path.exists():
+        return note_path
+    pdf_path = resolve_row_pdf_path(
+        row,
+        repo_root=REPO_ROOT,
+        search_roots=[Path(root) for root in args.pdf_search_root],
+    ) or resolve_pdf_path(row)
+    pdf_ref = f"paperPDFs/{conf_year}/{pdf_path.name}"
+    return existing_note_for_pdf(vault_root, pdf_path, pdf_ref)
 
 
 def parse_named_variants(items: list[str]) -> list[dict[str, Any]]:
@@ -281,6 +382,9 @@ def command_for_row(args: argparse.Namespace, row: dict[str, str], *, variant: d
     paper_link = paper_link_for_row(row)
     if paper_link:
         cmd += ["--paper-link", paper_link]
+    source_link = row_value(row, "project_link_or_github_link", "project_link", "code_link", "github_link")
+    if source_link:
+        cmd += ["--source-link", source_link]
     openreview_forum_id = row_value(row, "openreview_forum_id", "forum_id")
     if openreview_forum_id:
         cmd += ["--openreview-forum-id", openreview_forum_id]
@@ -336,21 +440,32 @@ def run_child(args: argparse.Namespace, row: dict[str, str], variant: dict[str, 
             "row": row,
         }
     else:
-        cmd = command_for_row(args, row, variant=variant)
-        proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
-        status = "done" if proc.returncode == 0 else "failed"
-        record = {
-            "row_key": key,
-            "status": status,
-            "returncode": proc.returncode,
-            "duration_seconds": round(time.monotonic() - started, 3),
-            "stdout_tail": proc.stdout[-4000:],
-            "stderr_tail": proc.stderr[-4000:],
-            "command": cmd,
-            "row": row,
-        }
-        if status == "failed":
-            record["failure_kind"] = classify_child_failure(record)
+        note_path = existing_vault_note(args, row, variant)
+        if note_path:
+            record = {
+                "row_key": key,
+                "status": "skipped",
+                "reason": "已存在",
+                "note_path": str(note_path),
+                "duration_seconds": round(time.monotonic() - started, 3),
+                "row": row,
+            }
+        else:
+            cmd = command_for_row(args, row, variant=variant)
+            proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
+            status = "done" if proc.returncode == 0 else "failed"
+            record = {
+                "row_key": key,
+                "status": status,
+                "returncode": proc.returncode,
+                "duration_seconds": round(time.monotonic() - started, 3),
+                "stdout_tail": proc.stdout[-4000:],
+                "stderr_tail": proc.stderr[-4000:],
+                "command": cmd,
+                "row": row,
+            }
+            if status == "failed":
+                record["failure_kind"] = classify_child_failure(record)
     record["variant_id"] = str(variant.get("id") or "")
     record["variant_label"] = str(variant.get("label") or "")
     record["variant_extra_args"] = list(variant.get("extra_args") or [])

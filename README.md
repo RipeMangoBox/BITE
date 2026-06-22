@@ -81,9 +81,10 @@ BITE 的核心不在于“先产出一个看起来合理的 idea”，而在于�
 
 ```text
 collect candidate papers / import local PDFs
-  -> batch MinerU PDF parse
-  -> structured paper analysis
-  -> index
+  -> download when needed
+  -> integrated analysis chain
+     (MinerU parse/reuse -> structured analysis -> vault export)
+  -> optional index refresh
   -> query / ideate / review / export
 ```
 
@@ -91,7 +92,7 @@ collect candidate papers / import local PDFs
 
 | 模式 | 用途 | 常用入口 |
 | --- | --- | --- |
-| Build | 收集候选论文、批量解析 PDF、分析论文并刷新索引 | `research-workflow` |
+| Build | 收集候选论文、下载或导入 PDF、运行集成分析链并按需刷新索引 | `research-workflow` |
 | Query | 按主题、任务、方法、venue、年份、标题或技术标签检索论文 | `papers-query-knowledge-base` |
 | Decision | 在选择 baseline、修改方案或写 related work 前对比方法 | `papers-query-knowledge-base` |
 | Idea | 基于本地知识库生成、收敛并压力测试研究方向 | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
@@ -114,11 +115,16 @@ conda activate researchflow
 
 ### 3. 安装或配置 MinerU
 
-MinerU 是前置的 PDF 批量解析阶段，不属于 BITE 的结构化分析本体。BITE 推荐先完成 MinerU 批量解析，再复用其输出进入后续分析。最小验证方式：`mineru --help` 能运行，或在 `.env` 中设置 `MINERU_CLI_PATH`。
+MinerU 是 BITE 本地分析链里的 PDF 解析组件。现在默认不需要先单独跑一轮
+MinerU 批处理；`scripts/run_local_paper_analysis.py` 可以在分析时调用 MinerU，
+也可以复用已有解析结果。最小验证方式：`mineru --help` 能运行，或在 `.env`
+中设置 `MINERU_CLI_PATH`。
 
-### 4. 先完成批量 MinerU 解析
+### 4. 运行集成本地分析链
 
-对于中大规模论文集合，建议先批量完成 MinerU 解析，并把结果整理到可复用的 `--mineru-output-root` 下。后续 BITE 分析应优先复用这些解析结果，而不是在分析阶段重复解析 PDF。
+单篇论文可以直接从 PDF 进入完整链路：MinerU 解析或复用、分块证据抽取、
+主分析 JSON、章节写作、图表放置、vault 导出和结构校验。已有 MinerU 输出时
+再传 `--mineru-output` 或 `--mineru-output-root` 复用即可。
 
 ### 5. 从 workflow skill 开始
 
@@ -144,7 +150,16 @@ python scripts/sync_assets_from_hf.py --mode assets
 # 下载全部（默认）
 python scripts/sync_assets_from_hf.py --mode all --dry-run   # 先看看需要多少
 python scripts/sync_assets_from_hf.py                        # 正式下载
+
+# 如果你想用 PaperBite 的公开清单替换本地清单，显式同步 paper_list.csv
+python scripts/sync_assets_from_hf.py --mode paper-list --overwrite-paper-list
 ```
+
+PaperBite shard 内部路径是 vault-relative 的 `analysis/`、`index/` 和
+`assets/`，默认会解压到 `obsidian-vault/` 下，适合直接作为 BITE 的公开
+evidence vault 使用。`paper_list.csv` 需要显式同步；默认不会覆盖你自己的本地
+清单。当前公开资产不包含完整原始 PDF corpus，`paperPDFs/` 仍按需本地下载或
+导入。
 
 ## 📚 延伸简介
 
@@ -180,33 +195,36 @@ python scripts/sync_assets_from_hf.py                        # 正式下载
 <details>
 <summary>运行正式本地分析链</summary>
 
-先复用已有的 MinerU 输出进入分析：
+默认从 PDF 直接运行完整链路：
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault \
+  --reasoning-effort max \
+  --part-thinking disabled \
+  --writer-thinking disabled
+```
+
+已有 MinerU 输出时再复用解析结果：
 
 ```bash
 python3 scripts/run_local_paper_analysis.py \
   --mineru-output "<mineru_output_dir>" \
-  --paper-pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
+  --paper-pdf "obsidian-vault/paperPDFs/<Venue_Year>/<Paper>.pdf" \
   --conf-year "<Venue_Year>" \
   --export-vault
 ```
 
-如果没有现成输出，也可以在单篇运行时由脚本触发 MinerU：
-
-```bash
-python3 scripts/run_local_paper_analysis.py \
-  --pdf "obsidian-vault/paperPDFs/<Category>/<Venue_Year>/<Paper>.pdf" \
-  --conf-year "<Venue_Year>" \
-  --export-vault
-```
-
-批量分析时，建议要求复用已有 MinerU 输出：
+批量分析时，队列 runner 会逐行调用同一条正式分析链：
 
 ```bash
 python3 scripts/run_paper_list_analysis.py \
   --source obsidian-vault/paper_list.csv \
   --state Downloaded \
-  --mineru-output-root "<mineru_output_root>" \
-  --require-existing-mineru-output
+  --jobs 2 \
+  --export-vault
 ```
 
 </details>

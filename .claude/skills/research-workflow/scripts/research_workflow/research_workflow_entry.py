@@ -221,7 +221,7 @@ def stage_spec(stage: str, mode: str, log_hint: str) -> Dict[str, object]:
     if stage == "analyze":
         return {
             "inputs": "PDF path, existing MinerU output directory, or Downloaded queue",
-            "outputs": "_private/local_analysis_runs/** + obsidian-vault/analysis/**/*.md",
+            "outputs": "<selected output root>/** + obsidian-vault/analysis/**/*.md",
             "commands": [
                 'Default single-paper chain: python3 "scripts/run_local_paper_analysis.py" --pdf "<pdf>" --conf-year "<Venue_Year>" --export-vault',
                 'Reuse existing MinerU output: python3 "scripts/run_local_paper_analysis.py" --mineru-output "<mineru_output_dir>" --paper-pdf "<pdf>" --conf-year "<Venue_Year>" --export-vault',
