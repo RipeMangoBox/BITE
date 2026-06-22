@@ -1,6 +1,6 @@
 # Asset Architecture
 
-ResearchFlow organizes research memory as a layered asset system rather than a
+BITE organizes research memory as a layered asset system rather than a
 single note collection.
 
 ## Levels
@@ -23,6 +23,6 @@ single note collection.
 ## PaperBite
 
 [PaperBite](https://github.com/RipeMangoBox/PaperBite) primarily serves
-`L0-L3`. It exposes public evidence assets built from the ResearchFlow analysis
+`L0-L3`. It exposes public evidence assets built from the BITE analysis
 framework, but it is not a replacement for local analysis, query, and research
 decision workflows.

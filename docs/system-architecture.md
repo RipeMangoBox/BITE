@@ -1,6 +1,6 @@
 # System Architecture
 
-ResearchFlow uses a local-first three-layer architecture.
+BITE uses a local-first three-layer architecture.
 
 ```text
 ┌─────────────────────────────────────────────────────────┐

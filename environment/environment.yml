@@ -1,4 +1,4 @@
-name: researchflow
+name: bite
 channels:
   - conda-forge
 dependencies:

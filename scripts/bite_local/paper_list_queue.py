@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 
-from scripts.researchflow_local.venue_slug import normalize_conf_year_slug
+from scripts.bite_local.venue_slug import normalize_conf_year_slug
 
 
 PDF_MAGIC = b"%PDF"

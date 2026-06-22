@@ -1,4 +1,4 @@
-PYTHON ?= conda run -n researchflow python
+PYTHON ?= conda run -n bite python
 
 .PHONY: check-index smoke-analysis smoke-index-workflow
 

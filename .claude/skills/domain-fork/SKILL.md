@@ -1,14 +1,14 @@
 ---
 name: domain-fork
 status: design-only-legacy
-description: Migrates ResearchFlow's architecture to a new professional domain (e.g. frontend development, accounting, journalism). Interactive session with the user to map research concepts to domain equivalents, then generates a complete set of adapted skills and folder structure. Explicit trigger only.
+description: Migrates BITE's architecture to a new professional domain (e.g. frontend development, accounting, journalism). Interactive session with the user to map research concepts to domain equivalents, then generates a complete set of adapted skills and folder structure. Explicit trigger only.
 ---
 
 # Domain Fork
 
 ## Purpose
 
-Migrate the core ResearchFlow architecture (collect/import local sources → download when needed → analyze → build index → query → ideate → focus → review) into a user-specified professional domain, and generate a complete domain-adapted skill set plus folder structure in one pass.
+Migrate the core BITE architecture (collect/import local sources → download when needed → analyze → build index → query → ideate → focus → review) into a user-specified professional domain, and generate a complete domain-adapted skill set plus folder structure in one pass.
 This is a design-only legacy workflow. It is not part of the active paper
 analysis pipeline.
 
@@ -17,8 +17,8 @@ analysis pipeline.
 **Explicit invocation only**. It should not be auto-triggered by description matching.
 
 User must clearly request something like:
-- "Fork a frontend development version of ResearchFlow"
-- "Migrate ResearchFlow to the accounting domain"
+- "Fork a frontend development version of BITE"
+- "Migrate BITE to the accounting domain"
 - "Use domain-fork to create a journalism knowledge-base workflow"
 
 ## Interactive Flow
@@ -30,15 +30,15 @@ After invocation, enter an interactive confirmation flow with **no skipped steps
 Confirm with the user:
 - **Target domain**: e.g., "frontend development", "accounting/audit", "news production"
 - **Repository name**: suggest `<Domain>Flow` (e.g., `FrontendFlow`, `AccountingFlow`, `JournalismFlow`), user can override
-- **Save location**: if not specified, default to `ResearchFlow/<RepoName>/` and prompt:
+- **Save location**: if not specified, default to `BITE/<RepoName>/` and prompt:
 
-> "Default output path is ResearchFlow/<RepoName>/. Do you want to change it?"
+> "Default output path is BITE/<RepoName>/. Do you want to change it?"
 
 ### Step 2: Concept mapping table
 
-Generate a ResearchFlow → target-domain concept mapping table for user confirmation/edit:
+Generate a BITE → target-domain concept mapping table for user confirmation/edit:
 
-| ResearchFlow concept | Mapped target-domain concept | Notes |
+| BITE concept | Mapped target-domain concept | Notes |
 |-------------------|--------------|------|
 | paper | (domain equivalent) | e.g., technical article, regulation document, news story |
 | PDF | (domain equivalent) | e.g., webpage article, regulation PDF, manuscript document |
@@ -54,9 +54,9 @@ Generate a ResearchFlow → target-domain concept mapping table for user confirm
 
 ### Step 3: Skill mapping confirmation
 
-Show how ResearchFlow's 17 routed skills map to target-domain skills (the shared Markdown convention skill can be copied separately without renaming):
+Show how BITE's 17 routed skills map to target-domain skills (the shared Markdown convention skill can be copied separately without renaming):
 
-| ResearchFlow Skill | Target-domain Skill | Keep? | Adjustment |
+| BITE Skill | Target-domain Skill | Keep? | Adjustment |
 |-------------------|---------------|---------|---------|
 | local source import | `<domain>-import-local-sources` | ✅/❌ | keep when users already have local source files or a source inbox |
 | papers-collect-from-web | `<domain>-collect-from-web` | ✅ | source websites become domain-specific |
@@ -107,7 +107,7 @@ After user confirmation, generate in one pass:
 └── README.md
 ```
 
-2. **SKILL.md for each skill**: rewritten from corresponding ResearchFlow skill with all domain terminology replaced
+2. **SKILL.md for each skill**: rewritten from corresponding BITE skill with all domain terminology replaced
 3. **skills-config.json**: register all generated skills
 4. **STATE_CONVENTION.md**: state transitions adapted for the target domain
 5. **User_README.md / README.md**: domain-adapted navigation and instructions
@@ -120,13 +120,13 @@ After user confirmation, generate in one pass:
 2. **Terminology consistency**: use one consistent term per concept across all skills
 3. **Minimum viable generation**: generate only skill definitions (`SKILL.md`), not scripts (agent writes scripts on demand)
 4. **State machine continuity**: keep the three-state main flow `Wait → Downloaded → checked`, with optional domain-specific labels
-5. **Do not modify ResearchFlow**: domain-fork reads ResearchFlow as template only and must not edit any ResearchFlow file
+5. **Do not modify BITE**: domain-fork reads BITE as template only and must not edit any BITE file
 
 ## Boundaries
 
 - Generate skill definitions and folder structure only; do not generate real content data
 - Do not auto-populate `tracking_log.csv` (that happens when users use the new repository)
-- Do not copy ResearchFlow `obsidian-vault/analysis` / `obsidian-vault/index` / `obsidian-vault/paperPDFs` data
+- Do not copy BITE `obsidian-vault/analysis` / `obsidian-vault/index` / `obsidian-vault/paperPDFs` data
 - Do not copy `.obsidian.zip` (user can copy/adjust it manually if needed)
 
 ## Example
@@ -136,7 +136,7 @@ User: "Fork a frontend development version"
 Step 1 confirmation:
 - domain: frontend development
 - repo name: FrontendFlow
-- path: ResearchFlow/FrontendFlow/
+- path: BITE/FrontendFlow/
 
 Step 2 mapping:
 - paper → technical article/spec document

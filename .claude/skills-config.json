@@ -5,7 +5,7 @@
    "path": ".claude/skills/code-context-paper-retrieval/SKILL.md"
   },
   "domain-fork": {
-   "description": "Adapts ResearchFlow workflow concepts, skills, and folder structure to another professional domain. Explicit trigger only.",
+   "description": "Adapts BITE workflow concepts, skills, and folder structure to another professional domain. Explicit trigger only.",
    "path": ".claude/skills/domain-fork/SKILL.md"
   },
   "idea-focus-coach": {
@@ -61,7 +61,7 @@
    "path": ".claude/skills/reviewer-stress-test/SKILL.md"
   },
   "rf-obsidian-markdown": {
-   "description": "Obsidian Flavored Markdown conventions for ResearchFlow. Defines wikilink, embed, callout, frontmatter, and tag rules that all .md-generating skills must follow. Ensures output renders correctly in Obsidian reading view, graph view, and backlink panels. Adapted from kepano/obsidian-skills.",
+   "description": "Obsidian Flavored Markdown conventions for BITE. Defines wikilink, embed, callout, frontmatter, and tag rules that all .md-generating skills must follow. Ensures output renders correctly in Obsidian reading view, graph view, and backlink panels. Adapted from kepano/obsidian-skills.",
    "path": ".claude/skills/rf-obsidian-markdown/SKILL.md"
   },
   "skill-fit-guard": {

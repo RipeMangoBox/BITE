@@ -31,7 +31,7 @@ DEFAULT_BATCH_ROOT = REPO_ROOT / "obsidian-vault" / "batches"
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.researchflow_local.paper_list_queue import (  # noqa: E402
+from scripts.bite_local.paper_list_queue import (  # noqa: E402
     classify_child_failure,
     resolve_row_pdf_path,
     validate_paper_list_row,

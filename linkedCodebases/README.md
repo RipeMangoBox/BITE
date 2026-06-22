@@ -14,4 +14,4 @@ Recommended pattern:
 - macOS / Linux: `ln -s /path/to/your-codebase linkedCodebases/your-codebase`
 - Windows PowerShell: `New-Item -ItemType Junction -Path .\\linkedCodebases\\your-codebase -Target C:\\path\\to\\your-codebase`
 
-Keep the actual code repositories outside version control. This directory only serves as a local bridge so ResearchFlow can stay the active workspace while still seeing the target codebase.
+Keep the actual code repositories outside version control. This directory only serves as a local bridge so BITE can stay the active workspace while still seeing the target codebase.

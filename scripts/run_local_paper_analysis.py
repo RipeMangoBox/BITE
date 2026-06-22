@@ -53,11 +53,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.researchflow_local.topic_tags import (
+from scripts.bite_local.topic_tags import (
     format_topic_tags,
     topic_tags_from_assignment,
 )
-from scripts.researchflow_local.venue_slug import normalize_conf_year_slug
+from scripts.bite_local.venue_slug import normalize_conf_year_slug
 
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "_private" / "local_analysis_runs"
 DEFAULT_MINERU_LOCK = REPO_ROOT / "_private" / "local_analysis_runs" / "locks" / "mineru_parse.lock"
@@ -296,7 +296,7 @@ Rules:
    GitLab links from the chunk. Do not infer URLs from the title or method name.
 6. Output no markdown fences, no prose, no reference list."""
 
-MAIN_ANALYSIS_SYSTEM = """You are ResearchFlow's local main analysis agent.
+MAIN_ANALYSIS_SYSTEM = """You are BITE's local main analysis agent.
 
 Merge the part-analysis JSON files with the compact paper context. Produce a
 verified analysis object for local file output. 正文/分析内容必须使用简体中文：
@@ -353,7 +353,7 @@ Rules:
 MAIN_ANALYSIS_PROMPT_CONTRACT = """Fixed merge contract for prompt-cache reuse.
 
 Task: merge chunk-level anchors, compact paper context, and figure/table
-metadata into one verified ResearchFlow analysis object. The variable paper
+metadata into one verified BITE analysis object. The variable paper
 payload appears after this fixed contract.
 
 正文/分析内容必须使用简体中文：translate generated explanatory fields into Chinese,
@@ -406,7 +406,7 @@ Rules:
    Do not invent links.
 8. Output ONLY valid JSON, with no markdown fences."""
 
-WRITER_SYSTEM = """You are ResearchFlow's local writer agent.
+WRITER_SYSTEM = """You are BITE's local writer agent.
 
 Write the final paper report from the verified local analysis JSON, part
 evidence, and figure/table metadata only. Do not invent claims. 正文内容必须使用
@@ -433,7 +433,7 @@ metadata if supplied by the analysis or source context, e.g. **MPGD** (He et
 al., CVPR 2023); omit the citation rather than guessing. Do not output JSON or
 markdown fences around the whole report."""
 
-SECTION_WRITER_SYSTEM = """You are ResearchFlow's local section writer.
+SECTION_WRITER_SYSTEM = """You are BITE's local section writer.
 
 Write ONLY the requested report section in Simplified Chinese from verified
 analysis JSON, part evidence, and the supplied paper context. Do not invent
@@ -459,7 +459,7 @@ Rules:
    guessing.
 """
 
-FIGURE_PLACEMENT_SYSTEM = """You are ResearchFlow's local note image placement reviewer.
+FIGURE_PLACEMENT_SYSTEM = """You are BITE's local note image placement reviewer.
 
 Choose which local MinerU figure/table images should be inserted into the
 exported Obsidian note. Use the verified analysis, report text, and captions.
@@ -488,7 +488,7 @@ Rules:
 6. Prefer Table 1 / benchmark summary tables and decisive result plots over
    decorative or example-only images."""
 
-FIGURE_VISUAL_SUMMARY_SYSTEM = """You are ResearchFlow's local figure/table visual summarizer.
+FIGURE_VISUAL_SUMMARY_SYSTEM = """You are BITE's local figure/table visual summarizer.
 
 Look at the supplied paper figure/table image and caption. Return JSON only:
 {
@@ -505,7 +505,7 @@ Keep the summary short and grounded in visible content. If the image is just
 dataset examples or decorative samples, set is_sample_only=true and
 placement_hint=\"skip\" unless it is explicitly needed for an experiment."""
 
-KIMI_NOTE_CHECK_REPAIR_SYSTEM = """You are ResearchFlow's final note quality checker.
+KIMI_NOTE_CHECK_REPAIR_SYSTEM = """You are BITE's final note quality checker.
 
 Check and lightly repair an Obsidian paper note for:
 1. Markdown/frontmatter formatting
@@ -516,7 +516,7 @@ Check and lightly repair an Obsidian paper note for:
    `$$...$$`, and `\\(...\\)` / `\\[...\\]` must not remain
 6. Image embeds must use Obsidian wikilinks like `![[assets/...]]`, never
    Markdown image links or `../../assets/...` prefixes
-7. ResearchFlow frontmatter schema: keep `aliases` as short English/model
+7. BITE frontmatter schema: keep `aliases` as short English/model
    aliases; preserve `project_link` and `code_link` if present; do not add
    `category`, `modalities`, or `frontier`
 
@@ -538,7 +538,7 @@ visible anchors from the source excerpt. Do not return an all-empty object when
 the excerpt contains headings, formulas, figures, tables, or result sentences.
 """
 
-MAIN_ANALYSIS_REPAIR_SYSTEM = """Repair a malformed ResearchFlow main-analysis response into JSON.
+MAIN_ANALYSIS_REPAIR_SYSTEM = """Repair a malformed BITE main-analysis response into JSON.
 
 Return JSON only. Preserve any supported fields from the raw output. If the raw
 output is missing late fields because it was truncated, keep the complete

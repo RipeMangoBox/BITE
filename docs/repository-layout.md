@@ -1,7 +1,7 @@
 # Repository Layout
 
 ```text
-ResearchFlow/
+BITE/
 ├── .claude/skills/                 maintained agent skill library
 ├── assets/                         public logo and README assets
 ├── docs/                           focused architecture and workflow docs
@@ -14,8 +14,8 @@ ResearchFlow/
 │   └── ideas/                      ideas, plans, reviews, and logs
 ├── scripts/                        setup, maintenance, and audit utilities
 ├── AGENTS.md                       agent-facing local workflow rules
-├── README.md                       English entry point
-└── README_CN.md                    Chinese entry point
+├── README.md                       Chinese entry point
+└── README_EN.md                    English entry point
 ```
 
 Generated corpora, private notes, local credentials, caches, and large

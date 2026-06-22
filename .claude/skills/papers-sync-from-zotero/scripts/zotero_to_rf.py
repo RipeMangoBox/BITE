@@ -869,7 +869,7 @@ class ZoteroAPIClient:
         self.session = requests.Session()
         self.session.headers.update(
             {
-                "User-Agent": "ResearchFlow Zotero Sync",
+                "User-Agent": "BITE Zotero Sync",
                 "Accept": "application/json",
             }
         )
@@ -1358,7 +1358,7 @@ def append_annotations_command(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Sync Zotero papers into ResearchFlow and optionally append Zotero annotations into analysis notes."
+        description="Sync Zotero papers into BITE and optionally append Zotero annotations into analysis notes."
     )
     parser.add_argument(
         "--repo-root",

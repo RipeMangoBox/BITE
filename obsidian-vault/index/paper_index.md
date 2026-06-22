@@ -1,5 +1,5 @@
 ---
-title: "ResearchFlow Index"
+title: "BITE Index"
 type: paper-index
 dimension: root
 tags:
@@ -7,7 +7,7 @@ tags:
 generated: 2026-05-23T00:00
 ---
 
-# ResearchFlow Index
+# BITE Index
 
 - [[obsidian-vault/index/_AllPapers.md|All papers]]
 - [[obsidian-vault/index/by_topic/topic_index.md|By topic]]

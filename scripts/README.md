@@ -1,6 +1,6 @@
 # scripts/
 
-Utility scripts for ResearchFlow.
+Utility scripts for BITE.
 
 Most day-to-day work should start from `.claude/skills` and the root README.
 Use scripts when you need direct file maintenance, index checks, or advanced

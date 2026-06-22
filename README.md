@@ -24,8 +24,6 @@
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> 本项目前身为 **ResearchFlow**，现已更名为 **BITE**（Bibliographic Intelligence for Thought Emergence）。
->
 > 🔥 **BITE 社区交流** | **[💬 微信交流 / BITE微信交流群](./WECHAT_CN.md)**
 >
 > 🔥 **News**：BITE 的公开证据层已发布至 HuggingFace dataset [PaperBite-Assets](https://huggingface.co/datasets/RipeMangoBox/PaperBite-Assets)，覆盖 `L0-L3` 的结构化论文资产（Markdown 分析笔记 + 图表 + manifests）。可直接用 `scripts/sync_assets_from_hf.py` 增量同步；如果你本身做 AI 相关研究，建议在此之上构建自己的 evidence vault。
@@ -33,7 +31,7 @@
 ---
 
 <p align="center">
-  <img src="./assets/researchflow-core-slide-2.png" alt="BITE 核心思想示意图" width="720"/>
+  <img src="./assets/bite-core-slide-2.png" alt="BITE 核心思想示意图" width="720"/>
 </p>
 
 > **BITE 是什么？** BITE 是一个本地优先的研究工作流框架，面向研究 Agent 的结构化论文分析与 Research Memory，帮助你将论文分析转化为结构化笔记，并构建可复用的个人 research memory。
@@ -59,7 +57,7 @@ BITE 的核心不在于“先产出一个看起来合理的 idea”，而在于�
 ## 🗂️ 资产层级
 
 <p align="center">
-  <img src="./assets/researchflow-asset-levels.png" alt="BITE 资产层级示意图" width="480"/>
+  <img src="./assets/bite-asset-levels.png" alt="BITE 资产层级示意图" width="480"/>
 </p>
 
 本图展示 BITE 的六层资产结构：`L0-L3` 由 PaperBite 驱动，完成知识积累与建库；`L4` 是观点涌现层；`L5` 是实验验证层。
@@ -105,7 +103,7 @@ collect candidate papers / import local PDFs
 git clone https://github.com/<your-username>/BITE.git
 cd BITE
 conda env create -f environment/environment.yml
-conda activate researchflow
+conda activate bite
 ```
 
 ### 2. 配置模型和解析工具

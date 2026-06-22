@@ -43,7 +43,7 @@ PLACEHOLDER_PATTERNS = ["待人工复核", "{{FIG:", "FIG:", "[TODO]"]
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Audit ResearchFlow formal analysis-chain note exports.")
+    parser = argparse.ArgumentParser(description="Audit BITE formal analysis-chain note exports.")
     parser.add_argument("--analysis-dir", default=str(ANALYSIS_DIR))
     parser.add_argument("--shard-index", type=int, default=0)
     parser.add_argument("--shard-count", type=int, default=1)

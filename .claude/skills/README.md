@@ -1,6 +1,6 @@
-# ResearchFlow Skills
+# BITE Skills
 
-This directory is the maintained skill library for ResearchFlow agents. Each
+This directory is the maintained skill library for BITE agents. Each
 skill is a `SKILL.md` file that tells an agent how to perform one bounded part
 of the research workflow.
 
@@ -125,7 +125,7 @@ The current default workflow is local-file based. The skills below operate on
   - Generate or update a structured daily research log from current artifacts
     and decisions.
 - **domain-fork**
-  - Adapt the ResearchFlow workflow to another professional domain.
+  - Adapt the BITE workflow to another professional domain.
 
 ## Choosing a Skill
 

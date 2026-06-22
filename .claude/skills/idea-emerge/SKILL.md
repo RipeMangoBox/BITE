@@ -1,6 +1,6 @@
 ---
 name: idea-emerge
-description: Generates research ideas from ResearchFlow KB evidence, domain bottleneck diagnosis, task-specific web papers, cross-domain operators, explicit research-decision rules, implementation traces, and task constraints. Use before brainstorming or focus when the user wants idea candidates with evidence anchors, novelty checks, baselines, metrics, and kill criteria rather than paper summaries or generic inspiration.
+description: Generates research ideas from BITE KB evidence, domain bottleneck diagnosis, task-specific web papers, cross-domain operators, explicit research-decision rules, implementation traces, and task constraints. Use before brainstorming or focus when the user wants idea candidates with evidence anchors, novelty checks, baselines, metrics, and kill criteria rather than paper summaries or generic inspiration.
 ---
 
 # Idea Emerge

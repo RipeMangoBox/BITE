@@ -159,7 +159,7 @@ audits should be handled by sampling, LLM-as-judge checks, or human review.
 
 ## Data Contract
 
-ResearchFlow can start from any of these inputs:
+BITE can start from any of these inputs:
 
 - `--pdf`
 - `--mineru-output`

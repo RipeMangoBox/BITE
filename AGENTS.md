@@ -4,12 +4,12 @@ Public agent-facing usage starts from [README.md](README.md) and
 [.claude/skills/README.md](.claude/skills/README.md). Internal deployment notes
 stay under `_private/`.
 
-ResearchFlow is a local-first research workflow for structured paper analysis.
+BITE is a local-first research workflow for structured paper analysis.
 Its goal is to turn academic PDFs into machine-actionable evidence notes,
 retrieval indexes, and downstream idea or review artifacts. PaperBite acts as
-the upstream public evidence layer: it helps batch-prepare parsed paper assets,
-while ResearchFlow focuses on structured analysis, retrieval, comparison, and
-research decision support.
+the upstream public evidence layer: it provides reusable structured paper
+assets, while BITE focuses on local analysis, retrieval, comparison, idea
+generation, and research decision support.
 
 ## Working Surface
 
@@ -22,9 +22,10 @@ research decision support.
 
 ```text
 collect candidate papers / import local PDFs
-  -> batch MinerU PDF parse
-  -> structured paper analysis
-  -> index
+  -> download when needed
+  -> integrated analysis chain
+     (MinerU parse/reuse -> structured analysis -> vault export)
+  -> optional index refresh
   -> query / ideate / focus / review / export
 ```
 

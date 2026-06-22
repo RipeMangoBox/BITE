@@ -13,6 +13,9 @@ __pycache__/
 # === Private workspace ===
 _private/
 obsidian-vault/ideas/
+!obsidian-vault/ideas/
+obsidian-vault/ideas/*
+!obsidian-vault/ideas/README.md
 
 
 # === Obsidian local runtime state ===

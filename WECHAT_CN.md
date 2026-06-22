@@ -1,7 +1,7 @@
-# ResearchFlow 微信交流群
+# BITE 微信交流群
 
 <p align="center">
-  <img src="./image/me.jpg" alt="ResearchFlow 微信二维码" width="520"/>
+  <img src="./image/me.jpg" alt="BITE 微信二维码" width="520"/>
 </p>
 
 <p align="center">

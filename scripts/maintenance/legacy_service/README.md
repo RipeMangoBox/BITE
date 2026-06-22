@@ -1,7 +1,7 @@
 # Legacy Service Maintenance Scripts
 
 This directory documents local-only Python scripts written for the retired
-service-mode ResearchFlow implementation backed by the hidden `platform/`
+service-mode BITE implementation backed by the hidden `platform/`
 tree and a service database. The script files themselves are ignored by Git.
 They are not part of the current local-file analysis chain described in
 `.claude/skills/README.md`.

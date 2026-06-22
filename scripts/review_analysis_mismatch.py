@@ -189,9 +189,9 @@ def describe_mismatch(af: Optional[AnalysisFile]) -> str:
         missing.append("frontmatter 中的 pdf_ref 字段")
 
     if not missing:
-        return "ok: 结构与技术深度均符合当前 ResearchFlow 分析模板，之前标记为 analysis_mismatch 属于误判。"
+        return "ok: 结构与技术深度均符合当前 BITE 分析模板，之前标记为 analysis_mismatch 属于误判。"
 
-    return "structure_or_depth: 缺失以下 ResearchFlow 分析要素：" + "；".join(missing)
+    return "structure_or_depth: 缺失以下 BITE 分析要素：" + "；".join(missing)
 
 
 def review_all_analysis_mismatch() -> None:

@@ -24,8 +24,6 @@
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-111827?style=flat-square"/>
 </p>
 
-> This project was formerly known as **ResearchFlow**. It has been renamed to **BITE** (Bibliographic Intelligence for Thought Emergence).
->
 > 🔥 **BITE Community** | **[💬 WeChat / BITE WeChat Group](./WECHAT.md)**
 >
 > 🔥 **News**: BITE's public evidence layer is published on HuggingFace dataset [PaperBite-Assets](https://huggingface.co/datasets/RipeMangoBox/PaperBite-Assets), covering `L0-L3` structured paper assets (Markdown analysis notes + figures + manifests). Incrementally sync with `scripts/sync_assets_from_hf.py`; if you work on AI-related research, it is a strong starting point for building your own evidence vault.
@@ -33,7 +31,7 @@
 ---
 
 <p align="center">
-  <img src="./assets/researchflow-core-slide-3-en.png" alt="BITE core idea in English" width="720"/>
+  <img src="./assets/bite-core-slide-3-en.png" alt="BITE core idea in English" width="720"/>
 </p>
 
 > **What is BITE?** BITE is a local-first workflow framework for structured paper analysis and research memory, purpose-built for knowledge-grounded research agents. It transforms paper analysis into structured notes and builds a persistent, reusable research memory.
@@ -68,7 +66,7 @@ traceable evidence base, then be stress-tested before execution.
 ## 🗂️ Asset Levels
 
 <p align="center">
-  <img src="./assets/researchflow-asset-levels.png" alt="BITE asset hierarchy" width="480"/>
+  <img src="./assets/bite-asset-levels.png" alt="BITE asset hierarchy" width="480"/>
 </p>
 
 This diagram shows BITE's six-layer asset hierarchy: `L0-L3` (knowledge building, powered by PaperBite), `L4` (emergence), and `L5` (validation).
@@ -115,7 +113,7 @@ You can use it in four common modes:
 git clone https://github.com/<your-username>/BITE.git
 cd BITE
 conda env create -f environment/environment.yml
-conda activate researchflow
+conda activate bite
 ```
 
 ### 2. Configure model and parser access
