@@ -105,9 +105,9 @@ You can use it in four common modes:
 | Decision | Compare methods before choosing baselines, changing a design, or writing related work | `papers-query-knowledge-base` |
 | Idea | Generate, focus, and stress-test research directions grounded in the local knowledge base | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
 
-## 🚀 Quick Start
+## 🛠️ Environment Setup
 
-### 1. Create the conda environment
+### 📦 1. Create the conda environment
 
 ```bash
 git clone https://github.com/<your-username>/BITE.git
@@ -116,13 +116,13 @@ conda env create -f environment/environment.yml
 conda activate bite
 ```
 
-### 2. Configure model and parser access
+### 🔐 2. Configure model and parser access
 
 Create a repo-root `.env` when you need model keys, model names, or parser
 overrides. Use [environment/.env.example](environment/.env.example) as a
 reference.
 
-### 3. Install or configure MinerU
+### 📄 3. Install or configure MinerU
 
 MinerU is the PDF parsing component inside BITE's local analysis chain. You no
 longer need a separate MinerU batch-preparation phase before analysis:
@@ -130,15 +130,9 @@ longer need a separate MinerU batch-preparation phase before analysis:
 existing parse outputs when you already have them. Minimal verification:
 `mineru --help` should run, or `.env` should set `MINERU_CLI_PATH`.
 
-### 4. Run the integrated local analysis chain
+## 🧭 Usage
 
-For a single paper, start directly from the PDF. The runner performs MinerU
-parse or cache reuse, chunk evidence extraction, main analysis JSON generation,
-section writing, figure/table placement, vault export, and structural
-validation. Pass `--mineru-output` or `--mineru-output-root` only when you
-already have parse outputs to reuse.
-
-### 5. Start from the workflow skill
+### 🧠 1. Start from the workflow skill
 
 ```text
 /research-workflow
@@ -146,7 +140,7 @@ I want to build a knowledge base for controllable motion generation from PDFs.
 Please tell me the next step and the expected outputs.
 ```
 
-### 6. Optional: Sync Public Evidence Layer
+### 📥 2. Optional: Sync public evidence layer
 
 To use BITE's pre-built structured paper assets, sync from HuggingFace by layer:
 
@@ -173,6 +167,21 @@ suitable as a drop-in public evidence vault for BITE. `paper_list.csv` is synced
 only when explicitly requested, so your local paper list is not overwritten by
 default. The public assets do not include the full original PDF corpus; keep
 downloading or importing `paperPDFs/` locally when PDFs are needed.
+
+### ⚙️ 3. Run the integrated local analysis chain
+
+For a single paper, start directly from the PDF. The runner performs MinerU
+parse or cache reuse, chunk evidence extraction, main analysis JSON generation,
+section writing, figure/table placement, vault export, and structural
+validation. Pass `--mineru-output` or `--mineru-output-root` only when you
+already have parse outputs to reuse.
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault
+```
 
 ## 📚 Further Reading
 

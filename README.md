@@ -95,9 +95,9 @@ collect candidate papers / import local PDFs
 | Decision | 在选择 baseline、修改方案或写 related work 前对比方法 | `papers-query-knowledge-base` |
 | Idea | 基于本地知识库生成、收敛并压力测试研究方向 | `research-brainstorm-from-kb`, `idea-focus-coach`, `reviewer-stress-test` |
 
-## 🚀 快速开始
+## 🛠️ 环境配置
 
-### 1. 创建 conda 环境
+### 📦 1. 创建 conda 环境
 
 ```bash
 git clone https://github.com/<your-username>/BITE.git
@@ -106,25 +106,21 @@ conda env create -f environment/environment.yml
 conda activate bite
 ```
 
-### 2. 配置模型和解析工具
+### 🔐 2. 配置模型和解析工具
 
 需要设置模型密钥、模型名或 parser override 时，在仓库根目录创建自己的 `.env`，
 并参考 [environment/.env.example](environment/.env.example)。
 
-### 3. 安装或配置 MinerU
+### 📄 3. 安装或配置 MinerU
 
 MinerU 是 BITE 本地分析链里的 PDF 解析组件。现在默认不需要先单独跑一轮
 MinerU 批处理；`scripts/run_local_paper_analysis.py` 可以在分析时调用 MinerU，
 也可以复用已有解析结果。最小验证方式：`mineru --help` 能运行，或在 `.env`
 中设置 `MINERU_CLI_PATH`。
 
-### 4. 运行集成本地分析链
+## 🧭 使用方式
 
-单篇论文可以直接从 PDF 进入完整链路：MinerU 解析或复用、分块证据抽取、
-主分析 JSON、章节写作、图表放置、vault 导出和结构校验。已有 MinerU 输出时
-再传 `--mineru-output` 或 `--mineru-output-root` 复用即可。
-
-### 5. 从 workflow skill 开始
+### 🧠 1. 从 workflow skill 开始
 
 ```text
 /research-workflow
@@ -132,7 +128,7 @@ MinerU 批处理；`scripts/run_local_paper_analysis.py` 可以在分析时调�
 请告诉我下一步应该做什么，以及会生成哪些结果。
 ```
 
-### 6. 可选：同步公开证据层
+### 📥 2. 可选：同步公开证据层
 
 如需直接使用 BITE 已沉淀的结构化论文资产，从 HuggingFace 按需同步：
 
@@ -158,6 +154,19 @@ PaperBite shard 内部路径是 vault-relative 的 `analysis/`、`index/` 和
 evidence vault 使用。`paper_list.csv` 需要显式同步；默认不会覆盖你自己的本地
 清单。当前公开资产不包含完整原始 PDF corpus，`paperPDFs/` 仍按需本地下载或
 导入。
+
+### ⚙️ 3. 运行集成本地分析链
+
+单篇论文可以直接从 PDF 进入完整链路：MinerU 解析或复用、分块证据抽取、
+主分析 JSON、章节写作、图表放置、vault 导出和结构校验。已有 MinerU 输出时
+再传 `--mineru-output` 或 `--mineru-output-root` 复用即可。
+
+```bash
+python3 scripts/run_local_paper_analysis.py \
+  --pdf "obsidian-vault/paperPDFs/<Venue_Year>/<Paper>.pdf" \
+  --conf-year "<Venue_Year>" \
+  --export-vault
+```
 
 ## 📚 延伸简介
 
