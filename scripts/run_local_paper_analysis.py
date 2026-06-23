@@ -78,15 +78,18 @@ KIMI_DEFAULT_TEMPERATURE = 0.6
 DEFAULT_KIMI_MODEL = "kimi-k2.6"
 DEFAULT_OPENAI_FIGURE_MODEL = "gpt-5.4"
 SECTION_SPECS: tuple[tuple[str, str], ...] = (
-    ("概述", "概括问题、核心结论、方法定位与主要结果，不要展开细节。"),
-    ("背景与动机", "说明问题背景、现有方法缺口、本文动机。"),
-    ("核心创新", "聚焦相对 baseline 的关键创新与 changed slots。"),
-    ("整体框架", "描述整体 pipeline、模块关系、输入输出流。"),
-    ("核心模块与公式推导", "只写关键模块、关键公式、公式变量含义，禁止猜公式。"),
-    ("实验与分析", "写主结果、消融、失败模式、重要图表结论。"),
+    ("概要", "用 150-250 中文字直陈问题、方法、主要结果和方法定位，不展开细节。"),
     (
-        "方法谱系与知识库定位",
-        "写与 baseline/follow-up 的关系、适用边界、局限与开放问题；若提到具体基线工作，保留或补充论文中可验证的作者、会议和年份，例如 **MPGD** (He et al., CVPR 2023)。",
+        "核心方法与创新机理",
+        "合并背景、创新、框架和关键公式；只写唯一瓶颈、核心机制、1-3 个 changed slots、必要公式与变量含义，避免与概要重复。",
+    ),
+    (
+        "实验与关键发现",
+        "写主结果、指标对比、关键消融、失败模式和适用边界；保留关键数值，不罗列全部实验。",
+    ),
+    (
+        "定位与知识库关联",
+        "只写与 baseline/follow-up 的本质差异、知识库挂载点、适用边界和后续启发；不要复述方法细节。若提到具体基线工作，保留或补充论文中可验证的作者、会议和年份，例如 **MPGD** (He et al., CVPR 2023)。",
     ),
 )
 
@@ -416,22 +419,30 @@ identifiers, URLs/citations, exact quoted evidence, and method, dataset, metric,
 paper names.
 
 Return Markdown only, with these sections:
-1. 概述
-2. 背景与动机
-3. 核心创新
-4. 整体框架
-5. 核心模块与公式推导
-6. 实验与分析
-7. 方法谱系与知识库定位
+1. 概要
+2. 核心方法与创新机理
+3. 实验与关键发现
+4. 定位与知识库关联
 
 Use exact table, figure, and equation labels when available. Do not embed
 images yourself; the deterministic vault exporter will insert local MinerU
 figure/table images. Use `$...$` for inline LaTeX and `$$...$$` for block
-LaTeX; do not use `\\(...\\)` or `\\[...\\]`. In 方法谱系与知识库定位, when
-you mention a concrete baseline work, include verified author/year/venue
-metadata if supplied by the analysis or source context, e.g. **MPGD** (He et
-al., CVPR 2023); omit the citation rather than guessing. Do not output JSON or
-markdown fences around the whole report."""
+LaTeX; do not use `\\(...\\)` or `\\[...\\]`.
+
+Compression rules:
+1. Target 4500-7000 Chinese characters for the whole report body.
+2. Each technical point should appear in one section only. Do not restate the
+   same bottleneck, formula, loss term, dataset fact, or main metric in later
+   sections.
+3. Keep method detail in 核心方法与创新机理; keep numbers and failure modes in
+   实验与关键发现; keep lineage and boundaries in 定位与知识库关联.
+4. Do not create `### 补充图表`; figure/table embeds are inserted by the
+   exporter.
+5. In 定位与知识库关联, when you mention a concrete baseline work, include
+   verified author/year/venue metadata if supplied by the analysis or source
+   context, e.g. **MPGD** (He et al., CVPR 2023); omit the citation rather than
+   guessing.
+Do not output JSON or markdown fences around the whole report."""
 
 SECTION_WRITER_SYSTEM = """You are BITE's local section writer.
 
@@ -443,6 +454,10 @@ identifiers, exact anchors, and method, dataset, metric, paper names.
 Write analytical synthesis, not a paper-like paraphrase. Compress source
 details into bottlenecks, causal mechanisms, evidence strength, and failure
 modes. Avoid copying long caption/body prose unless it is an exact short anchor.
+Avoid repeating technical points that belong in another section:
+概要 gives only the conclusion; 核心方法与创新机理 owns method/formula details;
+实验与关键发现 owns metrics/ablations/failures; 定位与知识库关联 owns lineage,
+boundaries, and follow-up value.
 
 Rules:
 1. Output Markdown only for the requested section body. Do not include the H1 title.
@@ -453,7 +468,8 @@ Rules:
 5. For formulas, preserve exact LaTeX if provided. Use `$...$` for inline
    formulas and `$$...$$` for block formulas; do not use `\\(...\\)` or
    `\\[...\\]`. Do not derive unseen formulas.
-6. In 方法谱系与知识库定位, when you mention a concrete baseline work, include
+6. Do not create `### 补充图表`.
+7. In 定位与知识库关联, when you mention a concrete baseline work, include
    verified author/year/venue metadata if supplied by the analysis or source
    context, e.g. **MPGD** (He et al., CVPR 2023); omit the citation rather than
    guessing.
@@ -463,30 +479,31 @@ FIGURE_PLACEMENT_SYSTEM = """You are BITE's local note image placement reviewer.
 
 Choose which local MinerU figure/table images should be inserted into the
 exported Obsidian note. Use the verified analysis, report text, and captions.
-Prefer method diagrams cited by the report and summary tables or result plots
-that directly support the note section.
-Do not place sample-only dataset images as the framework image. If no real
-framework/pipeline/method diagram exists, leave 整体框架 empty.
+Prefer figures/tables that directly support one of three roles:
+1. motivation/problem illustration,
+2. core method or pipeline (including multi-panel pipelines split across two figures),
+3. comparison/result tables or plots.
+Avoid fine-grained sample galleries and decorative examples unless the paper is
+primarily a dataset/benchmark and the sample image is essential evidence.
 
 Return JSON only:
 {
   "placements": [
-    {"item_id": str, "section": "整体框架" | "核心模块与公式推导" | "实验与分析", "reason": str}
+    {"item_id": str, "section": "核心方法与创新机理" | "实验与关键发现", "reason": str}
   ]
 }
 
 Rules:
-1. Select at most the requested image budget.
+1. Select at most the requested image budget. Use fewer when extra images add
+   only detail rather than evidence.
 2. Use only supplied item_id values.
 3. Do not duplicate the same item_id.
 4. When the report explicitly cites Figure N / Table N and the candidate
-   exists, include it. If it is sample-only or decorative, place it only in
-   实验与分析 and do not use it as framework or method evidence.
-5. Put overall pipeline/architecture diagrams in 整体框架; put tokenizer,
-   masking, denoising, sampling, guidance, or other method-module diagrams in
-   核心模块与公式推导.
-6. Prefer Table 1 / benchmark summary tables and decisive result plots over
-   decorative or example-only images."""
+   exists, include it unless it is purely decorative.
+5. Put motivation, pipeline, architecture, tokenizer, masking, denoising,
+   sampling, guidance, or other method-module diagrams in 核心方法与创新机理.
+6. Put benchmark tables, metric comparison tables, result plots, ablations, and
+   decisive qualitative comparisons in 实验与关键发现."""
 
 FIGURE_VISUAL_SUMMARY_SYSTEM = """You are BITE's local figure/table visual summarizer.
 
@@ -497,7 +514,7 @@ Look at the supplied paper figure/table image and caption. Return JSON only:
   "is_sample_only": bool,
   "key_visible_elements": [str],
   "supports_claims": [str],
-  "placement_hint": "整体框架" | "实验与分析" | "skip",
+  "placement_hint": "核心方法与创新机理" | "实验与关键发现" | "skip",
   "confidence": float
 }
 
@@ -3617,6 +3634,10 @@ def normalize_report_markdown(report: str) -> str:
         "Key Modules and Formulas": "核心模块与公式推导",
         "Experiments and Analysis": "实验与分析",
         "Lineage and Knowledge Positioning": "方法谱系与知识库定位",
+        "Summary": "概要",
+        "Core Method and Innovation Mechanism": "核心方法与创新机理",
+        "Experiments and Key Findings": "实验与关键发现",
+        "Positioning and Knowledge Base Links": "定位与知识库关联",
     }
     for english, chinese in replacements.items():
         report = re.sub(
@@ -3632,6 +3653,10 @@ def normalize_report_markdown(report: str) -> str:
 
 def section_keywords(section_title: str) -> tuple[str, ...]:
     mapping = {
+        "概要": ("abstract", "introduction", "conclusion", "summary", "overview", "benchmark", "result"),
+        "核心方法与创新机理": ("method", "algorithm", "formula", "equation", "framework", "pipeline", "architecture", "propose", "new", "motivation"),
+        "实验与关键发现": ("experiment", "result", "table", "figure", "benchmark", "mae", "performance", "estimate", "ablation", "limitation"),
+        "定位与知识库关联": ("limitation", "future", "related", "discussion", "conclusion", "open", "baseline"),
         "概述": ("abstract", "introduction", "conclusion", "summary", "overview", "benchmark", "result"),
         "背景与动机": ("abstract", "introduction", "motivation", "related", "background", "benchmark", "dataset"),
         "核心创新": ("method", "algorithm", "benchmark", "dataset", "propose", "new", "lid", "idr", "ms"),
@@ -3668,9 +3693,9 @@ def slim_part_analysis(part: dict[str, Any], *, max_items: int = 3) -> dict[str,
 
 
 def part_matches_section(part: dict[str, Any], section_title: str) -> bool:
-    if section_title == "实验与分析" and (part.get("experiment_evidence") or part.get("figure_table_roles")):
+    if section_title in {"实验与分析", "实验与关键发现"} and (part.get("experiment_evidence") or part.get("figure_table_roles")):
         return True
-    if section_title == "核心模块与公式推导" and (part.get("formula_evidence") or part.get("method_evidence")):
+    if section_title in {"核心模块与公式推导", "核心方法与创新机理"} and (part.get("formula_evidence") or part.get("method_evidence")):
         return True
     keywords = section_keywords(section_title)
     if not keywords:
@@ -3687,7 +3712,7 @@ def focused_part_analyses(
     max_evidence_items: int = 2,
 ) -> list[dict[str, Any]]:
     selected = [part for part in part_results if part_matches_section(part, section_title)]
-    if section_title == "概述":
+    if section_title in {"概述", "概要"}:
         selected = (part_results[:4] + part_results[-2:]) if len(part_results) > 6 else part_results
     if not selected:
         selected = part_results[:max_parts]
@@ -4050,7 +4075,7 @@ EXPERIMENT_FIGURE_PATTERN = re.compile(
     flags=re.IGNORECASE,
 )
 
-ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"整体框架", "核心模块与公式推导", "实验与分析"}
+ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"核心方法与创新机理", "实验与关键发现"}
 
 
 def placement_text(item: dict[str, Any]) -> str:
@@ -4058,8 +4083,7 @@ def placement_text(item: dict[str, Any]) -> str:
 
 
 def method_figure_section(item: dict[str, Any]) -> str:
-    text = placement_text(item)
-    return "整体框架" if FRAMEWORK_FIGURE_PATTERN.search(text) else "核心模块与公式推导"
+    return "核心方法与创新机理"
 
 
 def figure_label_sort_key(item: dict[str, Any]) -> tuple[int, str]:
@@ -4117,7 +4141,7 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
             if item.get("type", "").lower() == "figure"
             and METHOD_FIGURE_PATTERN.search(text)
             and not EXPERIMENT_FIGURE_PATTERN.search(text)
-            else "实验与分析"
+            else "实验与关键发现"
         )
         placements.append({
             "item_id": item["item_id"],
@@ -4129,7 +4153,7 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
     for item in candidates:
         if len(placements) >= max_images:
             break
-        method_count = sum(1 for placement in placements if placement.get("section") in {"整体框架", "核心模块与公式推导"})
+        method_count = sum(1 for placement in placements if placement.get("section") == "核心方法与创新机理")
         if method_count >= method_image_budget:
             break
         text = placement_text(item)
@@ -4164,7 +4188,7 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
             break
         if item["item_id"] not in by_id:
             continue
-        placements.append({"item_id": item["item_id"], "section": "实验与分析", "reason": "caption indicates a table or result plot"})
+        placements.append({"item_id": item["item_id"], "section": "实验与关键发现", "reason": "caption indicates a table or result plot"})
         used.add(item["item_id"])
     return placements[:max_images]
 
@@ -4231,13 +4255,13 @@ def visual_summary_candidates(figures_tables: list[dict[str, Any]], *, max_items
 
 def focused_figures_tables(section_title: str, figures_tables: list[dict[str, Any]], *, max_items: int = 10) -> list[dict[str, Any]]:
     candidates = placement_candidates(figures_tables)
-    if section_title == "整体框架":
+    if section_title in {"整体框架", "核心模块与公式推导", "核心方法与创新机理"}:
         filtered = [
             item for item in candidates
             if item.get("placement_hint") == "整体框架"
             or re.search(r"\b(framework|pipeline|architecture|overview|method)\b", f"{item.get('label') or ''} {item.get('caption') or ''} {item.get('visual_summary') or ''}".lower())
         ]
-    elif section_title == "实验与分析":
+    elif section_title in {"实验与分析", "实验与关键发现"}:
         filtered = [
             item for item in candidates
             if item.get("placement_hint") == "实验与分析"
@@ -4257,7 +4281,13 @@ def normalize_visual_summary(parsed: dict[str, Any]) -> dict[str, Any]:
     elements = parsed.get("key_visible_elements")
     claims = parsed.get("supports_claims")
     hint = str(parsed.get("placement_hint") or "")
-    if hint not in {"整体框架", "实验与分析", "skip"}:
+    legacy_hints = {
+        "整体框架": "核心方法与创新机理",
+        "核心模块与公式推导": "核心方法与创新机理",
+        "实验与分析": "实验与关键发现",
+    }
+    hint = legacy_hints.get(hint, hint)
+    if hint not in {"核心方法与创新机理", "实验与关键发现", "skip"}:
         hint = ""
     confidence = parsed.get("confidence")
     try:
@@ -4278,7 +4308,7 @@ def normalize_visual_summary(parsed: dict[str, Any]) -> dict[str, Any]:
 def caption_only_visual_summary(item: dict[str, Any]) -> dict[str, Any]:
     label = str(item.get("label") or "")
     caption = compact_text(dedupe_caption_prefix(label, str(item.get("caption") or "")), max_len=500)
-    hint = "skip" if sample_only_figure(item) else ("实验与分析" if str(item.get("type") or "").lower() == "table" else "")
+    hint = "skip" if sample_only_figure(item) else ("实验与关键发现" if str(item.get("type") or "").lower() == "table" else "")
     return {
         "visual_summary": caption,
         "visual_type": str(item.get("type") or ""),
@@ -4559,10 +4589,10 @@ def section_for_referenced_item(markdown: str, item: dict[str, Any]) -> str:
                 return current
             break
     if str(item.get("type") or "").lower() == "table":
-        return "实验与分析"
+        return "实验与关键发现"
     if METHOD_FIGURE_PATTERN.search(placement_text(item)) and not sample_only_figure(item):
         return method_figure_section(item)
-    return "实验与分析"
+    return "实验与关键发现"
 
 
 def ensure_referenced_figure_placements(
@@ -4719,8 +4749,7 @@ def inject_figure_items(markdown: str, heading: str, items: list[dict[str, Any]]
             _, end = bounds
             blocks = [image_block(item) for item in unmatched if image_block(item).strip()]
             if blocks:
-                supplement = ["", "### 补充图表", "", *("\n\n".join(blocks)).splitlines(), ""]
-                lines[end:end] = supplement
+                lines[end:end] = ["", *("\n\n".join(blocks)).splitlines(), ""]
     return "\n".join(lines)
 
 
@@ -4742,7 +4771,7 @@ def figure_items_for_note(
             continue
         section = str(placement.get("section") or "")
         if section not in ALLOWED_FIGURE_PLACEMENT_SECTIONS:
-            section = "实验与分析"
+            section = "实验与关键发现"
         items_by_section.setdefault(section, []).append(by_id[item_id])
         used.add(item_id)
         if len(used) >= max_images:
@@ -4956,7 +4985,7 @@ def compose_vault_note(
         max_images=max_images,
         placements=figure_placements,
     )
-    for section in ("整体框架", "核心模块与公式推导", "实验与分析"):
+    for section in ("核心方法与创新机理", "实验与关键发现"):
         body = inject_figure_items(body, section, figure_items_by_section.get(section, []))
     parts = [
         render_frontmatter(
@@ -5403,7 +5432,7 @@ def note_check_repair_prompt(
             for item in copied_figures
             if any(str(item.get("item_id") or "") == str(placement.get("item_id") or "") for placement in (figure_placements or []))
         ],
-        "repair_scope": "Only fix Markdown formatting, duplicated captions, unescaped < in image captions, broken table syntax, and obvious image-placement mismatch.",
+        "repair_scope": "Only fix Markdown formatting, duplicated captions, unescaped < in image captions, broken table syntax, and obvious image-placement mismatch. Preserve the four body sections: 概要, 核心方法与创新机理, 实验与关键发现, 定位与知识库关联.",
         "frontmatter_schema_guard": "Do not add category, modalities, or frontier. Keep aliases as short English/model aliases. Preserve project_link and code_link.",
     }
     return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
@@ -5756,15 +5785,34 @@ def mock_json(kind: str, *, part_id: str = "") -> dict[str, Any]:
 def mock_report() -> str:
     return (
         "# Mock Paper\n\n"
-        "## Overview\n\n"
-        "This is a mock local report generated without an LLM call.\n\n"
-        "## Background and Motivation\n\nMock background.\n\n"
-        "## Core Innovation\n\nMock innovation.\n\n"
-        "## Framework\n\nMock framework.\n\n"
-        "## Key Modules and Formulas\n\nMock modules.\n\n"
-        "## Experiments and Analysis\n\nMock experiments.\n\n"
-        "## Lineage and Knowledge Positioning\n\nMock positioning.\n"
+        "## 概要\n\n"
+        "这是一份不调用 LLM 的本地 smoke-test 报告，用于验证新版 BITE 分析链的四段结构、vault 导出、PDF 嵌入与图片校验是否能正常工作。\n\n"
+        "## 核心方法与创新机理\n\n"
+        "MockMethod 将论文问题压缩为一个可验证的因果链：现有方法缺少稳定控制旋钮，本文通过一个显式模块把输入条件、核心表示和输出目标连接起来。该段模拟真实报告中的背景缺口、changed slots、pipeline 描述和关键公式说明，避免把同一技术点拆散到多个独立章节里反复出现。\n\n"
+        "关键机制可以写成 $y=f_\\theta(x, c)$，其中 $x$ 表示输入，$c$ 表示控制条件，$y$ 表示目标输出。真实链路中这里会保留 1-3 个关键公式及变量含义，并明确公式对应的模块和消融证据。\n\n"
+        "## 实验与关键发现\n\n"
+        "实验部分模拟保留主结果、指标对比、关键消融和失败模式。真实报告会优先引用主表、结果图和消融图，而不会默认堆叠样例图库。若指标对比只以图片形式存在，图表插入器应将其放入本节。\n\n"
+        "Mock evidence 表明新结构至少能承载主指标、消融趋势和适用边界，同时减少模板性背景铺陈。局限性也放在本节或定位节中，而不是在多个章节重复展开。\n\n"
+        "## 定位与知识库关联\n\n"
+        "该段模拟知识库定位：只说明方法族、与 baseline 的本质差异、适用边界和后续启发，不复述前文公式和 pipeline。这样后续检索可以抓到核心 operator，同时降低单篇 note 的输出量。\n"
     )
+
+
+def mock_section_report(section_title: str) -> str:
+    report = normalize_report_markdown(mock_report())
+    lines = report.splitlines()
+    start = None
+    end = len(lines)
+    for index, line in enumerate(lines):
+        if line.strip() == f"## {section_title}":
+            start = index
+            continue
+        if start is not None and index > start and re.match(r"^##\s+\S", line):
+            end = index
+            break
+    if start is None:
+        return f"## {section_title}\n\n这是一段用于 smoke test 的新版 BITE 分析链 mock 内容，确保 section writer 能输出合法章节。\n"
+    return "\n".join(lines[start:end]).strip() + "\n"
 
 
 def deepseek_uses_reasoning(model: str) -> bool:
@@ -6640,7 +6688,7 @@ async def run_section_writer(
     started = time.monotonic()
     usage: dict[str, Any] = {}
     if args.mock_llm:
-        text = f"## {section_title}\n\n待人工补充。\n"
+        text = mock_section_report(section_title)
     else:
         llm_result = await writer_llm_text(args, system=SECTION_WRITER_SYSTEM, prompt=prompt, max_tokens=args.writer_max_tokens)
         text = llm_result.text
@@ -7300,7 +7348,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Override figure/table asset root. Defaults to <vault-root>/assets/figures/papers.",
     )
-    parser.add_argument("--max-note-images", type=int, default=12)
+    parser.add_argument(
+        "--max-note-images",
+        type=int,
+        default=6,
+        help="Maximum figure/table embeds in the vault note. Default 6 covers motivation, split pipeline/method figures, and key comparison/result evidence without sample-gallery bloat.",
+    )
     parser.add_argument("--mock-llm", action="store_true", help="Use deterministic local mock outputs")
     parser.add_argument("--dry-run", action="store_true", help="Parse and chunk only")
     parser.add_argument("--force", action="store_true", help="Overwrite existing stage outputs")
