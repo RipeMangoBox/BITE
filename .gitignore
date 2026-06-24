@@ -16,6 +16,33 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
+# === Model weights and compressed archives ===
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.gguf
+*.ggml
+pytorch_model*.bin
+model*.bin
+*.tar
+*.tar.gz
+*.tgz
+*.tar.zst
+*.tzst
+*.tar.xz
+*.txz
+*.tar.bz2
+*.tbz2
+*.zip
+*.zst
+*.xz
+*.bz2
+*.gz
+*.rar
+*.7z
+
 # === Agent/runtime state ===
 .codex/
 .mcp.json
