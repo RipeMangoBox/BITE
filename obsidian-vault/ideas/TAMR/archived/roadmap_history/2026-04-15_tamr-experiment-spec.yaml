@@ -1,0 +1,627 @@
+spec_version: 1
+spec_id: tamr_agent_experiment_spec_v1
+status: active_with_legacy_baseline_warning
+created: 2026-04-15
+updated: 2026-04-17
+roadmap_ref: ResearchWY/paperIDEAs/TAMR/2026-04-15_tamr-status-and-roadmap.md
+
+audit_warning:
+  added: 2026-04-17
+  summary: >
+    This spec predates the packaged-root fair-baseline audit. The current
+    baseline_reference_id `REF00_S2E_V2_3SEED` still points to the legacy
+    strict-split reference family whose retrieval gallery remains
+    `data/HumanML3D`, not `HumanML3D-E-MP`.
+  implication:
+    - "The spec is still usable for exploratory smoke execution."
+    - "The spec must not be used as-is for paper-safe delta gates or final baseline freeze."
+    - "See ResearchWY/paperIDEAs/TAMR/eval_summary/2026-04-17_tamr-fair-baseline-eval-summary.md before running downstream gating."
+
+fair_baseline_status:
+  updated: 2026-04-17
+  packaged_root_eval:
+    retrieval_gallery_root: HumanML3D-E-MP
+    normal_queries: 4646
+    nsim_queries: 97
+  current_seed42_anchor:
+    run_id: plain00_s42
+    primary_score: 43.8275
+    role: current_fair_baseline_anchor
+  current_seed42_reference:
+    run_id: stage5_s2e_v2_local_eval_2026-04-17_hmlemp
+    primary_score: 44.4487
+    delta_vs_anchor: 0.6212
+    role: exploratory_fair_same_regime_positive_signal
+  rerun_status:
+    run_id: ref00_s42_local_eval_2026-04-17_hmlemp
+    primary_score: 43.8662
+    delta_vs_anchor: 0.0387
+    interpretation: rerun_reference_only_not_frozen_baseline
+
+goal:
+  summary: >
+    Convert the TAMR roadmap into an agent-executable experiment contract with
+    explicit prerequisites, command templates, artifacts, and machine-readable
+    go/no-go rules.
+  intended_user: "coding / research agent working inside this repository"
+
+execution_policy:
+  automatic_advance_on:
+    - pass
+  stop_and_request_human_review_on:
+    - hold
+    - human_review
+  terminate_branch_on:
+    - fail
+  default_step_3_3_branch: dual_head_reranker
+  notes:
+    - "The agent may implement code, run experiments, collect metrics, and emit a decision."
+    - "The agent must not silently reinterpret gates; all branch changes must be logged in decision.md."
+    - "Human review is mandatory for caption-level 'and' / parallel audit labels unless a separate labeling policy is approved."
+
+environment:
+  repo_root: /home/ripemangobox/Coding/Github/Motion/TMR
+  motionpatches_root: ${repo_root}/MotionPatches-main
+  conda_env: TMR
+  humanml3de_root: ${repo_root}/../datasets/HumanML3D-E
+  output_root: ${repo_root}/RUN_DIR/tamr_agent_spec_v1
+  strict_label: HumanML3D-E keyid strict retrieval split
+
+reference_data_contract:
+  corrected_d0_expected:
+    total_captions: 83347
+    valid_captions: 83347
+    canonical_decomposed_coverage: 1.0
+    k_eq_1_count: 42261
+    k_eq_1_ratio: 0.5070
+    k_ge_2_count: 41086
+    k_ge_2_ratio: 0.4930
+    overlap_ratio: 0.0181
+  train_split_expected:
+    captions_total: 66636
+    k_eq_1_count: 34673
+    k_eq_1_ratio: 0.5203
+    k_eq_2_count: 22962
+    k_eq_3_count: 6524
+
+seed_policy:
+  smoke_seed: 41
+  full_seeds:
+    - 41
+    - 42
+    - 43
+  baseline_reference_id: REF00_S2E_V2_3SEED
+  notes:
+    - "All final go/no-go decisions must be based on 3-seed aggregates."
+    - "Smoke runs are functional checks only and cannot trigger final paper-level PASS."
+
+bootstrap_policy:
+  enabled: true
+  unit: query
+  resamples: 10000
+  confidence_interval: percentile_95
+  split_handling:
+    - bootstrap TMR-normal queries independently
+    - bootstrap TMR-nsim queries independently
+    - compute split-level deltas first
+    - aggregate split deltas into PrimaryScore delta
+  outputs:
+    - mean_delta
+    - ci95_low
+    - ci95_high
+    - p_delta_gt_0
+  implementation_notes:
+    - "Use paired bootstrap against the chosen reference run on identical query ids."
+    - "Report bootstrap on the 3-seed mean metric, not just on a single seed."
+
+artifact_contract:
+  required_per_experiment:
+    - run_manifest.json
+    - metrics_summary.json
+    - decision.json
+    - decision.md
+  required_per_seed:
+    - train_stdout.log
+    - eval_stdout.log
+    - contrastive_metrics/TMR-normal.yaml
+    - contrastive_metrics/TMR-nsim.yaml
+    - contrastive_metrics/EVT-normal.yaml
+    - contrastive_metrics/EVT-nsim.yaml
+  decision_json_fields:
+    - experiment_id
+    - parent_reference
+    - compared_to
+    - seeds
+    - primary_score_mean
+    - primary_score_delta_mean
+    - primary_score_ci95_low
+    - primary_score_ci95_high
+    - primary_score_p_delta_gt_0
+    - normal_delta_mean
+    - nsim_delta_mean
+    - car1_delta_mean
+    - params_delta
+    - flops_delta
+    - decision
+    - rationale
+
+command_templates:
+  build_humanml3de_splits: |
+    cd ${motionpatches_root}
+    conda run --no-capture-output -n ${conda_env} python ${motionpatches_root}/scripts/build_humanml3de_splits.py \
+      --humanml3de-root ${humanml3de_root}
+  train_direct: |
+    cd ${motionpatches_root}
+    conda run --no-capture-output -n ${conda_env} python ${motionpatches_root}/scripts/train.py \
+      "exp_name=${exp_name}" \
+      "dataset=HumanML3D" \
+      "train.dataset_regime=humanml3de" \
+      "train.seed=${seed}" \
+      "eval.strict_split.preset=humanml3de" \
+      "eval.strict_split.label=${strict_label}" \
+      ${extra_overrides}
+  eval_direct: |
+    cd ${motionpatches_root}
+    conda run --no-capture-output -n ${conda_env} python ${motionpatches_root}/scripts/test.py \
+      "run_dir=${run_dir}" \
+      "checkpoints_dir=${run_dir}" \
+      "dataset=HumanML3D" \
+      "eval.strict_split.preset=humanml3de" \
+      "eval.strict_split.label=${strict_label}" \
+      "eval.temporal.event_source.data_root=${humanml3de_root}" \
+      "eval.output_dir=${run_dir}" \
+      ${extra_overrides}
+  d0_corrected_audit: |
+    cd ${repo_root}
+    conda run --no-capture-output -n ${conda_env} python ${repo_root}/scripts/d0_humanml3de_event_stats.py \
+      --dataset-root ${humanml3de_root} \
+      --output-dir ${output_dir}
+
+supporting_scripts_required:
+  existing:
+    - MotionPatches-main/scripts/train.py
+    - MotionPatches-main/scripts/test.py
+    - MotionPatches-main/scripts/build_humanml3de_splits.py
+    - scripts/d0_humanml3de_event_stats.py
+  must_add_before_full_autonomy:
+    - scripts/tamr_collect_metrics.py
+    - scripts/tamr_bootstrap_ci.py
+    - scripts/tamr_multi_seed_runner.py
+    - scripts/tamr_and_parallel_audit.py
+    - scripts/tamr_negative_coverage_audit.py
+  notes:
+    - "The roadmap can be executed step-by-step before these helpers exist, but not fully autonomously."
+    - "All helper scripts must write machine-readable JSON in addition to human-readable Markdown."
+
+feature_flag_contract:
+  step_3_1_relative_bias:
+    expected_config_keys:
+      - model.temporal_rel_bias.enable
+      - model.temporal_rel_bias.mode
+      - model.temporal_rel_bias.time_scheme
+      - model.temporal_rel_bias.space_scheme
+      - train.temporal_rel_bias.bias_lr_scale
+      - train.temporal_rel_bias.warmup_epochs
+    allowed_modes:
+      - abs_only
+      - abs_rel
+      - rel_only
+  step_3_2_motion_repr:
+    expected_config_keys:
+      - dataset.motion_input_variant
+      - model.motion_in_chans
+      - train.motion_repr.init_strategy
+    allowed_motion_input_variants:
+      - pos_only
+      - pos_vel_acc
+  step_3_3_temporal_scoring:
+    expected_config_keys:
+      - model.temporal_scoring.enable
+      - model.temporal_scoring.mode
+      - model.temporal_scoring.rerank_topk
+    allowed_modes:
+      - dual_head_reranker
+      - latent_event_queries
+  step_3_4_text_structure:
+    expected_config_keys:
+      - model.event_text_encoder.enable
+      - model.event_text_encoder.mode
+    allowed_modes:
+      - event_structured
+      - hierarchical
+  step_3_5_augmentation:
+    expected_config_keys:
+      - train.temporal_augmentation.patch_shuffle_prob
+      - train.temporal_augmentation.crop_stitch_prob
+
+decision_rules:
+  hard_pass:
+    conditions:
+      - primary_score_delta_mean >= 0.5
+      - primary_score_ci95_low > 0.0
+      - normal_delta_mean >= 0.0
+      - nsim_delta_mean >= 0.0
+  soft_pass:
+    conditions:
+      - primary_score_delta_mean >= 0.3
+      - primary_score_delta_mean < 0.5
+      - car1_delta_mean >= 5.0
+      - primary_score_p_delta_gt_0 >= 0.9
+  fail:
+    conditions:
+      - primary_score_delta_mean < 0.3
+      - car1_delta_mean < 5.0
+  human_review_triggers:
+    - vit_large_primary_score > 45.0
+    - params_delta_ratio > 0.05
+    - primary_score_ci95_low <= 0.0 and primary_score_delta_mean >= 0.5
+
+experiments:
+  - id: PREFLIGHT_ENV
+    phase: preflight
+    automation_level: automated
+    status: ready
+    purpose: Verify environment, dataset path, and split generation before any training.
+    prerequisites: []
+    commands:
+      - ${build_humanml3de_splits}
+    outputs:
+      - ${motionpatches_root}/datasets/annotations/humanml3de/splits/train.txt
+      - ${motionpatches_root}/datasets/annotations/humanml3de/splits/val.txt
+      - ${motionpatches_root}/datasets/annotations/humanml3de/splits/test.txt
+      - ${motionpatches_root}/datasets/annotations/humanml3de/splits/nsim_test.txt
+    gate:
+      pass_if:
+        - all_split_files_exist == true
+      fail_if:
+        - missing_split_files == true
+      on_fail: Stop all downstream experiments.
+
+  - id: REF00_S2E_V2_3SEED
+    phase: reference
+    automation_level: automated
+    status: ready
+    purpose: Create the 3-seed S2E-v2 reference baseline used by all delta-based gates.
+    prerequisites:
+      - PREFLIGHT_ENV
+    per_seed:
+      exp_name_template: tamr_ref_s2e_v2_seed${seed}
+      run_dir_template: ${motionpatches_root}/checkpoints/tamr_ref_s2e_v2_seed${seed}/HumanML3D
+      train_overrides: |
+        "train.epoch=50" \
+        "train.batch_size=64" \
+        "train.train_motion_encoder=true" \
+        "train.train_text_encoder=true" \
+        "train.event_temporal.enable=true" \
+        "train.event_temporal.enable_event_loss=true" \
+        "train.event_temporal.enable_temporal_loss=true" \
+        "train.event_temporal.event_source.type=gt" \
+        "train.event_temporal.event_source.split=train" \
+        "train.event_temporal.event_source.use_cache=true" \
+        "train.event_temporal.loss.global_weight=1.0" \
+        "train.event_temporal.loss.event_weight=0.5" \
+        "train.event_temporal.loss.temporal_weight=0.3" \
+        "train.temporal_adapter.enable=false" \
+        "train.event_patch_alignment.enable=false" \
+        "train.tmr_transfer.enable=false"
+    outputs:
+      - 3 completed run directories under ${motionpatches_root}/checkpoints/tamr_ref_s2e_v2_seed*/
+      - aggregated metrics_summary.json
+    gate:
+      pass_if:
+        - completed_seed_runs == 3
+        - aggregated_reference_exists == true
+      fail_if:
+        - completed_seed_runs < 3
+      on_fail: Do not evaluate any candidate branch against a single-seed reference.
+
+  - id: S30_D0_CORRECTED_AUDIT
+    phase: 3.0
+    automation_level: automated
+    status: ready
+    purpose: Re-verify corrected D0 statistics before using any temporal supervision claims.
+    prerequisites:
+      - PREFLIGHT_ENV
+    commands:
+      - ${d0_corrected_audit}
+    outputs:
+      - ${repo_root}/RUN_DIR/tamr_agent_spec_v1/S30_D0_CORRECTED_AUDIT/2026-04-15_d0_realdata_report.md
+      - ${repo_root}/RUN_DIR/tamr_agent_spec_v1/S30_D0_CORRECTED_AUDIT/2026-04-15_d0_realdata_event_stats.json
+    gate:
+      pass_if:
+        - total_captions == 83347
+        - valid_captions == 83347
+        - k_eq_1_ratio in [0.5065, 0.5075]
+        - overlap_ratio in [0.0175, 0.0185]
+      fail_if:
+        - total_captions != 83347
+        - valid_captions != 83347
+      on_fail: Stop and investigate dataset root or parser drift.
+
+  - id: S30_AND_PARALLEL_AUDIT
+    phase: 3.0
+    automation_level: semi_manual
+    status: requires_helper_script
+    purpose: Audit whether captions containing 'and' are incorrectly decomposed into sequential events.
+    prerequisites:
+      - S30_D0_CORRECTED_AUDIT
+    required_helper: scripts/tamr_and_parallel_audit.py
+    sample_policy:
+      source: corrected_d0_train_val_test
+      sample_size: 200
+      match_rule: caption contains literal ' and '
+      label_set:
+        - parallel
+        - sequential
+        - ambiguous
+    outputs:
+      - and_parallel_audit_sample.csv
+      - and_parallel_audit_labels.csv
+      - and_parallel_audit_summary.json
+    gate:
+      pass_if:
+        - sequential_misparse_rate <= 0.15
+      hold_if:
+        - labels_missing == true
+        - ambiguous_rate > 0.25
+      fail_if:
+        - sequential_misparse_rate > 0.15
+      on_fail: Fix decomposition or lower trust in temporal hard-negative pipeline before continuing.
+
+  - id: S30_NEGATIVE_COVERAGE_AUDIT
+    phase: 3.0
+    automation_level: automated
+    status: requires_helper_script
+    purpose: Convert current temporal negative implementation details into a machine-readable audit.
+    prerequisites:
+      - PREFLIGHT_ENV
+    required_helper: scripts/tamr_negative_coverage_audit.py
+    outputs:
+      - negative_coverage_audit.json
+      - negative_coverage_audit.md
+    gate:
+      pass_if:
+        - audit_completed == true
+      human_review_if:
+        - relation_sensitive_reads_gt_relations == true
+        - parallel_to_sequential_default_enabled == true
+      on_fail: Use audit findings to update root-cause assumptions before proceeding.
+
+  - id: S30_VIT_LARGE_SANITY
+    phase: 3.0
+    automation_level: automated
+    status: ready_with_config_override
+    purpose: Estimate how much gain can be obtained by a stronger backbone without architectural novelty.
+    prerequisites:
+      - PREFLIGHT_ENV
+      - REF00_S2E_V2_3SEED
+    execution_mode:
+      type: single_seed_full_run
+      seed: 41
+    train_overrides: |
+      "model.motion_encoder=vit_large_patch16_224_in21k" \
+      "train.epoch=50" \
+      "train.batch_size=32" \
+      "train.train_motion_encoder=true" \
+      "train.train_text_encoder=true" \
+      "train.event_temporal.enable=false"
+    outputs:
+      - one completed ViT-Large run directory
+      - metrics_summary.json
+    gate:
+      pass_if:
+        - run_completed == true
+      human_review_if:
+        - primary_score >= 45.0
+      fail_if:
+        - run_completed == false
+      on_fail: Do not start architecture story until sanity baseline is known.
+
+  - id: S31_REL_BIAS_B
+    phase: 3.1
+    automation_level: automated_after_code_change
+    status: requires_impl
+    purpose: Implement and validate decomposed temporal-spatial relative bias on top of the ViT backbone.
+    prerequisites:
+      - REF00_S2E_V2_3SEED
+      - S30_D0_CORRECTED_AUDIT
+      - S30_VIT_LARGE_SANITY
+    code_scope:
+      - MotionPatches-main/models/clip.py
+      - MotionPatches-main/scripts/train.py
+      - MotionPatches-main/scripts/test.py
+      - MotionPatches-main/conf/config.yaml
+    required_feature_flags:
+      - model.temporal_rel_bias.enable
+      - model.temporal_rel_bias.mode
+      - train.temporal_rel_bias.bias_lr_scale
+    execution_mode:
+      smoke:
+        seeds:
+          - 41
+        epochs: 10
+      full:
+        seeds:
+          - 41
+          - 42
+          - 43
+        epochs: 50
+    ablations_required:
+      - abs_only
+      - abs_rel
+      - rel_only
+    compare_against:
+      - REF00_S2E_V2_3SEED
+    gate:
+      pass_if:
+        - hard_pass == true
+      soft_pass_if:
+        - soft_pass == true
+      human_review_if:
+        - vit_large_primary_score > 45.0
+        - abs_rel_outperforms_abs_only_by < 0.2
+      fail_if:
+        - fail == true
+      on_pass: Promote best ablation to BASELINE_FOR_STACKING.
+      on_soft_pass: Promote best ablation to BASELINE_FOR_STACKING with caution.
+      on_fail: Try Step 3.1 fallback branch D or E before abandoning architecture changes.
+
+  - id: S32_MOTION_REPR_VEL_ACC
+    phase: 3.2
+    automation_level: automated_after_code_change
+    status: requires_impl
+    purpose: Add velocity / acceleration channels and test whether explicit dynamics improve retrieval.
+    prerequisites:
+      - S31_REL_BIAS_B
+    code_scope:
+      - MotionPatches-main/datasets/dataset.py
+      - MotionPatches-main/models/clip.py
+      - MotionPatches-main/scripts/cal_mean_var.py
+      - MotionPatches-main/scripts/train.py
+      - MotionPatches-main/scripts/test.py
+    required_feature_flags:
+      - dataset.motion_input_variant=pos_vel_acc
+      - model.motion_in_chans=9
+      - train.motion_repr.init_strategy=copy_pos_zero_new
+    compare_against:
+      - BASELINE_FOR_STACKING
+    gate:
+      pass_if:
+        - primary_score_delta_mean >= 0.3
+        - primary_score_ci95_low > 0.0
+        - params_delta_ratio <= 0.05
+      soft_pass_if:
+        - primary_score_delta_mean >= 0.2
+        - car1_delta_mean >= 3.0
+      fail_if:
+        - primary_score_delta_mean < 0.2
+      on_pass: Stack with best Step 3.1 setting.
+      on_fail: Keep Step 3.1 winner as main branch.
+
+  - id: S33_TEMPORAL_SCORING
+    phase: 3.3
+    automation_level: automated_after_code_change
+    status: requires_impl
+    purpose: Add temporal scoring beyond the pure global head without depending on GT event boundaries at inference.
+    prerequisites:
+      - S31_REL_BIAS_B
+    branch_order:
+      - dual_head_reranker
+      - latent_event_queries
+    notes:
+      - "Default path is dual_head_reranker because it avoids external event decomposition at inference."
+      - "latent_event_queries is only attempted if reranker shows signal or if explicitly requested."
+    compare_against:
+      - BASELINE_FOR_STACKING
+    gate:
+      pass_if:
+        - primary_score_delta_mean >= 0.3
+        - primary_score_ci95_low > 0.0
+      soft_pass_if:
+        - primary_score_delta_mean >= 0.2
+        - car1_delta_mean >= 5.0
+      fail_if:
+        - primary_score_delta_mean < 0.2
+      on_fail: Do not make Step 3.3 the main contribution path.
+
+  - id: S34_TEXT_STRUCTURE
+    phase: 3.4
+    automation_level: automated_after_code_change
+    status: requires_impl
+    purpose: Test whether explicit event-structured text encoding removes the text-side bottleneck.
+    prerequisites:
+      - S31_REL_BIAS_B
+    compare_against:
+      - BASELINE_FOR_STACKING
+    gate:
+      pass_if:
+        - primary_score_delta_mean >= 0.2
+        - no_main_metric_regression == true
+      fail_if:
+        - primary_score_delta_mean < 0.2
+      on_fail: Treat as supporting negative evidence, not a blocker.
+
+  - id: S35_TEMPORAL_AUGMENTATION
+    phase: 3.5
+    automation_level: automated_after_code_change
+    status: requires_impl
+    purpose: Add patch-shuffle / crop-stitch only after structural changes show positive signal.
+    prerequisites:
+      - S31_REL_BIAS_B
+    start_condition:
+      - BASELINE_FOR_STACKING decision in [pass, soft_pass]
+    gate:
+      pass_if:
+        - primary_score_delta_mean >= 0.2
+      fail_if:
+        - primary_score_delta_mean < 0.2
+      on_fail: Drop augmentation from the main branch.
+
+  - id: S36_TRB_BENCHMARK
+    phase: 3.6
+    automation_level: requires_benchmark_builder
+    status: requires_impl
+    purpose: Build the temporal retrieval benchmark and package evaluation code for paper release.
+    prerequisites:
+      - S30_D0_CORRECTED_AUDIT
+    required_helper:
+      - scripts/tamr_build_trb.py
+      - scripts/tamr_eval_trb.py
+    gate:
+      pass_if:
+        - benchmark_manifest_exists == true
+        - eval_script_exists == true
+      fail_if:
+        - benchmark_manifest_exists == false
+      on_fail: Keep benchmark contribution out of final paper claim.
+
+  - id: STEP4_FINAL_SELECTION
+    phase: 4
+    automation_level: automated_with_human_confirmation
+    status: ready_after_upstream_steps
+    purpose: Select the main paper candidate branch and emit final go/no-go.
+    prerequisites:
+      - REF00_S2E_V2_3SEED
+      - S30_VIT_LARGE_SANITY
+    required_inputs:
+      - at least one candidate branch with decision in [pass, soft_pass]
+      - 3-seed aggregated metrics for main candidate
+      - bootstrap CI output for main candidate
+      - at least 2 ablations
+    final_go_if:
+      - primary_score_delta_mean >= 0.5
+      - primary_score_ci95_low > 0.0
+      - completed_core_ablations >= 2
+      - vit_large_primary_score < candidate_primary_score + 0.2
+    final_soft_go_if:
+      - primary_score_delta_mean >= 0.3
+      - car1_delta_mean >= 5.0
+      - primary_score_p_delta_gt_0 >= 0.9
+    final_no_go_if:
+      - primary_score_delta_mean < 0.3
+      - all_candidate_branches failed == true
+    outputs:
+      - final_ranking.json
+      - final_go_no_go.md
+
+  - id: CONTINGENCY_MOTION_NATIVE
+    phase: 7.3
+    automation_level: manual_repo_integration
+    status: blocked_on_external_code
+    purpose: Run a disconfirming motion-native backbone baseline if ViT-on-motion-patches remains weak.
+    prerequisites:
+      - STEP4_FINAL_SELECTION
+    start_condition:
+      - all_candidate_branches failed == true
+      - or vit_large_primary_score >= candidate_primary_score
+    candidate_backbones:
+      - MotionBERT_DSTFormer
+      - discrete_token_RVQ_route
+    gate:
+      human_review_if:
+        - external_repo_required == true
+      on_trigger: Start a new integration plan rather than continuing TAMR mainline blindly.
+
+notes:
+  - "This spec is intentionally stricter than the roadmap: if a step cannot emit machine-readable artifacts, it is not considered complete."
+  - "The first downstream branch that may change the paper story is S31_REL_BIAS_B; everything before that exists to establish trustworthy reference baselines and decision gates."

@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/home/ripemangobox/.local/bin/mineru",
+    "-p",
+    "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/paperPDFs/CVPR_2026/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens.pdf",
+    "-o",
+    "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw",
+    "-b",
+    "pipeline"
+  ],
+  "env": {
+    "MINERU_MODEL_SOURCE": "local",
+    "MINERU_TOOLS_CONFIG_JSON": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/mineru_local/mineru.json",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"
+  },
+  "returncode": 0,
+  "duration_seconds": 46.887
+}

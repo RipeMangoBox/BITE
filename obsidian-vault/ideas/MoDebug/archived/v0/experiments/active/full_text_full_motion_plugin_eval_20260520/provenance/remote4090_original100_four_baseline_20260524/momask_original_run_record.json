@@ -1,0 +1,16 @@
+{
+  "date": "2026-05-25T04:11:21",
+  "protocol": "paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/protocols/phase1_phase2_eval_data_split_contract.md",
+  "condition_pair": "original_full_text_only",
+  "role": "diagnostic",
+  "used_for": "observation",
+  "limitations": "Original100 baseline generation artifact only; not a final evaluator; unified rendering and human review are downstream.",
+  "artifact_path": "/data/public/ripemangobox/Motion/momask-codes-mocritique-mvp-27687f4-20260518/generation/modebug_hml_original100_four_momask_original_20260524",
+  "evaluator": "momask_native_gen_t2m_original100_original_humanml3d_ckpt",
+  "motion_source": "MoMask official HumanML3D original checkpoints on remote4090 GPU1 via mogents-gpu1 env",
+  "n/evaluable": "100/100",
+  "coverage": "100 custom prompt lines in MoMask text_path prompt#length#length format; visualization skipped.",
+  "npy_count": 100,
+  "mp4_count": 0,
+  "native_root": "/data/public/ripemangobox/Motion/momask-codes-mocritique-mvp-27687f4-20260518/generation/modebug_hml_original100_four_momask_original_20260524"
+}

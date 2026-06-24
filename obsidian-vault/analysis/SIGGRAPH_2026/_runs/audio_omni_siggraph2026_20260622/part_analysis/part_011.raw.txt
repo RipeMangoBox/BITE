@@ -1,0 +1,45 @@
+{
+  "part_id": "11/13",
+  "section_role": "Appendix",
+  "method_evidence": [
+    {
+      "claim": "Style-transfer keyword generation uses Gemini 2.5 Pro with original keyword to generate related but different target keywords, filtered by CLAP before guiding ZETA.",
+      "section": "1.1 Dataset Details",
+      "anchor": "For style-transfer data construction, we prompt Gemini 2.5 Pro with each audio’s original keyword to generate semantically related but stylistically different target keywords. The prompt template is: “Given audio with keyword ‘[original\\_keyword]’, generate a related but different keyword for style transfer.” Generated candidates are filtered by CLAP before guiding ZETA for style transformation.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Ablation on encoders: Qwen MLLM outperforms T5, CLAP, CLIP, VideoMAE on T2A and V2A tasks.",
+      "table_or_figure": "Table A1",
+      "metric": "KL↓ / IS↑ / FD↓ / FAD↓",
+      "value": "T2A Qwen: 1.25 / 11.65 / 12.21 / 2.14; V2A Qwen: 2.00 / 8.08 / 8.50 / 2.23",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Zero-shot cross-lingual T2A: Audio-Omni maintains strong performance across CN, ES, DE, FR, JP despite English-only training.",
+      "table_or_figure": "Table A2",
+      "metric": "KL↓ / IS↑ / FD↓ / FAD↓",
+      "value": "CN: 1.65 / 11.10 / 15.05 / 2.26; ES: 2.36 / 9.16 / 25.26 / 4.32; DE: 2.39 / 9.13 / 23.51 / 2.92; FR: 2.47 / 8.80 / 28.63 / 4.21; JP: 2.27 / 8.67 / 19.82 / 3.13",
+      "confidence": 0.98
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table A1",
+      "role_hint": "Ablation study on different encoders for T2A and V2A tasks.",
+      "caption": "Table A1. Ablation study on different encoders. We evaluate the impact of different encoders for text-to-audio (T2A) and video-to-audio (V2A) tasks.",
+      "confidence": 0.99
+    },
+    {
+      "label": "Table A2",
+      "role_hint": "Zero-shot cross-lingual text-to-audio generation results.",
+      "caption": "Table A2. Zero-shot cross-lingual text-to-audio generation results.",
+      "confidence": 0.99
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

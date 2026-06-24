@@ -1,0 +1,66 @@
+{
+  "part_id": "part_001",
+  "section_role": "supplementary expert feedback",
+  "method_evidence": [],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "open_questions": [
+    "How difficult is the tool to operate for non-professionals?",
+    "Can the tool incorporate set, mise-en-scène, and lighting considerations?",
+    "Does the tool limit creativity by standardizing camera movements?",
+    "How can language control be made more precise for professional requirements?"
+  ],
+  "_meta": {
+    "part_id": "part_001",
+    "part_index": 1,
+    "part_count": 1,
+    "chunk_chars": 5112,
+    "latency_seconds": 3.62,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 2205,
+      "completion_tokens_est": 154,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 2359,
+      "total_with_reasoning_tokens_est": 2359,
+      "estimated_cost_usd": 0.001093,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 1639,
+      "completion_tokens_api": 125,
+      "total_tokens_api": 1764,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 1536,
+      "prompt_cache_miss_tokens": 103,
+      "cached_tokens_api": 1536,
+      "api_usage_raw": {
+        "completion_tokens": 125,
+        "prompt_tokens": 1639,
+        "total_tokens": 1764,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 1536
+        },
+        "prompt_cache_hit_tokens": 1536,
+        "prompt_cache_miss_tokens": 103
+      },
+      "estimated_cost_usd_api": 0.000159,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 512,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 127,
+        "api_usage_present": true
+      }
+    }
+  }
+}

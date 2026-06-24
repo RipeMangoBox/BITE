@@ -1,0 +1,2554 @@
+---
+title: "Topic: Benchmarks / Datasets / Evaluation"
+type: paper-index
+dimension: topic
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Topic: Benchmarks / Datasets / Evaluation
+
+- [[obsidian-vault/analysis/TOG_2015/Intuitive_and_Efficient_Camera_Control_with_the_Toric_Space.md|Intuitive and Efficient Camera Control with the Toric Space (TOG 2015 2015)]]
+	- [[obsidian-vault/paperPDFs/TOG_2015/Intuitive_and_Efficient_Camera_Control_with_the_Toric_Space.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Toric Space Camera Control
+	- datasets: Five viewpoint composition problems from Ranon & Urli 2014, Precise framing problem, User study: reproduce a reference viewpoint
+- [[obsidian-vault/analysis/TECHNOLOGIES_2019/Choreographic_Pattern_Analysis_from_Heterogeneous_Motion_Capture_Systems_Using_Dynamic_Time_Warping.md|Choreographic Pattern Analysis from Heterogeneous Motion Capture Systems Using Dynamic Time Warping (TECHNOLOGIES 2019 2019)]]
+	- [[obsidian-vault/paperPDFs/TECHNOLOGIES_2019/Choreographic_Pattern_Analysis_from_Heterogeneous_Motion_Capture_Systems_Using_Dynamic_Time_Warping.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: 基于动态时间规整（DTW）和坐标归一化的跨传感器舞蹈相似性评估
+	- datasets: 希腊民间舞蹈数据集
+- [[obsidian-vault/analysis/NEURIPS_2020/Ultrahyperbolic_Representation_Learning.md|Ultrahyperbolic Representation Learning (NEURIPS 2020 2020)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2020/Ultrahyperbolic_Representation_Learning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Representation / Self-Supervised / Transfer
+	- methods: Ultrahyperbolic Representation Learning
+	- datasets: NIPS co-authorship dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Motion_Matching-based_Framework_for_Controllable_Gesture_Synthesis_From_Speech.md|A Motion Matching-based Framework for Controllable Gesture Synthesis From Speech (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Motion_Matching_based_Framework_for_Controllable_Gesture_Synthesis_From_Speech.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Motion Matching-based k-NN + cGAN
+	- datasets: User study - control-based synthesis, User study - unconstrained synthesis
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Approximate_Convex_Decomposition_for_3D_Meshes_With_Collision-aware_Concavity_and_Tree_Search.md|Approximate Convex Decomposition for 3D Meshes With Collision-aware Concavity and Tree Search (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Approximate_Convex_Decomposition_for_3D_Meshes_With_Collision_aware_Concavity_and_Tree_Search.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CoACD
+	- datasets: V-HACD dataset, PartNet-Mobility, OpenCabinetDrawer
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Authentic_Volumetric_Avatars_From_a_Phone_Scan.md|Authentic Volumetric Avatars From a Phone Scan (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Authentic_Volumetric_Avatars_From_a_Phone_Scan.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Deep Lighting Adaptation for DAM
+	- datasets: In-the-wild test set
+- [[obsidian-vault/analysis/SIGGRAPH_2022/CLIPasso_Semantically_Aware_Object_Sketching.md|CLIPasso: Semantically Aware Object Sketching (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CLIPasso_Semantically_Aware_Object_Sketching.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CLIPasso
+	- datasets: User Study, SketchyCOCO
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Comparison_of_Single-image_HDR_Reconstruction_Methods_The_Caveats_of_Quality_Assessment.md|Comparison of Single-image HDR Reconstruction Methods — The Caveats of Quality Assessment (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Comparison_of_Single_image_HDR_Reconstruction_Methods_The_Caveats_of_Quality_Assessment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CRF校正评估协议（CRF Correction-based Evaluation Protocol）
+	- datasets: 新构建的SI-HDR数据集, 主观实验与客观指标相关性, 全验证集方法排名可靠性
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DEF_Deep_Estimation_of_Sharp_Geometric_Features_in_3D_Shapes.md|DEF: Deep Estimation of Sharp Geometric Features in 3D Shapes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DEF_Deep_Estimation_of_Sharp_Geometric_Features_in_3D_Shapes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DEF (Deep Estimators of Features)
+	- datasets: DEF-Sim local patches, Parametric curve extraction on ABC shapes
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DeltaConv_Anisotropic_Operators_for_Geometric_Deep_Learning_on_Point_Clouds.md|DeltaConv: Anisotropic Operators for Geometric Deep Learning on Point Clouds (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DeltaConv_Anisotropic_Operators_for_Geometric_Deep_Learning_on_Point_Clouds.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: DeltaConv
+	- datasets: ModelNet40, ScanObjectNN, ShapeNet
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Drivable_Volumetric_Avatars_Using_Texel-aligned_Features.md|Drivable Volumetric Avatars Using Texel-aligned Features (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Drivable_Volumetric_Avatars_Using_Texel_aligned_Features.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Drivable Volumetric Avatars (DVA)
+	- datasets: ZJU-MoCap S386, ZJU-MoCap S387
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dual_Octree_Graph_Networks_for_Learning_Adaptive_Volumetric_Shape_Representations.md|Dual Octree Graph Networks for Learning Adaptive Volumetric Shape Representations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dual_Octree_Graph_Networks_for_Learning_Adaptive_Volumetric_Shape_Representations.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: Dual Octree Graph Networks
+	- datasets: D-Faust, ShapeNet autoencoder
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Estimation_of_Yarn-level_Simulation_Models_for_Production_Fabrics.md|Estimation of Yarn-level Simulation Models for Production Fabrics (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Estimation_of_Yarn_level_Simulation_Models_for_Production_Fabrics.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Two-step yarn-level parameter estimation via thin-shell intermediation
+	- datasets: Fabric dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Face_Deblurring_Using_Dual_Camera_Fusion_on_Mobile_Phones.md|Face Deblurring Using Dual Camera Fusion on Mobile Phones (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Face_Deblurring_Using_Dual_Camera_Fusion_on_Mobile_Phones.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Face Deblurring via Dual Camera Fusion
+	- datasets: In-house dataset, Runtime on Google Pixel 6, Desktop GPU latency
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Fast_Evaluation_of_Smooth_Distance_Constraints_on_Co-dimensional_Geometry.md|Fast Evaluation of Smooth Distance Constraints on Co-dimensional Geometry (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Fast_Evaluation_of_Smooth_Distance_Constraints_on_Co_dimensional_Geometry.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Weighted LogSumExp Smooth Distance with Conservative Barnes-Hut
+	- datasets: Thingi10K 1003 体素网格评估, V形碗刚体质点仿真, Thingi10K GPU基准测试
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Grid-free_Monte_Carlo_for_PDEs_With_Spatially_Varying_Coefficients.md|Grid-free Monte Carlo for PDEs With Spatially Varying Coefficients (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Grid_free_Monte_Carlo_for_PDEs_With_Spatially_Varying_Coefficients.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Volumetric Walk on Spheres (VWoS) / Volumetric Walk on Stars (VWoSt)
+	- datasets: Bilipid Membrane Electrostatics, Mushroom 域, Connector 域
+- [[obsidian-vault/analysis/SIGGRAPH_2022/GWA_A_Large_Geometric-wave_Acoustic_Dataset_for_Audio_Deep_Learning.md|GWA: A Large Geometric-wave Acoustic Dataset for Audio Deep Learning (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/GWA_A_Large_Geometric_wave_Acoustic_Dataset_for_Audio_Deep_Learning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: GWA（Geometric-Wave Acoustic混合仿真与数据集生成流程）
+	- datasets: AMI corpus, VOICES corpus
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/An_Implicit_Parametric_Morphable_Dental_Model.md|An Implicit Parametric Morphable Dental Model (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/An_Implicit_Parametric_Morphable_Dental_Model.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Implicit Parametric Morphable Dental Model (Compositional DeepSDF)
+	- datasets: Custom Aligned Dental Scans, Public Dataset
+- [[obsidian-vault/analysis/arxiv_2023/Explainable_Multimodal_Emotion_Recognition.md|Explainable Multimodal Emotion Recognition (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Explainable_Multimodal_Emotion_Recognition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EMER (Explainable Multimodal Emotion Recognition)
+	- datasets: EMER dataset
+- [[obsidian-vault/analysis/arxiv_2023/LAMP_Learn_A_Motion_Pattern_for_Few_Shot_Based_Video_Generation.md|LAMP: Learn A Motion Pattern for Few-Shot-Based Video Generation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/LAMP_Learn_A_Motion_Pattern_for_Few_Shot_Based_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LAMP
+	- datasets: Custom evaluation set, User study
+- [[obsidian-vault/analysis/arxiv_2023/Motion_Conditioned_Image_Animation_for_Video_Editing.md|Motion-Conditioned Image Animation for Video Editing (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Motion_Conditioned_Image_Animation_for_Video_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MoCA (Motion-Conditioned Image Animation)
+	- datasets: VideoEdit Benchmark
+- [[obsidian-vault/analysis/arxiv_2023/VideoControlNet_A_Motion_Guided_Video_to_Video_Translation_Framework_by_Using_Diffusion_Model_with_ControlNet.md|VideoControlNet: A Motion-Guided Video-to-Video Translation Framework by Using Diffusion Model with ControlNet (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/VideoControlNet_A_Motion_Guided_Video_to_Video_Translation_Framework_by_Using_Diffusion_Model_with_ControlNet.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoControlNet
+	- datasets: User Study, DAVIS
+- [[obsidian-vault/analysis/ICCV_2023/Learning_Human_Dynamics_in_Autonomous_Driving_Scenarios.md|Learning Human Dynamics in Autonomous Driving Scenarios (ICCV 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2023/Learning_Human_Dynamics_in_Autonomous_Driving_Scenarios.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Physics-aware motion tracking framework for human dynamics
+	- datasets: Waymo Open Dataset
+- [[obsidian-vault/analysis/NEURIPS_2023/Towards_Distribution_Agnostic_Generalized_Category_Discovery.md|Towards Distribution-Agnostic Generalized Category Discovery (NEURIPS 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2023/Towards_Distribution_Agnostic_Generalized_Category_Discovery.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Representation / Self-Supervised / Transfer
+	- methods: Self-Balanced Co-Advice contrastive framework (BaCon)
+	- datasets: CIFAR-10-LT, CIFAR-100-LT, ImageNet-100-LT
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.md|A Convex Optimization Framework for Regularized Geodesic Distances (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: Convex Optimization Framework for Regularized Geodesic Distances
+	- datasets: Single-source distance, Pipe mesh, Dragon mesh
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Fast_Geometric_Multigrid_Method_for_Curved_Surfaces.md|A Fast Geometric Multigrid Method for Curved Surfaces (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Fast_Geometric_Multigrid_Method_for_Curved_Surfaces.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Gravo MG (A Fast Geometric Multigrid Method for Curved Surfaces)
+	- datasets: Poisson 方程, 数据平滑
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Method_for_Animating_Childrens_Drawings_of_the_Human_Figure.md|A Method for Animating Children's Drawings of the Human Figure (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Method_for_Animating_Children_s_Drawings_of_the_Human_Figure.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Animated Drawings
+	- datasets: Amateur Drawings Dataset 验证集
+- [[obsidian-vault/analysis/TPAMI_2023/Bailando_3D_Dance_Generation_by_Actor_Critic_GPT_with_Choreographic_Memory.md|Bailando 3D Dance Generation by Actor Critic GPT with Choreographic Memory (TPAMI 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/TPAMI_2023/Bailando_3D_Dance_Generation_by_Actor_Critic_GPT_with_Choreographic_Memory.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Bailando++
+	- datasets: AIST++ test set, User Study
+- [[obsidian-vault/analysis/ACM_MM_2024/SATO_Stable_Text-to-Motion_Framework.md|SATO: Stable Text-to-Motion Framework (ACM MM 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ACM_MM_2024/SATO_Stable_Text_to_Motion_Framework.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SATO (Stable Text-to-Motion Framework)
+	- datasets: HumanML3D, KIT-ML, Human evaluation
+- [[obsidian-vault/analysis/arxiv_2024/DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_Driven_Dance_Motion_Reconstruction.md|DanceFusion A Spatio Temporal Skeleton Diffusion Transformer for Audio Driven Dance Motion Reconstruction (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_Driven_Dance_Motion_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DanceFusion
+	- datasets: TikTok Dance Dataset
+- [[obsidian-vault/analysis/arxiv_2024/Learning_Generalizable_Human_Motion_Generator_with_Reinforcement_Learning.md|Learning Generalizable Human Motion Generator with Reinforcement Learning (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Learning_Generalizable_Human_Motion_Generator_with_Reinforcement_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: InstructMotion
+	- datasets: HumanML3D, KIT-ML, Human Evaluation
+- [[obsidian-vault/analysis/CVPR_2024/ChatPose_Chatting_about_3D_Human_Pose.md|ChatPose Chatting about 3D Human Pose (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/ChatPose_Chatting_about_3D_Human_Pose.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: ChatPose
+	- datasets: SPG Benchmark, RPE Benchmark, LLaVA Eval
+- [[obsidian-vault/analysis/CVPR_2024/EMAGE_Towards_Unified_Holistic_Co_Speech_Gesture_Generation_via_Expressive_Masked_Audio_Gesture_Modeling.md|EMAGE Towards Unified Holistic Co Speech Gesture Generation via Expressive Masked Audio Gesture Modeling (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/EMAGE_Towards_Unified_Holistic_Co_Speech_Gesture_Generation_via_Expressive_Masked_Audio_Gesture_Modeling.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: EMAGE
+	- datasets: BEATv2, User Study
+- [[obsidian-vault/analysis/CVPR_2024/FoundationPose_Unified_6D_Pose_Estimation_and_Tracking_of_Novel_Objects.md|FoundationPose Unified 6D Pose Estimation and Tracking of Novel Objects (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/FoundationPose_Unified_6D_Pose_Estimation_and_Tracking_of_Novel_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: FoundationPose
+	- datasets: YCB-Video, LINEMOD, BOP datasets - model-based
+- [[obsidian-vault/analysis/CVPR_2024/Inter_X_Towards_Versatile_Human_Human_Interaction_Analysis.md|Inter X Towards Versatile Human Human Interaction Analysis (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/Inter_X_Towards_Versatile_Human_Human_Interaction_Analysis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Inter-X Dataset and Benchmark
+	- datasets: Inter-X
+- [[obsidian-vault/analysis/CVPR_2024/MAS_Multi_view_Ancestral_Sampling_for_3D_motion_generation_using_2D_diffusion.md|MAS Multi view Ancestral Sampling for 3D motion generation using 2D diffusion (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/MAS_Multi_view_Ancestral_Sampling_for_3D_motion_generation_using_2D_diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Multi-view Ancestral Sampling (MAS)
+	- datasets: NBA 2D projections, NBA user study, Human3.6M
+- [[obsidian-vault/analysis/CVPR_2024/MoST_Motion_Style_Transformer_between_Diverse_Action_Contents.md|MoST Motion Style Transformer between Diverse Action Contents (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/MoST_Motion_Style_Transformer_between_Diverse_Action_Contents.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MoST
+	- datasets: Xia dataset
+- [[obsidian-vault/analysis/CVPR_2024/Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generation_with_Scene_Affordance.md|Move as You Say Interact as You Can Language guided Human Motion Generation with Scene Affordance (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generation_with_Scene_Affordance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Two-stage Affordance Diffusion Framework (ADM + AMDM)
+	- datasets: HumanML3D, HUMANISE, Novel Evaluation Set
+- [[obsidian-vault/analysis/CVPR_2024/NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis.md|NIFTY Neural Object Interaction Fields for Guided Human Motion Synthesis (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: NIFTY (Neural Interaction Fields for Trajectory sYnthesis)
+	- datasets: User Study, Lifting
+- [[obsidian-vault/analysis/CVPR_2024/Rethinking_the_Spatial_Inconsistency_in_Classifier_Free_Diffusion_Guidance.md|Rethinking the Spatial Inconsistency in Classifier-Free Diffusion Guidance (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/Rethinking_the_Spatial_Inconsistency_in_Classifier_Free_Diffusion_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Semantic-aware Classifier-Free Guidance (S-CFG)
+	- datasets: MS COCO validation set, Human evaluation, ControlNet tasks
+- [[obsidian-vault/analysis/ECCV_2024/CoMo_Controllable_Motion_Generation_through_Language_Guided_Pose_Code_Editing.md|CoMo: Controllable Motion Generation through Language Guided Pose Code Editing (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/CoMo_Controllable_Motion_Generation_through_Language_Guided_Pose_Code_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CoMo
+	- datasets: HumanML3D, KIT-ML, Human Evaluation on Motion Editing
+- [[obsidian-vault/analysis/ECCV_2024/HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objects.md|HIMO A New Benchmark for Full Body Human Interacting with Multiple Objects (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: HIMO-Gen / HIMO-SegGen
+	- datasets: HIMO 2-objects partition, HIMO 3-objects partition
+- [[obsidian-vault/analysis/NEURIPS_2024/InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every_Joint.md|InterControl Generate Human Motion Interactions by Controlling Every Joint (NEURIPS 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2024/InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every_Joint.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InterControl
+	- datasets: HumanML3D, Interaction Settings, User Study
+- [[obsidian-vault/analysis/NEURIPS_2024/InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every_Joint.md|InterControl Zero shot Human Interaction Generation by Controlling Every Joint (NEURIPS 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2024/InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every_Joint.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InterControl
+	- datasets: HumanML3D, Interaction Settings, User Study
+- [[obsidian-vault/analysis/NEURIPS_2024/OccFusion_Rendering_Occluded_Humans_with_Generative_Diffusion_Priors.md|OccFusion Rendering Occluded Humans with Generative Diffusion Priors (NEURIPS 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2024/OccFusion_Rendering_Occluded_Humans_with_Generative_Diffusion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OccFusion
+	- datasets: ZJU-MoCap, OcMotion
+- [[obsidian-vault/analysis/NEURIPS_2024/Pricing_and_Competition_for_Generative_AI.md|Pricing and Competition for Generative AI (NEURIPS 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2024/Pricing_and_Competition_for_Generative_AI.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: 基于竞争比排名的生成式AI定价博弈模型 (Generative AI competitive pricing game via task ranking by competitive ratio)
+	- datasets: 无实证数据集
+- [[obsidian-vault/analysis/SIGGRAPH_2024/4D-Rotor_Gaussian_Splatting_Towards_Efficient_Novel_View_Synthesis_for_Dynamic_Scenes.md|4D-Rotor Gaussian Splatting: Towards Efficient Novel View Synthesis for Dynamic Scenes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/4D_Rotor_Gaussian_Splatting_Towards_Efficient_Novel_View_Synthesis_for_Dynamic_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: 4D-Rotor Gaussian Splatting (4DRotorGS)
+	- datasets: Plenoptic Video Dataset, D-NeRF Dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Iterative_Motion_Editing_with_Natural_Language.md|Iterative Motion Editing with Natural Language (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Iterative_Motion_Editing_with_Natural_Language.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: MEO-based Iterative Motion Editing System
+	- datasets: User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Dynamic_By-example_BTF_Synthesis_Scheme.md|A Dynamic By-example BTF Synthesis Scheme (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Dynamic_By_example_BTF_Synthesis_Scheme.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Comprehensive Survey of 3D Gaussian Splatting Methods
+	- datasets: Novel View Synthesis, D-NeRF Dataset, MipNeRF 360 Dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Plentoptic_3D_Vision_System.md|A Plentoptic 3D Vision System (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Plentoptic_3D_Vision_System.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Deep Plenoptic Stereo (P-Stereo)
+	- datasets: Industrial Robotics Dataset, Calibration Accuracy, RPS Polar Dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Time-Dependent_Inclusion-Based_Method_for_Continuous_Collision_Detection_between_Parametric_Surfaces.md|A Time-Dependent Inclusion-Based Method for Continuous Collision Detection between Parametric Surfaces (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Time_Dependent_Inclusion_Based_Method_for_Continuous_Collision_Detection_between_Parametric_Surfaces.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: Time-Dependent Inclusion-Based CCD
+	- datasets: Simulation sequence, Large-scale benchmark, Handcrafted Dataset - EE CCD
+- [[obsidian-vault/analysis/TPAMI_2024/GTA-Human_Playing_for_3D_Human_Recovery.md|GTA-Human: Playing for 3D Human Recovery (TPAMI 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/TPAMI_2024/GTA-Human:_Playing_for_3D_Human_Recovery.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: GTA-Human Dataset with Blended Training and Finetuning
+- [[obsidian-vault/analysis/3DV_2025/3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability.md|3D Whole body Grasp Synthesis with Directional Controllability (3DV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/3DV_2025/3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CWGrasp
+	- datasets: GRAB / ReplicaGrasp, ReplicaGrasp, User study
+- [[obsidian-vault/analysis/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditions.md|EchoMimic Lifelike Audio Driven Portrait Animations through Editable Landmark Conditioning (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditioning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EchoMimic
+	- datasets: HDTF, CelebV-HQ, Collected Dataset
+- [[obsidian-vault/analysis/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditions.md|EchoMimic Lifelike Audio Driven Portrait Animations through Editable Landmark Conditions (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditioning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EchoMimic
+	- datasets: HDTF, CelebV-HQ, Collected Dataset
+- [[obsidian-vault/analysis/AAAI_2025/Unified_Text_Music_and_Motion_Generation.md|Unified Text Music and Motion Generation (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/Unified_Text_Music_and_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: UniMuMo
+	- datasets: MusicCaps, AIST++, MusicQA
+- [[obsidian-vault/analysis/ACM_MM_2025/PP-Motion_Physical-Perceptual_Fidelity_Evaluation_for_Human_Motion_Generation.md|PP-Motion: Physical-Perceptual Fidelity Evaluation for Human Motion Generation (ACM MM 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/ACM_MM_2025/2025_PP_Motion_Physical_Perceptual_Fidelity_Evaluation_for_Human_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PP-Motion
+	- datasets: MotionPercept-MDM, MotionPercept-FLAME
+- [[obsidian-vault/analysis/ACM_MM_2025/OnlineHOI_Towards_Online_Human_Object_Interaction_Generation_and_Perception.md|OnlineHOI Towards Online Human Object Interaction Generation and Perception (ACM_MM_2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ACM_MM_2025/OnlineHOI_Towards_Online_Human_Object_Interaction_Generation_and_Perception.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OnlineHOI (OnlineHOI-G for generation, OnlineHOI-P for perception)
+	- datasets: Core4D S1, Core4D S2, Core4D User Study
+- [[obsidian-vault/analysis/arxiv_2025/CoMPAS3D_A_Dataset_and_Benchmark_for_Interactive_Motion.md|CoMPAS3D: A Dataset and Benchmark for Interactive Motion (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/CoMPAS3D:_A_Dataset_and_Benchmark_for_Interactive_Motion.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CoMPAS3D（数据集与三层评估框架）
+	- datasets: CoMPAS3D Move Classification, CoMPAS3D Proficiency Estimation, CoMPAS3D Follower Generation - 运动学指标
+- [[obsidian-vault/analysis/arxiv_2025/A_Guide_to_Structureless_Visual_Localization.md|A Guide to Structureless Visual Localization (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/A_Guide_to_Structureless_Visual_Localization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Structureless Visual Localization Comprehensive Evaluation Framework
+	- datasets: Aachen Day-Night v1.1, Extended CMU Seasons, NAVER HDS 1F
+- [[obsidian-vault/analysis/arxiv_2025/C_Drag_Chain_of_Thought_Driven_Motion_Controller_for_Video_Generation.md|C-Drag: Chain-of-Thought Driven Motion Controller for Video Generation (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/C_Drag_Chain_of_Thought_Driven_Motion_Controller_for_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: C-Drag
+	- datasets: VOIDataset
+- [[obsidian-vault/analysis/arxiv_2025/CLONE_Closed_Loop_Whole_Body_Humanoid_Teleoperation_for_Long_Horizon_Tasks.md|CLONE Closed Loop Whole Body Humanoid Teleoperation for Long Horizon Tasks (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/CLONE_Closed_Loop_Whole_Body_Humanoid_Teleoperation_for_Long_Horizon_Tasks.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CLONE
+	- datasets: CLONED dataset, Real-world straight-path tracking, Real-world curved-path tracking
+- [[obsidian-vault/analysis/arxiv_2025/Free_Form_Motion_Control_A_Synthetic_Video_Generation_Dataset_with_Controllable_Camera_and_Object_Motions.md|Free-Form Motion Control: A Synthetic Video Generation Dataset with Controllable Camera and Object Motions (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Free_Form_Motion_Control_A_Synthetic_Video_Generation_Dataset_with_Controllable_Camera_and_Object_Motions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Free-Form Motion Control (FMC)
+	- datasets: SynFMC test set, User study
+- [[obsidian-vault/analysis/arxiv_2025/InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_Scenes_with_Movable_Objects.md|InteractMove Text Controlled Human Object Interaction Generation in 3D Scenes with Movable Objects (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_Scenes_with_Movable_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Affordance-Guided Collision-Aware Interaction Generation (AGCA)
+	- datasets: InteractMove Dataset, TRUMANS Dataset
+- [[obsidian-vault/analysis/arxiv_2025/Learning_Video_Generation_for_Robotic_Manipulation_with_Collaborative_Trajectory_Control.md|Learning Video Generation for Robotic Manipulation with Collaborative Trajectory Control (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Learning_Video_Generation_for_Robotic_Manipulation_with_Collaborative_Trajectory_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: RoboMaster
+	- datasets: Bridge Dataset
+- [[obsidian-vault/analysis/arxiv_2025/Motion2Motion_Cross_topology_Motion_Transfer_with_Sparse_Correspondence.md|Motion2Motion: Cross-topology Motion Transfer with Sparse Correspondence (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Motion2Motion_Cross_topology_Motion_Transfer_with_Sparse_Correspondence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Motion2Motion
+	- datasets: Similar Skeleton Transfer, Cross-species Skeleton Transfer, User Study
+- [[obsidian-vault/analysis/arxiv_2025/STAGE_Storyboard_Anchored_Generation_for_Cinematic_Multi_shot_Narrative.md|STAGE: Storyboard-Anchored Generation for Cinematic Multi-shot Narrative (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/STAGE_Storyboard_Anchored_Generation_for_Cinematic_Multi_shot_Narrative.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: STAGE (Storyboard-Anchored Generation) with STEP²
+	- datasets: ConStoryBoard test set, Human evaluation
+- [[obsidian-vault/analysis/arxiv_2025/SVAG_Bench_A_Large_Scale_Benchmark_for_Multi_Instance_Spatio_temporal_Video_Action_Grounding.md|SVAG-Bench: A Large-Scale Benchmark for Multi-Instance Spatio-temporal Video Action Grounding (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/SVAG_Bench_A_Large_Scale_Benchmark_for_Multi_Instance_Spatio_temporal_Video_Action_Grounding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SVAGFormer
+	- datasets: SVAG-Bench, OVIS, MOT17
+- [[obsidian-vault/analysis/arxiv_2025/Unified_Camera_Positional_Encoding_for_Camera_Controllable_Video_Generation.md|Unified Camera Positional Encoding for Camera-Controllable Video Generation (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Unified_Camera_Positional_Encoding_for_Camera_Controllable_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: UCPE (Unified Camera Positional Encoding)
+	- datasets: Synthesized dataset, RealEstate10K
+- [[obsidian-vault/analysis/arxiv_2025/VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Generation_in_Video_Models.md|VideoJAM Joint Appearance Motion Representations for Enhanced Motion Generation in Video Models (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Generation_in_Video_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VideoJAM
+	- datasets: VideoJAM-bench, Movie Gen benchmark
+- [[obsidian-vault/analysis/CVPR_2025/GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models.md|GORP Real Time Motion Generation with Rolling Prediction Models (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Rolling Prediction Model (RPM)
+	- datasets: A-P1 - Hand Tracking scenario, A-P1 - Motion Controllers scenario, A-P2 - Hand Tracking scenario
+- [[obsidian-vault/analysis/CVPR_2025/HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_Gesture_Generation.md|HOP Heterogeneous Topology based Multimodal Entanglement for Co Speech Gesture Generation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_Gesture_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HOP
+	- datasets: TED Gesture, TED Expressive, User Study
+- [[obsidian-vault/analysis/CVPR_2025/HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Scene_Interaction_Wang_et_al.md|HSI GPT A General Purpose Large Scene Motion Language Model for Human Scene Interaction. Wang et al (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Scene_Interaction_Wang_et_al.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: HSI-GPT
+	- datasets: HumanML3D, Novel Evaluation Set, HumanML3D augmented
+- [[obsidian-vault/analysis/CVPR_2025/SemGeoMo_Dynamic_Contextual_Human_Motion_Generation_with_Semantic_and_Geometric_Guidance.md|SemGeoMo Dynamic Contextual Human Motion Generation with Semantic and Geometric Guidance (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SemGeoMo_Dynamic_Contextual_Human_Motion_Generation_with_Semantic_and_Geometric_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SemGeoMo
+	- datasets: FullBodyManipulation, BEHAVE, IMHD2
+- [[obsidian-vault/analysis/CVPR_2025/StickMotion_Generating_3D_Human_Motions_by_Drawing_a_Stickman.md|StickMotion Generating 3D Human Motions by Drawing a Stickman (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/StickMotion_Generating_3D_Human_Motions_by_Drawing_a_Stickman.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: StickMotion
+	- datasets: HumanML3D, User Study
+- [[obsidian-vault/analysis/EGPGV_2025/From_Cluster_to_Desktop_A_Cache_Accelerated_INR_framework_for_Interactive_Visualization_of_Tera_Scale_Data.md|From Cluster to Desktop: A Cache-Accelerated INR framework for Interactive Visualization of Tera-Scale Data (EGPGV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/EGPGV_2025/From_Cluster_to_Desktop_A_Cache_Accelerated_INR_framework_for_Interactive_Visualization_of_Tera_Scale_Data.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: Cache-Accelerated INR Rendering Framework
+	- datasets: Magnetic, DNS
+- [[obsidian-vault/analysis/ICCV_2025/DanceEditor_Towards_Iterative_Editable_Music_driven_Dance_Generation_with_Open_Vocabulary_Descriptions.md|DanceEditor: Towards Iterative Editable Music-driven Dance Generation with Open-Vocabulary Descriptions (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/DanceEditor_Towards_Iterative_Editable_Music_driven_Dance_Generation_with_Open_Vocabulary_Descriptions.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: DanceEditor
+	- datasets: DanceRemix, POPDG
+- [[obsidian-vault/analysis/ICCV_2025/GenDoP_Auto_regressive_Camera_Trajectory_Generation_as_a_Director_of_Photography.md|GenDoP: Auto-regressive Camera Trajectory Generation as a Director of Photography (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/GenDoP_Auto_regressive_Camera_Trajectory_Generation_as_a_Director_of_Photography.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GenDoP
+	- datasets: Motion Caption, Directorial Caption, User Study
+- [[obsidian-vault/analysis/ICCV_2025/HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions.md|HUMOTO A 4D Dataset of Mocap Human Object Interactions (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: HUMOTO Dataset Creation Methodology
+	- datasets: HOI Dataset Comparison, Perceptual Absolute Quality, Perceptual Pairwise Comparison
+- [[obsidian-vault/analysis/ICCV_2025/Perceiving_and_Acting_in_First_Person_A_Dataset_and_Benchmark_for_Egocentric_Human_Object_Human_Interactions.md|Perceiving and Acting in First Person A Dataset and Benchmark for Egocentric Human Object Human Interactions (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/Perceiving_and_Acting_in_First_Person_A_Dataset_and_Benchmark_for_Egocentric_Human_Object_Human_Interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: 受限 FC-Datalog 片段框架（线性、确定性、OLLA/DOLLA、SD-DOLLA 及 DOLLA+）
+- [[obsidian-vault/analysis/ICCV_2025/SIMS_Simulating_Human_Scene_Interactions_with_Real_World_Script_Planning.md|SIMS Simulating Human Scene Interactions with Real World Script Planning (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/SIMS_Simulating_Human_Scene_Interactions_with_Real_World_Script_Planning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SIMS
+	- datasets: Motion Diversity, User Study
+- [[obsidian-vault/analysis/ICLR_2025/CO3GESTURE_TOWARDS_COHERENT_CONCURRENT_CO_SPEECH_3D_GESTURE_GENERATION_WITH_INTER_ACTIVE_DIFFUSION.md|CO3GESTURE: TOWARDS COHERENT CONCURRENT CO-SPEECH 3D GESTURE GENERATION WITH INTER- ACTIVE DIFFUSION (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/CO3GESTURE_TOWARDS_COHERENT_CONCURRENT_CO_SPEECH_3D_GESTURE_GENERATION_WITH_INTER_ACTIVE_DIFFUSION.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: Co3Gesture
+	- datasets: GES-Inter Dataset
+- [[obsidian-vault/analysis/ICLR_2025/Physics_informed_Temporal_Difference_Metric_Learning_for_Robot_Motion_Planning.md|Physics-informed Temporal Difference Metric Learning for Robot Motion Planning (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/Physics_informed_Temporal_Difference_Metric_Learning_for_Robot_Motion_Planning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Agent / RL / Planning
+	- methods: PTDML (Physics-informed Temporal Difference Metric Learning)
+	- datasets: Cluttered 3D 已知环境, Gibson 2D 导航
+- [[obsidian-vault/analysis/PREPRINT_2025/DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Generation.md|DiffME Component Process Model Induced Controllable Micro Expression Generation (PREPRINT 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/PREPRINT_2025/DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DiffME
+	- datasets: Leave-One-Dataset-Out protocol across six spontaneous ME datasets
+- [[obsidian-vault/analysis/SIGGRAPH_2025/LayerFlow_A_Unified_Model_for_Layer-aware_Video_Generation.md|LayerFlow: A Unified Model for Layer-aware Video Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/LayerFlow_A_Unified_Model_for_Layer_aware_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LayerFlow
+	- datasets: VBench, User Study, DAVIS
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Mobius_Text_to_Seamless_Looping_Video_Generation_via_Latent_Shift.md|Mobius: Text to Seamless Looping Video Generation via Latent Shift (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Mobius_Text_to_Seamless_Looping_Video_Generation_via_Latent_Shift.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Mobius
+	- datasets: Custom text prompts, User Study, Longer Video Generation
+- [[obsidian-vault/analysis/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.md|Appreciate the View: A Task-Aware Evaluation Framework for Novel View Synthesis (3DV 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: PRISM (Metrics: DPRISM / MMDPRISM)
+	- datasets: VIEWMATCH, GSO, Toys4K
+- [[obsidian-vault/analysis/AAAI_2026/Vid_CamEdit_Video_Camera_Trajectory_Editing_with_Generative_Rendering_from_Estimated_Geometry.md|Vid-CamEdit: Video Camera Trajectory Editing with Generative Rendering from Estimated Geometry (AAAI 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2026/Vid_CamEdit_Video_Camera_Trajectory_Editing_with_Generative_Rendering_from_Estimated_Geometry.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Vid-CamEdit
+	- datasets: Neu3D, ST-NeRF dataset
+- [[obsidian-vault/analysis/arxiv_2026/AnyAct_Towards_Human_Reenactment_of_Character_Motion_From_Video.md|AnyAct: Towards Human Reenactment of Character Motion From Video (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/AnyAct_Towards_Human_Reenactment_of_Character_Motion_From_Video.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: AnyAct
+	- datasets: AnyAct benchmark
+- [[obsidian-vault/analysis/arxiv_2026/Asset_Harvester_Extracting_3D_Assets_from_Autonomous_Driving_Logs_for_Simulation.md|Asset Harvester: Extracting 3D Assets from Autonomous Driving Logs for Simulation (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Asset_Harvester_Extracting_3D_Assets_from_Autonomous_Driving_Logs_for_Simulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Asset Harvester
+	- datasets: NuRec AV Object Benchmark Part A, NuRec AV Object Benchmark Part B
+- [[obsidian-vault/analysis/arxiv_2026/CoMoVi_Co_Generation_of_3D_Human_Motions_and_Realistic_Videos.md|CoMoVi: Co-Generation of 3D Human Motions and Realistic Videos (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/CoMoVi_Co_Generation_of_3D_Human_Motions_and_Realistic_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CoMoVi
+	- datasets: CoMoVi-Dataset, Motion-X++, VBench
+- [[obsidian-vault/analysis/arxiv_2026/Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction_Motion_in_Dynamic_Scenes.md|Dynamic Worlds Dynamic Humans Generating Virtual Human Scene Interaction Motion in Dynamic Scenes (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction_Motion_in_Dynamic_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Dyn-HSI
+	- datasets: LINGO, Dyn-LINGO, Dyn-Trumans
+- [[obsidian-vault/analysis/arxiv_2026/FlowAct-R1_Towards_Interactive_Humanoid_Video_Generation.md|FlowAct-R1: Towards Interactive Humanoid Video Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/FlowAct-R1:_Towards_Interactive_Humanoid_Video_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FlowAct-R1
+	- datasets: User study, Real-time performance
+- [[obsidian-vault/analysis/arxiv_2026/Geometrically_Consistent_Multi_View_Scene_Generation_from_Freehand_Sketches.md|Geometrically Consistent Multi-View Scene Generation from Freehand Sketches (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Geometrically_Consistent_Multi_View_Scene_Generation_from_Freehand_Sketches.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CA3-Adapted Video DiT with Sparse Correspondence Supervision
+	- datasets: S2MV test set
+- [[obsidian-vault/analysis/arxiv_2026/MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval.md|MoCHA: Denoising Caption Supervision for Motion-Text Retrieval (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MoCHA (Motion Canonicalization for Human Action retrieval)
+	- datasets: HumanML3D, KIT-ML, Cross-dataset H→K
+- [[obsidian-vault/analysis/arxiv_2026/MOSAIC_Bridging_the_Sim_to_Real_Gap_in_Generalist_Humanoid_Motion_Tracking_and_Teleoperation_with_Rapid_Residual_Adaptation.md|MOSAIC: Bridging the Sim-to-Real Gap in Generalist Humanoid Motion Tracking and Teleoperation with Rapid Residual Adaptation (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/MOSAIC_Bridging_the_Sim_to_Real_Gap_in_Generalist_Humanoid_Motion_Tracking_and_Teleoperation_with_Rapid_Residual_Adaptation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MOSAIC
+	- datasets: VR teleoperation dataset, Motion-X-Sub
+- [[obsidian-vault/analysis/arxiv_2026/PPISP_Physically_Plausible_Compensation_and_Control_of_Photometric_Variations_in_Radiance_Field_Reconstruction.md|PPISP: Physically-Plausible Compensation and Control of Photometric Variations in Radiance Field Reconstruction (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/PPISP_Physically_Plausible_Compensation_and_Control_of_Photometric_Variations_in_Radiance_Field_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: PPISP (Physically-Plausible ISP correction module + controller)
+	- datasets: Tanks and Temples, Mip-NeRF 360, HDR-NeRF
+- [[obsidian-vault/analysis/arxiv_2026/TrajectoryMover_Generative_Movement_of_Object_Trajectories_in_Videos.md|TrajectoryMover: Generative Movement of Object Trajectories in Videos (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/TrajectoryMover_Generative_Movement_of_Object_Trajectories_in_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TrajectoryMover
+	- datasets: TrajectoryAtlas test set, TrajectoryAtlas test set user study
+- [[obsidian-vault/analysis/CVPR_2026/3D_LATTE_Latent_Space_3D_Editing_from_Textual_Instructions.md|3D-LATTE: Latent Space 3D Editing from Textual Instructions (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/3D_LATTE_Latent_Space_3D_Editing_from_Textual_Instructions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 3D-LATTE
+	- datasets: GPTEval3D
+- [[obsidian-vault/analysis/CVPR_2026/3DReflecNet_A_Large_Scale_Dataset_for_3D_Reconstruction_of_Reflective_Transparent_and_Low_Texture_Objects.md|3DReflecNet: A Large-Scale Dataset for 3D Reconstruction of Reflective, Transparent, and Low-Texture Objects (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/3DReflecNet_A_Large_Scale_Dataset_for_3D_Reconstruction_of_Reflective_Transparent_and_Low_Texture_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: 3DReflecNet（数据集）
+	- datasets: Image Matching, Reflection Removal
+- [[obsidian-vault/analysis/CVPR_2026/3M_TI_High_Quality_Mobile_Thermal_Imaging_via_Calibration_free_Multi_Camera_Cross_Modal_Diffusion.md|3M-TI: High-Quality Mobile Thermal Imaging via Calibration-free Multi-Camera Cross-Modal Diffusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/3M_TI_High_Quality_Mobile_Thermal_Imaging_via_Calibration_free_Multi_Camera_Cross_Modal_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: 3M-TI
+	- datasets: Public RGB-Thermal Datasets, Real-World Smartphone Dataset, Downstream Object Detection
+- [[obsidian-vault/analysis/CVPR_2026/4DWorldBench_A_Comprehensive_Evaluation_Framework_for_3D4D_World_Generation_Models.md|4DWorldBench: A Comprehensive Evaluation Framework for 3D/4D World Generation Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/4DWorldBench_A_Comprehensive_Evaluation_Framework_for_3D_4D_World_Generation_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 4DWorldBench
+	- datasets: VideoPhy2-test, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Accelerating_Diffusion_Model_Training_under_Minimal_Budgets_A_Condensation_Based_Perspective.md|Accelerating Diffusion Model Training under Minimal Budgets: A Condensation-Based Perspective (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Accelerating_Diffusion_Model_Training_under_Minimal_Budgets_A_Condensation_Based_Perspective.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: D²C (Diffusion Dataset Condensation)
+	- datasets: ImageNet 256×256, ImageNet 512×512, CIFAR-10
+- [[obsidian-vault/analysis/CVPR_2026/Accelerating_Diffusion_based_Video_Editing_via_Heterogeneous_Caching_Beyond_Full_Computing_at_Sampled_Denoising_Timestep.md|Accelerating Diffusion-based Video Editing via Heterogeneous Caching: Beyond Full Computing at Sampled Denoising Timestep (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Accelerating_Diffusion_based_Video_Editing_via_Heterogeneous_Caching_Beyond_Full_Computing_at_Sampled_Denoising_Timestep.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: HetCache
+	- datasets: VACE-Benchmark video inpainting, VACE-Benchmark text-guided editing, VPBench text-guided editing
+- [[obsidian-vault/analysis/CVPR_2026/Action_Geometry_Prediction_with_3D_Geometric_Prior_for_Bimanual_Manipulation.md|Action-Geometry Prediction with 3D Geometric Prior for Bimanual Manipulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Action_Geometry_Prediction_with_3D_Geometric_Prior_for_Bimanual_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: GAP (Action-Geometry Prediction)
+	- datasets: RoboTwin 2.0 Dominant-select Tasks, RoboTwin 2.0 Sync-bimanual Tasks, RoboTwin 2.0 Seq-coordinate Tasks
+- [[obsidian-vault/analysis/CVPR_2026/Adaptive_3D_Perception_for_Small_Aerial_Targets_Under_Sparse_Sampling_via_Reinforcement_Learning.md|Adaptive 3D Perception for Small Aerial Targets Under Sparse Sampling via Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Adaptive_3D_Perception_for_Small_Aerial_Targets_Under_Sparse_Sampling_via_Reinforcement_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: A3PRL
+	- datasets: MMAUD V2/V3, Multi-LiDAR Multi-UAV dataset, In-house LiDAR-RTK rig
+- [[obsidian-vault/analysis/CVPR_2026/Adaptive_Video_Distillation_Mitigating_Oversaturation_and_Temporal_Collapse_in_Few_Step_Generation.md|Adaptive Video Distillation: Mitigating Oversaturation and Temporal Collapse in Few-Step Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Adaptive_Video_Distillation_Mitigating_Oversaturation_and_Temporal_Collapse_in_Few_Step_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Adaptive Video Distillation
+	- datasets: VBench2, VBench1, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Agentic_Retoucher_for_Text_To_Image_Generation.md|Agentic Retoucher for Text-To-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Agentic_Retoucher_for_Text_To_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Agentic Retoucher
+	- datasets: GenBlemish-27K, SynArtifacts-1K, Human Evaluation
+- [[obsidian-vault/analysis/CVPR_2026/AMusE_Audio_Visual_Benchmark_and_Alignment_Framework_for_Agentic_Multi_Speaker_Understanding.md|AMusE: Audio-Visual Benchmark and Alignment Framework for Agentic Multi-Speaker Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AMusE_Audio_Visual_Benchmark_and_Alignment_Framework_for_Agentic_Multi_Speaker_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: RAFT
+	- datasets: AMUSE Audio-Visual Dialogue Summarization, AMUSE Audio-Visual Speaker Association, AMUSE Next Speaker Prediction
+- [[obsidian-vault/analysis/CVPR_2026/An_Instance_Centric_Panoptic_Occupancy_Prediction_Benchmark_for_Autonomous_Driving.md|An Instance-Centric Panoptic Occupancy Prediction Benchmark for Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/An_Instance_Centric_Panoptic_Occupancy_Prediction_Benchmark_for_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: 网格驱动的全景占用生成框架（ADMesh 与 CarlaOcc）
+	- datasets: Occupancy Dataset Quality, Panoptic Occupancy Prediction on CarlaOcc, Semantic Occupancy Prediction on CarlaOcc
+- [[obsidian-vault/analysis/CVPR_2026/Anatomica_Localized_Control_over_Geometric_and_Topological_Properties_for_Anatomical_Diffusion_Models.md|Anatomica: Localized Control over Geometric and Topological Properties for Anatomical Diffusion Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Anatomica_Localized_Control_over_Geometric_and_Topological_Properties_for_Anatomical_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Anatomica
+	- datasets: Cardiac - Right Ventricle Task, Cardiac - Atrial Separation Task, Aortic Branch - Branch Connectivity Task
+- [[obsidian-vault/analysis/CVPR_2026/Ani3DHuman_Photorealistic_3D_Human_Animation_with_Self_guided_Stochastic_Sampling.md|Ani3DHuman: Photorealistic 3D Human Animation with Self-guided Stochastic Sampling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Ani3DHuman_Photorealistic_3D_Human_Animation_with_Self_guided_Stochastic_Sampling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: ANI3DHUMAN
+	- datasets: ActorsHQ, User Study
+- [[obsidian-vault/analysis/CVPR_2026/AniMimic_Imitating_3D_Animation_from_Video_Priors.md|AniMimic: Imitating 3D Animation from Video Priors (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AniMimic_Imitating_3D_Animation_from_Video_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: AniMimic
+	- datasets: Custom Dataset, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Any4D_Unified_Feed_Forward_Metric_4D_Reconstruction.md|Any4D: Unified Feed-Forward Metric 4D Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Any4D_Unified_Feed_Forward_Metric_4D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Any4D
+	- datasets: DriveTrack, Dynamic Replica, Kubric-4D Dynamic Camera
+- [[obsidian-vault/analysis/CVPR_2026/AREA3D_Active_Reconstruction_Agent_with_Unified_Feed_Forward_3D_Perception_and_Vision_Language_Guidance.md|AREA3D: Active Reconstruction Agent with Unified Feed-Forward 3D Perception and Vision-Language Guidance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AREA3D_Active_Reconstruction_Agent_with_Unified_Feed_Forward_3D_Perception_and_Vision_Language_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: AREA3D
+	- datasets: Replica room0, Object-level benchmark, Scene-level benchmark
+- [[obsidian-vault/analysis/CVPR_2026/AsymLoc_Towards_Asymmetric_Feature_Matching_for_Efficient_Visual_Localization.md|AsymLoc: Towards Asymmetric Feature Matching for Efficient Visual Localization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AsymLoc_Towards_Asymmetric_Feature_Matching_for_Efficient_Visual_Localization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/CVPR_2026/Attention_Surgery_An_Efficient_Recipe_to_Linearize_Your_Video_Diffusion_Transformer.md|Attention Surgery: An Efficient Recipe to Linearize Your Video Diffusion Transformer (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Attention_Surgery_An_Efficient_Recipe_to_Linearize_Your_Video_Diffusion_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Attention Surgery
+	- datasets: VBench, VBench-2.0, User Study
+- [[obsidian-vault/analysis/CVPR_2026/BarbieGait_An_Identity_Consistent_Synthetic_Human_Dataset_with_Versatile_Cloth_Changing_for_Gait_Recognition.md|BarbieGait: An Identity-Consistent Synthetic Human Dataset with Versatile Cloth-Changing for Gait Recognition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/BarbieGait_An_Identity_Consistent_Synthetic_Human_Dataset_with_Versatile_Cloth_Changing_for_Gait_Recognition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GaitCLIF (Gait-oriented CLoth-Invariant Feature)
+	- datasets: BarbieGait, CCPG, SUSTech1K
+- [[obsidian-vault/analysis/CVPR_2026/Beyond_3D_VQAs_Injecting_3D_Spatial_Priors_into_Vision_Language_Models_for_Enhanced_Geometric_Reasoning.md|Beyond 3D VQAs: Injecting 3D Spatial Priors into Vision-Language Models for Enhanced Geometric Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Beyond_3D_VQAs_Injecting_3D_Spatial_Priors_into_Vision_Language_Models_for_Enhanced_Geometric_Reasoning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: GASP (Geometric-Aware Spatial Priors)
+	- datasets: All-Angles Bench, VSI-Bench, BLINK
+- [[obsidian-vault/analysis/CVPR_2026/Beyond_Single_Images_A_Comprehensive_Benchmark_for_Album_Level_Vision_Language_Understanding.md|Beyond Single Images: A Comprehensive Benchmark for Album-Level Vision-Language Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Beyond_Single_Images_A_Comprehensive_Benchmark_for_Album_Level_Vision_Language_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: AlbumBench
+	- datasets: AlbumBench Group Clustering / Group Labeling, AlbumBench 各项任务与MMMU-val相关性, AlbumBench 所有任务
+- [[obsidian-vault/analysis/CVPR_2026/Bi_directional_Autoregressive_Diffusion_for_Large_Complex_Motion_Interpolation.md|Bi-directional Autoregressive Diffusion for Large Complex Motion Interpolation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Bi_directional_Autoregressive_Diffusion_for_Large_Complex_Motion_Interpolation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ARVFI
+	- datasets: DAVIS-7, Eval set, Pixels
+- [[obsidian-vault/analysis/CVPR_2026/Bias_Is_a_Subspace_Not_a_Coordinate_A_Geometric_Rethinking_of_Post_hoc_Debiasing_in_Vision_Language_Models.md|Bias Is a Subspace, Not a Coordinate: A Geometric Rethinking of Post-hoc Debiasing in Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Bias_Is_a_Subspace_Not_a_Coordinate_A_Geometric_Rethinking_of_Post_hoc_Debiasing_in_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Subspace Projection Debiasing (SPD)
+	- datasets: FairFace, 文本图像生成
+- [[obsidian-vault/analysis/CVPR_2026/Breaking_Semantic_Boundaries_Distribution_Guided_Semantic_Exploration_for_Creative_Generation.md|Breaking Semantic Boundaries: Distribution-Guided Semantic Exploration for Creative Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Breaking_Semantic_Boundaries_Distribution_Guided_Semantic_Exploration_for_Creative_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DisTok
+	- datasets: CangJie TP2O text pairs, Distribution-Conditional Generation, User study
+- [[obsidian-vault/analysis/CVPR_2026/Breaking_the_3D_Dataset_Bottleneck_Fast_Scalable_Generation_of_Aligned_3D_Assets_from_Scratch_for_Category_6D_Pose_Estimation_and_Robotic_Grasping.md|Breaking the 3D Dataset Bottleneck: Fast Scalable Generation of Aligned 3D Assets from Scratch for Category 6D Pose Estimation and Robotic Grasping (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Breaking_the_3D_Dataset_Bottleneck_Fast_Scalable_Generation_of_Aligned_3D_Assets_from_Scratch_for_Category_6D_Pose_Estimation_and_Robotic_Grasping.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: GenOmni3D Pipeline（基于深度条件控制的文本到图像到3D生成流水线）
+	- datasets: NOCS REAL275, 自定义SAPIEN抓取仿真, NOCS合成验证集
+- [[obsidian-vault/analysis/CVPR_2026/Bridging_the_2D_3D_Gap_A_Hierarchical_Semantic_Geometric_Map_for_Vision_Language_Navigation.md|Bridging the 2D-3D Gap: A Hierarchical Semantic-Geometric Map for Vision Language Navigation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Bridging_the_2D_3D_Gap_A_Hierarchical_Semantic_Geometric_Map_for_Vision_Language_Navigation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Hierarchical Semantic-Geometric Map (HSGM)
+	- datasets: R2R-CE Val-Unseen, RxR-CE Val-Unseen
+- [[obsidian-vault/analysis/CVPR_2026/Bridging_the_Perception_Gap_in_Image_Super_Resolution_Evaluation.md|Bridging the Perception Gap in Image Super-Resolution Evaluation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Bridging_the_Perception_Gap_in_Image_Super_Resolution_Evaluation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Relative Quality Index (RQI)
+	- datasets: User Study, SRIQA-Bench, BSD-SR
+- [[obsidian-vault/analysis/CVPR_2026/CapNav_Benchmarking_Vision_Language_Models_on_Capability_conditioned_Indoor_Navigation.md|CapNav: Benchmarking Vision Language Models on Capability-conditioned Indoor Navigation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CapNav_Benchmarking_Vision_Language_Models_on_Capability_conditioned_Indoor_Navigation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CapNav
+	- datasets: CapNav
+- [[obsidian-vault/analysis/CVPR_2026/CARD_A_Multi_Modal_Automotive_Dataset_for_Dense_3D_Reconstruction_in_Challenging_Road_Topography.md|CARD: A Multi-Modal Automotive Dataset for Dense 3D Reconstruction in Challenging Road Topography (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CARD_A_Multi_Modal_Automotive_Dataset_for_Dense_3D_Reconstruction_in_Challenging_Road_Topography.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CARD
+	- datasets: CARD benchmark, Depth Completion on CARD
+- [[obsidian-vault/analysis/CVPR_2026/Charge_A_Comprehensive_Novel_View_Synthesis_Benchmark_and_Dataset_to_Bind_Them_All.md|Charge: A Comprehensive Novel View Synthesis Benchmark and Dataset to Bind Them All (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Charge_A_Comprehensive_Novel_View_Synthesis_Benchmark_and_Dataset_to_Bind_Them_All.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Charge (Dataset)
+	- datasets: Charge Dense Setup, Charge Sparse Setup, Charge Mono Setup
+- [[obsidian-vault/analysis/CVPR_2026/ChArtist_Generating_Pictorial_Charts_with_Unified_Spatial_and_Subject_Control.md|ChArtist: Generating Pictorial Charts with Unified Spatial and Subject Control (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ChArtist_Generating_Pictorial_Charts_with_Unified_Spatial_and_Subject_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: ChArtist
+	- datasets: Human Evaluation, Line Chart, Bar Chart
+- [[obsidian-vault/analysis/CVPR_2026/CI_VID_A_Coherent_Interleaved_Text_Video_Dataset.md|CI-VID: A Coherent Interleaved Text-Video Dataset (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CI_VID_A_Coherent_Interleaved_Text_Video_Dataset.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CI-VID Dataset Construction Pipeline
+	- datasets: VLM-based Evaluation, Human Evaluation
+- [[obsidian-vault/analysis/CVPR_2026/CineBrain_A_Large_Scale_Multi_Modal_Audiovisual_Brain_Dataset_for_Brain_Conditioned_Video_Generation.md|CineBrain: A Large-Scale Multi-Modal Audiovisual Brain Dataset for Brain-Conditioned Video Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CineBrain_A_Large_Scale_Multi_Modal_Audiovisual_Brain_Dataset_for_Brain_Conditioned_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CineSync
+	- datasets: CineBrain
+- [[obsidian-vault/analysis/CVPR_2026/Circular_DPO_Aligning_Multi_Stage_3D_Generative_Models_via_Preference_Feedback_Loop.md|Circular-DPO: Aligning Multi-Stage 3D Generative Models via Preference Feedback Loop (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Circular_DPO_Aligning_Multi_Stage_3D_Generative_Models_via_Preference_Feedback_Loop.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: Circular-DPO
+	- datasets: DreamReward, User Study
+- [[obsidian-vault/analysis/CVPR_2026/CLaD_Planning_with_Grounded_Foresight_via_Cross_Modal_Latent_Dynamics.md|CLaD: Planning with Grounded Foresight via Cross-Modal Latent Dynamics (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CLaD_Planning_with_Grounded_Foresight_via_Cross_Modal_Latent_Dynamics.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: CLaD (Cross-modal Latent Dynamics)
+	- datasets: LIBERO-LONG
+- [[obsidian-vault/analysis/CVPR_2026/ClipGStream_Clip_Stream_Gaussian_Splatting_for_Any_Length_and_Any_Motion_Multi_View_Dynamic_Scene_Reconstruction.md|ClipGStream: Clip-Stream Gaussian Splatting for Any Length and Any Motion Multi-View Dynamic Scene Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ClipGStream_Clip_Stream_Gaussian_Splatting_for_Any_Length_and_Any_Motion_Multi_View_Dynamic_Scene_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: ClipGStream
+	- datasets: Long 360, VRU, Neural 3D Video Dataset
+- [[obsidian-vault/analysis/CVPR_2026/Cloning_Deterministic_Worlds_The_Critical_Role_of_Latent_Geometry_in_Long_Horizon_World_Models.md|Cloning Deterministic Worlds: The Critical Role of Latent Geometry in Long-Horizon World Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Cloning_Deterministic_Worlds_The_Critical_Role_of_Latent_Geometry_in_Long_Horizon_World_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Geometrically-Regularized World Models (GRWM)
+	- datasets: Maze 9×9-DET, Atari Asterix, Atari Breakout
+- [[obsidian-vault/analysis/CVPR_2026/CogniVerse_Revolutionizing_Multi_Modal_Retrieval_Augmented_Generation_with_Cognitive_Reflection_and_Geometric_Reasoning.md|CogniVerse: Revolutionizing Multi-Modal Retrieval-Augmented Generation with Cognitive Reflection and Geometric Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CogniVerse_Revolutionizing_Multi_Modal_Retrieval_Augmented_Generation_with_Cognitive_Reflection_and_Geometric_Reasoning.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: CogniVerse
+	- datasets: Encyclopedic-VQA, MultiModalQA, WebQA
+- [[obsidian-vault/analysis/CVPR_2026/CoIn_Coverage_and_Informativeness_Guided_Token_Reduction_for_Efficient_Large_Multimodal_Models.md|CoIn: Coverage and Informativeness-Guided Token Reduction for Efficient Large Multimodal Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CoIn_Coverage_and_Informativeness_Guided_Token_Reduction_for_Efficient_Large_Multimodal_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Systems / Efficiency / Compression, Benchmark / Evaluation
+	- methods: CoIn
+- [[obsidian-vault/analysis/CVPR_2026/CompBench_Benchmarking_Complex_Instruction_guided_Image_Editing.md|CompBench: Benchmarking Complex Instruction-guided Image Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CompBench_Benchmarking_Complex_Instruction_guided_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CompBench
+	- datasets: CompBench
+- [[obsidian-vault/analysis/CVPR_2026/Complet4R_Geometric_Complete_4D_Reconstruction.md|Complet4R: Geometric Complete 4D Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Complet4R_Geometric_Complete_4D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Complet4R
+	- datasets: SAIL-VOS 3D-test, Point Odyssey, Dynamic Replica
+- [[obsidian-vault/analysis/CVPR_2026/Concept_Aware_LoRA_for_Domain_Aligned_Segmentation_Dataset_Generation.md|Concept-Aware LoRA for Domain-Aligned Segmentation Dataset Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Concept_Aware_LoRA_for_Domain_Aligned_Segmentation_Dataset_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Concept-Aware LoRA (CA-LoRA)
+	- datasets: Cityscapes 0.3% fraction, Cityscapes 100%, Domain Generalization
+- [[obsidian-vault/analysis/CVPR_2026/Copy_Transform_Paste_Zero_Shot_Object_Object_Alignment_Guided_by_Vision_Language_and_Geometric_Constraints.md|Copy-Transform-Paste: Zero-Shot Object-Object Alignment Guided by Vision-Language and Geometric Constraints (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Copy_Transform_Paste_Zero_Shot_Object_Object_Alignment_Guided_by_Vision_Language_and_Geometric_Constraints.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Copy-Transform-Paste (CTP)
+	- datasets: OOA Benchmark, User Study
+- [[obsidian-vault/analysis/CVPR_2026/CraftMesh_High_Fidelity_Generative_Mesh_Manipulation_via_Poisson_Seamless_Fusion.md|CraftMesh: High-Fidelity Generative Mesh Manipulation via Poisson Seamless Fusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CraftMesh_High_Fidelity_Generative_Mesh_Manipulation_via_Poisson_Seamless_Fusion.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: CraftMesh
+	- datasets: CraftMesh Editing Benchmark, Computational Cost
+- [[obsidian-vault/analysis/CVPR_2026/CREval_An_Automated_Interpretable_Evaluation_for_Creative_Image_Manipulation_under_Complex_Instructions.md|CREval: An Automated Interpretable Evaluation for Creative Image Manipulation under Complex Instructions (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CREval_An_Automated_Interpretable_Evaluation_for_Creative_Image_Manipulation_under_Complex_Instructions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CREval
+	- datasets: CREval-Bench, Human Preference Validation
+- [[obsidian-vault/analysis/CVPR_2026/CrossHOI_Bench_A_Unified_Benchmark_for_HOI_Evaluation_across_Vision_Language_Models_and_HOI_Specific_Methods.md|CrossHOI-Bench: A Unified Benchmark for HOI Evaluation across Vision-Language Models and HOI-Specific Methods (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CrossHOI_Bench_A_Unified_Benchmark_for_HOI_Evaluation_across_Vision_Language_Models_and_HOI_Specific_Methods.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CrossHOI-Bench
+	- datasets: CrossHOI-Bench Setting 1, CrossHOI-Bench Setting 2, CrossHOI-Bench Setting 3
+- [[obsidian-vault/analysis/CVPR_2026/Data_Leakage_Detection_and_De_duplication_in_Large_Scale_Geospatial_Image_Datasets.md|Data Leakage Detection and De-duplication in Large Scale Geospatial Image Datasets (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Data_Leakage_Detection_and_De_duplication_in_Large_Scale_Geospatial_Image_Datasets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: 基于感知哈希的数据泄漏检测与去重流水线
+	- datasets: INRIA Aerial Image Labelling, SpaceNet 2 Building Detection v2, AICrowd Mapping Challenge
+- [[obsidian-vault/analysis/CVPR_2026/Decompose_Mix_Adapt_A_Unified_Framework_for_Parameter_Efficient_Neural_Network_Recombination_and_Compression.md|Decompose, Mix, Adapt: A Unified Framework for Parameter-Efficient Neural Network Recombination and Compression (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Decompose_Mix_Adapt_A_Unified_Framework_for_Parameter_Efficient_Neural_Network_Recombination_and_Compression.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: CRISP (Coefficient-gated weight Recombination by Interpolated Shared basis Projections)
+	- datasets: VTAB-1K, ViT-B/16 50% compression on 6 fine-grained benchmarks, ViT-B/16 50% compression + PEFT on 6 benchmarks
+- [[obsidian-vault/analysis/CVPR_2026/Delta_Rectified_Flow_Sampling_for_Text_to_Image_Editing.md|Delta Rectified Flow Sampling for Text-to-Image Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Delta_Rectified_Flow_Sampling_for_Text_to_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Delta Rectified Flow Sampling (DRFS)
+	- datasets: PIE Benchmark, PIE
+- [[obsidian-vault/analysis/CVPR_2026/DENALI_A_Dataset_Enabling_Non_Line_of_Sight_Spatial_Reasoning_with_Low_Cost_LiDARs.md|DENALI: A Dataset Enabling Non-Line-of-Sight Spatial Reasoning with Low-Cost LiDARs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DENALI_A_Dataset_Enabling_Non_Line_of_Sight_Spatial_Reasoning_with_Low_Cost_LiDARs.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: DENALI Dataset and Data-Driven NLOS Perception Benchmark
+	- datasets: NLOS Localization, NLOS Object Classification, NLOS Size Prediction
+- [[obsidian-vault/analysis/CVPR_2026/DetAny4D_Detect_Anything_4D_Temporally_in_a_Streaming_RGB_Video.md|DetAny4D: Detect Anything 4D Temporally in a Streaming RGB Video (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DetAny4D_Detect_Anything_4D_Temporally_in_a_Streaming_RGB_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DetAny4D
+	- datasets: DA4D full, DA4D sub-datasets
+- [[obsidian-vault/analysis/CVPR_2026/DGGT_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_Images.md|DGGT: Feedforward 4D Reconstruction of Dynamic Driving Scenes using Unposed Images (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DGGT_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DGGT
+	- datasets: Waymo Open Dataset, nuScenes, Argoverse2
+- [[obsidian-vault/analysis/CVPR_2026/Diffusion_Based_sRGB_Real_Noise_Generation_via_Prompt_Driven_Noise_Representation_Learning.md|Diffusion-Based sRGB Real Noise Generation via Prompt-Driven Noise Representation Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Diffusion_Based_sRGB_Real_Noise_Generation_via_Prompt_Driven_Noise_Representation_Learning.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: PNG
+	- datasets: SIDD validation, SIDD-Benchmark, PolyU
+- [[obsidian-vault/analysis/CVPR_2026/Disentangling_to_Re_couple_Resolving_the_Similarity_Controllability_Paradox_in_Subject_Driven_Text_to_Image_Generation.md|Disentangling to Re-couple: Resolving the Similarity-Controllability Paradox in Subject-Driven Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Disentangling_to_Re_couple_Resolving_the_Similarity_Controllability_Paradox_in_Subject_Driven_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DisCo
+	- datasets: DreamBench, Human evaluation
+- [[obsidian-vault/analysis/CVPR_2026/DMGD_Train_Free_Dataset_Distillation_with_Semantic_Distribution_Matching_in_Diffusion_Models.md|DMGD: Train-Free Dataset Distillation with Semantic-Distribution Matching in Diffusion Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DMGD_Train_Free_Dataset_Distillation_with_Semantic_Distribution_Matching_in_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DMGD (Dual Matching Guided Diffusion)
+	- datasets: ImageNet-Woof, ImageNet-Nette, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Do_Vision_Language_Models_Measure_Up_Benchmarking_Visual_Measurement_Reading_with_MeasureBench.md|Do Vision-Language Models Measure Up? Benchmarking Visual Measurement Reading with MeasureBench (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Do_Vision_Language_Models_Measure_Up_Benchmarking_Visual_Measurement_Reading_with_MeasureBench.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: 基于合成数据的GRPO强化微调方法
+	- datasets: MeasureBench
+- [[obsidian-vault/analysis/CVPR_2026/DreamOmni2_Multimodal_Instruction_based_Generation_and_Editing.md|DreamOmni2: Multimodal Instruction-based Generation and Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DreamOmni2_Multimodal_Instruction_based_Generation_and_Editing.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamOmni2
+	- datasets: DreamOmni2 Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/Drive_My_Way_Preference_Alignment_of_Vision_Language_Action_Model_for_Personalized_Driving.md|Drive My Way: Preference Alignment of Vision-Language-Action Model for Personalized Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Drive_My_Way_Preference_Alignment_of_Vision_Language_Action_Model_for_Personalized_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Drive My Way (DMW)
+	- datasets: Bench2Drive, Personalized Driving Dataset, User Study
+- [[obsidian-vault/analysis/CVPR_2026/DSFlash_Comprehensive_Panoptic_Scene_Graph_Generation_in_Realtime.md|DSFlash: Comprehensive Panoptic Scene Graph Generation in Realtime (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DSFlash_Comprehensive_Panoptic_Scene_Graph_Generation_in_Realtime.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DSFlash
+	- datasets: PSG dataset
+- [[obsidian-vault/analysis/CVPR_2026/DyaDiT_A_Multi_Modal_Diffusion_Transformer_for_Socially_Favorable_Dyadic_Gesture_Generation.md|DyaDiT: A Multi-Modal Diffusion Transformer for Socially Favorable Dyadic Gesture Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DyaDiT_A_Multi_Modal_Diffusion_Transformer_for_Socially_Favorable_Dyadic_Gesture_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DyaDiT
+	- datasets: Seamless Interaction Dataset, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Dynamic_Logits_Adjustment_and_Exploration_for_Test_Time_Adaptation_in_Vision_Language_Models.md|Dynamic Logits Adjustment and Exploration for Test-Time Adaptation in Vision Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Dynamic_Logits_Adjustment_and_Exploration_for_Test_Time_Adaptation_in_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DLAE (Dynamic Logits Adjustment and Exploration)
+	- datasets: Cross-datasets generalization, Natural distribution shifts
+- [[obsidian-vault/analysis/CVPR_2026/E_comIQ_ZH_A_Human_Aligned_Dataset_and_Benchmark_for_Fine_Grained_Evaluation_of_E_commerce_Posters_with_Chain_of_Thought.md|E-comIQ-ZH: A Human-Aligned Dataset and Benchmark for Fine-Grained Evaluation of E-commerce Posters with Chain-of-Thought (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/E_comIQ_ZH_A_Human_Aligned_Dataset_and_Benchmark_for_Fine_Grained_Evaluation_of_E_commerce_Posters_with_Chain_of_Thought.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: E-comIQ-M
+	- datasets: E-comIQ-18k test set, E-comIQ-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Edge_Focused_Super_Resolution_for_Omnidirectional_Images_with_Spherical_Geometric_Augmentation.md|Edge-Focused Super-Resolution for Omnidirectional Images with Spherical Geometric Augmentation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Edge_Focused_Super_Resolution_for_Omnidirectional_Images_with_Spherical_Geometric_Augmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Edge-Aware Multi-Scale (EAM) network with Spherical Geometric Augmentation
+	- datasets: ODI-SR
+- [[obsidian-vault/analysis/CVPR_2026/EduDiag_A_Benchmark_for_Educational_Diagnostic_Reasoning_with_Error_Tracing_and_Correction_on_Large_Multimodal_Models.md|EduDiag: A Benchmark for Educational Diagnostic Reasoning with Error Tracing and Correction on Large Multimodal Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EduDiag_A_Benchmark_for_Educational_Diagnostic_Reasoning_with_Error_Tracing_and_Correction_on_Large_Multimodal_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: EduDiag Benchmark（教育诊断推理基准）
+	- datasets: EduDiag Overall, EduDiag Science, EduDiag Mathematics
+- [[obsidian-vault/analysis/CVPR_2026/Ego2Web_A_Web_Agent_Benchmark_Grounded_in_Egocentric_Videos.md|Ego2Web: A Web Agent Benchmark Grounded in Egocentric Videos (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Ego2Web_A_Web_Agent_Benchmark_Grounded_in_Egocentric_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Ego2Web (benchmark) and Ego2WebJudge (evaluator)
+	- datasets: Ego2Web human evaluation, Evaluation agreement, Ablation on visual modality
+- [[obsidian-vault/analysis/CVPR_2026/EgoEdit_Dataset_Real_Time_Streaming_Model_and_Benchmark_for_Egocentric_Video_Editing.md|EgoEdit: Dataset, Real-Time Streaming Model, and Benchmark for Egocentric Video Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EgoEdit_Dataset_Real_Time_Streaming_Model_and_Benchmark_for_Egocentric_Video_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EgoEdit（含流式变体 EgoEdit-RT）
+	- datasets: EgoEditBench, EditVerseBench
+- [[obsidian-vault/analysis/CVPR_2026/EgoProx_Evaluating_MLLMs_on_Egocentric_3D_Proximity_Reasoning_Across_a_Cognitive_Hierarchy.md|EgoProx: Evaluating MLLMs on Egocentric 3D Proximity Reasoning Across a Cognitive Hierarchy (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EgoProx_Evaluating_MLLMs_on_Egocentric_3D_Proximity_Reasoning_Across_a_Cognitive_Hierarchy.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EgoProx Benchmark and Agentic Data Engine
+	- datasets: EgoProx Chain of Actions, EgoProx Exploitation, EgoProx Intention
+- [[obsidian-vault/analysis/CVPR_2026/EgoXtreme_A_Dataset_for_Robust_Object_Pose_Estimation_in_Egocentric_Views_under_Extreme_Conditions.md|EgoXtreme: A Dataset for Robust Object Pose Estimation in Egocentric Views under Extreme Conditions (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EgoXtreme_A_Dataset_for_Robust_Object_Pose_Estimation_in_Egocentric_Views_under_Extreme_Conditions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EgoXtreme Dataset
+	- datasets: EgoXtreme Sports, EgoXtreme Maintenance, EgoXtreme Emergency
+- [[obsidian-vault/analysis/CVPR_2026/ENC_Bench_A_Benchmark_for_Evaluating_Multimodal_Large_Language_Models_in_Electronic_Navigational_Chart_Understanding.md|ENC-Bench: A Benchmark for Evaluating Multimodal Large Language Models in Electronic Navigational Chart Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ENC_Bench_A_Benchmark_for_Evaluating_Multimodal_Large_Language_Models_in_Electronic_Navigational_Chart_Understanding.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: ENC-Bench (基准框架)
+	- datasets: ENC-Bench, ENC-Bench L-1 Perception, ENC-Bench L-2 Spatial
+- [[obsidian-vault/analysis/CVPR_2026/Enhancing_Spatial_Understanding_in_Image_Generation_via_Reward_Modeling.md|Enhancing Spatial Understanding in Image Generation via Reward Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Enhancing_Spatial_Understanding_in_Image_Generation_via_Reward_Modeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SPATIALSCORE with Top-k GRPO
+	- datasets: Reward Evaluation Benchmark, SpatialScore, DPG-Bench - Relation-Spatial
+- [[obsidian-vault/analysis/CVPR_2026/eRetinexGS_Retinex_Modeling_for_Low_Light_Scene_Enhancement_via_Event_Streams_and_3D_Gaussian_Splatting.md|eRetinexGS: Retinex Modeling for Low-Light Scene Enhancement via Event Streams and 3D Gaussian Splatting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/eRetinexGS_Retinex_Modeling_for_Low_Light_Scene_Enhancement_via_Event_Streams_and_3D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: eRetinexGS
+	- datasets: Synthetic Low-Light Dataset
+- [[obsidian-vault/analysis/CVPR_2026/Event_Illumination_Collaborative_Low_light_Image_Enhancement_with_a_High_resolution_Real_world_Dataset.md|Event-Illumination Collaborative Low-light Image Enhancement with a High-resolution Real-world Dataset (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Event_Illumination_Collaborative_Low_light_Image_Enhancement_with_a_High_resolution_Real_world_Dataset.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EIC-LIE
+	- datasets: SDE-indoor, SDE-outdoor, SDSD-indoor
+- [[obsidian-vault/analysis/CVPR_2026/EVLF_Early_Vision_Language_Fusion_for_Generative_Dataset_Distillation.md|EVLF: Early Vision-Language Fusion for Generative Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EVLF_Early_Vision_Language_Fusion_for_Generative_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: EVLF (Early Vision-Language Fusion)
+	- datasets: ImageWoof, ImageNette, ImageIDC
+- [[obsidian-vault/analysis/CVPR_2026/Expand_and_Prune_Maximizing_Trajectory_Diversity_for_Effective_GRPO_in_Generative_Models.md|Expand and Prune: Maximizing Trajectory Diversity for Effective GRPO in Generative Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Expand_and_Prune_Maximizing_Trajectory_Diversity_for_Effective_GRPO_in_Generative_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Pro-GRPO
+	- datasets: DrawBench, GenEval, PickScore evaluation training cost
+- [[obsidian-vault/analysis/CVPR_2026/Expanding_mmWave_Datasets_for_Human_Pose_Estimation_with_Unlabeled_Data_and_LiDAR_Datasets.md|Expanding mmWave Datasets for Human Pose Estimation with Unlabeled Data and LiDAR Datasets (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Expanding_mmWave_Datasets_for_Human_Pose_Estimation_with_Unlabeled_Data_and_LiDAR_Datasets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EMDUL
+	- datasets: MM-Fi, mmBody → MM-Fi, MM-Fi → MM-Fi
+- [[obsidian-vault/analysis/CVPR_2026/Explore_with_Long_term_Memory_A_Benchmark_and_Multimodal_LLM_based_Reinforcement_Learning_Framework_for_Embodied_Exploration.md|Explore with Long-term Memory: A Benchmark and Multimodal LLM-based Reinforcement Learning Framework for Embodied Exploration (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Explore_with_Long_term_Memory_A_Benchmark_and_Multimodal_LLM_based_Reinforcement_Learning_Framework_for_Embodied_Exploration.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Agent / RL / Planning, Benchmark / Evaluation
+	- methods: MemoryExplorer
+	- datasets: LMEE-Bench, GOAT-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Exploring_Spatiotemporal_Feature_Propagation_for_Video_Level_Compressive_Spectral_Reconstruction_Dataset_Model_and_Benchmark.md|Exploring Spatiotemporal Feature Propagation for Video-Level Compressive Spectral Reconstruction: Dataset, Model and Benchmark (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Exploring_Spatiotemporal_Feature_Propagation_for_Video_Level_Compressive_Spectral_Reconstruction_Dataset_Model_and_Benchmark.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: PG-SVRT
+	- datasets: KAIST, DynaSpec
+- [[obsidian-vault/analysis/CVPR_2026/Faithful_Contouring_Near_Lossless_3D_Voxel_Representation_Free_from_Iso_surface.md|Faithful Contouring: Near-Lossless 3D Voxel Representation Free from Iso-surface (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Faithful_Contouring_Near_Lossless_3D_Voxel_Representation_Free_from_Iso_surface.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Faithful Contouring (FaithC)
+	- datasets: Representation fidelity benchmark, Mesh reconstruction on Dora benchmark
+- [[obsidian-vault/analysis/CVPR_2026/FinPercep_RM_A_Fine_grained_Reward_Model_and_Co_evolutionary_Curriculum_for_RL_based_Real_world_Super_Resolution.md|FinPercep-RM: A Fine-grained Reward Model and Co-evolutionary Curriculum for RL-based Real-world Super-Resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FinPercep_RM_A_Fine_grained_Reward_Model_and_Co_evolutionary_Curriculum_for_RL_based_Real_world_Super_Resolution.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Agent / RL / Planning, Benchmark / Evaluation
+	- methods: FinPercep-RM and Co-evolutionary Curriculum Learning (CCL)
+	- datasets: RealLQ250, User Study
+- [[obsidian-vault/analysis/CVPR_2026/FlashPortrait_6x_Faster_Infinite_Portrait_Animation_with_Adaptive_Latent_Prediction.md|FlashPortrait: 6x Faster Infinite Portrait Animation with Adaptive Latent Prediction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FlashPortrait_6x_Faster_Infinite_Portrait_Animation_with_Adaptive_Latent_Prediction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FlashPortrait
+	- datasets: Hard100, Voxceleb2 & Vfhq, Ablation
+- [[obsidian-vault/analysis/CVPR_2026/From_Rays_to_Projections_Better_Inputs_for_Feed_Forward_View_Synthesis.md|From Rays to Projections: Better Inputs for Feed-Forward View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/From_Rays_to_Projections_Better_Inputs_for_Feed_Forward_View_Synthesis.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: PVSM (Projective View Synthesis Model)
+	- datasets: RealEstate10K, Consistency Benchmark, RealEstate10K Small Overlap
+- [[obsidian-vault/analysis/CVPR_2026/G2VLM_Geometry_Grounded_Vision_Language_Model_with_Unified_3D_Reconstruction_and_Spatial_Reasoning.md|G$^2$VLM: Geometry Grounded Vision Language Model with Unified 3D Reconstruction and Spatial Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/G_2_VLM_Geometry_Grounded_Vision_Language_Model_with_Unified_3D_Reconstruction_and_Spatial_Reasoning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: G^2VLM
+	- datasets: Sintel, Co3Dv2, SPAR-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Gastric_X_A_Multimodal_Multi_Phase_Benchmark_Dataset_for_Advancing_Vision_Language_Models_in_Gastric_Cancer_Analysis.md|Gastric-X: A Multimodal Multi-Phase Benchmark Dataset for Advancing Vision-Language Models in Gastric Cancer Analysis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Gastric_X_A_Multimodal_Multi_Phase_Benchmark_Dataset_for_Advancing_Vision_Language_Models_in_Gastric_Cancer_Analysis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Gastric-X多模态基准与VLM适配
+	- datasets: Gastric-X VQA, Gastric-X Report Generation, Gastric-X Cross-modal Retrieval
+- [[obsidian-vault/analysis/CVPR_2026/GaussianPile_A_Unified_Sparse_Gaussian_Splatting_Framework_for_Slice_based_Volumetric_Reconstruction.md|GaussianPile: A Unified Sparse Gaussian Splatting Framework for Slice-based Volumetric Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GaussianPile_A_Unified_Sparse_Gaussian_Splatting_Framework_for_Slice_based_Volumetric_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: GaussianPile
+	- datasets: ABUS, rDL-LSM, ISBI12
+- [[obsidian-vault/analysis/CVPR_2026/GaussianVision_Vision_Language_Alignment_from_Compressed_Image_Representations_using_2D_Gaussian_Splatting.md|GaussianVision: Vision-Language Alignment from Compressed Image Representations using 2D Gaussian Splatting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GaussianVision_Vision_Language_Alignment_from_Compressed_Image_Representations_using_2D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GaussianVision (2DGS-adapted CLIP)
+	- datasets: CLIP Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/GaussianZoom_Progressive_Zoom_in_Generative_3D_Gaussian_Splatting_with_Geometric_and_Semantic_Guidance.md|GaussianZoom: Progressive Zoom-in Generative 3D Gaussian Splatting with Geometric and Semantic Guidance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GaussianZoom_Progressive_Zoom_in_Generative_3D_Gaussian_Splatting_with_Geometric_and_Semantic_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GaussianZoom
+	- datasets: Mip-NeRF360 4× SR, Tanks&Temples 4× SR
+- [[obsidian-vault/analysis/CVPR_2026/GenColorBench_A_Color_Evaluation_Benchmark_for_Text_to_Image_Generation.md|GenColorBench: A Color Evaluation Benchmark for Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GenColorBench_A_Color_Evaluation_Benchmark_for_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: GenColorBench
+	- datasets: GenColorBench - Color Name Accuracy, GenColorBench - Numerical Color Understanding, GenColorBench - Implicit Color Association
+- [[obsidian-vault/analysis/CVPR_2026/Geometric_Neural_Distance_Fields_for_Learning_Human_Motion_Priors.md|Geometric Neural Distance Fields for Learning Human Motion Priors (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Geometric_Neural_Distance_Fields_for_Learning_Human_Motion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Neural Riemannian Motion Fields (NRMF)
+	- datasets: AMASS
+- [[obsidian-vault/analysis/CVPR_2026/Geometrically_Constrained_Agent_for_Spatial_Reasoning.md|Geometrically-Constrained Agent for Spatial Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Geometrically_Constrained_Agent_for_Spatial_Reasoning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- datasets: MMSI-Bench, MindCube, SpatialBench
+- [[obsidian-vault/analysis/CVPR_2026/GeoRelight_Learning_Joint_Geometrical_Relighting_and_Reconstruction_with_Flexible_Multi_Modal_Diffusion_Transformers.md|GeoRelight: Learning Joint Geometrical Relighting and Reconstruction with Flexible Multi-Modal Diffusion Transformers (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GeoRelight_Learning_Joint_Geometrical_Relighting_and_Reconstruction_with_Flexible_Multi_Modal_Diffusion_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GeoRelight
+	- datasets: 合成数据, Light Stage数据, HumanOLAT
+- [[obsidian-vault/analysis/CVPR_2026/GeoTikzBridge_Advancing_Multimodal_Code_Generation_for_Geometric_Perception_and_Reasoning.md|GeoTikzBridge: Advancing Multimodal Code Generation for Geometric Perception and Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GeoTikzBridge_Advancing_Multimodal_Code_Generation_for_Geometric_Perception_and_Reasoning.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GeoTikzBridge
+	- datasets: DaTikZ, MathVista-GPS, GeoTikz-Instruct
+- [[obsidian-vault/analysis/CVPR_2026/GeoWorld_Geometric_World_Models.md|GeoWorld: Geometric World Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GeoWorld_Geometric_World_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Agent / RL / Planning
+	- methods: GeoWorld
+	- datasets: CrossTask, COIN
+- [[obsidian-vault/analysis/CVPR_2026/GGBench_A_Geometric_Generative_Reasoning_Benchmark_for_Unified_Multimodal_Models.md|GGBench: A Geometric Generative Reasoning Benchmark for Unified Multimodal Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GGBench_A_Geometric_Generative_Reasoning_Benchmark_for_Unified_Multimodal_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: GGBench
+	- datasets: GGBench, GGBench-Code
+- [[obsidian-vault/analysis/CVPR_2026/Hear_What_You_See_Video_to_Audio_Generation_with_Diffusion_Transformer_and_Semantic_Temporal_Alignment_Ranked_Direct_Preference_Optimization.md|Hear What You See: Video-to-Audio Generation with Diffusion Transformer and Semantic-Temporal Alignment-Ranked Direct Preference Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Hear_What_You_See_Video_to_Audio_Generation_with_Diffusion_Transformer_and_Semantic_Temporal_Alignment_Ranked_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VisioSonic (with STAR-DPO)
+	- datasets: VGGSound test set, User Study
+- [[obsidian-vault/analysis/CVPR_2026/HierAmp_Coarse_to_Fine_Autoregressive_Amplification_for_Generative_Dataset_Distillation.md|HierAmp: Coarse-to-Fine Autoregressive Amplification for Generative Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/HierAmp_Coarse_to_Fine_Autoregressive_Amplification_for_Generative_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HIERAMP
+	- datasets: CIFAR-10, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Hoi_A_Multimodal_Dataset_for_Force_Grounded_Cross_View_Articulated_Manipulation.md|Hoi! - A Multimodal Dataset for Force-Grounded, Cross-View Articulated Manipulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Hoi_A_Multimodal_Dataset_for_Force_Grounded_Cross_View_Articulated_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Hoi! Dataset Collection and Annotation Pipeline
+	- datasets: Hoi! Articulation Estimation, Hoi! Tactile Force Prediction, Hoi! Visual Force Estimation
+- [[obsidian-vault/analysis/CVPR_2026/HUMAPS_4D_A_Multimodal_Dataset_for_HUman_Motion_Analysis_with_Physiological_and_Semantic_informations.md|HUMAPS-4D: A Multimodal Dataset for HUman Motion Analysis with Physiological and Semantic informations (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/HUMAPS_4D_A_Multimodal_Dataset_for_HUman_Motion_Analysis_with_Physiological_and_Semantic_informations.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: HUMAPS‑4D 多模态数据集及其基准任务
+	- datasets: HUMAPS-4D LOSO 动作识别, HUMAPS-4D 4-fold CV 3D姿态估计
+- [[obsidian-vault/analysis/CVPR_2026/HybridDriveVLA_Vision_Language_Action_Model_with_Visual_CoT_reasoning_and_ToT_Evaluation_for_Autonomous_Driving.md|HybridDriveVLA: Vision-Language-Action Model with Visual CoT reasoning and ToT Evaluation for Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/HybridDriveVLA_Vision_Language_Action_Model_with_Visual_CoT_reasoning_and_ToT_Evaluation_for_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: HybridDriveVLA
+	- datasets: nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/I2I_Bench_A_Comprehensive_Benchmark_Suite_for_Image_to_Image_Editing_Models.md|I2I-Bench: A Comprehensive Benchmark Suite for Image-to-Image Editing Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/I2I_Bench_A_Comprehensive_Benchmark_Suite_for_Image_to_Image_Editing_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: I2I-Bench
+	- datasets: I2I-Bench Single-Image Editing, I2I-Bench Multi-Image Editing, I2I-Bench Single-Image
+- [[obsidian-vault/analysis/CVPR_2026/ImageRAGTurbo_Towards_One_step_Text_to_Image_Generation_with_Retrieval_Augmented_Diffusion_Models.md|ImageRAGTurbo: Towards One-step Text-to-Image Generation with Retrieval-Augmented Diffusion Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ImageRAGTurbo_Towards_One_step_Text_to_Image_Generation_with_Retrieval_Augmented_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: ImageRAGTurbo
+	- datasets: MS-COCO, TIFA benchmark
+- [[obsidian-vault/analysis/CVPR_2026/ImmerIris_A_Large_Scale_Dataset_and_Benchmark_for_Off_Axis_and_Unconstrained_Iris_Recognition_in_Immersive_Applications.md|ImmerIris: A Large-Scale Dataset and Benchmark for Off-Axis and Unconstrained Iris Recognition in Immersive Applications (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ImmerIris_A_Large_Scale_Dataset_and_Benchmark_for_Off_Axis_and_Unconstrained_Iris_Recognition_in_Immersive_Applications.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: NormFree
+	- datasets: Immer-Control, Immer-Any, Immer-Gaze
+- [[obsidian-vault/analysis/CVPR_2026/Improving_Text_to_Image_Generation_with_Intrinsic_Self_Confidence_Rewards.md|Improving Text-to-Image Generation with Intrinsic Self-Confidence Rewards (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Improving_Text_to_Image_Generation_with_Intrinsic_Self_Confidence_Rewards.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SOLACE
+	- datasets: GenEval, OCR, CLIPScore
+- [[obsidian-vault/analysis/CVPR_2026/Improving_Vision_language_Models_with_Perception_centric_Process_Reward_Models.md|Improving Vision-language Models with Perception-centric Process Reward Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Improving_Vision_language_Models_with_Perception_centric_Process_Reward_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: PERCEVAL (Perception-centric process reward evaluation model)
+	- datasets: V*pos, V*, Math and Chart tasks
+- [[obsidian-vault/analysis/CVPR_2026/IMS3_Breaking_Distributional_Aggregation_in_Diffusion_Based_Dataset_Distillation.md|IMS3: Breaking Distributional Aggregation in Diffusion-Based Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IMS3_Breaking_Distributional_Aggregation_in_Diffusion_Based_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ImS³ (Inversion-Matching + Selective Subgroup Sampling)
+	- datasets: ImageWoof, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Inferring_Compositional_4D_Scenes_without_Ever_Seeing_One.md|Inferring Compositional 4D Scenes without Ever Seeing One (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Inferring_Compositional_4D_Scenes_without_Ever_Seeing_One.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: COM4D
+	- datasets: User Study, CMU Panoptic, DeformingThings
+- [[obsidian-vault/analysis/CVPR_2026/InfiniBench_Infinite_Benchmarking_for_Visual_Spatial_Reasoning_with_Customizable_Scene_Complexity.md|InfiniBench: Infinite Benchmarking for Visual Spatial Reasoning with Customizable Scene Complexity (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/InfiniBench_Infinite_Benchmarking_for_Visual_Spatial_Reasoning_with_Customizable_Scene_Complexity.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: InfiniBench
+	- datasets: InfiniBench
+- [[obsidian-vault/analysis/CVPR_2026/Instruction_Guided_Lesion_Segmentation_for_Chest_X_rays_with_Automatically_Generated_Large_Scale_Dataset.md|Instruction-Guided Lesion Segmentation for Chest X-rays with Automatically Generated Large-Scale Dataset (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Instruction_Guided_Lesion_Segmentation_for_Chest_X_rays_with_Automatically_Generated_Large_Scale_Dataset.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: ROSALIA (RadiOlogy Segmentation Assistant trained on Lesion-grounded Instruction-Answer dataset)
+	- datasets: MIMIC-ILS test set
+- [[obsidian-vault/analysis/CVPR_2026/Inter_Edit_First_Benchmark_for_Interactive_Instruction_Based_Image_Editing.md|Inter-Edit: First Benchmark for Interactive Instruction-Based Image Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Inter_Edit_First_Benchmark_for_Interactive_Instruction_Based_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: I3E (Interactive Instruction-based Image Editing)
+	- datasets: Inter-Edit test set
+- [[obsidian-vault/analysis/CVPR_2026/Is_Bin_Generation_Indispensable_A_Bin_Generation_Free_Dataset_Quantization_via_Semantic_Perspective.md|Is Bin Generation Indispensable? A Bin-Generation-Free Dataset Quantization via Semantic Perspective (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Is_Bin_Generation_Indispensable_A_Bin_Generation_Free_Dataset_Quantization_via_Semantic_Perspective.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Bin-Generation-Free Dataset Quantization (BGFDQ)
+	- datasets: CIFAR-10, CIFAR-100, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Is_your_VLM_Sky_Ready_A_Comprehensive_Spatial_Intelligence_Benchmark_for_UAV_Navigation.md|Is your VLM Sky-Ready? A Comprehensive Spatial Intelligence Benchmark for UAV Navigation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Is_your_VLM_Sky_Ready_A_Comprehensive_Spatial_Intelligence_Benchmark_for_UAV_Navigation.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Agent / RL / Planning
+	- methods: Sky-VLM
+	- datasets: SpatialSky-Bench
+- [[obsidian-vault/analysis/CVPR_2026/LASER_Layer_wise_Scale_Alignment_for_Training_Free_Streaming_4D_Reconstruction.md|LASER: Layer-wise Scale Alignment for Training-Free Streaming 4D Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LASER_Layer_wise_Scale_Alignment_for_Training_Free_Streaming_4D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: LASER
+	- datasets: Sintel, Bonn, KITTI
+- [[obsidian-vault/analysis/CVPR_2026/Learnability_Guided_Diffusion_for_Dataset_Distillation.md|Learnability-Guided Diffusion for Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learnability_Guided_Diffusion_for_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Learnability-Guided Diffusion (LGD)
+	- datasets: ImageNette, ImageWoof, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Learning_Like_Humans_Analogical_Concept_Learning_for_Generalized_Category_Discovery.md|Learning Like Humans: Analogical Concept Learning for Generalized Category Discovery (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learning_Like_Humans_Analogical_Concept_Learning_for_Generalized_Category_Discovery.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: AL-GCD (Analogical Learning for Generalized Category Discovery)
+	- datasets: All Datasets, Fine-grained datasets avg, CUB
+- [[obsidian-vault/analysis/CVPR_2026/Let_Your_Image_Move_with_Your_Motion_Implicit_Multi_Object_Multi_Motion_Transfer.md|Let Your Image Move with Your Motion! -- Implicit Multi-Object Multi-Motion Transfer (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Let_Your_Image_Move_with_Your_Motion_Implicit_Multi_Object_Multi_Motion_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: FlexiMMT
+	- datasets: Custom evaluation set
+- [[obsidian-vault/analysis/CVPR_2026/Leveraging_Verifier_Based_Reinforcement_Learning_in_Image_Editing.md|Leveraging Verifier-Based Reinforcement Learning in Image Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Leveraging_Verifier_Based_Reinforcement_Learning_in_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Edit-R1
+	- datasets: Internal Reward Benchmark, EditRewardBench, GEdit-Bench-EN
+- [[obsidian-vault/analysis/CVPR_2026/Lighting_grounded_Video_Generation_with_Renderer_based_Agent_Reasoning.md|Lighting-grounded Video Generation with Renderer-based Agent Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Lighting_grounded_Video_Generation_with_Renderer_based_Agent_Reasoning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LiVER
+	- datasets: LiVERSet eval, User Study
+- [[obsidian-vault/analysis/CVPR_2026/LiveGesture_Streamable_Co_Speech_Gesture_Generation_Model.md|LiveGesture: Streamable Co-Speech Gesture Generation Model (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LiveGesture_Streamable_Co_Speech_Gesture_Generation_Model.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: LiveGesture
+	- datasets: BEAT2, User Study
+- [[obsidian-vault/analysis/CVPR_2026/M3DLayout_A_Multi_Source_Dataset_of_3D_Indoor_Layouts_and_Structured_Descriptions_for_3D_Generation.md|M3DLayout: A Multi-Source Dataset of 3D Indoor Layouts and Structured Descriptions for 3D Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/M3DLayout_A_Multi_Source_Dataset_of_3D_Indoor_Layouts_and_Structured_Descriptions_for_3D_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: M3DLayout Dataset and Text-Conditioned Layout Generation Models (DIFF-M3DLayout & AR-M3DLayout)
+	- datasets: Inf3DLayout, Overall
+- [[obsidian-vault/analysis/CVPR_2026/M4Human_A_Large_Scale_Multimodal_mmWave_Radar_Benchmark_for_Human_Mesh_Reconstruction.md|M4Human: A Large-Scale Multimodal mmWave Radar Benchmark for Human Mesh Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/M4Human_A_Large_Scale_Multimodal_mmWave_Radar_Benchmark_for_Human_Mesh_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: RT-Mesh
+	- datasets: M4Human
+- [[obsidian-vault/analysis/CVPR_2026/MangoBench_A_Benchmark_for_Multi_Agent_Goal_Conditioned_Offline_Reinforcement_Learning.md|MangoBench: A Benchmark for Multi-Agent Goal-Conditioned Offline Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MangoBench_A_Benchmark_for_Multi_Agent_Goal_Conditioned_Offline_Reinforcement_Learning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Agent / RL / Planning, Benchmark / Evaluation
+	- methods: Goal-Conditioned Offline MARL Framework (GCMBC, ICRL, IHIQL, HIQL-CTDE, GCOMIGA, GCOMAR)
+	- datasets: AntMaze-navigate giant, lift-barrier, place-food
+- [[obsidian-vault/analysis/CVPR_2026/ManifoldGD_Training_Free_Hierarchical_Manifold_Guidance_for_Diffusion_Based_Dataset_Distillation.md|ManifoldGD: Training-Free Hierarchical Manifold Guidance for Diffusion-Based Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ManifoldGD_Training_Free_Hierarchical_Manifold_Guidance_for_Diffusion_Based_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: ManifoldGD
+	- datasets: ImageNette, ImageNet-100, ImageWoof
+- [[obsidian-vault/analysis/CVPR_2026/MatAnyone_2_Scaling_Video_Matting_via_a_Learned_Quality_Evaluator.md|MatAnyone 2: Scaling Video Matting via a Learned Quality Evaluator (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MatAnyone_2_Scaling_Video_Matting_via_a_Learned_Quality_Evaluator.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MatAnyone 2
+	- datasets: VideoMatte, YoutubeMatte, CRGNN
+- [[obsidian-vault/analysis/CVPR_2026/MDCS_MoAME_Multi_directional_Composite_Scanning_with_Mixture_of_Attention_and_Mamba_Experts_for_Cancer_Survival_Prediction.md|MDCS-MoAME: Multi-directional Composite Scanning with Mixture of Attention and Mamba Experts for Cancer Survival Prediction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MDCS_MoAME_Multi_directional_Composite_Scanning_with_Mixture_of_Attention_and_Mamba_Experts_for_Cancer_Survival_Prediction.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: MDCS-MoAME
+	- datasets: Five TCGA datasets
+- [[obsidian-vault/analysis/CVPR_2026/Med_CMR_A_Fine_Grained_Benchmark_Integrating_Visual_Evidence_and_Clinical_Logic_for_Medical_Complex_Multimodal_Reasoning.md|Med-CMR: A Fine-Grained Benchmark Integrating Visual Evidence and Clinical Logic for Medical Complex Multimodal Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Med_CMR_A_Fine_Grained_Benchmark_Integrating_Visual_Evidence_and_Clinical_Logic_for_Medical_Complex_Multimodal_Reasoning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Med-CMR
+	- datasets: Med-CMR MCQ, Med-CMR 开放式, Long-Tail Generalization
+- [[obsidian-vault/analysis/CVPR_2026/MedCLIPSeg_Probabilistic_Vision_Language_Adaptation_for_Data_Efficient_and_Generalizable_Medical_Image_Segmentation.md|MedCLIPSeg: Probabilistic Vision-Language Adaptation for Data-Efficient and Generalizable Medical Image Segmentation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MedCLIPSeg_Probabilistic_Vision_Language_Adaptation_for_Data_Efficient_and_Generalizable_Medical_Image_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MedCLIPSeg
+- [[obsidian-vault/analysis/CVPR_2026/Medic_AD_Towards_Medical_Vision_Language_Models_Clinical_Intelligence.md|Medic-AD: Towards Medical Vision-Language Model's Clinical Intelligence (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Medic_AD_Towards_Medical_Vision_Language_Model_s_Clinical_Intelligence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MEDIC-AD
+	- datasets: Medical Zero-shot Anomaly Detection, Medical Symptom Tracking, Visual Grounding - BraTS2021
+- [[obsidian-vault/analysis/CVPR_2026/MeshMosaic_Scaling_Artist_Mesh_Generation_via_Local_to_Global_Assembly.md|MeshMosaic: Scaling Artist Mesh Generation via Local-to-Global Assembly (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MeshMosaic_Scaling_Artist_Mesh_Generation_via_Local_to_Global_Assembly.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MeshMosaic
+	- datasets: ShapeNet, Thingi10K, Objaverse
+- [[obsidian-vault/analysis/CVPR_2026/MetaSpectra_A_Compact_Broadband_Metasurface_Camera_for_Snapshot_Hyperspectral_Imaging.md|MetaSpectra+: A Compact Broadband Metasurface Camera for Snapshot Hyperspectral+ Imaging (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MetaSpectra_A_Compact_Broadband_Metasurface_Camera_for_Snapshot_Hyperspectral_Imaging.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MetaSpectra+
+	- datasets: KAUST dataset, Real-world HDR+Hyperspectral scenes
+- [[obsidian-vault/analysis/CVPR_2026/MeteorPred_A_Meteorological_Multimodal_Large_Model_and_Dataset_for_Severe_Weather_Event_Prediction.md|MeteorPred: A Meteorological Multimodal Large Model and Dataset for Severe Weather Event Prediction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MeteorPred_A_Meteorological_Multimodal_Large_Model_and_Dataset_for_Severe_Weather_Event_Prediction.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: MMLM (Meteorological Multimodal Large Model)
+	- datasets: MP-Bench
+- [[obsidian-vault/analysis/CVPR_2026/MetricHMSR_Metric_Human_Mesh_and_Scene_Recovery_from_Monocular_Images.md|MetricHMSR: Metric Human Mesh and Scene Recovery from Monocular Images (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MetricHMSR_Metric_Human_Mesh_and_Scene_Recovery_from_Monocular_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MetricHMSR
+- [[obsidian-vault/analysis/CVPR_2026/MimiCAT_Mimic_with_Correspondence_Aware_Cascade_Transformer_for_Category_Free_3D_Pose_Transfer.md|MimiCAT: Mimic with Correspondence-Aware Cascade-Transformer for Category-Free 3D Pose Transfer (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MimiCAT_Mimic_with_Correspondence_Aware_Cascade_Transformer_for_Category_Free_3D_Pose_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MimiCAT
+	- datasets: Humanoid-to-Humanoid, Cross-Category Transfer, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Mind_the_Generative_Details_Direct_Localized_Detail_Preference_Optimization_for_Video_Diffusion_Models.md|Mind the Generative Details: Direct Localized Detail Preference Optimization for Video Diffusion Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mind_the_Generative_Details_Direct_Localized_Detail_Preference_Optimization_for_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: LocalDPO
+	- datasets: VBench, VideoJAM, Human Evaluation
+- [[obsidian-vault/analysis/CVPR_2026/MindPower_Enabling_Theory_of_Mind_Reasoning_in_VLM_based_Embodied_Agents.md|MindPower: Enabling Theory-of-Mind Reasoning in VLM-based Embodied Agents (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MindPower_Enabling_Theory_of_Mind_Reasoning_in_VLM_based_Embodied_Agents.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: MindPower
+	- datasets: MindPower Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/Mitigating_The_Distribution_Shift_of_Diffusion_based_Dataset_Distillation.md|Mitigating The Distribution Shift of Diffusion-based Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mitigating_The_Distribution_Shift_of_Diffusion_based_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: RSM+CGS
+	- datasets: ImageNet-1K, ImageNette, ImageWoof
+- [[obsidian-vault/analysis/CVPR_2026/MMBench_GUI_A_Unified_Hierarchical_Evaluation_Framework_for_Multi_Platform_GUI_Agents.md|MMBench-GUI: A Unified Hierarchical Evaluation Framework for Multi-Platform GUI Agents (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MMBench_GUI_A_Unified_Hierarchical_Evaluation_Framework_for_Multi_Platform_GUI_Agents.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: MMBench-GUI
+	- datasets: L3-GUI Task Automation, L4-GUI Task Collaboration
+- [[obsidian-vault/analysis/CVPR_2026/MMLandmarks_a_Cross_View_Instance_Level_Benchmark_for_Geo_Spatial_Understanding.md|MMLandmarks: a Cross-View Instance-Level Benchmark for Geo-Spatial Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MMLandmarks_a_Cross_View_Instance_Level_Benchmark_for_Geo_Spatial_Understanding.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: MMCLIP
+	- datasets: MMLANDMARKS 跨视角检索, MMLANDMARKS 地面图像定位, MMLANDMARKS 卫星图像定位
+- [[obsidian-vault/analysis/CVPR_2026/MMR_AD_A_Large_Scale_Multimodal_Dataset_for_Benchmarking_General_Anomaly_Detection_with_Multimodal_Large_Language_Models.md|MMR-AD: A Large-Scale Multimodal Dataset for Benchmarking General Anomaly Detection with Multimodal Large Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MMR_AD_A_Large_Scale_Multimodal_Dataset_for_Benchmarking_General_Anomaly_Detection_with_Multimodal_Large_Language_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: Anomaly-R1
+	- datasets: MVTecAD, VisA
+- [[obsidian-vault/analysis/CVPR_2026/MoE_GRPO_Optimizing_Mixture_of_Experts_via_Reinforcement_Learning_in_Vision_Language_Models.md|MoE-GRPO: Optimizing Mixture-of-Experts via Reinforcement Learning in Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MoE_GRPO_Optimizing_Mixture_of_Experts_via_Reinforcement_Learning_in_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: MoE-GRPO
+	- datasets: 跨数据集评估, 领域泛化
+- [[obsidian-vault/analysis/CVPR_2026/MoReGen_Multi_Agent_Motion_Reasoning_Engine_for_Code_based_Text_to_Video_Synthesis.md|MoReGen: Multi-Agent Motion-Reasoning Engine for Code-based Text-to-Video Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MoReGen_Multi_Agent_Motion_Reasoning_Engine_for_Code_based_Text_to_Video_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MoReGen
+	- datasets: MoReSet
+- [[obsidian-vault/analysis/CVPR_2026/Mostly_Text_Smart_Visuals_Asymmetric_Text_Visual_Pruning_for_Large_Vision_Language_Models.md|Mostly Text, Smart Visuals: Asymmetric Text-Visual Pruning for Large Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mostly_Text_Smart_Visuals_Asymmetric_Text_Visual_Pruning_for_Large_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: ATV-Pruning (Asymmetric Text-Visual Weight Pruning)
+	- datasets: Avg. Retention, MME, OKVQA
+- [[obsidian-vault/analysis/CVPR_2026/Motion_Aware_Animatable_Gaussian_Avatars_Deblurring.md|Motion-Aware Animatable Gaussian Avatars Deblurring (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Motion_Aware_Animatable_Gaussian_Avatars_Deblurring.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Motion-Aware Animatable Gaussian Avatars Deblurring (MAD-Avatar)
+	- datasets: Synthetic Dataset, Real Dataset
+- [[obsidian-vault/analysis/CVPR_2026/MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing.md|MotionEdit Benchmarking and Learning Motion Centric Image Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionNFT
+	- datasets: MotionEdit-Bench
+- [[obsidian-vault/analysis/CVPR_2026/MSJoE_Jointly_Evolving_MLLM_and_Sampler_for_Efficient_Long_Form_Video_Understanding.md|MSJoE: Jointly Evolving MLLM and Sampler for Efficient Long-Form Video Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MSJoE_Jointly_Evolving_MLLM_and_Sampler_for_Efficient_Long_Form_Video_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MLLM-Sampler Joint Evolution (MSJoE)
+	- datasets: MLVU, LVBench, Video-MME Long
+- [[obsidian-vault/analysis/CVPR_2026/MultiBanana_A_Challenging_Benchmark_for_Multi_Reference_Text_to_Image_Generation.md|MultiBanana: A Challenging Benchmark for Multi-Reference Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MultiBanana_A_Challenging_Benchmark_for_Multi_Reference_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MultiBanana Benchmark
+	- datasets: MultiBanana, LAION-5B
+- [[obsidian-vault/analysis/CVPR_2026/Multimodal_Distribution_Matching_for_Vision_Language_Dataset_Distillation.md|Multimodal Distribution Matching for Vision-Language Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Multimodal_Distribution_Matching_for_Vision_Language_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MDM (Multimodal Distribution Matching)
+	- datasets: Flickr8k, COCO
+- [[obsidian-vault/analysis/CVPR_2026/NAMI_Efficient_Image_Generation_via_Bridged_Progressive_Rectified_Flow_Transformers.md|NAMI: Efficient Image Generation via Bridged Progressive Rectified Flow Transformers (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/NAMI_Efficient_Image_Generation_via_Bridged_Progressive_Rectified_Flow_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: NAMI (Bridged Progressive Rectified Flow Transformers)
+	- datasets: Inference Time, GenEval, DPG-Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/Neural_Field_Based_3D_Surface_Reconstruction_of_Microstructures_from_Multi_Detector_Signals_in_Scanning_Electron_Microscopy.md|Neural Field-Based 3D Surface Reconstruction of Microstructures from Multi-Detector Signals in Scanning Electron Microscopy (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Neural_Field_Based_3D_Surface_Reconstruction_of_Microstructures_from_Multi_Detector_Signals_in_Scanning_Electron_Microscopy.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: NFH-SEM
+	- datasets: Simulated TPL dataset, Real-world NFH-SEM dataset
+- [[obsidian-vault/analysis/CVPR_2026/Next_Scale_Autoregressive_Models_for_Text_to_Motion_Generation.md|Next-Scale Autoregressive Models for Text-to-Motion Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Next_Scale_Autoregressive_Models_for_Text_to_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MoScale
+	- datasets: HumanML3D, KIT-ML, User Study
+- [[obsidian-vault/analysis/CVPR_2026/NitroGen_An_Open_Foundation_Model_for_Generalist_Gaming_Agents.md|NitroGen: An Open Foundation Model for Generalist Gaming Agents (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/NitroGen_An_Open_Foundation_Model_for_Generalist_Gaming_Agents.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: NitroGen
+	- datasets: Multi-game benchmark, Isometric roguelike, Gamepad action extraction benchmark
+- [[obsidian-vault/analysis/CVPR_2026/OccuFly_A_3D_Vision_Benchmark_for_Semantic_Scene_Completion_from_the_Aerial_Perspective.md|OccuFly: A 3D Vision Benchmark for Semantic Scene Completion from the Aerial Perspective (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OccuFly_A_3D_Vision_Benchmark_for_Semantic_Scene_Completion_from_the_Aerial_Perspective.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: OccuFly（基于相机数据生成流水线的航拍SSC基准）
+	- datasets: OccuFly
+- [[obsidian-vault/analysis/CVPR_2026/OctoT2I_A_Self_Evolving_Agentic_Text_to_Image_Router.md|OctoT2I: A Self-Evolving Agentic Text-to-Image Router (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OctoT2I_A_Self_Evolving_Agentic_Text_to_Image_Router.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OctoT2I
+	- datasets: GenEval, T2ICompBench++, User Study
+- [[obsidian-vault/analysis/CVPR_2026/OLATverse_A_Large_scale_Real_world_Object_Dataset_with_Precise_Lighting_Control.md|OLATverse: A Large-scale Real-world Object Dataset with Precise Lighting Control (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OLATverse_A_Large_scale_Real_world_Object_Dataset_with_Precise_Lighting_Control.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: OLATverse
+	- datasets: OLATverse validation set
+- [[obsidian-vault/analysis/CVPR_2026/OMG_Bench_A_New_Challenging_Benchmark_for_Skeleton_based_Online_Micro_Hand_Gesture_Recognition.md|OMG-Bench: A New Challenging Benchmark for Skeleton-based Online Micro Hand Gesture Recognition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OMG_Bench_A_New_Challenging_Benchmark_for_Skeleton_based_Online_Micro_Hand_Gesture_Recognition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Hierarchical Memory-Augmented Transformer (HMATr)
+	- datasets: OMG-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Order_Matters_3D_Shape_Generation_from_Sequential_VR_Sketches.md|Order Matters: 3D Shape Generation from Sequential VR Sketches (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Order_Matters_3D_Shape_Generation_from_Sequential_VR_Sketches.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VRSketch2Shape
+	- datasets: VRSketch2Shape, User Study
+- [[obsidian-vault/analysis/CVPR_2026/PackUV_Packed_Gaussian_UV_Maps_for_4D_Volumetric_Video.md|PackUV: Packed Gaussian UV Maps for 4D Volumetric Video (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PackUV_Packed_Gaussian_UV_Maps_for_4D_Volumetric_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: PackUV / PackUV-GS
+	- datasets: PackUV-2B, SelfCap, N3DV
+- [[obsidian-vault/analysis/CVPR_2026/PAI_Bench_A_Comprehensive_Benchmark_For_Physical_AI.md|PAI-Bench: A Comprehensive Benchmark For Physical AI (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PAI_Bench_A_Comprehensive_Benchmark_For_Physical_AI.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: PAI-Bench
+	- datasets: PAI-Bench-G, PAI-Bench-U, PAI-Bench-C
+- [[obsidian-vault/analysis/CVPR_2026/Paparazzo_Active_Mapping_of_Moving_3D_Objects.md|Paparazzo: Active Mapping of Moving 3D Objects (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Paparazzo_Active_Mapping_of_Moving_3D_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Paparazzo
+	- datasets: Active Mapping of Moving Objects Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/PETAR_Localized_Findings_Generation_with_Mask_Aware_Vision_Language_Modeling_for_PET_Automated_Reporting.md|PETAR: Localized Findings Generation with Mask-Aware Vision-Language Modeling for PET Automated Reporting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PETAR_Localized_Findings_Generation_with_Mask_Aware_Vision_Language_Modeling_for_PET_Automated_Reporting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PETAR-4B
+	- datasets: PETARSeg-11k test set, Internal Reader Study, External AutoPET Dataset
+- [[obsidian-vault/analysis/CVPR_2026/Photo3D_Advancing_Photorealistic_3D_Generation_through_Structure_Aligned_Detail_Enhancement.md|Photo3D: Advancing Photorealistic 3D Generation through Structure-Aligned Detail Enhancement (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Photo3D_Advancing_Photorealistic_3D_Generation_through_Structure_Aligned_Detail_Enhancement.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Photo3D
+	- datasets: ImageNet, Real 3D Datasets
+- [[obsidian-vault/analysis/CVPR_2026/PhysGaia_A_Physics_aware_Benchmark_with_Multi_Body_Interactions_for_Dynamic_Novel_View_Synthesis.md|PhysGaia: A Physics-aware Benchmark with Multi-Body Interactions for Dynamic Novel View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PhysGaia_A_Physics_aware_Benchmark_with_Multi_Body_Interactions_for_Dynamic_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: PhysGaia Benchmark
+	- datasets: Cow, Box-smoke, All scenes
+- [[obsidian-vault/analysis/CVPR_2026/PhysHead_Simulation_Ready_Gaussian_Head_Avatars.md|PhysHead: Simulation-Ready Gaussian Head Avatars (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PhysHead_Simulation_Ready_Gaussian_Head_Avatars.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: PhysHead
+	- datasets: Ava-256, User Study, Ava-256 dynamics
+- [[obsidian-vault/analysis/CVPR_2026/Pico_Banana_400K_A_Large_Scale_Dataset_for_Text_Guided_Image_Editing.md|Pico-Banana-400K: A Large-Scale Dataset for Text-Guided Image Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Pico_Banana_400K_A_Large_Scale_Dataset_for_Text_Guided_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Pico-Banana-400K (数据集)
+	- datasets: Pico-Banana-400K, OpenImages
+- [[obsidian-vault/analysis/CVPR_2026/Plant_Taxonomy_Meets_Plant_Counting_A_Fine_Grained_Taxonomic_Dataset_for_Counting_Hundreds_of_Plant_Species.md|Plant Taxonomy Meets Plant Counting: A Fine-Grained, Taxonomic Dataset for Counting Hundreds of Plant Species (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Plant_Taxonomy_Meets_Plant_Counting_A_Fine_Grained_Taxonomic_Dataset_for_Counting_Hundreds_of_Plant_Species.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: TPC-268 (大规模分类学植物计数数据集与基准)
+	- datasets: TPC-268 test set, Cross-dataset transfer FSC-147 → TPC-268
+- [[obsidian-vault/analysis/CVPR_2026/POLAR_A_Portrait_OLAT_Dataset_and_Generative_Framework_for_Illumination_Aware_Face_Modeling.md|POLAR: A Portrait OLAT Dataset and Generative Framework for Illumination-Aware Face Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/POLAR_A_Portrait_OLAT_Dataset_and_Generative_Framework_for_Illumination_Aware_Face_Modeling.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: POLARNet
+	- datasets: POLAR relit portraits test set
+- [[obsidian-vault/analysis/CVPR_2026/PosterIQ_A_Design_Perspective_Benchmark_for_Poster_Understanding_and_Generation.md|PosterIQ: A Design Perspective Benchmark for Poster Understanding and Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PosterIQ_A_Design_Perspective_Benchmark_for_Poster_Understanding_and_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: PosterIQ Benchmark
+	- datasets: Logo OCR, Font Matching, Composition Understanding
+- [[obsidian-vault/analysis/CVPR_2026/PosterReward_Unlocking_Accurate_Evaluation_for_High_Quality_Graphic_Design_Generation.md|PosterReward: Unlocking Accurate Evaluation for High-Quality Graphic Design Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PosterReward_Unlocking_Accurate_Evaluation_for_High_Quality_Graphic_Design_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PosterReward (including variants: PosterReward-Lite, PosterReward-Pairwise)
+	- datasets: PosterRewardBench-Basic, PosterRewardBench-Advanced
+- [[obsidian-vault/analysis/CVPR_2026/PromptDepth_Efficient_and_Promptable_Geometric_3D_Vision_Model_for_Embodied_Intelligence.md|PromptDepth: Efficient and Promptable Geometric 3D Vision Model for Embodied Intelligence (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PromptDepth_Efficient_and_Promptable_Geometric_3D_Vision_Model_for_Embodied_Intelligence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: PromptDepth
+	- datasets: KITTI, Sintel, NYU
+- [[obsidian-vault/analysis/CVPR_2026/QUANTIPHY_A_Quantitative_Benchmark_Evaluating_Physical_Reasoning_Abilities_of_Vision_Language_Models.md|QUANTIPHY: A Quantitative Benchmark Evaluating Physical Reasoning Abilities of Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/QUANTIPHY_A_Quantitative_Benchmark_Evaluating_Physical_Reasoning_Abilities_of_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: QUANTIPHY定量物理推理基准与评估协议
+	- datasets: QUANTIPHY Overall, QUANTIPHY 2D-Dynamic, QUANTIPHY 3D-Dynamic
+- [[obsidian-vault/analysis/CVPR_2026/RDFace_A_Benchmark_Dataset_for_Rare_Disease_Facial_Image_Analysis_under_Extreme_Data_Scarcity_and_Phenotype_Aware_Synthetic_Generation.md|RDFace: A Benchmark Dataset for Rare Disease Facial Image Analysis under Extreme Data Scarcity and Phenotype-Aware Synthetic Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RDFace_A_Benchmark_Dataset_for_Rare_Disease_Facial_Image_Analysis_under_Extreme_Data_Scarcity_and_Phenotype_Aware_Synthetic_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: RDFace基准数据集与表型感知合成增强评估框架
+	- datasets: RDFace, RDFace Few-shot, Synthetic data fidelity
+- [[obsidian-vault/analysis/CVPR_2026/Re_evaluating_Continual_VQA_Toward_Fair_and_Robust_Evaluation_for_Multimodal_Continual_Learning.md|Re-evaluating Continual VQA: Toward Fair and Robust Evaluation for Multimodal Continual Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Re_evaluating_Continual_VQA_Toward_Fair_and_Robust_Evaluation_for_Multimodal_Continual_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MaDQ (Matching and Distillation with Question replay)
+	- datasets: VQA v3, GQA v2
+- [[obsidian-vault/analysis/CVPR_2026/Real_Time_Dynamic_Scene_Rendering_with_Controlled_Compressibility_and_Contact_Awareness.md|Real-Time Dynamic Scene Rendering with Controlled Compressibility and Contact Awareness (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Real_Time_Dynamic_Scene_Rendering_with_Controlled_Compressibility_and_Contact_Awareness.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Source-Aware Dynamic Rendering with Compressibility and Contact Constraints (Unified Source-Aware Framework)
+	- datasets: Plenoptic Video Dataset, D-NeRF Dataset
+- [[obsidian-vault/analysis/CVPR_2026/RealUnify_Do_Unified_Models_Truly_Benefit_from_Unification_A_Comprehensive_Benchmark.md|RealUnify: Do Unified Models Truly Benefit from Unification? A Comprehensive Benchmark (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RealUnify_Do_Unified_Models_Truly_Benefit_from_Unification_A_Comprehensive_Benchmark.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: RealUnify (双评估协议基准)
+	- datasets: RealUnify UEG, RealUnify GEU
+- [[obsidian-vault/analysis/CVPR_2026/RealVLG_R1_A_Large_Scale_Real_World_Visual_Language_Grounding_Benchmark_for_Robotic_Perception_and_Manipulation.md|RealVLG-R1: A Large-Scale Real-World Visual-Language Grounding Benchmark for Robotic Perception and Manipulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RealVLG_R1_A_Large_Scale_Real_World_Visual_Language_Grounding_Benchmark_for_Robotic_Perception_and_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: RealVLG-R1
+	- datasets: RealVLG Benchmark, Real-World Single-Object Grasping, Real-World Cluttered Grasping
+- [[obsidian-vault/analysis/CVPR_2026/ReGenHOI_Unifying_Reconstruction_and_Generation_for_3D_Human_Object_Interaction_Understanding.md|ReGenHOI: Unifying Reconstruction and Generation for 3D Human-Object Interaction Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ReGenHOI_Unifying_Reconstruction_and_Generation_for_3D_Human_Object_Interaction_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ReGenHOI
+	- datasets: DAMON, PICO, FullBodyManipulation
+- [[obsidian-vault/analysis/CVPR_2026/ReLaX_Reasoning_with_Latent_Exploration_for_Large_Reasoning_Models.md|ReLaX: Reasoning with Latent Exploration for Large Reasoning Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ReLaX_Reasoning_with_Latent_Exploration_for_Large_Reasoning_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: ReLaX
+- [[obsidian-vault/analysis/CVPR_2026/Repurposing_3D_Generative_Model_for_Autoregressive_Layout_Generation.md|Repurposing 3D Generative Model for Autoregressive Layout Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Repurposing_3D_Generative_Model_for_Autoregressive_Layout_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LaviGen
+	- datasets: LayoutVLM Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/ResiHMR_Residual_Limb_Aware_Single_Image_3D_Human_Mesh_Recovery_for_Individuals_with_Limb_Loss.md|ResiHMR: Residual-Limb Aware Single-Image 3D Human Mesh Recovery for Individuals with Limb Loss (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ResiHMR_Residual_Limb_Aware_Single_Image_3D_Human_Mesh_Recovery_for_Individuals_with_Limb_Loss.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: ResiHMR
+	- datasets: LDPose-LimbLoss Evaluation Dataset
+- [[obsidian-vault/analysis/CVPR_2026/Rethinking_Dataset_Distillation_Hard_Truths_about_Soft_Labels.md|Rethinking Dataset Distillation: Hard Truths about Soft Labels (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Rethinking_Dataset_Distillation_Hard_Truths_about_Soft_Labels.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CA2D (Compute-Aware Dataset Distillation) / CAD-Prune (Compute-Aware Difficulty Pruning)
+	- datasets: ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/RetimeGS_Continuous_Time_Reconstruction_of_4D_Gaussian_Splatting.md|RetimeGS: Continuous-Time Reconstruction of 4D Gaussian Splatting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RetimeGS_Continuous_Time_Reconstruction_of_4D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: RetimeGS
+	- datasets: Stage-Capture Dataset, Neural3DV
+- [[obsidian-vault/analysis/CVPR_2026/Retrieve_and_Segment_Are_a_Few_Examples_Enough_to_Bridge_the_Supervision_Gap_in_Open_Vocabulary_Segmentation.md|Retrieve and Segment: Are a Few Examples Enough to Bridge the Supervision Gap in Open-Vocabulary Segmentation? (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Retrieve_and_Segment_Are_a_Few_Examples_Enough_to_Bridge_the_Supervision_Gap_in_Open_Vocabulary_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Retrieve and Segment (RNS)
+	- datasets: 同上, PASCAL VOC
+- [[obsidian-vault/analysis/CVPR_2026/Revisiting_Geometric_Obfuscation_with_Dual_Convergent_Lines_for_Privacy_Preserving_Image_Queries_in_Visual_Localization.md|Revisiting Geometric Obfuscation with Dual Convergent Lines for Privacy-Preserving Image Queries in Visual Localization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Revisiting_Geometric_Obfuscation_with_Dual_Convergent_Lines_for_Privacy_Preserving_Image_Queries_in_Visual_Localization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Dual Convergent Lines (DCL)
+	- datasets: Aachen Day-Night, Cambridge
+- [[obsidian-vault/analysis/CVPR_2026/RLFTSim_Realistic_and_Controllable_Multi_Agent_Traffic_Simulation_via_Reinforcement_Learning_Fine_Tuning.md|RLFTSim: Realistic and Controllable Multi-Agent Traffic Simulation via Reinforcement Learning Fine-Tuning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RLFTSim_Realistic_and_Controllable_Multi_Agent_Traffic_Simulation_via_Reinforcement_Learning_Fine_Tuning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Agent / RL / Planning, Benchmark / Evaluation
+	- methods: RLFTSim
+	- datasets: WOSAC private test split, Full WOMD validation set
+- [[obsidian-vault/analysis/CVPR_2026/RoadSceneBench_A_Lightweight_Benchmark_for_Mid_Level_Road_Scene_Understanding.md|RoadSceneBench: A Lightweight Benchmark for Mid-Level Road Scene Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RoadSceneBench_A_Lightweight_Benchmark_for_Mid_Level_Road_Scene_Understanding.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: MapVLM
+	- datasets: RoadSceneBench
+- [[obsidian-vault/analysis/CVPR_2026/RobotSeg_A_Model_and_Dataset_for_Segmenting_Robots_in_Image_and_Video.md|RobotSeg: A Model and Dataset for Segmenting Robots in Image and Video (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RobotSeg_A_Model_and_Dataset_for_Segmenting_Robots_in_Image_and_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: RobotSeg
+	- datasets: VRS, Computational Efficiency
+- [[obsidian-vault/analysis/CVPR_2026/RoMo_A_Large_Scale_Richly_Organized_Dataset_and_Semantic_Taxonomy_for_Human_Motion_Generation.md|RoMo: A Large-Scale, Richly Organized Dataset and Semantic Taxonomy for Human Motion Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RoMo_A_Large_Scale_Richly_Organized_Dataset_and_Semantic_Taxonomy_for_Human_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: RoMo数据集构建与分类感知过滤流水线
+- [[obsidian-vault/analysis/CVPR_2026/Scaling_Agentic_Reinforcement_Learning_for_Tool_Integrated_Reasoning_in_VLMs.md|Scaling Agentic Reinforcement Learning for Tool-Integrated Reasoning in VLMs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Scaling_Agentic_Reinforcement_Learning_for_Tool_Integrated_Reasoning_in_VLMs.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Agent / RL / Planning, Benchmark / Evaluation
+	- methods: VISTA-R1
+	- datasets: ChartQA, Geometry3K, MapQA
+- [[obsidian-vault/analysis/CVPR_2026/Scaling_Instruction_Based_Video_Editing_with_a_High_Quality_Synthetic_Dataset.md|Scaling Instruction-Based Video Editing with a High-Quality Synthetic Dataset (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Scaling_Instruction_Based_Video_Editing_with_a_High_Quality_Synthetic_Dataset.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Editto (based on Ditto framework)
+	- datasets: Custom test set
+- [[obsidian-vault/analysis/CVPR_2026/SceneScribe_1M_A_Large_Scale_Video_Dataset_with_Comprehensive_Geometric_and_Semantic_Annotations.md|SceneScribe-1M: A Large-Scale Video Dataset with Comprehensive Geometric and Semantic Annotations (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SceneScribe_1M_A_Large_Scale_Video_Dataset_with_Comprehensive_Geometric_and_Semantic_Annotations.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SceneScribe-1M 数据构建流水线
+	- datasets: DIODE / ETH3D / KITTI / NYUv2 / ScanNet / Sintel, CO3Dv2 + ETH3D, Sintel
+- [[obsidian-vault/analysis/CVPR_2026/SCIEval_Evaluating_and_Benchmarking_the_Faithfulness_of_Scientific_Image_Generation_and_Interpretation_with_Large_Multimodal_Models.md|SCIEval: Evaluating and Benchmarking the Faithfulness of Scientific Image Generation and Interpretation with Large Multimodal Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SCIEval_Evaluating_and_Benchmarking_the_Faithfulness_of_Scientific_Image_Generation_and_Interpretation_with_Large_Multimodal_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SCIEval
+	- datasets: SCIEval-Bench Sci-T2I, SCIEval-Bench Sci-IC, SCIEval-Bench Rationale Quality
+- [[obsidian-vault/analysis/CVPR_2026/SCoRe_Salience_Coverage_Reduction_for_Vision_Token_Pruning_in_Vision_Language_Models.md|SCoRe: Salience-Coverage Reduction for Vision Token Pruning in Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SCoRe_Salience_Coverage_Reduction_for_Vision_Token_Pruning_in_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SCoRe (Salience-Coverage Reduction)
+	- datasets: LLaVA-1.5-7B average over 10 benchmarks, LLaVA-NeXT-7B average over benchmarks
+- [[obsidian-vault/analysis/CVPR_2026/SEA_Vision_A_Multilingual_Benchmark_for_Comprehensive_Document_and_Scene_Text_Understanding_in_Southeast_Asia.md|SEA-Vision: A Multilingual Benchmark for Comprehensive Document and Scene Text Understanding in Southeast Asia (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SEA_Vision_A_Multilingual_Benchmark_for_Comprehensive_Document_and_Scene_Text_Understanding_in_Southeast_Asia.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SEA-Vision Benchmark
+	- datasets: Document Parsing, TEC-VQA, TEC-VQA language groups
+- [[obsidian-vault/analysis/CVPR_2026/SeeGroup_Multi_Layer_Depth_Estimation_of_Transparent_Surfaces_via_Self_Determined_Grouping.md|SeeGroup: Multi-Layer Depth Estimation of Transparent Surfaces via Self-Determined Grouping (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SeeGroup_Multi_Layer_Depth_Estimation_of_Transparent_Surfaces_via_Self_Determined_Grouping.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: SeeGroup
+	- datasets: LayeredDepth benchmark test set
+- [[obsidian-vault/analysis/CVPR_2026/Seeing_the_Scene_Matters_Revealing_Forgetting_in_Video_Understanding_Models_with_a_Scene_Aware_Long_Video_Benchmark.md|Seeing the Scene Matters: Revealing Forgetting in Video Understanding Models with a Scene-Aware Long-Video Benchmark (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Seeing_the_Scene_Matters_Revealing_Forgetting_in_Video_Understanding_Models_with_a_Scene_Aware_Long_Video_Benchmark.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Scene-RAG
+	- datasets: SceneBench, Video-MME
+- [[obsidian-vault/analysis/CVPR_2026/SegMoTE_Token_Level_Mixture_of_Experts_for_Medical_Image_Segmentation.md|SegMoTE: Token-Level Mixture of Experts for Medical Image Segmentation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SegMoTE_Token_Level_Mixture_of_Experts_for_Medical_Image_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SegMoTE
+	- datasets: Out-of-domain datasets, Multi-dataset under bounding-box
+- [[obsidian-vault/analysis/CVPR_2026/Selectively_Extracting_and_Injecting_Visual_Attributes_into_Text_to_Image_Models.md|Selectively Extracting and Injecting Visual Attributes into Text-to-Image Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Selectively_Extracting_and_Injecting_Visual_Attributes_into_Text_to_Image_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Selective Attribute Extraction and Injection (proposed concept injection method)
+	- datasets: Concept Learning Dataset
+- [[obsidian-vault/analysis/CVPR_2026/Self_Consistency_for_LLM_Based_Motion_Trajectory_Generation_and_Verification.md|Self-Consistency for LLM-Based Motion Trajectory Generation and Verification (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Self_Consistency_for_LLM_Based_Motion_Trajectory_Generation_and_Verification.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Self-Consistent Motion Trajectory Generation/Verification via Lie Group Hierarchy
+- [[obsidian-vault/analysis/CVPR_2026/Self_Evaluation_Unlocks_Any_Step_Text_to_Image_Generation.md|Self-Evaluation Unlocks Any-Step Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Self_Evaluation_Unlocks_Any_Step_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Self-Evaluating Model (Self-E)
+	- datasets: GenEval
+- [[obsidian-vault/analysis/CVPR_2026/Selfi_Self_improving_Reconstruction_Engine_via_3D_Geometric_Feature_Alignment.md|Selfi: Self-improving Reconstruction Engine via 3D Geometric Feature Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Selfi_Self_improving_Reconstruction_Engine_via_3D_Geometric_Feature_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Selfi
+	- datasets: DL3DV-10K Short, RealEstate10K Short, RealEstate10K Two-View
+- [[obsidian-vault/analysis/CVPR_2026/SHands_A_Multi_View_Dataset_and_Benchmark_for_Surgical_Hand_Gesture_and_Error_Recognition_Toward_Medical_Training.md|SHands: A Multi-View Dataset and Benchmark for Surgical Hand-Gesture and Error Recognition Toward Medical Training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SHands_A_Multi_View_Dataset_and_Benchmark_for_Surgical_Hand_Gesture_and_Error_Recognition_Toward_Medical_Training.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: SHANDS 多视角外科手势与错误识别数据集与基准
+	- datasets: SHANDS 手势识别
+- [[obsidian-vault/analysis/CVPR_2026/ShapeR_Robust_Conditional_3D_Shape_Generation_from_Casual_Captures.md|ShapeR: Robust Conditional 3D Shape Generation from Casual Captures (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ShapeR_Robust_Conditional_3D_Shape_Generation_from_Casual_Captures.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ShapeR
+	- datasets: ShapeR Evaluation Dataset, User Study, DTC Active
+- [[obsidian-vault/analysis/CVPR_2026/SineProject_Machine_Unlearning_for_Stable_Vision_Language_Alignment.md|SineProject: Machine Unlearning for Stable Vision-Language Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SineProject_Machine_Unlearning_for_Stable_Vision_Language_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SINEPROJECT
+	- datasets: SafeEraser, MLLMU-Bench, Geometric Stability
+- [[obsidian-vault/analysis/CVPR_2026/SLARM_Streaming_and_Language_Aligned_Reconstruction_Model_for_Dynamic_Scenes.md|SLARM: Streaming and Language-Aligned Reconstruction Model for Dynamic Scenes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SLARM_Streaming_and_Language_Aligned_Reconstruction_Model_for_Dynamic_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SLARM
+	- datasets: Waymo Open Dataset - Full Image, Waymo Open Dataset, NuScenes
+- [[obsidian-vault/analysis/CVPR_2026/SliderEdit_Continuous_Image_Editing_with_Fine_Grained_Instruction_Control.md|SliderEdit: Continuous Image Editing with Fine-Grained Instruction Control (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SliderEdit_Continuous_Image_Editing_with_Fine_Grained_Instruction_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SliderEdit (with STLoRA and GSTLoRA adapters)
+	- datasets: Facial Editing Benchmark, Multi-instruction Editing
+- [[obsidian-vault/analysis/CVPR_2026/SLVMEval_Synthetic_Meta_Evaluation_Benchmark_for_Text_to_Long_Video_Generation.md|SLVMEval: Synthetic Meta Evaluation Benchmark for Text-to-Long Video Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SLVMEval_Synthetic_Meta_Evaluation_Benchmark_for_Text_to_Long_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SLVMEval Benchmark Construction
+	- datasets: SLVMEval - Aesthetics, SLVMEval - Technical Quality, SLVMEval - Object Integrity
+- [[obsidian-vault/analysis/CVPR_2026/SMVRT_Implicit_Human_3D_Modeling_Using_Sparse_Multi_View_Volumetric_Reconstruction_with_Transformer_Fusion.md|SMVRT: Implicit Human 3D Modeling Using Sparse Multi-View Volumetric Reconstruction with Transformer Fusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SMVRT_Implicit_Human_3D_Modeling_Using_Sparse_Multi_View_Volumetric_Reconstruction_with_Transformer_Fusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SMVRT
+	- datasets: THUman2.1
+- [[obsidian-vault/analysis/CVPR_2026/SO_Bench_A_Structural_Output_Evaluation_of_Multimodal_LLM.md|SO-Bench: A Structural Output Evaluation of Multimodal LLM (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SO_Bench_A_Structural_Output_Evaluation_of_Multimodal_LLM.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: SO-Bench（视觉结构化输出基准及其数据生成与评估框架）
+	- datasets: SO-Bench
+- [[obsidian-vault/analysis/CVPR_2026/SocialNav_Training_Human_Inspired_Foundation_Model_for_Socially_Aware_Embodied_Navigation.md|SocialNav: Training Human-Inspired Foundation Model for Socially-Aware Embodied Navigation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SocialNav_Training_Human_Inspired_Foundation_Model_for_Socially_Aware_Embodied_Navigation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: SocialNav
+	- datasets: CityWalker Open-Loop Benchmark, SocNav Closed-Loop Benchmark, Real-World Deployment
+- [[obsidian-vault/analysis/CVPR_2026/Socratic_Geo_Synthetic_Data_Generation_and_Cross_Modal_Geometric_Reasoning_via_Multi_Agent_Interaction.md|Socratic-Geo: Synthetic Data Generation and Cross-Modal Geometric Reasoning via Multi-Agent Interaction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Socratic_Geo_Synthetic_Data_Generation_and_Cross_Modal_Geometric_Reasoning_via_Multi_Agent_Interaction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Socratic-Geo
+	- datasets: 六个几何推理基准平均, GenExam-Math, Chart Reasoning & Multimodal Coding
+- [[obsidian-vault/analysis/CVPR_2026/Spatial_SSRL_Enhancing_Spatial_Understanding_via_Self_Supervised_Reinforcement_Learning.md|Spatial-SSRL: Enhancing Spatial Understanding via Self-Supervised Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Spatial_SSRL_Enhancing_Spatial_Understanding_via_Self_Supervised_Reinforcement_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Spatial-SSRL
+	- datasets: Spatial457, VSI-Bench, General VQA
+- [[obsidian-vault/analysis/CVPR_2026/SpatiaLQA_A_Benchmark_for_Evaluating_Spatial_Logical_Reasoning_in_Vision_Language_Models.md|SpatiaLQA: A Benchmark for Evaluating Spatial Logical Reasoning in Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SpatiaLQA_A_Benchmark_for_Evaluating_Spatial_Logical_Reasoning_in_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Recursive Scene Graph Assisted Reasoning (RSGAR)
+	- datasets: SpatiaLQA
+- [[obsidian-vault/analysis/CVPR_2026/SpatialScore_Towards_Comprehensive_Evaluation_for_Spatial_Intelligence.md|SpatialScore: Towards Comprehensive Evaluation for Spatial Intelligence (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SpatialScore_Towards_Comprehensive_Evaluation_for_Spatial_Intelligence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SpatialScore (Benchmark), SpatialCorpus (Training Data), and SpatialAgent (Agent Framework)
+	- datasets: SpatialScore-OpenSource, SpatialScore-Repurpose
+- [[obsidian-vault/analysis/CVPR_2026/SpatialVID_A_Large_Scale_Video_Dataset_with_Spatial_Annotations.md|SpatialVID: A Large-Scale Video Dataset with Spatial Annotations (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SpatialVID_A_Large_Scale_Video_Dataset_with_Spatial_Annotations.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SpatialVID
+	- datasets: RE10K, Sekai, SpatialVID
+- [[obsidian-vault/analysis/CVPR_2026/Spectral_Geometric_Neural_Fields_for_Pose_Free_LiDAR_View_Synthesis.md|Spectral-Geometric Neural Fields for Pose-Free LiDAR View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Spectral_Geometric_Neural_Fields_for_Pose_Free_LiDAR_View_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SG-NLF
+	- datasets: KITTI-360, nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/Spectrum_from_Defocus_Fast_Spectral_Imaging_with_Chromatic_Focal_Stack.md|Spectrum from Defocus: Fast Spectral Imaging with Chromatic Focal Stack (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Spectrum_from_Defocus_Fast_Spectral_Imaging_with_Chromatic_Focal_Stack.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Spectrum from Defocus (SfD)
+	- datasets: Harvard dataset
+- [[obsidian-vault/analysis/CVPR_2026/SRPO_Self_Referential_Policy_Optimization_for_Vision_Language_Action_Models.md|SRPO: Self-Referential Policy Optimization for Vision-Language-Action Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SRPO_Self_Referential_Policy_Optimization_for_Vision_Language_Action_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SRPO (Self-Referential Policy Optimization)
+	- datasets: LIBERO, LIBERO-Plus, Progress Reward Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/Stable_and_Efficient_Single_Rollout_RL_for_Multimodal_Reasoning.md|Stable and Efficient Single-Rollout RL for Multimodal Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Stable_and_Efficient_Single_Rollout_RL_for_Multimodal_Reasoning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MSSR (Multimodal Stabilized Single-Rollout)
+	- datasets: MathVerse, MathVista, MMK12
+- [[obsidian-vault/analysis/CVPR_2026/Stand_In_A_Lightweight_and_Plug_and_Play_Identity_Control_for_Video_Generation.md|Stand-In: A Lightweight and Plug-and-Play Identity Control for Video Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Stand_In_A_Lightweight_and_Plug_and_Play_Identity_Control_for_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Stand-In
+	- datasets: Custom identity-preserving video generation test set, User Study
+- [[obsidian-vault/analysis/CVPR_2026/StreamAvatar_Streaming_Diffusion_Models_for_Real_Time_Interactive_Human_Avatars.md|StreamAvatar: Streaming Diffusion Models for Real-Time Interactive Human Avatars (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/StreamAvatar_Streaming_Diffusion_Models_for_Real_Time_Interactive_Human_Avatars.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: StreamAvatar
+	- datasets: Short dataset, Long dataset, Interactive dataset
+- [[obsidian-vault/analysis/CVPR_2026/SurgCoT_Advancing_Spatiotemporal_Reasoning_in_Surgical_Videos_through_a_Chain_of_Thought_Benchmark.md|SurgCoT: Advancing Spatiotemporal Reasoning in Surgical Videos through a Chain-of-Thought Benchmark (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SurgCoT_Advancing_Spatiotemporal_Reasoning_in_Surgical_Videos_through_a_Chain_of_Thought_Benchmark.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SurgCoT
+	- datasets: SurgCoT Main Questions
+- [[obsidian-vault/analysis/CVPR_2026/SVBench_Evaluation_of_Video_Generation_Models_on_Social_Reasoning.md|SVBench: Evaluation of Video Generation Models on Social Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SVBench_Evaluation_of_Video_Generation_Models_on_Social_Reasoning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SVBench
+	- datasets: SVBench-15
+- [[obsidian-vault/analysis/CVPR_2026/SynMotion_Semantic_Visual_Adaptation_for_Motion_Customized_Video_Generation.md|SynMotion: Semantic-Visual Adaptation for Motion Customized Video Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SynMotion_Semantic_Visual_Adaptation_for_Motion_Customized_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SynMotion
+	- datasets: MotionBench, MotionBench - User Study
+- [[obsidian-vault/analysis/CVPR_2026/Talk2Move_Reinforcement_Learning_for_Text_Instructed_Object_Level_Geometric_Transformation_in_Scenes.md|Talk2Move: Reinforcement Learning for Text-Instructed Object-Level Geometric Transformation in Scenes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Talk2Move_Reinforcement_Learning_for_Text_Instructed_Object_Level_Geometric_Transformation_in_Scenes.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Agent / RL / Planning, Benchmark / Evaluation
+	- methods: TALK2MOVE
+	- datasets: Curated Synthetic Test Benchmark, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Taming_Preference_Mode_Collapse_via_Directional_Decoupling_Alignment_in_Diffusion_Reinforcement_Learning.md|Taming Preference Mode Collapse via Directional Decoupling Alignment in Diffusion Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Taming_Preference_Mode_Collapse_via_Directional_Decoupling_Alignment_in_Diffusion_Reinforcement_Learning.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Directional Decoupling Alignment (D2-Align)
+	- datasets: HPDv2, DivGenBench, HPDv2 User Study
+- [[obsidian-vault/analysis/CVPR_2026/Texvent_Asynchronous_Event_Data_Simulation_via_Text_Prompt.md|Texvent: Asynchronous Event Data Simulation via Text Prompt (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Texvent_Asynchronous_Event_Data_Simulation_via_Text_Prompt.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Texvent
+	- datasets: NT-ImageNet, Event Camera Dataset
+- [[obsidian-vault/analysis/CVPR_2026/The_Image_as_Its_Own_Reward_Reinforcement_Learning_with_Adversarial_Reward_for_Image_Generation.md|The Image as Its Own Reward: Reinforcement Learning with Adversarial Reward for Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/The_Image_as_Its_Own_Reward_Reinforcement_Learning_with_Adversarial_Reward_for_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Adv-GRPO
+	- datasets: PickScore prompt dataset, OCR benchmark, General evaluation
+- [[obsidian-vault/analysis/CVPR_2026/The_SA_FARI_Dataset_Segment_Anything_in_Footage_of_Animals_for_Recognition_and_Identification.md|The SA-FARI Dataset: Segment Anything in Footage of Animals for Recognition and Identification (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/The_SA_FARI_Dataset_Segment_Anything_in_Footage_of_Animals_for_Recognition_and_Identification.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: SA-FARI Dataset
+	- datasets: SA-FARI test set
+- [[obsidian-vault/analysis/CVPR_2026/Thermal_is_Always_Wild_Characterizing_and_Addressing_Challenges_in_Thermal_Only_Novel_View_Synthesis.md|Thermal is Always Wild: Characterizing and Addressing Challenges in Thermal-Only Novel View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Thermal_is_Always_Wild_Characterizing_and_Addressing_Challenges_in_Thermal_Only_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Wild Thermal (Photometric Stabilized 3DGS with Embedding-conditioned Emission)
+	- datasets: MSX, ThermalMix, MVTV
+- [[obsidian-vault/analysis/CVPR_2026/Thinking_with_Frames_Generative_Video_Distortion_Evaluation_via_Frame_Reward_Model.md|Thinking with Frames: Generative Video Distortion Evaluation via Frame Reward Model (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Thinking_with_Frames_Generative_Video_Distortion_Evaluation_via_Frame_Reward_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: REACT
+	- datasets: REACT-Video, REACT-Frame, VBench
+- [[obsidian-vault/analysis/CVPR_2026/Toward_Real_world_Infrared_Image_Super_Resolution_A_Unified_Autoregressive_Framework_and_Benchmark_Dataset.md|Toward Real-world Infrared Image Super-Resolution: A Unified Autoregressive Framework and Benchmark Dataset (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Toward_Real_world_Infrared_Image_Super_Resolution_A_Unified_Autoregressive_Framework_and_Benchmark_Dataset.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Real-IISR
+	- datasets: FLIR-IISR Set5, M3FD
+- [[obsidian-vault/analysis/CVPR_2026/Towards_Policy_Adaptive_Image_Guardrail_Benchmark_and_Method.md|Towards Policy-Adaptive Image Guardrail: Benchmark and Method (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Towards_Policy_Adaptive_Image_Guardrail_Benchmark_and_Method.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SafeGuard-VL
+	- datasets: UnsafeBench, SafeEditBench, LlavaGuardBench & General VQA
+- [[obsidian-vault/analysis/CVPR_2026/TrajRAG_Retrieving_Geometric_Semantic_Experience_for_Zero_Shot_Object_Navigation.md|TrajRAG: Retrieving Geometric-Semantic Experience for Zero-Shot Object Navigation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TrajRAG_Retrieving_Geometric_Semantic_Experience_for_Zero_Shot_Object_Navigation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: TrajRAG
+	- datasets: MP3D, HM3D-v1, HM3D-v2
+- [[obsidian-vault/analysis/CVPR_2026/TTP_Test_Time_Padding_for_Adversarial_Detection_and_Robust_Adaptation_on_Vision_Language_Models.md|TTP: Test-Time Padding for Adversarial Detection and Robust Adaptation on Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TTP_Test_Time_Padding_for_Adversarial_Detection_and_Robust_Adaptation_on_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: Test-Time Padding (TTP)
+	- datasets: Same 8 datasets, fine-grained datasets under CLIP backbones
+- [[obsidian-vault/analysis/CVPR_2026/Twin_T_TwintVQA_A_Reliable_Structure_Detail_Separating_VLM_and_a_Comprehensive_Benchmark_for_Chart_and_Table_Tasks.md|Twin-T & TwintVQA: A Reliable Structure-Detail Separating VLM and a Comprehensive Benchmark for Chart and Table Tasks (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Twin_T_and_TwintVQA_A_Reliable_Structure_Detail_Separating_VLM_and_a_Comprehensive_Benchmark_for_Chart_and_Table_Tasks.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: Twin-T
+	- datasets: AI2D, CharXiv_R, TableVQA
+- [[obsidian-vault/analysis/CVPR_2026/UAVLight_A_Benchmark_for_Illumination_Robust_3D_Reconstruction_in_Unmanned_Aerial_Vehicle_UAV_Scenes.md|UAVLight: A Benchmark for Illumination-Robust 3D Reconstruction in Unmanned Aerial Vehicle (UAV) Scenes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UAVLight_A_Benchmark_for_Illumination_Robust_3D_Reconstruction_in_Unmanned_Aerial_Vehicle_UAV_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: UAVLight 数据集构建与评估管线
+	- datasets: UAVLight Scene Town, UAVLight Scene Footbridge, UAVLight Scene Intersection
+- [[obsidian-vault/analysis/CVPR_2026/Underground_Plant_Exploration_Non_Destructive_3D_Root_Assessment_with_GPR_Based_on_Point_Graph_Neural_Network.md|Underground Plant Exploration: Non-Destructive 3D Root Assessment with GPR Based on Point Graph Neural Network (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Underground_Plant_Exploration_Non_Destructive_3D_Root_Assessment_with_GPR_Based_on_Point_Graph_Neural_Network.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Ours (GPR-based Root Detection and 3D Reconstruction Framework)
+	- datasets: Simulated 2D GPR Images, Synthetic 3D root point cloud dataset
+- [[obsidian-vault/analysis/CVPR_2026/Understanding_the_Role_of_Hallucination_in_Reinforcement_Post_Training_of_Multimodal_Reasoning_Models.md|Understanding the Role of Hallucination in Reinforcement Post-Training of Multimodal Reasoning Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Understanding_the_Role_of_Hallucination_in_Reinforcement_Post_Training_of_Multimodal_Reasoning_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Hallucination-as-Cue Framework
+	- datasets: Geometry3K, Multi-benchmark average, MathVision
+- [[obsidian-vault/analysis/CVPR_2026/UNICBench_UNIfied_Counting_Benchmark_for_MLLM.md|UNICBench: UNIfied Counting Benchmark for MLLM (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UNICBench_UNIfied_Counting_Benchmark_for_MLLM.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: UNICBench (Unified Multimodal Counting Benchmark)
+	- datasets: UNICBench Image Track, UNICBench Text Track, UNICBench Audio Track
+- [[obsidian-vault/analysis/CVPR_2026/UnicEdit_10M_A_Dataset_and_Benchmark_Breaking_the_Scale_Quality_Barrier_via_Unified_Verification_for_Reasoning_Enriched_Edits.md|UnicEdit-10M: A Dataset and Benchmark Breaking the Scale-Quality Barrier via Unified Verification for Reasoning-Enriched Edits (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UnicEdit_10M_A_Dataset_and_Benchmark_Breaking_the_Scale_Quality_Barrier_via_Unified_Verification_for_Reasoning_Enriched_Edits.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: UnicEdit Data Curation Pipeline with Qwen-Verify
+	- datasets: UnicEdit-10M Dataset Quality, UnicBench, Post-Verification Accuracy
+- [[obsidian-vault/analysis/CVPR_2026/UniGeoRS_A_Unified_Benchmark_for_Tri_view_Geo_Localization.md|UniGeoRS: A Unified Benchmark for Tri-view Geo-Localization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniGeoRS_A_Unified_Benchmark_for_Tri_view_Geo_Localization.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Cross-Attention-based Matching Enhancement (CAME)
+	- datasets: UniGeoRS
+- [[obsidian-vault/analysis/CVPR_2026/UniLS_End_to_End_Audio_Driven_Avatars_for_Unified_Listening_and_Speaking.md|UniLS: End-to-End Audio-Driven Avatars for Unified Listening and Speaking (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniLS_End_to_End_Audio_Driven_Avatars_for_Unified_Listening_and_Speaking.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: UniLS
+	- datasets: Seamless Interaction, User Study
+- [[obsidian-vault/analysis/CVPR_2026/UniM_A_Unified_Any_to_Any_Interleaved_Multimodal_Benchmark.md|UniM: A Unified Any-to-Any Interleaved Multimodal Benchmark (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniM_A_Unified_Any_to_Any_Interleaved_Multimodal_Benchmark.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: UNIMA
+	- datasets: UNIM
+- [[obsidian-vault/analysis/CVPR_2026/UniRain_Unified_Image_Deraining_with_RAG_based_Dataset_Distillation_and_Multi_objective_Reweighted_Optimization.md|UniRain: Unified Image Deraining with RAG-based Dataset Distillation and Multi-objective Reweighted Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniRain_Unified_Image_Deraining_with_RAG_based_Dataset_Distillation_and_Multi_objective_Reweighted_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: UniRain
+	- datasets: Real-world public benchmarks, WeatherBench
+- [[obsidian-vault/analysis/CVPR_2026/UniVBench_Towards_Unified_Evaluation_for_Video_Foundation_Models.md|UniVBench: Towards Unified Evaluation for Video Foundation Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniVBench_Towards_Unified_Evaluation_for_Video_Foundation_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: UniVBench and UniV-Eval
+	- datasets: UniVBench
+- [[obsidian-vault/analysis/CVPR_2026/Unsupervised_Multi_Scale_Segmentation_of_3D_Subcellular_World_with_Stable_Diffusion_Foundation_Model.md|Unsupervised Multi-Scale Segmentation of 3D Subcellular World with Stable Diffusion Foundation Model (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Unsupervised_Multi_Scale_Segmentation_of_3D_Subcellular_World_with_Stable_Diffusion_Foundation_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Unsupervised Multi-Scale Cryo-ET Segmentation via Stable Diffusion (无监督多尺度分割流程)
+	- datasets: VPP S. Pombe cellular cryo-ET dataset
+- [[obsidian-vault/analysis/CVPR_2026/UTPTrack_Towards_Simple_and_Unified_Token_Pruning_for_Visual_Tracking.md|UTPTrack: Towards Simple and Unified Token Pruning for Visual Tracking (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UTPTrack_Towards_Simple_and_Unified_Token_Pruning_for_Visual_Tracking.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: UTPTrack
+	- datasets: LaSOT, LaSOT_ext, TrackingNet
+- [[obsidian-vault/analysis/CVPR_2026/VABench_A_Comprehensive_Benchmark_for_Audio_Video_Generation.md|VABench: A Comprehensive Benchmark for Audio-Video Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VABench_A_Comprehensive_Benchmark_for_Audio_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VABench
+	- datasets: VABench T2AV, VABench I2AV, VABench Audio QA
+- [[obsidian-vault/analysis/CVPR_2026/VAR_RL_Done_Right_Tackling_Asynchronous_Policy_Conflicts_in_Visual_Autoregressive_Generation.md|VAR RL Done Right: Tackling Asynchronous Policy Conflicts in Visual Autoregressive Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VAR_RL_Done_Right_Tackling_Asynchronous_Policy_Conflicts_in_Visual_Autoregressive_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: NextFlow-RL (VMR + PANW + MP enhanced GRPO)
+	- datasets: CVTG-2K, HPSv2 Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/VerseCrafter_Dynamic_Realistic_Video_World_Model_with_4D_Geometric_Control.md|VerseCrafter: Dynamic Realistic Video World Model with 4D Geometric Control (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VerseCrafter_Dynamic_Realistic_Video_World_Model_with_4D_Geometric_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VerseCrafter
+	- datasets: VerseControl4D
+- [[obsidian-vault/analysis/CVPR_2026/VGA_Bench_A_Unified_Benchmark_and_Multi_Model_Framework_for_Video_Aesthetics_and_Generation_Quality_Evaluation.md|VGA-Bench: A Unified Benchmark and Multi-Model Framework for Video Aesthetics and Generation Quality Evaluation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VGA_Bench_A_Unified_Benchmark_and_Multi_Model_Framework_for_Video_Aesthetics_and_Generation_Quality_Evaluation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VGA-Bench
+	- datasets: VGA-Bench 人工标注测试集, 跨模型泛化测试
+- [[obsidian-vault/analysis/CVPR_2026/VGGDrive_Empowering_Vision_Language_Models_with_Cross_View_Geometric_Grounding_for_Autonomous_Driving.md|VGGDrive: Empowering Vision-Language Models with Cross-View Geometric Grounding for Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VGGDrive_Empowering_Vision_Language_Models_with_Cross_View_Geometric_Grounding_for_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VGGDrive
+	- datasets: NAVSIM navtest, NuInstruct, DriveLM
+- [[obsidian-vault/analysis/CVPR_2026/Video_as_Answer_Predict_and_Generate_Next_Video_Event_with_Joint_GRPO.md|Video-as-Answer: Predict and Generate Next Video Event with Joint-GRPO (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Video_as_Answer_Predict_and_Generate_Next_Video_Event_with_Joint_GRPO.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VANS (Video-as-Answer System)
+	- datasets: Procedural Benchmarks, Predictive Benchmarks
+- [[obsidian-vault/analysis/CVPR_2026/VideoNet_A_Large_Scale_Dataset_for_Domain_Specific_Action_Recognition.md|VideoNet: A Large-Scale Dataset for Domain-Specific Action Recognition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VideoNet_A_Large_Scale_Dataset_for_Domain_Specific_Action_Recognition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VideoNet (带硬负样本的领域特定动作基准 + 自动训练数据构建及微调方案)
+	- datasets: VideoNet Multiple-Choice, VideoNet Binary 0-shot
+- [[obsidian-vault/analysis/CVPR_2026/VideoRealBench_A_Chain_of_Thought_Realism_Evaluation_Benchmark_for_Generated_Human_Centric_Videos.md|VideoRealBench: A Chain-of-Thought Realism Evaluation Benchmark for Generated Human-Centric Videos (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VideoRealBench_A_Chain_of_Thought_Realism_Evaluation_Benchmark_for_Generated_Human_Centric_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VideoRealBench (包含 VideoRealDataset 与 VideoRealEval)
+	- datasets: VideoRealDataset, Video-Bench
+- [[obsidian-vault/analysis/CVPR_2026/VINS_120K_Ultra_High_Resolution_Image_Editing_with_A_Large_Scale_Dataset.md|VINS-120K: Ultra High-Resolution Image Editing with A Large-Scale Dataset (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VINS_120K_Ultra_High_Resolution_Image_Editing_with_A_Large_Scale_Dataset.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: High-Frequency-Aware Post-Adaptation
+	- datasets: VINS-4KEval
+- [[obsidian-vault/analysis/CVPR_2026/VISion_On_Request_Enhanced_VLLM_efficiency_with_sparse_dynamically_selected_vision_language_interactions.md|VISion On Request: Enhanced VLLM efficiency with sparse, dynamically selected, vision-language interactions (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VISion_On_Request_Enhanced_VLLM_efficiency_with_sparse_dynamically_selected_vision_language_interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VISOR (VISion On Request)
+	- datasets: RealWorldQA, Aggregate Easy Benchmarks, Aggregate Hard Benchmarks
+- [[obsidian-vault/analysis/CVPR_2026/VISTA_A_Test_Time_Self_Improving_Video_Generation_Agent.md|VISTA: A Test-Time Self-Improving Video Generation Agent (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VISTA_A_Test_Time_Self_Improving_Video_Generation_Agent.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VISTA
+	- datasets: Single-scene, Multi-scene, Human Evaluation
+- [[obsidian-vault/analysis/CVPR_2026/Visual_Diffusion_Models_are_Geometric_Solvers.md|Visual Diffusion Models are Geometric Solvers (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Visual_Diffusion_Models_are_Geometric_Solvers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Visual Diffusion Geometric Solver
+	- datasets: Inscribed Square Problem, Steiner Tree Problem, Maximum Area Polygon
+- [[obsidian-vault/analysis/CVPR_2026/VL_RouterBench_A_Benchmark_for_Vision_Language_Model_Routing.md|VL-RouterBench: A Benchmark for Vision-Language Model Routing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VL_RouterBench_A_Benchmark_for_Vision_Language_Model_Routing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VL-RouterBench（视觉语言模型路由基准）
+	- datasets: VL-RouterBench
+- [[obsidian-vault/analysis/CVPR_2026/VLM_PTQ_Efficient_Post_Training_Quantization_for_Large_Vision_Language_Models.md|VLM-PTQ: Efficient Post-Training Quantization for Large Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VLM_PTQ_Efficient_Post_Training_Quantization_for_Large_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: VLM-PTQ
+	- datasets: Eight VLM Benchmark Avg
+- [[obsidian-vault/analysis/CVPR_2026/VMD_FACT_A_New_Video_Dataset_and_MLLM_based_method_for_Detecting_Realistic_AI_Generated_Video_Misinformation.md|VMD-FACT: A New Video Dataset and MLLM-based method for Detecting Realistic AI-Generated Video Misinformation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VMD_FACT_A_New_Video_Dataset_and_MLLM_based_method_for_Detecting_Realistic_AI_Generated_Video_Misinformation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: IEEG (Internal-External Evidence Graph Modeling)
+	- datasets: RAVM, FakeTT, FakeSV
+- [[obsidian-vault/analysis/CVPR_2026/VoDaSuRe_A_Large_Scale_Dataset_Revealing_Domain_Shift_in_Volumetric_Super_Resolution.md|VoDaSuRe: A Large-Scale Dataset Revealing Domain Shift in Volumetric Super-Resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VoDaSuRe_A_Large_Scale_Dataset_Revealing_Domain_Shift_in_Volumetric_Super_Resolution.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: VoDaSuRe (dataset and benchmark)
+	- datasets: VoDaSuRe
+- [[obsidian-vault/analysis/CVPR_2026/VS_Bench_Evaluating_VLMs_for_Strategic_Abilities_in_Multi_Agent_Environments.md|VS-Bench: Evaluating VLMs for Strategic Abilities in Multi-Agent Environments (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VS_Bench_Evaluating_VLMs_for_Strategic_Abilities_in_Multi_Agent_Environments.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VS-BENCH (Visual Strategic Benchmark)
+	- datasets: VS-BENCH Overall, Human Baseline
+- [[obsidian-vault/analysis/CVPR_2026/What_Are_You_Doing_A_Closer_Look_at_Controllable_Human_Video_Generation.md|What Are You Doing? A Closer Look at Controllable Human Video Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/What_Are_You_Doing_A_Closer_Look_at_Controllable_Human_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: WYD Evaluation Protocol and Benchmark
+	- datasets: WYD16
+- [[obsidian-vault/analysis/CVPR_2026/When_Anonymity_Breaks_Identifying_Models_Behind_Text_to_Image_Leaderboards.md|When Anonymity Breaks: Identifying Models Behind Text-to-Image Leaderboards (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/When_Anonymity_Breaks_Identifying_Models_Behind_Text_to_Image_Leaderboards.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Centroid-based Deanonymization Attack (IT-Emb, 基于嵌入质心的去匿名化攻击)
+	- datasets: Same as above, One-vs-Rest setting
+- [[obsidian-vault/analysis/CVPR_2026/When_Pretty_Isnt_Useful_Investigating_Why_Modern_Text_to_Image_Models_Fail_as_Reliable_Training_Data_Generators.md|When Pretty Isn't Useful: Investigating Why Modern Text-to-Image Models Fail as Reliable Training Data Generators (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/When_Pretty_Isn_t_Useful_Investigating_Why_Modern_Text_to_Image_Models_Fail_as_Reliable_Training_Data_Generators.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Systematic Synth→Real Diagnosis and Benchmarking Framework
+	- datasets: ImageNet-1k, Density & Coverage, Cross-domain transfer
+- [[obsidian-vault/analysis/CVPR_2026/When_Visualizing_is_the_First_Step_to_Reasoning_MIRA_a_Benchmark_for_Visual_Chain_of_Thought.md|When Visualizing is the First Step to Reasoning: MIRA, a Benchmark for Visual Chain-of-Thought (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/When_Visualizing_is_the_First_Step_to_Reasoning_MIRA_a_Benchmark_for_Visual_Chain_of_Thought.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: MIRA
+	- datasets: MIRA
+- [[obsidian-vault/analysis/CVPR_2026/Where_Culture_Fades_Revealing_the_Cultural_Gap_in_Text_to_Image_Generation.md|Where Culture Fades: Revealing the Cultural Gap in Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Where_Culture_Fades_Revealing_the_Cultural_Gap_in_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Zero-Training Neuron Amplifier and Fine-Tuned Layer Enhancer
+	- datasets: CultureBench test subset, User Study, Cross-Domain Generalization
+- [[obsidian-vault/analysis/CVPR_2026/Which_Concepts_to_Forget_and_How_to_Refuse_Decomposing_Concepts_for_Continual_Unlearning_in_Large_Vision_Language_Models.md|Which Concepts to Forget and How to Refuse? Decomposing Concepts for Continual Unlearning in Large Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Which_Concepts_to_Forget_and_How_to_Refuse_Decomposing_Concepts_for_Continual_Unlearning_in_Large_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CORE (COncept-aware REfuser)
+	- datasets: Safety benchmark + ImageNet-R - Vicuna
+- [[obsidian-vault/analysis/CVPR_2026/White_Balance_First_Adjust_Later_Cross_Camera_Color_Constancy_via_Vision_Language_Evaluation.md|White-Balance First, Adjust Later: Cross-Camera Color Constancy via Vision-Language Evaluation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/White_Balance_First_Adjust_Later_Cross_Camera_Color_Constancy_via_Vision_Language_Evaluation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VLM-CC
+	- datasets: Gehler-Shi, NUS-8, Cube+
+- [[obsidian-vault/analysis/CVPR_2026/WorldLens_Full_Spectrum_Evaluations_of_Driving_World_Models_in_Real_World.md|WorldLens: Full-Spectrum Evaluations of Driving World Models in Real World (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/WorldLens_Full_Spectrum_Evaluations_of_Driving_World_Models_in_Real_World.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: WorldLens
+	- datasets: Generation, Reconstruction, Action-Following
+- [[obsidian-vault/analysis/ICLR_2026/PhyWorldBench_A_Comprehensive_Evaluation_of_Physical_Realism_in_Text_to_Video_Models.md|$PhyWorldBench$: A Comprehensive Evaluation of Physical Realism in Text-to-Video Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/PhyWorldBench_A_Comprehensive_Evaluation_of_Physical_Realism_in_Text_to_Video_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: PhyWorldBench
+	- datasets: PhyWorldBench
+- [[obsidian-vault/analysis/ICLR_2026/3DCS_Datasets_and_Benchmark_for_Evaluating_Conformational_Sensitivity_in_Molecular_Representations.md|3DCS: Datasets and Benchmark for Evaluating Conformational Sensitivity in Molecular Representations (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/3DCS_Datasets_and_Benchmark_for_Evaluating_Conformational_Sensitivity_in_Molecular_Representations.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: 3DCS (3D Conformational Sensitivity) benchmark with GCE evaluation framework
+	- datasets: Geometry, Chirality
+- [[obsidian-vault/analysis/ICLR_2026/A_High_Quality_Dataset_and_Reliable_Evaluation_for_Interleaved_Image_Text_Generation.md|A High Quality Dataset and Reliable Evaluation for Interleaved Image-Text Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_High_Quality_Dataset_and_Reliable_Evaluation_for_Interleaved_Image_Text_Generation.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: InterSyn + SEIR + SynJudge
+	- datasets: InterSyn Evaluation Benchmark
+- [[obsidian-vault/analysis/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.md|AdaSpec: Adaptive Spectrum for Enhanced Node Distinguishability (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: AdaSpec
+	- datasets: Texas, Minesweeper, Roman_Empire
+- [[obsidian-vault/analysis/ICLR_2026/Addressing_Pitfalls_in_the_Evaluation_of_Uncertainty_Estimation_Methods_for_Natural_Language_Generation.md|Addressing Pitfalls in the Evaluation of Uncertainty Estimation Methods for Natural Language Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Addressing_Pitfalls_in_the_Evaluation_of_Uncertainty_Estimation_Methods_for_Natural_Language_Generation.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: SP-MoJI, Structured Tasks, and Elo Aggregation for Uncertainty Evaluation
+	- datasets: CoQA / SQuAD, Various QA benchmarks, ALL TASKS
+- [[obsidian-vault/analysis/ICLR_2026/AMemGym_Interactive_Memory_Benchmarking_for_Assistants_in_Long_Horizon_Conversations.md|AMemGym: Interactive Memory Benchmarking for Assistants in Long-Horizon Conversations (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AMemGym_Interactive_Memory_Benchmarking_for_Assistants_in_Long_Horizon_Conversations.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: AMemGym
+	- datasets: AMemGym base
+- [[obsidian-vault/analysis/ICLR_2026/An_Information_Theoretic_Framework_For_Optimizing_Experimental_Design_To_Distinguish_Probabilistic_Neural_Codes.md|An Information-Theoretic Framework For Optimizing Experimental Design To Distinguish Probabilistic Neural Codes (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/An_Information_Theoretic_Framework_For_Optimizing_Experimental_Design_To_Distinguish_Probabilistic_Neural_Codes.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Information-Gap Maximization Framework (信息差距最大化实验设计框架)
+	- datasets: Simulated Poisson neural populations, Simulated populations across diverse task parameters, Allen Visual Coding dataset
+- [[obsidian-vault/analysis/ICLR_2026/Benchmarking_LLM_Tool_Use_in_the_Wild.md|Benchmarking LLM Tool-Use in the Wild (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Benchmarking_LLM_Tool_Use_in_the_Wild.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: WildToolBench
+	- datasets: WildToolBench, WildToolBench Tool Orchestration, Cross-benchmark
+- [[obsidian-vault/analysis/ICLR_2026/Beyond_Prompt_Induced_Lies_Investigating_LLM_Deception_on_Benign_Prompts.md|Beyond Prompt-Induced Lies: Investigating LLM Deception on Benign Prompts (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Beyond_Prompt_Induced_Lies_Investigating_LLM_Deception_on_Benign_Prompts.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: Contact Searching Question (CSQ) Framework
+	- datasets: CSQ across 16 LLMs, CSQ Rephrased Questions, CSQ Overall /ρ̄/ vs Model Size
+- [[obsidian-vault/analysis/ICLR_2026/BIRD_INTERACT_Re_imagining_Text_to_SQL_Evaluation_via_Lens_of_Dynamic_Interactions.md|BIRD-INTERACT: Re-imagining Text-to-SQL Evaluation via Lens of Dynamic Interactions (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/BIRD_INTERACT_Re_imagining_Text_to_SQL_Evaluation_via_Lens_of_Dynamic_Interactions.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: BIRD-INTERACT Benchmark
+	- datasets: BIRD-INTERACT-FULL, BIRD-INTERACT-LITE, UserSim-Guard
+- [[obsidian-vault/analysis/ICLR_2026/CauKer_Classification_Time_Series_Foundation_Models_Can_Be_Pretrained_on_Synthetic_Data.md|CauKer: Classification Time Series Foundation Models Can Be Pretrained on Synthetic Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/CauKer_Classification_Time_Series_Foundation_Models_Can_Be_Pretrained_on_Synthetic_Data.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Data Curation / Synthesis
+	- methods: CAUKER
+	- datasets: UCR, WOODS
+- [[obsidian-vault/analysis/ICLR_2026/Childrens_Intelligence_Tests_Pose_Challenges_for_MLLMs_KidGym_A_2D_Grid_Based_Reasoning_Benchmark_for_MLLMs.md|Children's Intelligence Tests Pose Challenges for MLLMs? KidGym: A 2D Grid-Based Reasoning Benchmark for MLLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Childrens_Intelligence_Tests_Pose_Challenges_for_MLLMs_KidGym_A_2D_Grid_Based_Reasoning_Benchmark_for_MLLMs.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: KIDGYM
+	- datasets: KIDGYM Counting L1, KIDGYM Puzzle L1, KIDGYM Classification L1
+- [[obsidian-vault/analysis/ICLR_2026/CoNavBench_Collaborative_Long_Horizon_Vision_Language_Navigation_Benchmark.md|CoNavBench: Collaborative Long-Horizon Vision-Language Navigation Benchmark (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/CoNavBench_Collaborative_Long_Horizon_Vision_Language_Navigation_Benchmark.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: NavCraft
+	- datasets: CoNavBench Step-by-step Subtasks
+- [[obsidian-vault/analysis/ICLR_2026/CounselBench_A_Large_Scale_Expert_Evaluation_and_Adversarial_Benchmarking_of_Large_Language_Models_in_Mental_Health_Question_Answering.md|CounselBench: A Large-Scale Expert Evaluation and Adversarial Benchmarking of Large Language Models in Mental Health Question Answering (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/CounselBench_A_Large_Scale_Expert_Evaluation_and_Adversarial_Benchmarking_of_Large_Language_Models_in_Mental_Health_Question_Answering.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: CounselBench
+	- datasets: CounselBench-Eval
+- [[obsidian-vault/analysis/ICLR_2026/DM4CT_Benchmarking_Diffusion_Models_for_Computed_Tomography_Reconstruction.md|DM4CT: Benchmarking Diffusion Models for Computed Tomography Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DM4CT_Benchmarking_Diffusion_Models_for_Computed_Tomography_Reconstruction.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: DM4CT
+	- datasets: Medical CT, Industrial CT, Real-world Synchrotron CT
+- [[obsidian-vault/analysis/ICLR_2026/DrivingGen_A_Comprehensive_Benchmark_for_Generative_Video_World_Models_in_Autonomous_Driving.md|DrivingGen: A Comprehensive Benchmark for Generative Video World Models in Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DrivingGen_A_Comprehensive_Benchmark_for_Generative_Video_World_Models_in_Autono_faee0d3a7a34.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DrivingGen
+	- datasets: SLAM Reconstruction on 20 nuPlan videos, Open-Domain Track, Ego-Conditioned Track
+- [[obsidian-vault/analysis/ICLR_2026/EditBench_Evaluating_LLM_Abilities_to_Perform_Real_World_Instructed_Code_Edits.md|EditBench: Evaluating LLM Abilities to Perform Real-World Instructed Code Edits (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/EditBench_Evaluating_LLM_Abilities_to_Perform_Real_World_Instructed_Code_Edits.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: EditBench
+	- datasets: EditBench, 与现有基准的相关性
+- [[obsidian-vault/analysis/ICLR_2026/FieryGS_In_the_Wild_Fire_Synthesis_with_Physics_Integrated_Gaussian_Splatting.md|FieryGS: In-the-Wild Fire Synthesis with Physics-Integrated Gaussian Splatting (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FieryGS_In_the_Wild_Fire_Synthesis_with_Physics_Integrated_Gaussian_Splatting_d7901a6ed2cd.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: FieryGS
+	- datasets: User study
+- [[obsidian-vault/analysis/ICLR_2026/FormalML_A_Benchmark_for_Evaluating_Formal_Subgoal_Completion_in_Machine_Learning_Theory.md|FormalML: A Benchmark for Evaluating Formal Subgoal Completion in Machine Learning Theory (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FormalML_A_Benchmark_for_Evaluating_Formal_Subgoal_Completion_in_Machine_Learning_Theory.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: FormalML基准构建（基于to_theorem策略的子目标提取）
+	- datasets: FormalML, FormalML premise utilization
+- [[obsidian-vault/analysis/ICLR_2026/From_Static_Benchmarks_to_Dynamic_Protocol_Agent_Centric_Text_Anomaly_Detection_for_Evaluating_LLM_Reasoning.md|From Static Benchmarks to Dynamic Protocol: Agent-Centric Text Anomaly Detection for Evaluating LLM Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/From_Static_Benchmarks_to_Dynamic_Protocol_Agent_Centric_Text_Anomaly_Detection_for_Evaluating_LLM_Reasoning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: Agent-Centric Text Anomaly Detection (ATAD)
+	- datasets: ATAD benchmark
+- [[obsidian-vault/analysis/ICLR_2026/Guaranteed_Simply_Connected_Mesh_Reconstruction_from_an_Unorganized_Point_Cloud.md|Guaranteed Simply Connected Mesh Reconstruction from an Unorganized Point Cloud (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Guaranteed_Simply_Connected_Mesh_Reconstruction_from_an_Unorganized_Point_Cloud_5f2be3ee1ede.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: HHD-based simply-connected mesh reconstruction
+	- datasets: CrossSDF medical benchmark, Synthetic Stanford Bunny with outliers
+- [[obsidian-vault/analysis/ICLR_2026/HeuriGym_An_Agentic_Benchmark_for_LLM_Crafted_Heuristics_in_Combinatorial_Optimization.md|HeuriGym: An Agentic Benchmark for LLM-Crafted Heuristics in Combinatorial Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/HeuriGym_An_Agentic_Benchmark_for_LLM_Crafted_Heuristics_in_Combinatorial_Optimization.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: HeuriGym
+	- datasets: HeuriGym, 对比进化框架
+- [[obsidian-vault/analysis/ICLR_2026/Horseshoe_Splatting_Handling_Structural_Sparsity_for_Uncertainty_Aware_Gaussian_Splatting_Radiance_Field_Rendering.md|Horseshoe Splatting: Handling Structural Sparsity for Uncertainty-Aware Gaussian-Splatting Radiance Field Rendering (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Horseshoe_Splatting_Handling_Structural_Sparsity_for_Uncertainty_Aware_Gaussian_e32e9c64d698.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Horseshoe Splatting
+	- datasets: LF dataset, Tanks & Temples, Mip-NeRF360
+- [[obsidian-vault/analysis/ICLR_2026/How_Learning_Rate_Decay_Wastes_Your_Best_Data_in_Curriculum_Based_LLM_Pretraining.md|How Learning Rate Decay Wastes Your Best Data in Curriculum-Based LLM Pretraining (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/How_Learning_Rate_Decay_Wastes_Your_Best_Data_in_Curriculum_Based_LLM_Pretraining.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: Curriculum Model Averaging (CMA) 与 Combined Decay-aware Model Averaging (CDMA)
+	- datasets: Core benchmarks
+- [[obsidian-vault/analysis/ICLR_2026/How_Reliable_is_Language_Model_Micro_Benchmarking.md|How Reliable is Language Model Micro-Benchmarking? (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/How_Reliable_is_Language_Model_Micro_Benchmarking.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: Minimum Detectable Ability Difference (MDAD) meta-evaluation measure
+	- datasets: MMLU, MMLU-Pro
+- [[obsidian-vault/analysis/ICLR_2026/Hubble_a_Model_Suite_to_Advance_the_Study_of_LLM_Memorization.md|Hubble: a Model Suite to Advance the Study of LLM Memorization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Hubble_a_Model_Suite_to_Advance_the_Study_of_LLM_Memorization.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: HUBBLE模型套件及受控扰动插入框架
+	- datasets: Copyright Passages, Gutenberg Unpopular passages, YAGO Biographies PII reconstruction
+- [[obsidian-vault/analysis/ICLR_2026/In_Place_Test_Time_Training.md|In-Place Test-Time Training (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/In_Place_Test_Time_Training.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: In-Place Test-Time Training (In-Place TTT)
+	- datasets: RULER, RULER-16k
+- [[obsidian-vault/analysis/ICLR_2026/InclusiveVidPose_Bridging_the_Pose_Estimation_Gap_for_Individuals_with_Limb_Deficiencies_in_Video_Based_Motion.md|InclusiveVidPose: Bridging the Pose Estimation Gap for Individuals with Limb Deficiencies in Video-Based Motion (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/InclusiveVidPose_Bridging_the_Pose_Estimation_Gap_for_Individuals_with_Limb_Deficiencies_in_Video_Based_Motion.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: InclusiveVidPose数据集与LiCC评估指标
+	- datasets: InclusiveVidPose test, InclusiveVidPose video benchmark
+- [[obsidian-vault/analysis/ICLR_2026/InfBaGel_Human_Object_Scene_Interaction_Generation_with_Dynamic_Perception_and_Iterative_Refinement.md|InfBaGel: Human-Object-Scene Interaction Generation with Dynamic Perception and Iterative Refinement (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/InfBaGel_Human_Object_Scene_Interaction_Generation_with_Dynamic_Perception_and_I_ff1cfe7d66d2.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InfBaGel
+	- datasets: HOSI Benchmark, HOI Dataset
+- [[obsidian-vault/analysis/ICLR_2026/Instilling_an_Active_Mind_in_Avatars_via_Cognitive_Simulation.md|Instilling an Active Mind in Avatars via Cognitive Simulation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Instilling_an_Active_Mind_in_Avatars_via_Cognitive_Simulation.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Dual-System Cognitive Simulation Framework (Proposed)
+	- datasets: CyberHost test set, Multi-person interaction benchmark, Subjective evaluation vs. commercial baselines
+- [[obsidian-vault/analysis/ICLR_2026/Its_All_Just_Vectorization_einx_a_Universal_Notation_for_Tensor_Operations.md|It's All Just Vectorization: einx, a Universal Notation for Tensor Operations (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Its_All_Just_Vectorization_einx_a_Universal_Notation_for_Tensor_Operations.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: einx
+	- datasets: einx.id compilation overhead, einx.add compilation overhead
+- [[obsidian-vault/analysis/ICLR_2026/MATH_Beyond_A_Benchmark_for_RL_to_Expand_Beyond_the_Base_Model.md|MATH-Beyond: A Benchmark for RL to Expand Beyond the Base Model (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MATH_Beyond_A_Benchmark_for_RL_to_Expand_Beyond_the_Base_Model.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Agent / RL / Planning
+	- methods: MATH-Beyond Benchmark (MATH-B)
+	- datasets: MATH-B-U, MATH-B vs AIME24
+- [[obsidian-vault/analysis/ICLR_2026/MAVEN_A_Mesh_Aware_Volumetric_Encoding_Network_for_Simulating_3D_Flexible_Deformation.md|MAVEN: A Mesh-Aware Volumetric Encoding Network for Simulating 3D Flexible Deformation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MAVEN_A_Mesh_Aware_Volumetric_Encoding_Network_for_Simulating_3D_Flexible_Deform_cdb77aedb5f8.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MAVEN
+	- datasets: Cavity Grasping, Metal Bending
+- [[obsidian-vault/analysis/ICLR_2026/MCP_Bench_Benchmarking_Tool_Using_LLM_Agents_with_Complex_Real_World_Tasks_via_MCP_Servers.md|MCP-Bench: Benchmarking Tool-Using LLM Agents with Complex Real-World Tasks via MCP Servers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MCP_Bench_Benchmarking_Tool_Using_LLM_Agents_with_Complex_Real_World_Tasks_via_MCP_Servers.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: MCP-Bench
+	- datasets: MCP-BENCH
+- [[obsidian-vault/analysis/ICLR_2026/Mixture_of_Experts_Can_Surpass_Dense_LLMs_Under_Strictly_Equal_Resource.md|Mixture-of-Experts Can Surpass Dense LLMs Under Strictly Equal Resource (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Mixture_of_Experts_Can_Surpass_Dense_LLMs_Under_Strictly_Equal_Resource.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Systems / Efficiency / Compression
+	- methods: Three-Step Strictly Equal-Resource MoE Framework
+	- datasets: Validation BPC, CMMLU
+- [[obsidian-vault/analysis/ICLR_2026/Monocular_Normal_Estimation_via_Shading_Sequence_Estimation.md|Monocular Normal Estimation via Shading Sequence Estimation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Monocular_Normal_Estimation_via_Shading_Sequence_Estimation.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+- [[obsidian-vault/analysis/ICLR_2026/Multi_Domain_Riemannian_Graph_Gluing_for_Building_Graph_Foundation_Models.md|Multi-Domain Riemannian Graph Gluing for Building Graph Foundation Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Multi_Domain_Riemannian_Graph_Gluing_for_Building_Graph_Foundation_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: GRAPHGLUE
+	- datasets: Arxiv, Reddit
+- [[obsidian-vault/analysis/ICLR_2026/MVCustom_Multi_View_Customized_Diffusion_via_Geometric_Latent_Rendering_and_Completion.md|MVCustom: Multi-View Customized Diffusion via Geometric Latent Rendering and Completion (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MVCustom_Multi_View_Customized_Diffusion_via_Geometric_Latent_Rendering_and_Comp_5fcfc95fff65.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MVCustom
+	- datasets: CO3Dv2测试集
+- [[obsidian-vault/analysis/ICLR_2026/One_for_Two_A_Unified_Framework_for_Imbalanced_Graph_Classification_via_Dynamic_Balanced_Prototype.md|One for Two: A Unified Framework for Imbalanced Graph Classification via Dynamic Balanced Prototype (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/One_for_Two_A_Unified_Framework_for_Imbalanced_Graph_Classification_via_Dynamic_Balanced_Prototype.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: UniImb
+	- datasets: PROTEINS, D&D
+- [[obsidian-vault/analysis/ICLR_2026/One2Scene_Geometric_Consistent_Explorable_3D_Scene_Generation_from_a_Single_Image.md|One2Scene: Geometric Consistent Explorable 3D Scene Generation from a Single Image (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/One2Scene_Geometric_Consistent_Explorable_3D_Scene_Generation_from_a_Single_Imag_271d95caee6f.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: One2Scene
+	- datasets: 全景深度估计
+- [[obsidian-vault/analysis/ICLR_2026/OpenThoughts_Data_Recipes_for_Reasoning_Models.md|OpenThoughts: Data Recipes for Reasoning Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/OpenThoughts_Data_Recipes_for_Reasoning_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: OpenThoughts3 Data Pipeline
+	- datasets: AIME 2025, LiveCodeBench 06/24-01/25, GPQA Diamond
+- [[obsidian-vault/analysis/ICLR_2026/ParaRNN_Unlocking_Parallel_Training_of_Nonlinear_RNNs_for_Large_Language_Models.md|ParaRNN: Unlocking Parallel Training of Nonlinear RNNs for Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ParaRNN_Unlocking_Parallel_Training_of_Nonlinear_RNNs_for_Large_Language_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: ParaRNN
+	- datasets: Language Modeling, Training speed, Inference throughput
+- [[obsidian-vault/analysis/ICLR_2026/ResearchRubrics_A_Benchmark_of_Prompts_and_Rubrics_For_Evaluating_Deep_Research_Agents.md|ResearchRubrics: A Benchmark of Prompts and Rubrics For Evaluating Deep Research Agents (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ResearchRubrics_A_Benchmark_of_Prompts_and_Rubrics_For_Evaluating_Deep_Research_Agents.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: RESEARCHRUBRICS基准与评估体系
+	- datasets: RESEARCHRUBRICS
+- [[obsidian-vault/analysis/ICLR_2026/Seek_CAD_A_Self_refined_Generative_Modeling_for_3D_Parametric_CAD_Using_Local_Inference_via_DeepSeek.md|Seek-CAD: A Self-refined Generative Modeling for 3D Parametric CAD Using Local Inference via DeepSeek (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Seek_CAD_A_Self_refined_Generative_Modeling_for_3D_Parametric_CAD_Using_Local_In_3b6e5b4dcc73.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: Seek-CAD
+	- datasets: SSR-based test set, DeepCAD dataset
+- [[obsidian-vault/analysis/ICLR_2026/Sharp_Monocular_View_Synthesis_in_Less_Than_a_Second.md|Sharp Monocular View Synthesis in Less Than a Second (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Sharp_Monocular_View_Synthesis_in_Less_Than_a_Second_9ff8519e0fec.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: SHARP
+	- datasets: Multiple datasets
+- [[obsidian-vault/analysis/ICLR_2026/SkyEvents_A_Large_Scale_Event_enhanced_UAV_Dataset_for_Robust_3D_Scene_Reconstruction.md|SkyEvents: A Large-Scale Event-enhanced UAV Dataset for Robust 3D Scene Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/SkyEvents_A_Large_Scale_Event_enhanced_UAV_Dataset_for_Robust_3D_Scene_Reconstru_5f0daf32f322.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GTA + RER (Geometry-constrained Timestamp Alignment + Region-wise Event Rendering loss)
+	- datasets: SkyEvents Scene2, SkyEvents Scene1
+- [[obsidian-vault/analysis/ICLR_2026/STAR_Bench_Probing_Deep_Spatio_Temporal_Reasoning_as_Audio_4D_Intelligence.md|STAR-Bench: Probing Deep Spatio-Temporal Reasoning as Audio 4D Intelligence (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/STAR_Bench_Probing_Deep_Spatio_Temporal_Reasoning_as_Audio_4D_Intelligence.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: STAR-BENCH
+	- datasets: STAR-BENCH, Foundational Perception, Temporal Reasoning
+- [[obsidian-vault/analysis/ICLR_2026/TabStruct_Measuring_Structural_Fidelity_of_Tabular_Data.md|TabStruct: Measuring Structural Fidelity of Tabular Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/TabStruct_Measuring_Structural_Fidelity_of_Tabular_Data.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: TabStruct（包含全局效用指标的结构保真度评估框架）
+	- datasets: Six SCM datasets
+- [[obsidian-vault/analysis/ICLR_2026/The_Polar_Express_Optimal_Matrix_Sign_Methods_and_their_Application_to_the_Muon_Algorithm.md|The Polar Express: Optimal Matrix Sign Methods and their Application to the Muon Algorithm (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/The_Polar_Express_Optimal_Matrix_Sign_Methods_and_their_Application_to_the_Muon_Algorithm.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Polar Express
+	- datasets: GPT-2-Large on FineWeb 1B tokens, GPT-2-Small on FineWeb 1B tokens, GPT-2-Large on FineWeb 10B tokens
+- [[obsidian-vault/analysis/ICLR_2026/The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation.md|The Quest for Generalizable Motion Generation Data Model and Evaluation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ViMoGen (full) and ViMoGen-light (distilled)
+	- datasets: MBench, HumanML3D
+- [[obsidian-vault/analysis/ICLR_2026/Trace_Anything_Representing_Any_Video_in_4D_via_Trajectory_Fields.md|Trace Anything: Representing Any Video in 4D via Trajectory Fields (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Trace_Anything_Representing_Any_Video_in_4D_via_Trajectory_Fields_c3173ca21ca2.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Trace Anything
+	- datasets: Trace Anything benchmark, TAPVid-3D
+- [[obsidian-vault/analysis/ICLR_2026/Train_before_Test_Harmonizes_Language_Model_Rankings.md|Train-before-Test Harmonizes Language Model Rankings (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Train_before_Test_Harmonizes_Language_Model_Rankings.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: train-before-test
+	- datasets: NQ-Open 与其他基准平均, 困惑度 vs 下游平均, 所有模型 PC1 解释方差
+- [[obsidian-vault/analysis/ICLR_2026/Unsupervised_Representation_Learning_for_3D_Mesh_Parameterization_with_Semantic_and_Visibility_Objectives.md|Unsupervised Representation Learning for 3D Mesh Parameterization with Semantic and Visibility Objectives (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Unsupervised_Representation_Learning_for_3D_Mesh_Parameterization_with_Semantic_fb445667e240.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Semantic-Visibility-Aware UV Parameterization
+	- datasets: Visibility Metric, Semantic-Aware Metric, User Study
+- [[obsidian-vault/analysis/ICLR_2026/UrbanGS_Efficient_and_Scalable_Architecture_for_Geometrically_Accurate_Large_Scene_Reconstruction.md|UrbanGS: Efficient and Scalable Architecture for Geometrically Accurate Large-Scene Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/UrbanGS_Efficient_and_Scalable_Architecture_for_Geometrically_Accurate_Large_Sce_dbeb8df34f9e.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: UrbanGS
+	- datasets: Mill19, UrbanScene3D, GauU-Scene
+- [[obsidian-vault/analysis/ICLR_2026/Verifying_Chain_of_Thought_Reasoning_via_Its_Computational_Graph.md|Verifying Chain-of-Thought Reasoning via Its Computational Graph (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Verifying_Chain_of_Thought_Reasoning_via_Its_Computational_Graph.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: Circuit-based Reasoning Verification (CRV)
+	- datasets: Synthetic, GSM8K
+- [[obsidian-vault/analysis/ICML_2026/Test_Time_Training_with_KV_Binding_Is_Secretly_Linear_Attention.md|Test-Time Training with KV Binding Is Secretly Linear Attention (ICML 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICML_2026/Test_Time_Training_with_KV_Binding_Is_Secretly_Linear_Attention.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: TTT as Linear Attention (TTT-LA)
+	- datasets: LaCT-LLM, LaCT-NVS, TTT Layer Inference
+- [[obsidian-vault/analysis/TPAMI_2026/DrawMotion_Generating_3D_Human_Motions_by_Freehand_Drawing.md|DrawMotion: Generating 3D Human Motions by Freehand Drawing (TPAMI 2026)]]
+	- [[obsidian-vault/paperPDFs/TPAMI_2026/DrawMotion_Generating_3D_Human_Motions_by_Freehand_Drawing.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DrawMotion
+	- datasets: HumanML3D test set, KIT-ML test set, User Study

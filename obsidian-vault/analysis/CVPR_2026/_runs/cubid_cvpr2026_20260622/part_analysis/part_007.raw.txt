@@ -1,0 +1,46 @@
+{
+  "part_id": "7/9",
+  "section_role": "experiments and conclusion",
+  "method_evidence": [
+    {
+      "claim": "CubiD directly generates with native high-dimensional representation tokens (768d).",
+      "section": "Table 5",
+      "anchor": "CubiD is the first and only discrete method to directly generate with native high-dimensional representation tokens (768d), while all other methods use compressed or low-dimensional tokens (mostly below 32).",
+      "confidence": 0.98
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "CubiD-XXL achieves state-of-the-art discrete generation with a gFID of 1.88.",
+      "table_or_figure": "Table 5",
+      "metric": "gFID",
+      "value": "1.88",
+      "confidence": 0.99
+    },
+    {
+      "claim": "CubiD-XXL achieves 2.02 gFID without guidance.",
+      "table_or_figure": "Table 5",
+      "metric": "gFID",
+      "value": "2.02",
+      "confidence": 0.99
+    },
+    {
+      "claim": "DINOv2 encoder achieves gFID 5.25, SigLIP2 achieves 5.87.",
+      "table_or_figure": "Table 4f",
+      "metric": "gFID",
+      "value": "5.25 (DINOv2), 5.87 (SigLIP2)",
+      "confidence": 0.97
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table 5",
+      "role_hint": "Main results on ImageNet 256x256 class-conditional generation comparing CubiD with existing discrete generation methods.",
+      "caption": "Discrete generation methods on ImageNet 256x256. Latent Dim denotes the original dimensionality of the latent space (features before vector quantization for low-dimensional methods, before and after dimension-wise quantization for CubiD). Results with superscript \"re\" denote rejection sampling. CubiD is the first and only discrete method to directly generate with native high-dimensional representation tokens (768d), while all other methods use compressed or low-dimensional tokens (mostly below 32).",
+      "confidence": 0.99
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

@@ -1,0 +1,59 @@
+---
+title: "Dataset: Toys4K"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: Toys4K
+
+- [[obsidian-vault/analysis/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.md|Appreciate the View: A Task-Aware Evaluation Framework for Novel View Synthesis (3DV 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: PRISM (Metrics: DPRISM / MMDPRISM)
+	- datasets: VIEWMATCH, GSO, Toys4K
+- [[obsidian-vault/analysis/arxiv_2026/EVA01_Unified_Native_3D_Understanding_and_Generation_via_Mixture-of-Transformers.md|EVA01: Unified Native 3D Understanding and Generation via Mixture-of-Transformers (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/EVA01:_Unified_Native_3D_Understanding_and_Generation_via_Mixture-of-Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: EVA01
+	- datasets: Toys4K, Multi-Turn Editing, PointLLM-200 captioning
+- [[obsidian-vault/analysis/CVPR_2026/Are_We_Ready_for_RL_in_Text_to_3D_Generation_A_Progressive_Investigation.md|Are We Ready for RL in Text-to-3D Generation? A Progressive Investigation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Are_We_Ready_for_RL_in_Text_to_3D_Generation_A_Progressive_Investigation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: AR3D-R1
+	- datasets: MME-3DR, Toys4K
+- [[obsidian-vault/analysis/CVPR_2026/FACE_A_Face_based_Autoregressive_Representation_for_High_Fidelity_and_Efficient_Mesh_Generation.md|FACE: A Face-based Autoregressive Representation for High-Fidelity and Efficient Mesh Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FACE_A_Face_based_Autoregressive_Representation_for_High_Fidelity_and_Efficient_Mesh_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: FACE
+	- datasets: Objaverse, Toys4K, Famous
+- [[obsidian-vault/analysis/CVPR_2026/Points_to_3D_Structure_Aware_3D_Generation_with_Point_Cloud_Priors.md|Points-to-3D: Structure-Aware 3D Generation with Point Cloud Priors (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Points_to_3D_Structure_Aware_3D_Generation_with_Point_Cloud_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Points-to-3D
+	- datasets: Toys4K
+- [[obsidian-vault/analysis/CVPR_2026/Residual_Primitive_Fitting_of_3D_Shapes_with_SuperFrusta.md|Residual Primitive Fitting of 3D Shapes with SuperFrusta (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Residual_Primitive_Fitting_of_3D_Shapes_with_SuperFrusta.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: SuperFrustum and Residual Primitive Fitting (ResFit)
+	- datasets: Toys4K
+- [[obsidian-vault/analysis/CVPR_2026/Text_Image_Conditioned_3D_Generation.md|Text-Image Conditioned 3D Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Text_Image_Conditioned_3D_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TIGON
+	- datasets: Toys4K, UniLat1K
+- [[obsidian-vault/analysis/ICLR_2026/SpaceControl_Introducing_Test_Time_Spatial_Control_to_3D_Generative_Modeling.md|SpaceControl: Introducing Test-Time Spatial Control to 3D Generative Modeling (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/SpaceControl_Introducing_Test_Time_Spatial_Control_to_3D_Generative_Modeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SpaceControl (SPACECONTROL)
+	- datasets: Toys4K, Chair

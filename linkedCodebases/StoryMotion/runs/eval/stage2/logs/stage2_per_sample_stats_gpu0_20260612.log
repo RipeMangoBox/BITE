@@ -1,0 +1,7 @@
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+{"event": "per_sample_stats_written", "path": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2_per_sample_stats_20260612/mixed_standard_last_val4096_per_sample_stats.json", "samples": 4096, "task_stats": {"camera": {"max": 308.9004211425781, "mean": 0.07810889528784681, "median": 0.0005757735634688288, "p90": 0.0017859847866930068, "p95": 0.002715889539103955, "p99": 0.008136815670877744, "trimmed_mean_10pct": 0.0006824348529779038}, "human": {"max": 2134.26953125, "mean": 0.5289367294551965, "median": 0.0035169851034879684, "p90": 0.011024720035493374, "p95": 0.015382679412141442, "p99": 0.031158385984599694, "trimmed_mean_10pct": 0.004138131916722285}, "joint": {"max": 1587.9798583984375, "mean": 0.4397920172829046, "median": 0.020918705500662327, "p90": 0.11289845779538155, "p95": 0.19236191734671593, "p99": 0.4366034165024762, "trimmed_mean_10pct": 0.029529917419886944}}}

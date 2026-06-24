@@ -1,0 +1,137 @@
+---
+title: "Dataset: AIME24"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: AIME24
+
+- [[obsidian-vault/analysis/ICLR_2026/A_State_Transition_Framework_for_Efficient_LLM_Reasoning.md|A State-Transition Framework for Efficient LLM Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_State_Transition_Framework_for_Efficient_LLM_Reasoning.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
+	- methods: State-Transition Framework with Mixed Attention Module (MAM)
+	- datasets: AIME24
+- [[obsidian-vault/analysis/ICLR_2026/A_Stitch_in_Time_Saves_Nine_Proactive_Self_Refinement_for_Language_Models.md|A Stitch in Time Saves Nine: Proactive Self-Refinement for Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Stitch_in_Time_Saves_Nine_Proactive_Self_Refinement_for_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: ProActive Self-Refinement (PASR)
+	- datasets: GSM8K, MATH, AIME24
+- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verifiable_Rewards.md|Adaptive Rollout Allocation for Online Reinforcement Learning with Verifiable Rewards (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verifiable_Rewards.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning
+	- methods: VIP (Variance-Informed Predictive allocation strategy)
+	- datasets: AIME24, Bamboogle, MuSiQue
+- [[obsidian-vault/analysis/ICLR_2026/Agentic_Reinforced_Policy_Optimization.md|Agentic Reinforced Policy Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Agentic_Reinforced_Policy_Optimization.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Agentic Reinforced Policy Optimization (ARPO)
+	- datasets: AIME24, AIME25, HLE
+- [[obsidian-vault/analysis/ICLR_2026/AgentMath_Empowering_Mathematical_Reasoning_for_Large_Language_Models_via_Tool_Augmented_Agent.md|AgentMath: Empowering Mathematical Reasoning for Large Language Models via Tool-Augmented Agent (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AgentMath_Empowering_Mathematical_Reasoning_for_Large_Language_Models_via_Tool_Augmented_Agent.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- methods: AgentMath
+	- datasets: AIME24, AIME25, HMMT25
+- [[obsidian-vault/analysis/ICLR_2026/Buffer_Matters_Unleashing_the_Power_of_Off_Policy_Reinforcement_Learning_in_Large_Language_Model_Reasoning.md|Buffer Matters: Unleashing the Power of Off-Policy Reinforcement Learning in Large Language Model Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Buffer_Matters_Unleashing_the_Power_of_Off_Policy_Reinforcement_Learning_in_Large_Language_Model_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: BAPO (Batch Adaptation Policy Optimization)
+	- datasets: 多任务平均提升, AIME24, MATH500
+- [[obsidian-vault/analysis/ICLR_2026/CDE_Curiosity_Driven_Exploration_for_Efficient_Reinforcement_Learning_in_Large_Language_Models.md|CDE: Curiosity-Driven Exploration for Efficient Reinforcement Learning in Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/CDE_Curiosity_Driven_Exploration_for_Efficient_Reinforcement_Learning_in_Large_Language_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: CDE (Curiosity-Driven Exploration)
+	- datasets: AIME24, AIME25, Overall Avg
+- [[obsidian-vault/analysis/ICLR_2026/Curriculum_Reinforcement_Learning_from_Easy_to_Hard_Tasks_Improves_LLM_Reasoning.md|Curriculum Reinforcement Learning from Easy to Hard Tasks Improves LLM Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Curriculum_Reinforcement_Learning_from_Easy_to_Hard_Tasks_Improves_LLM_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: E2H Reasoner (E2H)
+	- datasets: Blocksworld, Countdown, GSM8K
+- [[obsidian-vault/analysis/ICLR_2026/Emergent_Hierarchical_Reasoning_in_LLMs_through_Reinforcement_Learning.md|Emergent Hierarchical Reasoning in LLMs through Reinforcement Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Emergent_Hierarchical_Reasoning_in_LLMs_through_Reinforcement_Learning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: HICRA (Hierarchy-Aware Credit Assignment)
+	- datasets: AIME24, AIME25, Math500
+- [[obsidian-vault/analysis/ICLR_2026/FAPO_Flawed_Aware_Policy_Optimization_for_Efficient_and_Reliable_Reasoning.md|FAPO: Flawed-Aware Policy Optimization for Efficient and Reliable Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FAPO_Flawed_Aware_Policy_Optimization_for_Efficient_and_Reliable_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: FAPO (Flawed-Aware Policy Optimization)
+	- datasets: AIME24, AIME25, GPQA-Diamond
+- [[obsidian-vault/analysis/ICLR_2026/Harder_Is_Better_Boosting_Mathematical_Reasoning_via_Difficulty_Aware_GRPO_and_Multi_Aspect_Question_Reformulation.md|Harder Is Better: Boosting Mathematical Reasoning via Difficulty-Aware GRPO and Multi-Aspect Question Reformulation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Harder_Is_Better_Boosting_Mathematical_Reasoning_via_Difficulty_Aware_GRPO_and_Multi_Aspect_Question_Reformulation.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: MathForge（DGPO + MQR）
+	- datasets: AIME24, MATH500, Minerva
+- [[obsidian-vault/analysis/ICLR_2026/Linking_Process_to_Outcome_Conditional_Reward_Modeling_for_LLM_Reasoning.md|Linking Process to Outcome: Conditional Reward Modeling for LLM Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Linking_Process_to_Outcome_Conditional_Reward_Modeling_for_LLM_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Conditional Reward Modeling (CRM)
+	- datasets: MATH500, AIME24
+- [[obsidian-vault/analysis/ICLR_2026/On_Entropy_Control_in_LLM_RL_Algorithms.md|On Entropy Control in LLM-RL Algorithms (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/On_Entropy_Control_in_LLM_RL_Algorithms.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: AEnt
+	- datasets: MATH-Hard, AIME24
+- [[obsidian-vault/analysis/ICLR_2026/On_the_Design_of_KL_Regularized_Policy_Gradient_Algorithms_for_LLM_Reasoning.md|On the Design of KL-Regularized Policy Gradient Algorithms for LLM Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/On_the_Design_of_KL_Regularized_Policy_Gradient_Algorithms_for_LLM_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Regularized Policy Gradient (RPG) and its REINFORCE-style variant (RPG-REINFORCE)
+	- datasets: AIME24, AIME25
+- [[obsidian-vault/analysis/ICLR_2026/Random_Policy_Valuation_is_Enough_for_LLM_Reasoning_with_Verifiable_Rewards.md|Random Policy Valuation is Enough for LLM Reasoning with Verifiable Rewards (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Random_Policy_Valuation_is_Enough_for_LLM_Reasoning_with_Verifiable_Rewards.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: ROVER
+	- datasets: AIME24, AIME25, HMMT25
+- [[obsidian-vault/analysis/ICLR_2026/Risk_Sensitive_Reinforcement_Learning_for_Alleviating_Exploration_Dilemmas_in_Large_Language_Models.md|Risk-Sensitive Reinforcement Learning for Alleviating Exploration Dilemmas in Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Risk_Sensitive_Reinforcement_Learning_for_Alleviating_Exploration_Dilemmas_in_Large_Language_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning
+	- methods: Risk-Sensitive GRPO (RS-GRPO)
+	- datasets: Average over 6 mathematical reasoning benchmarks, AIME24
+- [[obsidian-vault/analysis/ICLR_2026/RL_Squeezes_SFT_Expands_A_Comparative_Study_of_Reasoning_LLMs.md|RL Squeezes, SFT Expands: A Comparative Study of Reasoning LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/RL_Squeezes_SFT_Expands_A_Comparative_Study_of_Reasoning_LLMs.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: 推理路径分析框架（Trajectory-level and Step-level Analysis Framework）
+	- datasets: AIME24, AIME25, AMC23
+- [[obsidian-vault/analysis/ICLR_2026/Scaf_GRPO_Scaffolded_Group_Relative_Policy_Optimization_for_Enhancing_LLM_Reasoning.md|Scaf-GRPO: Scaffolded Group Relative Policy Optimization for Enhancing LLM Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Scaf_GRPO_Scaffolded_Group_Relative_Policy_Optimization_for_Enhancing_LLM_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Scaf‑GRPO
+	- datasets: AIME24
+- [[obsidian-vault/analysis/ICLR_2026/SimpleTIR_End_to_End_Reinforcement_Learning_for_Multi_Turn_Tool_Integrated_Reasoning.md|SimpleTIR: End-to-End Reinforcement Learning for Multi-Turn Tool-Integrated Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/SimpleTIR_End_to_End_Reinforcement_Learning_for_Multi_Turn_Tool_Integrated_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: SimpleTIR
+	- datasets: AIME24, MATH500, AIME25
+- [[obsidian-vault/analysis/ICLR_2026/Supervised_Reinforcement_Learning_From_Expert_Trajectories_to_Step_wise_Reasoning.md|Supervised Reinforcement Learning: From Expert Trajectories to Step-wise Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Supervised_Reinforcement_Learning_From_Expert_Trajectories_to_Step_wise_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Supervised Reinforcement Learning (SRL)
+	- datasets: AIME24, Minerva Math, Overall Average
+- [[obsidian-vault/analysis/ICLR_2026/Unlocking_the_Power_of_Multi_Agent_LLM_for_Reasoning_From_Lazy_Agents_to_Deliberation.md|Unlocking the Power of Multi-Agent LLM for Reasoning: From Lazy Agents to Deliberation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Unlocking_the_Power_of_Multi_Agent_LLM_for_Reasoning_From_Lazy_Agents_to_Deliberation.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Dr. MAMR (Multi-Agent Meta-Reasoning Done Right)
+	- datasets: MATH500, GSM8K, AIME24

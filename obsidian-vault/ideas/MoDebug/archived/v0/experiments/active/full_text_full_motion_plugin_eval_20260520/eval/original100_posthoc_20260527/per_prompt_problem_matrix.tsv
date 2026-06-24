@@ -1,0 +1,101 @@
+row_index	prompt_id	motion_id	primary_bucket	original_text	gt_problem	motiongpt_problem	molingo_problem	momask_original_problem	mogents_problem	gt_description	motiongpt_description	molingo_description	momask_original_description	mogents_description
+0	hml_orig100_train_001__full	M012637	simple_locomotion	a person slides from side to side 2 times then takes off running while looking forward the whole time	0	0	0	1	0				foot sliding严重	
+1	hml_orig100_train_002__full	M003909	simple_locomotion	a person looking to their right walks in a tight circle while continuing to face the same direction. they look to be slightly off balance	0	0	1	1	1			没有走完一圈	没有绕圈走	没有走完一圈
+2	hml_orig100_train_003__full	M011839	simple_locomotion	a person jogs straight forward.	0	0	0	0	0					
+3	hml_orig100_train_004__full	M000879	simple_locomotion	a person walks and turns right.	0	0	0	0	0					
+4	hml_orig100_train_005__full	M004389	simple_locomotion	the person is stepping forward.	0	0	0	0	0					
+5	hml_orig100_train_006__full	010667	simple_locomotion	a person picks up a cloth/sponge with their right hand, then walks over to an object, lifts it with their left hand and washes/wipes it with the cloth.	0	0	1	1	1			左手拿	左手拿	左手拿
+6	hml_orig100_train_007__full	001552	simple_locomotion	a person takes a few steps curving to the left.	0	0	0	0	0					
+7	hml_orig100_train_008__full	M001526	simple_locomotion	a man walks forward slowly in a jagged line.	0	0	0	0	0					
+8	hml_orig100_train_009__full	001405	direction_turn	a person steps back, sits down, stands up and steps forward.	0	0	0	0	0					
+9	hml_orig100_train_010__full	010892	direction_turn	a person walks at a left bend.	0	0	0	0	0					
+10	hml_orig100_train_011__full	M007018	direction_turn	someone with outstretched arms spins counterclockwise	0	0	0	1	1				没有逆时针旋转	滑步严重，没有逆时针旋转
+11	hml_orig100_train_012__full	M006180	direction_turn	a man throws object with his left hand.	0	0	0	0	0					
+12	hml_orig100_train_013__full	013970	direction_turn	the man walk and turn like a haf sercle and stops.	0	0	0	0	0					
+13	hml_orig100_train_014__full	M003026	direction_turn	a person walks and does a 180 degree turn.	0	0	0	0	0					
+14	hml_orig100_train_015__full	M004806	direction_turn	a person standing in place holds a ball with both hands, then throws the ball with left hand and catches the ball with both hands, then throws the ball and catches the ball again.	0	0	0	0	0					
+15	hml_orig100_train_016__full	000052	direction_turn	a person walks to the right in a partial circle.	0	0	0	0	0					
+16	hml_orig100_train_017__full	012623	stop_go	person standing begins moving arms with hands coming together then apart and then raising arms above head	0	0	0	0	0					
+17	hml_orig100_train_018__full	009702	stop_go	a standing person performs a cartwheel starting with their left hand	0	0	0	0	1					用了双手
+18	hml_orig100_train_019__full	M000846	stop_go	a person quickly sprints in a figure-eight pattern, stopping briefly at each side to carefully turn.	0	0	0	1	1				轨迹不是8	轨迹不是8
+19	hml_orig100_train_020__full	M010803	stop_go	the man is standing still like a statue.	0	0	0	0	0					
+20	hml_orig100_train_021__full	007332	stop_go	a standing person scratches their head.	0	0	0	0	0					
+21	hml_orig100_train_022__full	004514	stop_go	robot walking forward slowly and then stopped.	0	0	0	0	0					
+22	hml_orig100_train_023__full	008176	stop_go	a person is walking taking big steps across the floor then suddenly stops.	0	0	0	0	0					
+23	hml_orig100_train_024__full	011214	stop_go	a figure walks in a straight line, turns and sits facing away, then stands and walks away	0	0	0	0	0					
+24	hml_orig100_train_025__full	014309	sit_squat_posture	a person picks something up, walks forward, sets it down, walks back and squats down.	0	0	0	0	0					
+25	hml_orig100_train_026__full	008819	sit_squat_posture	person take a step back then sits down then getting back up and stepping forward.	0	0	0	0	0					
+26	hml_orig100_train_027__full	M005330	sit_squat_posture	a person bends and holds their head with their left hand.	0	0	0	0	0					
+27	hml_orig100_train_028__full	000711	sit_squat_posture	a persons walks forward, bends down to pick something up, then walks in a circle and sets it back down.	0	0	0	0	1					没回到远处放置
+28	hml_orig100_train_029__full	011788	sit_squat_posture	a person sits down with both hands on his knees.	0	0	0	1	0				坐下错误生成为跪下	
+29	hml_orig100_train_030__full	M009416	sit_squat_posture	a man walks over , sits down , then walks back.	0	0	0	0	0					
+30	hml_orig100_train_031__full	009629	sit_squat_posture	a man kneels to the ground one leg at a time starting with the right leg	1	0	0	0	0	左腿先跪下，text为右腿				
+31	hml_orig100_train_032__full	M013424	sit_squat_posture	a person sitting quickly reaches around them and grabs objects.	0	0	0	0	0					
+32	hml_orig100_train_033__full	002812	jump_kick	the woman angerily kicked at the ground with her left foot.	1	0	0	1	1	实际是右腿踢的			停滞在保持踢的准备动作	右腿踢的
+33	hml_orig100_train_034__full	014460	jump_kick	a person kicked something with left leg	0	0	0	0	0					
+34	hml_orig100_train_035__full	013083	jump_kick	a person kicked with the left leg	1	1	0	0	1	实际是右腿踢的	左脚为支点旋转一周			身体扭动异常
+35	hml_orig100_train_036__full	005403	jump_kick	the person took a jump forward.	0	0	0	0	0					
+36	hml_orig100_train_037__full	002708	jump_kick	a person does a quick wheel-like spin kick with left leg, pivoting on right leg while both arms resume fighting gesture.	0	1	0	1	0		没完成whell-like spin kick，只是简单的kick		右脚踢，且没有wheel-like spin	
+37	hml_orig100_train_038__full	M006356	jump_kick	the man kicks at something with his left leg.	0	0	0	0	0					
+38	hml_orig100_train_039__full	006465	jump_kick	person is practicing their long jump	0	0	0	0	0					
+39	hml_orig100_train_040__full	004637	jump_kick	someone jumps over something, turns around and jumps back over it, before getting ready to jump over it again.	0	0	0	0	0					
+40	hml_orig100_train_041__full	M004885	upper_body_gesture	a person acting traumatic throwing his left hand.	0	0	0	0	1					甩的右手
+41	hml_orig100_train_042__full	012182	upper_body_gesture	the person holds their head, crouches down on their hands and continues to hold their head.	0	0	0	0	0					
+42	hml_orig100_train_043__full	M000176	upper_body_gesture	a person sitting down raises its right hand.	0	0	0	0	0					
+43	hml_orig100_train_044__full	M011628	upper_body_gesture	this person is standing still and lifts the left hand up to the face.	0	0	0	0	0					
+44	hml_orig100_train_045__full	M008299	upper_body_gesture	both arms bent forward chicken wing flaps to left and right	0	0	0	0	0					
+45	hml_orig100_train_046__full	003757	upper_body_gesture	a person wave their arm in a straight motion	0	0	0	0	0					
+46	hml_orig100_train_047__full	010666	upper_body_gesture	a person bends slightly to grab something with his right hand then limps one step to his left, pauses, and limps another step to the left.	0	1	1	0	0		缺少and limps another step to the left.	没有两次limp		
+47	hml_orig100_train_048__full	M013243	upper_body_gesture	lowering hands then raising hands towards face.	0	0	0	0	0					
+48	hml_orig100_train_049__full	004526	object_interaction	a person holds up both of their hands in front of their face and then leans back to dodge an obstacle.	0	0	0	0	0					
+49	hml_orig100_train_050__full	004260	object_interaction	a man turns to the left and reaches up to grab something with his left hands.	0	1	1	1	1		a man walks forward and 左右摇摆	用右手摘	缺少turns to the left	缺少turns to the left
+50	hml_orig100_train_051__full	001866	object_interaction	someone walks disoriented looking for something or someone	0	0	0	0	0					
+51	hml_orig100_train_052__full	006973	object_interaction	a person does jumping jacks in place.	0	0	0	0	0					
+52	hml_orig100_train_053__full	014288	object_interaction	a person slowly walked and touched something with right and left hand	0	0	0	1	0				a person slowly bentd and touched something with right hand, walking fast and turn and touched something with  left hand	
+53	hml_orig100_train_054__full	009214	object_interaction	the person is throwing something with both hands overhead.	0	0	0	0	0					
+54	hml_orig100_train_055__full	M013894	object_interaction	this person stands in one place and claps.	0	0	0	0	0					
+55	hml_orig100_train_056__full	014569	object_interaction	a person is walking while holding onto something.	0	0	0	0	0					
+56	hml_orig100_train_057__full	008073	count_duration_speed	a person walks forward a few steps	0	0	0	0	0					
+57	hml_orig100_train_058__full	M002292	count_duration_speed	person quickly raises their left hand	0	1	0	0	0		缓慢伸右手			
+58	hml_orig100_train_059__full	013723	count_duration_speed	the person makes many gestures in quick succession.	0	0	0	0	0					
+59	hml_orig100_train_060__full	011272	count_duration_speed	a person slowly straightens, turns back and to the right, picks up an object, walks forward, and wipes something with the object.	0	0	0	0	0					
+60	hml_orig100_train_061__full	003727	count_duration_speed	person moves back in a seated position sits then stand up again returning to original position	0	0	0	0	0					
+61	hml_orig100_train_062__full	M000778	count_duration_speed	a person slowly walks forward.	1	0	0	0	0	走得并不慢				
+62	hml_orig100_train_063__full	006831	count_duration_speed	a person begins walking then quickly turns around to stand with his back to the viewer.	0	0	0	0	0					
+63	hml_orig100_train_064__full	009700	count_duration_speed	a man does several cart wheels in a small area.	0	0	1	1	0			人物抖动、漂移严重	手部触底时飘逸	
+64	hml_orig100_train_065__full	M012541	multi_action_composition	a man emulates jogging, shuffling around in a couple counterclockwise circles while keeping his body facing forward the whole time.	0	0	0	1	1				朝向一直在变	朝向一直在变
+65	hml_orig100_train_066__full	004665	multi_action_composition	this person jump and spin and then balance themselves.	0	0	1	0	0			第二次跳跃后脚步滑动		
+66	hml_orig100_train_067__full	M011649	multi_action_composition	a person bends down and crawls forward, then back and then stands up.	0	0	0	0	1					没有back回原位
+67	hml_orig100_train_068__full	007053	multi_action_composition	a person is standing on his right foot and then his left foot.	0	0	0	1	0				一直右脚站立，且左膝盖弯曲异常	
+68	hml_orig100_train_069__full	000303	multi_action_composition	a man is standing and reaches down to the left with his left hand then to the right with his right hand, and then the left again.	0	0	0	1	1				a man is standing and  reaches  to the front with his left hand then reaches  to the left with his left hand.	a man is standing and bending down and reaches down with his left hand then to the right with his right hand.
+69	hml_orig100_train_070__full	M007760	multi_action_composition	a person walks forward and steps forward on their right foot, reaching their left arm out before returning to regular.	0	0	0	1	0				a person walks forward and bends down, reaching their right arm out before returning to regular.	
+70	hml_orig100_train_071__full	004878	multi_action_composition	the person picks up one container with each hand, pours them at the same time, then grabs something with their right hand and mixes the concoction.	0	0	0	0	0					
+71	hml_orig100_train_072__full	M008532	multi_action_composition	a person is turning something with its left hand, while holding something with its right hand	0	0	0	0	0					
+72	hml_orig100_train_073__full	004365	dance_exercise	a man stands with feet apart left arm stretched and right arm bent, then lunges forward and kicks his right foot into the air.	0	0	0	1	1				踢左腿	踢左腿
+73	hml_orig100_train_074__full	002663	dance_exercise	a man stands facing forward, stretch both hands forward, he turned right walked a little turned left walked a little turned left walked.	0	0	1	0	0			a man stands facing forward, stretch both hands forward, he turned right walked a little turned left walked a little turned right walked.		
+74	hml_orig100_train_075__full	013123	dance_exercise	man has two hands on the ground facing downward with the right leg in front and the left leg stretched behind; kicks right leg behind as well and went intp a downward facing dog position.	0	0	1	0	1			man has two hands on the ground facing downward with the left leg in front and the right leg stretched behind; kicks right leg behind as well and went intp a downward facing dog position.		man has two hands on the ground facing downward with the left leg in front and the right leg stretched behind; kicks right leg behind as well and went intp a downward facing dog position.
+75	hml_orig100_train_076__full	011546	dance_exercise	a man bends foward ,stretches his right hand towards the ground and then followed by the left hand trying to search something.	0	0	1	0	0			a man bends foward ,stretches his left hand towards the ground and then followed by the right hand trying to search something.		
+76	hml_orig100_train_077__full	M013361	dance_exercise	figure appears to be stretching	0	0	0	0	0					
+77	hml_orig100_train_078__full	M007961	dance_exercise	person dances energetically on screen and throws left arm in the sky repeatedly.	0	0	0	1	1				person dances energetically on screen and throws both arms in the sky repeatedly.	person dances energetically on screen and throws both arms in the sky repeatedly.
+78	hml_orig100_train_079__full	012036	dance_exercise	a standing  woman gracefully dances forward, from the viewer's right to left, tapping toes and swaying arms in synchrony.	0	0	0	0	1					a standing woman gracefully dances forward, from the viewer's left to right, tapping toes and swaying arms in synchrony.
+79	hml_orig100_train_080__full	003136	dance_exercise	stretching out arms while shaking out left arm	0	0	0	0	0					
+80	hml_orig100_test_001__full	011555	simple_locomotion	a person walks forward, swaying their hips.	0	0	0	0	0					
+81	hml_orig100_test_002__full	M009714	simple_locomotion	a person who is poised to run steps to his right with is right foot and dashes to his left.	0	1	0	1	1		在原地踉跄		直线跑，且滑步严重	直线跑
+82	hml_orig100_test_003__full	M013419	direction_turn	a person stands normally then begins hops on their right foot while their left foot is elevated then stops and stands normally.	0	1	1	1	1		a person stands normally then begins hops on their left foot while their right foot is elevated then stops and stands normally.	两只脚轮流单脚跳	a person stands normally then begins hops on their left foot while their right foot is elevated then stops and stands normally.	a person stands normally then begins hops on their left foot while their right foot is elevated then stops and stands normally.
+83	hml_orig100_test_004__full	004904	direction_turn	a person slowly walks backward in a straight line.	0	0	0	0	0					
+84	hml_orig100_test_005__full	008696	stop_go	a person stands on one leg in yoga pose.	0	0	0	1	0				不是yoga pose	
+85	hml_orig100_test_006__full	001808	stop_go	this person stands still then lifts his right foot.	0	1	1	0	0		this person stands still then lifts his left foot.	this person stands still then lifts his left foot.		
+86	hml_orig100_test_007__full	M002542	sit_squat_posture	person standing bends forward slightly to left to pick something up with both hands and moves item slightly to the right	1	0	0	0	0	person standing bends forward slightly to left to pick something up with both hands and moves item slightly to the right如果按观众视角是对的；如果是主角视角则左右相反。所以更多是text本身描述不清晰，导致模型生成易混淆左右				
+87	hml_orig100_test_008__full	M007281	sit_squat_posture	a person bends slightly at the shoulders and mimics the movements of picking something up with both arms moving it from their right side to their left side.	0	0	0	0	0					
+88	hml_orig100_test_009__full	M014557	jump_kick	a person walked forward in right direction adn jumped	1	1	0	0	0	a person walked forward in right direction adn jumped应该是a person walked forward in right direction and jumped	人物沿着8字行走和跑步，这个prompt在别的样本中出现过			
+89	hml_orig100_test_010__full	M001851	jump_kick	a person jumps on the spot twice.	0	0	0	0	0					
+90	hml_orig100_test_011__full	002609	upper_body_gesture	the person is moving around both arms.	0	0	0	0	0					
+91	hml_orig100_test_012__full	M009400	upper_body_gesture	a person twists to the left and picks something up with their left hand.	0	1	0	0	0		the person reaches forward with right hand			
+92	hml_orig100_test_013__full	002459	object_interaction	a person lowers the right hand bending down slightly to examine something, then straightens and raises something to his face with the left hand.	0	1	0	1	1		a person lowers the right hand bending down slightly to examine something, then straightens and raises something to his face with the right hand.		a person lowers the right hand bending down slightly to examine something	a person lowers the right hand bending down slightly to examine something, then straightens and raises something to his face with the right hand.
+93	hml_orig100_test_014__full	011379	object_interaction	the sim is jogging in place.	0	0	0	0	0					
+94	hml_orig100_test_015__full	M003926	count_duration_speed	a person starts slowly walking forward and then jogs some before coming to a stop.	0	1	0	0	0		a person starts slowly walking forward and then stands on left leg.			
+95	hml_orig100_test_016__full	M001772	count_duration_speed	a person walks up to shake with their left hand, turns slightly left to shake again, and turns left again to shake for a final time.	0	1	0	1	0		a person walks up to shake with their left hand, turns slightly left and turns fast right and turns left again to shake for a final time.		a person walks up to shake with their left hand, turns slightly left to shake again, and turns right again to shake for a final time.	
+96	hml_orig100_test_017__full	M001473	multi_action_composition	a person sits in a  chair then stands back up.	0	0	0	0	0					
+97	hml_orig100_test_018__full	M007573	multi_action_composition	a man lifts each knee to his elbow multiple times and then does a squat.	0	0	0	0	0					
+98	hml_orig100_test_019__full	008502	dance_exercise	a man steps forward, lifts his arms then bends and stretches them.	0	0	0	0	0					
+99	hml_orig100_test_020__full	005583	dance_exercise	a man slowly raises both arms high over his head in a stretch, holding the posture for several seconds, with his right arm stretched out to his side.	0	1	1	1	1		没有holding the posture for several seconds保持姿势不动数秒，在将双手举过头顶后收回两侧	没有holding the posture for several seconds保持姿势不动数秒	没有holding the posture for several seconds保持姿势不动数秒，在左右弯腰	没有holding the posture for several seconds保持姿势不动数秒

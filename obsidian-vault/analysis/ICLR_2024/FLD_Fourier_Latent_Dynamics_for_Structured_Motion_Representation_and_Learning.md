@@ -1,0 +1,342 @@
+---
+title: "FLD: Fourier Latent Dynamics for Structured Motion Representation and Learning"
+type: paper
+paper_level: A
+venue: ICLR
+year: 2024
+pdf_ref: paperPDFs/ICLR_2024/FLD_Fourier_Latent_Dynamics_for_Structured_Motion_Representation_and_Learning.pdf
+aliases:
+- FLDF
+- FLD
+tags:
+- ICLR_2024
+- topic/representation_self_supervised_transfer
+- topic/representation_self_supervised_transfer/representation_learning
+core_operator: "通过显式强制执行潜在动力学（局部恒定的全局参数化与多步前向预测），使模型能够提取周期性/准周期性运动中的时空关系。"
+primary_logic: "在周期性或准周期性运动中，频率、幅度、偏移等参数在整个轨迹上近似恒定；利用这一假设，可以大幅减少表示一条完整轨迹所需的参数，并增强运动的插值与过渡能力。"
+claims:
+- "FLD 将运动轨迹表示在“同心圆”式的潜在流形中，角度代表时间索引（相位），半径代表高层特征（频率/幅度/偏移），结构一致性显著优于 PAE、VAE 以及原始状态空间。"
+- "与 PAE 相比，FLD 表达整条轨迹仅需 4c 个参数，而 PAE 需要 4c×(轨迹段数) 个参数。"
+- "在未见过的 diagonal run 运动上，FLD 的长期预测相对误差显著低于 PAE 和 FF 模型，特别是随着预测步数增加，PAE 和 FF 的复合误差急剧变大。"
+- "在线跟踪实验中，FLD 能够通过潜在动力学损失 L_{FLD}^N 自动拒绝对应于高风险运动的用户输入（如 spinkick），并回退到安全的替代目标，实现了平滑的 fallback 与运动过渡。"
+---
+
+# FLD: Fourier Latent Dynamics for Structured Motion Representation and Learning
+
+> [!tip] 核心洞察
+> 在周期性或准周期性运动中，频率、幅度、偏移等参数在整个轨迹上近似恒定；利用这一假设，可以大幅减少表示一条完整轨迹所需的参数，并增强运动的插值与过渡能力。
+
+| 字段 | 内容 |
+| ------ | ------ |
+| 中文题名 | FLD: 用于结构化运动表示与学习的傅里叶潜在动力学 |
+| 英文题名 | FLD: Fourier Latent Dynamics for Structured Motion Representation and Learning |
+| 会议/期刊 | ICLR 2024 |
+| Links | [paper](https://arxiv.org/abs/2402.13820) |
+| Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
+| Method | Fourier Latent Dynamics (FLD) |
+| Dataset | 运动表示紧凑性, 通用跟踪性能（基于 FLD 潜在空间的不同 skill sampler 对比） |
+
+> [!tip] 效果简介
+> - 运动表示紧凑性 上，表示一条轨迹所需的参数数量 为 4c（FLD），对比 PAE: 4c × (|τ| - H + 1); Original: d × |τ|，变化 FLP 将参数数量从轨迹长度相关降为固定常数。
+> - 通用跟踪性能（基于 FLD 潜在空间的不同 skill sampler 对比） 上，平均跟踪回报（Table S13 的 General 范围） 为 0.80 ± 0.03 (ALPGMM)，对比 0.72 ± 0.01 (OFFLINE)，变化 +0.08。
+
+## 概述
+
+**问题瓶颈**：原始运动轨迹存在稀疏性，现有方法如 **PAE**（Starke et al., 2022）仅记忆实例而无法理解底层动力学结构，导致在轨迹间隙处的插值与泛化能力不足。
+
+**核心思想**：在周期性或准周期性运动中，频率、幅度、偏移等参数在整个轨迹上近似恒定。利用这一假设，FLD 通过显式强制执行潜在动力学——局部恒定的全局参数化与多步前向预测——使模型能够提取运动中的时空关系，大幅减少表示完整轨迹所需的参数，并增强运动的插值与过渡能力。
+
+**方法定位**：FLD 是 PAE 的生成式扩展，在相同的编码器-解码器架构基础上，将 PAE 的单步重建损失替换为多步前向预测损失 $L_{FLD}^N$（式5），并将逐帧独立参数化改为轨迹段内全局恒定的 $(f, a, b)$ 假设（式4）。这一改动使 FLD 从“记忆帧”转向“理解动力学”。
+
+**主要结果**：
+- **表示紧凑性**：FLD 表达整条轨迹仅需 $4c$ 个参数，而 PAE 需要 $4c \times (\text{轨迹段数})$（Table 1）。
+- **潜在流形结构**：FLD 将运动轨迹表示在“同心圆”式流形中，角度代表时间索引（相位），半径代表高层特征，结构一致性显著优于 PAE、VAE 及原始状态空间（Fig. 4）。
+- **泛化预测**：在未见过的 diagonal run 运动上，FLD 的长期预测相对误差显著低于 PAE 和 FF 模型，复合误差增长远慢于基线（Fig. 5）。
+- **在线跟踪与安全回退**：通过潜在动力学损失 $L_{FLD}^N$ 自动拒绝对应于高风险运动的用户输入（如 spinkick），并回退到安全的替代目标，实现平滑的 fallback 与运动过渡（Fig. 6）。
+- **自适应课程学习**：ALPGMM 采样器通过绝对学习进度（ALP）自动避开不可学习区域，在含 60% 不可学习运动的参考数据中保持最高跟踪性能，而 RANDOM 采样则严重失败（Fig. S14）。
+
+**局限与开放问题**：FLD 依赖“准恒定运动参数化”假设，对包含强烈非周期过渡的运动可能产生较大重建误差；当前方法假设所有目标运动可由同一套奖励函数学习，而复杂运动（如跳跃、旋转踢）需要专门设计的奖励函数。如何将 FLD 扩展到更广泛的不规则运动，以及如何自动设计目标依赖的奖励函数，是值得进一步探索的方向。
+
+## 背景与动机
+
+### 问题背景：运动轨迹的稀疏性与表示瓶颈
+
+在机器人运动学习与角色动画领域，从高维运动轨迹中提取紧凑且可泛化的表示是一个核心挑战。原始运动轨迹通常以每帧关节角度或位置的形式存储，维度高（记作 $d$），且数据在时间上高度冗余。更关键的是，实际采集的运动数据往往是稀疏的——它们仅覆盖了特定运动类型下的有限样本，而在不同运动模式之间的过渡区域存在大量“轨迹间隙”。这些间隙对运动插值、过渡生成以及下游的策略学习构成了根本性障碍。
+
+现有方法在处理这一问题时，倾向于“记忆”训练集中出现的具体运动实例，而非理解其背后的动力学结构。例如，**Periodic Autoencoder (PAE)**（Starke et al., 2022）通过频域分析将运动片段分解为正弦分量，实现了对周期性运动的高效压缩，但其参数化是局部且时变的：每一帧都编码独立的频率 $f_t$、幅度 $a_t$ 和偏移 $b_t$。这意味着 PAE 对一条轨迹的表示需要 $4c \times (|\tau| - H + 1)$ 个参数（其中 $c$ 为潜在通道数，$H$ 为时间窗口长度），参数数量随轨迹长度线性增长。更重要的是，这种局部参数化缺乏对运动长期演化规律的结构性约束，导致模型在轨迹间隙处的插值与泛化能力不足。
+
+### 核心瓶颈：缺乏对底层动力学结构的显式建模
+
+上述问题的本质在于，现有方法未对运动的**时空关系**进行显式建模。在周期性或准周期性运动（如行走、跑步、踏步等）中，运动的频率、幅度和偏移等高层特征在整条轨迹上近似恒定——这一观察在 PAE 自身的结果中已有体现（Fig. S7b：沿一条前向跑步轨迹，尽管个别频率通道存在波动，但潜在频率 $f$、幅度 $a$ 和偏移 $b$ 在整条轨迹上近乎恒定）。然而，PAE 并未将这一“准恒定”性质作为归纳偏置纳入模型设计，而是继续为每一帧独立估计参数，从而错失了利用全局结构大幅压缩表示并增强泛化能力的机会。
+
+由此形成了本文的核心研究问题：**能否通过显式强制执行潜在动力学，使模型在表示运动时不仅“压缩”数据，更能“理解”其内在的演化规律？**
+
+### 动机与本文方案
+
+本文提出 **Fourier Latent Dynamics (FLD)**，其核心动机正是将上述“准恒定运动参数化”的观察转化为显式的模型约束。FLD 在 PAE 的频域参数化基础上引入两个关键改进：
+
+1. **全局恒定参数化假设**：在一个运动片段内，未来所有帧共享相同的频率 $f$、幅度 $a$ 和偏移 $b$，仅相位 $\phi$ 按固定频率递增（$\phi_{t+i} = \phi_t + i \cdot f \cdot \Delta t$）。这使得表示一条完整轨迹所需的参数从 PAE 的 $4c \times (|\tau| - H + 1)$ 骤降至固定的 $4c$（Table 1）。
+
+2. **多步前向预测损失**：通过计算 $N$ 步解码输出与真实未来状态的加权 MSE（$L_{FLD}^N = \sum_{i=0}^N \alpha^i \cdot \text{MSE}(\hat{\mathbf{s}}_{t+i}', \mathbf{s}_{t+i})$），强制模型在长时预测中维持恒定的参数化，从而学习到具有物理一致性的潜在动力学。
+
+通过这种设计，FLD 的潜在空间呈现出“同心圆”式的结构化流形（Fig. 4）：角度代表时间索引（相位 $\phi$），半径代表高层运动特征（频率/幅度/偏移）。这种结构不仅使运动表示更加紧凑，还天然支持运动插值与过渡——在潜在空间中沿径向移动即可实现不同运动类型之间的平滑切换。在实验中，FLD 在未见过的 diagonal run 运动上展现出显著优于 PAE 和前馈模型的长期预测能力，并在在线跟踪任务中通过 $L_{FLD}^N$ 损失自动识别高风险用户输入（如 spinkick），实现安全的 fallback 与运动过渡（Fig. 5-6）。
+
+## 核心创新
+
+FLD 的核心创新在于将 **Periodic Autoencoder (PAE)**（Starke et al., 2022）从局部正弦重建扩展为具有显式时间传播能力的生成式潜在动力学模型。其关键洞察是：在周期性或准周期性运动中，频率 $f$、幅度 $a$、偏移 $b$ 等高层特征在整个轨迹上近似恒定，而仅有时序索引（相位 $\phi$）随时间推进。基于这一假设，FLD 通过三个关键机制实现了对 PAE 的根本性改进。
+
+### 1. 全局恒定的参数化假设
+
+PAE 对每一帧独立编码 $f_t, a_t, b_t$，其潜在参数化仅在局部时间窗口内有效（$\theta_t = \theta(\phi_t)$）。FLD 则强制假设在整条轨迹段内，频率、幅度和偏移保持恒定，所有未来帧共享相同的 $f, a, b$，仅相位按固定频率递增：
+
+$$\hat{\mathbf{z}}_{t+i}' = \hat{p}(\phi_t + i f_t \Delta t, f_t, a_t, b_t)$$
+
+这一设计使得 FLD 表示一条完整轨迹仅需 $4c$ 个参数（$c$ 为潜在通道数），而 PAE 需要 $4c \times (|\tau| - H + 1)$ 个参数，随轨迹长度线性增长（Table 1）。参数量的急剧压缩源于模型不再为每个时间步存储独立的参数化，而是将运动理解为由恒定高层特征驱动的动力学演化过程。
+
+### 2. 多步前向预测损失
+
+PAE 仅优化单步重建损失 $L_0$（相当于 $N=0$），不涉及任何时间传播。FLD 引入多步前向预测损失 $L_{FLD}^N$，强制模型在 $N$ 步范围内维持恒定的频率/幅度/偏移假设：
+
+$$L_{FLD}^N = \sum_{i=0}^N \alpha^i L_i, \quad L_i = \mathrm{MSE}(\hat{\mathbf{s}}_{t+i}', \mathbf{s}_{t+i})$$
+
+其中 $\alpha$ 为衰减因子，控制远期预测的权重。该损失函数是 FLD 区别于 PAE 的核心训练信号——它迫使编码器提取的潜在参数化必须能够支撑多步前向传播，而非仅满足当前帧的重建。消融实验表明，当 $N$ 设为零（退化为 PAE）时，长期预测误差显著增大，潜在流形的时空结构也明显弱化（Fig. 4–5）。
+
+### 3. 显式潜在状态传播
+
+PAE 没有显式的时间传播机制，仅利用局部时间窗口进行正弦重建。FLD 则通过潜在动力学显式传播状态：在策略训练和在线跟踪阶段，参数化 $\theta$ 保持不变，相位按固定频率推进：
+
+$$\theta_t = \theta_{t-1}, \quad \phi_t = \phi_{t-1} + f_{t-1} \Delta t$$
+
+这一传播机制使得 FLD 能够在没有真实观测的情况下自主生成未来运动轨迹，为运动插值、过渡生成以及在线跟踪中的 fallback 提供了统一的动力学基础。在潜在流形可视化中（Fig. 4），FLD 呈现出“同心圆”式的结构——角度代表时间索引（相位），半径代表高层特征（频率/幅度/偏移）——这种时空一致性显著优于 PAE 的局部模式、VAE 的纯空间邻近性，以及原始状态空间的无结构分布。
+
+### 创新总结
+
+三项 changed slots 构成了一个递进的因果链条：**全局恒定参数化假设**提供了紧凑表示的理论基础，**多步前向预测损失**提供了强制该假设的训练信号，**显式潜在状态传播**则将训练得到的动力学推广至策略学习与在线部署。这一设计使得 FLD 不仅能够紧凑地表示运动，还具备了在轨迹间隙处进行插值、在未见运动上进行泛化、以及在在线跟踪中识别并规避高风险目标的能力。
+
+## 整体框架
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/001_Figure_1.jpg]]
+*Figure 1: FLD training pipeline. During training, latent dynamics are enforced to predict proceeding latent states and parameterizations. The prediction loss is computed in the original motion space with respect to the ground truth future states*
+
+FLD 的系统设计围绕一个核心闭环展开：**从运动观测中提取频域参数化 → 利用恒定参数假设进行潜在动力学前向传播 → 多步预测解码并计算损失 → 将潜在空间作为运动学习与在线跟踪的统一接口**。整个框架可分为训练阶段与部署阶段两条主线。
+
+### 训练阶段：潜在动力学建模
+
+训练流程的目标是让模型学会将高维运动轨迹压缩到一个具有显式时空结构的潜在流形中，而非仅仅记忆局部模式。其关键模块与数据流如下：
+
+1. **运动编码器（Motion Encoder）**：采用一维卷积网络，将原始运动片段 $\mathbf{s}_t$ 映射至潜在轨迹 $\mathbf{z}_t$（Sec. 3，Table S4）。这一步将高维关节角度/位置数据压缩为低维潜在表示。
+
+2. **频域参数化（Frequency Domain Parameterization）**：对 $\mathbf{z}_t$ 执行可微快速傅里叶变换（FFT）与 Atan2 操作，提取四个潜在向量——相位 $\phi_t$、频率 $f_t$、幅度 $a_t$、偏移 $b_t$（Eq. 1‑2）。这些参数构成了对运动局部周期性的完整描述。
+
+3. **潜在动力学前向传播（Latent Dynamics Propagation）**：这是 FLD 区别于 PAE 的核心机制。模型假设在局部时间窗口内，频率、幅度、偏移是恒定的，仅相位按固定频率递增。基于此假设，从当前状态出发，通过 $\hat{\mathbf{z}}_{t+i}' = \hat{p}(\phi_t + i f_t \Delta t, f_t, a_t, b_t)$ 显式地向前传播 $i$ 步，得到未来潜在状态的预测（Eq. 4, Fig. 1）。
+
+4. **运动解码器（Motion Decoder）**：同样采用一维卷积网络，将预测的潜在轨迹 $\hat{\mathbf{z}}'$ 解码回原始运动空间 $\hat{\mathbf{s}}'$（Eq. 3）。
+
+5. **多步预测损失（FLD Multi-Step Prediction Loss）**：在解码后的运动空间上，计算 $N$ 步前向预测与真实未来状态之间的加权均方误差 $L_{FLD}^N = \sum_{i=0}^N \alpha^i \cdot \text{MSE}(\hat{\mathbf{s}}_{t+i}', \mathbf{s}_{t+i})$，其中 $\alpha$ 为衰减因子（Eq. 5）。这个损失函数是 FLD 的因果旋钮——它强制模型在 $N$ 步范围内维持恒定的 $f, a, b$，从而将“局部记忆”转化为“对底层动力学结构的理解”。当 $N=0$ 时，该损失退化为 PAE 的单步重建损失 $L_0$。
+
+整个训练管线的输入是原始运动片段序列，输出是多步预测误差，通过反向传播同时优化编码器、参数化模块和解码器。
+
+### 部署阶段：运动学习与在线跟踪
+
+训练完成的 FLD 模型提供了一个结构化的潜在空间，该空间成为下游运动学习与跟踪的统一接口（Fig. 2）：
+
+1. **Skill Sampler（$p_\theta$）**：从潜在参数空间 $\Theta$ 中采样 $(f, a, b)$ 作为每回合的跟踪目标（Sec. 4.3.1）。不同的采样策略（如固定离线采样、随机采样、基于绝对学习进度的 ALPGMM 采样）决定了策略训练时接触到的运动多样性。ALPGMM 通过计算 $\text{alp}(\theta) = |r_{e,new}^{T}(\theta) - r_{e,old}^{T}(\theta)|$ 来量化策略在特定参数化下的学习进度，并据此自适应地调整采样分布（Eq. S8, Fig. S11）。
+
+2. **潜在状态更新**：在策略 rollout 过程中，潜在参数化保持恒定（$\theta_t = \theta_{t-1}$），相位按固定频率推进（$\phi_t = \phi_{t-1} + f_{t-1} \Delta t$），由此生成连续的跟踪目标 $\hat{\mathbf{s}}_t$（Eq. 6‑7）。
+
+3. **跟踪奖励计算**：将解码得到的跟踪目标 $\hat{\mathbf{s}}_t$ 与仿真器实测状态 $\mathbf{s}_t$ 之间的距离作为奖励信号 $r^T$，驱动强化学习策略（PPO）优化。
+
+4. **在线跟踪与 Fallback 机制**：在实际部署时，用户输入的跟踪目标首先进入一个输入缓冲区。系统计算该缓冲区内运动的 $L_{FLD}^N$ 损失——若损失低于阈值 $\epsilon_{FLD}$，说明输入运动与训练数据的时空结构一致，予以接受；若损失过高（如用户突然做出 spinkick 这类高风险动作），则触发 fallback，通过潜在动力学传播生成安全的替代目标，实现平滑过渡（Fig. 3, Sec. 4.3.2）。
+
+### 模块关系总结
+
+FLD 的创新并非引入全新的网络架构，而是在 PAE 的编码器-解码器框架上，通过**潜在动力学传播**和**多步预测损失**这两个关键模块，将原本仅具有局部重建能力的表示学习转化为一个具备前向预测能力的生成式动力学模型。这一设计使得潜在空间从“相似运动的聚类”升级为“具有明确时空结构的流形”，进而支撑了下游的紧凑表示、运动插值、安全跟踪与自适应课程学习等一系列能力。
+
+## 核心模块与公式推导
+
+### 1. 运动编码器与频域参数化
+
+FLD 继承并扩展了 **Periodic Autoencoder (PAE)**（Starke et al., 2022）的编码器-解码器架构。给定原始运动片段 $\mathbf{s}_t$，首先通过一维卷积编码器映射至潜在轨迹 $\mathbf{z}_t$：
+
+$$\mathbf{z}_t = \mathbf{enc}(\mathbf{s}_t), \quad \phi_t, f_t, a_t, b_t = p(\mathbf{z}_t)$$
+
+其中 $p(\cdot)$ 通过可微快速傅里叶变换（FFT）与 Atan2 操作，从 $\mathbf{z}_t$ 的 $c$ 个潜在通道中提取四组参数：**相位** $\phi_t \in \mathbb{R}^c$、**频率** $f_t \in \mathbb{R}^c$、**幅度** $a_t \in \mathbb{R}^c$ 和**偏移** $b_t \in \mathbb{R}^c$。PAE 随后利用正弦函数重建潜在轨迹段：
+
+$$\hat{\mathbf{z}}_t = \hat{p}(\phi_t, f_t, a_t, b_t) = a_t \sin(2\pi(f_t \mathcal{T} + \phi_t)) + b_t$$
+
+再经解码器还原为运动空间 $\hat{\mathbf{s}}_t = \mathbf{dec}(\hat{\mathbf{z}}_t)$，并以单步均方误差 $L_0 = \mathrm{MSE}(\hat{\mathbf{s}}_t, \mathbf{s}_t)$ 作为训练目标。
+
+### 2. 潜在动力学传播（核心创新）
+
+PAE 的关键局限在于其参数化仅在局部时间窗口内有效——每一帧独立编码 $f_t, a_t, b_t$，无法捕捉跨时间步的动力学一致性。FLD 的核心突破是引入**恒定参数化假设**（Assumption 1）：在周期性或准周期性运动中，频率、幅度和偏移在整个轨迹段上近似恒定，仅相位按固定频率递增。基于此，FLD 定义了潜在动力学的前向传播规则：
+
+$$\hat{\mathbf{z}}_{t+i}' = \hat{p}(\phi_t + i f_t \Delta t,\; f_t,\; a_t,\; b_t)$$
+
+$$\hat{\mathbf{s}}_{t+i}' = \mathbf{dec}(\hat{\mathbf{z}}_{t+i}')$$
+
+即从当前时刻 $t$ 的相位 $\phi_t$ 出发，以恒定参数 $(f_t, a_t, b_t)$ 向前传播 $i$ 步，每步相位增量固定为 $f_t \Delta t$，再将预测的潜在状态解码为未来运动状态。
+
+### 3. 多步预测损失函数
+
+为强制模型学习上述恒定参数化假设，FLD 引入**多步前向预测损失** $L_{FLD}^N$，在 $N$ 步范围内计算解码预测与真实未来状态的加权均方误差：
+
+$$L_{FLD}^N = \sum_{i=0}^{N} \alpha^i L_i, \quad L_i = \mathrm{MSE}(\hat{\mathbf{s}}_{t+i}',\; \mathbf{s}_{t+i})$$
+
+其中 $\alpha \in (0, 1]$ 为衰减因子，使远期预测的权重逐渐降低。当 $N=0$ 时，该损失退化为 PAE 的单步重建损失 $L_0$。通过增大 $N$，FLD 迫使编码器提取在整段轨迹上保持恒定的 $f, a, b$，从而将运动表示从“逐帧记忆”转变为“参数化生成”。
+
+### 4. 运动学习中的潜在状态更新
+
+在将 FLD 集成至强化学习运动跟踪时，潜在状态的更新遵循简化的动力学规则（Eq. 6）：参数化 $\theta_t = (f_t, a_t, b_t)$ 在回合内保持恒定，相位按固定频率推进：
+
+$$\theta_t = \theta_{t-1}, \quad \phi_t = \phi_{t-1} + f_{t-1} \Delta t$$
+
+每步的跟踪目标由解码器从当前潜在状态重建：$\hat{\mathbf{s}}_t = \mathbf{dec}(\hat{p}(\phi_t, \theta_t))$。策略以 $\hat{\mathbf{s}}_t$ 与实际状态的偏差作为跟踪奖励进行训练。
+
+### 5. 在线跟踪与 Fallback 机制
+
+在线部署时，FLD 利用输入缓冲区评估用户提供的跟踪目标。对缓冲区内的运动序列计算预测损失 $L_{FLD}^N$，若损失低于阈值 $\epsilon_{FLD}$，表明输入运动与训练数据的时空关系一致，予以接受；否则判定为高风险运动（如 spinkick），触发 fallback 机制——拒绝用户输入，改为从当前相位出发，以恒定参数化向前传播生成安全的替代目标，实现平滑回退与运动过渡（Fig. 3）。
+
+### 模块关系总结
+
+整个 FLD 管线由七个关键模块串联：**运动编码器**提取潜在表示 → **频域参数化**获取 $(\phi, f, a, b)$ → **潜在动力学传播**生成未来潜在状态 → **运动解码器**还原为运动空间 → **多步预测损失**强制恒定参数化假设 → **Skill Sampler** 从参数空间采样训练目标 → **在线 Fallback** 保障部署安全。其中，潜在动力学传播与多步预测损失构成 FLD 区别于 PAE 的核心因果调节旋钮。
+
+## 实验与分析
+
+### 核心瓶颈与评估逻辑
+
+FLD 的设计围绕一个明确瓶颈展开：原始运动轨迹存在稀疏性，现有方法（如 PAE）仅记忆实例而无法理解底层动力学结构，导致轨迹间隙处的插值与泛化能力不足。因此，实验评估的核心逻辑是：**通过显式强制执行潜在动力学（局部恒定的全局参数化与多步前向预测），模型能否在周期性/准周期性运动中提取时空关系，从而在表示紧凑性、长期预测精度和在线安全跟踪三个维度上超越基线。**
+
+### 运动表示的结构化与紧凑性
+
+**潜在流形结构对比（Fig. 4）** 是最具说服力的定性证据。实验将 FLD 的潜在流形与原始状态空间、VAE 和 PAE 进行对比：
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/004_Figure_4.jpg]]
+*Figure 4: Latent manifolds for different motions. Each color is associated with a trajectory from a motion type. The arrows denote the state evolution direction. FLD presents the strongest spatialtemporal relationships with explicit latent dynamics enforcement. PAE witnesses a similar but weaker pattern with local sinusoidal reconstruction. In comparison, VAE enables only spatial closeness, and the trajectories of the original states are the least structured*
+
+- **FLD**：呈现“同心圆”式结构——角度代表时间索引（相位），半径代表高层特征（频率/幅度/偏移）。不同运动类型形成清晰分离的环状轨迹，箭头指示的状态演化方向一致，时空结构最强。
+- **PAE**：呈现类似但更弱的模式。由于仅进行局部正弦重建，高层特征的一致性仅在局部窗口内成立，整体结构不如 FLD 规整。
+- **VAE**：仅保证空间邻近性，缺乏时间结构。
+- **原始状态空间**：轨迹最无结构。
+
+这一对比直接验证了 FLD 的核心洞察：**在周期性运动中，频率、幅度、偏移等参数在整个轨迹上近似恒定**，利用这一假设可以大幅增强潜在空间的时空一致性。
+
+**表示紧凑性（Table 1）** 从参数数量角度量化了这一优势。表示一条完整轨迹所需的参数数量：
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/005_Table_1.jpg]]
+*Table 1: Motion representation parameters*
+
+| 方法 | 参数数量 |
+|------|----------|
+| 原始状态 | $d \times |\tau|$ |
+| PAE | $4c \times (|\tau| - H + 1)$ |
+| **FLD** | **$4c$** |
+
+其中 $d$ 为状态维度，$c$ 为潜在通道数，$H$ 为时间窗口大小，$|\tau|$ 为轨迹长度。FLD 将参数数量从与轨迹长度相关的量级降为固定常数，这一压缩来自于全局恒定参数化假设——整条轨迹共享同一组 $f, a, b$，仅相位 $\phi_t$ 按固定频率递增。
+
+### 长期预测与泛化
+
+**未知运动上的预测（Fig. 5 左）** 是 FLD 泛化能力的关键验证。在未见过的 diagonal run 运动上，实验对比了 FLD、PAE 和纯前馈自回归模型（FF）的长期预测相对误差：
+
+- FLD 的相对误差始终最低，且随预测步数增加保持稳定。
+- PAE 和 FF 的复合误差随预测步数急剧增大，验证了缺乏显式动力学约束会导致误差累积。
+- 这一结果直接归因于 FLD 的多步前向预测损失 $L_{FLD}^N$（Eq. 5），该损失强制模型在 $N$ 步内维持恒定的频率/幅度/偏移。
+
+**潜在偏移空间的可解释性（Fig. 5 右）** 进一步展示了 FLD 的表示质量。不同运动类型（原地踏步、前向跑、前向跨步）在潜在偏移空间中形成可区分的分布，每个半径对应一个潜在通道，表明高层运动特征被有效解耦。
+
+### 在线跟踪与安全 Fallback
+
+**在线跟踪实验（Fig. 6）** 验证了 FLD 在实际控制场景中的价值：
+
+- **正常运动跟踪**：FLD 能够准确跟踪用户指定的周期性运动目标，测量状态与目标状态紧密对齐。
+- **高风险运动拒绝**：当用户输入 spinkick（旋转踢）等超出训练分布的运动时，FLD 通过计算输入缓冲区上的预测损失 $L_{FLD}^N$ 自动识别风险——损失超过阈值 $\epsilon_{FLD}$ 时拒绝该提议，并回退到安全的替代目标。
+- **平滑过渡**：在运动过渡阶段（Fig. 6 底部），目标运动参数化通过源运动与目标运动之间的线性插值获得，插值过程呈现出从高频低速度踏步到低频高速度跨步的渐进演化，验证了潜在空间的连续性和插值能力。
+
+### 消融实验
+
+**传播步数 $N$ 的影响**：将 FLD 的传播步数 $N$ 设为零（即退化退 PAE，仅保留单步重建损失 $L_0$）时，长期预测误差显著增大，潜在流形结构变弱（Sec. 5.1–5.2, Fig. 4–5）。这直接证明多步前向预测损失是 FLD 性能提升的关键因素。
+
+**Skill Sampler 对比（Table S13, Fig. S14–S15）**：
+
+- **ALPGMM vs. OFFLINE**：基于绝对学习进度（ALP）的自适应 GMM 采样（ALPGMM）在通用跟踪性能上达到 $0.80 \pm 0.03$，显著优于固定离线目标采样（OFFLINE）的 $0.72 \pm 0.01$（+0.08）。
+- **RANDOM 采样的失败**：当参考数据含有大量不可学习运动时，随机采样策略导致策略严重失败，而 ALPGMM 通过自适应避开不可学习区域保持了最高跟踪性能（Fig. S14）。
+- **ALPGMM 的工作机制**（Fig. S15）：ALPGMM 通过计算每个潜在参数化 $\theta$ 上策略跟踪性能的提升幅度 $alp(\theta) = |r_{e,new}^{T}(\theta) - r_{e,old}^{T}(\theta)|$，在训练过程中自动扩大跟踪目标的覆盖范围，同时保持对已掌握运动的高性能。
+
+### 公平性说明
+
+所有运动学习实验均在相同的 Isaac Gym 仿真环境中使用相同的 PPO 超参数进行。FLP 与 PAE 使用相同的编码器-解码器架构，仅损失函数和潜在动力学传播步骤存在差异（见 Suppl. A.1.2 和 A.2），确保性能差异可归因于方法设计本身。
+
+### 已知失败模式与局限
+
+1. **非周期运动的欠参数化**：FLD 依赖“准恒定运动参数化”假设，对包含强烈非周期过渡的运动可能产生较大重建误差，全局恒定参数化容易欠参数化。
+2. **复杂运动的奖励函数缺失**：当前的自适应课程学习方法假设所有合成目标运动都可由同一套奖励函数学习，而某些复杂运动（如跳跃、旋转踢）需要专门设计的奖励函数。
+3. **ALPGMM 的探索偏差**：基于学习进度的探索可能偏向于性能快速增长的区域，而忽视那些需要长时间学习但真正有意义的运动模式。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/010_Figure.jpg]]
+*Figure: (b) Latent parameters along a forward run trajectory. Figure S7: Motion representation using PAE. (a) PAE utilizes frequency domain analysis to extract the local periodicity of highly nonlinear motions. Latent features are constructed using sinusoidal functions. (b) Each color is associated with a distinct latent channel. Despite the fluctuation on two frequency channels, the latent frequency f, amplitude a, and offset b stay nearly constant throughout the trajectory*
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/012_Table.jpg]]
+*Table: S5: VAE architecture Table S6: Other baseline architectures*
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/013_Figure.jpg]]
+*Figure: (a) FLD latent manifold. (b) Policy learned latent manifold*
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/014_Figure.jpg]]
+*Figure: S8: Schematic view of the latent manifold induced by the latent state and latent parameterization of FLD. While the latent parameterization θ determines which motion the current state is experiencing, the latent state \phi _ { t } indicates the time index of the state frame on this motion. (a) Each motion is represented by a solid grey circle. The shaded rings denote the collection of representations of motions in the offline dataset M. (b) The grey circle denotes an unlearnable motion and the grey shaded ring denotes the unlearnable subspace. The green circles represent learnable motions, with the dashed one denoting a motion outside the offline dataset M but acquired during training. The...*
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/015_Figure.jpg]]
+*Figure: forward stride (a) Latent representation of different motion types. (b) Latent representation of different forward run velocities*
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/017_Table.jpg]]
+*Table: S8: Policy training parameters Table S9: Policy training architecture*
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/028_Figure.jpg]]
+*Figure: (a) Jump (b) Kick (c) Spinkick Figure S17: Representative motions that require specific reward functions to be learned*
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/008_Table.jpg]]
+*Table: S2: Policy observation space*
+
+![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/009_Table.jpg]]
+*Table: S3: Representation training parameters*
+
+## 方法谱系与知识库定位
+
+### 直接前身与继承关系
+
+FLD 是 **Periodic Autoencoder（PAE）**（Starke et al., 2022）的生成式扩展。PAE 首次将运动片段编码至潜在空间，并通过可微分 FFT 提取频率 $f_t$、幅度 $a_t$、偏移 $b_t$ 与相位 $\phi_t$，再用正弦函数重建潜在轨迹（Eq. 1‑2）。然而，PAE 的潜在参数化仅作用于局部时间窗口——每一帧都独立编码自己的 $f_t, a_t, b_t$，因此其学习目标本质上是“记忆”实例，而非理解运动底层的动力学结构。
+
+FLD 的核心改造在于将 PAE 的**局部参数化**升级为**局部恒定的全局参数化**：假设在一条轨迹段内，频率、幅度、偏移保持不变，仅相位按固定频率递增（Assump. 1）。这一假设将表示一条完整轨迹所需的参数从 PAE 的 $4c \times (|\tau| - H + 1)$ 压缩为 FLD 的固定 $4c$（Table 1），同时通过多步前向预测损失 $L_{FLD}^N$（Eq. 5）强制模型在 $N$ 步范围内维持该恒定性。当 $N=0$ 时，FLD 退化为 PAE，实验表明此时长期预测误差显著增大，潜在流形结构也明显减弱（Fig. 4‑5, Sec. 5.1‑5.2）。
+
+### 与通用基线的差异
+
+与 **Variational Autoencoder（VAE）** 和纯前馈自回归模型（**FF**）相比，FLD 的根本差异在于其潜在空间被显式赋予了时间演化规则。Fig. 4 的流形可视化清晰地展示了这一差异：VAE 的潜在表示仅呈现空间邻近性，原始状态空间几乎无结构可言；PAE 开始出现类似“同心圆”的周期模式，但一致性仅局部成立；FLD 则呈现最完整的时空结构——角度对应时间索引（相位），半径对应高层运动特征（频率/幅度/偏移）。这种结构化表示直接转化为预测能力：在未见过的 diagonal run 运动上，FLD 的长期关节位置预测相对误差显著低于 PAE 和 FF，且随着预测步数增加，后两者的复合误差急剧放大（Fig. 5 left, Sec. 5.2）。
+
+### 在运动学习管线中的定位
+
+FLD 不仅是一个表示学习模型，更是一套完整的运动学习管线的基础设施。其模块化设计包含三个层次：
+
+1. **表示层**：Motion Encoder → 频域参数化 → Latent Dynamics Propagation → Motion Decoder，构成自监督训练闭环。
+2. **策略层**：Skill Sampler 从潜在参数空间 $\Theta$ 采样 $(f, a, b)$ 作为跟踪目标，策略通过 PPO 在 Isaac Gym 中学习跟踪（Fig. 2, Sec. 4.3.1）。
+3. **部署层**：在线跟踪与 Fallback 机制利用输入缓冲区的 $L_{FLD}^N$ 评估用户输入的安全性，自动拒绝对应于高风险运动的指令并回退至安全替代目标（Fig. 3, Sec. 4.3.2）。
+
+在 Skill Sampler 层面，论文比较了多种采样策略（Table S13, Suppl. A.2.10）：固定离线采样（OFFLINE）平均跟踪回报为 0.72，而基于绝对学习进度（ALP）的自适应 GMM 采样（ALPGMM）达到 0.80，提升约 +0.08。ALPGMM 的核心机制是通过 $alp(\theta) = |r_{e,new}^T(\theta) - r_{e,old}^T(\theta)|$（Eq. S8）量化策略在各潜在参数化下的性能提升幅度，并据此动态调整 GMM 的采样分布，从而在训练过程中自动扩大跟踪目标的覆盖范围，同时避免在不可学习区域浪费计算（Fig. S13, S15, Suppl. A.2.10‑A.2.11）。
+
+### 适用边界与局限
+
+FLD 的有效性建立在一个关键前提之上：**运动轨迹具有周期性或准周期性**，使得频率、幅度、偏移等高层特征在整条轨迹上近似恒定。这一假设在行走、跑步、原地踏步等运动上得到充分验证（Fig. S7b 显示 PAE 提取的 $f, a, b$ 沿 forward run 轨迹近乎恒定），但也划定了方法的适用边界：
+
+1. **非周期过渡的欠参数化**：对包含强烈非周期过渡的运动（如跳跃、旋转踢），全局恒定参数化可能产生较大重建误差。在线实验（Fig. 6 top）中，FLD 正是通过 $L_{FLD}^N$ 检测到 spinkick 运动的高预测损失，从而触发 fallback 机制——这既是 FLD 的优势，也暴露了其对此类运动的表示能力不足。
+2. **奖励函数设计的单一性**：当前的自适应课程学习方法假设所有合成目标运动都可由同一套奖励函数学习。然而，复杂运动（如跳跃、spinkick）可能需要专门设计的奖励函数，这是 ALPGMM 无法自动解决的。
+3. **探索偏差**：ALPGMM 基于学习进度进行探索，可能偏向于性能快速增长的区域，而忽视那些需要长时间学习但真正有意义的运动模式。
+
+### 开放问题
+
+1. **扩展至非周期运动**：如何将 FLD 的潜在动力学框架扩展到更广泛的不规则或非周期性运动，而无需大量人工预处理（如周期检测）？
+2. **奖励函数的自动适配**：如何自动设计或调用依赖于目标运动类型的奖励函数，以支持真实机器人系统上的多样化运动跟踪？
+3. **探索的正则化**：如何在 ALPGMM 或其他探索策略中引入正则化，使探索最终收敛并避免在毫无意义的插值区域浪费计算？
+4. **作为世界模型的潜力**：FLD 的潜在动力学能否作为世界模型的一部分，直接集成到基于模型的强化学习或规划算法中？这一方向可能将 FLD 从表示学习工具提升为决策系统的核心组件。
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2024/FLD_Fourier_Latent_Dynamics_for_Structured_Motion_Representation_and_Learning.pdf]]

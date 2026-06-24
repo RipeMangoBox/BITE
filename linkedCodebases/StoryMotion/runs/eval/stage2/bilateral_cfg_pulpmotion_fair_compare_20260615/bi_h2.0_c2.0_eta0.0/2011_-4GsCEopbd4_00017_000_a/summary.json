@@ -1,0 +1,61 @@
+{
+  "fair_compare_png": "runs/eval/stage2/bilateral_cfg_pulpmotion_fair_compare_20260615/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/fair_compare.png",
+  "joint_fair_concat": "runs/eval/stage2/bilateral_cfg_pulpmotion_fair_compare_20260615/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/joint_fair_concat.mp4",
+  "motion_stats": {
+    "pulpmotion_wz0_wc11": {
+      "bone_len_cv_mean": 2.4511622132325775e-07,
+      "bone_len_relerr_mean": 0.05725317425816878,
+      "joint_accel_mean": 0.0033148417714983225,
+      "joint_velocity_mean": 0.0034188919235020876,
+      "mpjpe_root_aligned": 0.14585153758525848,
+      "root_accel_mean": 0.0019249309552833438,
+      "root_path_len": 0.2210230827331543
+    },
+    "pulpmotion_wz2_wc11": {
+      "bone_len_cv_mean": 2.4745400218437305e-07,
+      "bone_len_relerr_mean": 0.05725315828347772,
+      "joint_accel_mean": 0.005154132377356291,
+      "joint_velocity_mean": 0.007136174943298101,
+      "mpjpe_root_aligned": 0.11764001846313477,
+      "root_accel_mean": 0.0029748829547315836,
+      "root_path_len": 0.4300025701522827
+    },
+    "story_human": {
+      "bone_len_cv_mean": 2.342665394009312e-07,
+      "bone_len_relerr_mean": 0.05725317975810654,
+      "joint_accel_mean": 0.005447704344987869,
+      "joint_velocity_mean": 0.00865632388740778,
+      "mpjpe_root_aligned": 0.03147927299141884,
+      "root_accel_mean": 0.0032649673521518707,
+      "root_path_len": 0.489696204662323
+    },
+    "story_joint": {
+      "bone_len_cv_mean": 2.5751518155482504e-07,
+      "bone_len_relerr_mean": 0.05725316927355192,
+      "joint_accel_mean": 0.003004522295668721,
+      "joint_velocity_mean": 0.0053841909393668175,
+      "mpjpe_root_aligned": 0.09323938935995102,
+      "root_accel_mean": 0.0015341867692768574,
+      "root_path_len": 0.4074496626853943
+    }
+  },
+  "render_context": {
+    "center_xy": [
+      -0.17372052371501923,
+      0.04555325210094452
+    ],
+    "ground_z": -0.05345422029495239,
+    "xy_limit": 1.2094196677207947,
+    "z_limit": 1.8544434905052183
+  },
+  "sample_id": "2011_-4GsCEopbd4_00017_000_a",
+  "story_human_vs_joint_concat": "runs/eval/stage2/bilateral_cfg_pulpmotion_fair_compare_20260615/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/story_human_vs_joint_concat.mp4",
+  "valid_frames": 105,
+  "videos": {
+    "gt": "runs/eval/stage2/bilateral_cfg_pulpmotion_fair_compare_20260615/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/gt_skeleton.mp4",
+    "pulpmotion_wz0_wc11": "runs/eval/stage2/bilateral_cfg_pulpmotion_fair_compare_20260615/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/pulpmotion_wz0_wc11_skeleton.mp4",
+    "pulpmotion_wz2_wc11": "runs/eval/stage2/bilateral_cfg_pulpmotion_fair_compare_20260615/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/pulpmotion_wz2_wc11_skeleton.mp4",
+    "story_human": "runs/eval/stage2/bilateral_cfg_pulpmotion_fair_compare_20260615/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/story_human_skeleton.mp4",
+    "story_joint": "runs/eval/stage2/bilateral_cfg_pulpmotion_fair_compare_20260615/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/story_joint_skeleton.mp4"
+  }
+}

@@ -1,0 +1,466 @@
+{
+  "batch_size": 128,
+  "cache_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+  "cache_file": "val.pt",
+  "cache_meta": {
+    "args": {
+      "batch_size": "128",
+      "config_name": "config_dit_xy",
+      "data_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/pulpmotion-data",
+      "device": "cuda:0",
+      "dtype": "float16",
+      "limit_train": "None",
+      "limit_val": "None",
+      "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+      "num_workers": "0",
+      "out_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+      "progress_every": "20",
+      "pulp_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/PulpMotion",
+      "seed": "17",
+      "set_name": "mixed_",
+      "train_split": "train",
+      "val_split": "test"
+    },
+    "camera_slice": [
+      128,
+      192
+    ],
+    "human_slice": [
+      0,
+      128
+    ],
+    "latent_order": "concat([z_hum,z_cam])",
+    "limit": null,
+    "official_latent_order": "concat([z_cam,z_hum])",
+    "pulp_checkpoint": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/autoencoder/aemmardm-xgmj0yjj-325.ckpt",
+    "pulp_model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+    "pulp_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/PulpMotion",
+    "samples": 10549,
+    "set_name": "mixed_",
+    "skipped": 0,
+    "source_split": "test",
+    "split": "val",
+    "valid_latent_rule": "ceil(num_valid_frames / z_scale)",
+    "z_scale": 4
+  },
+  "config_name": "config_dit_xy",
+  "created_at": "2026-06-14T00:39:24+0800",
+  "data_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/pulpmotion-data",
+  "device": "cuda:0",
+  "diffusion_schedule": {
+    "num_train_timesteps": 1000,
+    "source": "loaded from StoryMotion checkpoint run meta via CondMDIDiffusion",
+    "sqrt_alphas_cumprod_sha256": "43c88a868003a5a3b14335c68d82056f957909f9ba62c19aa7c452424ca38a76",
+    "sqrt_one_minus_alphas_cumprod_sha256": "88680c3a8b0e3bc8cc0d5d9e866d7d4b11a60f7386263c65ebd98eeb948af3e0"
+  },
+  "elapsed_sec": 171.64366173744202,
+  "evaluated_samples": 1024,
+  "first_batch_summary": {
+    "cache_z_shape": [
+      128,
+      192,
+      75
+    ],
+    "completion_shape": [
+      128,
+      192,
+      75
+    ],
+    "outputs": {
+      "raw_input": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            128,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              128,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            128,
+            300,
+            4
+          ]
+        },
+        "projection": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            128,
+            300,
+            9,
+            2
+          ]
+        }
+      },
+      "raw_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            128,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              128,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            128,
+            300,
+            4
+          ]
+        }
+      },
+      "x_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            128,
+            300,
+            14
+          ]
+        },
+        "human": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            128,
+            300,
+            199
+          ]
+        }
+      }
+    },
+    "sample_ids": [
+      "2011_-4GsCEopbd4_00008_001_a",
+      "2011_-4GsCEopbd4_00017_000_a",
+      "2011_-EuO6OFypLo_00002_000_a",
+      "2011_-EuO6OFypLo_00002_000_b",
+      "2011_-EuO6OFypLo_00020_000_a",
+      "2011_-MG8-wCvzpE_00002_000_a",
+      "2011_-MG8-wCvzpE_00002_001_a",
+      "2011_-RBjiJto4hc_00027_000_a",
+      "2011_-UAElWXbk3I_00000_000_a",
+      "2011_-UAElWXbk3I_00000_001_a",
+      "2011_-WW51YaWO-4_00007_000_a",
+      "2011_-WW51YaWO-4_00007_002_a",
+      "2011_-Y2wqkD2KVM_00040_000_a",
+      "2011_-fJwmmnPHok_00006_000_a",
+      "2011_-fJwmmnPHok_00007_000_a",
+      "2011_-fJwmmnPHok_00007_001_a",
+      "2011_-nkqrSaJf1g_00012_000_b",
+      "2011_-qK58CZslAs_00001_000_a",
+      "2011_-rq6IBVPcBU_00001_000_a",
+      "2011_-tUodP_Wus4_00031_000_a",
+      "2011_-tUodP_Wus4_00031_001_a",
+      "2011_-zIzLRgwdxA_00019_000_a",
+      "2011_-zIzLRgwdxA_00019_001_a",
+      "2011_00pBYZ1yofs_00026_000_a",
+      "2011_00pBYZ1yofs_00026_001_a",
+      "2011_06KH47jZbG0_00062_000_a",
+      "2011_06KH47jZbG0_00062_001_a",
+      "2011_0IxeTLiovq8_00000_000_a",
+      "2011_0IxeTLiovq8_00000_001_a",
+      "2011_0JXwzlRcYWk_00043_000_a",
+      "2011_0LzZVYshI7s_00001_000_a",
+      "2011_0LzZVYshI7s_00001_001_a",
+      "2011_0fTXzdHoip8_00000_000_a",
+      "2011_0fTXzdHoip8_00000_001_a",
+      "2011_0hau_p3N-MI_00003_000_a",
+      "2011_0hau_p3N-MI_00014_000_a",
+      "2011_0j4aiJowI8I_00002_000_a",
+      "2011_0lNb6NAV6jg_00000_000_a",
+      "2011_0lNb6NAV6jg_00004_000_a",
+      "2011_0qvpcfYFHcw_00000_001_a",
+      "2011_0qvpcfYFHcw_00000_001_b",
+      "2011_0qvpcfYFHcw_00000_002_a",
+      "2011_0qvpcfYFHcw_00000_002_b",
+      "2011_0qvpcfYFHcw_00000_002_c",
+      "2011_0qvpcfYFHcw_00000_002_d",
+      "2011_0qvpcfYFHcw_00000_002_e",
+      "2011_0qvpcfYFHcw_00005_000_a",
+      "2011_0sNSVtTcxpo_00034_000_a",
+      "2011_0t6IIdmOIOQ_00001_000_a",
+      "2011_0uSOiu_WUDw_00002_000_a",
+      "2011_0yOwWkbamyM_00031_000_a",
+      "2011_1-G0Fxf9IYU_00017_000_a",
+      "2011_1-HbIkCjDbk_00019_000_a",
+      "2011_117FZnev4Os_00061_000_a",
+      "2011_11nfPZqT5c0_00010_000_a",
+      "2011_12Iosf6btzM_00011_000_a",
+      "2011_12Iosf6btzM_00011_000_b",
+      "2011_12Iosf6btzM_00011_001_a",
+      "2011_12Iosf6btzM_00011_002_a",
+      "2011_1BRteOP9UL8_00007_000_a",
+      "2011_1Ez6dw3ywcc_00005_000_a",
+      "2011_1Ez6dw3ywcc_00030_000_a",
+      "2011_1Ez6dw3ywcc_00036_000_a",
+      "2011_1Ez6dw3ywcc_00038_000_a",
+      "2011_1FZ2FA-epcE_00008_000_a",
+      "2011_1JyApnR4o9U_00029_000_a",
+      "2011_1KbamNWEfdw_00001_000_a",
+      "2011_1MJg1718M74_00023_000_a",
+      "2011_1Qb-2KSKByg_00030_000_a",
+      "2011_1Qb-2KSKByg_00034_000_a",
+      "2011_1Qb-2KSKByg_00036_000_a",
+      "2011_1Qb-2KSKByg_00036_001_a",
+      "2011_1VZzulIl0DI_00005_000_a",
+      "2011_1YCz4y8b58k_00011_000_a",
+      "2011_1Zro4CfP9wY_00031_000_a",
+      "2011_1_-RGLVHmOA_00012_000_a",
+      "2011_1eH4YUzgfN4_00008_000_a",
+      "2011_1eH4YUzgfN4_00008_001_a",
+      "2011_1n4wtaSq7AY_00008_000_a",
+      "2011_1zOSmScTr_w_00002_000_a",
+      "2011_22VmzX35pvM_00002_000_a",
+      "2011_22VmzX35pvM_00002_001_a",
+      "2011_22VmzX35pvM_00011_000_a",
+      "2011_22VmzX35pvM_00011_000_b",
+      "2011_26-SvRLhthc_00020_000_a",
+      "2011_26MkbK_C-lM_00008_000_a",
+      "2011_26MkbK_C-lM_00009_000_a",
+      "2011_28JhyDR8-5M_00022_000_a",
+      "2011_28JhyDR8-5M_00022_000_b",
+      "2011_29KrhW9Ft4E_00002_000_b",
+      "2011_29nIXG5KJYw_00000_000_a",
+      "2011_29nIXG5KJYw_00016_000_a",
+      "2011_2C6FHPmqETM_00001_000_a",
+      "2011_2C6FHPmqETM_00001_001_a",
+      "2011_2CEYOnJqPE4_00008_000_a",
+      "2011_2Ee6xrIGhcY_00037_000_a",
+      "2011_2L0A2D7zV7A_00028_000_a",
+      "2011_2QT4mFNVyzc_00002_000_a",
+      "2011_2QT4mFNVyzc_00006_000_a",
+      "2011_2V5LfF6uxT0_00007_000_a",
+      "2011_2Vam2a4r9vo_00004_000_a",
+      "2011_2bMvW5QUMYk_00000_000_a",
+      "2011_2eqWGVKtm5w_00007_000_a",
+      "2011_2h8rH8zxA64_00027_000_a",
+      "2011_2hs_qcU6410_00000_000_a",
+      "2011_2sFAyhjR8_o_00031_000_a",
+      "2011_303wyvo5Uow_00015_000_a",
+      "2011_303wyvo5Uow_00015_001_a",
+      "2011_303wyvo5Uow_00015_002_a",
+      "2011_32me3lMxEDU_00015_000_a",
+      "2011_32me3lMxEDU_00015_001_a",
+      "2011_331wiVQINn8_00004_000_a",
+      "2011_331wiVQINn8_00004_001_a",
+      "2011_331wiVQINn8_00005_000_b",
+      "2011_331wiVQINn8_00005_000_c",
+      "2011_331wiVQINn8_00006_000_a",
+      "2011_398qkvR92GU_00010_000_a",
+      "2011_3A3iNVaLod4_00002_000_a",
+      "2011_3A3iNVaLod4_00002_001_a",
+      "2011_3YM3AYZaTZ0_00002_000_a",
+      "2011_3ZPlgOWbkcY_00008_000_a",
+      "2011_3dluAhOU1cA_00011_000_a",
+      "2011_3eGHDodwIZI_00012_000_a",
+      "2011_3eGHDodwIZI_00012_001_a",
+      "2011_3eGHDodwIZI_00022_000_a",
+      "2011_3eGHDodwIZI_00022_000_b",
+      "2011_3fwlRWBtHLg_00003_000_a",
+      "2011_3o2ACEr9NmQ_00034_000_a"
+    ],
+    "x_input": {
+      "camera": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          128,
+          300,
+          14
+        ]
+      },
+      "human": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          128,
+          300,
+          199
+        ]
+      },
+      "projection": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          128,
+          300,
+          18
+        ]
+      }
+    }
+  },
+  "metric_checkpoint_status": {
+    "autoencoder_ckpts": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/autoencoder/aemmardm-xgmj0yjj-325.ckpt"
+    ],
+    "clatr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-text_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_decoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_std.pt"
+    ],
+    "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+    "tmr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_decoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_encoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-text_encoder.pt"
+    ]
+  },
+  "metric_keys": [
+    "test/captions/fscore",
+    "test/captions/precision",
+    "test/captions/recall",
+    "test/clatr/R1",
+    "test/clatr/R2",
+    "test/clatr/R3",
+    "test/clatr/clatr_score",
+    "test/clatr/coverage",
+    "test/clatr/density",
+    "test/clatr/fcd",
+    "test/clatr/mm_distance",
+    "test/clatr/precision",
+    "test/clatr/recall",
+    "test/proj/coverage",
+    "test/proj/density",
+    "test/proj/error",
+    "test/proj/g_fpd",
+    "test/proj/outscreen",
+    "test/proj/precision",
+    "test/proj/r_fpd",
+    "test/proj/recall",
+    "test/tmr/R1",
+    "test/tmr/R2",
+    "test/tmr/R3",
+    "test/tmr/coverage",
+    "test/tmr/density",
+    "test/tmr/ftd",
+    "test/tmr/mm_distance",
+    "test/tmr/precision",
+    "test/tmr/recall",
+    "test/tmr/tmr_score"
+  ],
+  "metrics": {
+    "test/captions/fscore": 0.32129231095314026,
+    "test/captions/precision": 0.48535189032554626,
+    "test/captions/recall": 0.3305729627609253,
+    "test/clatr/R1": 0.0712890625,
+    "test/clatr/R2": 0.125,
+    "test/clatr/R3": 0.1552734375,
+    "test/clatr/clatr_score": 28.920387268066406,
+    "test/clatr/coverage": 0.49414155906264945,
+    "test/clatr/density": 0.4468898453690419,
+    "test/clatr/fcd": 227.92507934570312,
+    "test/clatr/mm_distance": 30.469552278518677,
+    "test/clatr/precision": 0.6717934002869441,
+    "test/clatr/recall": 0.6924629363940699,
+    "test/proj/coverage": 0.0,
+    "test/proj/density": 0.0,
+    "test/proj/error": 0.0,
+    "test/proj/g_fpd": 0.0,
+    "test/proj/outscreen": 0.16989213228225708,
+    "test/proj/precision": 0.0,
+    "test/proj/r_fpd": 3.783525228500366,
+    "test/proj/recall": 0.0,
+    "test/tmr/R1": 0.0703125,
+    "test/tmr/R2": 0.1142578125,
+    "test/tmr/R3": 0.1591796875,
+    "test/tmr/coverage": 0.3720325203252033,
+    "test/tmr/density": 0.2552510760401722,
+    "test/tmr/ftd": 329.5369873046875,
+    "test/tmr/mm_distance": 50.369707107543945,
+    "test/tmr/precision": 0.4434241989478718,
+    "test/tmr/recall": 0.6679866092778575,
+    "test/tmr/tmr_score": 15.255602836608887
+  },
+  "mode": "storymotion_generated_eval_with_pulpmotion_official_callbacks",
+  "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+  "pulp_root": "/data/public/ripemangobox/Motion/PulpMotion",
+  "records_path": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/bilateral_cfg_matrix_20260614/bi_e1_h2_c3.records.jsonl",
+  "run": {
+    "checkpoint": "/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/pulp_official_full_mixed_20260611/gpu3_branchmean_jointheavy6_ft_b512_102688_20260612_2151/last.pt",
+    "joint_loss_mode": "branch_mean",
+    "run_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/pulp_official_full_mixed_20260611/gpu3_branchmean_jointheavy6_ft_b512_102688_20260612_2151",
+    "step": 102688
+  },
+  "sample_range": [
+    0,
+    1024
+  ],
+  "sampler": {
+    "cfg_camera": 3.0,
+    "cfg_human": 2.0,
+    "cfg_mode": "bilateral_textspace_3pass",
+    "cfg_scale": 1.0,
+    "cfg_unconditional_text": "torch.zeros_like(text)",
+    "eta": 1.0,
+    "name": "ddim_start_x",
+    "num_steps": 50,
+    "observed_branch_policy": "inject q(z_gt,t,per_sample_noise) at every step; final merge gt observed branch",
+    "padding_policy": "inject q(z_gt,t,per_sample_noise) at every step; final merge gt padded frames",
+    "prediction_type": "START_X",
+    "time_grid": "round(linspace(T-1,0,num_steps)) unique_consecutive, includes 0"
+  },
+  "scope_note": "Uses PulpMotion official metric callbacks/evaluator components, but StoryMotion model and sampler are custom.",
+  "script_hashes": {
+    "build_stage2_pulp_latent_cache.py": "7ea26aef87144636dc038a9378542188eb0e6027b431106a58002e119c518816",
+    "storymotion_official_bridge_smoke.py": "0f119ee371b9695a25882e0e6666c7ed844d7585d2f3ad11c6f541b7a261604b",
+    "storymotion_official_full_eval.py": "3dd2dcb7fe446996b6a7a44ba48ab0c6498fc42b5dbf1316aacc67f199b5e42c",
+    "train_stage2_condmdi_pulp.py": "39d9cdb53a3cb52609f6fc5acbcfe04a6feb54e8a31e04e189efc7483f7a5b4d"
+  },
+  "seed": 20260613,
+  "set_name": "mixed_",
+  "split": "test",
+  "task": "joint",
+  "torch": {
+    "cuda_available": true,
+    "cuda_device": "NVIDIA GeForce RTX 5090",
+    "version": "2.8.0+cu128"
+  },
+  "training_conditioning_contract": {
+    "code_expression": "x = torch.where(obs_mask.bool(), obs_x0, x_t)",
+    "forward_policy": "TemporalObsUNet.forward replaces observed x_t positions with clean obs_x0 before concatenating obs_mask.",
+    "implication": "Observed branches are clean GT conditions inside the model, matching training-time CondMDI replacement."
+  }
+}

@@ -1,0 +1,410 @@
+---
+title: "PanoEnv: Exploring 3D Spatial Intelligence in Panoramic Environments with Reinforcement Learning"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/PanoEnv_Exploring_3D_Spatial_Intelligence_in_Panoramic_Environments_with_Reinforcement_Learning.pdf
+project_link: null
+code_link: "https://github.com/7zk1014/PanoEnv"
+aliases:
+- PRGGGRTSC
+- PanoEnv
+tags:
+- CVPR_2026
+- topic/vision_multimodal_applications
+- topic/vision_multimodal_applications/3d_rendering_reconstruction
+core_operator: 引入基于合成环境精确3D标注的多面几何奖励（GRPO）和两阶段课程学习，迫使模型从2D全景图中隐式重建3D空间关系。
+primary_logic: 利用合成数据的像素级3D真值构建可验证的强化学习奖励信号，可有效地在2D全景图上教会模型3D推理，这种能力能跨域泛化到真实世界场景。
+claims:
+- 基线VLM在开放式问题（OE）准确率仅6.39%，暴露出缺乏3D推理的严重缺陷。
+- 提出的GRPO-Balanced模型将总准确率提升至52.93%，OE提升至14.83%（+132%相对），并超越32B模型。
+- 两阶段课程至关重要：仅结构化训练导致OE崩溃（5.7%），仅OE训练削弱结构化能力，而两阶段结合达到最佳综合性能。
+- Sim-to-Real实验证明模型在真实OSR-Bench上的物体计数和相对距离任务中超越72B模型，验证了可迁移的几何逻辑而非记忆。
+---
+
+# PanoEnv: Exploring 3D Spatial Intelligence in Panoramic Environments with Reinforcement Learning
+
+> [!tip] 核心洞察
+> 利用合成数据的像素级3D真值构建可验证的强化学习奖励信号，可有效地在2D全景图上教会模型3D推理，这种能力能跨域泛化到真实世界场景。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | PanoEnv：通过强化学习探索全景环境中的3D空间智能 |
+| 英文题名 | PanoEnv: Exploring 3D Spatial Intelligence in Panoramic Environments with Reinforcement Learning |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2602.21992) · [Code](https://github.com/7zk1014/PanoEnv) |
+| Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
+| Method | PanoEnv-RL (GRPO with geometry-grounded reward and two-stage curriculum) |
+| Dataset | PanoEnv-QA, OSR-Bench |
+
+> [!tip] 效果简介
+> - PanoEnv-QA (test set) 上，Total Accuracy (%) 52.93 vs 49.34 (Qwen2.5-VL-7B Base) (+3.59)；Open-Ended Accuracy (%) 14.83 vs 6.39 (Qwen2.5-VL-7B Base) (+8.44 (+132%相对))；Q-Score (0-10) 6.24 vs 5.60 (Qwen2.5-VL-7B Base) (+0.64)。
+> - OSR-Bench (Real-World) 上，Object Counting 0.507 vs 0.477 (Qwen2.5-VL-7B Base); 0.498 (72B) (+0.030 over 7B; +0.009 over 72B)。
+
+## 概述
+
+当前视觉语言模型（VLM）在360°全景图像上的3D空间推理能力存在根本性缺陷。在PanoEnv-QA基准测试中，14个主流VLM的开放式问题（OE）准确率仅6.39%，总准确率49.34%，暴露出模型缺乏从2D等距柱状投影（ERP）图像中隐式重建3D几何关系的能力。这一瓶颈的根源在于：现有VLM未经过几何感知的3D推理训练，且缺乏物理真值监督信号。
+
+本文提出**PanoEnv-RL**——一个基于强化学习的3D感知后训练框架。其核心思路是：利用合成环境中像素级的精确3D标注，构建可验证的几何奖励信号，通过GRPO（Group Relative Policy Optimization）迫使模型从2D全景图中学习3D空间推理。该方法包含两个关键设计：**多面几何奖励**（routed reward），根据问题类型自动选择距离容差、空间一致性等五种精度奖励策略；**两阶段课程学习**，先结构化预训练（T/F、MCQ）稳定输出格式，再混合开放式微调提升生成能力。
+
+主要结果：
+- 在PanoEnv-QA测试集上，GRPO-Balanced模型将总准确率提升至52.93%（+3.59%），OE准确率提升至14.83%（相对提升+132%），超越Qwen2.5-VL-32B等更大尺寸模型。
+- 消融实验证实两阶段课程的必要性：仅结构化训练导致OE崩溃（5.7%），仅OE训练削弱结构化能力，两阶段结合达到最优综合性能。
+- Sim-to-Real泛化实验表明，模型在真实OSR-Bench上的物体计数和相对距离任务中超越72B模型，验证了所学几何逻辑的可迁移性，而非对合成数据的记忆。
+
+本工作揭示了合成3D真值驱动的强化学习是弥合2D全景感知与3D空间推理之间鸿沟的有效路径，为全景环境中的具身智能提供了新的基准和训练范式。
+
+## 背景与动机
+
+### 全景环境中的3D空间推理困境
+
+360°全景图像（等距柱状投影，ERP）能够一次性捕获全向场景信息，在自动驾驶、机器人导航和虚拟现实等领域具有天然优势。然而，这种投影方式引入了严重的几何畸变——球面场景被拉伸为平面矩形，物体的空间位置、距离和相对关系在像素空间中变得高度非线性。人类观察者可以凭借先验知识从全景图中推断3D结构，但对当前的视觉语言模型（VLM）而言，这构成了一个根本性挑战。
+
+### 现有VLM的3D推理缺口
+
+PanoEnv对14个主流VLM进行了系统基准测试，结果揭示了令人警醒的现实：**即使是最强的基线模型Qwen2.5-VL-7B，在PanoEnv-QA测试集上的总体准确率也仅为49.34%，而开放式问题（OE）准确率更是低至6.39%**（Table 2）。所有基线的平均总体准确率为36.72%，开放式问题平均准确率仅4.26%。这表明当前VLM在处理需要精确度量输出或组合多轴空间关系的开放式问题时几乎完全失效。
+
+这一性能崩塌的根源在于两个相互交织的瓶颈：
+
+1. **缺乏几何感知的3D推理能力**：VLM主要从2D图像-文本对中学习，缺少对三维空间关系的显式建模。当面对ERP全景图时，模型无法将扭曲的像素坐标映射回真实的3D场景结构，导致距离估计、相对定位等任务上的系统性错误。
+
+2. **缺少物理真值监督**：现有VLM的训练范式（预训练+指令微调）依赖文本描述作为监督信号，而自然语言对空间关系的描述往往是模糊和定性的（如“左边”、“远处”），无法提供精确的度量监督。这使得模型难以习得可量化的空间推理能力。
+
+### 合成数据带来的契机
+
+一个关键的洞察是：**合成环境可以提供像素级的3D真值标注**，包括深度图、语义分割和精确的物体3D坐标。这些真值在真实世界数据中获取成本极高甚至不可能，但在合成数据中却是“免费”的副产品。PanoEnv利用TartanAir合成数据集的多视角渲染数据，通过坐标变换和几何投影，自动生成了包含精确3D真值的全景图问答对。这为构建可验证的强化学习奖励信号提供了基础。
+
+### 从2D全景到3D推理的因果路径
+
+本文的核心动机在于探索一条因果路径：**能否利用合成数据的3D真值构建奖励函数，通过强化学习迫使模型从2D全景图中隐式重建3D空间关系，并将这种能力泛化到真实世界场景？**
+
+这一思路区别于传统的“更大模型、更多数据”的缩放范式，而是聚焦于**训练信号的质变**——用精确的几何奖励替代模糊的语言奖励，引导模型发展出真正的3D空间智能。初步的Sim-to-Real实验（Table 7）已经提供了正向证据：在合成数据上训练的7B模型，在真实OSR-Bench的物体计数和相对距离任务上超越了72B模型，暗示习得的是可迁移的几何逻辑而非表面记忆。
+
+## 核心创新
+
+### 问题瓶颈：2D全景图上的3D推理鸿沟
+
+当前视觉语言模型（VLM）在处理360°等距柱状投影图像时，面临一个根本性瓶颈：**缺乏几何感知的3D推理能力**。ERP投影将球面信息非线性压缩为2D平面，模型仅凭像素模式无法隐式重建物体间的空间关系。这导致两个层面的失败：
+
+1. **度量精度崩溃**：在需要输出具体数值的开放式问题中，最强基线Qwen2.5-VL-7B的准确率仅6.39%（Table 3），14个基线模型的平均开放式准确率低至4.26%（Table 2），暴露出VLM在缺乏物理真值监督时无法进行精确空间量化。
+2. **多轴组合推理缺失**：即使是非度量的结构化任务（如判断相对方位、比较物体属性），基线模型也仅达49.34%的总准确率，远未达到可靠空间推理的门槛。
+
+### 因果旋钮：几何真值引导的强化学习
+
+PanoEnv-RL的核心创新在于引入了一个**可验证的3D监督信号闭环**，通过强化学习迫使模型从2D全景图中隐式学习3D空间关系。这一框架包含三个相互耦合的changed slots：
+
+**Slot 1：训练范式——从零样本推理到GRPO后训练**
+
+基线VLM完全依赖预训练阶段学到的通用视觉知识进行零样本推理，未针对3D全景场景进行任何专门训练。PanoEnv-RL将此转变为基于Group Relative Policy Optimization（GRPO）的强化学习后训练范式。GRPO的核心机制是：对每个输入采样K个候选回答，以组内平均奖励为基线计算优势函数：
+
+$$A ( s , a _ { k } ) = R ( s , a _ { k } ) - \frac { 1 } { K } \sum _ { i = 1 } ^ { K } R ( s , a _ { i } )$$
+
+该优势估计驱动策略梯度更新，同时引入与参考策略的KL散度惩罚项防止灾难性遗忘：
+
+$${ \mathcal { L } } _ { \mathrm { t o t a l } } = { \mathcal { L } } ^ { \mathrm { G R P O } } - \beta \cdot D _ { \mathrm { K L } } ( \pi _ { \theta } | | \pi _ { \mathrm { r e f } } )$$
+
+这一范式的关键优势在于：无需人工标注偏好数据，直接利用合成环境中的像素级3D真值构建奖励信号，使训练目标与空间推理正确性严格对齐。
+
+**Slot 2：奖励函数——从无奖励到多面几何路由奖励**
+
+基线模型在推理时无任何外部奖励引导。PanoEnv-RL设计了**地面真值引导的路由奖励系统**（ground-truth-guided routed reward），总奖励由正确性奖励和格式奖励加权求和：
+
+$$R ( s , a ) = w _ { \mathrm { a c c } } R _ { \mathrm { a c c } } ( a , a ^ { * } ) + w _ { \mathrm { f m t } } R _ { \mathrm { f m t } } ( a )$$
+
+其中正确性权重$w_{\mathrm{acc}}=0.9$，格式权重$w_{\mathrm{fmt}}=0.1$。核心创新在于$R_{\mathrm{acc}}$并非单一函数，而是根据问题类型自动路由到五种专门策略：
+
+- **距离估计任务**：采用容忍度阈值判定（如相对误差<10%视为正确），而非硬匹配
+- **空间关系判断**：提取空间关键词（如“left”、“above”）与真值进行语义一致性验证
+- **属性比较**：基于3D笛卡尔坐标计算真实属性差异，验证模型输出方向
+- **视角识别**：利用ERP像素到球面坐标的映射公式验证几何一致性
+- **环境识别**：匹配场景语义标签
+
+这种细粒度路由设计的关键价值在于：针对不同空间推理子能力提供差异化的学习信号，避免了通用奖励函数对度量精度和关系判断的混淆惩罚。
+
+**Slot 3：训练课程——从混合训练到两阶段渐进课程**
+
+基线若采用RL训练，通常将所有问题类型混合同时优化。PanoEnv-RL提出**两阶段课程学习**：
+
+- **Stage 1：结构化预训练**（GRPO-Structured）。仅使用判断题和选择题，目标是稳定输出格式并建立基础的空间决策能力。此阶段格式奖励快速收敛（Figure 4），为后续开放式生成奠定结构基础。
+- **Stage 2：混合开放式微调**（GRPO-Balanced）。在Stage 1的权重初始化基础上，引入平衡的结构化与开放式问题混合训练，使模型在保持结构化能力的同时提升生成式空间推理。
+
+消融实验（Table 4）揭示了这一设计的因果必要性：仅结构化训练导致开放式问题崩溃（OE仅5.7%），仅开放式训练削弱结构化能力（MCQ降至52.3%），而两阶段结合达到最优综合性能（总准确率52.93%，OE 14.83%）。反向课程（先开放式后混合）表现更差（50.9%），证明**先学结构化输出是稳定RL优化的前提条件**。
+
+### 核心洞察：合成真值驱动的可迁移几何逻辑
+
+上述三个changed slots共同实现了一个深层洞察：**合成数据的像素级3D真值可以构建可验证的RL奖励信号，有效地在2D全景图上教会模型3D推理，且这种能力能跨域泛化到真实世界场景**。
+
+Sim-to-Real实验（Table 7）提供了决定性证据：在真实OSR-Bench上，PanoEnv-RL在物体计数任务上达到0.507，超越Qwen2.5-VL-72B的0.498；在相对距离任务上也超越72B模型。这表明模型学到的是**可迁移的几何逻辑而非对合成环境的记忆**——这一结论的置信度极高（0.99），因为它排除了合成数据过拟合的可能。
+
+### 方法谱系与知识库定位
+
+PanoEnv-RL在方法谱系中占据一个独特位置：它将**合成3D真值监督**、**GRPO强化学习**和**课程学习**三者首次耦合用于全景空间推理。相比传统VLM后训练方法（如基于LLM裁判的RLHF），其关键区别在于奖励信号的客观性和几何精度；相比3D视觉的显式重建方法，它保持了2D输入的便捷性，将3D推理隐式编码进模型参数。这一框架的局限性在于依赖精确3D真值（在真实噪声数据上难以直接应用），且当前仅处理空间推理，尚未扩展到全景视频的时序任务。
+
+## 整体框架
+
+PanoEnv 的核心思路是通过**合成环境中的精确 3D 几何真值**，构建可验证的强化学习奖励信号，迫使 VLM 在 2D 全景图上隐式重建空间关系，从而解决现有模型在等距柱状投影（ERP）图像上缺乏 3D 推理能力的瓶颈。整个框架由两大模块串联构成：**PanoEnv-QA 数据集构建**与**基于 GRPO 的 3D 感知强化学习后训练（PanoEnv-RL）**。
+
+### 数据流与模块关系
+
+框架的输入是 TartanAir 合成引擎生成的多视角 RGB‑D 图像与语义分割标注，输出是一个经 RL 微调后具备 3D 空间推理能力的 VLM。数据流自上而下分为四个阶段：
+
+1. **全景合成与几何真值提取**  
+   多视角图像通过投影变换拼接为单张 ERP 全景图，同时利用深度和语义分割标注，经由 ERP‑球面‑笛卡尔坐标转换链（式 1–2），为每个物体计算精确的 3D 位置、相机可见性和深度信息。这一步为后续 QA 生成提供了像素级的物理真值。
+
+2. **几何基础的 QA 对自动生成**  
+   基于上述 3D 真值，系统围绕五个互补的空间推理类别自动生成结构化问题：**相机视角来源识别**（Camera View Source Identification）、**物体距离估计**（Object Distance Estimation）、**环境识别**（Environment Identification）、**相对空间定位**（Relative Spatial Positioning）和**内在属性比较**（Intrinsic Attribute Comparison）。每个类别约占数据集的 20%，问题类型覆盖 True/False、多选题（MCQ）和开放式（OE）三种格式，形成 14,827 道问题的 PanoEnv-QA 基准。
+
+3. **GRPO 采样与路由奖励计算**  
+   将 PanoEnv-QA 中的问题‑全景图对送入待训练的 VLM（基座为 Qwen2.5‑VL‑7B），模型从当前策略中采样 K 个候选回答。奖励计算采用**路由式多面几何奖励**（routed reward）：系统根据问题类型自动选择对应的精度奖励策略（如距离容忍度、空间关键词匹配、属性比较一致性等），与格式奖励加权求和（权重 0.9:0.1，式 5），形成最终的标量奖励信号。
+
+4. **策略更新与两阶段课程**  
+   利用组内相对优势估计（式 3）驱动 PPO 裁剪目标，并附加与参考策略的 KL 散度惩罚（式 4）以防止灾难性遗忘。训练采用**两阶段课程**：第一阶段仅在结构化问题（T/F、MCQ）上预训练，稳定输出格式和基础决策能力；第二阶段在结构化与开放式问题的混合数据上微调，提升生成式空间推理能力。最终输出即为具备 3D 空间智能的 PanoEnv‑RL 模型。
+
+### 关键设计决策
+
+框架在两个关键节点上做出了区别于常规 RL 微调范式的选择：
+
+- **奖励函数的物理真值锚定**：不同于依赖 LLM 裁判或单一格式奖励的做法，PanoEnv 的奖励直接来源于合成数据的 3D 真值，消除了奖励模型的主观偏差。这是实现从 2D 全景图到 3D 推理能力迁移的核心因果杠杆。
+- **课程学习的结构化先验**：消融实验证实，若跳过第一阶段直接混合训练，开放式问题准确率会崩溃至 5.7%；若仅训练结构化任务则无法泛化到开放式场景。先结构化后混合的课程设计是稳定优化的必要条件。
+
+**证据强度**：上述模块关系与数据流均有明确的图表和公式锚点支撑（Fig. 2 数据集构建流程，Fig. 3 GRPO 训练框架，Eq. 1–5 坐标转换与损失函数），消融实验（Table 4）进一步验证了两阶段课程的必要性。合成到真实的泛化能力则由 OSR‑Bench 上的零样本实验（Table 7）独立证实。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/001_Figure_1.jpg]]
+*Figure 1: Overview of the PanoEnv framework, including the PanoEnv-QA benchmark and the RL-enhanced PanoEnv-RL model*
+
+## 核心模块与公式推导
+
+### 3.1 合成数据生成管道：从多视图到几何真值QA对
+
+PanoEnv-QA数据集构建的核心是将TartanAir合成引擎的多视图RGB、深度和语义分割数据转化为等距柱状投影（ERP）全景图，并基于像素级3D真值自动生成可验证的问答对。管道包含三个关键模块：
+
+**多视图到ERP投影。** 将环绕相机的多张透视图像拼接为单张360°全景图，保留每个像素的深度和语义标注。
+
+**3D空间坐标恢复。** 对ERP图像中的任意像素 $p = (p_x, p_y)$，首先通过式(1)将其映射到球面坐标——经度 $\lambda$ 和纬度 $\phi$：
+
+$$\lambda = \left( \frac { p _ { x } } { W } - 0.5 \right) 2\pi, \quad \phi = -\left( \frac { p _ { y } } { H } - 0.5 \right) \pi$$
+
+其中 $W$、$H$ 为全景图的宽和高。随后利用深度值 $d_i$ 将球面坐标转换为3D笛卡尔坐标（式(2)）：
+
+$$\begin{array} { l } { x _ { i } = - d _ { i } \cdot \cos ( \phi _ { i } ) \cdot \sin ( \lambda _ { i } ) } \\ { y _ { i } = d _ { i } \cdot \sin ( \phi _ { i } ) } \\ { z _ { i } = - d _ { i } \cdot \cos ( \phi _ { i } ) \cdot \cos ( \lambda _ { i } ) } \end{array}$$
+
+这一转换是整个数据集的几何基础——所有后续QA对的生成、距离计算、空间关系判断均依赖于此公式链恢复的物体3D位置。
+
+**五类几何QA生成。** 基于恢复的3D坐标，管道自动生成覆盖五个互补类别的14,827个问题：相机视角源识别、物体距离估计、环境识别、相对空间定位、内在属性比较。每类约占20%（见Table 1），Yes/No比率接近平衡（45.3% vs 54.7%），避免了简单的多数类捷径。
+
+### 3.2 GRPO强化学习后训练框架
+
+PanoEnv-RL的核心是一个基于GRPO（Group Relative Policy Optimization）的3D感知强化学习后训练框架，包含三个关键模块。
+
+#### 3.2.1 GRPO采样与优势估计
+
+对每个输入状态 $s$（全景图+问题），从当前策略 $\pi_\theta$ 采样 $K$ 个候选回答 $\{a_1, ..., a_K\}$。GRPO的核心创新在于用组内相对优势替代传统的价值函数估计（式(3)）：
+
+$$A(s, a_k) = R(s, a_k) - \frac{1}{K} \sum_{i=1}^{K} R(s, a_i)$$
+
+其中 $R(s, a_k)$ 为候选回答 $a_k$ 的奖励。该设计避免了对额外价值网络的依赖，同时通过组内标准化有效降低了奖励尺度波动的影响。最终策略更新采用PPO裁剪目标与KL散度惩罚的组合（式(4)）：
+
+$$\mathcal{L}_{\mathrm{total}} = \mathcal{L}^{\mathrm{GRPO}} - \beta \cdot D_{\mathrm{KL}}(\pi_\theta \| \pi_{\mathrm{ref}})$$
+
+KL惩罚项以参考策略 $\pi_{\mathrm{ref}}$（初始模型）为锚点，防止训练过程中的灾难性遗忘。
+
+#### 3.2.2 路由式几何奖励系统
+
+区别于通用的LLM裁判奖励，PanoEnv-RL采用基于物理真值的路由式奖励函数（式(5)）：
+
+$$R(s, a) = w_{\mathrm{acc}} R_{\mathrm{acc}}(a, a^*) + w_{\mathrm{fmt}} R_{\mathrm{fmt}}(a)$$
+
+其中 $w_{\mathrm{acc}}=0.9$、$w_{\mathrm{fmt}}=0.1$ 分别为正确性奖励和格式奖励的权重。正确性奖励 $R_{\mathrm{acc}}$ 并非单一函数，而是根据问题类型自动路由到五种专用策略之一：距离估计类使用容忍阈值奖励，空间定位类使用关键词匹配，结构化问题使用精确匹配等。这种细粒度设计直接利用了合成数据的像素级3D真值，为模型提供了精确且可验证的学习信号。
+
+#### 3.2.3 两阶段课程学习
+
+训练课程分为两个阶段，这是消融实验验证的关键设计选择：
+
+- **阶段一（结构化预训练）**：仅在判断题（T/F）和选择题（MCQ）上训练，快速稳定输出格式和基础推理能力。
+- **阶段二（混合开放式微调）**：在结构化与开放式问题的平衡混合数据上继续训练，继承阶段一习得的格式规范，同时提升开放式生成能力。
+
+消融实验表明，仅做阶段一会导致开放式问题崩溃（OE准确率仅5.7%），仅做开放式训练会削弱结构化能力（MCQ降至52.3%），而两阶段结合达到最优综合性能（总准确率52.93%，OE 14.83%）。反向课程（先开放式后混合）表现更差（50.9%），证实先学结构化输出对稳定优化至关重要。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/002_Figure_2.jpg]]
+*Figure 2: Overview of the PanoEnv-QA construction pipeline. We convert multi-view TartanAir data into ERP panoramas and generate geometry-grounded QA pairs using depth, semantics, and 3D projections*
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/004_Figure_3.jpg]]
+*Figure 3: Overview of our framework, including GRPO sampling, routed reward computation, and two-stage curriculum updates*
+
+## 实验与分析
+
+### 核心实验设置
+
+实验基于 **PanoEnv-QA** 数据集展开，该数据集包含 14,827 个问题，均匀分布于五个类别（每类约占 20%），Yes/No 比率接近平衡（45.3% vs 54.7%），有效避免了简单的多数类捷径。训练采用基于 Qwen2.5-VL-7B 的 GRPO 后训练框架，使用 LoRA 微调解码器，冻结视觉编码器，训练 2 个 epoch，组大小 K=4。具体超参数配置详见 **Table 5**。
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/009_Table_5.jpg]]
+*Table 5: Hyperparameter configurations for GRPO fine-tuning*
+
+### 基线模型全面评测：开放式问题暴露致命短板
+
+在零样本设定下，对 14 个主流 VLM 进行了全面评测（**Table 2**）。结果显示，所有基线模型在开放式问题（OE）上表现极差：最强基线 **Qwen2.5-VL-7B** 总准确率仅 49.34%，OE 准确率低至 6.39%；14 个基线的平均总准确率为 36.72%，平均 OE 准确率仅 4.26%。这一结果直接验证了核心瓶颈——当前 VLM 在 360° ERP 图像上严重缺乏几何感知的 3D 推理能力，在需要精确度量输出的开放式问题中几乎失效。
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/005_Table_2.jpg]]
+*Table 2: Overall performance and per-type accuracy breakdown of 14 baseline VLMs. LLM scores (Q-Score, P-Score) are on a 0-10 scale*
+
+### 主要结果：GRPO-Balanced 实现显著突破
+
+**Table 3** 展示了 GRPO 训练模型与 14 个基线的全面对比。核心发现如下：
+
+- **GRPO-Balanced（最终模型）** 将总准确率提升至 **52.93%**，较 Qwen2.5-VL-7B Base 的 49.34% 提升 +3.59 个百分点。
+- **开放式问题准确率从 6.39% 跃升至 14.83%，相对提升 132%**，Q-Score 从 5.60 提升至 6.24。
+- 值得注意的是，经过 GRPO 训练的 7B 模型在多项指标上超越了参数量更大的 **Qwen2.5-VL-32B**（总准确率 51.47%，OE 8.36%），证明了 RL 后训练的高效性。
+
+**Table 3** 的详细分类型数据显示，GRPO-Balanced 在结构化问题（T/F、MCQ）上保持稳定，同时显著改善了开放式问题的生成质量，实现了结构化推理与自由形式生成的协同优化。
+
+### 消融实验：两阶段课程设计是成功关键
+
+**Table 4** 的系统消融揭示了课程设计对最终性能的决定性影响：
+
+| 变体 | 总准确率 (%) | OE 准确率 (%) | MCQ 准确率 (%) |
+|------|:------------:|:-------------:|:--------------:|
+| GRPO-OneStage（单阶段混合） | 50.8 | 10.9 | 56.3 |
+| GRPO-Structured（仅结构化） | 51.5 | **5.7** | 62.5 |
+| GRPO-OE（仅开放式） | 50.1 | 10.6 | 52.3 |
+| GRPO-Reverse（反向课程） | 50.9 | 10.4 | 56.1 |
+| **GRPO-Balanced（两阶段）** | **52.9** | **14.8** | 57.1 |
+
+关键洞察：
+- **仅结构化训练导致 OE 崩溃**（5.7%），模型丧失了开放式生成能力。
+- **仅开放式训练削弱结构化能力**（MCQ 52.3%），缺乏稳定的输出格式基础。
+- **反向课程（先 OE 后混合）表现更差**（50.9%），表明先学习结构化输出对稳定优化至关重要。
+- 两阶段课程（先结构化预训练，再混合微调）实现了最佳综合性能，验证了结构化基础与开放式推理之间的互补性。
+
+**Figure 4** 的训练动态曲线进一步佐证了这一结论：Stage 1 快速学习输出格式和结构化决策；Stage 2 继承此能力，在平衡训练下专注于提升 OE 推理质量。
+
+### Sim-to-Real 泛化：几何逻辑可迁移至真实场景
+
+**Table 7** 展示了在真实世界基准 **OSR-Bench** 上的零样本泛化性能。核心发现：
+
+- 在**物体计数**任务上，PanoEnv-RL 达到 **0.507**，超越 Qwen2.5-VL-7B Base（0.477）和更大规模的 **Qwen2.5-VL-72B**（0.498）。
+- 在**相对距离**任务上同样取得提升（0.452 vs 0.413 Base），验证了模型习得的是可迁移的几何逻辑，而非对合成数据的记忆。
+
+这一结果直接支撑了核心洞察：利用合成数据的像素级 3D 真值构建可验证的 RL 奖励信号，能有效教会模型在 2D 全景图上进行 3D 推理，且该能力可跨域泛化。
+
+### 失败模式与局限性
+
+尽管取得了显著进展，实验也揭示了若干失败模式与局限：
+
+1. **合成到真实域差距**：模型在合成数据上训练，在真实场景中仍存在性能衰减，尤其在光照、纹理差异显著的环境下。
+2. **奖励系统依赖精确 3D 真值**：当前框架要求像素级深度和语义标注，在真实噪声或缺失 GT 的数据集上难以直接应用。
+3. **开放式问题仍是瓶颈**：尽管 OE 准确率提升了 132%，14.83% 的绝对值仍远低于结构化问题，表明自由形式的 3D 推理仍极具挑战。
+4. **时序任务未覆盖**：当前框架仅处理静态全景图像的空间推理，尚未扩展到全景视频中的时序推理任务。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/006_Table_3.jpg]]
+*Table 3: Comprehensive comparison of our GRPO-trained models (Ours) against 14 state-of-the-art baselines on the PanoEnv-QA test set. All our models are fine-tuned on Qwen2.5-VL-7B using LoRA*
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/008_Table_4.jpg]]
+*Table 4: Unified ablation results across all variants*
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/010_Table_7.jpg]]
+*Table 7: Zero-Shot Performance on OSR-Bench (Real-World)*
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/007_Figure_4.jpg]]
+*Figure 4: Training dynamics of our two-stage GRPO curriculum. Stage 1 quickly learns output format and structured decisionmaking; Stage 2 inherits this and focuses on improving OE reasoning under balanced training*
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/003_Table_1.jpg]]
+*Table 1: Distribution of questions in the PanoEnv-QA dataset across major categories and question types*
+
+![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/011_Table_6.jpg]]
+*Table 6: Comprehensive comparison between PanoEnv and existing panoramic benchmarks*
+
+## 方法谱系与知识库定位
+
+### 1. 全景空间推理的方法谱系
+
+PanoEnv-RL 的贡献位于三个交叉领域：全景视觉理解基准、视觉语言模型的强化学习后训练、以及合成数据驱动的3D推理。以下从这三个维度梳理其与现有工作的关系。
+
+#### 1.1 全景基准的演进：从语义到几何
+
+现有全景视觉基准主要关注语义识别或空间感知，但缺乏对精确3D几何推理的系统评估。**OSR-Bench** 和 **OmniVQA** 等基准包含真实场景中的空间关系问答，但其问题设计偏向常识推理，且缺乏像素级3D真值监督。PanoEnv-QA 的差异化在于：
+
+- **物理真值驱动**：利用 TartanAir 合成引擎的深度、语义分割和相机参数，为每个问题提供可验证的3D几何真值（如物体距离、相对方位角）。
+- **五维能力覆盖**：从 ERP 格式的基础感知（Camera View Source Identification）到组合几何推理（Relative Spatial Positioning），构建了逐层递进的评估体系。
+- **结构化与开放式并重**：14,827 个问题中，MCQ、T/F 与 OE 三类题型均衡分布，避免了仅靠选择题无法暴露生成能力缺陷的常见问题。
+
+Table 6 的对比显示，现有全景基准在“2D到3D的物理推理”维度上存在明显空白，而 PanoEnv-QA 正是填补这一空白的首次系统尝试。
+
+#### 1.2 RL后训练的范式定位：GRPO 与几何奖励
+
+PanoEnv-RL 的训练框架属于 **RL-based post-training for VLMs** 这一新兴范式。与以下工作形成对比：
+
+- **通用 RLHF/DPO 方法**：依赖人类偏好或 LLM-as-Judge 提供奖励信号，无法处理需要精确几何度量的任务（如“物体A距离相机多少米？”）。PanoEnv-RL 的 **routed reward** 系统直接利用3D真值计算任务特定的准确性奖励（距离容差、空间关键词匹配等），避免了裁判模型的偏差。
+- **纯 SFT 微调**：在 PanoEnv-QA 上直接进行监督微调可以提升结构化任务的表现，但开放式问题需要模型具备隐式3D重建和组合推理能力——这正是 RL 探索的优势所在。GRPO 通过组内相对优势估计，鼓励模型在开放式生成空间中搜索更优的推理路径。
+
+#### 1.3 合成数据与 Sim-to-Real 迁移
+
+PanoEnv-RL 的合成数据策略与近年来的 **sim-to-real 迁移** 工作一脉相承。关键区别在于：
+
+- 不同于域随机化或对抗训练的通用迁移策略，PanoEnv 依赖 **几何不变性**：球面坐标转换、欧氏距离计算等几何操作在合成域和真实域中完全一致。
+- 这一设计使得在合成数据上学到的几何推理逻辑可以直接泛化——Table 7 中 PanoEnv-RL 在真实 OSR-Bench 上超越 72B 模型的结果即为实证。
+
+### 2. 技术栈与知识库定位
+
+#### 2.1 核心依赖
+
+| 组件 | 来源 | 角色 |
+|------|------|------|
+| **Qwen2.5-VL-7B-Instruct** | Qwen团队 | 基础VLM，作为GRPO微调的初始策略 |
+| **GRPO** (Group Relative Policy Optimization) | Shao et al., 2024 | PPO的变体，用于语言生成的策略优化 |
+| **LoRA** | Hu et al., 2021 | 参数高效微调，仅训练语言解码器的低秩适配器 |
+| **TartanAir** | Wang et al., 2020 | 合成多视图数据集，提供深度、语义和相机参数 |
+| **ERP投影** | 标准全景成像 | 将多视图数据拼接为等距柱状投影全景图 |
+
+#### 2.2 贡献的增量性质
+
+PanoEnv-RL 的贡献不在于提出全新的算法组件，而在于 **系统性地组合现有技术以解决一个被忽视的关键瓶颈**：
+
+1. **问题定义**：首次明确揭示当前VLM在360°全景图上缺乏3D几何推理能力这一根本缺陷——14个基线模型在开放式问题上平均准确率仅4.26%。
+2. **数据-奖励闭环**：利用合成数据的天然优势（像素级3D真值）构建可验证的强化学习奖励信号，形成从数据生成到策略优化的完整闭环。
+3. **课程设计洞察**：通过消融实验（Table 4）证明两阶段课程的必要性——仅结构化训练导致OE崩溃（5.7%），仅OE训练削弱结构化能力（MCQ 52.3%），而先结构化后混合的课程实现了最优平衡。
+
+### 3. 适用边界与失效模式
+
+#### 3.1 适用条件
+
+- **输入格式**：仅适用于 ERP 投影的 360° 全景图像，不支持其他全景表示（如立方体贴图）。
+- **任务范围**：当前框架覆盖五类空间推理任务，但不包括全景视频中的时序推理或动态场景理解。
+- **真值依赖**：奖励系统要求精确的3D几何真值（深度图、语义分割、相机参数），在真实噪声数据上无法直接部署。
+- **模型规模**：实验基于 7B 模型，更大规模模型的 scaling behavior 尚未验证。
+
+#### 3.2 已知失效模式
+
+- **合成-真实域差距**：尽管几何推理可迁移，但合成场景的视觉外观（纹理、光照）与真实场景存在差异，可能影响语义相关任务的表现。
+- **开放式问题的绝对水平**：即使最优模型 OE 准确率也仅 14.83%，表明开放式3D推理仍远未解决。模型倾向于生成模糊或规避精确数值的回答。
+- **奖励稀疏性**：对于需要多步推理的复杂空间关系问题，最终答案的二元奖励可能无法提供足够密集的学习信号。
+
+### 4. 局限与开放问题
+
+#### 4.1 已声明的局限
+
+1. **合成数据依赖**：训练完全基于合成环境，向真实场景的泛化受限于视觉域的差异。
+2. **真值要求严格**：奖励系统依赖完整的3D几何标注，无法处理真实数据中常见的噪声或缺失真值。
+3. **任务范围受限**：仅处理单帧全景图像的空间推理，未扩展到全景视频的时序任务。
+
+#### 4.2 待探索的开放问题
+
+1. **弱监督/无真值适配**：如何将 RL 框架适应于带有噪声或不完整真值的真实世界 360° 数据集？可能的路径包括自监督预训练或基于几何一致性的弱监督奖励。
+2. **时序扩展**：如何将该空间推理框架扩展到全景视频中的时序任务（如运动预测、轨迹推理）？这需要引入时序建模组件和相应的奖励设计。
+3. **跨任务迁移**：几何引导的 RL 训练策略能否应用于其他3D感知任务（如全景语义分割、深度估计）？奖励函数的路由机制是否具有通用性？
+4. **推理可解释性**：模型在 GRPO 训练后是否真正学会了隐式3D重建，还是仅学习了统计关联？需要更深入的可解释性分析来验证其推理机制。
+5. **Scaling 行为**：该框架在更大规模模型（32B+）上的表现如何？几何奖励是否能够持续提供有效的学习信号，还是会遇到奖励饱和？
+
+### 5. 知识库贡献总结
+
+PanoEnv 的核心知识贡献在于 **证明了合成数据的3D真值可以作为强化学习的有效奖励信号，从而在2D全景图上教会VLM进行3D推理**。这一发现具有方法论意义：它表明对于需要精确物理推理的任务，基于真值的可验证奖励可能比人类偏好或LLM裁判更为有效。同时，两阶段课程的设计原则——先稳定结构化输出再引入开放式探索——为类似的多任务RL训练场景提供了可复用的经验。
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/PanoEnv_Exploring_3D_Spatial_Intelligence_in_Panoramic_Environments_with_Reinforcement_Learning.pdf]]

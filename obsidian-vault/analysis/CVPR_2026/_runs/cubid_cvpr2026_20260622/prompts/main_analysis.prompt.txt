@@ -1,0 +1,1937 @@
+Fixed merge contract for prompt-cache reuse.
+
+Task: merge chunk-level anchors, compact paper context, and figure/table
+metadata into one verified ResearchFlow analysis object. The variable paper
+payload appears after this fixed contract.
+
+正文/分析内容必须使用简体中文：translate generated explanatory fields into Chinese,
+while preserving original caption text, formulas, symbols, code identifiers,
+exact evidence anchors, and method, dataset, metric, paper names.
+
+Return exactly one valid JSON object:
+{
+  "paper_metadata": {"title": str, "title_zh": str, "venue": str | null, "year": int | null, "project_link": str | null, "code_link": str | null},
+  "source_links": [{"label": "Project" | "Code" | "arXiv", "url": str, "anchor": str | null, "confidence": float | null}],
+  "analysis_truth": {
+    "real_bottleneck": str,
+    "causal_knob": str,
+    "core_insight": str,
+    "decisive_evidence": [{"claim": str, "anchor": str, "confidence": float}]
+  },
+  "method": {
+    "proposed_method_name": str,
+    "baseline_methods": [{"name": str, "role": str, "citation": str | null}],
+    "changed_slots": [{"slot_name": str, "baseline_value": str, "proposed_value": str, "evidence_anchor": str, "confidence": float}],
+    "pipeline_modules": [{"name": str, "role": str, "evidence_anchor": str}]
+  },
+  "experiments": {
+    "main_results": [{"benchmark": str, "metric": str, "proposed": str, "baseline": str, "delta": str, "anchor": str, "confidence": float}],
+    "ablations": [{"claim": str, "anchor": str, "confidence": float}],
+    "fairness_notes": [str]
+  },
+  "formulas": [{"name": str, "latex": str, "meaning": str, "anchor": str}],
+  "figures_tables": [{"label": str, "role": str, "caption": str}],
+  "limitations": [str],
+  "open_questions": [str]
+}
+
+Rules:
+1. Do not add unsupported claims.
+2. Resolve conflicts by preferring directly anchored evidence.
+3. If evidence is weak or absent, keep the field empty or use open_questions.
+4. Set paper_metadata.title to the original paper title. Set
+   paper_metadata.title_zh to a concise Chinese title when a faithful
+   translation is possible; otherwise repeat the original title.
+5. Natural-language explanations MUST be Simplified Chinese. Keep the original
+   language only for caption text, formulas, symbols, code identifiers, exact
+   anchors, and method, dataset, metric, paper names.
+6. For each concrete baseline method, fill citation when the paper provides
+   verifiable author/year/venue metadata, e.g. "He et al., CVPR 2023"; otherwise
+   use null instead of guessing.
+7. Preserve directly visible project page and code repository links in
+   source_links. Also put the best project page in paper_metadata.project_link
+   and the best code repository/GitHub/GitLab link in paper_metadata.code_link.
+   Do not invent links.
+8. Output ONLY valid JSON, with no markdown fences.
+
+=== VARIABLE PAPER PAYLOAD ===
+{
+  "paper_title": "Cubic Discrete Diffusion: Discrete Visual Generation on High-Dimensional Representation Tokens",
+  "paper_context": "# Cubic Discrete Difusion: Discrete Visual Generation on High-Dimensional Representation Tokens\n\nYuqing Wang1 Chuofan Ma1 Zhijie Lin2† Yao Teng1 Lijun Yu3 Shuai Wang4 Jiaming Han5 Jiashi Feng2 Yi Jiang2 Xihui Liul \\* lUniversity of Hong Kong ²ByteDance Seed3Carnegie Mellon University 4Nanjing University 5The Chinese University of Hong Kong\n\n## Abstract\n\nVisual generation with discrete tokens has gained significant attention as it enables a unified token prediction paradigm shared with language models,promising seamless multimodal architectures. However, current discrete generation methods remain limited to low-dimensional latent tokens (typically 8-32 dims)，sacrificing the semantic richness essential for understanding.While highdimensional pretrained representations (768-1024 dims) could bridge this gap,their discrete generation poses fundamental challenges.In thispaper,we present Cubic Discrete Diffusion (CubiD),the first discrete generation model forhigh-dimensional representations.CubiD performs fine-grained masking throughout the high-dimensional discrete representation—any dimension at any position can bemasked and predicted from partial observations.This enables themodel to learn rich correlations both within andacrossspatial positions,with the numberofgeneration stepsfixedatT regardlessoffeaturedimensionality,where T<hwd.On ImageNet-256,CubiD achieves state-of-theart discrete generation with strong scaling behavior from 900Mto 3.7B parameters.Crucially,wevalidate that these discretized tokens preserve original representation capabilities,demonstrating that the same discrete tokens can effectively serve both understanding and generation tasks. We hope thisworkwill inspire future research toward unified multimodal architectures. Code is available at: ht tps : //github.com/YuqingWangl029/CubiD.\n\n## 1. Introduction\n\nThe pursuit of unified multimodal modeling [6,38,46] requires both language and vision to operate on semantically meaningful tokens. While language models have long benefited from semantic tokens that naturally support both understanding and generation,visual models remain fragmented—using high-dimensional semantic features for understanding but low-dimensional compressed tokens [10,16,41,47,54] for generation．Recent advances [5,37,53] have shown that high-dimensional representation features (768-1O24 dimensions） can achieve high-quality reconstruction,offering a path forward.For discrete generative models [2,36,39],which share the token-based paradigm with language models,adopting such high-dimensional representation tokens is particularly compelling,as it would allow visual generation to leverage the same semantic richness that has proven essential for understanding,potentially enabling more coherent unified architectures.\n\n![](auto/images/rf_full_regions/page_001_Figure_1_c1621dbf36eb.jpg)  \n(b) High-dim Token Generation\n\nFigure 1.Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor—any dimension at any position can be masked and predicted independently-enabling effcient generation in T< h ×w ×d iterations while capturing both spatial and dimensional correlations.\n\n![](images/b6415517082ec51d32360678bde13fe75befb4f79bb1cb2919b75efbe675fa9c.jpg)  \nFigur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories.\n\nHowever,high-dimensional representations pose significant challenges for discrete generative modeling.The first is how to discretize these features while maintaining their representation quality. Traditional Vector Quantization [41] methods that work well in low dimensions （8- 32) fail at 768-1O24 dimensions due to the curse of dimensionality—data points become sparsely distributed, making clustering ineffective,and the codebook size required for adequate coverage grows exponentially. The quantized features inevitably drift from the original representations,corrupting the semantic information essential for understanding.Dimension-wise quantization [43] offers a promising solution.By treating each dimension independently rather than quantizing entire vectors jointly,it sidesteps the clustering problems in high-dimensional spaces.As a trainingfree method, it can be directly applied to frozen pretrained features,making discretization tractable at 768+ dimensions.We validate this approach on multimodal understanding tasks:dimension-wise quantized features achieve nearly identical performance to continuous features,while VQ suffers substantial degradation (Table 3). This result confirms that properly discretized high-dimensional tokens preserve semantic quality for understanding tasks,establishing them as viable unified representations.\n\nThe more fundamental challenge lies in modeling such high-dimensional discrete tokens.While dimension-wise quantization successfully preserves semantic quality, the resulting representation contains h × w × d discrete tokens (196.608 for a typical 16 ×16× 768 configuration). As illustrated in Figure 1(b),direct sequential generation requires O(hwd) steps,which is intractable,while standard discrete diffusion methods cannot capture the dependencies across dimensions within each spatial position.To make this problem tractable,we need a method that avoids sequential bottlenecks while preserving the rich dependency structure across both spatial and dimensional axes.We observe that the h×w ×d tensor has inherent multi-dimensional structure that can be exploited—rather than treating spatial positions as atomic units or requiring sequential generation of all dimensions,we can break these rigid boundaries and operate flexibly across the entire tensor.\n\nWe propose Cubic Discrete Diffusion (CubiD)，a masked diffusion method [1,3,26] for high-dimensional discrete generation. Our key insight is to perform finegrained masking across the three-dimensional h × w × d tensor.Unlike existing methods [3] that mask entire spatial positions,our approach treats this tensor as a unified cubic space where any subset of dimensions at any position can be masked and predicted from partial observations.This allows the model to learn complex dependencies both within and across spatial locations.As shown in Figure 1(b),during generation,CubiD starts froma fully masked tensor and iteratively refines it through progressive unmasking,randomly selecting tokens across the entire tensor to unmask at each step until reaching the complete representation.\n\nThis approach offers two main advantages.First,it effectively models complex dependencies in high-dimensional tensors—learning both intra-position correlations (how dimensions relate within a spatial location) and inter-position patterns (how features propagate spatially)—through bidirectional attention over partially observed values.Second,it decouples generation complexity from dimensionality:unlike autoregressive methods that scale with O(hwd), our iterative refinement requires a fixed number of steps Tregardless of feature dimensionality,benefiting from the semantic redundancy inherent in high-dimensional representations.By transforming an intractable sequential process into hundreds of parallel iterations,CubiD makes high-dimensional discrete generation computationally feasible while maintaining the modeling capacity necessary for\n\nhigh-quality synthesis.\n\nExtensive experiments validate our approach．We first verify that dimension-wise quantization preserves both understanding and reconstruction capabilities of the original continuous representations.In ablation studies,we compare our fine-grained cubic masking against alternative strategies: treating spatial positions or dimensions as groups significantly degrades performance,confirming the necessity of element-wise masking across the 3D tensor. The method also exhibits strong scaling behavior from 90oM to 3.7B parameters and generalizes well across different representation encoders (DINOv2 [3O] and SigLIP2 [4O]). On ImageNet 256x256 [8],CubiD achieves a competitive 1.88 FID score with 768-dimensional discrete tokens,establishing that high-dimensional discrete generation is both feasible and effective.\n\nOur contributions are summarized as follows:\n\n·We demonstrate that proper discretization of highdimensional representation tokens can preserve their original semantic capabilities,establishing the viability of unified discrete representations for both understanding and generation.\n\n·We propose Cubic Discrete Diffusion,a novel method that addresses the fundamental modeling challenge of high-dimensional discrete generation by treating the h × w × d tensor as a unified space with fine-grained masking,making discrete generative models tractable at high dimensionality.\n\n· We achieve state-of-the-art discrete generation results on ImageNet 256x256,with strong scaling behavior from 900M to 3B parameters and generalization across different representation encoders,demonstrating the effectiveness of discrete diffusion for high-dimensional visual generation.\n\n## 2.Related Work\n\nVisual TokenizationVisual tokenization is commonly used to convert images into latent representations that support image reconstruction and generation.In the traditional VAE tokenizers [7,16],an encoder first compresses an image into a low-dimensional continuous latent map (typically with 4-32 dimensions) and then a decoder reconstructs the corresponding image with the latent as input. The encoder and decoder of these tokenizers are jointly trained for the reconstruction task.Building on this framework,discrete tokenizers further quantize each vector from the latent maps into one or several tokens [10,13,28,43,49,51],enabling discrete image generation．More recently,representationbased tokenizers [34,52,53] have emerged.Most of these methods use a frozen pretrained vision foundation model [3O,4O] as the encoder and further train additional adapters to project its outputs into low-dimensional latents. In contrast,RAE [53] directly uses high-dimensional DI-\n\nNOv2 [30] or SigLIP [4O] features as latents (768+ dimensions)without any adaptation,and a specially designed training schedule is applied to these high-dimensional latents to adapt the continuous diffusion models for generation.In this paper,we first transform high-dimensional features from vision foundation models into discrete tokens and then train generative models on those tokens.\n\nDiscrete Visual Generation Discrete visual generation performs image generation based on sequences of discrete tokens. Autoregressive models [17,24,31,36, 42, 44, 48] generate tokens sequentially via the next-token prediction paradigm.Although these models can generate high-quality images,they require O(N） generation steps for N tokens, making this paradigm computationally expensive for highresolution images.To improve sampling efficiency,discrete diffusion models [3] have been introduced.Instead of generating tokens sequentially, they generate multiple tokens in parallel, thereby achieving higher efficiency. Like continuous diffusion models,discrete diffusion models also learn to restore corrupted tokens, with corruption defined by absorbing-state [3,26,29,45],uniform[1],or Gaussianlike transitions [1,26].Among these,the absorbing-state transition is the predominant choice due to its strong empirical performance [29]. It corrupts tokens into a special [MASK] state,aligning with representative masked generative models such as BERT[9] and MaskGIT[3]. Existing autoregressive and discrete diffusion models perform well when each image is represented by a small number of discrete tokens derived from low-dimensional latents.However,when representation-based tokenizers produce more tokens per latent,the total token count grows dramatically and existing models become impractical. Therefore,in this work,we extend discrete diffusion models to more efficiently handle tokens derived from high-dimensional latents.\n\n## 3.Method\n\nOur goal is to enable discrete generative modeling of highdimensional representation tokens from frozen pretrained encoders.This requires two steps:discretizing the continuous high-dimensional features,and modeling the resulting discrete token distribution.We frst review the necessary preliminaries:high-dimensional features from pretrained encoders and dimension-wise quantization that enables tractable discretization (Sec.3.1). The core challenge—and our main contribution—lies in modeling the joint distribution of the resulting h × w × d discrete tokens,an exponentially large space where traditional methods fail.We propose Cubic Discrete Diffusion (CubiD), which performs masked prediction across both spatial and dimensional axes simultaneously. By masking and predicting at the dimension level, CubiD captures complex interdimensional dependencies while enabling efcient parallel generation,transforming intractable sequential modeling into practical iterative refinement (Sec. 3.2).\n\n![](images/1eafac52892166386681d533f32eeef3d31b9776144cf80cb53cbe840b7de4d0.jpg)  \nFigur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes.\n\n## 3.1. Preliminaries\n\nHigh-dimensional Representation Tokens.Our method operates on features from frozen pretrained vision encoders. Given an input image $\\mathbf { x } ~ \\in ~ \\mathbb { R } ^ { \\mathbf { \\hat { H } } \\times W \\times 3 }$ ，apretrained encoder E (e.g.,DINOv2 [30], SigLIP2 [40]) with patch size p produces a feature map $\\textbf { z } = \\boldsymbol { E } ( \\mathbf { x } ) \\in \\mathbb { R } ^ { h \\times w \\times d }$ ，where $h \\ = \\ H / p , \\ w \\ = \\ W / p ,$ and d is the feature dimension (typically 768-1024).These encoders produce semantically rich,high-dimensional features that capture both local details and global semantic structures,in contrast to the low-dimensional compressed spaces (8-32 dims) commonly used in generative modeling.\n\nDimension-wise Quantization.To discretize these highdimensional features,we adopt dimension-wise quantization [43],which operates directly on frozen encoder features without any retraining.As shown in Figure 3(a),it independently quantizes each continuous value into L discrete levels:\n\n$$\nq _ { x , y , i } = \\mathrm { Q u a n t i z e } ( z _ { x , y , i } ; L ) ,\\tag{1}\n$$\n\nwhere $z _ { x , y , i } \\in$ z denotes the i-th dimension at spatial position $( x , y )$ ,and Quantize(-;L) maps continuous values to discrete indices in $\\{ 0 , . . . , L - 1 \\}$ .Unlike vector quantization which struggles to cover high-dimensional spaces with fixed-size codebooks,this method treats each dimension independently,making it tractable even for 768-dimensional features. The resulting $h \\times w \\times d$ discrete tokens maintain their tensor structure.More details can be found in [43]. Through experiments on understanding tasks,we verify that this discretization preserves the semantic quality of the original representations (Table 3).\n\n## 3.2. Cubic Discrete Diffusion\n\nThe discretization process,although preserving continuouslevel quality,yields h ×w ×d discrete tokens.For example, it takes 196,608 tokens for a typical 16x16x768 configuration.The real challenge lies in how to model this massive token space: direct autoregressive generation would require O(hwd) steps,while naive parallel methods fail to capture the complex dependencies within this structured tensor.\n\nMasking Across Spatial and Dimensional Axes.In this paper, we propose Cubic Discrete Diffusion (CubiD),which follows the discrete diffusion paradigm by treating generation as iterative denoising of masked tokens.Unlike traditional discrete diffusion methods like MaskGIT [3] that mask entire spatial positions,CubiD performs fine-grained masking at the dimension level—treating the $h \\times w \\times d$ tensor as a unified modeling space where any subset of dimensions can be masked and predicted from the remaining visible context.This enables the model to capture rich dependencies both within and across spatial locations.\n\nGiven discrete tokens $\\mathbf { q } \\in \\{ 0 , . . . , L - 1 \\} ^ { h \\times w \\times d }$ from dimension-wise quantization, CubiD learns to predict randomly masked tokens from visible ones．As illustrated in Figure 3(b),during training,we apply a binary mask $\\mathbf { M } \\in \\{ 0 , 1 \\} ^ { h \\times w \\times d }$ where each element is independently and randomly masked.We first sample a masking ratio r from a truncated Gaussian distribution:\n\n$$\nr \\sim \\mathrm { T r u n c N o r m } ( \\mu = 1 . 0 , \\sigma , [ 0 , 1 . 0 ] )\\tag{2}\n$$\n\nwhere $\\mu = 1 . 0$ is the mean and o is the standard deviation, with the distribution truncated to the range [O,1]. Then, we randomlyselect $\\lfloor r \\times h \\times w \\times d \\rfloor$ positions to mask across the entire tensor. This distribution covers the fullrange [O,1] to ensure consistency with inference,which progresses from fully masked to fully unmasked.With $\\mu = 1 . 0$ ,itbiases toward aggressive masking,encouraging the model to learn robust predictions from minimal context.Masked positions are replaced with a learnable [MASK] token,and the model is trained to predict the original discrete token categories at these positions through cross-entropy loss:\n\n![](images/81cc91a110464149186ceac2ffd68c0691231fc6e3f1adeee405b9e1f4af80d9.jpg)  \nFigure4.InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details.\n\n$$\n\\mathcal { L } = - \\mathbb { E } _ { \\mathbf { q } , \\mathbf { M } } \\left[ \\sum _ { i \\in \\mathbf { M } } \\log p ( q _ { i } | \\mathbf { q } _ { \\bar { \\mathbf { M } } } ) \\right]\\tag{3}\n$$\n\nwhere $\\mathbf { q } _ { \\mathrm { M } }$ denotes the visible tokens that provide context for prediction.\n\nThis fine-grained masking allows the model to observe partial dimensions at each location,learning how different dimensions jointly encode information and constrain each other's values.Through bidirectional attention over the partially masked tensor, the model discovers complex dependency patterns both within and across spatial positions without being constrained to predefined factorization orders.\n\nInference.During inference,CubiD generates images through iterative refinement starting from a fully masked tensor.As illustrated in Figure 4,the model begins with all tokens masked (O%）and progressively unmasks them until reaching a complete image (loo%).At each iteration t, the model predicts all masked tokens simultaneously and unmasks a subset randomly. Motivated by MaskGIT [3], the number of tokens to unmask follows a cosine schedule.The schedule ensures a coarse-to-fine generation process where early iterations establish overall structure and later iterations refine details. Crucially, the parallel nature of our approach means generation requires only O(T) iterations—typically hundreds of steps-regardless of the tensor dimensionality d,making high-dimensional discrete generation computationally feasible.\n\nModel Architecture.CubiD employs a standard Transformer architecture with bidirectional attention.As shown in Figure 3(b),each spatial position,comprising d tokens,is treated as a single token for the transformer model, thereby preserving the spatial structure while enabling fine-grained predictions. Specifically, for each spatial position,we dequantize its d discrete tokens back to continuous scalars (with ［MASK] tokens mapped to a learnable value） and concatenate them into a d-dimensional feature vector. This results in a sequence of h × w tokens,each with dimensionality d. The Transformer processes this sequence through bidirectional attention,with the sequence length remaining fixed at h × w regardless of feature dimensionality. Each output token from the Transformer is passed through an MLP-based prediction head that produces d × L logits,enabling simultaneous prediction of all d dimensions at that spatial position. This design decouples computational complexity from feature dimensionality—the Transformer's sequence length depends only on spatial resolution, not on d.\n\nTable 1.Model sizes and architecture configurations of CubiD.\n<table><tr><td>Model</td><td>Hidden Dim</td><td>Blocks</td><td>Parameters</td></tr><tr><td>CubiD-L</td><td>1536</td><td>32</td><td>946M</td></tr><tr><td>CubiD-XL</td><td>1920</td><td>32</td><td>1.4B</td></tr><tr><td>CubiD-XXL</td><td>3072</td><td>32</td><td>3.7B</td></tr></table>\n\n## 4. Experiments\n\n## 4.1.Implementation Details\n\nRepresentation Encoders.We use frozen DINOv2-B [30] and SigLIP2-B [4O] as representation encoders,both producing 16x16x768 feature maps. DINOv2-B processes 224×224 images while SigLIP2-B takes 256x256 inputs. For reconstruction,we adopt decoders from [53] that decode 256x256 images.Unless otherwise specified,we use DINOv2-B as our default encoder.\n\nModel Configurations.We evaluate three model sizes as shown in Table 1.All models use 16 attention heads with MLP ratio of 4. Unless otherwise specified,we report results using CubiD-L.\n\nTraining and Inference. Models are trained on ImageNet [8] at 256x256 resolution. We use AdamW optimizer with learning rate $5 \\times 1 0 ^ { - 5 }$ ,cosine schedule,and 0.05 weight decay.Gradient clipping is applied at norm 3.0.Ablation studies use 15O epochs while final results are reported at 8OO epochs. Generation employs iterative unmasking with cosine scheduling for mask ratios,using T = 256 steps for ablation studies.\n\n![](auto/images/rf_full_regions/page_006_Table_2_18451403a218.jpg)\nTable 2. Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2).\n<table><tr><td colspan=\"3\">DINOv2 [30] L rFID↓ IS↑</td></tr><tr><td>Continuous</td><td></td><td>-0.57 226.9</td></tr><tr><td>Discrete</td><td></td><td>21.38 206.1 40.70 221.1</td></tr><tr><td></td><td>8 0.57 226.8</td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td>16 0.57 226.9</td></tr></table>\n\n<table><tr><td colspan=\"2\">SigLIP2 [40] L rFID↓IS↑</td></tr><tr><td>Continuous</td><td>-0.69 217.5</td></tr><tr><td>Discrete</td><td>41.54 193.8 8 0.92 210.7</td></tr><tr><td></td><td>16 0.69 216.2</td></tr><tr><td></td><td>32 0.69 217.5</td></tr><tr><td></td><td></td></tr></table>\n\nTable 3.Understanding performance onLLaVA benchmarks with different quantization methods.Evaluation using SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degrad\n\n[... middle omitted in main merge prompt; see parse/full.md and part analyses ...]\n\ns limited scaling benefits—performance slightly degrades from VFMTok-XXL(1.95 gFID) to VFMTok-3B(2.04 gFID).In contrast, CubiD demonstrates consistent improvement with scale,from 2.37 (L) to 2.04 (XL) to 1.88(XXL） with cfg,while generating directly in the original high-dimensional representation space without any reorganization or compression.These results illustrate the effectiveness of our discrete diffusion approach for highdimensional token generation.\n\n## 5. Conclusion\n\nIn this work,we introduce CubiD,a novel discrete generative model that directly models native high-dimensional representation tokens for the first time.We achieve this through fine-grained masking across the entire spatialdimensional tensor, transforming the intractable problem of generating hundreds of thousands of sequential tokens into manageable parallel iterations. Our work demonstrates that discrete generation with standard cross-entropy loss can achieve state-of-the-art results even in the challenging regime of high-dimensional tokens,without requiring compression or reorganization of the original representation space.The preservation of native representation ability enables the same discrete tokens to serve both understanding and generation tasks,eliminating the need for separate tokenization schemes across tasks.We hope our work will inspire future research on unified multimodal architectures.\n\n## Acknowledgment\n\nThis work is supported in part by the Research Grant Council of Hong Kong through the NSFC-RGC Joint Research Scheme under grant N\\_HKU769/25.The authors are grateful to Boyang Zheng for helpful discussions on RAE and to Difan Zou,Yi Zhang,Yujin Han and Yuanzhi Zhu for valuable feedback on the early version of this work.\n\n## References\n\n[1] Jacob Austin,Daniel D Johnson,Jonathan Ho,Daniel Tarlow,and Rianne Van Den Berg. Structured denoising diffusion models in discrete state-spaces.In NeurIPS,2O21．2, 3\n\n[2] Tom Brown,Benjamin Mann,Nick Ryder,Melanie Subbiah,Jared D Kaplan,Prafulla Dhariwal,Arvind Neelakantan,Pranav Shyam, Sastry,et al. Language models are fewshot learners.In NeurIPS,2020.1\n\n[3] Huiwen Chang，Han Zhang,Lu Jiang，Ce Liu,and William T.Freeman.Maskgit: Masked generative image transformer.In CVPR,2022.2,3,4,5,8\n\n[4] Junyu Chen,Han Cai,Junsong Chen,Enze Xie,Shang Yang, Haotian Tang,Muyang Li, Yao Lu,and Song Han.Deep compression autoencoder for efficient high-resolution diffusion models.arXiv preprint arXiv:2410.10733,2024.1\n\n[5] Jiuhai Chen,Zhiyang Xu, Xichen Pan, Yushi Hu, Can Qin, Tom Goldstein,Lifu Huang,Tianyi Zhou, Saining Xie, Silvio Savarese,et al.Blip3-o:A family of fully open unifed multimodal models-architecture,training and dataset.arXiv preprint arXiv:2505.09568,2025.1\n\n[6] Yufeng Cui,Honghao Chen,Haoge Deng, Xu Huang, Xinghang Li, Jirong Liu, Yang Liu, Zhuoyan Luo,Jinsheng Wang，Wenxuan Wang,etal.Emu3.5:Native multimodal models are world learners.arXiv preprint arXiv:2510.26583, 2025.1\n\n[7] Bin Dai and David Wipf.Diagnosing and enhancing Vae models.arXiv preprint arXiv:1903.05789,2019.3\n\n[8] Jia Deng,Wei Dong,Richard Socher,Li-Jia Li,Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database.In CVPR,2009.3,6,8,1\n\n[9]Jacob Devlin,Ming-Wei Chang,Kenton Lee,and Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding.In NAACL,2019.3\n\n[10] Patrick Esser,Robin Rombach,and Bjorn Ommer. Taming transformers for high-resolution image synthesis. In CVPR, 2021. 1, 3,8\n\n[11] Chaoyou Fu,Peixian Chen，Yunhang Shen,Yulei Qin, Mengdan Zhang,Xu Lin, Jinrui Yang,Xiawu Zheng,Ke Li, Xing Sun,et al. Mme:A comprehensive evaluation benchmark for multimodal large language models.arXiv preprint arXiv:2306.13394,2023.6,1\n\n[12] Shuyang Gu,Dong Chen,Jianmin Bao,Fang Wen,Bo Zhang,Dongdong Chen,Lu Yuan,and Baining Guo．Vector quantized diffusion model for text-to-image synthesis.In CVPR,2022.8\n\n[13]Jian Han,Jinlai Liu,Yi Jiang,Bin Yan, Yuqi Zhang,Zehuan Yuan,Bingyue Peng,and Xiaobing Liu.Infinity: Scaling bitwise autoregressive modeling for high-resolution image synthesis.arXiv preprint arXiv:2412.04431,2024.3\n\n[14] Martin Heusel,Hubert Ramsauer,Thomas Unterthiner, Bernhard Nesser,and Sepp Hochreiter. Gans trained by a two time-scale update rule converge to a local nash equilibrium.NeurIPS,30,2017.6\n\n[15] Drew A Hudson and Christopher D Manning.Gqa:A new dataset for real-world visual reasoning and compositional question answering.In CVPR,2019.6,1\n\n[16]Diederik P Kingma and Max Welling.Auto-encoding variational bayes.arXiv preprint arXiv:1312.6114,2013.1,3\n\n[17] Dan Kondratyuk,Lijun Yu,Xiuye Gu,José Lezama, Jonathan Huang,Rachel Hornung,Hartwig Adam,Hassan Akbari,Yair Alon,Vighnesh Birodkar,et al.Videopoet:A large language model for zero-shot video generation.arXiv preprint arXiv:2312.14125,2023.3\n\n[18] Tuomas Kynkäänniemi,Tero Karras,Samuli Laine,Jaakko Lehtinen,and Timo Aila.Improved precision and recall metric for assessing generative models.NeurIPS,32,2019.6\n\n[19] Doyup Lee,Chiheon Kim, Saehoon Kim,Minsu Cho,and Wook-Shin Han.Autoregressive image generation using residual quantization.In CVPR,2022.8\n\n[20] José Lezama,Huiwen Chang,Lu Jiang,and Irfan Essa. Improved masked image generation with token-critic.In ECCV, 2022. 8\n\n[21] Jose Lezama,Tim Salimans,Lu Jiang,Huiwen Chang, Jonathan Ho,and Irfan Essa．Discrete predictor-corrector diffusion models for image synthesis. In ICLR,2022.8\n\n[22] Junnan Li,Dongxu Li,Caiming Xiong,and Steven Hoi. Blip: Bootstrapping language-image pre-training for unified vision-language understanding and generation. In ICML, 2022.1\n\n[23] Yifan Li, Yifan Du,Kun Zhou,Jinpeng Wang,Wayne Xin Zhao,and Ji rong Wen．Evaluating object hallucination in large vision-language models. 2023. 6,1\n\n[24] Dongyang Liu,Shitian Zhao,Le Zhuo,Weifeng Lin, Yu Qiao,Hongsheng Li,and Peng Gao．Lumina-mgpt: Illuminate flexible photorealistic text-to-image generation with multimodal generative pretraining.arXiv preprint arXiv:2408.02657,2024.3\n\n[25] Haotian Liu,Chunyuan Li,Yuheng LiBo Li,Yuanhan Zhang,Sheng Shen,and Yong Jae Lee.Llava-next:Improved reasoning,ocr,and world knowledge,2024.6,1\n\n[26] Aaron Lou,Chenlin Meng,and Stefano Ermon．Discrete diffusion modeling by estimating the ratios of the data distribution. arXiv preprint arXiv:2310.16834,2023.2,3\n\n[27] Nanye Ma,Mark Goldstein，Michael S.Albergo, Nicholas M.Bof，Eric Vanden-Eijnden，and Saining Xie.Sit: Exploring flow and diffusion-based generative models with scalable interpolant transformers.arXiv preprint arXiv:2401.08740,2024.1\n\n[28] Fabian Mentzer,David Minnen,Eirikur Agustsson,and Michael Tschannen.Finite scalar quantization: Vq-vae made simple.arXiv preprint arXiv:2309.15505,2023.3\n\n[29] Shen Nie,Fengqi Zhu, Zebin You, Xiaolu Zhang,Jingyang Ou,Jun Hu,Jun Zhou,Yankai Lin,Ji-Rong Wen,and Chongxuan Li.Large language diffusion models.arXiv preprint arXiv:2502.09992,2025.3\n\n[30] Maxime Oquab,Timothée Darcet,Theo Moutakanni,Huy Vo,Marc Szafraniec,Vasil Khalidov,Pierre Fernandez, Daniel Haziza,Francisco Massa,Alaaeldin El-Nouby,et al. Dinov2:Learning robust visual features without supervision. arXiv preprint arXiv:2304.07193,2023.3,4,5,6,7\n\n[31] Aditya Ramesh,Mikhail Pavlov,Gabriel Goh, Scott Gray, Chelsea Voss,Alec Radford,Mark Chen,and Ilya Sutskever. Zero-shot text-to-image generation.In ICML, pages 8821- 8831,2021. 3\n\n[32] Ali Razavi,Aäron van den Oord,and Oriol Vinyals.Generating diverse high-fidelity images with vq-vae-2.In NeurIPS, 2019.8\n\n[33] Tim Salimans,Ian Goodfellow,Wojciech Zaremba,Vicki Cheung,Alec Radford,and Xi Chen.Improved techniques for training gans.NeurIPS,29,2016.6\n\n[34] Minglei Shi,Haolin Wang,Wenzhao Zheng,Ziyang Yuan, Xiaoshi Wu,Xintao Wang,Pengfei Wan,Jie Zhou,and Jiwen Lu.Latent diffusion model without variational autoencoder. arXiv preprint arXiv:2510.15301,2025.3\n\n[35] Amanpreet Singh,Vivek Natarajan,Meet Shah,Yu Jiang, Xinlei Chen，Dhruv Batra,Devi Parikh,and Marcus Rohrbach．Towards vqa models that can read．In CVPR, 2019. 6,1\n\n[36] Peize Sun,Yi Jiang,Shoufa Chen,Shilong Zhang,Bingyue Peng,Ping Luo,and Zehuan Yuan．Autoregressive model beats diffusion: Llama for scalable image generation.arXiv preprint arXiv:2406.06525,2024.1,3,8\n\n[37] Quan Sun, Yufeng Cui, Xiaosong Zhang,Fan Zhang, Qiying Yu, Zhengxiong Luo,Yueze Wang,Yongming Rao,Jingjing Liu,Tiejun Huang,and Xinlong Wang. Generative multimodal models are in-context learners.2023.1\n\n[38] Chameleon Team． Chameleon:Mixed-modal early-fusion foundation models.arXiv preprint arXiv:2405.09818,2024.\n\n[39] Keyu Tian,Yi Jiang,Zehuan Yuan,Bingyue Peng,and Liwei Wang.Visual autoregressive modeling: Scalable image generation via next-scale prediction.arXiv preprint arXiv:2404.02905,2024. 1,8\n\n[40] Michael Tschannen,Alexey Gritsenko,Xiao Wang,Muhammad Ferjad Naeem,Ibrahim Alabdulmohsin，Nikhil Parthasarathy,Talfan Evans,Lucas Beyer,Ye Xia,Basil Mustafa,et al. Siglip 2:Multilingual vision-language encoders with improved semantic understanding,localization, and dense features.arXiv preprint arXiv:2502.14786,2025. 3,4,5,6,7\n\n[41] Aaron van den Oord, Oriol Vinyals,and koray kavukcuoglu. Neural discrete representation learning．In NeurIPS,2017. 1,2, 6\n\n[42] Yuqing Wang,Tianwei Xiong,Daquan Zhou, Zhijie Lin, Yang Zhao, Bingyi Kang,JiashiFeng,and Xihui Liu.Loong: Generating minute-level long videos with autoregressive language models.arXiv preprint arXiv:2410.02757,2024.3\n\n[43] Yuqing Wang,Zhijie Lin,Yao Teng,Yuanzhi Zhu,Shuhuai Ren,Jiashi Feng,and Xihui Liu.Bridging continuous and\n\ndiscrete tokens for autoregressive visual generation．2025. 2,3,4\n\n[44] Yuqing Wang,Shuhuai Ren,Zhijie Lin, Yujin Han,Haoyuan Guo,Zhenheng Yang,Difan Zou,Jiashi Feng,and Xihui Liu.Parallelized autoregressive visual generation.In CVPR, 2025.3\n\n[45] Mark Weber,Lijun Yu,Qihang Yu,Xueqing Deng,Xiaohui Shen,Daniel Cremers,and Liang-Chieh Chen.Maskbit: Embedding-free image generation via bit tokens.Transactions onMachineLearning Research,2024.3\n\n[46] Jinheng Xie,Weijia Mao,Zechen Bai,David Junhao Zhang, Weihao Wang，Kevin Qinghong Lin,Yuchao Gu,Zhijie Chen,Zhenheng Yang,and Mike Zheng Shou． Show-o: One single transformer to unify multimodal understanding and generation. ArXiv,2024.1\n\n[47] Jiahui Yu, Xin Li,Jing Yu Koh, Han Zhang,Ruoming Pang, James Qin,Alexander Ku, Yuanzhong Xu,Jason Baldridge, and Yonghui Wu.Vector-quantized image modeling with improved vqgan.arXiv preprint arXiv:2110.04627,2021.1, 8\n\n[48] Jiahui Yu, Yuanzhong Xu, Jing Yu Koh,Thang Luong,Gunjan Baid, Zirui Wang,Vijay Vasudevan,Alexander Ku,Yinfei Yang,Burcu Karagol Ayan,et al.Scaling autoregressive models for content-rich text-to-image generation. arXiv preprint arXiv:2206.10789,2022.3\n\n[49] Lijun Yu,José Lezama,Nitesh B Gundavarapu,Luca Versari,Kihyuk Sohn,David Minnen，Yong Cheng，Agrim Gupta, Xiuye Gu, Alexander G Hauptmann, et al. Language model beats diffusion-tokenizer is key to visual generation. In ICLR,2024.3\n\n[50] Qihang Yu,Mark Weber, Xueqing Deng,Xiaohui Shen, Daniel Cremers,and Liang-Chieh Chen.An image is worth 32 tokens for reconstruction and generation．arxiv: 2406.07550,2024. 8\n\n[51] Yue Zhao,Yuanjun Xiong,and Philipp Krähenbuhl. Image and video tokenization with binary spherical quantization. arXiv preprint arXiv:2406.07548,2024.3\n\n[52] Anlin Zheng,Xin Wen,Xuanyang Zhang,Chuofan Ma, Tiancai Wang,Gang Yu,Xiangyu Zhang,and Xiaojuan Qi. Vision foundation models as effective visual tokenizers for autoregressive image generation.arXiv preprint arXiv:2507.08441,2025. 3,8\n\n[53] Boyang Zheng,Nanye Ma, Shengbang Tong,and Saining Xie.Diffusion transformers with representation autoencoders．arXiv preprint arXiv:2510.11690,2025．1,3,5, 2\n\n[54] Chuanxia Zheng and Andrea Vedaldi. Online clustered codebook.In ICCV,2023.1\n\n[55] Lianmin Zheng，Wei-Lin Chiang，Ying Sheng，Siyuan Zhuang,Zhanghao Wu,Yonghao Zhuang,Zi Lin, Zhuohan Li,Dacheng Li, Eric.P Xing,Hao Zhang,Joseph E.Gonzalez,and Ion Stoica. Judging llm-as-a-judge with mt-bench and chatbot arena.arXiv preprint arXiv:2306.05685,2023. 1",
+  "part_analyses": [
+    {
+      "part_id": "part_001",
+      "section_role": "Abstract and Introduction",
+      "method_evidence": [
+        {
+          "claim": "CubiD performs fine-grained masking throughout the high-dimensional discrete representation—any dimension at any position can be masked and predicted from partial observations.",
+          "section": "Abstract",
+          "anchor": "CubiD performs fine-grained masking throughout the high-dimensional discrete representation—any dimension at any position can be masked and predicted from partial observations.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "We propose Cubic Discrete Diffusion (CubiD), a masked diffusion method for high-dimensional discrete generation.",
+          "section": "1. Introduction",
+          "anchor": "We propose Cubic Discrete Diffusion (CubiD), a masked diffusion method [1,3,26] for high-dimensional discrete generation.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Our key insight is to perform finegrained masking across the three-dimensional h × w × d tensor.",
+          "section": "1. Introduction",
+          "anchor": "Our key insight is to perform finegrained masking across the three-dimensional h × w × d tensor.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "CubiD starts from a fully masked tensor and iteratively refines it through progressive unmasking, randomly selecting tokens across the entire tensor to unmask at each step.",
+          "section": "1. Introduction",
+          "anchor": "during generation, CubiD starts from a fully masked tensor and iteratively refines it through progressive unmasking, randomly selecting tokens across the entire tensor to unmask at each step until reaching the complete representation.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "CubiD achieves state-of-the-art discrete generation on ImageNet-256.",
+          "table_or_figure": "Abstract",
+          "metric": "state-of-the-art",
+          "value": "state-of-the-art",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Dimension-wise quantized features achieve nearly identical performance to continuous features on multimodal understanding tasks.",
+          "table_or_figure": "Table 3",
+          "metric": "performance",
+          "value": "nearly identical",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Figure 1",
+          "role_hint": "Comparison of discrete visual generation approaches",
+          "caption": "Comparison of discrete visual generation approaches. (a) Low-dimensional token generation... (b) High-dimensional token generation... Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor...",
+          "confidence": 0.95
+        },
+        {
+          "label": "Figure 2",
+          "role_hint": "Generated samples from CubiD",
+          "caption": "Generated samples from CubiD. Class-conditional generation results on ImageNet 256×256 using high-dimensional representation tokens from DINOv2-B encoder, demonstrating fine details and textures across diverse categories.",
+          "confidence": 0.95
+        },
+        {
+          "label": "Table 3",
+          "role_hint": "Validation of dimension-wise quantization preserving semantic quality",
+          "caption": "We validate this approach on multimodal understanding tasks: dimension-wise quantized features achieve nearly identical performance to continuous features, while VQ suffers substantial degradation (Table 3).",
+          "confidence": 0.9
+        }
+      ],
+      "source_links": [
+        {
+          "label": "Code",
+          "url": "https://github.com/YuqingWang1029/CubiD",
+          "anchor": "Code is available at: https://github.com/YuqingWang1029/CubiD",
+          "confidence": 1.0
+        }
+      ],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_001",
+        "part_index": 1,
+        "part_count": 9,
+        "chunk_chars": 7864,
+        "latency_seconds": 10.861,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 3201,
+          "completion_tokens_est": 1109,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 4310,
+          "total_with_reasoning_tokens_est": 4310,
+          "estimated_cost_usd": 0.002357,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 2223,
+          "completion_tokens_api": 852,
+          "total_tokens_api": 3075,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1583,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 852,
+            "prompt_tokens": 2223,
+            "total_tokens": 3075,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 1583
+          },
+          "estimated_cost_usd_api": 0.001432,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 3698,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 854,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    },
+    {
+      "part_id": "part_002",
+      "section_role": "abstract, contributions, related work, method overview",
+      "method_evidence": [
+        {
+          "claim": "CubiD performs masked prediction across both spatial and dimensional axes simultaneously.",
+          "section": "3. Method",
+          "anchor": "We propose Cubic Discrete Diffusion (CubiD), which performs masked prediction across both spatial and dimensional axes simultaneously.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "CubiD treats the h × w × d tensor as a unified space with fine-grained masking.",
+          "section": "Contributions",
+          "anchor": "treating the h × w × d tensor as a unified space with fine-grained masking",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Dimension-wise quantization discretizes continuous high-dimensional features.",
+          "section": "3.1",
+          "anchor": "dimension-wise quantization that enables tractable discretization",
+          "confidence": 0.9
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "CubiD achieves 1.88 FID on ImageNet 256x256 with 768-dimensional discrete tokens.",
+          "table_or_figure": "N/A",
+          "metric": "FID",
+          "value": "1.88",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Method scales from 900M to 3.7B parameters.",
+          "table_or_figure": "N/A",
+          "metric": "Parameters",
+          "value": "900M to 3.7B",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Figure 3",
+          "role_hint": "Overview of Cubic Discrete Diffusion",
+          "caption": "Figure 3. Overview of Cubic Discrete Diffusion. (a) High-dimensional Token Discretization... (b) Training via Dimension-wise Mask Modeling...",
+          "confidence": 0.95
+        }
+      ],
+      "source_links": [],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_002",
+        "part_index": 2,
+        "part_count": 9,
+        "chunk_chars": 7036,
+        "latency_seconds": 5.909,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 2954,
+          "completion_tokens_est": 536,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 3490,
+          "total_with_reasoning_tokens_est": 3490,
+          "estimated_cost_usd": 0.001751,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 2105,
+          "completion_tokens_api": 475,
+          "total_tokens_api": 2580,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1465,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 475,
+            "prompt_tokens": 2105,
+            "total_tokens": 2580,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 1465
+          },
+          "estimated_cost_usd_api": 0.001053,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 1788,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 477,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    },
+    {
+      "part_id": "part_003",
+      "section_role": "Method",
+      "method_evidence": [
+        {
+          "claim": "CubiD performs fine-grained masking at the dimension level—treating the h×w×d tensor as a unified modeling space where any subset of dimensions can be masked and predicted from the remaining visible context.",
+          "section": "3.2",
+          "anchor": "CubiD performs fine-grained masking at the dimension level—treating the $h \\times w \\times d$ tensor as a unified modeling space where any subset of dimensions can be masked and predicted from the remaining visible context.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "During training, we apply a binary mask M ∈ {0,1}^{h×w×d} where each element is independently and randomly masked.",
+          "section": "3.2",
+          "anchor": "during training,we apply a binary mask $\\mathbf { M } \\in \\{ 0 , 1 \\} ^ { h \\times w \\times d }$ where each element is independently and randomly masked.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "The model is trained to predict the original discrete token categories at masked positions through cross-entropy loss.",
+          "section": "3.2",
+          "anchor": "the model is trained to predict the original discrete token categories at these positions through cross-entropy loss",
+          "confidence": 0.95
+        },
+        {
+          "claim": "During inference, CubiD generates images through iterative refinement starting from a fully masked tensor.",
+          "section": "3.2",
+          "anchor": "During inference,CubiD generates images through iterative refinement starting from a fully masked tensor.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "The number of tokens to unmask follows a cosine schedule.",
+          "section": "3.2",
+          "anchor": "the number of tokens to unmask follows a cosine schedule.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Through experiments on understanding tasks, we verify that this discretization preserves the semantic quality of the original representations.",
+          "table_or_figure": "Table 3",
+          "metric": "semantic quality",
+          "value": "preserves",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [
+        {
+          "name": "Dimension-wise Quantization",
+          "latex": "q_{x,y,i} = \\mathrm{Quantize}(z_{x,y,i}; L)",
+          "meaning": "Quantizes each continuous value into L discrete levels independently per dimension.",
+          "section": "3.1",
+          "confidence": 0.95
+        },
+        {
+          "name": "Masking Ratio Sampling",
+          "latex": "r \\sim \\mathrm{TruncNorm}(\\mu = 1.0, \\sigma, [0, 1.0])",
+          "meaning": "Samples a masking ratio from a truncated Gaussian distribution biased toward aggressive masking.",
+          "section": "3.2",
+          "confidence": 0.95
+        },
+        {
+          "name": "Cross-entropy Loss",
+          "latex": "\\mathcal{L} = -\\mathbb{E}_{\\mathbf{q}, \\mathbf{M}} \\left[ \\sum_{i \\in \\mathbf{M}} \\log p(q_i | \\mathbf{q}_{\\bar{\\mathbf{M}}}) \\right]",
+          "meaning": "Trains the model to predict masked discrete tokens from visible context.",
+          "section": "3.2",
+          "confidence": 0.95
+        }
+      ],
+      "figure_table_roles": [
+        {
+          "label": "Figure 3",
+          "role_hint": "Overview of Cubic Discrete Diffusion",
+          "caption": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes.",
+          "confidence": 0.9
+        },
+        {
+          "label": "Figure 4",
+          "role_hint": "Inference process of CubiD",
+          "caption": "Figure4.InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details.",
+          "confidence": 0.9
+        }
+      ],
+      "source_links": [],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_003",
+        "part_index": 3,
+        "part_count": 9,
+        "chunk_chars": 7125,
+        "latency_seconds": 14.228,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 2981,
+          "completion_tokens_est": 1402,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 4383,
+          "total_with_reasoning_tokens_est": 4383,
+          "estimated_cost_usd": 0.002516,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 2472,
+          "completion_tokens_api": 1245,
+          "total_tokens_api": 3717,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1832,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 1245,
+            "prompt_tokens": 2472,
+            "total_tokens": 3717,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 1832
+          },
+          "estimated_cost_usd_api": 0.001882,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 4673,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 1247,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    },
+    {
+      "part_id": "part_004",
+      "section_role": "method details and experiments",
+      "method_evidence": [
+        {
+          "claim": "CubiD generates images through iterative refinement starting from a fully masked tensor.",
+          "section": "Model Architecture",
+          "anchor": "CubiD generates images through iterative refinement starting from a fully masked tensor.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "The number of tokens to unmask follows a cosine schedule.",
+          "section": "Model Architecture",
+          "anchor": "the number of tokens to unmask follows a cosine schedule.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Each spatial position, comprising d tokens, is treated as a single token for the transformer model.",
+          "section": "Model Architecture",
+          "anchor": "each spatial position,comprising d tokens,is treated as a single token for the transformer model",
+          "confidence": 0.95
+        },
+        {
+          "claim": "The Transformer processes this sequence through bidirectional attention, with the sequence length remaining fixed at h × w regardless of feature dimensionality.",
+          "section": "Model Architecture",
+          "anchor": "The Transformer processes this sequence through bidirectional attention,with the sequence length remaining fixed at h × w regardless of feature dimensionality.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Each output token from the Transformer is passed through an MLP-based prediction head that produces d × L logits.",
+          "section": "Model Architecture",
+          "anchor": "Each output token from the Transformer is passed through an MLP-based prediction head that produces d × L logits",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Effect of quantization levels on reconstruction quality.",
+          "table_or_figure": "Table 2",
+          "metric": "rFID",
+          "value": "DINOv2 L=8: 0.57, SigLIP2 L=16: 0.69",
+          "confidence": 0.95
+        },
+        {
+          "claim": "DQ maintains continuous-level performance while VQ shows significant degradation.",
+          "table_or_figure": "Table 3",
+          "metric": "GQA",
+          "value": "SigLIP2-DQ: 63.1, SigLIP2-VQ: 54.9",
+          "confidence": 0.95
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Table 1",
+          "role_hint": "model sizes and architecture configurations",
+          "caption": "Model sizes and architecture configurations of CubiD.",
+          "confidence": 0.95
+        },
+        {
+          "label": "Table 2",
+          "role_hint": "ablation on quantization levels",
+          "caption": "Effect of quantization levels on reconstruction quality.",
+          "confidence": 0.95
+        },
+        {
+          "label": "Table 3",
+          "role_hint": "comparison of quantization methods on LLaVA benchmarks",
+          "caption": "Understanding performance on LLaVA benchmarks with different quantization methods.",
+          "confidence": 0.95
+        }
+      ],
+      "source_links": [],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_004",
+        "part_index": 4,
+        "part_count": 9,
+        "chunk_chars": 5030,
+        "latency_seconds": 7.544,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 2353,
+          "completion_tokens_est": 889,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 3242,
+          "total_with_reasoning_tokens_est": 3242,
+          "estimated_cost_usd": 0.001797,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 2181,
+          "completion_tokens_api": 728,
+          "total_tokens_api": 2909,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1541,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 728,
+            "prompt_tokens": 2181,
+            "total_tokens": 2909,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 1541
+          },
+          "estimated_cost_usd_api": 0.001306,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 2964,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 730,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    },
+    {
+      "part_id": "part_005",
+      "section_role": "Experiments: Discretization studies and ablation",
+      "method_evidence": [
+        {
+          "claim": "Dimension-wise quantization preserves continuous-level performance while VQ shows significant degradation.",
+          "section": "4.2",
+          "anchor": "SigLIP2-DQ achieves nearly identical performance to continuous features (63.1 vs 63.2 on GQA,59.8 vs 59.6 on TextVQA),while SigLIP2-VQ shows significant degradation across all metrics.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Masking strategy: per-element masking is used.",
+          "section": "Table 4(b)",
+          "anchor": "Per-element (Ours) gFID↓ 5.33",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Learned mask token is used.",
+          "section": "Table 4(c)",
+          "anchor": "Learned gFID↓ 5.33",
+          "confidence": 0.9
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "SigLIP2-DQ matches continuous SigLIP2 on multimodal benchmarks.",
+          "table_or_figure": "Table 3",
+          "metric": "GQA",
+          "value": "63.1 vs 63.2",
+          "confidence": 0.95
+        },
+        {
+          "claim": "SigLIP2-DQ matches continuous SigLIP2 on TextVQA.",
+          "table_or_figure": "Table 3",
+          "metric": "TextVQA",
+          "value": "59.8 vs 59.6",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Per-element masking achieves best gFID.",
+          "table_or_figure": "Table 4(b)",
+          "metric": "gFID↓",
+          "value": "5.33",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Learned mask token achieves best gFID.",
+          "table_or_figure": "Table 4(c)",
+          "metric": "gFID↓",
+          "value": "5.33",
+          "confidence": 0.9
+        },
+        {
+          "claim": "DINOv2-B reaches baseline rFID at L=8, SigLIP2-B at L=16.",
+          "table_or_figure": "Table 2",
+          "metric": "rFID",
+          "value": "DINOv2-B 0.57, SigLIP2-B 0.69",
+          "confidence": 0.85
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Table 3",
+          "role_hint": "Multimodal understanding comparison: continuous vs VQ vs DQ",
+          "caption": "SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation.",
+          "confidence": 0.95
+        },
+        {
+          "label": "Table 4",
+          "role_hint": "Ablation studies on CubiD design choices",
+          "caption": "Table 4.Ablation studies on CubiD design choices.Gray rows indicate best results.",
+          "confidence": 0.95
+        },
+        {
+          "label": "Table 4(a)",
+          "role_hint": "Mask ratio distribution ablation",
+          "caption": "Effect of standard deviation σ in sampling mask ratios.",
+          "confidence": 0.9
+        },
+        {
+          "label": "Table 4(b)",
+          "role_hint": "Masking granularity ablation",
+          "caption": "Perdim: mask all spatial positions per dimension. Per-spatial: mask all dimensions per position. Perelement:mask independently across all axes.",
+          "confidence": 0.9
+        },
+        {
+          "label": "Table 4(c)",
+          "role_hint": "Mask value ablation",
+          "caption": "Fixed,random, or learned mask token.",
+          "confidence": 0.9
+        }
+      ],
+      "source_links": [],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_005",
+        "part_index": 5,
+        "part_count": 9,
+        "chunk_chars": 4422,
+        "latency_seconds": 10.37,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 2170,
+          "completion_tokens_est": 949,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 3119,
+          "total_with_reasoning_tokens_est": 3119,
+          "estimated_cost_usd": 0.00177,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 2116,
+          "completion_tokens_api": 944,
+          "total_tokens_api": 3060,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1476,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 944,
+            "prompt_tokens": 2116,
+            "total_tokens": 3060,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 1476
+          },
+          "estimated_cost_usd_api": 0.001466,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 3163,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 946,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    },
+    {
+      "part_id": "part_006",
+      "section_role": "Ablation studies and analysis of CubiD",
+      "method_evidence": [
+        {
+          "claim": "Masking ratio r is sampled from a truncated Gaussian distribution with μ=1.0 and varying σ.",
+          "section": "4.3",
+          "anchor": "We sample the masking ratio r from a truncated Gaussian distribution (Eq.2) with μ = 1.O and varying standard deviation o.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Per-element masking independently masks individual elements across the h×w×d tensor.",
+          "section": "4.3",
+          "anchor": "Perelement masking,our approach that independently masks individual elements across the tensor.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Learned mask token achieves best performance.",
+          "section": "4.3",
+          "anchor": "Learned: treating the mask token as a learnable parameter. The learned mask token achieves the best performance (gFID=5.33).",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Optimal masking ratio standard deviation σ=0.10 achieves gFID=5.33.",
+          "table_or_figure": "Table 4a",
+          "metric": "gFID",
+          "value": "5.33",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Per-element masking achieves gFID=5.33, outperforming per-dim (120.03) and per-spatial (22.22).",
+          "table_or_figure": "Table 4b",
+          "metric": "gFID",
+          "value": "5.33",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Learned mask token achieves gFID=5.33, random mask token achieves 56.38.",
+          "table_or_figure": "Table 4c",
+          "metric": "gFID",
+          "value": "5.33",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Performance saturates around 512 inference steps with gFID=5.25.",
+          "table_or_figure": "Table 4d",
+          "metric": "gFID",
+          "value": "5.25",
+          "confidence": 0.95
+        },
+        {
+          "claim": "3.7B model achieves gFID=4.68, improving over 946M (5.25) and 1.4B (4.91).",
+          "table_or_figure": "Table 4e",
+          "metric": "gFID",
+          "value": "4.68",
+          "confidence": 0.95
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Table 4a",
+          "role_hint": "Mask ratio distribution ablation",
+          "caption": "Effect of standard deviation σ in truncated Gaussian masking ratio distribution.",
+          "confidence": 0.9
+        },
+        {
+          "label": "Table 4b",
+          "role_hint": "Masking strategy ablation",
+          "caption": "Comparison of per-dim, per-spatial, and per-element masking strategies.",
+          "confidence": 0.9
+        },
+        {
+          "label": "Table 4c",
+          "role_hint": "Mask token design ablation",
+          "caption": "Comparison of fixed, random, and learned mask token values.",
+          "confidence": 0.9
+        },
+        {
+          "label": "Table 4d",
+          "role_hint": "Inference steps ablation",
+          "caption": "Effect of inference steps T on generation quality.",
+          "confidence": 0.9
+        },
+        {
+          "label": "Figure 5",
+          "role_hint": "Qualitative comparison of masking strategies",
+          "caption": "Qualitative comparison of different masking strategies. Top row: Per-dim masking. Middle row: Per-spatial masking. Bottom row: Our per-element masking.",
+          "confidence": 0.95
+        }
+      ],
+      "source_links": [],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_006",
+        "part_index": 6,
+        "part_count": 9,
+        "chunk_chars": 6504,
+        "latency_seconds": 10.204,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 2795,
+          "completion_tokens_est": 986,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 3781,
+          "total_with_reasoning_tokens_est": 3781,
+          "estimated_cost_usd": 0.002074,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 2236,
+          "completion_tokens_api": 948,
+          "total_tokens_api": 3184,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1596,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 948,
+            "prompt_tokens": 2236,
+            "total_tokens": 3184,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 1596
+          },
+          "estimated_cost_usd_api": 0.001521,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 3286,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 950,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    },
+    {
+      "part_id": "part_007",
+      "section_role": "experiments and conclusion",
+      "method_evidence": [
+        {
+          "claim": "CubiD directly generates with native high-dimensional representation tokens (768d).",
+          "section": "Table 5",
+          "anchor": "CubiD is the first and only discrete method to directly generate with native high-dimensional representation tokens (768d), while all other methods use compressed or low-dimensional tokens (mostly below 32).",
+          "confidence": 0.98
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "CubiD-XXL achieves state-of-the-art discrete generation with a gFID of 1.88.",
+          "table_or_figure": "Table 5",
+          "metric": "gFID",
+          "value": "1.88",
+          "confidence": 0.99
+        },
+        {
+          "claim": "CubiD-XXL achieves 2.02 gFID without guidance.",
+          "table_or_figure": "Table 5",
+          "metric": "gFID",
+          "value": "2.02",
+          "confidence": 0.99
+        },
+        {
+          "claim": "DINOv2 encoder achieves gFID 5.25, SigLIP2 achieves 5.87.",
+          "table_or_figure": "Table 4f",
+          "metric": "gFID",
+          "value": "5.25 (DINOv2), 5.87 (SigLIP2)",
+          "confidence": 0.97
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Table 5",
+          "role_hint": "Main results on ImageNet 256x256 class-conditional generation comparing CubiD with existing discrete generation methods.",
+          "caption": "Discrete generation methods on ImageNet 256x256. Latent Dim denotes the original dimensionality of the latent space (features before vector quantization for low-dimensional methods, before and after dimension-wise quantization for CubiD). Results with superscript \"re\" denote rejection sampling. CubiD is the first and only discrete method to directly generate with native high-dimensional representation tokens (768d), while all other methods use compressed or low-dimensional tokens (mostly below 32).",
+          "confidence": 0.99
+        }
+      ],
+      "source_links": [],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_007",
+        "part_index": 7,
+        "part_count": 9,
+        "chunk_chars": 7314,
+        "latency_seconds": 6.258,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 3038,
+          "completion_tokens_est": 595,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 3633,
+          "total_with_reasoning_tokens_est": 3633,
+          "estimated_cost_usd": 0.001839,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 3211,
+          "completion_tokens_api": 539,
+          "total_tokens_api": 3750,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 2571,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 539,
+            "prompt_tokens": 3211,
+            "total_tokens": 3750,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 2571
+          },
+          "estimated_cost_usd_api": 0.00159,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 1983,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 541,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    },
+    {
+      "part_id": "part_008",
+      "section_role": "acknowledgments and references",
+      "method_evidence": [],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [],
+      "source_links": [],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_008",
+        "part_index": 8,
+        "part_count": 9,
+        "chunk_chars": 7776,
+        "latency_seconds": 1.585,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 3176,
+          "completion_tokens_est": 68,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 3244,
+          "total_with_reasoning_tokens_est": 3244,
+          "estimated_cost_usd": 0.001441,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 3059,
+          "completion_tokens_api": 70,
+          "total_tokens_api": 3129,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 2419,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 70,
+            "prompt_tokens": 3059,
+            "total_tokens": 3129,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 2419
+          },
+          "estimated_cost_usd_api": 0.001115,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 228,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 72,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    },
+    {
+      "part_id": "part_009",
+      "section_role": "references",
+      "method_evidence": [],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [],
+      "source_links": [],
+      "open_questions": [],
+      "_meta": {
+        "part_id": "part_009",
+        "part_index": 9,
+        "part_count": 9,
+        "chunk_chars": 4085,
+        "latency_seconds": 1.777,
+        "usage": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "thinking": "disabled",
+          "reasoning_effort": "",
+          "prompt_tokens_est": 2069,
+          "completion_tokens_est": 62,
+          "reasoning_tokens_est": 0,
+          "total_tokens_est": 2131,
+          "total_with_reasoning_tokens_est": 2131,
+          "estimated_cost_usd": 0.000954,
+          "cost_basis": "discounted_estimate_from_local_text_lengths",
+          "prompt_tokens_api": 2029,
+          "completion_tokens_api": 65,
+          "total_tokens_api": 2094,
+          "reasoning_tokens_api": 0,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1389,
+          "cached_tokens_api": 640,
+          "api_usage_raw": {
+            "completion_tokens": 65,
+            "prompt_tokens": 2029,
+            "total_tokens": 2094,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 1389
+          },
+          "estimated_cost_usd_api": 0.000663,
+          "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+          "stream_diagnostics": {
+            "content_chars": 208,
+            "reasoning_chars": 0,
+            "finish_reason": "stop",
+            "finish_reasons": [
+              "stop",
+              "stop"
+            ],
+            "stream_chunk_count": 67,
+            "api_usage_present": true
+          }
+        }
+      },
+      "_aggregate": {
+        "part_wall_seconds": 35.037,
+        "part_total_llm_seconds": 68.736
+      }
+    }
+  ],
+  "figures_tables": [
+    {
+      "label": "Figure 1",
+      "type": "figure",
+      "caption": "Figure 1.Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor—any dimension at any position can be masked and predicted independently-enabling effcient generation in T< h ×w ×d iterations while capturing both spatial and dimensional correlations.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/rf_full_regions/page_001_Figure_1_c1621dbf36eb.jpg",
+      "bbox": [
+        511.0,
+        332.0,
+        846.0,
+        570.0
+      ],
+      "cluster_bbox": [
+        511.0,
+        332.0,
+        846.0,
+        570.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/d287d4edcee3d59bdb2e666ca97757c51596999395e11b502ade0a87654a23c0.jpg",
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/a3e02756e743b4e4f4460e944f34f02be83145c2496be01c4352459600d3111a.jpg"
+      ],
+      "page": 0,
+      "cluster_size": 2,
+      "raw_items": [
+        {
+          "type": "image",
+          "page": 0,
+          "bbox": [
+            558.0,
+            332.0,
+            789.0,
+            430.0
+          ],
+          "caption": "(b) High-dim Token Generation",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/d287d4edcee3d59bdb2e666ca97757c51596999395e11b502ade0a87654a23c0.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        },
+        {
+          "type": "image",
+          "page": 0,
+          "bbox": [
+            511.0,
+            443.0,
+            846.0,
+            570.0
+          ],
+          "caption": "Figure 1.Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor—any dimension at any position can be masked and predicted independently-enabling effcient generation in T< h ×w ×d iterations while capturing both spatial and dimensional correlations.",
+          "label": "Figure 1",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/a3e02756e743b4e4f4460e944f34f02be83145c2496be01c4352459600d3111a.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "full_region_source": "pdf_crop",
+      "full_region_origin_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens_origin.pdf",
+      "full_region_bbox_pdf": [
+        307.836,
+        258.192,
+        522.648,
+        456.192
+      ],
+      "full_region_bbox_content": [
+        511.0,
+        332.0,
+        846.0,
+        570.0
+      ],
+      "middle_visual_blocks": [
+        {
+          "page": 0,
+          "type": "image",
+          "bbox": [
+            342.0,
+            263.0,
+            483.0,
+            341.0
+          ],
+          "caption": "",
+          "source_path": ""
+        },
+        {
+          "page": 0,
+          "type": "image",
+          "bbox": [
+            313.0,
+            351.0,
+            518.0,
+            452.0
+          ],
+          "caption": "",
+          "source_path": ""
+        }
+      ],
+      "item_id": "item_001",
+      "visual_summary": "Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D te...",
+      "visual_type": "figure",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Figure",
+      "type": "figure",
+      "caption": "Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/b6415517082ec51d32360678bde13fe75befb4f79bb1cb2919b75efbe675fa9c.jpg",
+      "bbox": [
+        145.0,
+        140.0,
+        849.0,
+        323.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/b6415517082ec51d32360678bde13fe75befb4f79bb1cb2919b75efbe675fa9c.jpg"
+      ],
+      "page": 1,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "image",
+          "page": 1,
+          "bbox": [
+            145.0,
+            140.0,
+            849.0,
+            323.0
+          ],
+          "caption": "Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories.",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/b6415517082ec51d32360678bde13fe75befb4f79bb1cb2919b75efbe675fa9c.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_002",
+      "visual_summary": "Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories",
+      "visual_type": "figure",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Figure",
+      "type": "figure",
+      "caption": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1eafac52892166386681d533f32eeef3d31b9776144cf80cb53cbe840b7de4d0.jpg",
+      "bbox": [
+        143.0,
+        142.0,
+        849.0,
+        276.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1eafac52892166386681d533f32eeef3d31b9776144cf80cb53cbe840b7de4d0.jpg"
+      ],
+      "page": 3,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "image",
+          "page": 3,
+          "bbox": [
+            143.0,
+            142.0,
+            849.0,
+            276.0
+          ],
+          "caption": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes.",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1eafac52892166386681d533f32eeef3d31b9776144cf80cb53cbe840b7de4d0.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_003",
+      "visual_summary": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturin...",
+      "visual_type": "figure",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Figure 4",
+      "type": "figure",
+      "caption": "Figure4.InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/81cc91a110464149186ceac2ffd68c0691231fc6e3f1adeee405b9e1f4af80d9.jpg",
+      "bbox": [
+        143.0,
+        138.0,
+        849.0,
+        272.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/81cc91a110464149186ceac2ffd68c0691231fc6e3f1adeee405b9e1f4af80d9.jpg"
+      ],
+      "page": 4,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "image",
+          "page": 4,
+          "bbox": [
+            143.0,
+            138.0,
+            849.0,
+            272.0
+          ],
+          "caption": "Figure4.InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details.",
+          "label": "Figure 4",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/81cc91a110464149186ceac2ffd68c0691231fc6e3f1adeee405b9e1f4af80d9.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_004",
+      "visual_summary": "InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidem...",
+      "visual_type": "figure",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Table 1",
+      "type": "table",
+      "caption": "Table 1.Model sizes and architecture configurations of CubiD.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1000149da4e70c155544383dd878f3a5bbb3f0dca5ef8a4930200af0a5796113.jpg",
+      "bbox": [
+        552.0,
+        378.0,
+        810.0,
+        438.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1000149da4e70c155544383dd878f3a5bbb3f0dca5ef8a4930200af0a5796113.jpg"
+      ],
+      "page": 4,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "table",
+          "page": 4,
+          "bbox": [
+            552.0,
+            378.0,
+            810.0,
+            438.0
+          ],
+          "caption": "Table 1.Model sizes and architecture configurations of CubiD.",
+          "label": "Table 1",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1000149da4e70c155544383dd878f3a5bbb3f0dca5ef8a4930200af0a5796113.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_005",
+      "visual_summary": "Model sizes and architecture configurations of CubiD",
+      "visual_type": "table",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "实验与分析",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Table 4",
+      "type": "table",
+      "caption": "Table 4.Ablation studies on CubiD design choices.Gray rows indicate best results.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/f28ceaedec30c9a8b05bec29b34ba97876681e385e0da14ddd258030dbf15a7f.jpg",
+      "bbox": [
+        545.0,
+        170.0,
+        633.0,
+        228.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/f28ceaedec30c9a8b05bec29b34ba97876681e385e0da14ddd258030dbf15a7f.jpg"
+      ],
+      "page": 5,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            545.0,
+            170.0,
+            633.0,
+            228.0
+          ],
+          "caption": "Table 4.Ablation studies on CubiD design choices.Gray rows indicate best results.",
+          "label": "Table 4",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/f28ceaedec30c9a8b05bec29b34ba97876681e385e0da14ddd258030dbf15a7f.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_006",
+      "visual_summary": "Ablation studies on CubiD design choices.Gray rows indicate best results",
+      "visual_type": "table",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "实验与分析",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Table",
+      "type": "table",
+      "caption": "",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/7a5708444105cb3dc8b486ebfc8d2e17a2506c09fe6edc4eb87c95a5b4de4a9d.jpg",
+      "bbox": [
+        699.0,
+        170.0,
+        861.0,
+        228.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/7a5708444105cb3dc8b486ebfc8d2e17a2506c09fe6edc4eb87c95a5b4de4a9d.jpg"
+      ],
+      "page": 5,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            699.0,
+            170.0,
+            861.0,
+            228.0
+          ],
+          "caption": "",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/7a5708444105cb3dc8b486ebfc8d2e17a2506c09fe6edc4eb87c95a5b4de4a9d.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_007",
+      "visual_summary": "",
+      "visual_type": "table",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "实验与分析",
+      "visual_confidence": 0.0,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Table 2",
+      "type": "table",
+      "caption": "Table 2. Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2).",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/rf_full_regions/page_006_Table_2_18451403a218.jpg",
+      "bbox": [
+        143.0,
+        181.0,
+        482.0,
+        276.0
+      ],
+      "cluster_bbox": [
+        143.0,
+        181.0,
+        482.0,
+        276.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/52ffa3593d0c2ab904d634a84ab50a973fedcd8b2e62d8e0e29383367e8f9f36.jpg",
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/21b8d47205a41cd0375d3e581a074537f385304f9828cc2bf39629a5bdf3e1e0.jpg"
+      ],
+      "page": 5,
+      "cluster_size": 2,
+      "raw_items": [
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            143.0,
+            181.0,
+            302.0,
+            276.0
+          ],
+          "caption": "Table 2. Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2).",
+          "label": "Table 2",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/52ffa3593d0c2ab904d634a84ab50a973fedcd8b2e62d8e0e29383367e8f9f36.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        },
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            325.0,
+            181.0,
+            482.0,
+            275.0
+          ],
+          "caption": "",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/21b8d47205a41cd0375d3e581a074537f385304f9828cc2bf39629a5bdf3e1e0.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "full_region_source": "pdf_crop",
+      "full_region_origin_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens_origin.pdf",
+      "full_region_bbox_pdf": [
+        82.62,
+        138.6,
+        299.88,
+        223.344
+      ],
+      "full_region_bbox_content": [
+        143.0,
+        181.0,
+        482.0,
+        276.0
+      ],
+      "middle_visual_blocks": [
+        {
+          "page": 5,
+          "type": "table",
+          "bbox": [
+            88.0,
+            144.0,
+            185.0,
+            219.0
+          ],
+          "caption": "",
+          "source_path": ""
+        },
+        {
+          "page": 5,
+          "type": "table",
+          "bbox": [
+            199.0,
+            144.0,
+            295.0,
+            218.0
+          ],
+          "caption": "",
+          "source_path": ""
+        }
+      ],
+      "item_id": "item_008",
+      "visual_summary": "Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2)",
+      "visual_type": "table",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "实验与分析",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Table",
+      "type": "table",
+      "caption": "(d) Inference steps.Effect of inference steps T. (f) Representation encoder. DI-NOv2 vs. SigLIP2.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/rf_full_regions/page_006_Table_1a71602ebb4c.jpg",
+      "bbox": [
+        717.0,
+        295.0,
+        826.0,
+        444.0
+      ],
+      "cluster_bbox": [
+        717.0,
+        295.0,
+        826.0,
+        444.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/49628e85330cfadf32b5c6fc436ff5af901181df67aecaff1c51a03755a7819c.jpg",
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/fb238e65b05fac3f215c6e3a94fac5dd54b6ac8d6fffaf2751a8d7cbf230f50e.jpg"
+      ],
+      "page": 5,
+      "cluster_size": 2,
+      "raw_items": [
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            730.0,
+            295.0,
+            821.0,
+            366.0
+          ],
+          "caption": "(d) Inference steps.Effect of inference steps T.",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/49628e85330cfadf32b5c6fc436ff5af901181df67aecaff1c51a03755a7819c.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        },
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            717.0,
+            395.0,
+            826.0,
+            444.0
+          ],
+          "caption": "(f) Representation encoder. DI-NOv2 vs. SigLIP2.",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/fb238e65b05fac3f215c6e3a94fac5dd54b6ac8d6fffaf2751a8d7cbf230f50e.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "full_region_source": "pdf_crop",
+      "full_region_origin_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens_origin.pdf",
+      "full_region_bbox_pdf": [
+        433.908,
+        228.888,
+        510.408,
+        356.4
+      ],
+      "full_region_bbox_content": [
+        717.0,
+        295.0,
+        826.0,
+        444.0
+      ],
+      "middle_visual_blocks": [
+        {
+          "page": 5,
+          "type": "table",
+          "bbox": [
+            447.0,
+            234.0,
+            503.0,
+            290.0
+          ],
+          "caption": "",
+          "source_path": ""
+        },
+        {
+          "page": 5,
+          "type": "table",
+          "bbox": [
+            439.0,
+            313.0,
+            506.0,
+            352.0
+          ],
+          "caption": "",
+          "source_path": ""
+        }
+      ],
+      "item_id": "item_009",
+      "visual_summary": "(d) Inference steps.Effect of inference steps T. (f) Representation encoder. DI-NOv2 vs. SigLIP2",
+      "visual_type": "table",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "实验与分析",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Table",
+      "type": "table",
+      "caption": "(c)Mask value.Fixed,random, or learned mask token.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/rf_full_regions/page_006_Table_00e81ee9c115.jpg",
+      "bbox": [
+        529.0,
+        301.0,
+        651.0,
+        449.0
+      ],
+      "cluster_bbox": [
+        529.0,
+        301.0,
+        651.0,
+        449.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/aff8842b99e866741cc7f799a0467c8263e7e970d230026f72abda63e945c8fe.jpg",
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/fb7d8e814c4cf395a81d4589797ebcef32618299a474d7fad1ab95086c8e7970.jpg"
+      ],
+      "page": 5,
+      "cluster_size": 2,
+      "raw_items": [
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            529.0,
+            301.0,
+            651.0,
+            359.0
+          ],
+          "caption": "(c)Mask value.Fixed,random, or learned mask token.",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/aff8842b99e866741cc7f799a0467c8263e7e970d230026f72abda63e945c8fe.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        },
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            539.0,
+            390.0,
+            642.0,
+            449.0
+          ],
+          "caption": "",
+          "label": "",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/fb7d8e814c4cf395a81d4589797ebcef32618299a474d7fad1ab95086c8e7970.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "full_region_source": "pdf_crop",
+      "full_region_origin_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens_origin.pdf",
+      "full_region_bbox_pdf": [
+        318.852,
+        233.64,
+        403.308,
+        360.36
+      ],
+      "full_region_bbox_content": [
+        529.0,
+        301.0,
+        651.0,
+        449.0
+      ],
+      "middle_visual_blocks": [
+        {
+          "page": 5,
+          "type": "table",
+          "bbox": [
+            324.0,
+            239.0,
+            399.0,
+            285.0
+          ],
+          "caption": "",
+          "source_path": ""
+        },
+        {
+          "page": 5,
+          "type": "table",
+          "bbox": [
+            330.0,
+            309.0,
+            393.0,
+            356.0
+          ],
+          "caption": "",
+          "source_path": ""
+        }
+      ],
+      "item_id": "item_010",
+      "visual_summary": "(c)Mask value.Fixed,random, or learned mask token",
+      "visual_type": "table",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "实验与分析",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Table 3",
+      "type": "table",
+      "caption": "Table 3.Understanding performance onLLaVA benchmarks with different quantization methods.Evaluation using SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/6ba7b681cfe8598e6842dd8f9e9cb7755b4ca6b8eed5d8c62da05eef29f1e6a0.jpg",
+      "bbox": [
+        151.0,
+        354.0,
+        472.0,
+        415.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/6ba7b681cfe8598e6842dd8f9e9cb7755b4ca6b8eed5d8c62da05eef29f1e6a0.jpg"
+      ],
+      "page": 5,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "table",
+          "page": 5,
+          "bbox": [
+            151.0,
+            354.0,
+            472.0,
+            415.0
+          ],
+          "caption": "Table 3.Understanding performance onLLaVA benchmarks with different quantization methods.Evaluation using SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation.",
+          "label": "Table 3",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/6ba7b681cfe8598e6842dd8f9e9cb7755b4ca6b8eed5d8c62da05eef29f1e6a0.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_011",
+      "visual_summary": "Understanding performance onLLaVA benchmarks with different quantization methods.Evaluation using SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation",
+      "visual_type": "table",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "实验与分析",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Figure 5",
+      "type": "figure",
+      "caption": "Figure 5.Qualitative comparison of different masking strategies.Top row:Per-dim masking completely fails,producing severe texture-like artifacts.Middle row:Per-spatial masking generates images with significant local inconsistencies and blurry details.Bottom row: Our per-element masking produces clear, coherent images with fine details.The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes.",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/256b80b327cb9f2125c251a19b11d58fdd665d7bfbc6da1d27984bb0afbe3cfe.jpg",
+      "bbox": [
+        516.0,
+        140.0,
+        851.0,
+        390.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/256b80b327cb9f2125c251a19b11d58fdd665d7bfbc6da1d27984bb0afbe3cfe.jpg"
+      ],
+      "page": 6,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "image",
+          "page": 6,
+          "bbox": [
+            516.0,
+            140.0,
+            851.0,
+            390.0
+          ],
+          "caption": "Figure 5.Qualitative comparison of different masking strategies.Top row:Per-dim masking completely fails,producing severe texture-like artifacts.Middle row:Per-spatial masking generates images with significant local inconsistencies and blurry details.Bottom row: Our per-element masking produces clear, coherent images with fine details.The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes.",
+          "label": "Figure 5",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/256b80b327cb9f2125c251a19b11d58fdd665d7bfbc6da1d27984bb0afbe3cfe.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_012",
+      "visual_summary": "Qualitative comparison of different masking strategies.Top row:Per-dim masking completely fails,producing severe texture-like artifacts.Middle row:Per-spatial masking generates images with significant local inconsistencies and blurry details.Bottom row: Our per-element masking produces clear, coherent images with fine details.The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes",
+      "visual_type": "figure",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    },
+    {
+      "label": "Table 5",
+      "type": "table",
+      "caption": "Table 5.Discrete generationmethodsonImageNet[8256x256.LatentDimdenotes theoriginaldimensionalityofthelatentspace (featureseforevectorquantizationforlow-dimensionalmethods,beforeandafterdimension-wiseuantizationforCubiD).Resultsith superscript\"redenoterejectionsampling.CubiDisthefirstandonlydiscretemethodtodirectlygeneratewithnativehigh-dimensional representation tokens (768d),while allother methods use compressed or low-dimensional tokens (mostly below 32).",
+      "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/cf10699f5945bf115313d7219c8520ad8872ad231fd723c19abd6a84a706d983.jpg",
+      "bbox": [
+        197.0,
+        141.0,
+        794.0,
+        401.0
+      ],
+      "source_paths": [
+        "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/cf10699f5945bf115313d7219c8520ad8872ad231fd723c19abd6a84a706d983.jpg"
+      ],
+      "page": 7,
+      "cluster_size": 1,
+      "raw_items": [
+        {
+          "type": "table",
+          "page": 7,
+          "bbox": [
+            197.0,
+            141.0,
+            794.0,
+            401.0
+          ],
+          "caption": "Table 5.Discrete generationmethodsonImageNet[8256x256.LatentDimdenotes theoriginaldimensionalityofthelatentspace (featureseforevectorquantizationforlow-dimensionalmethods,beforeandafterdimension-wiseuantizationforCubiD).Resultsith superscript\"redenoterejectionsampling.CubiDisthefirstandonlydiscretemethodtodirectlygeneratewithnativehigh-dimensional representation tokens (768d),while allother methods use compressed or low-dimensional tokens (mostly below 32).",
+          "label": "Table 5",
+          "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/cf10699f5945bf115313d7219c8520ad8872ad231fd723c19abd6a84a706d983.jpg",
+          "extra_captions": [],
+          "unassigned_extra_captions": [],
+          "caption_repair": ""
+        }
+      ],
+      "item_id": "item_013",
+      "visual_summary": "Discrete generationmethodsonImageNet[8256x256.LatentDimdenotes theoriginaldimensionalityofthelatentspace (featureseforevectorquantizationforlow-dimensionalmethods,beforeandafterdimension-wiseuantizationforCubiD).Resultsith superscript\"redenoterejectionsampling.CubiDisthefirstandonlydiscretemethodtodirectlygeneratewithnativehigh-dimensional representation tokens (768d),while allother methods use compressed or low-dimensional tokens (mostly below 32)",
+      "visual_type": "table",
+      "is_sample_only": false,
+      "key_visible_elements": [],
+      "supports_claims": [],
+      "placement_hint": "实验与分析",
+      "visual_confidence": 0.25,
+      "visual_summary_provider": "caption_fallback"
+    }
+  ]
+}

@@ -1,0 +1,3038 @@
+---
+title: "5090 数据恢复受损与未完成路径清单"
+type: incident-damage-manifest
+server: "5090"
+tags:
+  - operations/data-recovery
+  - status/needs-user-action
+aliases:
+  - 5090 Data Damage Manifest
+created: 2026-06-20T15:37+08:00
+updated: 2026-06-20T15:37+08:00
+---
+
+# 5090 数据恢复受损与未完成路径清单
+
+> [!warning] 使用范围
+> 本清单由全部 rsync 日志合并去重生成。主清单包含 2,956 个需要用户核验或重建的路径；不是对新盘进行逐文件校验后的结论。日志中的原始 `/data` 已在 2026-06-20 切换为新盘，坏盘当前对应路径为 `/data_broken`。
+
+关联文档：[[social/2026-06-20_5090_data_recovery_consolidated_report|5090 数据恢复合并报告]]、[[social/2026-06-20_5090_data_damage_user_notice|5090 数据受损用户通知]]。
+
+## 汇总
+
+- 待处理路径：2,956
+- `zz`：2,955
+- `ripemangobox`：1
+- 明确 `update discarded`：790
+- 位于最终排除范围且完整性未验证：2,150
+- 最终一轮仍报错：16
+- 历史报错后由 rsync 重试恢复：10
+
+> [!note] 证据解释
+> `文件内容读取失败；rsync 丢弃更新` 表示该轮未能用坏盘上的版本更新新盘，目标可能缺失或保留旧版本。`最终排除` 表示后续轮次主动跳过，不能证明整个目录都损坏，也不能证明完整。`最终轮路径/目录失败` 表示完成遍历时仍无法读取。
+
+## 待处理路径
+
+### 用户 ripemangobox
+
+#### Motion（1）
+
+- `/data/public/ripemangobox/Motion/datasets/pulpmotion-data/smpl_rifke` — 最终轮目录枚举失败；子项可能不完整
+
+### 用户 zz
+
+#### .cache（3）
+
+- `/data/public/zz/.cache/home-cache/uv/archive-v0/3rJP9ehUPUMjerwgF0WLu/sgl_kernel/flash_ops.abi3.so` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/.cache/home-cache/uv/archive-v0/9CK4dDNH1vMf0GLxxyY7n/nvidia/curand/lib/libcurand.so.10` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/.cache/home-cache/uv/archive-v0/OMtrwP_tfruiklz5aFbd1/tiktoken/_tiktoken.cpython-313-x86_64-linux-gnu.so` — 文件内容读取失败；rsync 丢弃更新
+
+#### baseline（1,441）
+
+- `/data/public/zz/baseline/AgentRx/.git/HEAD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/config` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/description` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/hooks/pre-applypatch.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/hooks/pre-commit.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/hooks/pre-merge-commit.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/hooks/pre-push.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/hooks/pre-receive.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/hooks/prepare-commit-msg.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/hooks/push-to-checkout.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/hooks/update.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/index` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/logs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/objects` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/packed-refs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.git/refs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/.github` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/agentrx` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/data` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentRx/trajectories` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/HEAD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/config` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/description` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/hooks/pre-rebase.sample` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/AgentSkillOS/.git/hooks/pre-receive.sample` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/AgentSkillOS/.git/hooks/prepare-commit-msg.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/hooks/push-to-checkout.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/hooks/update.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/index` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/logs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/objects` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/packed-refs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/refs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/.git/shallow` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/artifacts` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/AgentSkillOS/assets` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/07` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/5e` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/6f` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/75/cd39c3bd9095a2a0e52ef47797aebd95933f3e` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/85` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/9a` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/a8` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/b0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/b2` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/bc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/c1` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/dc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.git/objects/ed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/etc/jupyter/nbconfig` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/IPython/core/profile` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/IPython/extensions/deduperreload` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/IPython/sphinxext` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/IPython/testing/plugin` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/_distutils_hack/override.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/_yaml` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/aiohttp-3.14.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/aiohttp/.hash` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/aiohttp/_websocket/.hash` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/anyio-4.13.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/anyio/_backends` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/bm25s` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/bm25s-0.2.12.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/certifi-2026.5.20.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/certifi-2026.5.20.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/charset_normalizer` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/charset_normalizer-3.4.7.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/cuda` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/cuda_pathfinder-1.5.5.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/cycler` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/cycler-0.12.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/dateutil/zoneinfo` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/dill` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/dill-0.3.8.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/docker_pycreds-0.4.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/dockerpycreds` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/filelock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/filelock-3.29.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/fqdn-1.5.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/hf_xet` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/hf_xet-1.5.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/ipython-9.14.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/ipython_pygments_lexers-1.1.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/ipywidgets` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/ipywidgets-8.1.8.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jax` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jax-0.6.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jedi-0.20.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jedi/third_party` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/json_repair` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/json_repair-0.60.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jsonpointer-3.1.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jsonschema-4.26.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jsonschema-4.26.0.dist-info/licenses` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jupyterlab_widgets` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/jupyterlab_widgets-3.0.16.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/langchain` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/langchain-0.3.30.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/langchain_community` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/langchain_community-0.3.23.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/litellm/proxy/_experimental/out/_next/static/media/2bbe8d2671613f1f-s.76dcb0b2.woff2` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/litellm/proxy/_experimental/out/assets/logos/aim_security.jpeg` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/litellm/proxy/_experimental/out/assets/logos/anthropic.svg` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/litellm/proxy/_experimental/out/assets/logos/aporia.png` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/nbconvert` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/nbconvert-7.17.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/nltk/sentiment` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/nvidia/cufile` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/nvidia_cufile_cu12-1.13.1.3.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/nvidia_nvjitlink_cu12-12.8.93.dist-info/License.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/nvidia_nvjitlink_cu12-12.8.93.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/nvidia_nvjitlink_cu12-12.8.93.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/oauthlib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/oauthlib-3.3.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/opentelemetry/sdk` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/opentelemetry/util` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/opentelemetry_sdk-1.42.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/opentelemetry_util_http-0.63b1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/orjson-3.11.9.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_astype.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_compat.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_duplicates.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_equivalence.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_formats.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_indexing.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_integrity.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_isin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_join.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_lexsort.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_pickle.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_reindex.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_reshape.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_take.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/multi/test_util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/numeric/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/numeric/test_astype.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/indexes/numeric/test_indexing.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/io/sas/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/io/sas/test_byteswap.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/io/sas/test_sas.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/io/sas/test_sas7bdat.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/io/xml/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/io/xml/conftest.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/io/xml/test_to_xml.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/io/xml/test_xml.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/libs/test_join.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/libs/test_lib.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/libs/test_libalgos.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/plotting/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/reshape/merge/test_merge_cross.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/reshape/merge/test_merge_ordered.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/reshape/merge/test_multi.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/interval/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/interval/test_contains.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/interval/test_formats.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/interval/test_interval.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/interval/test_overlaps.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/period/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/period/test_period.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/timestamp/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/timestamp/methods/test_to_julian_date.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/timestamp/methods/test_to_pydatetime.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/scalar/timestamp/test_comparisons.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/series/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/series/test_api.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/window/moments/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/window/moments/conftest.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/window/moments/test_moments_consistency_expanding.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/window/moments/test_moments_consistency_rolling.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/window/test_online.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/window/test_rolling_functions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/window/test_rolling_quantile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pandas/tests/window/test_rolling_skew_kurt.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/posthog` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/posthog-7.18.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/array.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/buffer.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/buffer_builder.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/builder.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/chunk_resolver.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/chunked_array.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/compare.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/config.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/testing/gtest_compat.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/testing/matchers.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/testing/math.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/testing/process.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/testing/uniform_real.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/testing/util.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/testing/visibility.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/util/algorithm.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/util/async_generator.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/include/arrow/util/async_generator_fwd.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/tests/data/orc/TestOrcFile.emptyFile.jsn.gz` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/tests/data/orc/TestOrcFile.emptyFile.orc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/tests/data/orc/TestOrcFile.test1.jsn.gz` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/tests/data/orc/TestOrcFile.testDate1900.orc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/tests/data/orc/decimal.jsn.gz` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/tests/data/parquet/v0.7.1.all-named-index.parquet` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/tests/data/parquet/v0.7.1.some-named-index.parquet` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyarrow/tests/interchange/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pypika-0.51.1.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pypika-0.51.1.dist-info/licenses` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/pyyaml-6.0.3.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/rapidfuzz` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/rapidfuzz-3.14.5.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/regex-2026.5.9.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scikit_learn-1.9.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scikit_learn-1.9.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/optimize/_shgo_lib/_complex.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/_ellip_harm.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/_ellip_harm_2.cpython-313-x86_64-linux-gnu.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/_precompute/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/_precompute/gammainc_asy.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/_precompute/hyp2f1_data.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/_precompute/lambertw.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/_precompute/loggamma.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/_precompute/struve_convergence.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/specfun.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/special/spfun_stats.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/scipy/stats/_quantile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/_itertools.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/_path.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/_vendor/zipp-3.23.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/cli-32.exe` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/cli-64.exe` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/cli-arm64.exe` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/cli.exe` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/config/_validate_pyproject/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/config/_validate_pyproject/error_reporting.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/config/setuptools.schema.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/setuptools/version.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/shellingham` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/shellingham-1.5.4.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/sklearn/utils` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/smmap` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/smmap-5.0.3.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/sniffio-1.3.1.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/soupsieve` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/soupsieve-2.8.4.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/doc/test_json_doc_conversion.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/doc/test_morphanalysis.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/doc/test_pickle_doc.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/doc/test_span.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/doc/test_span_group.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/doc/test_underscore.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/lang/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/lang/test_attrs.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/lang/test_initialize.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/spacy/tests/lang/test_lemmatizers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/sqlalchemy` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/sqlalchemy-2.0.50.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/srsly` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/srsly-2.5.3.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/stack_data-0.6.3.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tabulate` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tabulate-0.10.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tenacity-9.1.4.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tenacity-9.1.4.dist-info/licenses` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/thinc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/thinc-8.3.13.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tinycss2` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tinycss2-1.4.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tokenizers-0.22.2.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tokenizers/tools` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/tokenizers/trainers` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/_shard/sharding_spec/chunk_sharding_spec.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/_shard/sharding_spec/chunk_sharding_spec_ops/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/_shard/sharding_spec/chunk_sharding_spec_ops/_common.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/_shard/sharding_spec/chunk_sharding_spec_ops/embedding.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/_shard/sharding_spec/chunk_sharding_spec_ops/embedding_bag.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/_symmetric_memory/_nvshmem_triton.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/_tensor/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/pipelining/_IR.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/pipelining/_schedule_visualizer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/tensor/_ops/registration.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/tensor/_ops/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/tensor/debug/_comm_mode.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/tensor/debug/_op_coverage.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/tensor/experimental/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/tensor/experimental/_attention.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/tensor/experimental/_tp_transform.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributed/tensor/parallel/_data_parallel_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/distributions/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_chebyshev_polynomial_v_ops.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_chebyshev_polynomial_w.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_chebyshev_polynomial_w_compositeexplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_chebyshev_polynomial_w_compositeexplicitautogradnonfunctional_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_chebyshev_polynomial_w_cpu_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_chebyshev_polynomial_w_cuda_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_chebyshev_polynomial_w_meta_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_entr_compositeexplicitautogradnonfunctional_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_entr_cpu_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_entr_cuda_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_entr_meta.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_entr_meta_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_entr_native.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_entr_ops.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erf_compositeimplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfc_compositeimplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfc_native.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfc_ops.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfcx.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfcx_compositeexplicitautogradnonfunctional_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfcx_cpu_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfcx_cuda_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfcx_meta.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_erfcx_meta_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammainc.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammainc_compositeimplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammainc_native.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammainc_ops.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammaincc.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammaincc_compositeimplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammaln_compositeimplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammaln_native.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_gammaln_ops.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_h_compositeexplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_h_compositeexplicitautogradnonfunctional_dispatch.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_h_cpu_dispatch.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_h_cuda_dispatch.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_h_meta.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_h_meta_dispatch.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_h_native.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_he.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_he_cuda_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_he_meta.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_he_meta_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_hermite_polynomial_he_ops.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_i0_native.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_i0_ops.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_i0e.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_i0e_compositeexplicitautogradnonfunctional_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/special_i0e_cpu_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/split_compositeexplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/sqrt_native.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/sspaddmm_ops.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/trace.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/trace_backward.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/trace_compositeexplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/trace_cpu_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/trace_cuda_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/zeros_compositeexplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/zeros_like_compositeexplicitautograd_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/zeros_like_compositeimplicitautogradnestedtensor_dispatch.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/ops/zeros_native.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/ATen/quantized/QTensorImpl.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/c10/cuda/impl/CUDATest.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/c10/macros/Export.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/c10/macros/Macros.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/c10/macros/cmake_macros.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/c10/metal/common.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/c10/test/util/Macros.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/include/c10/util/AlignOf.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/jit/_pickle.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/quantization/fx/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/quantization/fx/_equalize.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/quantization/fx/fuse.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/quantization/fx/graph_module.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/quantization/fx/match_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/quantization/fx/pattern_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/quantization/fx/quantization_patterns.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/quantization/fx/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/share/cmake/ATen/ATenConfig.cmake` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/testing/_internal/distributed/nn/api/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/testing/_internal/distributed/nn/api/remote_module_test.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/testing/_internal/distributed/rpc/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/testing/_internal/distributed/rpc/examples/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/testing/_internal/distributed/rpc/examples/parameter_server_test.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/testing/_internal/distributed/rpc/examples/reinforcement_learning_rpc_test.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/testing/_internal/distributed/rpc/faulty_rpc_agent_test_fixture.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/testing/_internal/distributed/rpc/tensorpipe_rpc_agent_test_fixture.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/utils/data/datapipes/map/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/utils/data/datapipes/map/combining.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/utils/data/datapipes/map/grouping.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/utils/data/datapipes/map/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/torch/utils/data/datapipes/utils/common.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timesfm/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timesfm/configuration_timesfm.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timesfm2_5/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timesfm2_5/configuration_timesfm2_5.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timesfm2_5/modular_timesfm2_5.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timesformer/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timesformer/configuration_timesformer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timm_backbone/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timm_backbone/configuration_timm_backbone.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timm_backbone/modeling_timm_backbone.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timm_wrapper/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timm_wrapper/configuration_timm_wrapper.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/timm_wrapper/modeling_timm_wrapper.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/tvp/processing_tvp.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/udop/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/udop/modeling_udop.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/zoedepth/image_processing_pil_zoedepth.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/zoedepth/image_processing_zoedepth.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/models/zoedepth/modeling_zoedepth.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/pipelines/any_to_any.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/transformers/pipelines/audio_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/widgetsnbextension` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/widgetsnbextension-4.0.15.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/xxhash` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/xxhash-3.7.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/zstandard-0.23.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/lib/python3.13/site-packages/zstandard.libs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/.venv/share` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/experiment_runs_data/experiment_cache_dirs/seed_0/HotpotQABench_HotpotMultiHop_GEPA_deepseek-v4-flash/.dspy_cache/001` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/experiment_runs_data/experiment_cache_dirs/seed_0/HotpotQABench_HotpotMultiHop_GEPA_deepseek-v4-flash/.dspy_cache/002` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/experiment_runs_data/experiment_cache_dirs/seed_0/HotpotQABench_HotpotMultiHop_GEPA_deepseek-v4-flash/.dspy_cache/003` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/experiment_runs_data/experiment_runs/seed_0/HotpotQABench_HotpotMultiHop_GEPA_deepseek-v4-flash_backup_20260608_152841/prog_candidates/0/metadata.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/experiment_runs_data/experiment_runs/seed_0/HotpotQABench_HotpotMultiHop_GEPA_deepseek-v4-flash_dryrun_20260608_1542/prog_candidates/0/metadata.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/IFBench/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/IFBench/__pycache__/ifbench_data.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/IFBench/__pycache__/ifbench_metric.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/IFBench/__pycache__/ifbench_program.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/IFBench/utils_ifbench/__pycache__/instructions_registry.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/hotpotQA/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/papillon/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/papillon/__pycache__/papillon_data.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/papillon/__pycache__/papillon_program.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/benchmarks/papillon/__pycache__/papillon_utils.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/__pycache__/optimizers.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy.egg-info/PKG-INFO` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy.egg-info/dependency_links.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy/datasets/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy/datasets/__pycache__/dataloader.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy/datasets/__pycache__/dataset.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy/datasets/__pycache__/hotpotqa.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy/datasets/__pycache__/math.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy/datasets/alfworld/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa-artifact/gepa_artifact/utils/dspy/dspy/datasets/alfworld/__pycache__/alfworld.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/DdsImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/FitsImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/FontFile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/FtexImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/GbrImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/GdImageFile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/GimpPaletteFile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/IcoImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/ImageDraw2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/ImageEnhance.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/ImageFilter.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/ImagePath.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/ImageQt.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/ImageSequence.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/ImageTk.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/ImageWin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/MpegImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/PSDraw.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/PalmImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/PcdImagePlugin.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/TiffTags.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/WmfImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/XbmImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/__pycache__/ImageMode.cpython-313.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/__pycache__/_binary.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/__pycache__/_deprecate.cpython-313.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/__pycache__/_typing.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/__pycache__/_util.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/__pycache__/_version.cpython-313.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/_deprecate.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/_imaging.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/_imagingmath.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/_imagingtk.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/PIL/_tkinter_finder.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/SecretStorage-3.3.3.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/SecretStorage-3.3.3.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/SecretStorage-3.3.3.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/SecretStorage-3.3.3.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/SecretStorage-3.3.3.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/SecretStorage-3.3.3.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/SecretStorage-3.3.3.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_distutils_hack/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_distutils_hack/override.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/_code/source.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/assertion/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/assertion/truncate.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/assertion/util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/doctest.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/helpconfig.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/hookspec.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/python_api.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/tmpdir.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_pytest/tracemalloc.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/_yaml/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/aiohttp/.hash/_find_header.pxd.hash` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/aiosignal-1.4.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/aiosignal-1.4.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/alembic/templates/generic/script.py.mako` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/anyio/abc/_subprocesses.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/attrs-25.3.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/attrs-25.3.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/blinker` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/blinker-1.9.0.dist-info/LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/blinker-1.9.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build-1.3.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build-1.3.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build-1.3.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build-1.3.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build-1.3.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build-1.3.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_builder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_compat/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_compat/importlib.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_compat/tarfile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_compat/tomllib.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_ctx.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_types.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/_util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/env.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/build/util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cachetools/func.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/certifi-2025.8.3.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/certifi-2025.8.3.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cfgv-3.4.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cfgv-3.4.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cfgv-3.4.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cfgv-3.4.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cfgv-3.4.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cfgv-3.4.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cfgv-3.4.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cfgv.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/charset_normalizer-3.4.3.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography-45.0.6.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography-45.0.6.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography-45.0.6.dist-info/licenses/LICENSE.BSD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/__about__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/bindings/_rust/_openssl.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/bindings/_rust/ocsp.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/bindings/_rust/openssl` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/bindings/_rust/pkcs7.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/bindings/_rust/test_support.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/ed25519.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/ed448.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/padding.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/types.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/x25519.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/x448.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/hmac.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/cryptography/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/databricks/sdk/_widgets/default_widgets_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/databricks/sdk/casing.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/databricks/sdk/service` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/combine.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/commands/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/commands/datasets_cli.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/commands/env.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/commands/test.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/download/streaming_download_manager.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/fingerprint.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/inspect.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/streaming.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/_filelock.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/deprecation_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/doc_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/experimental.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/metadata.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/patching.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/resources/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/resources/creators.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/resources/languages.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/resources/multilingualities.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/resources/readme_structure.yaml` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/resources/size_categories.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/tf_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/track.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/datasets/utils/version.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dateutil/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/objtypes.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/settings.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/test_check.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/test_fglobals.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/test_module.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/test_moduledict.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/test_nested.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/test_properties.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/test_restricted.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/dill/tests/test_selected.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro-1.9.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro-1.9.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro-1.9.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro-1.9.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro-1.9.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro-1.9.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro/distro.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/distro/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/credentials/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/credentials/constants.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/credentials/store.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/credentials/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/configs.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/containers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/images.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/networks.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/nodes.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/plugins.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/resource.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/secrets.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/services.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/swarm.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/models/volumes.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/tls.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/transport/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/transport/basehttpadapter.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/transport/npipeconn.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/transport/npipesocket.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/transport/sshconn.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/transport/unixconn.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docker/version.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils-0.22.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils-0.22.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils-0.22.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils-0.22.dist-info/licenses/COPYING.rst` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils-0.22.dist-info/licenses/licenses/BSD-0-Clause.rst` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils-0.22.dist-info/licenses/licenses/BSD-2-Clause.rst` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils-0.22.dist-info/licenses/licenses/gpl-3-0.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/io.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/parsers/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/parsers/commonmark_wrapper.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/parsers/null.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/parsers/rst` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/writers/s5_html/themes/default/slides.css` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/writers/s5_html/themes/medium-black` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/writers/s5_html/themes/small-black/__base__` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/docutils/writers/s5_html/themes/small-black/pretty.css` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock-3.19.1.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock-3.19.1.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock-3.19.1.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock-3.19.1.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock-3.19.1.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock/_error.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock/_soft.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock/_util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock/_windows.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/filelock/version.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/flask-3.1.2.dist-info/licenses/LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/fontTools/tfmLib.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/fontTools/ttLib/tables/G_D_E_F_.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/fsspec/archive.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/fsspec/callbacks.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/fsspec/gui.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/fsspec/mapping.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/fsspec/tests/abstract` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/fsspec/transaction.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/gepa-0.1.1.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/gepa-0.1.1.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/gepa-0.1.1.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/git/index/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/auth/_credentials_base.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/auth/api_key.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/auth/environment_vars.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/auth/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/oauth2` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/__init__.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/api_implementation.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/builder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/containers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/decoder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/encoder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/enum_type_wrapper.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/field_mask.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/message_listener.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/python_message.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/testing_refleaks.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/type_checkers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/well_known_types.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/internal/wire_format.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/source_context_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/timestamp.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/google/protobuf/unknown_fields.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphene-3.4.3.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphene-3.4.3.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphene-3.4.3.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphene/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphene/validation/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphene/validation/disable_introspection.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphene/validation/tests` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphql/validation/rules/unique_fragment_names.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphql_relay/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphql_relay/connection/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphql_relay/connection/arrayconnection.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/graphql_relay/version.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/greenlet/platform/switch_riscv_unix.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11-0.16.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11-0.16.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11-0.16.0.dist-info/licenses/LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11/_abnf.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11/_headers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11/_readers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11/_receivebuffer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11/_state.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11/_util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11/_version.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/h11/_writers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/hf_xet-1.1.8.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/hf_xet-1.1.8.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/hf_xet-1.1.8.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey-3.0.1.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey-3.0.1.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/base.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/test_helpers.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/test_registry.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/test_serializer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/test_sql_huey.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/test_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huey/tests/test_wrappers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/_commit_api.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/_cli_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/auth.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/hf.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/jobs.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/lfs.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/repo.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/repo_files.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/system.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/upload.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/cli/upload_large_folder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/commands/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/commands/delete_cache.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/commands/download.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/inference/_generated/types/question_answering.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/inference/_providers` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/templates/datasetcard_template.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/huggingface_hub/templates/modelcard_template.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id-1.5.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id-1.5.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id-1.5.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id-1.5.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id-1.5.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id-1.5.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/id/_internal/oidc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify-2.6.13.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify-2.6.13.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify-2.6.13.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify-2.6.13.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify-2.6.13.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify-2.6.13.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify/cli.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify/interpreters.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/identify/vendor/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/idna/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/iniconfig-2.1.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/iniconfig-2.1.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/iniconfig-2.1.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/iniconfig-2.1.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/iniconfig-2.1.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/iniconfig/_parse.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/iniconfig/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/iniconfig/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/itsdangerous` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/itsdangerous-2.2.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/itsdangerous-2.2.0.dist-info/LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/itsdangerous-2.2.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/itsdangerous-2.2.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.classes-3.4.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.classes-3.4.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.classes-3.4.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.classes-3.4.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.classes-3.4.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.context-6.0.1.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.context-6.0.1.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.context-6.0.1.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.context-6.0.1.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.context-6.0.1.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.context-6.0.1.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco.context-6.0.1.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco/classes` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco/context` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco/functools` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco_functools-4.3.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco_functools-4.3.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco_functools-4.3.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco_functools-4.3.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco_functools-4.3.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco_functools-4.3.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jaraco_functools-4.3.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney-0.9.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney-0.9.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney-0.9.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/bus.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/io/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/io/tests` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/tests/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/tests/test_auth.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/tests/test_bindgen.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/tests/test_bus.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/tests/test_bus_messages.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/tests/test_fds.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/tests/test_low_level.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jeepney/tests/test_wrappers.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jiter/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jiter/__init__.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jiter/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/joblib/externals/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/joblib/externals/cloudpickle` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/joblib/externals/loky` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/_format.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/_suite.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/fuzz_validate.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/test_cli.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/test_deprecations.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/test_exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/test_format.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/test_types.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/test_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/test_validators.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/tests/typing` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/jsonschema/validators.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring-25.6.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring-25.6.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring-25.6.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring-25.6.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring-25.6.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring-25.6.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring-25.6.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backend.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backend_complete.bash` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backend_complete.zsh` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backends/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backends/chainer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backends/fail.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backends/libsecret.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backends/macOS` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/backends/null.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/cli.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/compat/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/compat/properties.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/compat/py312.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/compat/py38.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/completion.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/core.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/credentials.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/devpi_client.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/errors.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/http.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/testing/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/testing/backend.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/testing/util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/util/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/keyring/util/platform_.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mdurl` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mdurl-0.1.2.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mdurl-0.1.2.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mdurl-0.1.2.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mdurl-0.1.2.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mdurl-0.1.2.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mdurl-0.1.2.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/entities/experiment.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/entities/gateway_guardrail.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/entities/run_data.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/entities/run_outputs.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/entities/span_status.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/entities/trace_state.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/johnsnowlabs/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/assessments_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/assessments_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_artifacts_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_exception_with_details_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_filesystem_service_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_filesystem_service_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_managed_catalog_messages_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_managed_catalog_service_pb2.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_managed_catalog_service_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_tracing_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_tracing_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/databricks_uc_registry_service_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/datasets_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/datasets_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/facet_feature_statistics_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/facet_feature_statistics_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/internal_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/issues_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/issues_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/jobs_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/mlflow_artifacts_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/mlflow_artifacts_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/model_registry_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/prompt_optimization_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/prompt_optimization_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/scalapb/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/scalapb/scalapb_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/scalapb/scalapb_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/service_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/unity_catalog_oss_messages_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/unity_catalog_oss_messages_pb2.pyi` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/unity_catalog_prompt_messages_pb2_grpc.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/unity_catalog_prompt_service_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/unity_catalog_prompt_service_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/webhooks_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/protos/webhooks_pb2.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/system_metrics/metrics/gpu_monitor.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/system_metrics/system_metrics_monitor.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mlflow/tracking/_uc_upsell.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/more_itertools` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/more_itertools-10.7.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/more_itertools-10.7.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/more_itertools-10.7.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/more_itertools-10.7.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/more_itertools-10.7.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/more_itertools-10.7.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mpl_toolkits/axes_grid1/tests/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mpl_toolkits/axes_grid1/tests/conftest.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mpl_toolkits/axes_grid1/tests/test_axes_grid1.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/mpl_toolkits/axisartist/tests/test_grid_finder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multidict-6.6.4.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multidict-6.6.4.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multidict-6.6.4.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multidict-6.6.4.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multidict/_abc.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multidict/_compat.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess-0.70.16.dist-info/COPYING` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess-0.70.16.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess-0.70.16.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess-0.70.16.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess-0.70.16.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess-0.70.16.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/popen_spawn_posix.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/popen_spawn_win32.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/process.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/reduction.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/spawn.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/tests/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/tests/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/tests/mp_fork_bomb.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/tests/test_multiprocessing_spawn` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/multiprocess/util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/nh3` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/nh3-0.3.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/nh3-0.3.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/nh3-0.3.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/nh3-0.3.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/nh3-0.3.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/nh3-0.3.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/numpy-2.3.2.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/numpy-2.3.2.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/numpy/_core/include/numpy/random/LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/numpy/_core/include/numpy/random/bitgen.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/_utils/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/_utils/_compat.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/_utils/_json.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/_utils/_logs.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/_utils/_proxy.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/_utils/_reflection.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/_utils/_resources_proxy.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/_utils/_streams.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/auth/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/certificates.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/groups/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/groups/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/projects/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/projects/api_keys.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/projects/roles.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/projects/service_accounts.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/projects/users/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/projects/users/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/projects/users/roles.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/users/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/admin/organization/users/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/resources/beta/threads/messages.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/openai/types/static_file_chunking_strategy.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/_logs/_internal` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/metrics/_internal/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/metrics/_internal/instrument.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/metrics/_internal/observation.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/proto/collector/metrics/v1/metrics_service_pb2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/proto/collector/trace` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/proto/common/v1/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/metrics/_internal/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/metrics/_internal/export` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/metrics/_internal/measurement_consumer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/metrics/_internal/metric_reader_storage.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/metrics/_internal/point.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/metrics/_internal/sdk_configuration.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/trace/export/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/trace/export/in_memory_span_exporter.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/sdk/trace/sampling.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/opentelemetry/util/_providers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging-25.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging-25.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging-25.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging-25.0.dist-info/licenses/LICENSE.APACHE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging-25.0.dist-info/licenses/LICENSE.BSD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging/_elffile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging/_manylinux.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging/_structures.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging/_tokenizer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging/licenses/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging/requirements.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/packaging/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas-2.3.2.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas-2.3.2.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas-2.3.2.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/_libs/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/_libs/internals.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/_libs/missing.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/_libs/testing.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/_libs/tslibs/conversion.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/_libs/writers.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/_version_meson.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/tseries/holiday.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pandas/tseries/offsets.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/api_tests.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/data/my-test-package-source` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/data/my-test-package-zip` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/data/my-test-package_unpacked-egg` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/data/my-test-package_zipped-egg` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/test_find_distributions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/test_integration_zope_interface.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/test_markers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/test_pkg_resources.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pkg_resources/tests/test_working_set.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy-1.6.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy-1.6.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy-1.6.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy-1.6.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy-1.6.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy-1.6.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy-1.6.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy/_callers.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy/_manager.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy/_result.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy/_tracing.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy/_warnings.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pluggy/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/conda.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/coursier.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/dart.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/docker_image.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/dotnet.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/fail.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/haskell.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/lua.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/node.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/perl.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/pygrep.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/script.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/swift.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/languages/system.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pre_commit/parse_shebang.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/propcache-0.3.2.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/propcache-0.3.2.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/propcache-0.3.2.dist-info/licenses/NOTICE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/propcache-0.3.2.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/propcache/_helpers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/propcache/_helpers_c.pyx` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/propcache/_helpers_py.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/propcache/api.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1/codec/ber` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1/codec/cer/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1/codec/cer/decoder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1/codec/cer/encoder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1/codec/streaming.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules-0.4.2.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules-0.4.2.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules-0.4.2.dist-info/zip-safe` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc1901.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc2876.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc3447.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc3820.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc4387.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc4683.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc5126.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc5755.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc6032.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyasn1_modules/rfc6486.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pycparser-2.22.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pydantic_core-2.33.2.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pydantic_core-2.33.2.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pydantic_core-2.33.2.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pydantic_core-2.33.2.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pydantic_core/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pygments/lexers/ldap.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pygments/styles/monokai.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks-1.2.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks-1.2.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks-1.2.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks-1.2.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks-1.2.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks-1.2.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks/_in_process/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyproject_hooks/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright-1.1.407.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright-1.1.407.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright-1.1.407.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/dist/LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/dist/dist/typeshed-fallback` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/dist/dist/vendor.js.LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/dist/index.js` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pyright/types.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pytest-8.4.1.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pytest-8.4.1.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pytest-8.4.1.dist-info/licenses/AUTHORS` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pytest-8.4.1.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pytest-8.4.1.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dateutil-2.9.0.post0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dateutil-2.9.0.post0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dateutil-2.9.0.post0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dateutil-2.9.0.post0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dateutil-2.9.0.post0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dateutil-2.9.0.post0.dist-info/zip-safe` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dotenv-1.1.1.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dotenv-1.1.1.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dotenv-1.1.1.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dotenv-1.1.1.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/python_dotenv-1.1.1.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pytz/zoneinfo/America/Belem` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pytz/zoneinfo/America/Kentucky` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/pytz/zoneinfo/Brazil/DeNoronha` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/readme_renderer` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/readme_renderer-44.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/readme_renderer-44.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/readme_renderer-44.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/readme_renderer-44.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/readme_renderer-44.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/readme_renderer-44.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests-2.34.2.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests-2.34.2.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests-2.34.2.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests-2.34.2.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests-2.34.2.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests-2.34.2.dist-info/licenses/NOTICE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests-2.34.2.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests/_internal_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests/_types.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests/api.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests/help.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests/models.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests/status_codes.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt-1.0.0.dist-info/AUTHORS.rst` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt-1.0.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt-1.0.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt-1.0.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt-1.0.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt-1.0.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/__init__.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/adapters/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/adapters/fingerprint.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/adapters/host_header_ssl.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/adapters/source.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/auth/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/auth/_digest_auth_compat.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/auth/http_proxy_digest.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/sessions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/streaming_iterator.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/threaded/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/requests_toolbelt/threaded/thread.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986-2.0.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986-2.0.0.dist-info/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986-2.0.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986-2.0.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986-2.0.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986-2.0.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986-2.0.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/_mixin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/abnf_regexp.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/api.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/builder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/compat.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/iri.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/misc.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rfc3986/uri.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_cell_widths.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_emoji_replace.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_fileno.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_log_render.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_palettes.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_pick.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_timer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_windows.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/_windows_renderer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/abc.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/ansi.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/bar.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/color_triplet.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/columns.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/containers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/control.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/default_styles.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/diagnose.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/emoji.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/file_proxy.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/filesize.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/highlighter.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/json.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/layout.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/live.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/live_render.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/logging.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/markdown.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/markup.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/measure.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/padding.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/pager.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/palette.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/panel.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/progress.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/progress_bar.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/protocol.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/region.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/repr.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/rule.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/scope.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/screen.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/style.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/styled.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/syntax.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/terminal_theme.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/text.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rich/theme.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rpds/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rpds_py-0.27.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rpds_py-0.27.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rpds_py-0.27.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/rpds_py-0.27.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/ruff-0.12.10.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/ruff-0.12.10.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/ruff-0.12.10.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/ruff-0.12.10.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/ruff-0.12.10.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/ruff-0.12.10.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/ruff/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/ruff/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/scipy/sparse/csc.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/scipy/sparse/csgraph/tests/test_connected_components.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/scipy/sparse/data.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/scipy/sparse/linalg/_isolve/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/scipy/sparse/linalg/_isolve/lgmres.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/scipy/sparse/linalg/_isolve/lsmr.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/scipy/sparse/linalg/_isolve/tests` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/secretstorage` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/semver` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/semver-3.0.4.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/semver-3.0.4.dist-info/LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/semver-3.0.4.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/semver-3.0.4.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/semver-3.0.4.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/semver-3.0.4.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/_init_implementation.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/_log_batcher.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/_werkzeug.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/api.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/envelope.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/feature_flags.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/integrations/modules.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/integrations/redis/consts.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/integrations/redis/modules` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/integrations/redis/redis.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/integrations/redis/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/logger.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/profiler/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/profiler/continuous_profiler.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/profiler/transaction_profiler.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/profiler/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/scope.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/spotlight.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sentry_sdk/types.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/setuptools-80.9.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/setuptools-80.9.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/setuptools-80.9.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/setuptools-80.9.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/setuptools-80.9.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/setuptools/_vendor/autocommand-2.2.2.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/setuptools/_vendor/backports.tarfile-1.2.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/setuptools/_vendor/typeguard` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/buf.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/mman.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/test/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/test/lib.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/test/test_buf.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/test/test_mman.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/test/test_util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/smmap/util.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/socksio-1.0.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/socksio-1.0.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/socksio-1.0.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/socksio/__pycache__/__init__.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/socksio/__pycache__/exceptions.cpython-313.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sqlalchemy/testing/plugin/plugin_base.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sqlalchemy/util/concurrency.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/sqlparse-0.5.3.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tokenizers/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tokenizers/decoders/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tokenizers/implementations/__init__.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tokenizers/implementations/sentencepiece_bpe.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tokenizers/processors/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tokenizers/tools/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm-4.67.1.dist-info/LICENCE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm-4.67.1.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/_dist_ver.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/_main.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/_tqdm.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/_tqdm_notebook.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/_tqdm_pandas.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/asyncio.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/completion.sh` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/dask.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tqdm/version.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/twine/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/twine/commands/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/twine/commands/check.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/twine/commands/register.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/twine/commands/upload.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/twine/wheel.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/typing_inspection-0.4.1.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/typing_inspection-0.4.1.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/typing_inspection-0.4.1.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/typing_inspection-0.4.1.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Africa` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Asia/Dili` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Australia` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Brazil` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/CET` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/CST6CDT` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Chile` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Cuba` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/EST` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/EST5EDT` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Europe/Tallinn` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/GMT+0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/GMT-0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Iceland` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Iran` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Jamaica` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/MET` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/NZ` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/NZ-CHAT` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/UTC` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/Zulu` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/tzdata/zoneinfo/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/urllib3-2.5.0.dist-info/INSTALLER` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/urllib3-2.5.0.dist-info/METADATA` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/urllib3-2.5.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/urllib3-2.5.0.dist-info/REQUESTED` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/urllib3-2.5.0.dist-info/licenses/LICENSE.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn-0.35.0.dist-info/RECORD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn-0.35.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn-0.35.0.dist-info/licenses/LICENSE.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/config.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/importer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/logging.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/loops/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/loops/asyncio.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/loops/auto.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/loops/uvloop.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/middleware/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/middleware/asgi2.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/middleware/message_logger.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/uvicorn/middleware/wsgi.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv-20.34.0.dist-info/WHEEL` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv-20.34.0.dist-info/licenses/LICENSE` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/activation/nushell/activate.nu` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/create/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/create/debug.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/create/describe.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/create/pyenv_cfg.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/create/via_global_ref` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/seed/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/seed/embed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/seed/seeder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/seed/wheels` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/virtualenv/util/subprocess` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/automations/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/automations/scopes.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/cli/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/old/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/old/core.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/sdk/launch/agent` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/wandb/wandb_run.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/.venv/lib/python3.13/site-packages/werkzeug/routing/map.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/src/gepa.egg-info/dependency_links.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/src/gepa.egg-info/requires.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/baseline/gepa_repo/src/gepa.egg-info/top_level.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+
+#### dataset（786）
+
+- `/data/public/zz/dataset/huggingface/datasets/hotpotqa___hotpot_qa/fullwiki/0.0.0/1908d6afbbead072334abe2965f91bd2709910ab/dataset_info.json` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/dataset/huggingface/hub/datasets--hotpotqa--hotpot_qa` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__N23duRv/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__7v5V3ut/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_gdpval_37__DVcn6KQ/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__ABsh2Q5/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__ABsh2Q5/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__ABsh2Q5/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__ABsh2Q5/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__qijL6hM/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_receiving_exception_audit__MmiUeFe/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_receiving_exception_audit__MmiUeFe/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_receiving_exception_audit__MmiUeFe/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/speaker-honorarium-review__wVjGWFk/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/speaker-honorarium-review__wVjGWFk/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/speaker-honorarium-review__wVjGWFk/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/speaker-honorarium-review__wVjGWFk/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__qYHtVfN/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__qYHtVfN/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__qYHtVfN/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__qYHtVfN/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__qYHtVfN/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__qYHtVfN/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-cross-rate-inverse-fix__M7Rfkzo/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-cross-rate-inverse-fix__M7Rfkzo/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-cross-rate-inverse-fix__M7Rfkzo/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__grADkiY/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__grADkiY/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__grADkiY/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__grADkiY/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__grADkiY/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__grADkiY/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__grADkiY/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__grADkiY/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/lattice_deferred_revenue_rollfor__ZD4YJPQ/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/lattice_deferred_revenue_rollfor__ZD4YJPQ/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/lattice_deferred_revenue_rollfor__ZD4YJPQ/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-clinic-intake-summary__oWez87G/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-event-announcement__V24Bcfc/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-inventory-report__KiDUgaZ/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-inventory-report__KiDUgaZ/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-supplier-contact-sheet__4EVvW79/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-supplier-contact-sheet__4EVvW79/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__4z7BaVu/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_syncpack_28v56__QVmsGCS/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__o4Ygmhe/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__VWqz3gc/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__VWqz3gc/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__VWqz3gc/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__VWqz3gc/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__VWqz3gc/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__VWqz3gc/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-housing-materials-correlati__28pRLDN/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__6kGvGb6/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__6kGvGb6/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__6kGvGb6/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__6kGvGb6/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__6kGvGb6/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__ooE3RKd/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__9vf4soT/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__3c6owgE/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__JrnT3bh/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/lock.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/01-cloud-service-portfolio-diff__fWF4mGF/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/01-cloud-service-portfolio-diff__fWF4mGF/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/01-cloud-service-portfolio-diff__fWF4mGF/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__Wn6kGzN/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__Wn6kGzN/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__Wn6kGzN/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__Wn6kGzN/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__Wn6kGzN/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__Wn6kGzN/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__TMMDusM/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__vChdd3L/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__beFihtu/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__sRE3tzU/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__sRE3tzU/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__sRE3tzU/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/07-shipping-container-manifest-d__GdfQpb2/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/07-shipping-container-manifest-d__GdfQpb2/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__nFxozfP/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__nFxozfP/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__nFxozfP/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__nFxozfP/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__nFxozfP/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/skill_patch_history.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_gdpval_35__BDsYeSw/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_gdpval_35__BDsYeSw/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_gdpval_35__BDsYeSw/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__owXJXgz/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__jNXSYui/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__jNXSYui/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__jNXSYui/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__jNXSYui/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__jNXSYui/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__jNXSYui/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__jNXSYui/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__jNXSYui/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__dcXPm8P/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__dcXPm8P/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__dcXPm8P/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__dcXPm8P/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/skill_patch_history.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_receiving_exception_audit__tfdKgF7/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_receiving_exception_audit__tfdKgF7/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_receiving_exception_audit__tfdKgF7/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_receiving_exception_audit__tfdKgF7/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_receiving_exception_audit__tfdKgF7/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_returns_disposition_audit__jNQsTE4/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_service_queue_sla_audit__tQJ6aDa/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_service_queue_sla_audit__tQJ6aDa/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_service_queue_sla_audit__tQJ6aDa/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_service_queue_sla_audit__tQJ6aDa/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_service_queue_sla_audit__tQJ6aDa/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_service_queue_sla_audit__tQJ6aDa/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_service_queue_sla_audit__tQJ6aDa/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_service_queue_sla_audit__tQJ6aDa/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_trailer_detention_audit__rt5sirj/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_trailer_detention_audit__rt5sirj/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/harbor_trailer_detention_audit__rt5sirj/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Distribution-Center-Auditing/shared_skills/Distribution-Center-Auditing/service-queue-sla-audit/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/clinic-shift-claim-review__WRsBpQt/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/clinic-shift-claim-review__WRsBpQt/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/clinic-shift-claim-review__WRsBpQt/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/clinic-shift-claim-review__WRsBpQt/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/clinic-shift-claim-review__WRsBpQt/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/clinic-shift-claim-review__WRsBpQt/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/field-service-workorder-audit__PePxsmC/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/field-service-workorder-audit__PePxsmC/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/field-service-workorder-audit__PePxsmC/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/field-service-workorder-audit__PePxsmC/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/field-service-workorder-audit__PePxsmC/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/field-service-workorder-audit__PePxsmC/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/field-service-workorder-audit__PePxsmC/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/field-service-workorder-audit__PePxsmC/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__chhXvvh/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__chhXvvh/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__chhXvvh/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__chhXvvh/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__chhXvvh/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__chhXvvh/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/research-stipend-reconciliation__yJAUz9d/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/research-stipend-reconciliation__yJAUz9d/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/research-stipend-reconciliation__yJAUz9d/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/research-stipend-reconciliation__yJAUz9d/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/research-stipend-reconciliation__yJAUz9d/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/research-stipend-reconciliation__yJAUz9d/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/shared_skills/Document-Fraud-Detection/clinic-shift-claim-screening/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/shared_skills/Document-Fraud-Detection/clinic-shift-claim-screening/scripts/screen_shifts.py` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/shared_skills/Document-Fraud-Detection/field-service-workorder-audit/scripts/screen_workorders.py` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/shared_skills/Document-Fraud-Detection/stipend-reconciliation/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/shared_skills/Document-Fraud-Detection/stipend-reconciliation/scripts/screen_stipends.py` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/skill_patch_history.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__dBF94Fd/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__dBF94Fd/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__dBF94Fd/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__dBF94Fd/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__dBF94Fd/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/travel-expense-screening__dBF94Fd/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/warehouse-coldchain-charge-revie__4frbCAx/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/warehouse-coldchain-charge-revie__4frbCAx/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/warehouse-coldchain-charge-revie__4frbCAx/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Document-Fraud-Detection/warehouse-coldchain-charge-revie__4frbCAx/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-cross-rate-inverse-fix__fJ7sRCP/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-cross-rate-inverse-fix__fJ7sRCP/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-cross-rate-inverse-fix__fJ7sRCP/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-cross-rate-inverse-fix__fJ7sRCP/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-cross-rate-inverse-fix__fJ7sRCP/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__c8fgk6W/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__c8fgk6W/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__c8fgk6W/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__c8fgk6W/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__c8fgk6W/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__c8fgk6W/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/fx-spot-matrix-refresh__c8fgk6W/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Embedded-Data-Repair/warehouse-slot-factor-refresh__x9ZTGGx/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/lattice_deferred_revenue_rollfor__RcJuucu/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/lattice_deferred_revenue_rollfor__RcJuucu/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/lattice_deferred_revenue_rollfor__RcJuucu/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/lattice_deferred_revenue_rollfor__RcJuucu/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/northstar_warranty_reserve_conso__JotkapY/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/northstar_warranty_reserve_conso__JotkapY/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/northstar_warranty_reserve_conso__JotkapY/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/northstar_warranty_reserve_conso__JotkapY/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/northstar_warranty_reserve_conso__JotkapY/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/northstar_warranty_reserve_conso__JotkapY/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/shared_skills/Financial-Statement-Rolling/warranty-reserve-workbook/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/solstice_commission_asset_alignm__sq4itTP/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/solstice_commission_asset_alignm__sq4itTP/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/solstice_commission_asset_alignm__sq4itTP/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/solstice_commission_asset_alignm__sq4itTP/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/solstice_commission_asset_alignm__sq4itTP/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Financial-Statement-Rolling/solstice_commission_asset_alignm__sq4itTP/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-clinic-intake-summary__4cwnFbR/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-event-announcement__ecXvDK9/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-project-proposal__dsJ9JMn/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-project-proposal__dsJ9JMn/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-renewal-playbook-update__bUtjpQH/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-safety-audit-brief__XCLVHVb/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-safety-audit-brief__XCLVHVb/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-safety-audit-brief__XCLVHVb/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-safety-audit-brief__XCLVHVb/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-safety-audit-brief__XCLVHVb/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-safety-audit-brief__XCLVHVb/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-safety-audit-brief__XCLVHVb/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-supplier-contact-sheet__LLps6Gc/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-training-feedback__B5a6xX6/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-training-feedback__B5a6xX6/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-training-feedback__B5a6xX6/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-training-feedback__B5a6xX6/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-training-feedback__B5a6xX6/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-training-feedback__B5a6xX6/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/hwpx-training-feedback__B5a6xX6/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__HWPX-Document-Automation/lock.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__Bds3m8f/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__Bds3m8f/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__Bds3m8f/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__Bds3m8f/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__Bds3m8f/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__Bds3m8f/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__Bds3m8f/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_gdpval_42__KozFMxN/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_gdpval_42__KozFMxN/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_gdpval_42__KozFMxN/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_gdpval_42__KozFMxN/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_infusionbatch_7v14__vwY6Wt4/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_infusionbatch_7v14__vwY6Wt4/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_infusionbatch_7v14__vwY6Wt4/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_mailerfill_45v90__WLN2qXx/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_oncocooler_10v20__epcjpoC/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_oncocooler_10v20__epcjpoC/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_oncocooler_10v20__epcjpoC/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_oncocooler_10v20__epcjpoC/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_oncocooler_10v20__epcjpoC/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_reagentkit_bulk__BFzMjA7/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_syncpack_28v56__eUFtxxv/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_syncpack_28v56__eUFtxxv/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_syncpack_28v56__eUFtxxv/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_syncpack_28v56__eUFtxxv/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_syncpack_28v56__eUFtxxv/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/harbor_syncpack_28v56__eUFtxxv/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/shared_skills/Healthcare-Cost-Benefit-Analysis/infusion-batch-analysis/references/cooler_dispatch_variant.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/shared_skills/Healthcare-Cost-Benefit-Analysis/infusion-batch-analysis/scripts/cooler_dispatch_analysis.py` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Healthcare-Cost-Benefit-Analysis/skill_patch_history.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__rjx9Kzv/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-coldchain-lastmile-correlat__QQ5GTzF/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-coldchain-lastmile-correlat__QQ5GTzF/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__Ycop9FH/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__Ycop9FH/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__Ycop9FH/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-equipment-software-correlat__Ycop9FH/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-housing-materials-correlati__GkwZjYx/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-housing-materials-correlati__GkwZjYx/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-housing-materials-correlati__GkwZjYx/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-housing-materials-correlati__GkwZjYx/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__YkafVnT/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__YkafVnT/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__YkafVnT/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__YkafVnT/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__YkafVnT/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__YkafVnT/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-service-hospitality-correla__YkafVnT/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-utilities-telecom-correlati__vK64zYx/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-utilities-telecom-correlati__vK64zYx/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__JF7Bnkr/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Industry-Correlation-Analysis/skill_patch_history.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/harbor_gdpval_21__Aexstie/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/harbor_gdpval_21__Aexstie/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/harbor_gdpval_21__Aexstie/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/harbor_gdpval_21__Aexstie/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/harbor_gdpval_21__Aexstie/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/harbor_gdpval_21__Aexstie/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/lock.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_10_maintenance_calcfiel__c9ksSFN/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_10_maintenance_calcfiel__c9ksSFN/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_10_maintenance_calcfiel__c9ksSFN/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_10_maintenance_calcfiel__c9ksSFN/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_10_maintenance_calcfiel__c9ksSFN/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_10_maintenance_calcfiel__c9ksSFN/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_10_maintenance_calcfiel__c9ksSFN/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_10_maintenance_calcfiel__c9ksSFN/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_datacenter_capacity_r__uPyJeva/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_datacenter_capacity_r__uPyJeva/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_datacenter_capacity_r__uPyJeva/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_datacenter_capacity_r__uPyJeva/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_datacenter_capacity_r__uPyJeva/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/new_task_9_hospital_staffing_res__RfjKCSX/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/shared_skills/Inventory-&-Finance-Integration/capacity-reconciliation-workbook/references/mapping.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Inventory-&-Finance-Integration/shared_skills/Inventory-&-Finance-Integration/inventory-replenishment-calculator/scripts/build_additional_shipments.py` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/electrolyte-rounding-harmonizati__m5nGScL/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/electrolyte-rounding-harmonizati__m5nGScL/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/hepatic-panel-harmonization__eCD75Re/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/hepatic-panel-harmonization__eCD75Re/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/hepatic-panel-harmonization__eCD75Re/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/hepatic-panel-harmonization__eCD75Re/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/lock.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/thyroid-monitoring-harmonization__svLLSVS/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Medical-Data-Standardization/thyroid-monitoring-harmonization__svLLSVS/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/lock.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_construction_measure__pmfMbTG/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_construction_measure__pmfMbTG/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_ecommerce_orders__kDPvQ5Z/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_ecommerce_orders__kDPvQ5Z/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_ecommerce_orders__kDPvQ5Z/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_ecommerce_orders__kDPvQ5Z/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_invoice_images__2n79SAh/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_pharmacy_labels__CDPo3w4/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_pharmacy_labels__CDPo3w4/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_pharmacy_labels__CDPo3w4/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_pharmacy_labels__CDPo3w4/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_pharmacy_labels__CDPo3w4/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_pharmacy_labels__CDPo3w4/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_utility_bills_templa__MHGrspb/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_utility_bills_templa__MHGrspb/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_utility_bills_templa__MHGrspb/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_utility_bills_templa__MHGrspb/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__OCR-Data-Extraction/task_family_utility_bills_templa__MHGrspb/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/harbor_gdpval_36__kpam2Zd/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/harbor_gdpval_36__kpam2Zd/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/harbor_gdpval_36__kpam2Zd/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/harbor_gdpval_36__kpam2Zd/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/harbor_gdpval_36__kpam2Zd/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/harbor_gdpval_36__kpam2Zd/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/harbor_gdpval_36__kpam2Zd/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/harbor_gdpval_36__kpam2Zd/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/new_task_1_soc_alert_recovery__asWsso6/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/new_task_1_soc_alert_recovery__asWsso6/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/new_task_3_returns_center_throug__SDqSpxw/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/new_task_3_returns_center_throug__SDqSpxw/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Operational-Recovery-Planning/new_task_3_returns_center_throug__SDqSpxw/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__PPT-Formatting-Optimization/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__PPT-Formatting-Optimization/lock.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__PPT-Formatting-Optimization/museum-exhibit-caption-cleanup__T946dey/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__PPT-Formatting-Optimization/museum-exhibit-caption-cleanup__T946dey/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__PPT-Formatting-Optimization/museum-exhibit-caption-cleanup__T946dey/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__PPT-Formatting-Optimization/museum-exhibit-caption-cleanup__T946dey/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__PPT-Formatting-Optimization/museum-exhibit-caption-cleanup__T946dey/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36__2xz5aPG/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task1__ukXtVKa/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task1__ukXtVKa/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task1__ukXtVKa/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task1__ukXtVKa/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task1__ukXtVKa/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task2__CEnvEjp/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task2__CEnvEjp/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task2__CEnvEjp/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task2__CEnvEjp/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task2__CEnvEjp/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task3__ysXyVBG/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task3__ysXyVBG/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task4__phsQUJS/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task4__phsQUJS/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task4__phsQUJS/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task4__phsQUJS/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/harbor_gdpval_36_task4__phsQUJS/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Production-Capacity-Planning/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-class-breakdown__NSFT9wn/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-class-breakdown__NSFT9wn/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-class-breakdown__NSFT9wn/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-class-breakdown__NSFT9wn/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-class-breakdown__NSFT9wn/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-class-breakdown__NSFT9wn/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/fund-shift-screen__MUXwLR3/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/issuer-ownership-rollup__VeGNGWs/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/issuer-ownership-rollup__VeGNGWs/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/issuer-ownership-rollup__VeGNGWs/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/issuer-ownership-rollup__VeGNGWs/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/shared_skills/SEC-13F-Financial-Analysis/process-13f-filing/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/shared_skills/SEC-13F-Financial-Analysis/process-13f-filing/references/classification.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/shared_skills/SEC-13F-Financial-Analysis/process-13f-filing/scripts/process_13f.py` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__SEC-13F-Financial-Analysis/skill_patch_history.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/employee-compensation-pivot__AghaErb/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/inventory-multi-warehouse-pivot__zVRyTa3/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/library-circulation-pivot__DreHfH2/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/library-circulation-pivot__DreHfH2/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/library-circulation-pivot__DreHfH2/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/lock.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/product-sales-pivot__yBhyJV4/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/quality-control-pivot__7J4d6KH/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Sales-Pivot-Analysis/shared_skills/Sales-Pivot-Analysis/quality-control-inspection-report/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/bakery_weekly_commit_gap__voACPib/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/bakery_weekly_commit_gap__voACPib/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/bakery_weekly_commit_gap__voACPib/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/bakery_weekly_commit_gap__voACPib/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/bakery_weekly_commit_gap__voACPib/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/bakery_weekly_commit_gap__voACPib/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/clinic_branch_transfer_gap__Sykt3vK/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/clinic_branch_transfer_gap__Sykt3vK/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/clinic_branch_transfer_gap__Sykt3vK/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/clinic_branch_transfer_gap__Sykt3vK/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/petcare_midmonth_pallet_gap__DKhCpUo/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/petcare_midmonth_pallet_gap__DKhCpUo/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/petcare_midmonth_pallet_gap__DKhCpUo/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/produce_lane_restock_gap__6SeY79A/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/produce_lane_restock_gap__6SeY79A/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/produce_lane_restock_gap__6SeY79A/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/snack_dc_august_load_plan__97fkHHS/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/snack_dc_august_load_plan__97fkHHS/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Supply-Chain-Replenishment/snack_dc_august_load_plan__97fkHHS/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/api-sla-at-risk-calc__XrK5uNb/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/shared_skills/Weighted-Risk-Assessment/excel-formula-fill/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/weighted-campus-energy-balance-c__HkNpALM/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/weighted-campus-energy-balance-c__HkNpALM/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/weighted-hospital-bedflow-calc__2rkgbHv/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/weighted-hospital-bedflow-calc__2rkgbHv/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/weighted-hospital-bedflow-calc__2rkgbHv/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/weighted-hospital-bedflow-calc__2rkgbHv/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/weighted-hospital-bedflow-calc__2rkgbHv/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-20pg-20260616-225357/iter-kimi-deepseek-v4-flash__Weighted-Risk-Assessment/weighted-hospital-bedflow-calc__2rkgbHv/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__DMAIC-Quality-Analysis/harbor_field_service_analyze_03__oAXuadm/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__n5gLfqG/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__Distribution-Center-Auditing/harbor_service_queue_sla_audit__ZBuzG93/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__Financial-Statement-Rolling/cedar_accrual_rollforward__A2kbGf6/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__Financial-Statement-Rolling/peregrine_rebate_template_update__MjAZaxS/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__HWPX-Document-Automation/hwpx-project-proposal__VoPFfY9/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_oncocooler_10v20__i6eWBec/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__Industry-Correlation-Analysis/econ-wholesale-packaging-correla__B9fwBgp/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__Inventory-&-Finance-Integration/new_task_9_datacenter_capacity_r__3JG6q9B/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/init/iter-kimi-deepseek-v4-flash-init-skill__Financial-Statement-Rolling/meridian_contract_liability_orch__xa5KvEJ/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/init/iter-kimi-deepseek-v4-flash-init-skill__PPT-Formatting-Optimization/storm-damage-caption-cleanup__PUX9afG/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/init/iter-kimi-deepseek-v4-flash-init-skill__Sales-Pivot-Analysis/budget-reconciliation-pivot__kfrs7fN/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Compensation-Scenario-Modeling/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/harbor_returns_disposition_audit__UGQjWJr/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/harbor_returns_disposition_audit__UGQjWJr/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/harbor_returns_disposition_audit__UGQjWJr/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/harbor_returns_disposition_audit__UGQjWJr/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/harbor_returns_disposition_audit__UGQjWJr/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/harbor_timesheet_policy_audit__wShzHxd/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Embedded-Data-Repair/rebate-band-live-embedding-fix__ArbLHzK/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_diagpanel_14v28__cePsFs8/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_reagentkit_bulk__NGSUUgv/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_vaxcrate_6v12__nES9ogP/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Inventory-&-Finance-Integration/new_task_9_datacenter_capacity_r__aFVvsPy/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Medical-Data-Standardization/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__OCR-Data-Extraction/task_family_ecommerce_orders__frp6fMH/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Operational-Recovery-Planning/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__PPT-Formatting-Optimization/coastal-trail-caption-cleanup__vDMXQ4p/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__PPT-Formatting-Optimization/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__PPT-Formatting-Optimization/museum-exhibit-caption-cleanup__4TAD8r7/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__PPT-Formatting-Optimization/transit-platform-caption-cleanup__4BqnDsd/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__Production-Capacity-Planning/harbor_gdpval_36_task1__sAg3kwG/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final.failed-402-20260617-100132/iter-kimi-deepseek-v4-pro-init-skill__SEC-13F-Financial-Analysis/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__Vv5DUud/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Compensation-Scenario-Modeling/03_university_faculty_model__KTYZZeo/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__DMAIC-Quality-Analysis/harbor_logistics_chain_03__S9xomw3/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__VRVUxVz/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Embedded-Data-Repair/emission-zone-dual-matrix-repair__YqXx43Q/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Financial-Statement-Rolling/atlas_refund_reserve_template_me__VTamEQi/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Financial-Statement-Rolling/solstice_commission_asset_alignm__Phn5gFD/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_cyclemargin_30v90__sAUXn7N/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Medical-Data-Standardization/electrolyte-rounding-harmonizati__3Ce4d6f/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Medical-Data-Standardization/neonatal-sepsis-harmonization__tnYj7Ym/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Medical-Data-Standardization/thyroid-monitoring-harmonization__Em8HSoK/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__OCR-Data-Extraction/task_family_case_settlement_pack__h7DWHZo/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Operational-Recovery-Planning/harbor_dc_recovery_01__vNuRdCN/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Operational-Recovery-Planning/harbor_wh_recovery_02__cXHAUTM/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__PPT-Formatting-Optimization/transit-platform-caption-cleanup__MFcS6ho/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Production-Capacity-Planning/harbor_gdpval_36_task4__rjehcZB/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Production-Capacity-Planning/harbor_gdpval_36_task5__YEsB9ns/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Production-Capacity-Planning/harbor_gdpval_36_task6__xxiPANu/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__SEC-13F-Financial-Analysis/fund-snapshot-canonical__f8T4aTC/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Sales-Pivot-Analysis/quality-control-pivot__xzFUsKk/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Sales-Pivot-Analysis/student-performance-pivot__jZ4N5aS/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Weighted-Risk-Assessment/factory-output-at-risk-calc__mdG5wjb/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Weighted-Risk-Assessment/hospital-capacity-at-risk-calc__ZWqwKik/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Compensation-Scenario-Modeling/03_university_faculty_model__uZ9LBea/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__FFNJDr7/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__FFNJDr7/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/harbor_returns_disposition_audit__hCZN4RM/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Document-Fraud-Detection/clinical-trial-participant-relea__SziWocd/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__fohiUzp/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__fohiUzp/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__fohiUzp/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__HWPX-Document-Automation/hwpx-safety-audit-brief__Aks7eqB/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_reagentkit_bulk__2jNK8tj/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Medical-Data-Standardization/thyroid-monitoring-harmonization__c697EcM/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Distribution-Center-Auditing/harbor_service_queue_sla_audit__npYRygE/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Document-Fraud-Detection/fleet-maintenance-chargeback-aud__kHBoF3e/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Document-Fraud-Detection/research-stipend-reconciliation__6mKx4dp/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Document-Fraud-Detection/warehouse-coldchain-charge-revie__fds29R9/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Financial-Statement-Rolling/peregrine_rebate_template_update__APGGPCj/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__HWPX-Document-Automation/hwpx-project-proposal__A459AwN/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__HWPX-Document-Automation/hwpx-safety-audit-brief__YrLNn8o/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_oncocooler_10v20__6cpXE8s/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_syncpack_28v56__byQ4r34/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_vaxcrate_6v12__UKHbdoP/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Industry-Correlation-Analysis/econ-broadcasting-advertising-co__oiyUPQs/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Industry-Correlation-Analysis/econ-housing-materials-correlati__erYPUnB/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__Operational-Recovery-Planning/new_task_1_soc_alert_recovery__8T3CCoR/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/candidate_skill.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/edit_apply_report.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/merged_patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/patches/minibatch_fail_000.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/ranked_patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/raw_patches.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/status.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/method_update/tokens.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__RVYyX5Y/skill_evolution/status.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/online/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/method_update_history.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/smoke-method-skillopt-batch1/snapshots/final/Compensation-Scenario-Modeling/skillopt-family-skill/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__vXZF58B/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__4wz2h6p/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__R4cSuqA/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__R4cSuqA/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__skMegrr/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__skMegrr/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__skMegrr/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__skMegrr/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__skMegrr/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__skMegrr/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__skMegrr/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/05_property_management_model__YaDT3hs/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/05_property_management_model__YaDT3hs/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/06_property_portfolio_refresh_mo__3sJQHWr/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/07_airline_crew_model__vAaZ24m/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/07_airline_crew_model__vAaZ24m/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Compensation-Scenario-Modeling/07_airline_crew_model__vAaZ24m/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__CjtZoWE/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__CjtZoWE/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__CjtZoWE/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__CjtZoWE/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__CjtZoWE/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__eHtxST8/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__WexgYAR/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__WexgYAR/docker-compose-shared-skills.yaml` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/07-shipping-container-manifest-d__kDr6UsL/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__VsDo2JW/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__VsDo2JW/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__LvEjirQ/agent/qwen-sessions/-root/chats/e05cfb93-3e51-4491-b932-970ced887f40.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/01_orchestra_foundation_model__LvEjirQ/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__aMnHDUy/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/02_orchestra_archive_refresh_mod__aMnHDUy/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__x4u9uXp/agent/qwen-sessions/-root/chats/15612f5b-3c00-4fa1-8558-29c653d77880.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__x4u9uXp/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__x4u9uXp/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__x4u9uXp/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__x4u9uXp/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/03_university_faculty_model__x4u9uXp/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5nAki5s/agent/qwen-sessions/-root/chats/3dda6e6e-f772-4529-8af4-7308f5c754ed.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5nAki5s/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5nAki5s/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5nAki5s/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5nAki5s/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5nAki5s/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/05_property_management_model__ZaC9nDx/agent/qwen-sessions/-root/chats/107c9bc8-af08-40db-a5a3-451876b3de40.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/05_property_management_model__ZaC9nDx/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/06_property_portfolio_refresh_mo__AVa7zZo/agent/qwen-sessions/-root/chats/9e7b2ac7-0238-45ea-9dd8-ffa46cb8a1ee.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/06_property_portfolio_refresh_mo__AVa7zZo/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/06_property_portfolio_refresh_mo__AVa7zZo/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/07_airline_crew_model__qrEo5aL/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/07_airline_crew_model__qrEo5aL/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/07_airline_crew_model__qrEo5aL/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Compensation-Scenario-Modeling/07_airline_crew_model__qrEo5aL/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/01-cloud-service-portfolio-diff__VUpSyZV/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/01-cloud-service-portfolio-diff__VUpSyZV/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/01-cloud-service-portfolio-diff__VUpSyZV/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/01-cloud-service-portfolio-diff__VUpSyZV/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__bVsjaeP/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__bVsjaeP/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__bVsjaeP/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__bVsjaeP/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__bVsjaeP/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__bVsjaeP/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__bVsjaeP/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__eGQHNCf/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__g9NDL7e/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/04-university-program-funding-di__g9NDL7e/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/05_property_management_model__MRqZaUo/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/06_property_portfolio_refresh_mo__kNYpebc/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/07_airline_crew_model__jjkhviU/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/07_airline_crew_model__jjkhviU/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/08_construction_union_model__Y6udZfi/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__LzEtsLa/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__LzEtsLa/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__LzEtsLa/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__LzEtsLa/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__LzEtsLa/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__LzEtsLa/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__LzEtsLa/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__LzEtsLa/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__eQFRu8h/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__eQFRu8h/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__eQFRu8h/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__eQFRu8h/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__eQFRu8h/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__eQFRu8h/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__a9dTw2i/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__a9dTw2i/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__a9dTw2i/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__a9dTw2i/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__a9dTw2i/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__MwfEkCG/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_devops_pipeline_02__MXgTXMF/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_devops_pipeline_02__MXgTXMF/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_gdpval_37__4qXMm56/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_gdpval_37__4qXMm56/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_gdpval_37__4qXMm56/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_gdpval_37__4qXMm56/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_gdpval_37__4qXMm56/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__zGsdxdE/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__zGsdxdE/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__zGsdxdE/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_safety_01__AAG6toy/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_safety_01__AAG6toy/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_safety_01__AAG6toy/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_safety_01__AAG6toy/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_safety_01__AAG6toy/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_logistics_chain_03__ui9oV3t/agent/kimi-cli.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_logistics_chain_03__ui9oV3t/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__a2QSx2e/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__a2QSx2e/artifacts/manifest.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/shared_skills/DMAIC-Quality-Analysis/patient-safety-risk-analysis/references/schema_template.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-kimi-nokey/iter-kimi-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/shared_skills/DMAIC-Quality-Analysis/patient-safety-risk-analysis/scripts/risk_analysis_utils.py` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/03_university_faculty_model__scgkNd6/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5rqTVCV/agent/qwen-sessions/-root/chats/dcadc294-70eb-479d-8cbf-5ade0a0f3d38.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5rqTVCV/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5rqTVCV/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5rqTVCV/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5rqTVCV/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/04_university_termload_refresh_m__5rqTVCV/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/05_property_management_model__PQJGmaA/agent/qwen-sessions/-root/chats/9bce044d-b185-4e49-b5fb-8fa59cbef53a.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/05_property_management_model__PQJGmaA/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/05_property_management_model__PQJGmaA/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/05_property_management_model__PQJGmaA/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/05_property_management_model__PQJGmaA/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/05_property_management_model__PQJGmaA/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/05_property_management_model__PQJGmaA/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/06_property_portfolio_refresh_mo__bCqbVAi/agent/qwen-sessions/-root/chats/56a42d1a-cce8-40d7-9189-3973927fe370.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/06_property_portfolio_refresh_mo__bCqbVAi/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/06_property_portfolio_refresh_mo__bCqbVAi/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/07_airline_crew_model__xQrimEB/agent/qwen-sessions/-root/chats/7e9d24e6-3058-4e38-8e4a-b038dc4047a9.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/07_airline_crew_model__xQrimEB/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/08_construction_union_model__gg7NKNH/agent/qwen-sessions/-root/chats/bc9b79e1-6f7f-4e8d-b9d9-1e1b7c4952e7.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/08_construction_union_model__gg7NKNH/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/08_construction_union_model__gg7NKNH/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/job.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/shared_skills/Compensation-Scenario-Modeling/excel-model-building/SKILL.md` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Compensation-Scenario-Modeling/skill_patch_history.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/01-cloud-service-portfolio-diff__M9B85ee/result.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__DumxVJg/agent/qwen-sessions/-root/chats/6aaecc3c-cdf2-425f-97e4-c19bb9a63d02.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__DumxVJg/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__DumxVJg/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/03-retail-supply-category-diff__DumxVJg/verifier/test-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__WkAw5g8/skill_evolution/applied.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__WkAw5g8/skill_evolution/changes.diff` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__WkAw5g8/skill_evolution/changes.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__WkAw5g8/skill_evolution/outcome.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/04-university-program-funding-di__WkAw5g8/skill_evolution/patch.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__8yKqdHg/agent/qwen-sessions/-root/chats/90ab6a2b-82f1-461c-af76-affefda6bb68.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__8yKqdHg/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__8yKqdHg/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__8yKqdHg/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__8yKqdHg/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/05-datacenter-hardware-registry__8yKqdHg/trial.log` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__zyTjHqW/agent/qwen-sessions/-root/chats/06be9dc4-b010-4574-ac33-6e58da370e93.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/06-hospital-medication-reconcili__zyTjHqW/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/07-shipping-container-manifest-d__eYqXrNi/agent/qwen-sessions/-root/chats/a89a315a-5e6f-4274-bd64-3191a640fd22.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__9oTyLft/agent/qwen-sessions/-root/chats/7351dc83-2d12-46fc-b250-32b0b877d927.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__9oTyLft/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_field_service_analyze_03__EcH7Myd/agent/qwen-sessions/-root/chats/2d68f851-8893-4d15-9f2a-890e6005db21.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_gdpval_35__gZTma6N/agent/qwen-sessions/-root/chats/7c4995a5-ed87-46ba-8f1e-111b74304468.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_gdpval_35__gZTma6N/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_gdpval_37__inF7kKo/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_lab_analyze_02__bJfSuUC/agent/qwen-sessions/-root/chats/1cd506a6-c101-4b26-a4c3-bc66c499943e.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_hospital_safety_01__MkEyMC2/agent/qwen-sessions/-root/chats/a8ccae1b-6f66-4b3e-8c25-08f5f5a00066.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__bKDshoa/agent/qwen-sessions/-root/chats/9da6c043-75c1-4f17-a783-0da1737f5e1c.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__bKDshoa/agent/setup/mode.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__bKDshoa/agent/setup/version-return-code.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__bKDshoa/agent/setup/version-stdout.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__bKDshoa/config.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__bKDshoa/verifier/ctrf.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_soc_alert_analyze_01__bKDshoa/verifier/reward.txt` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__UmQ9mkL/agent/qwen-sessions/-root/chats/6d63a84d-545c-4d77-ad6b-4c945295e6ea.jsonl` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/harbor_university_it_analyze_04__UmQ9mkL/agent/trajectory.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-3families-qwen-nokey/iter-qwen-deepseek-v4-flash-3families__DMAIC-Quality-Analysis/lock.json` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/dataset/skillflow-task/.git/lfs/objects/2b/e4` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/dataset/skillflow-task/.git/lfs/objects/2d/2b` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/dataset/skillflow-task/.git/lfs/objects/37` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/dataset/skillflow-task/.git/lfs/objects/72` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/dataset/skillflow-task/.git/lfs/objects/93/98` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/dataset/skillflow-task/.git/lfs/objects/9b/f4` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/dataset/skillflow-task/.git/lfs/objects/cd/92` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/dataset/skillflow-task/.git/lfs/objects/d7/87` — 路径/元数据读取失败；最终排除；I/O error (5)
+
+#### home-migrated（11）
+
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/flashinfer_cubin/cubins/b55211623be7f5697c5262ffd8361fc06c147bc9/batched_gemm-b3c1646-c111d7c/Bmm_Bfloat16_E4m3E4m3_Fp32_t128x16x128u2_s6_et64x16_m64x16x32_cga1x1x1_16dp256b_rM_TN_transOut_noShflA_dsFp8_schPd4x2x2x3_bN_rgTma_clmp_dynB_sm100f.cubin` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/flashinfer_cubin/cubins/b55211623be7f5697c5262ffd8361fc06c147bc9/batched_gemm-b3c1646-c111d7c/Bmm_Bfloat16_E4m3E4m3_Fp32_t128x64x128u2_s8_et128x64_m256x64x32_cga2x1x1_16dp256b_rM_TN_transOut_schPd2x1x2x3_bN_rgTma_clmp_dynB_sm100f.cubin` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/flashinfer_cubin/cubins/b55211623be7f5697c5262ffd8361fc06c147bc9/batched_gemm-b3c1646-c111d7c/Bmm_Bfloat16_E4m3E4m3_Fp32_t128x8x128_s8_et64x8_m64x8x32_cga1x1x1_16dp256b_rM_BN_transOut_dsFp8_schPd4x2x2x3_bN_rgTma_clmp_dynB_sm100f.cubin` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/flashinfer_cubin/cubins/b55211623be7f5697c5262ffd8361fc06c147bc9/batched_gemm-b3c1646-c111d7c/Bmm_Bfloat16_E4m3E4m3_Fp32_t128x8x128_s8_et64x8_m64x8x32_cga1x1x1_16dp256b_rM_BN_transOut_dsFp8_schedS_bN_rgTma_clmp_dynB_sm100f.cubin` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/numba/np/__pycache__/new_arraymath.cpython-312.pyc` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/numba/tests/__pycache__/test_dyn_array.cpython-312.pyc` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/numba/tests/__pycache__/test_extending.cpython-312.pyc` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/numba/tests/__pycache__/test_linalg.cpython-312.pyc` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/numba/tests/__pycache__/test_lists.cpython-312.pyc` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/numba/tests/test_parfors.py` — 文件内容读取失败；rsync 丢弃更新
+- `/data/public/zz/home-migrated/miniconda3/envs/llm/lib/python3.12/site-packages/numpy/_core/include/numpy/random/libdivide.h` — 文件内容读取失败；rsync 丢弃更新
+
+#### paper（3）
+
+- `/data/public/zz/paper/SkillFlow:Benchmarking Lifelong Skill Discovery and Evolution for Autonomous Agents/arxiv_source/extracted/00README.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/paper/SkillFlow:Benchmarking Lifelong Skill Discovery and Evolution for Autonomous Agents/arxiv_source/extracted/appendix/failure_cases.tex` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/paper/SkillFlow:Benchmarking Lifelong Skill Discovery and Evolution for Autonomous Agents/arxiv_source/extracted/sections/5_relate_work.tex` — 路径/元数据读取失败；最终排除；I/O error (5)
+
+#### research（711）
+
+- `/data/public/zz/research/AFSE_EMNLP2026/.git/modules/external/gepa/objects/6f` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/.git/modules/external/gepa/objects/af` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/include` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/BdfFontFile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/BlpImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ContainerIO.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/CurImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/DcxImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/EpsImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ExifTags.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/FliImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/FontFile.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/FpxImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/FtexImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/GbrImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/GifImagePlugin.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/GribStubImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/Image.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageChops.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageEnhance.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageFile.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageGrab.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageMath.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageMode.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageMorph.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageOps.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImagePalette.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImagePath.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImageStat.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/ImtImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/Jpeg2KImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/JpegImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/JpegPresets.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/McIdasImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/MicImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/MpegImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/MpoImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/MspImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/PaletteFile.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/PcdImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/PcfFontFile.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/PixarImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/PpmImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/QoiImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/SgiImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/SpiderImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/TarIO.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/TgaImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/WebPImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/XVThumbImagePlugin.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_avif.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_binary.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imaging.cpython-313-x86_64-linux-gnu.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imaging.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imagingcms.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imagingft.cpython-313-x86_64-linux-gnu.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imagingft.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imagingmath.cpython-313-x86_64-linux-gnu.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imagingmorph.cpython-313-x86_64-linux-gnu.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imagingmorph.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_imagingtk.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_tkinter_finder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_version.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/_webp.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/features.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/py.typed` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/PIL/report.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/__init__.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/_compat.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/_funcs.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/_make.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/_typing_compat.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/_version_info.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/converters.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/exceptions.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/filters.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/py.typed` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/setters.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/attr/setters.pyi` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/click/_winconsole.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/click/decorators.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/click/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/click/termui.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/click/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/_oid.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/backends` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/bindings` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/decrepit` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/_asymmetric.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/_serialization.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/dh.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/ec.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/ed448.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/rsa.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/x25519.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/asymmetric/x448.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/ciphers` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/constant_time.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/hashes.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/kdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/poly1305.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/hazmat/primitives/serialization` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/utils.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/cryptography/x509` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets-4.0.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/arrow_reader.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/arrow_writer.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/config.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/data_files.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/dataset_dict.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/distributed.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/exceptions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/features/_torchcodec.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/features/pdf.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/filesystems` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/formatting` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/hub.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/info.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/io` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/keyhash.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/load.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/naming.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/packaged_modules` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/parallel` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/search.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/splits.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/table.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/datasets/utils` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill-0.3.8.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/__info__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/_objects.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/_shims.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/detect.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/pointers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_classdef.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_dataclasses.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_detect.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_dictviews.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_diff.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_extendpickle.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_functions.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_logger.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_moduledict.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_objects.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_properties.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_pycapsule.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_registered.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_selected.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_temp.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/dill/tests/test_weakref.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/flask/app.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/flask/blueprints.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/flask/json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/flask/sansio` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/flask/signals.py` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/flask/templating.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/flask/typing.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/flask/wrappers.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/__init__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/afmLib.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/agl.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/cffLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/colorLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/config` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/cu2qu` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/designspaceLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/encodings` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/fontBuilder.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/help.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/merge` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/misc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/mtiLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/otlLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/pens` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/qu2cu` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/subset` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/svgLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/t1Lib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/ttLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/ttx.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/ufoLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/unicode.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/unicodedata` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/varLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fontTools/voltLib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/fonttools-4.59.2.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/graphql_relay-3.2.0.dist-info/top_level.txt` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet-3.2.4.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/TGreenlet.cpp` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/TStackState.cpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/TThreadStateDestroy.cpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/TUserGreenlet.cpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/greenlet.h` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/greenlet_allocator.hpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/greenlet_cpython_compat.hpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/greenlet_internal.hpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/greenlet_refs.hpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/greenlet_slp_switch.hpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/greenlet/platform` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/gunicorn-23.0.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/jsonschema-4.25.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/matplotlib` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/matplotlib-3.10.6.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/mlflow-3.12.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/mlflow_skinny-3.12.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/opentelemetry_proto-1.39.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/packaging-25.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/pillow-11.3.0.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/pillow.libs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/pylab.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/scikit_learn-1.7.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/scikit_learn.libs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/scipy-1.16.1.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/tzdata-2025.2.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/wandb-0.21.3.dist-info` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/lib/python3.13/site-packages/wandb.libs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_EMNLP2026/external/gepa/.venv/share` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/lora/backend/__pycache__/base_backend.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/lora/backend/__pycache__/lmhead_mixing.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/lora/backend/__pycache__/lora_registry.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/async_dynamic_batch_tokenizer.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/cache_controller.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/data_parallel_controller.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/detokenizer_manager.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/disagg_service.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/hisparse_coordinator.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/io_struct.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/mm_utils.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/multi_tokenizer_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/multimodal_processor.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/overlap_utils.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/prefill_delayer.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/schedule_batch.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/schedule_policy.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler_dp_attn_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler_input_blocker.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler_output_processor_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler_pp_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler_profiler_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler_recv_skipper.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler_runtime_checker_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/scheduler_update_weights_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/session_controller.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/template_manager.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/tokenizer_communicator_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/tokenizer_manager.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/tokenizer_manager_multiitem_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/tp_worker.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/managers/__pycache__/utils.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/__pycache__/allocator.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/__pycache__/base_prefix_cache.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/__pycache__/cache_init_params.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/__pycache__/common.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/aibrix_kvcache/README.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/aibrix_kvcache/aibrix_kvcache_storage.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/aibrix_kvcache/unit_test.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/eic/README.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/eic/eic_storage.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/eic/test_unit.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/hf3fs/docs/README.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/hf3fs/hf3fs_client.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/hf3fs/hf3fs_usrbio_client.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/hf3fs/hf3fs_utils.cpp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/hf3fs/mini_3fs_metadata_server.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/hf3fs/storage_hf3fs.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/mem_cache/storage/hf3fs/test_hf3fs_utils.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/cpu_graph_runner.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/cuda_graph_runner.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/forward_batch_deepseek_mha_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/forward_batch_info.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/hook_manager.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/input_buffers.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/model_runner.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/model_runner_kv_cache_mixin.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_executor/__pycache__/piecewise_cuda_graph_runner.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_loader/__pycache__/__init__.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_loader/__pycache__/ci_weight_validation.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_loader/__pycache__/loader.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_loader/__pycache__/remote_instance_weight_loader_utils.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_loader/__pycache__/utils.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/model_loader/__pycache__/weight_utils.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/bailing_moe_linear.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/bailing_moe_nextn.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/bert.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/chatglm.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/clip.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/deepseek_janus_pro.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/deepseek_nextn.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/teleflm.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/torch_native_llama.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/SGLang/lib/python3.12/site-packages/sglang/srt/models/__pycache__/xverse.cpython-312.pyc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compiler_compat/README` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/TreeLauncherSubreaper` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/TreeLauncherTargetLdPreloadHelper` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/compute-sanitizer` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/VERSION` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/_static/css/fonts/lato-normal-italic.woff2` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/_static/css/fonts/lato-normal.woff` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/_static/css/fonts/lato-normal.woff2` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/_static/js/badge_only.js` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/_static/js/html5shiv-printshiv.min.js` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/_static/js/html5shiv.min.js` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/_static/js/theme.js` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/api/group__SANITIZER__MEMORY__API.html` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/api/group__SANITIZER__RESULT__API.html` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/api/structSanitizer__BatchMemopData.html` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/api/structSanitizer__GraphNodeLaunchData.html` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/api/structSanitizer__LaunchData.html` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/api/structSanitizer__MemcpyData.html` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/genindex.html` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/index.html` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/objects.inv` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/docs/project.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/libInterceptorInjectionTarget.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/libTreeLauncherPlaceholder.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/libTreeLauncherTargetInjection.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/libTreeLauncherTargetUpdatePreloadInjection.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/libsanitizer-collection.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/envs/llm/compute-sanitizer/libsanitizer-public.so` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/icu-78.2-h33c6efd_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/kernel-headers_linux-64-5.14.0-he073ed8_3` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/lcms2-2.18-h0c24ade_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/libbrotlienc-1.2.0-hb03c661_1` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/libcudnn-dev-9.10.2.21-h58dd1b1_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/libnpp-12.4.1.87-h676940d_1` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/libnvfatbin-12.9.82-hecca717_1` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/libsqlite-3.52.0-hf4e2dac_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/libuuid-2.41.4-h5347b49_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/pip-25.3-pyh8b19718_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/pysocks-1.7.1-pyha55dd90_7` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/rdma-core-61.0-h192683f_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/reportlab-4.4.9-py312h4c3975b_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/root_cache_moved/miniforge3/pkgs/xcb-util-cursor-0.1.6-hb03c661_0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/costs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/development_eval/tasks__simpo-code-reproduction__seed/anchor/original_anchor/jobs/2026-05-22__13-08-43/original_anchor__50a36b92/trajectory` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/development_eval/tasks__simpo-code-reproduction__seed/dev` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/iteration_000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_1001_sharp_logits` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_101_margin_mid` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_202_low_gamma` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_303_high_beta` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_404_zero_margin_shift` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_505_large_margin` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_606_gemma_like` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_707_instruct_like` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_808_small_beta` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/materialized_dev_tasks/simpo_loss_seed_909_balanced` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_simpo_reuse_strict_replacement/tasks/tasks__simpo-code-reproduction/rendered_for_eval/i000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/development_eval/tasks__travel-planning__i000__c00/anchor` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/development_eval/tasks__travel-planning__i000__c00/dev` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/development_eval/tasks__travel-planning__i000__c00/train/nc_from_charleston_7d` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/development_eval/tasks__travel-planning__i001__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/development_eval/tasks__travel-planning__i002__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/iteration_001` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/iteration_002` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/iteration_003` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/rendered_for_eval/i001` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605221211_p3p4_paper_full5_oracle_round5_travel_strict_replacement/tasks/tasks__travel-planning/rendered_for_eval/i002` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i003__c00/i013_parent_train_b000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i004__c00/i016_parent_train_b000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i004__c00/i020_parent_train_b000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i005__c00/i011_parent_train_b000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i010__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i011__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i012__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i013__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i014__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i015__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i016__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i018__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i019__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i020__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i021__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i022__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i023__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i025__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__seed/i012_parent_train_b000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5a71691d5542994082a3e81d` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5a7dd6255542995f4f4022c9` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5a8507305542994c784ddada` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5a8b1fec5542996c9b8d5fb0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5a8fae775542992414482b3b` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5a904e725542995651fb5118` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5ac3e8c65542997ea680c993` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5addc8765542997dc7907022` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5ae0d91e55429924de1b7198` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i003__c00/train/5ae56de75542990ba0bbb2a6` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i004__c00/train/5a8507305542994c784ddada` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i004__c00/train/5a8647e35542991e771815f5` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i004__c00/train/5a8b1fec5542996c9b8d5fb0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i004__c00/train/5addc8765542997dc7907022` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i004__c00/train/5ae0d91e55429924de1b7198` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i004__c00/train/5ae56de75542990ba0bbb2a6` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i004__c00/train/5ae753b75542997b22f6a6db` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i004__c00/train/5ae780e85542997ec2727672` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i005__c00/train/5a7906f55542990784727792` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i005__c00/train/5a846f395542990548d0b2b8` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i005__c00/train/5a8647e35542991e771815f5` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i005__c00/train/5a8ba093554299240d9c203f` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i005__c00/train/5abba5e75542992ccd8e7f64` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i005__c00/train/5add44235542995b365faae2` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i010__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i011__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i012__c00/dev` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i013__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i014__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i015__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i016__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i018__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i019__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i020__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i021__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i022__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i023__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i025__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/final_package` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_011` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_012` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_013` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_014` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_015` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_016` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_017` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_018` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_019` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_020` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_021` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_022` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_023` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_024` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232027_hotpotqa_afse_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_025` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__c00/i001_parent_train_b000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__c00/i002_parent_train_b000` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/rollouts/hotpotqa-distractor-generic-multihop-qa__i002__c00` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a71691d5542994082a3e81d` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a736bfa5542991f29ee2e03` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a7724de5542993569682cf9` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a7906f55542990784727792` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a7932de55429907847277e6` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a7d52655542990b8f50397b` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a7dd6255542995f4f4022c9` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a8b1fec5542996c9b8d5fb0` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5a8fa3f35542992414482b15` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5ab3ad3c554299753aec5989` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5abba5e75542992ccd8e7f64` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5ac25c4a55429951e9e6857f` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5ac2b5d2554299218029dafd` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5ac3e8c65542997ea680c993` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5addc8765542997dc7907022` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/development_eval/hotpotqa-distractor-generic-multihop-qa__i000__c00/train/5ae789025542994a481bbd78` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_001` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232131_hotpotqa_afse_judge_b8_standard_full_50_100_100/tasks/hotpotqa-distractor-generic-multihop-qa/iteration_002` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/.hotpotqa_afse.lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/artifact_schema.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/config.yaml` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/costs/seed_skill.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/dataset_manifest.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/events.jsonl` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/method_trace_contract.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/rollouts/hotpotqa-distractor-generic-multihop-qa__seed/seed_dev_b000/command.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/rollouts/hotpotqa-distractor-generic-multihop-qa__seed/seed_dev_b000/result.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/rollouts/hotpotqa-distractor-generic-multihop-qa__seed/seed_dev_b000/solver_prompt.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/rollouts/hotpotqa-distractor-generic-multihop-qa__seed/seed_dev_b000/stderr.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232207_hotpotqa_afse_judge_nodup_b8_smoke/rollouts/hotpotqa-distractor-generic-multihop-qa__seed/seed_dev_b000/stdout.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232213_hotpotqa_afse_judge_nodup_b8_standard_full_50_100_100_seedreused` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232218_hotpotqa_afse_judge_nodup_v2_b8_standard_full_50_100_100_seedreused` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232304_hotpotqa_afse_judge_suppressed_b8_standard_full_50_100_100_seedreused` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232332_hotpotqa_afse_judge_virtualstrict_b8_standard_full_50_100_100_i000reused` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605232339_hotpotqa_afse_judge_refvirtual_b8_standard_full_50_100_100_i000reused` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605250105_hotpotqa_soft_guard_action_route_smoke_50_32_32_i6` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v2/runs/202605250146_hotpotqa_precision_fallback_smoke_50_32_32_i8` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.codex/skills/research-paper-writing/references/examples/introduction/pipeline-not-recommended-abstract-only.md` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.codex/skills/research-paper-writing/references/examples/introduction/pipeline-version-1-one-contribution-multi-advantages.md` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.codex/skills/research-paper-writing/references/examples/introduction/pipeline-version-2-two-contributions.md` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.codex/skills/research-paper-writing/references/examples/introduction/pipeline-version-3-new-module-on-existing-pipeline.md` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.codex/skills/research-paper-writing/references/examples/introduction/pipeline-version-4-observation-driven.md` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmb10.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbsy10.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbx10.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbx12.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbx5.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbx6.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbx7.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbx8.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbx9.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbxsl10.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/cm/cmbxti10.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/euex10.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/euex7.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/euex8.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/euex9.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/eusb10.afm` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/eusb5.afm` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/eusb7.afm` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/eusm10.afm` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/eusm5.afm` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/euler/eusm7.afm` — 路径/元数据读取失败；最终排除；Bad message (74)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/latxfont/lasy10.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/latxfont/lasy5.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/latxfont/lasy6.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/latxfont/lasy7.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/latxfont/lasy8.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/latxfont/lasy9.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/afm/public/amsfonts/latxfont/lasyb10.afm` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/map/dvips/amsfonts/cm.map` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/map/dvips/amsfonts/cmextra.map` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/map/dvips/amsfonts/cyrillic.map` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/map/dvips/amsfonts/euler.map` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/map/dvips/amsfonts/latxfont.map` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/map/dvips/amsfonts/symbols.map` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cmextra/cmex8.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cmextra/cmex9.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cmextra/cmmib5.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cmextra/cmmib6.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cmextra/cmmib7.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cmextra/cmmib8.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cmextra/cmmib9.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/cyrfont.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/cyrmax.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/serb.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/serbspu.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/wncyb7.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/wncyb8.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/wncyi5.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/wncyi7.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/wncyi8.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/wncyr8.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.envs/tinytex/texmf-dist/fonts/source/public/amsfonts/cyrillic/wncyss8.mf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.git/objects/09/daa55482fe596316819a0675c4a075fdd44d30` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.git/objects/2f` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.git/objects/e6/d34816524592b129d304cdad5182f7572dde3f` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/.venv/lib/python3.13/site-packages/fonttools-4.63.0.dist-info/entry_points.txt` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/AFSE/benchmarks/__pycache__` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/failed_rollouts/hotpotqa-distractor-generic-multihop-qa__i000/i000_dev_b000__20260526091648/agents/221_5a8038b55542996402f6a485/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/failed_rollouts/hotpotqa-distractor-generic-multihop-qa__i000/i000_dev_b000__20260526091648/agents/222_5ae2c696554299495565db32/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/failed_rollouts/hotpotqa-distractor-generic-multihop-qa__i000/i000_dev_b000__20260526091648/agents/223_5ae4f2c75542993aec5ec0fb/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/failed_rollouts/hotpotqa-distractor-generic-multihop-qa__i000/i000_dev_b000__20260526091648/agents/225_5a8b8f5b55429949d91db5e1/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/failed_rollouts/hotpotqa-distractor-generic-multihop-qa__i000/i000_dev_b000__20260526091648/agents/230_5a73cad5554299623ed4ac5e/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/failed_rollouts/hotpotqa-distractor-generic-multihop-qa__i000/i000_dev_b000__20260526091648/agents/266_5abb2f245542996cc5e49fd2/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/failed_rollouts/hotpotqa-distractor-generic-multihop-qa__i000/i000_dev_b000__20260526092931/agents/279_5a845e9055429933447460ec/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/failed_rollouts/hotpotqa-distractor-generic-multihop-qa__i000/i000_dev_b000__20260526092931/agents/288_5ae1fa2b5542997f29b3c1df/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_000_multi_hop_qa_skill/i007_counterfactual_m000_000_multi_hop_qa_skill_train_b000/agents/011_5a88dbe95542993b751ca88f/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_000_multi_hop_qa_skill/i007_counterfactual_m000_000_multi_hop_qa_skill_train_b000/agents/014_5ae80b50554299540e5a5701/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_000_multi_hop_qa_skill/i015_counterfactual_m000_000_multi_hop_qa_skill_train_b000/agents/011_5ae780e85542997ec2727672/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_000_multi_hop_qa_skill/i015_counterfactual_m000_000_multi_hop_qa_skill_train_b000/agents/013_5ae334345542991a06ce9951/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_000_multi_hop_qa_skill/i015_counterfactual_m000_000_multi_hop_qa_skill_train_b000/agents/018_5a7d52655542990b8f50397b/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_000_multi_hop_qa_skill/i016_counterfactual_m000_000_multi_hop_qa_skill_train_b000/agents/000_5ab2b1d35542992953946815/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_001_question_routing/i013_counterfactual_m000_001_question_routing_train_b000/agents/011_5ab30329554299166977417b/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_001_question_routing/i015_counterfactual_m000_001_question_routing_train_b000/agents/000_5a7deffd5542995f4f40232e/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_001_question_routing/i015_counterfactual_m000_001_question_routing_train_b000/agents/010_5ae1904a554299492dc91b42/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_001_question_routing/i015_counterfactual_m000_001_question_routing_train_b000/agents/011_5ae780e85542997ec2727672/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/000_5abe37295542993f32c2a090/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/003_5ae67c245542996d980e7b82/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/005_5a8e08b05542995085b37394/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/005_5a8e08b05542995085b37394/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/006_5a7932de55429907847277e6/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/007_5ac12fda5542994d76dccdb0/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/011_5ab30329554299166977417b/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/013_5abae247554299660624165c/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/015_5abb03ff554299232ef4a3a8/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/018_5ae64cab5542991bbc9760be/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/018_5ae64cab5542991bbc9760be/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/019_5a89d9775542992e4fca83e9/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i013_counterfactual_m000_002_bridge_linking_train_b000/agents/019_5a89d9775542992e4fca83e9/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i015_counterfactual_m000_002_bridge_linking_train_b000/agents/003_5ab433675542991751b4d6e6/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i015_counterfactual_m000_002_bridge_linking_train_b000/agents/004_5adccec85542994d58a2f6de/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i015_counterfactual_m000_002_bridge_linking_train_b000/agents/007_5ac12fda5542994d76dccdb0/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i015_counterfactual_m000_002_bridge_linking_train_b000/agents/019_5ab2f42c5542991669774150/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_002_bridge_linking/i016_counterfactual_m000_002_bridge_linking_train_b000/agents/014_5a8fae775542992414482b3b/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_003_answer_extraction/i013_counterfactual_m000_003_answer_extraction_train_b000/agents/003_5ae67c245542996d980e7b82/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_003_answer_extraction/i013_counterfactual_m000_003_answer_extraction_train_b000/agents/007_5ac12fda5542994d76dccdb0/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_003_answer_extraction/i015_counterfactual_m000_003_answer_extraction_train_b000/agents/003_5ab433675542991751b4d6e6/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_003_answer_extraction/i016_counterfactual_m000_003_answer_extraction_train_b000/agents/006_5adef2be5542993a75d263b1/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_003_answer_extraction/i016_counterfactual_m000_003_answer_extraction_train_b000/agents/007_5a8cc6c7554299441c6b9ef8/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_003_answer_extraction/i016_counterfactual_m000_003_answer_extraction_train_b000/agents/011_5ab5a2f85542997d4ad1f197/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_003_answer_extraction/i016_counterfactual_m000_003_answer_extraction_train_b000/agents/018_5a72b5dd5542991f9a20c57b/workspace/.tmp/codex-bwrap-synthetic-mount-targets-1006/lock` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_003_answer_extraction/i016_counterfactual_m000_003_answer_extraction_train_b000/agents/019_5a8507305542994c784ddada/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i013_counterfactual_m000_004_support_selection_train_b000/agents/003_5ae67c245542996d980e7b82/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i013_counterfactual_m000_004_support_selection_train_b000/agents/006_5a7932de55429907847277e6/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i013_counterfactual_m000_004_support_selection_train_b000/agents/009_5ab6e84a554299710c8d1fab/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i013_counterfactual_m000_004_support_selection_train_b000/agents/019_5a89d9775542992e4fca83e9/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i015_counterfactual_m000_004_support_selection_train_b000/agents/005_5a72b5dd5542991f9a20c57b/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i015_counterfactual_m000_004_support_selection_train_b000/agents/013_5ae334345542991a06ce9951/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i015_counterfactual_m000_004_support_selection_train_b000/agents/019_5ab2f42c5542991669774150/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i016_counterfactual_m000_004_support_selection_train_b000/agents/006_5adef2be5542993a75d263b1/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i016_counterfactual_m000_004_support_selection_train_b000/agents/007_5a8cc6c7554299441c6b9ef8/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i016_counterfactual_m000_004_support_selection_train_b000/agents/018_5a72b5dd5542991f9a20c57b/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i000__ablated__m000_004_support_selection/i016_counterfactual_m000_004_support_selection_train_b000/agents/019_5a8507305542994c784ddada/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/002_5a78daf855429970f5fffdae/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/002_5a78daf855429970f5fffdae/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/006_5adca8375542990d50227cd4/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/008_5ab2c5e255429916697740ba/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/012_5ab8f7535542991b5579f0a7/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/013_5ae3f2395542995ad6573cc6/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/015_5ae6050f55429929b0807a5e/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/026_5ab9b29c554299743d22ebae/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/030_5a7631cd5542994ccc91870c/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/039_5ab69c25554299110f219a39/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/043_5a901e5c55429933b8a2047c/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/057_5a8ef2a75542995a26add583/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/058_5ade99295542992fa25da7d8/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/059_5ae4a2b25542995ad6573de0/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/060_5a7759fc5542993569682d60/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/065_5a7cbf8c554299452d57b9f4/workspace/.git` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/docs/runs/afse_skillcreator_i020/rollouts/hotpotqa-distractor-generic-multihop-qa__i001/i001_dev_b000/agents/068_5a85dfcc5542994775f60673/workspace/.tmp` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/experiments/configs/hotpotqa_distractor_skill_only_seed_54mini_solver_55lowstandard_afse.yaml` — 最终轮路径/元数据读取失败；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/ranking/__main__.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/ranking/compare.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/ranking/rank.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/01_introduction.tex` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/02_related_work.tex` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/compute_analysis/axial_flop.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/compute_analysis/axial_img_sec_core.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/compute_analysis/transformer_shape_average_5shot.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/compute_analysis/transformer_shape_imagenet_5shot.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/dataset_analysis/imagenet_5shot.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/dataset_analysis/imagenet_5shot.png` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/dataset_analysis/transvolution-i1k-scaling.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/finetune_vs_compute.png` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/finetune_vs_compute2.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/head_tokens.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/img_sec_core.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/model_scheme.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/visualizations/20200930_position_embeddings_16490619_1.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/visualizations/20200930_position_embeddings_17192124_1.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/visualizations/20200930_position_embeddings_17192217_1.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/visualizations/20201001_attention_distance_by_depth.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/visualizations/20201002_attention_distance_by_depth_main.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/visualizations/20201002_batch_attention_examples_compressed.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/visualizations/20201002_position_embeddings_17085772_1.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/visualizations/20201002_rgb_filter_pca.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task2/paper_src/images/vit-vtab.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/AgentSkillOS/benchmark/AgentSkillOS_bench/task_data/document_creation_task3/attention_is_all_you_need.pdf` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/EvoSkill/.claude` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/EvoSkill/assets` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/EvoSkill/docs` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/EvoSkill/examples` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/EvoSkill/notebooks` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/EvoSkill/scripts` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/EvoSkill/src` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/EvoSkill/tests` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/add-uint-support.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/analytics-events.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/analyze-ci.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/bash-defensive-patterns.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/bazel-build-optimization.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/changelog-automation.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/clojure-write.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/dbt-transformation-patterns.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/django-patterns.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/gitlab-ci-patterns.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/gitops-workflow.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/implementing-agent-modes.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/istio-traffic-management.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/k8s-manifest-generator.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/linkerd-patterns.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/llm-evaluation.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/mcp-builder.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SWE-Skills-Bench/tasks/batch10/nx-workspace-patterns.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/HEAD` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/config` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/description` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/hooks/applypatch-msg.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/hooks/commit-msg.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/hooks/post-update.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/hooks/pre-push.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/hooks/pre-rebase.sample` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/external/SkillLearnBench/.git/shallow` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__lab-unit-harmonization__mutation_i000.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__lab-unit-harmonization__seed_package.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__llm-prefix-cache-replay__mutation_i000.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__llm-prefix-cache-replay__seed_package.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__powerlifting-coef-calc__mutation_i000.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__powerlifting-coef-calc__seed_package.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__software-dependency-audit__mutation_i000.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__software-dependency-audit__seed_package.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__suricata-custom-exfil__mutation_i000.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/costs/tasks__suricata-custom-exfil__seed_package.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__lab-unit-harmonization` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/bootstrap_summary.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/dev_verifier/README.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/dev_verifier/verifier.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/llm_trace_attempt_1/command.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/llm_trace_attempt_1/status.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/llm_trace_attempt_1/stderr.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/llm_trace_attempt_1/stdout.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/raw_response.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/raw_response_attempt_1.txt` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/shared_fixture_files/fixtures/generate_prefix_cache_instance.py` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/split_manifest.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed11_balanced/root/config.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed11_balanced/root/trace.jsonl` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed17_smallcache/root/config.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed17_smallcache/root/trace.jsonl` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed23_largeblocks/root/config.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed23_largeblocks/root/trace.jsonl` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed31_highfreq/root/config.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed31_highfreq/root/trace.jsonl` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed37_ghost/root/config.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/synthetic_fixtures/s3fifo_prefix_replay_seed37_ghost/root/trace.jsonl` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/bootstrap/workflow.md` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/candidate_archive.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/frontier.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__llm-prefix-cache-replay/visible_info.json` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__powerlifting-coef-calc` — 路径/元数据读取失败；最终排除；I/O error (5)
+- `/data/public/zz/research/AFSE_v3/runs/202605210354_phase1_oracle_55_low_fast_5task_fullset_1iter_v1/tasks/tasks__suricata-custom-exfil` — 路径/元数据读取失败；最终排除；I/O error (5)
+
+## 历史读错但重试后恢复
+
+> [!note]
+> 下列 10 个路径出现过 `read errors mapping`，但未出现在 `failed verification -- update discarded` 集合中，说明同一轮 rsync 的重试已通过。它们保留在审计记录中，不计入待处理主清单。
+
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-full-12pg-20260616-232753/iter-kimi-deepseek-v4-flash__DMAIC-Quality-Analysis/harbor_hospital_safety_01__DgiqQm4/result.json` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__Embedded-Data-Repair/supplier-pack-matrix-refresh__QdqnwZD/agent/kimi-cli.txt` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-flash/final/iter-kimi-deepseek-v4-flash-init-skill__Sales-Pivot-Analysis/student-performance-pivot__AacXFoZ/agent/kimi-cli.txt` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__Compensation-Scenario-Modeling/05_property_management_model__9K6BHQb/agent/kimi-cli.txt` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/final/iter-kimi-deepseek-v4-pro-init-skill__SEC-13F-Financial-Analysis/fund-snapshot-canonical__f8T4aTC/agent/trajectory.json` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__HWPX-Document-Automation/hwpx-inventory-report__dykPBAy/agent/kimi-cli.txt` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/eval/deepseek-v4-pro/init/iter-kimi-deepseek-v4-pro-init-skill__Healthcare-Cost-Benefit-Analysis/harbor_infusionbatch_7v14__3p4YAwz/result.json` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/kimi-init-skill-2models-20260617-023318/online/deepseek-v4-pro/iter-kimi-deepseek-v4-pro-init-skill__OCR-Data-Extraction/task_family_nested_fuel_packets__asHL7mK/agent/kimi-cli.txt` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-kimi-nokey/iter-kimi-deepseek-v4-flash__Cross-Format-Data-Reconciliation/08-university-course-catalog-dif__VsDo2JW/result.json` — rsync 重试后未丢弃更新
+- `/data/public/zz/dataset/skillflow-code/jobs/stage-20families-qwen-nokey/iter-qwen-deepseek-v4-flash__Cross-Format-Data-Reconciliation/02-hospital-capacity-portfolio-d__bVsjaeP/config.json` — rsync 重试后未丢弃更新
+
+## 生成依据
+
+- 原始日志：`/data/rescue_logs/rsync_*.log`
+- 最终排除规则：`/data/rescue_logs/fastpass_deferred_20260620_151147.txt`
+- 去重键：完整路径；错误类型与最终排除覆盖状态作为证据字段保留。
+- 目录枚举失败会使未知子项无法进入清单，因此本清单不是受损对象数量的理论上限。

@@ -1,0 +1,143 @@
+---
+title: "Dataset: BEHAVE"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: BEHAVE
+
+- [[obsidian-vault/analysis/ICCV_2023/InterDiff_Generating_3D_Human-Object_Interactions_with_Physics-Informed_Diffusion.md|InterDiff: Generating 3D Human-Object Interactions with Physics-Informed Diffusion (ICCV 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2023/InterDiff:_Generating_3D_Human-Object_Interactions_with_Physics-Informed_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InterDiff
+	- datasets: BEHAVE, Human-Object Interaction
+- [[obsidian-vault/analysis/CVPR_2024/CG_HOI_Contact_Guided_3D_Human_Object_Interaction_Generation.md|CG HOI Contact Guided 3D Human Object Interaction Generation (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/CG_HOI_Contact_Guided_3D_Human_Object_Interaction_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CG-HOI
+	- datasets: BEHAVE, CHAIRS
+- [[obsidian-vault/analysis/CVPR_2024/HOI_Animator_Generating_Text_Prompt_Human_Object_Animations_using_Novel_Perceptive_Diffusion_Models.md|HOI Animator Generating Text Prompt Human Object Animations using Novel Perceptive Diffusion Models (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/HOI_Animator_Generating_Text_Prompt_Human_Object_Animations_using_Novel_Perceptive_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HOIAnimator
+	- datasets: BEHAVE
+- [[obsidian-vault/analysis/NEURIPS_2024/InterDreamer_Zero_Shot_Text_to_3D_Dynamic_Human_Object_Interaction.md|InterDreamer Zero Shot Text to 3D Dynamic Human Object Interaction (NEURIPS 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2024/InterDreamer_Zero_Shot_Text_to_3D_Dynamic_Human_Object_Interaction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: InterDreamer
+	- datasets: BEHAVE, OMOMO
+- [[obsidian-vault/analysis/AAAI_2025/ARDHOI_Auto_Regressive_Diffusion_for_Generating_3D_Human_Object_Interactions.md|ARDHOI Auto Regressive Diffusion for Generating 3D Human Object Interactions (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/ARDHOI_Auto_Regressive_Diffusion_for_Generating_3D_Human_Object_Interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ARDHOI
+	- datasets: OMOMO, BEHAVE
+- [[obsidian-vault/analysis/arxiv_2025/CoopDiff_Anticipating_3D_Human_object_Interactions_via_Contact_consistent_Decoupled_Diffusion.md|CoopDiff Anticipating 3D Human object Interactions via Contact consistent Decoupled Diffusion (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/CoopDiff_Anticipating_3D_Human_object_Interactions_via_Contact_consistent_Decoupled_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CoopDiff
+	- datasets: BEHAVE, HOI
+- [[obsidian-vault/analysis/arxiv_2025/ECHO_Ego_Centric_modeling_of_Human_Object_interactions.md|ECHO Ego Centric modeling of Human Object interactions (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/ECHO_Ego_Centric_modeling_of_Human_Object_interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ECHO
+	- datasets: BEHAVE, OMOMO, AMASS
+- [[obsidian-vault/analysis/arxiv_2025/EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for_Text_guided_HOI_Generation.md|EJIM Efficient Explicit Joint level Interaction Modeling with Mamba for Text guided HOI Generation (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for_Text_guided_HOI_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: EJIM (Efficient Explicit Joint-level Interaction Model)
+	- datasets: BEHAVE, OMOMO
+- [[obsidian-vault/analysis/CVPR_2025/ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interaction_Generation.md|ChainHOI Joint based Kinematic Chain Modeling for Human Object Interaction Generation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interaction_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ChainHOI
+	- datasets: BEHAVE, OMOMO
+- [[obsidian-vault/analysis/CVPR_2025/InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human_Object_Interactions.md|InterMimic Towards Universal Whole Body Control for Physics Based Human Object Interactions (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human_Object_Interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: InterMimic
+	- datasets: BEHAVE, OMOMO-Train, OMOMO-Test
+- [[obsidian-vault/analysis/CVPR_2025/SemGeoMo_Dynamic_Contextual_Human_Motion_Generation_with_Semantic_and_Geometric_Guidance.md|SemGeoMo Dynamic Contextual Human Motion Generation with Semantic and Geometric Guidance (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SemGeoMo_Dynamic_Contextual_Human_Motion_Generation_with_Semantic_and_Geometric_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SemGeoMo
+	- datasets: FullBodyManipulation, BEHAVE, IMHD2
+- [[obsidian-vault/analysis/ICCV_2025/SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Interaction_Synthesis.md|SyncDiff Synchronized Motion Diffusion for Multi Body Human Object Interaction Synthesis (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Interaction_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SyncDiff
+	- datasets: TACO, CORE4D, BEHAVE
+- [[obsidian-vault/analysis/CVPR_2026/AnyLift_Scaling_Motion_Reconstruction_from_Internet_Videos_via_2D_Diffusion.md|AnyLift: Lifting Unseen In-the-Wild Human Motions via Camera-Aware 2D Diffusion (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AnyLift_Scaling_Motion_Reconstruction_from_Internet_Videos_via_2D_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnyLift
+	- datasets: AIST++, BEHAVE
+- [[obsidian-vault/analysis/arxiv_2026/Uni_HOI_A_Unified_Framework_for_Learning_the_Joint_Distribution_of_Text_and_Human_Object_Interaction.md|Uni HOI A Unified Framework for Learning the Joint Distribution of Text and Human Object Interaction (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Uni_HOI_A_Unified_Framework_for_Learning_the_Joint_Distribution_of_Text_and_Human_Object_Interaction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Uni-HOI
+	- datasets: FullBodyManipulation, BEHAVE, GRAB
+- [[obsidian-vault/analysis/CVPR_2026/AnyLift_Scaling_Motion_Reconstruction_from_Internet_Videos_via_2D_Diffusion.md|AnyLift: Scaling Motion Reconstruction from Internet Videos via 2D Diffusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AnyLift_Scaling_Motion_Reconstruction_from_Internet_Videos_via_2D_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnyLift
+	- datasets: AIST++, BEHAVE
+- [[obsidian-vault/analysis/CVPR_2026/CARI4D_Category_Agnostic_4D_Reconstruction_of_Human_Object_Interaction.md|CARI4D: Category Agnostic 4D Reconstruction of Human-Object Interaction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CARI4D_Category_Agnostic_4D_Reconstruction_of_Human_Object_Interaction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: CARI4D
+	- datasets: BEHAVE, InterCap
+- [[obsidian-vault/analysis/CVPR_2026/CrossHOI_Learning_Cross_View_Representations_for_Monocular_3D_Human_Object_Interaction_Reconstruction.md|CrossHOI: Learning Cross-View Representations for Monocular 3D Human-Object Interaction Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CrossHOI_Learning_Cross_View_Representations_for_Monocular_3D_Human_Object_Interaction_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: CrossHOI
+	- datasets: BEHAVE, InterCap
+- [[obsidian-vault/analysis/CVPR_2026/IMU_HOI_A_Symbiotic_Framework_for_Coherent_Human_Object_Interaction_and_Motion_Capture_via_Contact_Conscious_Inertial_Fusion.md|IMU-HOI: A Symbiotic Framework for Coherent Human-Object Interaction and Motion Capture via Contact-Conscious Inertial Fusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IMU_HOI_A_Symbiotic_Framework_for_Coherent_Human_Object_Interaction_and_Motion_Capture_via_Contact_Conscious_Inertial_Fusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: IMU-HOI
+	- datasets: OMOMO, IMHD2, BEHAVE
+- [[obsidian-vault/analysis/CVPR_2026/Recovering_Physically_Plausible_Human_Object_Interactions_from_Monocular_Videos.md|Recovering Physically Plausible Human-Object Interactions from Monocular Videos (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Recovering_Physically_Plausible_Human_Object_Interactions_from_Monocular_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Physics-Guided HOI Refinement via RL with Adaptive Sampling and Dual Propagation
+	- datasets: BEHAVE, InterCap
+- [[obsidian-vault/analysis/CVPR_2026/ReGenHOI_Unifying_Reconstruction_and_Generation_for_3D_Human_Object_Interaction_Understanding.md|ReGenHOI: Unifying Reconstruction and Generation for 3D Human-Object Interaction Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ReGenHOI_Unifying_Reconstruction_and_Generation_for_3D_Human_Object_Interaction_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ReGenHOI
+	- datasets: DAMON, PICO, FullBodyManipulation
+- [[obsidian-vault/analysis/CVPR_2026/TeHOR_Text_Guided_3D_Human_and_Object_Reconstruction_with_Textures.md|TeHOR: Text-Guided 3D Human and Object Reconstruction with Textures (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TeHOR_Text_Guided_3D_Human_and_Object_Reconstruction_with_Textures.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TeHOR
+	- datasets: Open3DHOI, BEHAVE
+- [[obsidian-vault/analysis/CVPR_2026/ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors.md|ViHOI Human Object Interaction Synthesis with Visual Priors (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ViHOI
+	- datasets: FullBodyManipulation, BEHAVE

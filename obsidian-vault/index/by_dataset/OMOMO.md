@@ -1,0 +1,89 @@
+---
+title: "Dataset: OMOMO"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: OMOMO
+
+- [[obsidian-vault/analysis/NEURIPS_2024/InterDreamer_Zero_Shot_Text_to_3D_Dynamic_Human_Object_Interaction.md|InterDreamer Zero Shot Text to 3D Dynamic Human Object Interaction (NEURIPS 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2024/InterDreamer_Zero_Shot_Text_to_3D_Dynamic_Human_Object_Interaction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: InterDreamer
+	- datasets: BEHAVE, OMOMO
+- [[obsidian-vault/analysis/AAAI_2025/ARDHOI_Auto_Regressive_Diffusion_for_Generating_3D_Human_Object_Interactions.md|ARDHOI Auto Regressive Diffusion for Generating 3D Human Object Interactions (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/ARDHOI_Auto_Regressive_Diffusion_for_Generating_3D_Human_Object_Interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ARDHOI
+	- datasets: OMOMO, BEHAVE
+- [[obsidian-vault/analysis/arxiv_2025/ECHO_Ego_Centric_modeling_of_Human_Object_interactions.md|ECHO Ego Centric modeling of Human Object interactions (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/ECHO_Ego_Centric_modeling_of_Human_Object_interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ECHO
+	- datasets: BEHAVE, OMOMO, AMASS
+- [[obsidian-vault/analysis/arxiv_2025/EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for_Text_guided_HOI_Generation.md|EJIM Efficient Explicit Joint level Interaction Modeling with Mamba for Text guided HOI Generation (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for_Text_guided_HOI_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: EJIM (Efficient Explicit Joint-level Interaction Model)
+	- datasets: BEHAVE, OMOMO
+- [[obsidian-vault/analysis/arxiv_2025/GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_for_Unseen_Objects.md|GenHOI Generalizing Text driven 4D Human Object Interaction Synthesis for Unseen Objects (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_for_Unseen_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: GenHOI
+	- datasets: OMOMO
+- [[obsidian-vault/analysis/arxiv_2025/HOIDiNi_Human_Object_Interaction_through_Diffusion_Noise_Optimization.md|HOIDiNi Human Object Interaction through Diffusion Noise Optimization (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/HOIDiNi_Human_Object_Interaction_through_Diffusion_Noise_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HOIDiNi
+	- datasets: GRAB, OMOMO
+- [[obsidian-vault/analysis/arxiv_2025/UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indoor_Scenes.md|UniHM Universal Human Motion Generation with Object Interactions in Indoor Scenes (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indoor_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: UniHM
+	- datasets: OMOMO, Lingo, HumanML3D
+- [[obsidian-vault/analysis/CVPR_2025/ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interaction_Generation.md|ChainHOI Joint based Kinematic Chain Modeling for Human Object Interaction Generation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interaction_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ChainHOI
+	- datasets: BEHAVE, OMOMO
+- [[obsidian-vault/analysis/arxiv_2026/PhysMoDPO_Physically-Plausible_Humanoid_Motion_with_Preference_Optimization.md|PhysMoDPO: Physically-Plausible Humanoid Motion with Preference Optimization (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/PhysMoDPO:_Physically-Plausible_Humanoid_Motion_with_Preference_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: PhysMoDPO
+	- datasets: HumanML3D, OMOMO, Unitree G1
+- [[obsidian-vault/analysis/CVPR_2026/IMU_HOI_A_Symbiotic_Framework_for_Coherent_Human_Object_Interaction_and_Motion_Capture_via_Contact_Conscious_Inertial_Fusion.md|IMU-HOI: A Symbiotic Framework for Coherent Human-Object Interaction and Motion Capture via Contact-Conscious Inertial Fusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IMU_HOI_A_Symbiotic_Framework_for_Coherent_Human_Object_Interaction_and_Motion_Capture_via_Contact_Conscious_Inertial_Fusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: IMU-HOI
+	- datasets: OMOMO, IMHD2, BEHAVE
+- [[obsidian-vault/analysis/CVPR_2026/InterPhys_Physics_aware_Human_Motion_Synthesis_in_a_Dynamic_Scene.md|InterPhys: Physics-aware Human Motion Synthesis in a Dynamic Scene (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/InterPhys_Physics_aware_Human_Motion_Synthesis_in_a_Dynamic_Scene.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: InterPhys
+	- datasets: OMOMO, TRUMANS
+- [[obsidian-vault/analysis/ICLR_2026/H2OFlow_Grounding_Human_Object_Affordances_with_3D_Generative_Models_and_Dense_Diffused_Flows.md|H2OFlow: Grounding Human-Object Affordances with 3D Generative Models and Dense Diffused Flows (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/H2OFlow_Grounding_Human_Object_Affordances_with_3D_Generative_Models_and_Dense_D_cf15d75b0efb.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: H2OFlow
+	- datasets: OMOMO, Real-world
+- [[obsidian-vault/analysis/ICLR_2026/Unleashing_Guidance_Without_Classifiers_for_Human_Object_Interaction_Animation.md|Unleashing Guidance Without Classifiers for Human-Object Interaction Animation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Unleashing_Guidance_Without_Classifiers_for_Human_Object_Interaction_Animation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LIGHT (Learning Implicit Guidance for Human-object inTeraction)
+	- datasets: InterAct, OMOMO

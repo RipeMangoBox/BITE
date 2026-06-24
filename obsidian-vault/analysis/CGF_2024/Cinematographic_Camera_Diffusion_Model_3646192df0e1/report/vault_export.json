@@ -1,0 +1,66 @@
+{
+  "note_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/analysis/CGF_2024/Cinematographic_Camera_Diffusion_Model.md",
+  "pdf_ref": "paperPDFs/CGF_2024/Cinematographic_Camera_Diffusion_Model.pdf",
+  "acceptance": "",
+  "source_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/obsidian-vault/paperPDFs/CGF_2024/Cinematographic_Camera_Diffusion_Model.pdf",
+  "source_pdf_resolution": {
+    "input": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/obsidian-vault/paperPDFs/CGF_2024/Cinematographic_Camera_Diffusion_Model.pdf",
+    "resolved": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/obsidian-vault/paperPDFs/CGF_2024/Cinematographic_Camera_Diffusion_Model.pdf",
+    "attempts": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/obsidian-vault/paperPDFs/CGF_2024/Cinematographic_Camera_Diffusion_Model.pdf"
+    ]
+  },
+  "figure_count": 0,
+  "figure_placements": [],
+  "asset_root": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/obsidian-vault/assets/figures/papers",
+  "numeric_ref_sanitizer": {
+    "changed": false,
+    "removed_refs": [],
+    "removed_count": 0
+  },
+  "validation": {
+    "ok": true,
+    "checks": {
+      "frontmatter_valid": true,
+      "openreview_forum_id_present": true,
+      "required_sections_present": true,
+      "pdf_embed_present": true,
+      "image_embeds_present": true,
+      "referenced_image_embeds_present": true,
+      "no_legacy_markdown_image_links": true,
+      "no_pdf_file_label": true,
+      "no_table_cell_aliased_wikilinks": true,
+      "no_fallback_metadata_markers": true,
+      "no_dangling_numeric_refs": true,
+      "no_incomplete_effect_callout": true,
+      "venue_year_tag_present": true,
+      "no_legacy_venue_topic_tags": true,
+      "note_length_ok": true
+    },
+    "note_chars": 7314,
+    "missing_frontmatter": [],
+    "expected_openreview_forum_id": "",
+    "openreview_forum_id": "",
+    "missing_sections": [],
+    "pdf_ref": "paperPDFs/CGF_2024/Cinematographic_Camera_Diffusion_Model.pdf",
+    "image_embed_count": 0,
+    "expected_image_count": 0,
+    "missing_image_paths": [],
+    "missing_referenced_images": [],
+    "legacy_markdown_image_links": [],
+    "legacy_relative_wikilink_images": [],
+    "pdf_file_label_count": 0,
+    "table_cell_aliased_wikilink_lines": [],
+    "fallback_markers": [],
+    "dangling_numeric_refs": [],
+    "incomplete_effect_callout_lines": [],
+    "expected_venue_year_tag": "CGF_2024",
+    "frontmatter_tags": [
+      "CGF_2024",
+      "topic/vision_multimodal_applications",
+      "topic/generative_models_diffusion",
+      "topic/generative_models_diffusion/diffusion_image_video"
+    ],
+    "legacy_venue_topic_tags": []
+  }
+}

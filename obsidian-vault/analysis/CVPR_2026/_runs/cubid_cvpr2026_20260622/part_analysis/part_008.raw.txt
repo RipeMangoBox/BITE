@@ -1,0 +1,10 @@
+{
+  "part_id": "8/9",
+  "section_role": "acknowledgments and references",
+  "method_evidence": [],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": []
+}

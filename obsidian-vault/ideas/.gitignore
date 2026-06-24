@@ -1,0 +1,23 @@
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# Python/runtime caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Obsidian local state, if this directory is opened as a vault
+.obsidian/workspace*.json
+.obsidian/workspace/
+.trash/
+
+# Local scratch outputs
+tmp/
+temp/
+*.tmp

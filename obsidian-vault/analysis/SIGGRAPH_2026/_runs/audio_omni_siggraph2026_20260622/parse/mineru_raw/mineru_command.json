@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/home/ripemangobox/.local/bin/mineru",
+    "-p",
+    "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/paperPDFs/SIGGRAPH_2026/Audio_Omni_Extending_Multi_modal_Understanding_to_Versatile_Audio_Generation_and_Editing.pdf",
+    "-o",
+    "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/SIGGRAPH_2026/_runs/audio_omni_siggraph2026_20260622/parse/mineru_raw",
+    "-b",
+    "pipeline"
+  ],
+  "env": {
+    "MINERU_MODEL_SOURCE": "local",
+    "MINERU_TOOLS_CONFIG_JSON": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/mineru_local/mineru.json",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"
+  },
+  "returncode": 0,
+  "duration_seconds": 47.182
+}

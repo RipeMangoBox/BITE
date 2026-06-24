@@ -1,0 +1,15 @@
+{
+  "date": "2026-05-25T04:11:08",
+  "protocol": "paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/protocols/phase1_phase2_eval_data_split_contract.md",
+  "condition_pair": "original_full_text_only",
+  "role": "diagnostic",
+  "used_for": "observation",
+  "limitations": "Original100 baseline generation artifact only; not a final evaluator; unified rendering and human review are downstream.",
+  "artifact_path": "/data/public/ripemangobox/Motion/EventT2M-codes/artifacts/remote4090/modebug_hml_original100_four_baseline_20260524/results/motiongpt/demo_outputs/mgpt/debug--Instruct_HumanML3D/samples_2026-05-25-04-10-58",
+  "evaluator": "motiongpt_official_demo_original100",
+  "motion_source": "MotionGPT-official-git demo.py on remote4090 GPU1 via event-t2m env",
+  "n/evaluable": "100/100",
+  "coverage": "100 HumanML3D native full-motion captions; demo.py native length handling.",
+  "out_npy_count": 100,
+  "in_txt_count": 100
+}

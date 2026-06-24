@@ -1,0 +1,371 @@
+---
+title: "MeteorPred: A Meteorological Multimodal Large Model and Dataset for Severe Weather Event Prediction"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/MeteorPred_A_Meteorological_Multimodal_Large_Model_and_Dataset_for_Severe_Weather_Event_Prediction.pdf
+project_link: null
+code_link: null
+aliases:
+- MMMLM
+- MeteorPred
+tags:
+- CVPR_2026
+- topic/benchmarks_datasets_evaluation
+- topic/benchmarks_datasets_evaluation/benchmarking
+core_operator: 通过DTGF、TGS、TGCA三个可插拔模块分别从时间差分、空间位置和通道语义三个维度注入先验，使模型能直接处理4D原始气象数据并聚焦与问题相关的关键时空尺度和物理变量。
+primary_logic: 利用任务文本语义（地点、时间、天气类型）驱动对高维气象数据的自适应注意力，而不是让模型盲目压缩或同时处理所有信息，这样既保留了关键细节，又抑制了冗余通道和无关区域的干扰，显著提升了强天气理解的准确性与可解释性。
+claims:
+- 相比仅用3层气压数据的基线，使用完整185层气压通道+三个模块的MMLM在Qwen2.5-VL上MC-main Acc提升16.1个百分点（72.37 vs 56.26），Macro-F1几乎翻倍（50.88 vs 26.88）。
+- 消融实验表明三个模块联合工作时所有指标最优，单独添加任一模块均能带来提升，且模块间存在互补性（如DTGF+TGS组合进一步改进区域识别）。
+- DTGF模块自动学到的时序权重差异与中国气象局预警等级标准吻合：红色暴雨预警权重集中于发布后前3小时，而蓝色预警更均匀分布。
+- TGCA模块学到的通道注意力集中在具有天气学意义的层次（如500hPa经向风、950hPa纬向风、300hPa温度等），表明模型捕捉到了物理一致的特征。
+---
+
+# MeteorPred: A Meteorological Multimodal Large Model and Dataset for Severe Weather Event Prediction
+
+> [!tip] 核心洞察
+> 利用任务文本语义（地点、时间、天气类型）驱动对高维气象数据的自适应注意力，而不是让模型盲目压缩或同时处理所有信息，这样既保留了关键细节，又抑制了冗余通道和无关区域的干扰，显著提升了强天气理解的准确性与可解释性。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | MeteorPred: 面向强天气事件预测的气象多模态大模型与数据集 |
+| 英文题名 | MeteorPred: A Meteorological Multimodal Large Model and Dataset for Severe Weather Event Prediction |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2508.06859) |
+| Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmarking |
+| Method | MMLM (Meteorological Multimodal Large Model) |
+| Dataset | MP-Bench |
+
+> [!tip] 效果简介
+> - MP-Bench 上，MC-main Acc 72.37 vs 56.26 (+16.11)；MC-main Macro-F1 50.88 vs 26.88 (+24.00)；MC-sub Acc 58.19 vs 46.54 (+11.65)。
+
+## 概述
+
+**核心问题**：现有气象多模态方法在将高维观测数据（时间 × 气压层 × 经纬度 × 变量）输入模型时，通常粗暴压缩为 3 通道 RGB 图像或日平均值，导致垂直结构、时序演变和变量间物理关联严重丢失。这使得模型难以识别快速发展的强天气过程，并在类别极度不均衡的罕见事件（如冰雹）上基本失效。
+
+**核心方法**：本文提出 **MeteorPred**，一个面向强天气事件预测的气象多模态大模型框架。其核心思路是利用任务文本语义（地点、时间、天气类型）驱动对高维气象数据的自适应注意力，而非让模型盲目压缩或同时处理所有信息。具体而言，MeteorPred 集成了三个可插拔模块：
+- **DTGF**（Dynamic Temporal Gating Fusion）：基于相邻时刻气象数据差异生成门控权重，实现时序特征的自适应融合；
+- **TGS**（Text-Driven Gaussian Spatial Masking）：从文本中提取地理坐标并生成二维高斯掩码，引导模型关注查询区域；
+- **TGCA**（Text-Driven Channel Attention）：利用文本嵌入与通道描述符的相似性动态生成通道注意力，筛选关键气压层。
+
+这三个模块分别从时间差分、空间位置和垂直通道语义三个维度注入先验，使模型能直接处理 4D 原始气象数据（37 层气压 × 5 变量 = 185 通道），并聚焦与问题相关的关键时空尺度和物理变量。
+
+**核心结论**：
+- 相比仅使用 3 层气压数据的基线，使用完整 185 通道 + 三个模块的 MMLM 在 Qwen2.5-VL 基座上，MC-main Acc 提升 **16.1 个百分点**（72.37 vs 56.26），Macro-F1 几乎翻倍（50.88 vs 26.88）。
+- 消融实验证实三个模块联合工作时所有指标最优，且模块间存在互补性。
+- 模型学到的注意力权重具有物理可解释性：DTGF 的时序权重差异与中国气象局预警等级标准吻合（红色暴雨预警权重集中于发布后前 3 小时）；TGCA 的通道注意力集中在具有天气学意义的层次（如 500hPa 经向风、950hPa 纬向风、300hPa 温度）。
+
+**方法定位**：MeteorPred 属于“文本驱动的气象特征自适应增强”范式，区别于传统的气象图分类或时序预测方法。其贡献在于通过三个轻量级可插拔模块，将物理先验注入多模态大模型，在保留关键气象细节的同时抑制冗余通道和无关区域干扰，显著提升了强天气理解的准确性与可解释性。
+
+## 背景与动机
+
+强天气事件（暴雨、大风、冰雹、雷电等）具有突发性强、局地性高、破坏力大的特点，对社会经济与公共安全构成持续威胁。精准的强天气预警依赖于对高维气象观测数据的深度理解——这些数据天然具有时间×气压层×经纬度×变量的四维结构，蕴含了大气垂直热力/动力配置、系统移动演变以及多变量物理耦合等关键信息。
+
+然而，现有气象多模态方法普遍将高维观测粗暴压缩为3通道图像或日平均值，仅选取少数几个标准气压层（如850hPa、500hPa、200hPa）的代表性变量拼合成类RGB输入。这种处理方式存在三个结构性缺口：**垂直维度**上，大量中间气压层信息被直接丢弃，导致模型无法感知大气斜压结构、逆温层、急流核等对强天气发生至关重要的垂直细节；**时间维度**上，缺乏对相邻时刻气象场变化的显式建模，难以捕捉快速发展的中小尺度系统；**通道语义**上，所有变量和层次被无差别对待，模型无法根据具体天气问题自适应地关注物理上最相关的变量组合（例如暴雨任务应侧重水汽通量散度与低空急流，而大风任务应侧重气压梯度与高空动量下传）。
+
+这些缺口直接导致现有模型在面对类别极度不均衡的罕见事件（如冰雹）时基本失效，且对复合型强天气（如暴雨伴随大风）的区分能力不足。一个根本性的瓶颈在于：**模型缺乏将任务语义（地点、时间、天气类型）与高维气象数据中关键时空尺度和物理变量进行显式对齐的机制**，只能被动地让LLM从高度压缩且信息混杂的输入中“猜测”答案。
+
+为突破上述瓶颈，本文提出Meteorological Multimodal Large Model（MMLM），核心思路是**利用任务文本语义驱动对高维气象数据的自适应注意力**：通过三个可插拔模块——Dynamic Temporal Gating Fusion（DTGF）、Text-Driven Gaussian Spatial Masking（TGS）和Text-Driven Channel Attention（TGCA）——分别从时间差分、空间位置和通道语义三个维度注入先验，使模型能直接处理完整的4D原始气象数据（37个垂直气压层×5种变量=185通道），并在保留关键细节的同时抑制冗余通道和无关区域的干扰。这一设计既避免了信息压缩带来的物理信号丢失，又通过文本条件引导实现了可解释的特征筛选，为强天气理解任务提供了新的技术路径。
+
+## 核心创新
+
+MeteorPred 的核心创新并非提出全新的模型架构，而是揭示并解决了现有气象多模态方法中长期被忽视的**输入退化瓶颈**，并通过三个任务文本驱动的可插拔模块，将物理先验注入高维气象数据的处理流程，使通用多模态大模型首次能够有效理解强天气事件。
+
+### 瓶颈洞察：从“3通道快照”到“4D物理场”
+
+现有气象多模态方法（如使用 Qwen2.5-VL、LLaVA-NeXT-Video 等基线模型）在处理数值气象数据时，普遍采用一种粗暴的降维策略：仅选取 2m 温度、10m 风场和总降水量等少数变量，合成 3 通道 RGB 图像输入模型。这一做法从根本上丢失了三类关键信息：**垂直结构**（大气在不同气压层的状态差异）、**时序演变**（强天气过程的快速变化）和**变量间的物理关联**（如风场与温度场的耦合）。其直接后果是模型无法识别快速发展的强天气过程，且对类别极度不均衡的罕见事件（如冰雹）基本失效。
+
+MeteorPred 的核心洞察在于：**利用任务文本中蕴含的语义（地点、时间、天气类型）来驱动对高维气象数据的自适应注意力，而非让模型盲目压缩或同时处理所有信息。** 这一思路既保留了关键细节，又抑制了冗余通道和无关区域的干扰。
+
+### 方法实现：三个任务驱动的可插拔模块
+
+基于上述洞察，MeteorPred 设计了三个可插拔模块，分别从时序、空间和通道三个维度注入先验，使模型能直接处理 4D 原始气象数据（时间 × 气压层 × 经纬度 × 变量）。下表总结了相对基线模型的关键变化槽位：
+
+| 变化槽位 | 基线方法 | MeteorPred 方法 | 物理意义 |
+|:---|:---|:---|:---|
+| **输入气象数据** | 3 个气压层的关键变量压缩为 3 通道 RGB 图像 | 37 个垂直气压层 × 5 种变量，共 185 通道原始数据 | 保留完整的垂直廓线与多变量物理场 |
+| **时序特征聚合** | 无专用模块（直接平均或忽略时序） | DTGF 模块：基于相邻时刻气象数据差异生成门控，自适应融合时序特征 | 捕捉天气系统的快速演变，差异大的时刻获得更高权重 |
+| **空间注意力** | 无明确空间引导 | TGS 模块：从文本中提取地理坐标，生成二维高斯空间掩码增强关注 | 聚焦预警区域，抑制无关地理区域的干扰 |
+| **垂直通道利用** | 仅选取少数气压层，丢弃大量垂直信息 | TGCA 模块：文本条件动态加权各气压层通道 | 根据天气类型自动筛选具有天气学意义的关键气压层 |
+| **多路特征融合** | 单一编码器输出直接输入 LLM | 三个模块输出拼接后经可学习 3D 卷积与 MLP 融合为统一表示 | 时空通道信息的协同整合 |
+
+三个模块的具体工作机制如下：
+
+- **DTGF（Dynamic Temporal Gating Fusion）**：计算相邻时刻气象数据的通道维度 L2 范数 $\Delta \mathbf{x}_t = \| \mathbf{x}_t - \mathbf{x}_{t-1} \|_2$，通过 MLP 与 Sigmoid 生成门控权重 $g_t = \mathrm{Sigmoid}(\mathrm{MLP}(\Delta \mathbf{x}_t))$，对时序特征进行加权融合 $\tilde{\mathbf{x}}_t = g_t \cdot \mathbf{x}_t$。该设计使模型自动关注变化剧烈的时段，而抑制平稳时段的信息冗余。
+
+- **TGS（Text-Driven Gaussian Spatial Masking）**：从任务文本中解析出地理坐标 $(\phi_i, \lambda_i)$，通过最近格点匹配映射到栅格索引 $(h_i, w_i)$，生成以目标位置为中心的二维高斯掩码 $G_i(h,w) = \exp\left(-\frac{(h-h_i)^2 + (w-w_i)^2}{2\sigma^2}\right)$，多个位置的高斯掩码叠加后对空间特征加权。该模块使模型的空间注意力与查询意图对齐。
+
+- **TGCA（Text-Driven Channel Attention）**：将文本嵌入线性投影到通道维度 $\mathbf{P} = \mathrm{Linear}(\mathbf{y})$，对 ERA5 数据时空平均得到通道描述符 $\mathbf{V} = \operatorname{Mean}(\mathbf{X})$，通过文本-通道相似度计算注意力权重并输出加权特征 $\mathbf{Y} = \mathbf{X} \cdot \mathrm{Sigmoid}\big(\mathrm{Softmax}(\mathbf{V}\mathbf{P}^{\top})\mathbf{P}\big)$。该模块使模型能根据天气类型自动筛选关键气压层，例如对暴雨事件关注低层水汽通道，对大风事件关注中高层风场通道。
+
+### 创新效果：从失效到可用
+
+三个模块联合使用时，效果呈现质的飞跃。以 Qwen2.5-VL-7B-Instruct 为基座，相比仅用 3 层气压数据的基线，MMLM 在 MP-Bench 上的 MC-main Acc 提升 16.11 个百分点（72.37 vs 56.26），Macro-F1 几乎翻倍（50.88 vs 26.88）。消融实验（Table 3）进一步证实三个模块存在互补性：单独添加任一模块均能带来提升，而联合使用时所有指标最优。值得注意的是，DTGF 模块自动学到的时序权重差异与中国气象局预警等级标准具有物理一致性——红色暴雨预警的权重集中于发布后前 3 小时，而蓝色预警的权重分布更为均匀（Figure 4(a)），这表明模型在没有显式物理约束的情况下，自发捕捉到了具有天气学意义的时间模式。
+
+## 整体框架
+
+MeteorPred 的核心是一个气象多模态大模型 **MMLM (Meteorological Multimodal Large Model)**，其设计目标是让大语言模型直接消费高维原始气象数据，而非将其粗暴压缩为低通道伪图像。整体 pipeline 遵循“多路条件化注入 → 可学习融合 → LLM 解码”的范式。
+
+### 输入规格
+
+模型输入包含两个模态：
+
+1. **气象场数据**：从 ERA5 再分析资料中提取 37 个垂直气压层（1000 hPa 至 1 hPa）上的 5 种物理变量（见 Table 6），构成 **时间 × 气压层 × 纬度 × 经度** 的四维张量，总计 185 个通道。时间窗口为预警发布时间 $t$ 起 12 小时 $[t, t+11]$，不做日平均或时序压缩（Section 3.1.2）。
+2. **任务文本**：描述查询目标（地点、时间、天气类型）的自然语言指令，例如“2023 年 7 月 15 日北京地区是否发布了暴雨红色预警？”。
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/012_Table_6.jpg]]
+*Table 6: Summary of the 5 physical variables in the dataset*
+
+### 三路条件化模块
+
+气象数据进入 LLM 之前，并行通过三个可插拔模块，分别从时间、空间、通道三个维度注入任务先验（Figure 2）：
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/002_Figure_2.jpg]]
+*Figure 2: Overview of the MMLM framework and its core components. (a) Displays the MMLM architecture, where outputs from the DTGF, TGCA, and TGS modules are concatenated and integrated in a learnable Fusion Layer before being fed into the LLM. (b), (c), and (d) illustrate the three plug-and-play modules, where color intensity represents the adaptive weights across temporal, channel, and spatial dimensions. (e) shows four QA samples from MP-Bench*
+
+| 模块 | 维度 | 核心机制 | 输入依赖 |
+|------|------|----------|----------|
+| **DTGF** (Dynamic Temporal Gating Fusion) | 时间 | 基于相邻时刻气象场的 L2 差值 $\Delta \mathbf{x}_t$ 经 MLP + Sigmoid 生成门控权重 $g_t$，自适应加权融合时序特征 | 仅气象数据 |
+| **TGS** (Text-Driven Gaussian Spatial Masking) | 空间 | 从文本中提取地理坐标 $(\phi_i, \lambda_i)$，通过最近格点匹配映射到栅格索引，在目标位置生成二维高斯掩码 $G_i(h,w)$，多位置叠加后对空间特征加权 | 文本 → 坐标 |
+| **TGCA** (Text-Driven Channel Attention) | 通道 | 将文本嵌入线性投影到通道维度得到 $\mathbf{P}$，与 ERA5 时空平均得到的通道描述符 $\mathbf{V}$ 计算相似度，经 Softmax + Sigmoid 生成通道注意力权重，筛选关键气压层和物理变量 | 文本 + 气象数据（通道描述符） |
+
+三个模块的数学形式如下（Equation 1–9）：
+
+**DTGF** 的时序门控：
+
+$$
+\Delta \mathbf{x}_t = \| \mathbf{x}_t - \mathbf{x}_{t-1} \|_2, \quad g_t = \mathrm{Sigmoid}(\mathrm{MLP}(\Delta \mathbf{x}_t)), \quad \tilde{\mathbf{x}}_t = g_t \cdot \mathbf{x}_t
+$$
+
+**TGS** 的空间掩码（以坐标为 $(h_i, w_i)$ 的目标位置为中心）：
+
+$$
+G_i(h,w) = \exp\left(-\frac{(h-h_i)^2 + (w-w_i)^2}{2\sigma^2}\right), \quad M(h,w) = \sum_{i=1}^N G_i(h,w)
+$$
+
+**TGCA** 的通道注意力（$\mathbf{y}$ 为文本嵌入，$\mathbf{X}$ 为气象场）：
+
+$$
+\mathbf{P} = \mathrm{Linear}(\mathbf{y}), \quad \mathbf{V} = \operatorname{Mean}(\mathbf{X}), \quad \mathbf{Y} = \mathbf{X} \cdot \mathrm{Sigmoid}\big(\mathrm{Softmax}(\mathbf{V}\mathbf{P}^{\top})\mathbf{P}\big)
+$$
+
+### 融合与解码
+
+三个模块的输出在通道维度拼接后，送入一个可学习的 **Fusion Layer**（由 3D 卷积与 MLP 构成），将多路特征压缩为统一的视觉 token 序列。该序列随后与文本 token 一同输入 LLM 骨干网络（如 Qwen2.5-VL-7B-Instruct），由 LLM 解码生成强天气预警文本（Figure 2a）。
+
+### 设计逻辑
+
+这条 pipeline 的核心洞察是：**利用任务文本语义驱动对高维气象数据的自适应注意力**。传统方法将 4D 数据压缩为 3 通道 RGB 图像，丢失了垂直结构、时序演变和变量间的物理关联，导致模型对快速强天气过程（尤其是冰雹等罕见类别）基本失效。MMLM 通过三个模块分别解决“何时关注”（DTGF）、“何处关注”（TGS）和“关注哪些物理量”（TGCA），使模型能直接处理原始 4D 数据并聚焦于与查询相关的关键时空尺度和物理变量，从而在保留关键细节的同时抑制冗余通道和无关区域的干扰。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/001_Figure_1.jpg]]
+*Figure 1: Conceptual illustration for severe weather event prediction using the Meteorological Multimodal Large Model (MMLM)*
+
+## 核心模块与公式推导
+
+MeteorPred的核心在于三个可插拔的时空-通道注意力模块：**DTGF**（动态时序门控融合）、**TGS**（文本驱动高斯空间掩码）和**TGCA**（文本驱动通道注意力）。它们分别从时间、空间和垂直维度向多模态大模型注入气象先验，使其能够直接处理4D原始气象数据（时间×气压层×经纬度×变量），而非将其粗暴压缩为3通道RGB图像。
+
+### DTGF：动态时序门控融合
+
+气象要素在强天气过程中的演变速度是区分预警等级的关键线索。DTGF模块通过相邻时刻数据的差异自适应地控制时序特征的融合权重，使模型能够聚焦于变化剧烈的时段。
+
+给定$T$个连续时刻的气象数据$\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T$，首先计算相邻时刻在通道维度上的L2范数作为差异度量：
+
+$$\Delta \mathbf{x}_t = \| \mathbf{x}_t - \mathbf{x}_{t-1} \|_2, \quad t = 2, \ldots, T$$
+
+随后，通过一个轻量MLP与Sigmoid函数将差异值映射为门控权重$g_t \in [0,1]$：
+
+$$g_t = \mathrm{Sigmoid}(\mathrm{MLP}(\Delta \mathbf{x}_t))$$
+
+最终，以该门控权重对原始特征进行加权：
+
+$$\tilde{\mathbf{x}}_t = g_t \cdot \mathbf{x}_t$$
+
+**物理可解释性**：实验表明，DTGF自动学到的时序权重差异与中国气象局预警等级标准高度吻合——红色暴雨预警的权重集中于发布后前3小时（天气过程最剧烈的时段），而蓝色预警的权重分布更为均匀（Figure 4(a)）。这种无需人工标注即可涌现的物理一致性，验证了门控机制的有效性。
+
+### TGS：文本驱动高斯空间掩码
+
+强天气预警文本通常包含明确的地理位置信息（如“北京市海淀区”）。TGS模块从文本中提取经纬度坐标，并在气象栅格上生成二维高斯掩码，引导模型将注意力集中于查询区域，抑制无关区域的干扰。
+
+具体而言，对于从文本中提取的$N$个地理坐标$\{(\phi_i, \lambda_i)\}_{i=1}^N$，通过最近格点匹配将其映射到栅格索引：
+
+$$(h_i, w_i) = \left( \arg\min_h |\phi_i - \mathrm{lat}(h)|, \arg\min_w |\lambda_i - \mathrm{lon}(w)| \right)$$
+
+以每个目标位置为中心生成二维高斯权重：
+
+$$G_i(h,w) = \exp\left(-\frac{(h-h_i)^2 + (w-w_i)^2}{2\sigma^2}\right)$$
+
+当文本涉及多个位置时，将所有高斯掩码叠加：
+
+$$M(h,w) = \sum_{i=1}^N G_i(h,w)$$
+
+**局限性**：当前TGS仅使用二维地理坐标，未利用气象场的三维物理结构（如不同气压层的空间模式差异），这可能是未来改进方向。
+
+### TGCA：文本驱动通道注意力
+
+气象数据的垂直维度包含37个气压层×5种物理变量，共计185个通道。并非所有通道对特定强天气类型的判断都具有同等重要性——例如，冰雹预测需要关注对流层中层的温度结构，而大风预警则更依赖低层风场。TGCA模块利用任务文本的语义信息，动态筛选与当前查询最相关的气压层和物理变量。
+
+首先，将文本嵌入$\mathbf{y}$通过线性映射投影到通道维度$C$：
+
+$$\mathbf{P} = \mathrm{Linear}(\mathbf{y})$$
+
+同时，对ERA5气象数据$\mathbf{X}$进行时空平均，得到通道描述符$\mathbf{V}$：
+
+$$\mathbf{V} = \operatorname{Mean}(\mathbf{X})$$
+
+通过文本投影与通道描述符的相似性计算注意力权重，经Softmax归一化后再与$\mathbf{P}$交互，最终由Sigmoid门控对原始特征进行重加权：
+
+$$\mathbf{Y} = \mathbf{X} \cdot \mathrm{Sigmoid}\big(\mathrm{Softmax}(\mathbf{V}\mathbf{P}^{\top})\mathbf{P}\big)$$
+
+**物理可解释性**：TGCA学到的通道注意力集中在具有天气学意义的层次。例如，对于大风事件，注意力集中于950hPa纬向风和500hPa经向风；对于高温事件，注意力集中于300hPa温度场（Figure 7）。这表明模型捕捉到了物理一致的特征，而非依赖虚假相关。
+
+### 多路融合
+
+三个模块的输出经拼接后，通过一个可学习的3D卷积与MLP融合层（Fusion Layer）整合为统一的视觉表示，再输入LLM骨干网络（如Qwen2.5-VL-7B-Instruct）进行文本解码。消融实验（Table 3）证实，三个模块联合工作时所有指标达到最优，且模块间存在互补性——例如DTGF与TGS的组合能进一步改进区域识别精度。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/007_Figure_4.jpg]]
+*Figure 4: Weight distribution patterns of three types of plug-and-play modules: (a) DTGF temporal weights difference (positive: higher for red warnings; negative: higher for blue warnings); (b) TGS spatial attention map;(c) TGCA channel weights of the V-component of wind across pressure levels. Additional examples are in appendix*
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/016_Figure_7.jpg]]
+*Figure 7: Examples of TGCA’s Weight distribution patterns. Each subplot represents a type of severe weather event*
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/014_Figure_8.jpg]]
+*Figure 8: Examples of DTGF’s weights difference distribution patterns.Each subplot represents a type of severe weather event. The positive bar indicates higher weights for red warnings. The negative bar indicates higher weights for blue warnings*
+
+## 实验与分析
+
+### 实验设置概览
+
+实验基于作者构建的 **MP-Bench** 数据集，该数据集以2023年中国气象局发布的强天气预警文本为核心，对齐ERA5再分析数据中的5种物理变量（温度、纬向风、经向风、比湿、位势高度），覆盖37个垂直气压层（1000 hPa至1 hPa），每条样本包含预警发布时刻起12小时窗口的原始四维气象场（时间×气压层×纬度×经度）。评测任务分为四类：多选题主类（MC-main）、多选题子类（MC-sub）、判断题（T/F）、区域选择（RSW）和全国强天气描述（NSW），其中NSW采用GPT-4o作为评判器，依据气象专家制定的细粒度评分标准进行0–5分评估。训练集为2023年中国数据，测试集包含2024年中国数据及NOAA美国子集。基线模型使用仅3个气压层（1000 hPa、850 hPa、500 hPa）的关键变量压缩为3通道RGB图像进行微调；MMLM则使用完整185通道（37层×5变量）并结合DTGF、TGS、TGCA三个模块。训练超参数与评估参数详见 Table 8 与 Table 9。
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/020_Table_8.jpg]]
+*Table 8: Model Training Parameters*
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/021_Table_9.jpg]]
+*Table 9: Model Evaluation Parameters*
+
+### 主实验结果
+
+Table 2 展示了各模型在MP-Bench上的全面对比。闭源模型GPT-4o在未微调的情况下几乎完全失效——MC-main准确率仅约随机水平，Macro-F1低至2.92%，T/F准确率仅0.19%，验证了强天气理解任务对专业气象知识和领域微调的高度依赖。
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/005_Table_2.jpg]]
+*Table 2: Model performance comparison on the MP-Bench dataset. Baseline refers to models fine-tuned using meteorological data from 3 pressure levels. MMLM refers to models fine-tuned using 185 pressure levels and combining the three plug-and-play modules (DTGF, TGS, and TGCA). Scoring scales: First Four Entries (0-100); Last Entry (0-5)*
+
+在开源多模态大模型中，**Qwen2.5-VL-7B-Instruct + MMLM** 取得最优性能。相比使用3层气压数据的Qwen2.5-VL基线，MMLM在MC-main准确率上提升**16.11个百分点**（72.37 vs 56.26），Macro-F1几乎翻倍（50.88 vs 26.88）；MC-sub准确率提升11.65个百分点（58.19 vs 46.54），Macro-F1提升19.53个百分点（29.31 vs 9.78）。T/F准确率从68.33跃升至87.13（+18.80），RSW准确率从61.82提升至71.23（+9.41）。NSW评分从1.7提升至2.1（+0.4），表明细粒度全国天气描述能力有所改善但仍有较大提升空间。InternVL3-8B在MMLM加持下同样获得显著增益，MC-main Acc从59.54提升至71.47，Macro-F1从27.13提升至48.95，验证了方法的模型无关性。
+
+值得注意的是，**Macro-F1的提升幅度远超准确率**，说明MMLM对类别不均衡的罕见事件（如冰雹、沙尘暴）识别能力有本质改善——这正是仅用3层数据时模型几乎完全失效的瓶颈所在。
+
+### 消融实验
+
+#### 三个模块的贡献与互补性
+
+Table 3 系统消融了DTGF、TGS、TGCA三个模块的独立与组合效果。以Qwen2.5-VL为基座，不使用任何模块时MC-main Acc仅为42.73。单独添加任一模块均带来提升：+TGS提升至46.97（+4.24），+TGCA提升至47.48（+4.75），+DTGF提升至49.84（+7.11）。两两组合进一步改善，如DTGF+TGS达到55.15（+12.42），而三者联合时达到最优58.27（+15.54）。这一梯度式提升清晰表明三个模块分别从时间、空间、通道维度注入互补先验，且不存在冗余或冲突。
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/006_Table_3.jpg]]
+*Table 3: Ablation study of the three proposed plug-and-play modules in MMLM*
+
+在完整185通道配置下，三个模块联合的MC-main Macro-F1达到43.14，相比无模块的20.77翻倍有余，进一步证实了对罕见类别的识别增益。
+
+#### 时间窗口长度的影响
+
+Table 4 和 Table 7 分别考察了1小时、6小时、12小时时间窗口对MC任务和其他任务的影响。结果显示，12小时窗口在所有任务上均显著优于1小时窗口：T/F Acc从67.17提升至79.21（+12.04），RSW Acc从67.61提升至73.47（+5.86），NSW评分从1.8提升至2.1（+0.3）。这表明强天气的发生发展是一个持续数小时的过程，过短的窗口无法捕获完整的气象演变信息，而12小时窗口在信息完整性与计算开销之间取得了较好平衡。
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/008_Table_4.jpg]]
+*Table 4: Analysis of Temporal Window Lengths (1h, 6h, 12h)*
+
+![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/015_Table_7.jpg]]
+*Table 7: Analysis of Temporal Window Lengths (1h, 6h, 12h)*
+
+### 模块权重分析：物理一致性与可解释性
+
+#### DTGF时序门控与预警等级的对应
+
+Figure 4(a) 和附录 Figure 8 展示了DTGF模块学习到的时序权重差异分布。对于红色暴雨预警（最高等级），模型自动赋予预警发布后前3小时更高的权重，随后权重逐渐衰减；而对于蓝色暴雨预警（最低等级），权重在时间轴上分布更为均匀。这一模式与中国气象局预警等级标准高度吻合——红色预警意味着强天气即将发生或已经发生，前3小时是关键决策窗口；蓝色预警则更多是提示性信息，时间紧迫性较低。该发现表明DTGF模块不仅提升了性能，还学到了具有气象学意义的时序注意力模式。
+
+#### TGCA通道注意力与关键气压层
+
+Figure 7 和附录 Section 4 展示了TGCA模块在不同灾害类型上的通道权重分布。模型自动聚焦于具有明确天气学意义的气压层：例如，对于大风事件，注意力集中在500 hPa经向风（V分量）和950 hPa纬向风（U分量）；对于高温事件，注意力集中在300 hPa温度层。这些层次分别对应中高层引导气流和近地面风场、高空温度场，与气象学中强天气诊断的关键层次一致。这证明TGCA模块能够从185个通道中自主筛选与任务文本语义相关的物理变量和垂直层次，而非盲目利用所有信息。
+
+#### TGS空间掩码的区域聚焦
+
+Figure 4(b) 显示TGS模块生成的空间注意力图能够准确定位文本查询中涉及的地理区域，有效抑制无关区域的干扰。注意，当前TGS仅使用二维高斯掩码，未利用气象场的三维物理结构，这可能是未来改进方向之一。
+
+### 失败模式与局限性分析
+
+尽管MMLM取得显著提升，多项指标仍暴露明确瓶颈：
+
+1. **罕见事件识别不足**：MC-sub Macro-F1最高仅29.31，NSW评分最高仅2.1/5，表明模型对冰雹、沙尘暴等样本稀少的灾害类型判别和描述能力有限。数据集本身存在严重类别不均衡（大风类占比超40%，冰雹不足5%），当前方法未引入专门的类别平衡策略。
+
+2. **复合天气事件误分类**：模型未嵌入物理定律约束，对暴雨伴随大风等复合事件容易混淆主次灾害类型。Figure 9的CoE特征分布显示，错误样本在特征空间中往往处于类别边界区域，提示模型对模糊案例的判别边界不够清晰。
+
+3. **空间建模粗粒度**：TGS仅使用二维地理坐标，无法区分同一地点不同高度层次的气象特征差异，限制了垂直结构的细粒度利用。
+
+4. **跨区域泛化验证不足**：测试集仅覆盖中国和美国子集，缺乏全球其他气候区（如热带季风区、地中海气候区）的验证，方法的普适性尚需进一步检验。
+
+### 关键图表结论汇总
+
+- **Table 2**：MMLM在Qwen2.5-VL上MC-main Acc 72.37（+16.11），Macro-F1 50.88（+24.00），T/F Acc 87.13（+18.80），全面碾压3通道基线；GPT-4o零样本几乎完全失效。
+- **Table 3**：三个模块联合效果最优，单独添加任一模块均有增益，模块间存在互补性。
+- **Figure 4(a)**：DTGF时序权重差异与预警等级标准物理一致——红色预警权重集中于前3小时。
+- **Figure 7**：TGCA通道注意力聚焦于天气学关键层次（500 hPa风场、300 hPa温度等）。
+- **Table 4/7**：12小时时间窗口显著优于1小时窗口，验证强天气过程需多时刻信息。
+
+## 方法谱系与知识库定位
+
+### 1. 核心问题与基线方法的根本差异
+
+现有气象多模态方法（包括本研究微调的开源基线 **Qwen2.5-VL-7B-Instruct**、**LLaVA-NeXT-Video-7B**、**Video-LLaVA-7B**、**InternVL3-8B**，以及闭源基线 **GPT-4o**）采用一种高度压缩的输入策略：仅从ERA5再分析数据中选取3个气压层的关键变量（2m温度、10m经/纬向风、总降水量），将其合成为3通道RGB图像输入视觉编码器。这一做法带来了三个层面的信息丢失：
+
+1. **垂直结构丢失**：大气强天气过程（如冰雹、雷暴大风）的识别高度依赖垂直风切变、不稳定层结等三维结构信息，3层气压远不足以刻画这些特征；
+2. **时序演变丢失**：缺乏专用时序融合模块，模型只能依赖视觉编码器的隐式时序建模或简单平均，无法捕捉快速发展的强对流过程；
+3. **物理变量关联丢失**：将多变量粗暴压缩为RGB三通道，破坏了变量间的物理关联，使模型难以学习气象学意义上的因果关系。
+
+**MeteorPred** 的核心改进在于将输入从3通道图像扩展为 **37个垂直气压层 × 5种物理变量 = 185通道的原始4D气象数据**（时间×气压层×经纬度×变量），并通过三个可插拔模块（DTGF、TGS、TGCA）分别从时间、空间、通道三个维度注入任务相关的先验，使模型能够自适应地聚焦于与查询相关的关键时空尺度和物理变量。
+
+### 2. 方法谱系定位
+
+**MeteorPred** 可被定位为 **“任务文本驱动的多模态气象理解框架”**，其设计理念与以下研究路线形成对话：
+
+- **多模态大模型（MLLM）在科学领域的应用**：继承自 Qwen2.5-VL、LLaVA-NeXT-Video 等通用多模态架构，但针对气象领域的高维结构化数据进行了深度定制。与直接将科学数据可视化为图像输入通用MLLM的做法不同，MeteorPred 在视觉编码器前引入了领域感知的特征提取模块。
+- **文本条件注意力机制**：TGCA 模块的“文本-通道相似度加权”策略与跨模态检索中的文本条件视觉注意力（如CLIP风格的对比学习）有方法论上的亲缘性，但将其应用于垂直气压层的物理变量选择，赋予了模型可解释的气象学意义。
+- **时序建模**：DTGF 模块的帧差门控机制借鉴了视频理解中的运动感知思想，但将其适配于气象数据的物理特性——相邻时刻的L2范数差值直接反映大气的剧烈变化程度，门控权重因此具有明确的物理含义。
+- **空间注意力**：TGS 模块的高斯掩码叠加策略属于显式空间先验注入，与目标检测中的位置编码和遥感图像中的地理坐标条件方法共享设计动机，但在气象文本-空间对齐的精度上做了简化（仅使用最近格点匹配，未使用亚像素插值）。
+
+### 3. 适用边界与已知局限
+
+**适用场景**：
+- 输入为规则网格化的再分析或数值预报数据（如ERA5）；
+- 查询文本包含明确的地理位置（经纬度或地名）、时间窗口和天气类型；
+- 目标为强天气事件的识别、真伪判断、区域描述和全国概况生成。
+
+**已知局限**（需注意以下分析点均来自论文自身披露或实验设计的约束，部分需进一步验证）：
+
+1. **空间建模的维度限制**：TGS 模块仅使用二维地理坐标生成空间掩码，未利用气象场的三维物理结构（如不同气压层的空间特征差异）。对于垂直结构主导的天气系统（如倾斜的锋面、高空急流），这一简化可能导致空间注意力的偏差。
+
+2. **物理定律约束缺失**：当前模型未嵌入大气运动方程、热力学约束等物理先验，对复合天气事件（如暴雨伴随大风）容易产生误分类。模型学到的“物理一致性”（如TGCA对500hPa经向风、950hPa纬向风的关注）是数据驱动的相关性，而非因果性。
+
+3. **细粒度文本生成能力有限**：NSW（全国强天气描述）任务的绝对分数仍偏低（最高仅2.1/5），表明模型在生成覆盖全国多类型强天气的细粒度描述文本方面存在瓶颈。这可能与训练数据的文本多样性和LLM解码策略有关。
+
+4. **罕见事件的识别困难**：数据集存在严重的类别不均衡（大风类样本占比超40%，冰雹等罕见类型不足5%），模型对冰雹等小样本事件的识别率较低。消融实验虽展示了模块的有效性，但未专门评估罕见事件的提升幅度。
+
+5. **跨区域泛化未充分验证**：训练集仅为2023年中国数据，跨区域测试仅使用NOAA美国子集进行验证，未覆盖热带、极地、南半球等气候区。模型在不同气候背景和预警标准下的迁移能力需要更多实验支持。
+
+### 4. 开放问题与未来方向
+
+1. **物理信息融合**：如何将大气运动方程、热力学约束等物理先验以可微分的方式嵌入模型（例如通过物理信息损失函数或神经微分方程），在不牺牲推理效率的前提下提升复杂场景的预测精度？
+
+2. **三维空间注意力扩展**：能否将TGS模块从二维高斯掩码扩展为三维（经纬度×气压层）注意力机制，使模型能够同时定位天气系统的水平位置和垂直高度？
+
+3. **类别不平衡缓解**：针对冰雹、龙卷等罕见强天气事件，是否可以通过数据增强（如物理约束的对抗生成）、重加权损失函数或元学习策略提升识别率？
+
+4. **基础模型迁移潜力**：MMLM的预训练表示能否作为基础模型迁移到台风路径预测、龙卷风识别、极端降水概率预报等其他气象灾害任务？这需要构建更通用的预训练目标和多任务基准。
+
+5. **多源数据融合**：当前仅使用ERA5单一数据源，未来能否融合雷达回波、卫星云图、地面观测站等多源观测数据，构建真正意义上的多模态气象理解系统？
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/MeteorPred_A_Meteorological_Multimodal_Large_Model_and_Dataset_for_Severe_Weather_Event_Prediction.pdf]]

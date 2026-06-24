@@ -1,0 +1,95 @@
+---
+title: "Venue_Year: SIGGRAPH_ASIA_2025"
+type: paper-index
+dimension: venue_year
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Venue_Year: SIGGRAPH_ASIA_2025
+
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/AnimaX_Animating_the_Inanimate_in_3D_with_Joint_Video_Pose_Diffusion_Models.md|AnimaX: Animating the Inanimate in 3D with Joint Video-Pose Diffusion Models (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/AnimaX_Animating_the_Inanimate_in_3D_with_Joint_Video_Pose_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnimaX
+	- datasets: VBench
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/CamCloneMaster_Enabling_Reference_based_Camera_Control_for_Video_Generation.md|CamCloneMaster: Enabling Reference-based Camera Control for Video Generation (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/CamCloneMaster_Enabling_Reference_based_Camera_Control_for_Video_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: CamCloneMaster
+	- datasets: RealEstate10K
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Context_as_Memory_Scene_Consistent_Interactive_Long_Video_Generation_with_Memory_Retrieval.md|Context as Memory: Scene-Consistent Interactive Long Video Generation with Memory Retrieval (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Context_as_Memory_Scene_Consistent_Interactive_Long_Video_Generation_with_Memory_Retrieval.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Context-as-Memory
+	- datasets: 自采集UE5渲染数据集, 同上
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Design_for_Descent_What_Makes_a_Shape_Grammar_Easy_to_Optimize.md|Design for Descent: What Makes a Shape Grammar Easy to Optimize? (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Design_for_Descent_What_Makes_a_Shape_Grammar_Easy_to_Optimize.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Stochastic Rewrite Descent (SRD)
+	- datasets: OneComp, Donut, TwoComp
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Gaussian_See_Gaussian_Do_3D_Semantic_Motion_Transfer.md|Gaussian See, Gaussian Do: 3D Semantic Motion Transfer (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Gaussian_See_Gaussian_Do_3D_Semantic_Motion_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Gaussian See, Gaussian Do
+	- datasets: Mini-Mixamo, Cross-Category, Novel-view Motion Synthesis
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Harmonic_caching_for_walk_on_spheres.md|Harmonic caching for walk on spheres (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Harmonic_caching_for_walk_on_spheres.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Harmonic Caching (HC)
+	- datasets: Poisson方程, 收敛性分析
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Img2CAD_Reverse_Engineering_3D_CAD_Models_from_Images_through_VLM_Assisted_Conditional_Factorization.md|Img2CAD: Reverse Engineering 3D CAD Models from Images through VLM-Assisted Conditional Factorization (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Img2CAD_Reverse_Engineering_3D_CAD_Models_from_Images_through_VLM_Assisted_Conditional_Factorization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Img2CAD
+	- datasets: CAD-ified Chair, Table, Cabinet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/MaskedManipulator_Versatile_Whole_Body_Manipulation.md|MaskedManipulator: Versatile Whole-Body Manipulation (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/MaskedManipulator_Versatile_Whole_Body_Manipulation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: MaskedManipulator
+	- datasets: GRAB test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Physics_Based_Motion_Imitation_with_Adversarial_Differential_Discriminators.md|Physics-Based Motion Imitation with Adversarial Differential Discriminators (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Physics_Based_Motion_Imitation_with_Adversarial_Differential_Discriminators.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: Adversarial Differential Discriminator (ADD)
+	- datasets: Humanoid - Double Kong, Humanoid - Dance A, EVAL 机器人 - Walk
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Robust_Derivative_Estimation_with_Walk_on_Stars.md|Robust Derivative Estimation with Walk on Stars (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Robust_Derivative_Estimation_with_Walk_on_Stars.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Safety / Privacy / Robustness
+	- methods: Robust Derivative Estimation with Walk on Stars
+	- datasets: 解析纯 Neumann 问题, 混合 Dirichlet-Neumann 问题, 纯 Neumann 问题解重建
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Social_Agent_Mastering_Dyadic_Nonverbal_Behavior_Generation_via_Conversational_LLM_Agents.md|Social Agent: Mastering Dyadic Nonverbal Behavior Generation via Conversational LLM Agents (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Social_Agent_Mastering_Dyadic_Nonverbal_Behavior_Generation_via_Conversational_LLM_Agents.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Social Agent
+	- datasets: Photoreal
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/StableMotion_Training_Motion_Cleanup_Models_with_Unpaired_Corrupted_Data.md|StableMotion: Training Motion Cleanup Models with Unpaired Corrupted Data (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/StableMotion_Training_Motion_Cleanup_Models_with_Unpaired_Corrupted_Data.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: StableMotion
+	- datasets: SoccerMocap, BrokenAMASS
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Motion_In_Betweening_for_Densely_Interacting_Characters.md|Motion In Betweening for Densely Interacting Characters (SIGGRAPH_ASIA_2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Motion_In_Betweening_for_Densely_Interacting_Characters.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Cross-Space In-Betweening
+	- datasets: Boxing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba.md|TCM Learning Human Motion with Temporally Conditional Mamba (SIGGRAPH_ASIA_2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Temporally Conditional Mamba (TCM)
+	- datasets: AIST++

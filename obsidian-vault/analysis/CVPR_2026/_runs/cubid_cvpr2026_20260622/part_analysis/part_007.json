@@ -1,0 +1,98 @@
+{
+  "part_id": "part_007",
+  "section_role": "experiments and conclusion",
+  "method_evidence": [
+    {
+      "claim": "CubiD directly generates with native high-dimensional representation tokens (768d).",
+      "section": "Table 5",
+      "anchor": "CubiD is the first and only discrete method to directly generate with native high-dimensional representation tokens (768d), while all other methods use compressed or low-dimensional tokens (mostly below 32).",
+      "confidence": 0.98
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "CubiD-XXL achieves state-of-the-art discrete generation with a gFID of 1.88.",
+      "table_or_figure": "Table 5",
+      "metric": "gFID",
+      "value": "1.88",
+      "confidence": 0.99
+    },
+    {
+      "claim": "CubiD-XXL achieves 2.02 gFID without guidance.",
+      "table_or_figure": "Table 5",
+      "metric": "gFID",
+      "value": "2.02",
+      "confidence": 0.99
+    },
+    {
+      "claim": "DINOv2 encoder achieves gFID 5.25, SigLIP2 achieves 5.87.",
+      "table_or_figure": "Table 4f",
+      "metric": "gFID",
+      "value": "5.25 (DINOv2), 5.87 (SigLIP2)",
+      "confidence": 0.97
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table 5",
+      "role_hint": "Main results on ImageNet 256x256 class-conditional generation comparing CubiD with existing discrete generation methods.",
+      "caption": "Discrete generation methods on ImageNet 256x256. Latent Dim denotes the original dimensionality of the latent space (features before vector quantization for low-dimensional methods, before and after dimension-wise quantization for CubiD). Results with superscript \"re\" denote rejection sampling. CubiD is the first and only discrete method to directly generate with native high-dimensional representation tokens (768d), while all other methods use compressed or low-dimensional tokens (mostly below 32).",
+      "confidence": 0.99
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_007",
+    "part_index": 7,
+    "part_count": 9,
+    "chunk_chars": 7314,
+    "latency_seconds": 6.258,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3038,
+      "completion_tokens_est": 595,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3633,
+      "total_with_reasoning_tokens_est": 3633,
+      "estimated_cost_usd": 0.001839,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 3211,
+      "completion_tokens_api": 539,
+      "total_tokens_api": 3750,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 2571,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 539,
+        "prompt_tokens": 3211,
+        "total_tokens": 3750,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 2571
+      },
+      "estimated_cost_usd_api": 0.00159,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 1983,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 541,
+        "api_usage_present": true
+      }
+    }
+  }
+}

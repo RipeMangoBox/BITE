@@ -1,0 +1,2552 @@
+---
+title: "Method: Representation / Self-Supervised / Transfer"
+type: paper-index
+dimension: method
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Method: Representation / Self-Supervised / Transfer
+
+- [[obsidian-vault/analysis/ICCV_2019/Meta_Sim_Learning_to_Generate_Synthetic_Datasets.md|Meta Sim: Learning to Generate Synthetic Datasets (ICCV 2019 2019)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2019/Meta_Sim_Learning_to_Generate_Synthetic_Datasets.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+	- methods: Meta-Sim
+	- datasets: MNIST Rotated Digits, Aerial2D Semantic Segmentation, KITTI Car Detection
+- [[obsidian-vault/analysis/CVPR_2020/Dreaming_to_Distill_Data_free_Knowledge_Transfer_via_DeepInversion.md|Dreaming to Distill: Data-free Knowledge Transfer via DeepInversion (CVPR 2020 2020)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2020/Dreaming_to_Distill_Data_free_Knowledge_Transfer_via_DeepInversion.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: DeepInversion (DI) / Adaptive DeepInversion (ADI)
+	- datasets: CIFAR-10, ImageNet, ImageNet knowledge transfer
+- [[obsidian-vault/analysis/ECCV_2020/Meta_Sim2_Unsupervised_Learning_of_Scene_Structure_for_Synthetic_Data_Generation.md|Meta-Sim2: Unsupervised Learning of Scene Structure for Synthetic Data Generation (ECCV 2020 2020)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2020/Meta_Sim2_Unsupervised_Learning_of_Scene_Structure_for_Synthetic_Data_Generation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+	- methods: Meta-Sim2
+	- datasets: KITTI 验证集, KITTI 训练集与生成数据之间的分布相似性
+- [[obsidian-vault/analysis/NEURIPS_2020/Ultrahyperbolic_Representation_Learning.md|Ultrahyperbolic Representation Learning (NEURIPS 2020 2020)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2020/Ultrahyperbolic_Representation_Learning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Representation / Self-Supervised / Transfer
+	- methods: Ultrahyperbolic Representation Learning
+	- datasets: NIPS co-authorship dataset
+- [[obsidian-vault/analysis/ICCV_2021/Self_Supervised_Real_to_Sim_Scene_Generation.md|Self-Supervised Real-to-Sim Scene Generation (ICCV 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2021/Self_Supervised_Real_to_Sim_Scene_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Sim2SG
+	- datasets: CLEVR target, Dining-Sim target
+- [[obsidian-vault/analysis/ICCVW_2021/Movie_Style.md|High-Level Features for Movie Style Understanding (ICCVW 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/ICCVW_2021/Movie_Style.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: High-Level Cinematographic Feature Extraction Pipelines (Frame Layering & Camera Motion Detection)
+	- datasets: MotionSet
+- [[obsidian-vault/analysis/NEURIPS_2021/Deep_Marching_Tetrahedra_a_Hybrid_Representation_for_High_Resolution_3D_Shape_Synthesis.md|Deep Marching Tetrahedra: a Hybrid Representation for High-Resolution 3D Shape Synthesis (NEURIPS 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2021/Deep_Marching_Tetrahedra_a_Hybrid_Representation_for_High_Resolution_3D_Shape_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Deep Marching Tetrahedra (DMTET)
+	- datasets: Animal Shape Dataset
+- [[obsidian-vault/analysis/NEURIPS_2021/Score_based_Generative_Modeling_in_Latent_Space.md|Score-based Generative Modeling in Latent Space (NEURIPS 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2021/Score_based_Generative_Modeling_in_Latent_Space.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Latent Score-based Generative Model (LSGM)
+	- datasets: CIFAR-10, CelebA-HQ-256
+- [[obsidian-vault/analysis/NEURIPS_2021/SegFormer_Simple_and_Efficient_Design_for_Semantic_Segmentation_with_Transformers.md|SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers (NEURIPS 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2021/SegFormer_Simple_and_Efficient_Design_for_Semantic_Segmentation_with_Transformers.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: SegFormer
+	- datasets: ADE20K, Cityscapes validation, Cityscapes
+- [[obsidian-vault/analysis/CVPR_2022/AUV_Net_Learning_Aligned_UV_Maps_for_Texture_Transfer_and_Synthesis.md|AUV-Net: Learning Aligned UV Maps for Texture Transfer and Synthesis (CVPR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2022/AUV_Net_Learning_Aligned_UV_Maps_for_Texture_Transfer_and_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: AUV-Net
+	- datasets: ShapeNet cars, ShapeNet chairs, Triplegangers heads
+- [[obsidian-vault/analysis/ECCV_2022/Language_Grounded_Indoor_3D_Semantic_Segmentation_in_the_Wild.md|Language-Grounded Indoor 3D Semantic Segmentation in the Wild (ECCV 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2022/Language_Grounded_Indoor_3D_Semantic_Segmentation_in_the_Wild.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Language-Grounded Pre-training with Instance Sampling and Class-Balanced Focal Loss
+	- datasets: ScanNet200
+- A Compact Representation of Measured BRDFs Using Neural Processes (SIGGRAPH 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DEF_Deep_Estimation_of_Sharp_Geometric_Features_in_3D_Shapes.md|DEF: Deep Estimation of Sharp Geometric Features in 3D Shapes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DEF_Deep_Estimation_of_Sharp_Geometric_Features_in_3D_Shapes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DEF (Deep Estimators of Features)
+	- datasets: DEF-Sim local patches, Parametric curve extraction on ABC shapes
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Domain_Enhanced_Arbitrary_Image_Style_Transfer_via_Contrastive_Learning.md|Domain Enhanced Arbitrary Image Style Transfer via Contrastive Learning (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Domain_Enhanced_Arbitrary_Image_Style_Transfer_via_Contrastive_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Deep Importance Map Network for Content-Aware Media Retargeting
+	- datasets: Image importance map generation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Drivable_Volumetric_Avatars_Using_Texel-aligned_Features.md|Drivable Volumetric Avatars Using Texel-aligned Features (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Drivable_Volumetric_Avatars_Using_Texel_aligned_Features.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Drivable Volumetric Avatars (DVA)
+	- datasets: ZJU-MoCap S386, ZJU-MoCap S387
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DSG-Net_Learning_Disentangled_Structure_and_Geometry_for_3D_Shape_Generation.md|DSG-Net: Learning Disentangled Structure and Geometry for 3D Shape Generation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DSG_Net_Learning_Disentangled_Structure_and_Geometry_for_3D_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DSG-Net
+	- datasets: PartNet Chairs, PartNet Lamps
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dual_Octree_Graph_Networks_for_Learning_Adaptive_Volumetric_Shape_Representations.md|Dual Octree Graph Networks for Learning Adaptive Volumetric Shape Representations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dual_Octree_Graph_Networks_for_Learning_Adaptive_Volumetric_Shape_Representations.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: Dual Octree Graph Networks
+	- datasets: D-Faust, ShapeNet autoencoder
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EyeNeRF_A_Hybrid_Representation_for_Photorealistic_Synthesis_Animation_and_Relighting_of_Human_Eyes.md|EyeNeRF: A Hybrid Representation for Photorealistic Synthesis, Animation, and Relighting of Human Eyes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EyeNeRF_A_Hybrid_Representation_for_Photorealistic_Synthesis_Animation_and_Relighting_of_Human_Eyes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: EyeNeRF
+- Implicit Neural Representation for Physics-driven Actuated Soft Bodies (SIGGRAPH 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- Learning High-DOF Reaching-and-grasping via Dynamic Representation of Gripper-object Interaction (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_High_DOF_Reaching_and_grasping_via_Dynamic_Representation_of_Gripper_object_Interaction.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- Motion Puzzle: Arbitrary Motion Style Transfer by Body Part (SIGGRAPH 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- NeuralSound: Learning-based Modal Sound Synthesis With Acoustic Transfer (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/NeuralSound_Learning_based_Modal_Sound_Synthesis_With_Acoustic_Transfer.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- Photo-to-shape Material Transfer for Diverse Structures (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Photo_to_shape_Material_Transfer_for_Diverse_Structures.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- Self-Supervised Post-Correction for Monte Carlo Denoising (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Self_Supervised_Post_Correction_for_Monte_Carlo_Denoising.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+- ShaderTransformer: Predicting Shader Quality via One-shot Embedding for Fast Simplification (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/ShaderTransformer_Predicting_Shader_Quality_via_One_shot_Embedding_for_Fast_Simplification.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- Stroke Transfer: Example-based Synthesis of Animatable Stroke Styles (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Stroke_Transfer_Example_based_Synthesis_of_Animatable_Stroke_Styles.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- Accelerated and Optimized Search of Imperceptible Color Vibration for Embedding Information into LCD images (SIGGRAPH ASIA 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Animatomy_an_Animator-centric_Anatomically_Inspired_System_for_3D_Facial_Modeling_Animation_and_Transfer.md|Animatomy: an Animator-centric, Anatomically Inspired System for 3D Facial Modeling, Animation and Transfer (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Animatomy_an_Animator_centric_Anatomically_Inspired_System_for_3D_Facial_Modeling_Animation_and_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Animatomy
+	- datasets: Validation Set Shot 1, Validation Set Shot 2, Validation Set Shot 3
+- Anime-Like Motion Transfer with Optimal Viewpoints (SIGGRAPH ASIA 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- Efficient Neural Style Transfer for Volumetric Simulations (SIGGRAPH ASIA 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Neural_Style_Transfer_for_Volumetric_Simulations.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- Implicit Conversion of Manifold B-Rep Solids by Neural Halfspace Representation (SIGGRAPH ASIA 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Implicit_Conversion_of_Manifold_B_Rep_Solids_by_Neural_Halfspace_Representation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Brushstroke_Engine_Learning_a_Latent_Style_Space_of_Interactive_Drawing_Tools.md|Neural Brushstroke Engine: Learning a Latent Style Space of Interactive Drawing Tools (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Neural_Brushstroke_Engine_Learning_a_Latent_Style_Space_of_Interactive_Drawing_Tools.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Neural Brushstroke Engine
+	- datasets: Styles1, User study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/PADL_Language_Directed_Physics_Based_Character_Control.md|PADL: Language-Directed Physics-Based Character Control (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/PADL_Language_Directed_Physics_Based_Character_Control.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: PADL
+	- datasets: Custom motion dataset, PADL language-command test set
+- Representation of FRP material damage in 3DCG (SIGGRAPH ASIA 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- Ribbon Font Neural Style Transfer for OpenType-SVG Font (SIGGRAPH ASIA 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- Sprite-from-Sprite: Cartoon Animation Decomposition with Self-supervised Sprite Estimation (SIGGRAPH ASIA 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- VToonify: Controllable High-Resolution Portrait Video Style Transfer (SIGGRAPH ASIA 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/VToonify_Controllable_High_Resolution_Portrait_Video_Style_Transfer.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/TOG_2022/DeepPhase_periodic_autoencoders_for_learning_motion_phase_manifolds.md|DeepPhase: periodic autoencoders for learning motion phase manifolds (TOG 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/TOG_2022/DeepPhase_periodic_autoencoders_for_learning_motion_phase_manifolds.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Periodic Autoencoder
+	- datasets: Style and Dance Dataset
+- [[obsidian-vault/analysis/WACV_2022/Contrast_to_Divide_Self_Supervised_Pre_Training_for_Learning_with_Noisy_Labels.md|Contrast to Divide: Self-Supervised Pre-Training for Learning with Noisy Labels (WACV 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/WACV_2022/Contrast_to_Divide_Self_Supervised_Pre_Training_for_Learning_with_Noisy_Labels.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: C2D (Contrast to Divide)
+	- datasets: CIFAR-100, CIFAR-10, mini-WebVision
+- [[obsidian-vault/analysis/arxiv_2023/NOVIS_A_Case_for_End_to_End_Near_Online_Video_Instance_Segmentation.md|NOVIS: A Case for End-to-End Near-Online Video Instance Segmentation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/NOVIS_A_Case_for_End_to_End_Near_Online_Video_Instance_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: NOVIS
+	- datasets: YouTube-VIS 2019, YouTube-VIS 2021, OVIS
+- [[obsidian-vault/analysis/arxiv_2023/TeG_DG_Textually_Guided_Domain_Generalization_for_Face_Anti_Spoofing.md|TeG-DG: Textually Guided Domain Generalization for Face Anti-Spoofing (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/TeG_DG_Textually_Guided_Domain_Generalization_for_Face_Anti_Spoofing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: TeG-DG
+	- datasets: I&C&M to O, O&C&M to I, O&C&I to M
+- [[obsidian-vault/analysis/CVPR_2023/MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space.md|MLD: Executing your Commands via Motion Diffusion in Latent Space (CVPR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2023/MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Motion Latent-based Diffusion (MLD)
+	- datasets: HumanML3D, KIT
+- [[obsidian-vault/analysis/ICCV_2023/DreamTeacher_Pretraining_Image_Backbones_with_Deep_Generative_Models.md|DreamTeacher: Pretraining Image Backbones with Deep Generative Models (ICCV 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2023/DreamTeacher_Pretraining_Image_Backbones_with_Deep_Generative_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: DreamTeacher
+	- datasets: COCO instance segmentation, COCO instance segmentation, BDD100K instance segmentation
+- [[obsidian-vault/analysis/ICLR_2023/On_The_Effectiveness_of_Out_of_Distribution_Data_in_Self_Supervised_Long_Tail_Learning.md|On The Effectiveness of Out-of-Distribution Data in Self-Supervised Long-Tail Learning (ICLR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2023/On_The_Effectiveness_of_Out_of_Distribution_Data_in_Self_Supervised_Long_Tail_Learning.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: COLT (Contrastive with Out-of-distribution data for Long-Tail learning)
+	- datasets: CIFAR-10-LT, CIFAR-100-LT, ImageNet-100-LT
+- [[obsidian-vault/analysis/ICLR_2023/Spacetime_Representation_Learning.md|Spacetime Representation Learning (ICLR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2023/Spacetime_Representation_Learning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Spacetime Representation Learning (基于洛伦兹预长度空间的定向图表征框架)
+	- datasets: Dupdiv, DREAM5 in silico, Social network
+- [[obsidian-vault/analysis/NEURIPS_2023/Towards_Distribution_Agnostic_Generalized_Category_Discovery.md|Towards Distribution-Agnostic Generalized Category Discovery (NEURIPS 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2023/Towards_Distribution_Agnostic_Generalized_Category_Discovery.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Representation / Self-Supervised / Transfer
+	- methods: Self-Balanced Co-Advice contrastive framework (BaCon)
+	- datasets: CIFAR-10-LT, CIFAR-100-LT, ImageNet-100-LT
+- Blended Latent Diffusion (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Blended_Latent_Diffusion.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2023/CALM_Conditional_Adversarial_Latent_Models_for_Directable_Virtual_Characters.md|CALM: Conditional Adversarial Latent Models for Directable Virtual Characters (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/CALM_Conditional_Adversarial_Latent_Models_for_Directable_Virtual_Characters.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
+	- methods: Conditional Adversarial Latent Models (CALM)
+	- datasets: Pre-training: Encoder quality, Pre-training: Motion diversity, Pre-training: Controllability
+- CLIP-PAE: Projection-Augmentation Embedding to Extract Relevant Features for a Disentangled, Interpretable and Controllable Text-Guided Face Manipulation (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/CLIP_PAE_Projection_Augmentation_Embedding_to_Extract_Relevant_Features_for_a_Disentangled_Interpretable_and_Controllable_Text_Guided_Face_Manipulation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+- Coupling Conduction, Convection, and Radiative Transfer in a Single Path-space: Application to Infrared Rendering (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- LatentAvatar: Learning Latent Expression Code for Expressive Neural Head Avatar (SIGGRAPH 2023 2023)
+	- method groups: Representation / Self-Supervised / Transfer
+- Neural Biplane Representation for BTF Rendering and Acquisition (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Neural_Biplane_Representation_for_BTF_Rendering_and_Acquisition.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Semi-supervised Reference-based Sketch Extraction Using a Contrastive Learning Framework (SIGGRAPH 2023 2023)
+	- method groups: Representation / Self-Supervised / Transfer
+- A Neural Implicit Representation for the Image Stack: Depth, All in Focus, and High Dynamic Range (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Neural_Implicit_Representation_for_the_Image_Stack_Depth_All_in_Focus_and_High_Dynamic_Range.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- ACE: Adversarial Correspondence Embedding for Cross Morphology Motion Retargeting from Human to Nonhuman Characters (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ACE_Adversarial_Correspondence_Embedding_for_Cross_Morphology_Motion_Retargeting_from_Human_to_Nonhuman_Characters.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
+- Controllable Group Choreography using Contrastive Diffusion (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Controllable_Group_Choreography_using_Contrastive_Diffusion.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Efficient Graphics Representation with Differentiable Indirection (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Graphics_Representation_with_Differentiable_Indirection.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- EXIM: A Hybrid Explicit-Implicit Representation for Text-Guided 3D Shape Generation (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/EXIM_A_Hybrid_Explicit_Implicit_Representation_for_Text_Guided_3D_Shape_Generation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- GeoLatent: A Geometric Approach to Latent Space Design for Deformable Shape Generators (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GeoLatent_A_Geometric_Approach_to_Latent_Space_Design_for_Deformable_Shape_Generators.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+- GroomGen: A High-Quality Generative Hair Model Using Hierarchical Latent Representations (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GroomGen_A_High_Quality_Generative_Hair_Model_Using_Hierarchical_Latent_Representations.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Learning the Geodesic Embedding with Graph Neural Networks (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_the_Geodesic_Embedding_with_Graph_Neural_Networks.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+- Neural-Singular-Hessian: Implicit Neural Representation of Unoriented Point Clouds by Enforcing Singular Hessian (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Singular_Hessian_Implicit_Neural_Representation_of_Unoriented_Point_Clouds_by_Enforcing_Singular_Hessian.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- SAME: Skeleton-Agnostic Motion Embedding for Character Animation (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SAME_Skeleton_Agnostic_Motion_Embedding_for_Character_Animation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- VMesh: Hybrid Volume-Mesh Representation for Efficient View Synthesis (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VMesh_Hybrid_Volume_Mesh_Representation_for_Efficient_View_Synthesis.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/TMLR_2023/Bridging_the_Sim2Real_gap_with_CARE_Supervised_Detection_Adaptation_with_Conditional_Alignment_and_Reweighting.md|Bridging the Sim2Real gap with CARE: Supervised Detection Adaptation with Conditional Alignment and Reweighting (TMLR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/TMLR_2023/Bridging_the_Sim2Real_gap_with_CARE_Supervised_Detection_Adaptation_with_Conditional_Alignment_and_Reweighting.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: CARE (Conditional Alignment and Reweighting)
+	- datasets: Sim10K→Cityscapes, Synscapes→Cityscapes, DriveSim→Cityscapes
+- [[obsidian-vault/analysis/TOG_2023/AdaptNet_Policy_Adaptation_for_Physics_Based_Character_Control.md|AdaptNet: Policy Adaptation for Physics-Based Character Control (TOG 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/TOG_2023/AdaptNet_Policy_Adaptation_for_Physics_Based_Character_Control.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: AdaptNet
+	- datasets: 风格迁移, 低摩擦地形
+- [[obsidian-vault/analysis/arxiv_2024/MBA_SLAM_Motion_Blur_Aware_Dense_Visual_SLAM_with_Radiance_Fields_Representation.md|MBA-SLAM: Motion Blur Aware Dense Visual SLAM with Radiance Fields Representation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MBA_SLAM_Motion_Blur_Aware_Dense_Visual_SLAM_with_Radiance_Fields_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MBA-SLAM
+	- datasets: ArchViz-1, Replica Room0, Replica
+- [[obsidian-vault/analysis/arxiv_2024/MoDiPO_text-to-motion_alignment_via_AI-feedback-driven_Direct_Preference_Optimization.md|MoDiPO: text-to-motion alignment via AI-feedback-driven Direct Preference Optimization (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MoDiPO:_text-to-motion_alignment_via_AI-feedback-driven_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MoDiPO
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2024/MotionFlow_Attention_Driven_Motion_Transfer_in_Video_Diffusion_Models.md|MotionFlow: Attention-Driven Motion Transfer in Video Diffusion Models (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MotionFlow_Attention_Driven_Motion_Transfer_in_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MotionFlow
+	- datasets: DAVIS, User Study
+- [[obsidian-vault/analysis/arxiv_2024/MotionShop_Zero_Shot_Motion_Transfer_in_Video_Diffusion_Models_with_Mixture_of_Score_Guidance.md|MotionShop: Zero-Shot Motion Transfer in Video Diffusion Models with Mixture of Score Guidance (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MotionShop_Zero_Shot_Motion_Transfer_in_Video_Diffusion_Models_with_Mixture_of_Score_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Mixture of Score Guidance (MSG)
+	- datasets: MotionBench, User Study
+- [[obsidian-vault/analysis/CVPR_2024/Tri-Modal_Motion_Retrieval_by_Learning_a_Joint_Embedding_Space.md|Tri-Modal Motion Retrieval by Learning a Joint Embedding Space (CVPR 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/Tri-Modal_Motion_Retrieval_by_Learning_a_Joint_Embedding_Space.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: LAVIMO (LAnguage-VIdeo-MOtion alignment)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2024/MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Latent_Diffusion_Model.md|MCM LDM Arbitrary Motion Style Transfer with Multi condition Motion Latent Diffusion Model (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Latent_Diffusion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Multi-condition Motion Latent Diffusion Model (MCM-LDM)
+- [[obsidian-vault/analysis/CVPR_2024/NoiseCLR_A_Contrastive_Learning_Approach_for_Unsupervised_Discovery_of_Interpretable_Directions_in_Diffusion_Models.md|NoiseCLR: A Contrastive Learning Approach for Unsupervised Discovery of Interpretable Directions in Diffusion Models (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/NoiseCLR_A_Contrastive_Learning_Approach_for_Unsupervised_Discovery_of_Interpretable_Directions_in_Diffusion_Models.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: NoiseCLR
+	- datasets: Race Edit, Mustache Edit, Age Edit
+- [[obsidian-vault/analysis/CVPR_2024/TokenHMR_Advancing_Human_Mesh_Recovery_with_a_Tokenized_Pose_Representation.md|TokenHMR Advancing Human Mesh Recovery with a Tokenized Pose Representation (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/TokenHMR_Advancing_Human_Mesh_Recovery_with_a_Tokenized_Pose_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: TokenHMR
+	- datasets: EMDB
+- [[obsidian-vault/analysis/CVPR_2024/WANDR_Intention_guided_Human_Motion_Generation.md|WANDR Intention guided Human Motion Generation (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/WANDR_Intention_guided_Human_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: WANDR (Wrist-driven Autonomous Navigation for Data-based goal Reaching)
+- [[obsidian-vault/analysis/ECCV_2024/DragAnything_Motion_Control_for_Anything_using_Entity_Representation.md|DragAnything: Motion Control for Anything using Entity Representation (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/DragAnything_Motion_Control_for_Anything_using_Entity_Representation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: DragAnything
+	- datasets: VIPSeg val 256x256, User Study
+- [[obsidian-vault/analysis/ECCV_2024/FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Language_Models.md|FreeMotion MoCap Free Human Motion Synthesis with Multimodal Large Language Models (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: FreeMotion
+	- datasets: HumanAct12, Olympic Sports, Style Transfer
+- [[obsidian-vault/analysis/ECCV_2024/PoseEmbroider_Towards_a_3D_Visual_Semantic_aware_Human_Pose_Representation.md|PoseEmbroider: Towards a 3D, Visual, Semantic-aware Human Pose Representation (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/PoseEmbroider_Towards_a_3D_Visual_Semantic_aware_Human_Pose_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: PoseEmbroider
+	- datasets: BEDLAM-Script 验证集, BEDLAM-Fix 验证集
+- [[obsidian-vault/analysis/ICLR_2024/FLD_Fourier_Latent_Dynamics_for_Structured_Motion_Representation_and_Learning.md|FLD: Fourier Latent Dynamics for Structured Motion Representation and Learning (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/FLD_Fourier_Latent_Dynamics_for_Structured_Motion_Representation_and_Learning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Fourier Latent Dynamics (FLD)
+	- datasets: 运动表示紧凑性, 通用跟踪性能
+- [[obsidian-vault/analysis/ICLR_2024/Graph_Metanetworks_for_Processing_Diverse_Neural_Architectures.md|Graph Metanetworks for Processing Diverse Neural Architectures (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/Graph_Metanetworks_for_Processing_Diverse_Neural_Architectures.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+	- methods: Graph Metanetworks (GMNs)
+	- datasets: Varying CNNs, Diverse Architectures
+- [[obsidian-vault/analysis/ICLR_2024/NeRM_Learning_Neural_Representations_for_High_Framerate_Human_Motion_Synthesis.md|NeRM Learning Neural Representations for High Framerate Human Motion Synthesis (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/NeRM_Learning_Neural_Representations_for_High_Framerate_Human_Motion_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: NeRM
+	- datasets: HumanML3D, KIT, HumanAct12
+- [[obsidian-vault/analysis/ICLR_2024/Transferring_Labels_to_Solve_Annotation_Mismatches_Across_Object_Detection_Datasets.md|Transferring Labels to Solve Annotation Mismatches Across Object Detection Datasets (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/Transferring_Labels_to_Solve_Annotation_Mismatches_Across_Object_Detection_Datasets.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+	- methods: Label‑Guided Pseudo‑Labeling (LGPL)
+	- datasets: nuScenes → nuImages, Synscapes → Cityscapes, Internal-Dataset → nuImagest
+- A Hierarchical 3D Gaussian Representation for Real-time Rendering of Very Large Scenes (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- BlockFusion: Expandable 3D Scene Generation Using Latent Tri-plane Extrapolation (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- BrepGen: A B-rep Generative Diffusion Model With Structured Latent Geometry (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Controllable Neural Style Transfer for Dynamic Meshes (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- Cross-image Attention for Zero-shot Appearance Transfer (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- IntrinsicDiffusion: Joint Intrinsic Layers From Latent Diffusion Models (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/IntrinsicDiffusion_Joint_Intrinsic_Layers_From_Latent_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Latent L-systems: Transformer-based Tree Generator (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- LayGA: Layered Gaussian Avatars for Animatable Clothing Transfer (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- NeLT: Object-oriented Neural Light Transfer (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- NeurCADRecon: Neural Representation for Reconstructing CAD Surfaces by Enforcing Zero Gaussian Curvature (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_Representation_and_GANs_Prior.md|Portrait3D Text Guided High Quality 3D Portrait Generation Using Pyramid Representation and GANs Prior (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_Representation_and_GANs_Prior.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Portrait3D
+	- datasets: User Study
+- ReFiNe: Recursive Field Networks for Cross-modal Multi-scene Representation (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- Self-Supervised High Dynamic Range Imaging: What Can Be Learned from a Single 8-bit Video? (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+- Self-supervised Video Defocus Deblurring With Atlas Learning (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Self_supervised_Video_Defocus_Deblurring_With_Atlas_Learning.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+- Spatial and Surface Correspondence Field for Interaction Transfer (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- TensoSDF: Roughness-aware Tensorial Representation for Robust Geometry and Material Reconstruction (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Text-to-vector Generation With Neural Path Representation (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Progressive_Embedding_Approach_to_Bijective_Tetrahedral_Maps_driven_by_Cluster_Mesh_Topology.md|A Progressive Embedding Approach to Bijective Tetrahedral Maps driven by Cluster Mesh Topology (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Progressive_Embedding_Approach_to_Bijective_Tetrahedral_Maps_driven_by_Cluster_Mesh_Topology.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Cluster Mesh Expansion (CM)
+	- datasets: Nigolian et al. 2023数据集
+- Camera Settings as Tokens: Modeling Photography on Latent Diffusion Models (SIGGRAPH ASIA 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Decoupling Contact for Fine-Grained Motion Style Transfer (SIGGRAPH ASIA 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- FabricDiffusion: High-Fidelity Texture Transfer for 3D Garments Generation from In-The-Wild Images (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/FabricDiffusion_High_Fidelity_Texture_Transfer_for_3D_Garments_Generation_from_In_The_Wild_Images.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- FreeAvatar: Robust 3D Facial Animation Transfer by Learning an Expression Foundation Model (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/FreeAvatar_Robust_3D_Facial_Animation_Transfer_by_Learning_an_Expression_Foundation_Model.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MaskedMimic_Unified_Physics_Based_Character_Control_Through_Masked_Motion_Inpainting.md|MaskedMimic: Unified Physics-Based Character Control Through Masked Motion Inpainting (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MaskedMimic_Unified_Physics_Based_Character_Control_Through_Masked_Motion_Inpainting.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: MaskedMimic
+	- datasets: AMASS
+- Medial Skeletal Diagram: A Generalized Medial Axis Approach for 3D Shape Representation (SIGGRAPH ASIA 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Monkey See, Monkey Do: Harnessing Self-attention in Motion Diffusion for Zero-shot Motion Transfer (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Monkey_See_Monkey_Do_Harnessing_Self_attention_in_Motion_Diffusion_for_Zero_shot_Motion_Transfer.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- PC-Planner: Physics-Constrained Self-Supervised Learning for Robust Neural Motion Planning with Shape-Aware Distance Function (SIGGRAPH ASIA 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+- SIGGesture: Generalized Co-Speech Gesture Synthesis via Semantic Injection with Large-Scale Pre-Training Diffusion Models (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/SIGGesture_Generalized_Co_Speech_Gesture_Synthesis_via_Semantic_Injection_with_Large_Scale_Pre_Training_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/SpaceMesh_A_Continuous_Representation_for_Learning_Manifold_Surface_Meshes.md|SpaceMesh: A Continuous Representation for Learning Manifold Surface Meshes (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/SpaceMesh_A_Continuous_Representation_for_Learning_Manifold_Surface_Meshes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SpaceMesh
+	- datasets: ABC Dataset
+- SPARK: Self-supervised Personalized Real-time Monocular Face Capture (SIGGRAPH ASIA 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- Stripe Embedding: Efficient Maps with Exact Numeric Computation (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Stripe_Embedding_Efficient_Maps_with_Exact_Numeric_Computation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- Style-NeRF2NeRF: 3D Style Transfer from Style-Aligned Multi-View Images (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Style_NeRF2NeRF_3D_Style_Transfer_from_Style_Aligned_Multi_View_Images.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views.md|Shuai et al. Reconstructing Close Human Interactions from Multiple Views (SIGGRAPH_ASIA_2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: CloseMoCap
+	- datasets: CHI3D, Hi4D, Panoptic
+- [[obsidian-vault/analysis/TOG_2024/NeuralVDB_High_resolution_Sparse_Volume_Representation_using_Hierarchical_Neural_Networks.md|NeuralVDB: High-resolution Sparse Volume Representation using Hierarchical Neural Networks (TOG 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/TOG_2024/NeuralVDB_High_resolution_Sparse_Volume_Representation_using_Hierarchical_Neural_Networks.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: NeuralVDB
+	- datasets: Disney Cloud dataset, SDF models, Density volumes
+- [[obsidian-vault/analysis/WACV_2024/Task_Oriented_Human_Object_Interactions_Generation_with_Implicit_Neural_Representations.md|Task Oriented Human Object Interactions Generation with Implicit Neural Representations (WACV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/WACV_2024/Task_Oriented_Human_Object_Interactions_Generation_with_Implicit_Neural_Representations.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: TOHO
+	- datasets: AMASS/GRAB
+- [[obsidian-vault/analysis/arxiv_2025/SMAP_Self-supervised_Motion_Adaptation_for_Physically_Plausible_Humanoid_Whole-body_Control.md|SMAP: Self-supervised Motion Adaptation for Physically Plausible Humanoid Whole-body Control (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/SMAP_Self_supervised_Motion_Adaptation_for_Physically_Plausible_Humanoid_Whole_body_Control.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SMAP
+	- datasets: CMU MoCap
+- [[obsidian-vault/analysis/arxiv_2025/SyncTrack4D_Cross-Video_Motion_Alignment_and_Video_Synchronization_for_Multi-Video_4D_Gaussian_Splatting.md|SyncTrack4D: Cross-Video Motion Alignment and Video Synchronization for Multi-Video 4D Gaussian Splatting (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/SyncTrack4D_Cross_Video_Motion_Alignment_and_Video_Synchronization_for_Multi_Video_4D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: SyncTrack4D
+	- datasets: Panoptic Studio
+- [[obsidian-vault/analysis/arxiv_2025/Towards_Synthesized_and_Editable_Motion_In-Betweening_Through_Part-Wise_Phase_Representation.md|Towards Synthesized and Editable Motion In-Betweening Through Part-Wise Phase Representation (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Towards_Synthesized_and_Editable_Motion_In_Betweening_Through_Part_Wise_Phase_Representation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Part-Wise Phase Representation Framework (BP Phase Autoencoder + BPMoE + Motion Sampler)
+- [[obsidian-vault/analysis/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.md|BAGEL: Emerging Properties in Unified Multimodal Pretraining (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: BAGEL
+	- datasets: MMMU, GenEval, WISE
+- [[obsidian-vault/analysis/arxiv_2025/Dispersion_Loss_Counteracts_Embedding_Condensation_and_Improves_Generalization_in_Small_Language_Models.md|Dispersion Loss Counteracts Embedding Condensation and Improves Generalization in Small Language Models (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/LM_Dispersion_Dispersion_Loss_Counteracts_Embedding_Condensation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Dispersion Loss
+	- datasets: PIQA, TruthfulQA
+- [[obsidian-vault/analysis/arxiv_2025/Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Constraints.md|Leader and Follower Interactive Motion Generation under Trajectory Constraints (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Constraints.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Leader-Follower Interactive Motion Generation with Pace Controller and Kinematic Synchronization Adapter
+	- datasets: InterHuman
+- [[obsidian-vault/analysis/arxiv_2025/Motion2Motion_Cross_topology_Motion_Transfer_with_Sparse_Correspondence.md|Motion2Motion: Cross-topology Motion Transfer with Sparse Correspondence (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Motion2Motion_Cross_topology_Motion_Transfer_with_Sparse_Correspondence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Motion2Motion
+	- datasets: Similar Skeleton Transfer, Cross-species Skeleton Transfer, User Study
+- [[obsidian-vault/analysis/arxiv_2025/MotionFlux_Efficient_Text_Guided_Motion_Generation_through_Rectified_Flow_Matching_and_Preference_Alignment.md|MotionFlux: Efficient Text-Guided Motion Generation through Rectified Flow Matching and Preference Alignment (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/MotionFlux_Efficient_Text_Guided_Motion_Generation_through_Rectified_Flow_Matching_and_Preference_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MotionFlux（含TAPO对齐框架）
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2025/Topology_Agnostic_Animal_Motion_Generation_from_Text_Prompt.md|Topology-Agnostic Animal Motion Generation from Text Prompt (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Topology_Agnostic_Animal_Motion_Generation_from_Text_Prompt.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Generalized Autoregressive Motion Generation with Topology-Aware Skeleton Embedding
+	- datasets: OmniZoo testset
+- [[obsidian-vault/analysis/arxiv_2025/VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Generation_in_Video_Models.md|VideoJAM Joint Appearance Motion Representations for Enhanced Motion Generation in Video Models (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Generation_in_Video_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VideoJAM
+	- datasets: VideoJAM-bench, Movie Gen benchmark
+- [[obsidian-vault/analysis/CVPR_2025/DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Human_Motion_Synthesis.md|DSDFM Deterministic to Stochastic Diverse Latent Feature Mapping for Human Motion Synthesis (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Human_Motion_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DSDFM (Deterministic-to-Stochastic Diverse Latent Feature Mapping)
+	- datasets: HumanAct12 Unconditional, HumanAct12 Action-to-Motion
+- [[obsidian-vault/analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing.md|Dynamic Motion Blending for Versatile Motion Editing (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MotionReFit
+	- datasets: STANCE Body Part Replacement, STANCE Style Transfer
+- [[obsidian-vault/analysis/CVPR_2025/Light3R_SfM_Towards_Feed_forward_Structure_from_Motion.md|Light3R-SfM: Towards Feed-forward Structure-from-Motion (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/Light3R_SfM_Towards_Feed_forward_Structure_from_Motion.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Light3R-SfM
+	- datasets: Tanks&Temples
+- [[obsidian-vault/analysis/CVPR_2025/MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation_across_Multiple_Granularities.md|MG-MotionLLM: A Unified Framework for Motion Comprehension and Generation across Multiple Granularities (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation_across_Multiple_Granularities.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: MG-MotionLLM
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/CVPR_2025/MotionBench_Benchmarking_and_Improving_Fine_grained_Video_Motion_Understanding_for_Vision_Language_Models.md|MotionBench: Benchmarking and Improving Fine-grained Video Motion Understanding for Vision Language Models (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/MotionBench_Benchmarking_and_Improving_Fine_grained_Video_Motion_Understanding_for_Vision_Language_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: TE Fusion (Through-Encoder Fusion)
+	- datasets: MotionBench Dev, MVBench, VideoMME
+- [[obsidian-vault/analysis/CVPR_2025/SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation_and_Editing.md|SALAD: Skeleton-aware Latent Diffusion for Text-driven Motion Generation and Editing (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation_and_Editing.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: SALAD
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/ICCV_2025/Align_Your_Rhythm_Generating_Highly_Aligned_Dance_Poses_with_Gating_Enhanced_Rhythm_Aware_Feature_Representation.md|Align Your Rhythm Generating Highly Aligned Dance Poses with Gating Enhanced Rhythm Aware Feature Representation (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/Align_Your_Rhythm_Generating_Highly_Aligned_Dance_Poses_with_Gating_Enhanced_Rhythm_Aware_Feature_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Danceba
+	- datasets: AIST++
+- [[obsidian-vault/analysis/ICCV_2025/MotionStreamer_Streaming_Motion_Generation_via_Diffusion_based_Autoregressive_Model_in_Causal_Latent_Space.md|MotionStreamer: Streaming Motion Generation via Diffusion-based Autoregressive Model in Causal Latent Space (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/MotionStreamer_Streaming_Motion_Generation_via_Diffusion_based_Autoregressive_Model_in_Causal_Latent_Space.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: MotionStreamer
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/ICCV_2025/Moto_Latent_Motion_Token_as_the_Bridging_Language_for_Learning_Robot_Manipulation_from_Videos.md|Moto: Latent Motion Token as the Bridging Language for Learning Robot Manipulation from Videos (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/Moto_Latent_Motion_Token_as_the_Bridging_Language_for_Learning_Robot_Manipulation_from_Videos.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Moto
+	- datasets: SIMPLER, CALVIN, Real-world
+- [[obsidian-vault/analysis/ICCV_2025/Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D_aware_Motion_Representation.md|Perception-as-Control: Fine-grained Controllable Image Animation with 3D-aware Motion Representation (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D_aware_Motion_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Perception-as-Control
+	- datasets: RealEstate-10K, WebVid-10M
+- [[obsidian-vault/analysis/ICCV_2025/PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Synthesis_in_Human_Motion_Tasks.md|PUMPS Skeleton Agnostic Point based Universal Motion Pre Training for Synthesis in Human Motion Tasks (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Synthesis_in_Human_Motion_Tasks.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: PUMPS
+	- datasets: Keyframe interpolation, Motion transition
+- [[obsidian-vault/analysis/ICCV_2025/StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusion.md|StyleMotif Multi Modal Motion Stylization using Style Content Cross Fusion (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: STYLEMOTIF
+	- datasets: Motion-Guided Stylization, Text-Guided Stylization, Motion Style Transfer
+- [[obsidian-vault/analysis/ICLR_2025/Neural_Spacetimes_for_DAG_Representation_Learning.md|Neural Spacetimes for DAG Representation Learning (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/Neural_Spacetimes_for_DAG_Representation_Learning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Neural Spacetime (NST)
+	- datasets: Cornell dim 2, In silico DAG dim 2, metric 1
+- [[obsidian-vault/analysis/ICLR_2025/REPA_Representation_Alignment_for_Generation_Training_Diffusion_Transformers_Is_Easier_Than_You_Think.md|REPA: Representation Alignment for Generation: Training Diffusion Transformers Is Easier Than You Think (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/ICLR_2025/2025_REPA_Representation_Alignment_for_Generation_Training_Diffusion_Transformers_Is_Easier_Than_You_Think.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: REPA (REPresentation Alignment)
+	- datasets: ImageNet 256×256 类条件生成, ImageNet 512×512 类条件生成
+- [[obsidian-vault/analysis/NEURIPS_2025/Feed_Forward_Bullet_Time_Reconstruction_of_Dynamic_Scenes_from_Monocular_Videos.md|Feed-Forward Bullet-Time Reconstruction of Dynamic Scenes from Monocular Videos (NEURIPS 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/Feed_Forward_Bullet_Time_Reconstruction_of_Dynamic_Scenes_from_Monocular_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: BTimer (BulletTimer)
+	- datasets: DyCheck iPhone dataset, NVIDIA Dynamic Scene dataset, RE10K
+- Boolean Operation for CAD Models Using a Hybrid Representation (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis.md|Chang et al. Large Scale Multi Character Interaction Synthesis (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Conditional Generative Pipeline for Coordinated Multi-Character Interaction
+	- datasets: InterHuman dancing subset, Adding New Characters, Generating Large Scenes
+- CLR-Wire: Towards Continuous Latent Representations for 3D Curve Wireframe Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CLR-Wire_Towards_Continuous_Latent_Representations_for_3D_Curve_Wireframe_Generation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2025/DAM-VSR_Disentanglement_of_Appearance_and_Motion_for_Video_Super-Resolution.md|DAM-VSR: Disentanglement of Appearance and Motion for Video Super-Resolution (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/SIGGRAPH_2025/2025_DAM_VSR_Disentanglement_of_Appearance_and_Motion_for_Video_Super_Resolution.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: DAM-VSR
+	- datasets: UDM10, YouHQ40, VideoLQ & AIGC29
+- Divide-and-Conquer Embedding (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- Gaussian Fluids: A Grid-Free Fluid Solver based on Gaussian Spatial Representation (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+- HoLa: B-Rep Generation using a Holistic Latent Representation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/HoLa_B-Rep_Generation_using_a_Holistic_Latent_Representation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- Image-GS: Content-Adaptive Image Representation via 2D Gaussians (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Image-GS_Content-Adaptive_Image_Representation_via_2D_Gaussians.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- IMLS-Splatting: Efficient Mesh Reconstruction from Multi-view Images via Point Representation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis.md|Large-Scale Multi-Character Interaction Synthesis (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Large-Scale_Multi-Character_Interaction_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Conditional Generative Pipeline for Coordinated Multi-Character Interaction
+	- datasets: InterHuman dancing subset, Adding New Characters, Generating Large Scenes
+- MASH: Masked Anchored SpHerical Distances for 3D Shape Representation and Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MASH_Masked_Anchored_SpHerical_Distances_for_3D_Shape_Representation_and_Generation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- MIND: Microstructure INverse Design with Generative Hybrid Neural Representation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MIND_Microstructure_INverse_Design_with_Generative_Hybrid_Neural_Representation.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Patch-Grid: An Efficient and Feature-Preserving Neural Implicit Surface Representation (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- PLT: Part-Wise Latent Tokens as Adaptable Motion Priors for Physically Simulated Characters (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- Pretraining Support for Cheerleading Stunts Using Virtual Reality (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inversion.md|Reenact Anything: Semantic Video Motion Transfer Using Motion-Textual Inversion (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inversion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: motion-textual inversion
+	- datasets: Something-Something V2 subset
+- RELATE3D: REfocusing Latent Adapter for Targeted local Enhancement and Editing in 3D Generation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- ReStyle3D: Scene-Level Appearance Transfer with Semantic Correspondences (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- Stable-Makeup: When Real-World Makeup Transfer Meets Diffusion Model (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Stroke Transfer for Participating Media (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Gaussian_See_Gaussian_Do_3D_Semantic_Motion_Transfer.md|Gaussian See, Gaussian Do: 3D Semantic Motion Transfer (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Gaussian_See_Gaussian_Do_3D_Semantic_Motion_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Gaussian See, Gaussian Do
+	- datasets: Mini-Mixamo, Cross-Category, Novel-view Motion Synthesis
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/MaskedManipulator_Versatile_Whole_Body_Manipulation.md|MaskedManipulator: Versatile Whole-Body Manipulation (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/MaskedManipulator_Versatile_Whole_Body_Manipulation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: MaskedManipulator
+	- datasets: GRAB test set
+- [[obsidian-vault/analysis/TMLR_2025/ReHub_Linear_Complexity_Graph_Transformers_with_Adaptive_Hub_Spoke_Reassignment.md|ReHub: Linear Complexity Graph Transformers with Adaptive Hub-Spoke Reassignment (TMLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/TMLR_2025/ReHub_Linear_Complexity_Graph_Transformers_with_Adaptive_Hub_Spoke_Reassignment.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+	- methods: ReHub
+	- datasets: Peptides-func, Peptides-struct, PCQM-Contact
+- [[obsidian-vault/analysis/WHITEPAPER_2025/Cosmos_Transfer1_Conditional_World_Generation_with_Adaptive_Multimodal_Control.md|Cosmos-Transfer1: Conditional World Generation with Adaptive Multimodal Control (WHITEPAPER 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/WHITEPAPER_2025/Cosmos_Transfer1_Conditional_World_Generation_with_Adaptive_Multimodal_Control.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Cosmos-Transfer1
+	- datasets: TransferBench, 自建机器人Sim2Real数据
+- [[obsidian-vault/analysis/WHITEPAPER_2025/Cosmos_Transfer2_5_World_Simulation_With_Video_Foundation_Models_for_Physical_AI.md|Cosmos-Transfer2.5: World Simulation With Video Foundation Models for Physical AI (WHITEPAPER 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/WHITEPAPER_2025/Cosmos_Transfer2_5_World_Simulation_With_Video_Foundation_Models_for_Physical_AI.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+	- methods: Cosmos-Predict2.5 / Cosmos-Transfer2.5
+	- datasets: PAI-Bench-Transfer, Real-Robot Manipulation, Bridge Dataset
+- [[obsidian-vault/analysis/arxiv_2026/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High-Dimensional_Representation_Tokens.md|Cubic Discrete Diffusion: Discrete Visual Generation on High-Dimensional Representation Tokens (arXiv 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Cubic Discrete Diffusion (CubiD)
+	- datasets: ImageNet 256×256 Class-Conditional Generation
+- [[obsidian-vault/analysis/arxiv_2026/Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.md|Beyond Global Alignment: Fine-Grained Motion-Language Retrieval via Pyramidal Shapley-Taylor Learning (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/PST_Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Pyramidal Shapley-Taylor (PST) Learning Framework
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2026/Egomotion_Aware_Video_Representation_for_Efficient_and_Accurate_3D_Scene_Understanding.md|Egomotion-Aware Video Representation for Efficient and Accurate 3D Scene Understanding (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Egomotion_Aware_Video_Representation_for_Efficient_and_Accurate_3D_Scene_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Motion-MLLM
+	- datasets: ScanQA, SQA3D, VSI-Bench
+- [[obsidian-vault/analysis/arxiv_2026/Exploring_Motion-Language_Alignment_for_Text-driven_Motion_Generation.md|Exploring Motion-Language Alignment for Text-driven Motion Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Exploring_Motion-Language_Alignment_for_Text-driven_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MLA-Gen
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2026/HumanScore_Benchmarking_Human_Motions_in_Generated_Videos.md|HumanScore: Benchmarking Human Motions in Generated Videos (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/arXiv_2026/2026_HumanScore_Benchmarking_Human_Motions_in_Generated_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: HumanScore
+	- datasets: HumanScore Leaderboard, Human Preference Alignment
+- [[obsidian-vault/analysis/arxiv_2026/InterEdit_Navigating_Text_Guided_Multi_Human_3D_Motion_Editing.md|InterEdit: Navigating Text-Guided Multi-Human 3D Motion Editing (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/InterEdit_Navigating_Text_Guided_Multi_Human_3D_Motion_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: InterEdit
+	- datasets: InterEdit3D test set
+- [[obsidian-vault/analysis/arxiv_2026/Motion-Adapter_A_Diffusion_Model_Adapter_for_Text-to-Motion_Generation_of_Compound_Actions.md|Motion-Adapter: A Diffusion Model Adapter for Text-to-Motion Generation of Compound Actions (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Motion-Adapter:_A_Diffusion_Model_Adapter_for_Text-to-Motion_Generation_of_Compound_Actions.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Motion-Adapter
+	- datasets: 用户研究, 复合动作数据集
+- [[obsidian-vault/analysis/arxiv_2026/Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.md|PST Beyond Global Alignment: Fine-Grained Motion-Language Retrieval via Pyramidal Shapley-Taylor Learning (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/PST_Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Pyramidal Shapley-Taylor (PST) Learning Framework
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2026/SemanticWM.md|SemanticWM: Reconstruction or Semantics? What Makes a Latent Space Useful for Robot World Models (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/SemanticWM.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Semantic Latent Diffusion World Model (with S-VAE adapter / wide DDT head)
+	- datasets: BridgeV2, SOAR
+- [[obsidian-vault/analysis/CVPR_2026/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High-Dimensional_Representation_Tokens.md|Cubic Discrete Diffusion: Discrete Visual Generation on High-Dimensional Representation Tokens (CVPR 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Cubic Discrete Diffusion (CubiD)
+	- datasets: ImageNet 256×256 class-conditional generation
+- [[obsidian-vault/analysis/CVPR_2026/A_Self_Conditioned_Representation_Guided_Diffusion_Model_for_Realistic_Text_to_LiDAR_Scene_Generation.md|A Self-Conditioned Representation Guided Diffusion Model for Realistic Text-to-LiDAR Scene Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/A_Self_Conditioned_Representation_Guided_Diffusion_Model_for_Realistic_Text_to_LiDAR_Scene_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: T2LDM
+	- datasets: KITTI-360, nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/A_Semantically_Disentangled_Unified_Model_for_Multi_category_3D_Anomaly_Detection.md|A Semantically Disentangled Unified Model for Multi-category 3D Anomaly Detection (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/A_Semantically_Disentangled_Unified_Model_for_Multi_category_3D_Anomaly_Detection.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SeDiR
+	- datasets: Real3D-AD, Anomaly-ShapeNet
+- [[obsidian-vault/analysis/CVPR_2026/AdvFM_Lookahead_Flow_Matching_Velocity_Field_Attacks_for_Imperceptible_and_Transferable_Adversarial_Examples.md|AdvFM: Lookahead Flow-Matching Velocity-Field Attacks for Imperceptible and Transferable Adversarial Examples (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AdvFM_Lookahead_Flow_Matching_Velocity_Field_Attacks_for_Imperceptible_and_Transferable_Adversarial_Examples.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: AdvFM (Lookahead Flow-Matching Velocity-Field Attack)
+	- datasets: ImageNet, 对抗净化防御 NRP, 对抗净化防御 Smooth
+- [[obsidian-vault/analysis/CVPR_2026/AGFT_Alignment_Guided_Fine_Tuning_for_Zero_Shot_Adversarial_Robustness_of_Vision_Language_Models.md|AGFT: Alignment-Guided Fine-Tuning for Zero-Shot Adversarial Robustness of Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AGFT_Alignment_Guided_Fine_Tuning_for_Zero_Shot_Adversarial_Robustness_of_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Alignment-Guided Fine-Tuning (AGFT)
+	- datasets: ε=1/255
+- [[obsidian-vault/analysis/CVPR_2026/AMusE_Audio_Visual_Benchmark_and_Alignment_Framework_for_Agentic_Multi_Speaker_Understanding.md|AMusE: Audio-Visual Benchmark and Alignment Framework for Agentic Multi-Speaker Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AMusE_Audio_Visual_Benchmark_and_Alignment_Framework_for_Agentic_Multi_Speaker_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: RAFT
+	- datasets: AMUSE Audio-Visual Dialogue Summarization, AMUSE Audio-Visual Speaker Association, AMUSE Next Speaker Prediction
+- [[obsidian-vault/analysis/CVPR_2026/An_Instance_Centric_Panoptic_Occupancy_Prediction_Benchmark_for_Autonomous_Driving.md|An Instance-Centric Panoptic Occupancy Prediction Benchmark for Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/An_Instance_Centric_Panoptic_Occupancy_Prediction_Benchmark_for_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: 网格驱动的全景占用生成框架（ADMesh 与 CarlaOcc）
+	- datasets: Occupancy Dataset Quality, Panoptic Occupancy Prediction on CarlaOcc, Semantic Occupancy Prediction on CarlaOcc
+- [[obsidian-vault/analysis/CVPR_2026/AsymLoc_Towards_Asymmetric_Feature_Matching_for_Efficient_Visual_Localization.md|AsymLoc: Towards Asymmetric Feature Matching for Efficient Visual Localization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AsymLoc_Towards_Asymmetric_Feature_Matching_for_Efficient_Visual_Localization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/CVPR_2026/AVATAR_Reinforcement_Learning_to_See_Hear_and_Reason_Over_Video.md|AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AVATAR_Reinforcement_Learning_to_See_Hear_and_Reason_Over_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: AVATAR (Audio-Video Agent for Alignment and Reasoning)
+	- datasets: OmniBench, Video-Holmes, MMVU
+- [[obsidian-vault/analysis/CVPR_2026/BarbieGait_An_Identity_Consistent_Synthetic_Human_Dataset_with_Versatile_Cloth_Changing_for_Gait_Recognition.md|BarbieGait: An Identity-Consistent Synthetic Human Dataset with Versatile Cloth-Changing for Gait Recognition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/BarbieGait_An_Identity_Consistent_Synthetic_Human_Dataset_with_Versatile_Cloth_Changing_for_Gait_Recognition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GaitCLIF (Gait-oriented CLoth-Invariant Feature)
+	- datasets: BarbieGait, CCPG, SUSTech1K
+- [[obsidian-vault/analysis/CVPR_2026/Black_box_Membership_Inference_Attacks_on_the_Pre_training_Data_of_Image_generation_Models.md|Black-box Membership Inference Attacks on the Pre-training Data of Image-generation Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Black_box_Membership_Inference_Attacks_on_the_Pre_training_Data_of_Image_generation_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: SD-MIA
+	- datasets: Stable Diffusion v1-2, Stable Diffusion v3.5, Stable Diffusion v1-5
+- [[obsidian-vault/analysis/CVPR_2026/CASR_A_Robust_Cyclic_Framework_for_Arbitrary_Large_Scale_Super_Resolution_with_Distribution_Alignment_and_Self_Similarity_Awareness.md|CASR: A Robust Cyclic Framework for Arbitrary Large-Scale Super-Resolution with Distribution Alignment and Self-Similarity Awareness (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CASR_A_Robust_Cyclic_Framework_for_Arbitrary_Large_Scale_Super_Resolution_with_Distribution_Alignment_and_Self_Similarity_Awareness.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: CASR
+	- datasets: DIV8K synthetic, RealSR, CelebA-HQ
+- [[obsidian-vault/analysis/CVPR_2026/Chorus_Multi_Teacher_Pretraining_for_Holistic_3D_Gaussian_Scene_Encoding.md|Chorus: Multi-Teacher Pretraining for Holistic 3D Gaussian Scene Encoding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Chorus_Multi_Teacher_Pretraining_for_Holistic_3D_Gaussian_Scene_Encoding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Chorus
+	- datasets: ScanNet200, Matterport3D, ScanNet
+- [[obsidian-vault/analysis/CVPR_2026/Copy_Transform_Paste_Zero_Shot_Object_Object_Alignment_Guided_by_Vision_Language_and_Geometric_Constraints.md|Copy-Transform-Paste: Zero-Shot Object-Object Alignment Guided by Vision-Language and Geometric Constraints (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Copy_Transform_Paste_Zero_Shot_Object_Object_Alignment_Guided_by_Vision_Language_and_Geometric_Constraints.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Copy-Transform-Paste (CTP)
+	- datasets: OOA Benchmark, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Cross_Axis_Feature_Fusion_with_Joint_Wise_Motion_Difference_Prediction_for_Text_Based_3D_Human_Motion_Editing.md|Cross-Axis Feature Fusion with Joint-Wise Motion Difference Prediction for Text-Based 3D Human Motion Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Cross_Axis_Feature_Fusion_with_Joint_Wise_Motion_Difference_Prediction_for_Text_Based_3D_Human_Motion_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Cross-Axis Feature Fusion with Joint-Wise Motion Difference Prediction
+	- datasets: MotionFix
+- [[obsidian-vault/analysis/CVPR_2026/Cross_Hand_Latent_Representation_for_Vision_Language_Action_Models.md|Cross-Hand Latent Representation for Vision-Language-Action Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Cross_Hand_Latent_Representation_for_Vision_Language_Action_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: XL-VLA
+	- datasets: 多灵巧手多任务, G1 人形机器人
+- [[obsidian-vault/analysis/CVPR_2026/CrossHOI_Learning_Cross_View_Representations_for_Monocular_3D_Human_Object_Interaction_Reconstruction.md|CrossHOI: Learning Cross-View Representations for Monocular 3D Human-Object Interaction Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CrossHOI_Learning_Cross_View_Representations_for_Monocular_3D_Human_Object_Interaction_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: CrossHOI
+	- datasets: BEHAVE, InterCap
+- [[obsidian-vault/analysis/CVPR_2026/D2_FOSA_Dual_Diffusion_Guided_EEG_to_Image_Reconstruction_with_Frequency_Oriented_Semantic_Alignment.md|D$^2$-FOSA: Dual-Diffusion Guided EEG-to-Image Reconstruction with Frequency-Oriented Semantic Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/D_2_FOSA_Dual_Diffusion_Guided_EEG_to_Image_Reconstruction_with_Frequency_Oriented_Semantic_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: D2-FOSA
+	- datasets: THINGS-EEG, THINGS-MEG, EEGImageNet
+- [[obsidian-vault/analysis/CVPR_2026/DA_VAE_Plug_in_Latent_Compression_for_Diffusion_via_Detail_Alignment.md|DA-VAE: Plug-in Latent Compression for Diffusion via Detail Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DA_VAE_Plug_in_Latent_Compression_for_Diffusion_via_Detail_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DA-VAE (Detail-Aligned VAE)
+	- datasets: ImageNet 512×512 class-conditional generation, MJHQ-30K text-to-image, ImageNet 512×512 reconstruction
+- [[obsidian-vault/analysis/CVPR_2026/Differentially_Private_2D_Human_Pose_Estimation.md|Differentially Private 2D Human Pose Estimation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Differentially_Private_2D_Human_Pose_Estimation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Feature-Projective DP-SGD
+	- datasets: MPII, HumanART
+- [[obsidian-vault/analysis/CVPR_2026/Diffusion_Based_sRGB_Real_Noise_Generation_via_Prompt_Driven_Noise_Representation_Learning.md|Diffusion-Based sRGB Real Noise Generation via Prompt-Driven Noise Representation Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Diffusion_Based_sRGB_Real_Noise_Generation_via_Prompt_Driven_Noise_Representation_Learning.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: PNG
+	- datasets: SIDD validation, SIDD-Benchmark, PolyU
+- [[obsidian-vault/analysis/CVPR_2026/DisCa_Accelerating_Video_Diffusion_Transformers_with_Distillation_Compatible_Learnable_Feature_Caching.md|DisCa: Accelerating Video Diffusion Transformers with Distillation-Compatible Learnable Feature Caching (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DisCa_Accelerating_Video_Diffusion_Transformers_with_Distillation_Compatible_Learnable_Feature_Caching.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Distillation-Compatible Learnable Feature Caching (DisCa)
+	- datasets: HunyuanVideo 1.0 on VBench
+- [[obsidian-vault/analysis/CVPR_2026/DMAligner_Enhancing_Image_Alignment_via_Diffusion_Model_Based_View_Synthesis.md|DMAligner: Enhancing Image Alignment via Diffusion Model Based View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DMAligner_Enhancing_Image_Alignment_via_Diffusion_Model_Based_View_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DMAligner
+	- datasets: DSIA, Sintel, DAVIS
+- [[obsidian-vault/analysis/CVPR_2026/Drive_My_Way_Preference_Alignment_of_Vision_Language_Action_Model_for_Personalized_Driving.md|Drive My Way: Preference Alignment of Vision-Language-Action Model for Personalized Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Drive_My_Way_Preference_Alignment_of_Vision_Language_Action_Model_for_Personalized_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Drive My Way (DMW)
+	- datasets: Bench2Drive, Personalized Driving Dataset, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Dual_level_Adapter_Boosting_Prompt_free_Curvilinear_Structure_Segmentation.md|Dual-level Adapter Boosting Prompt-free Curvilinear Structure Segmentation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Dual_level_Adapter_Boosting_Prompt_free_Curvilinear_Structure_Segmentation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: SACM (Segment Anything Curve Model)
+	- datasets: DRIVE, CHASEDB1, DCA1
+- [[obsidian-vault/analysis/CVPR_2026/EditCtrl_Disentangled_Local_and_Global_Control_for_Real_Time_Generative_Video_Editing.md|EditCtrl: Disentangled Local and Global Control for Real-Time Generative Video Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EditCtrl_Disentangled_Local_and_Global_Control_for_Real_Time_Generative_Video_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: EditCtrl
+	- datasets: VPBench-Edit, VPBench-Inp
+- [[obsidian-vault/analysis/CVPR_2026/EfficientVPR_Toward_Efficient_Visual_Place_Recognition_via_Scene_Aware_Prompt_Tuning_and_Adaptive_Feature_Enhancement.md|EfficientVPR: Toward Efficient Visual Place Recognition via Scene-Aware Prompt Tuning and Adaptive Feature Enhancement (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EfficientVPR_Toward_Efficient_Visual_Place_Recognition_via_Scene_Aware_Prompt_Tuning_and_Adaptive_Feature_Enhancement.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: EfficientVPR
+	- datasets: Pitts250k-test, MSLS-val, AmsterTime
+- [[obsidian-vault/analysis/CVPR_2026/Energy_GS_Image_Energy_guided_Pose_Alignment_Gaussian_Splatting_with_redesigned_pose_gradient_flow.md|Energy-GS: Image Energy-guided Pose Alignment Gaussian Splatting with redesigned pose gradient flow (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Energy_GS_Image_Energy_guided_Pose_Alignment_Gaussian_Splatting_with_redesigned_pose_gradient_flow.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Energy-GS
+	- datasets: Synthetic NeRF
+- [[obsidian-vault/analysis/CVPR_2026/Evo_1_Lightweight_Vision_Language_Action_Model_with_Preserved_Semantic_Alignment.md|Evo-1: Lightweight Vision-Language-Action Model with Preserved Semantic Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Evo_1_Lightweight_Vision_Language_Action_Model_with_Preserved_Semantic_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Evo-1
+	- datasets: Meta-World, LIBERO, RoboTwin
+- [[obsidian-vault/analysis/CVPR_2026/Experience_Transfer_for_Multimodal_LLM_Agents_in_Minecraft_Game.md|Experience Transfer for Multimodal LLM Agents in Minecraft Game (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Experience_Transfer_for_Multimodal_LLM_Agents_in_Minecraft_Game.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Echo
+	- datasets: Recipe, Object Unlocking Progress, Continuous Learning
+- [[obsidian-vault/analysis/CVPR_2026/Exploring_Spatiotemporal_Feature_Propagation_for_Video_Level_Compressive_Spectral_Reconstruction_Dataset_Model_and_Benchmark.md|Exploring Spatiotemporal Feature Propagation for Video-Level Compressive Spectral Reconstruction: Dataset, Model and Benchmark (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Exploring_Spatiotemporal_Feature_Propagation_for_Video_Level_Compressive_Spectral_Reconstruction_Dataset_Model_and_Benchmark.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: PG-SVRT
+	- datasets: KAIST, DynaSpec
+- [[obsidian-vault/analysis/CVPR_2026/FACE_A_Face_based_Autoregressive_Representation_for_High_Fidelity_and_Efficient_Mesh_Generation.md|FACE: A Face-based Autoregressive Representation for High-Fidelity and Efficient Mesh Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FACE_A_Face_based_Autoregressive_Representation_for_High_Fidelity_and_Efficient_Mesh_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: FACE
+	- datasets: Objaverse, Toys4K, Famous
+- [[obsidian-vault/analysis/CVPR_2026/Faithful_Contouring_Near_Lossless_3D_Voxel_Representation_Free_from_Iso_surface.md|Faithful Contouring: Near-Lossless 3D Voxel Representation Free from Iso-surface (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Faithful_Contouring_Near_Lossless_3D_Voxel_Representation_Free_from_Iso_surface.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Faithful Contouring (FaithC)
+	- datasets: Representation fidelity benchmark, Mesh reconstruction on Dora benchmark
+- [[obsidian-vault/analysis/CVPR_2026/FILTR_Extracting_Topological_Features_from_Pretrained_3D_Models.md|FILTR: Extracting Topological Features from Pretrained 3D Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FILTR_Extracting_Topological_Features_from_Pretrained_3D_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: FILTR (Filtration Transformer)
+	- datasets: DONUT, ModelNet40, ABC
+- [[obsidian-vault/analysis/CVPR_2026/FlowMotion_Training_Free_Flow_Guidance_for_Video_Motion_Transfer.md|FlowMotion: Training-Free Flow Guidance for Video Motion Transfer (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FlowMotion_Training_Free_Flow_Guidance_for_Video_Motion_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: FlowMotion
+- [[obsidian-vault/analysis/CVPR_2026/FoleyDesigner_Immersive_Stereo_Foley_Generation_with_Precise_Spatio_Temporal_Alignment_for_Film_Clips.md|FoleyDesigner: Immersive Stereo Foley Generation with Precise Spatio-Temporal Alignment for Film Clips (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FoleyDesigner_Immersive_Stereo_Foley_Generation_with_Precise_Spatio_Temporal_Alignment_for_Film_Clips.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: FoleyDesigner
+	- datasets: FilmStereo, Film Clips
+- [[obsidian-vault/analysis/CVPR_2026/Forecast_the_Principal_Stabilize_the_Residual_Subspace_Aware_Feature_Caching_for_Diffusion_Transformers.md|Forecast the Principal, Stabilize the Residual: Subspace-Aware Feature Caching for Diffusion Transformers (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Forecast_the_Principal_Stabilize_the_Residual_Subspace_Aware_Feature_Caching_for_Diffusion_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SVD-Cache
+	- datasets: FLUX.1-dev, HunyuanVideo
+- [[obsidian-vault/analysis/CVPR_2026/FreqEdit_Preserving_High_Frequency_Features_for_Robust_Multi_Turn_Image_Editing.md|FreqEdit: Preserving High-Frequency Features for Robust Multi-Turn Image Editing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FreqEdit_Preserving_High_Frequency_Features_for_Robust_Multi_Turn_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: FreqEdit
+	- datasets: Multi-turn editing
+- [[obsidian-vault/analysis/CVPR_2026/From_2D_Alignment_to_3D_Plausibility_Unifying_Heterogeneous_2D_Priors_and_Penetration_Free_Diffusion_for_Occlusion_Robust_Two_Hand_Reconstruction.md|From 2D Alignment to 3D Plausibility: Unifying Heterogeneous 2D Priors and Penetration-Free Diffusion for Occlusion-Robust Two-Hand Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/From_2D_Alignment_to_3D_Plausibility_Unifying_Heterogeneous_2D_Priors_and_Penetration_Free_Diffusion_for_Occlusion_Robust_Two_Hand_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: A2P (From 2D Alignment to 3D Plausibility)
+	- datasets: InterHand2.6M
+- [[obsidian-vault/analysis/CVPR_2026/From_None_to_All_Self_Supervised_3D_Reconstruction_via_Novel_View_Synthesis.md|From None to All: Self-Supervised 3D Reconstruction via Novel View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/From_None_to_All_Self_Supervised_3D_Reconstruction_via_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: NAS3R
+	- datasets: RE10K, BlendedMVS, DL3DV
+- [[obsidian-vault/analysis/CVPR_2026/GA_VLN_Geometry_Aware_BEV_Representation_for_Efficient_Vision_Language_Navigation.md|GA-VLN: Geometry-Aware BEV Representation for Efficient Vision-Language Navigation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GA_VLN_Geometry_Aware_BEV_Representation_for_Efficient_Vision_Language_Navigation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GA-VLN
+	- datasets: R2R-CE val unseen, RxR-CE val unseen, NavRAG-CE val unseen
+- [[obsidian-vault/analysis/CVPR_2026/GauMVC_Generative_Decoupled_Gaussian_Representation_for_Human_centric_Multi_view_Video_Compression.md|GauMVC: Generative Decoupled Gaussian Representation for Human-centric Multi-view Video Compression (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GauMVC_Generative_Decoupled_Gaussian_Representation_for_Human_centric_Multi_view_Video_Compression.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GauMVC
+	- datasets: ENerf-Outdoor, AvatarRex
+- [[obsidian-vault/analysis/CVPR_2026/GaussianVision_Vision_Language_Alignment_from_Compressed_Image_Representations_using_2D_Gaussian_Splatting.md|GaussianVision: Vision-Language Alignment from Compressed Image Representations using 2D Gaussian Splatting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GaussianVision_Vision_Language_Alignment_from_Compressed_Image_Representations_using_2D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GaussianVision (2DGS-adapted CLIP)
+	- datasets: CLIP Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/Generative_Adversarial_Perturbations_with_Cross_paradigm_Transferability_on_Localized_Crowd_Counting.md|Generative Adversarial Perturbations with Cross-paradigm Transferability on Localized Crowd Counting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Generative_Adversarial_Perturbations_with_Cross_paradigm_Transferability_on_Localized_Crowd_Counting.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: CrowdGen (跨范式生成对抗扰动框架)
+	- datasets: SHHA, SHHA & UCF-QNRF
+- [[obsidian-vault/analysis/CVPR_2026/Generative_Video_Compression_with_One_Dimensional_Latent_Representation.md|Generative Video Compression with One-Dimensional Latent Representation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Generative_Video_Compression_with_One_Dimensional_Latent_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: GVC1D
+	- datasets: HEVC-B
+- [[obsidian-vault/analysis/CVPR_2026/GM_R2_Generative_Matching_Learning_for_Unsupervised_Geometric_Representation_and_Registration.md|GM-R^2: Generative Matching Learning for Unsupervised Geometric Representation and Registration (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GM_R_2_Generative_Matching_Learning_for_Unsupervised_Geometric_Representation_and_Registration.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GM-R^2
+	- datasets: ScanNet
+- [[obsidian-vault/analysis/CVPR_2026/GS_CLIP_Zero_shot_3D_Anomaly_Detection_by_Geometry_Aware_Prompt_and_Synergistic_View_Representation_Learning.md|GS-CLIP: Zero-shot 3D Anomaly Detection by Geometry-Aware Prompt and Synergistic View Representation Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GS_CLIP_Zero_shot_3D_Anomaly_Detection_by_Geometry_Aware_Prompt_and_Synergistic_View_Representation_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GS-CLIP
+	- datasets: MVTec3D-AD, Eyecandies
+- [[obsidian-vault/analysis/CVPR_2026/GT_SVJ_Generative_Transformer_Based_Self_Supervised_Video_Judge_For_Efficient_Video_Reward_Modeling.md|GT-SVJ: Generative-Transformer-Based Self-Supervised Video Judge For Efficient Video Reward Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GT_SVJ_Generative_Transformer_Based_Self_Supervised_Video_Judge_For_Efficient_Video_Reward_Modeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GT-SVJ
+	- datasets: GenAI-Bench, MonteBench, VideoReward-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Guiding_Diffusion_based_Reconstruction_with_Contrastive_Signals_for_Balanced_Visual_Representation.md|Guiding Diffusion-based Reconstruction with Contrastive Signals for Balanced Visual Representation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Guiding_Diffusion_based_Reconstruction_with_Contrastive_Signals_for_Balanced_Visual_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Diffusion Contrastive Reconstruction (DCR)
+	- datasets: MMVP-VLM, Zero-shot Classification
+- [[obsidian-vault/analysis/CVPR_2026/H2A2_Homogeneity_Aware_and_Heterogeneity_Aware_Feature_Perception_for_Unified_Indoor_3D_Object_Detection.md|H^2A^2: Homogeneity-Aware and Heterogeneity-Aware Feature Perception for Unified Indoor 3D Object Detection (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/H_2A_2_Homogeneity_Aware_and_Heterogeneity_Aware_Feature_Perception_for_Unified_Indoor_3D_Object_Detection.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: H^2A^2
+	- datasets: ScanNet v2, SUN RGB-D, S3DIS
+- [[obsidian-vault/analysis/CVPR_2026/Hear_What_You_See_Video_to_Audio_Generation_with_Diffusion_Transformer_and_Semantic_Temporal_Alignment_Ranked_Direct_Preference_Optimization.md|Hear What You See: Video-to-Audio Generation with Diffusion Transformer and Semantic-Temporal Alignment-Ranked Direct Preference Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Hear_What_You_See_Video_to_Audio_Generation_with_Diffusion_Transformer_and_Semantic_Temporal_Alignment_Ranked_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VisioSonic (with STAR-DPO)
+	- datasets: VGGSound test set, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Hierarchical_Enhancement_of_Semantic_Priors_for_Disentangled_Text_Driven_Motion_Generation.md|Hierarchical Enhancement of Semantic Priors for Disentangled Text-Driven Motion Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Hierarchical_Enhancement_of_Semantic_Priors_for_Disentangled_Text_Driven_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: HESP
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/CVPR_2026/Hierarchical_Visual_Relocalization_with_Nearest_View_Synthesis_from_Feature_Gaussian_Splatting.md|Hierarchical Visual Relocalization with Nearest View Synthesis from Feature Gaussian Splatting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Hierarchical_Visual_Relocalization_with_Nearest_View_Synthesis_from_Feature_Gaussian_Splatting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SplatHLoc
+	- datasets: Cambridge Landmarks
+- [[obsidian-vault/analysis/CVPR_2026/HiF_VLA_Hindsight_Insight_and_Foresight_through_Motion_Representation_for_Vision_Language_Action_Models.md|HiF-VLA: Hindsight, Insight and Foresight through Motion Representation for Vision-Language-Action Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/HiF_VLA_Hindsight_Insight_and_Foresight_through_Motion_Representation_for_Vision_Language_Action_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: HiF-VLA
+	- datasets: LIBERO-Long, CALVIN ABC-D, LIBERO 四套件平均
+- [[obsidian-vault/analysis/CVPR_2026/HiFi_BRep_High_Fidelity_Latent_Representation_for_Robust_B_Rep_Generation.md|HiFi-BRep: High-Fidelity Latent Representation for Robust B-Rep Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/HiFi_BRep_High_Fidelity_Latent_Representation_for_Robust_B_Rep_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: HiFi-BRep
+	- datasets: DeepCAD, ABC
+- [[obsidian-vault/analysis/CVPR_2026/IAFMNet_Information_Aware_Feature_Modulation_for_Efficient_Super_Resolution.md|IAFMNet: Information-Aware Feature Modulation for Efficient Super-Resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IAFMNet_Information_Aware_Feature_Modulation_for_Efficient_Super_Resolution.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: IAFMNet
+	- datasets: Urban100, Manga109
+- [[obsidian-vault/analysis/CVPR_2026/InstAP_Instance_Aware_Vision_Language_Pre_Train_for_Spatial_Temporal_Understanding.md|InstAP: Instance-Aware Vision-Language Pre-Train for Spatial-Temporal Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/InstAP_Instance_Aware_Vision_Language_Pre_Train_for_Spatial_Temporal_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: InstAP
+	- datasets: InstVL-10K instance, InstVL-1K instance, InstVL-1K global
+- [[obsidian-vault/analysis/CVPR_2026/IVAAN_Instance_level_Vision_Language_Alignment_via_Attribute_Guided_Text_Prompts_Generation_for_Nuclei_Analysis.md|IVAAN: Instance-level Vision-Language Alignment via Attribute-Guided Text Prompts Generation for Nuclei Analysis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IVAAN_Instance_level_Vision_Language_Alignment_via_Attribute_Guided_Text_Prompts_Generation_for_Nuclei_Analysis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: IVAAN
+	- datasets: PanNuke, MoNuSeg, CPM17
+- [[obsidian-vault/analysis/CVPR_2026/Large_scale_Codec_Avatars_The_Unreasonable_Effectiveness_of_Large_scale_Avatar_Pretraining.md|Large-scale Codec Avatars: The Unreasonable Effectiveness of Large-scale Avatar Pretraining (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Large_scale_Codec_Avatars_The_Unreasonable_Effectiveness_of_Large_scale_Avatar_Pretraining.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Large-scale Codec Avatars (LCA)
+	- datasets: Capture-Studio, In-the-Wild, Multiview
+- [[obsidian-vault/analysis/CVPR_2026/LASER_Layer_wise_Scale_Alignment_for_Training_Free_Streaming_4D_Reconstruction.md|LASER: Layer-wise Scale Alignment for Training-Free Streaming 4D Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LASER_Layer_wise_Scale_Alignment_for_Training_Free_Streaming_4D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: LASER
+	- datasets: Sintel, Bonn, KITTI
+- [[obsidian-vault/analysis/CVPR_2026/Layered_4D_Rotor_Gaussian_Splatting_A_Compressed_Representation_for_Long_Dynamic_Scenes.md|Layered 4D-Rotor Gaussian Splatting: A Compressed Representation for Long Dynamic Scenes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Layered_4D_Rotor_Gaussian_Splatting_A_Compressed_Representation_for_Long_Dynamic_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Layered 4D-Rotor Gaussian Splatting (L4DRotorGS)
+	- datasets: N3DV, SelfCap, N3DV Flame Salmon
+- [[obsidian-vault/analysis/CVPR_2026/Learning_Compact_3D_Representations_from_Feed_Forward_Novel_View_Synthesis.md|Learning Compact 3D Representations from Feed-Forward Novel View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learning_Compact_3D_Representations_from_Feed_Forward_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: C3G (C3G-G 和 C3G-F)
+	- datasets: ScanNet, N/A
+- [[obsidian-vault/analysis/CVPR_2026/Learning_Effective_Sign_Features_without_Text_for_Gloss_free_Sign_Language_Translation.md|Learning Effective Sign Features without Text for Gloss-free Sign Language Translation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learning_Effective_Sign_Features_without_Text_for_Gloss_free_Sign_Language_Translation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: SignDINO
+	- datasets: PHOENIX14T, How2Sign
+- [[obsidian-vault/analysis/CVPR_2026/Learning_Explicit_Continuous_Motion_Representation_for_Dynamic_Gaussian_Splatting_from_Monocular_Videos.md|Learning Explicit Continuous Motion Representation for Dynamic Gaussian Splatting from Monocular Videos (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learning_Explicit_Continuous_Motion_Representation_for_Dynamic_Gaussian_Splatting_from_Monocular_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SE3-BSplineGS
+	- datasets: iPhone, NVIDIA
+- [[obsidian-vault/analysis/CVPR_2026/Learning_Latent_Concepts_for_Detecting_Out_of_Distribution_Objects.md|Learning Latent Concepts for Detecting Out-of-Distribution Objects (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learning_Latent_Concepts_for_Detecting_Out_of_Distribution_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: UNO-Adapter
+	- datasets: PASCAL-VOC, BDD-100K, ImageNet-200
+- [[obsidian-vault/analysis/CVPR_2026/Learning_Long_term_Motion_Embeddings_for_Efficient_Kinematics_Generation.md|Learning Long-term Motion Embeddings for Efficient Kinematics Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learning_Long_term_Motion_Embeddings_for_Efficient_Kinematics_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Long-term Motion Embedding (LME) for Kinematics Generation
+	- datasets: LIBERO, Video Motion, Open-Domain Poked Motion
+- [[obsidian-vault/analysis/CVPR_2026/Let_Your_Image_Move_with_Your_Motion_Implicit_Multi_Object_Multi_Motion_Transfer.md|Let Your Image Move with Your Motion! -- Implicit Multi-Object Multi-Motion Transfer (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Let_Your_Image_Move_with_Your_Motion_Implicit_Multi_Object_Multi_Motion_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: FlexiMMT
+	- datasets: Custom evaluation set
+- [[obsidian-vault/analysis/CVPR_2026/Mantis_A_Versatile_Vision_Language_Action_Model_with_Disentangled_Visual_Foresight.md|Mantis: A Versatile Vision-Language-Action Model with Disentangled Visual Foresight (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mantis_A_Versatile_Vision_Language_Action_Model_with_Disentangled_Visual_Foresight.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Mantis
+	- datasets: LIBERO, LIBERO Spatial, LIBERO Object
+- [[obsidian-vault/analysis/CVPR_2026/MAPS_Preserving_Vision_Language_Representations_via_Module_Wise_Proximity_Scheduling_for_Better_Vision_Language_Action_Generalization.md|MAPS: Preserving Vision-Language Representations via Module-Wise Proximity Scheduling for Better Vision-Language-Action Generalization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MAPS_Preserving_Vision_Language_Representations_via_Module_Wise_Proximity_Scheduling_for_Better_Vision_Language_Action_Generalization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MAPS (Module-Wise Proximity Scheduling)
+	- datasets: SimplerEnv, LIBERO, Real-world Franka
+- [[obsidian-vault/analysis/CVPR_2026/Masked_Diffusion_Autoencoders_for_3D_Medical_Vision_Representation_Learning.md|Masked-Diffusion Autoencoders for 3D Medical Vision Representation Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Masked_Diffusion_Autoencoders_for_3D_Medical_Vision_Representation_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Masked-Diffusion Autoencoders (MDAE)
+	- datasets: In-distribution, Cross-modal generalization, BraTS18 tumor grading
+- [[obsidian-vault/analysis/CVPR_2026/MaxMark_High_Capacity_Diffusion_Native_Watermarking_via_Robust_and_Invertible_Latent_Embedding.md|MaxMark: High-Capacity Diffusion-Native Watermarking via Robust and Invertible Latent Embedding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MaxMark_High_Capacity_Diffusion_Native_Watermarking_via_Robust_and_Invertible_Latent_Embedding.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: MaxMark
+	- datasets: Stable Diffusion v1.5, multiple payloads
+- [[obsidian-vault/analysis/CVPR_2026/MedCLIPSeg_Probabilistic_Vision_Language_Adaptation_for_Data_Efficient_and_Generalizable_Medical_Image_Segmentation.md|MedCLIPSeg: Probabilistic Vision-Language Adaptation for Data-Efficient and Generalizable Medical Image Segmentation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MedCLIPSeg_Probabilistic_Vision_Language_Adaptation_for_Data_Efficient_and_Generalizable_Medical_Image_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MedCLIPSeg
+- [[obsidian-vault/analysis/CVPR_2026/MimiCAT_Mimic_with_Correspondence_Aware_Cascade_Transformer_for_Category_Free_3D_Pose_Transfer.md|MimiCAT: Mimic with Correspondence-Aware Cascade-Transformer for Category-Free 3D Pose Transfer (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MimiCAT_Mimic_with_Correspondence_Aware_Cascade_Transformer_for_Category_Free_3D_Pose_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MimiCAT
+	- datasets: Humanoid-to-Humanoid, Cross-Category Transfer, User Study
+- [[obsidian-vault/analysis/CVPR_2026/Mixture_of_Experts_based_Feature_Decoupling_for_Open_Vocabulary_Scene_Graph_Generation.md|Mixture-of-Experts based Feature Decoupling for Open Vocabulary Scene Graph Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mixture_of_Experts_based_Feature_Decoupling_for_Open_Vocabulary_Scene_Graph_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MoE-FD
+	- datasets: Visual Genome
+- [[obsidian-vault/analysis/CVPR_2026/MoBind_Motion_Binding_for_Fine_Grained_IMU_Video_Pose_Alignment.md|MoBind: Motion Binding for Fine-Grained IMU-Video Pose Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MoBind_Motion_Binding_for_Fine_Grained_IMU_Video_Pose_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MoBind
+	- datasets: mRi, TotalCapture, EgoHumans
+- [[obsidian-vault/analysis/CVPR_2026/Mocap_2_to_3_Multi_view_Lifting_for_Monocular_Motion_Recovery_with_2D_Pretraining.md|Mocap-2-to-3: Multi-view Lifting for Monocular Motion Recovery with 2D Pretraining (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mocap_2_to_3_Multi_view_Lifting_for_Monocular_Motion_Recovery_with_2D_Pretraining.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Mocap-2-to-3
+	- datasets: RICH
+- [[obsidian-vault/analysis/CVPR_2026/MorphSeek_Fine_grained_Latent_Representation_Level_Policy_Optimization_for_Deformable_Image_Registration.md|MorphSeek: Fine-grained Latent Representation-Level Policy Optimization for Deformable Image Registration (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MorphSeek_Fine_grained_Latent_Representation_Level_Policy_Optimization_for_Deformable_Image_Registration.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: MorphSeek
+	- datasets: OASIS, LiTS, Abdomen MR←CT
+- [[obsidian-vault/analysis/CVPR_2026/Multi_level_Causal_LLM_based_Text_to_Motion_Generation_with_Human_Alignment.md|Multi-level Causal LLM-based Text-to-Motion Generation with Human Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Multi_level_Causal_LLM_based_Text_to_Motion_Generation_with_Human_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MoTiGA
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2026/MultiAnimate_Pose_Guided_Image_Animation_Made_Extensible.md|MultiAnimate: Pose-Guided Image Animation Made Extensible (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MultiAnimate_Pose_Guided_Image_Animation_Made_Extensible.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MultiAnimate
+	- datasets: Swing Dance, Gen-dataset, Unseen dance videos
+- [[obsidian-vault/analysis/CVPR_2026/MusicInfuser_Making_Video_Diffusion_Listen_and_Dance.md|MusicInfuser: Making Video Diffusion Listen and Dance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MusicInfuser_Making_Video_Diffusion_Listen_and_Dance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MusicInfuser
+	- datasets: AIST++ Dance Quality, User Study / Prompt Alignment
+- [[obsidian-vault/analysis/CVPR_2026/Neighbor_GRPO_Contrastive_ODE_Policy_Optimization_Aligns_Flow_Models.md|Neighbor GRPO: Contrastive ODE Policy Optimization Aligns Flow Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Neighbor_GRPO_Contrastive_ODE_Policy_Optimization_Aligns_Flow_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: Neighbor GRPO
+	- datasets: HPDv2 测试集
+- [[obsidian-vault/analysis/CVPR_2026/No_Way_To_Steal_My_Face_Proactive_Defense_Against_Identity_Preserving_Personalized_Generation.md|No Way To Steal My Face: Proactive Defense Against Identity-Preserving Personalized Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/No_Way_To_Steal_My_Face_Proactive_Defense_Against_Identity_Preserving_Personalized_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: IDGuardian
+	- datasets: IP-Adapter, Protected Image Quality on VGGFace2
+- [[obsidian-vault/analysis/CVPR_2026/One_Token_Two_Fates_A_Unified_Framework_via_Vision_Token_Manipulation_Against_MLLMs_Hallucination.md|One Token, Two Fates: A Unified Framework via Vision Token Manipulation Against MLLMs Hallucination (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/One_Token_Two_Fates_A_Unified_Framework_via_Vision_Token_Manipulation_Against_MLLMs_Hallucination.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: 统一隐空间校准框架（Unified Latent Calibration，含 Synergistic Visual Calibration (SVC) 与 Causal Representation Calibration (CRC) 模块）
+	- datasets: POPE, Inference Efficiency, CHAIR
+- [[obsidian-vault/analysis/CVPR_2026/One_to_All_Animation_Alignment_Free_Character_Animation_and_Image_Pose_Transfer.md|One-to-All Animation: Alignment-Free Character Animation and Image Pose Transfer (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/One_to_All_Animation_Alignment_Free_Character_Animation_and_Image_Pose_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: One-to-All Animation
+	- datasets: TikTok, Cartoon, DeepFashion
+- [[obsidian-vault/analysis/CVPR_2026/Opening_the_Sim_to_Real_Door_for_Humanoid_Pixel_to_Action_Policy_Transfer.md|Opening the Sim-to-Real Door for Humanoid Pixel-to-Action Policy Transfer (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Opening_the_Sim_to_Real_Door_for_Humanoid_Pixel_to_Action_Policy_Transfer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DoorMan
+	- datasets: Omniverse simulated door-opening tasks, real-world unseen-door trials
+- [[obsidian-vault/analysis/CVPR_2026/Pano3DComposer_Feed_Forward_Compositional_3D_Scene_Generation_from_Single_Panoramic_Image.md|Pano3DComposer: Feed-Forward Compositional 3D Scene Generation from Single Panoramic Image (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Pano3DComposer_Feed_Forward_Compositional_3D_Scene_Generation_from_Single_Panoramic_Image.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Pano3DComposer
+- [[obsidian-vault/analysis/CVPR_2026/PAVAS_Physics_Aware_Video_to_Audio_Synthesis.md|PAVAS: Physics-Aware Video-to-Audio Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PAVAS_Physics_Aware_Video_to_Audio_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: PAVAS (Physics-Aware Video-to-Audio Synthesis)
+	- datasets: VGGSound, VGG-Impact
+- [[obsidian-vault/analysis/CVPR_2026/PhysSkin_Real_Time_and_Generalizable_Physics_Based_Animation_via_Self_Supervised_Neural_Skinning.md|PhysSkin: Real-Time and Generalizable Physics-Based Animation via Self-Supervised Neural Skinning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PhysSkin_Real_Time_and_Generalizable_Physics_Based_Animation_via_Self_Supervised_Neural_Skinning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: PhysSkin
+	- datasets: RigNet, ShapeNet
+- [[obsidian-vault/analysis/CVPR_2026/Plant_Taxonomy_Meets_Plant_Counting_A_Fine_Grained_Taxonomic_Dataset_for_Counting_Hundreds_of_Plant_Species.md|Plant Taxonomy Meets Plant Counting: A Fine-Grained, Taxonomic Dataset for Counting Hundreds of Plant Species (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Plant_Taxonomy_Meets_Plant_Counting_A_Fine_Grained_Taxonomic_Dataset_for_Counting_Hundreds_of_Plant_Species.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: TPC-268 (大规模分类学植物计数数据集与基准)
+	- datasets: TPC-268 test set, Cross-dataset transfer FSC-147 → TPC-268
+- [[obsidian-vault/analysis/CVPR_2026/Point4Cast_Streaming_Dynamic_Scene_Reconstruction_and_Forecasting.md|Point4Cast: Streaming Dynamic Scene Reconstruction and Forecasting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Point4Cast_Streaming_Dynamic_Scene_Reconstruction_and_Forecasting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Point4Cast
+	- datasets: PointOdyssey, TAPVid-3D
+- [[obsidian-vault/analysis/CVPR_2026/PointAlign_Feature_Level_Alignment_Regularization_for_3D_Vision_Language_Models.md|PointAlign: Feature-Level Alignment Regularization for 3D Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PointAlign_Feature_Level_Alignment_Regularization_for_3D_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: PointAlign
+	- datasets: ModelNet40 + Objaverse, Objaverse 分类, Scan2Cap
+- [[obsidian-vault/analysis/CVPR_2026/Premier_Personalized_Preference_Modulation_with_Learnable_User_Embedding_in_Text_to_Image_Generation.md|Premier: Personalized Preference Modulation with Learnable User Embedding in Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Premier_Personalized_Preference_Modulation_with_Learnable_User_Embedding_in_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Premier
+	- datasets: PIP 数据集偏好对齐, 与 LoRA 个性化方案对比
+- [[obsidian-vault/analysis/CVPR_2026/PromptLoop_Plug_and_Play_Prompt_Refinement_via_Latent_Feedback_for_Diffusion_Model_Alignment.md|PromptLoop: Plug-and-Play Prompt Refinement via Latent Feedback for Diffusion Model Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PromptLoop_Plug_and_Play_Prompt_Refinement_via_Latent_Feedback_for_Diffusion_Model_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: PromptLoop
+	- datasets: SDXL + ImageReward, SD1.5 + ImageReward, SDXL + Diffusion-DPO + PromptLoop
+- [[obsidian-vault/analysis/CVPR_2026/ProPhy_Progressive_Physical_Alignment_for_Dynamic_World_Simulation.md|ProPhy: Progressive Physical Alignment for Dynamic World Simulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ProPhy_Progressive_Physical_Alignment_for_Dynamic_World_Simulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: ProPhy
+	- datasets: VideoPhy2, VBench
+- [[obsidian-vault/analysis/CVPR_2026/Proxy3D_Efficient_3D_Representations_for_Vision_Language_Models_via_Semantic_Clustering_and_Alignment.md|Proxy3D: Efficient 3D Representations for Vision-Language Models via Semantic Clustering and Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Proxy3D_Efficient_3D_Representations_for_Vision_Language_Models_via_Semantic_Clustering_and_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Proxy3D
+	- datasets: ScanRefer, VSI-Bench
+- [[obsidian-vault/analysis/CVPR_2026/PvP_Data_Efficient_Humanoid_Robot_Learning_with_Proprioceptive_Privileged_Contrastive_Representations.md|PvP: Data-Efficient Humanoid Robot Learning with Proprioceptive-Privileged Contrastive Representations (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PvP_Data_Efficient_Humanoid_Robot_Learning_with_Proprioceptive_Privileged_Contrastive_Representations.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: PvP
+	- datasets: LimX-Oli-31dof-Velocity, LimX-Oli-31dof-Mimic
+- [[obsidian-vault/analysis/CVPR_2026/RAISE_Requirement_Adaptive_Evolutionary_Refinement_for_Training_Free_Text_to_Image_Alignment.md|RAISE: Requirement-Adaptive Evolutionary Refinement for Training-Free Text-to-Image Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RAISE_Requirement_Adaptive_Evolutionary_Refinement_for_Training_Free_Text_to_Image_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: RAISE
+	- datasets: GenEval, DrawBench
+- [[obsidian-vault/analysis/CVPR_2026/RegFormer_Transferable_Relational_Grounding_for_Efficient_Weakly_Supervised_Human_Object_Interaction_Detection.md|RegFormer: Transferable Relational Grounding for Efficient Weakly-Supervised Human-Object Interaction Detection (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RegFormer_Transferable_Relational_Grounding_for_Efficient_Weakly_Supervised_Human_Object_Interaction_Detection.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: RegFormer (Relational Grounding Transformer)
+	- datasets: HICO-DET
+- [[obsidian-vault/analysis/CVPR_2026/Reliable_Policy_Transfer_for_Safety_Aware_End_to_End_Driving_with_Deep_Reinforcement_Learning.md|Reliable Policy Transfer for Safety-Aware End-to-End Driving with Deep Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Reliable_Policy_Transfer_for_Safety_Aware_End_to_End_Driving_with_Deep_Reinforcement_Learning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+	- methods: Unified Safety-Aware DRL Framework
+	- datasets: Town10HD
+- [[obsidian-vault/analysis/CVPR_2026/ReMoRa_Multimodal_Large_Language_Model_based_on_Refined_Motion_Representation_for_Long_Video_Understanding.md|ReMoRa: Multimodal Large Language Model based on Refined Motion Representation for Long-Video Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ReMoRa_Multimodal_Large_Language_Model_based_on_Refined_Motion_Representation_for_Long_Video_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: ReMoRa
+	- datasets: LongVideoBench, NExT-QA, MLVU
+- [[obsidian-vault/analysis/CVPR_2026/Rethinking_Camera_Choice_An_Empirical_Study_on_Fisheye_Camera_Properties_in_Robotic_Manipulation.md|Rethinking Camera Choice: An Empirical Study on Fisheye Camera Properties in Robotic Manipulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Rethinking_Camera_Choice_An_Empirical_Study_on_Fisheye_Camera_Properties_in_Robotic_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Random Scale Augmentation (RSA)
+	- datasets: Robomimic / MimicGen, Real-world Pick Cup task, Cross-camera transfer on six simulation tasks
+- [[obsidian-vault/analysis/CVPR_2026/Rethinking_Intermediate_Representation_for_VLM_based_Robot_Manipulation.md|Rethinking Intermediate Representation for VLM-based Robot Manipulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Rethinking_Intermediate_Representation_for_VLM_based_Robot_Manipulation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: SEAM (Semantic Assembly Representation)
+	- datasets: Insert the pen in holder, Recycle the battery, Pick up cup/bowl onto the dish
+- [[obsidian-vault/analysis/CVPR_2026/RHINO_Reconstructing_Human_Interactions_with_Novel_Objects_from_Monocular_Videos.md|RHINO: Reconstructing Human Interactions with Novel Objects from Monocular Videos (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RHINO_Reconstructing_Human_Interactions_with_Novel_Objects_from_Monocular_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: RHINO
+	- datasets: BenchRHINO
+- [[obsidian-vault/analysis/CVPR_2026/Saliency_Guided_Representation_with_Consistency_Policy_Learning_for_Visual_Unsupervised_Reinforcement_Learning.md|Saliency-Guided Representation with Consistency Policy Learning for Visual Unsupervised Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Saliency_Guided_Representation_with_Consistency_Policy_Learning_for_Visual_Unsupervised_Reinforcement_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SRCP (Saliency-Guided Representation with Consistency Policy Learning)
+	- datasets: ExORL Walker, ExORL Quadruped, ExORL Cheetah
+- [[obsidian-vault/analysis/CVPR_2026/Saliency_R1_Enforcing_Interpretable_and_Faithful_Vision_language_Reasoning_via_Saliency_map_Alignment_Reward.md|Saliency-R1: Enforcing Interpretable and Faithful Vision-language Reasoning via Saliency-map Alignment Reward (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Saliency_R1_Enforcing_Interpretable_and_Faithful_Vision_language_Reasoning_via_Saliency_map_Alignment_Reward.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Saliency-R1
+	- datasets: COCO Caption, OpenPSG, POPE
+- [[obsidian-vault/analysis/CVPR_2026/Sampling_Aware_Quantization_for_Diffusion_Models.md|Sampling-Aware Quantization for Diffusion Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Sampling_Aware_Quantization_for_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Sampling-Aware Quantization (SA-PTQ and SA-QLoRA)
+	- datasets: LSUN-Churches 256×256, LSUN-Bedroom 256×256, ImageNet 256×256
+- [[obsidian-vault/analysis/CVPR_2026/Selfi_Self_improving_Reconstruction_Engine_via_3D_Geometric_Feature_Alignment.md|Selfi: Self-improving Reconstruction Engine via 3D Geometric Feature Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Selfi_Self_improving_Reconstruction_Engine_via_3D_Geometric_Feature_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Selfi
+	- datasets: DL3DV-10K Short, RealEstate10K Short, RealEstate10K Two-View
+- [[obsidian-vault/analysis/CVPR_2026/SineProject_Machine_Unlearning_for_Stable_Vision_Language_Alignment.md|SineProject: Machine Unlearning for Stable Vision-Language Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SineProject_Machine_Unlearning_for_Stable_Vision_Language_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SINEPROJECT
+	- datasets: SafeEraser, MLLMU-Bench, Geometric Stability
+- [[obsidian-vault/analysis/CVPR_2026/SliderEdit_Continuous_Image_Editing_with_Fine_Grained_Instruction_Control.md|SliderEdit: Continuous Image Editing with Fine-Grained Instruction Control (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SliderEdit_Continuous_Image_Editing_with_Fine_Grained_Instruction_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SliderEdit (with STLoRA and GSTLoRA adapters)
+	- datasets: Facial Editing Benchmark, Multi-instruction Editing
+- [[obsidian-vault/analysis/CVPR_2026/SMRABooth_Subject_and_Motion_Representation_Alignment_for_Customized_Video_Generation.md|SMRABooth: Subject and Motion Representation Alignment for Customized Video Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SMRABooth_Subject_and_Motion_Representation_Alignment_for_Customized_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SMRABooth
+	- datasets: Customized Video Generation, User Study
+- [[obsidian-vault/analysis/CVPR_2026/SoccerMaster_A_Vision_Foundation_Model_for_Soccer_Understanding.md|SoccerMaster: A Vision Foundation Model for Soccer Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SoccerMaster_A_Vision_Foundation_Model_for_Soccer_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SoccerMaster
+	- datasets: SoccerNet-GSR, Athlete Detection, Event Classification
+- [[obsidian-vault/analysis/CVPR_2026/SoliReward_Mitigating_Susceptibility_to_Reward_Hacking_and_Annotation_Noise_in_Video_Generation_Reward_Models.md|SoliReward: Mitigating Susceptibility to Reward Hacking and Annotation Noise in Video Generation Reward Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SoliReward_Mitigating_Susceptibility_to_Reward_Hacking_and_Annotation_Noise_in_Video_Generation_Reward_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SoliReward（含二元标注、跨提示配对、BT-WT损失、HPQA架构）
+	- datasets: In-Domain, Out-of-Distribution, VBench2 Human Fidelity
+- [[obsidian-vault/analysis/CVPR_2026/Spatial_Aware_VLA_Pretraining_through_Visual_Physical_Alignment_from_Human_Videos.md|Spatial-Aware VLA Pretraining through Visual-Physical Alignment from Human Videos (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Spatial_Aware_VLA_Pretraining_through_Visual_Physical_Alignment_from_Human_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VIPA-VLA
+	- datasets: LIBERO, RoboCasa, 真实机器人
+- [[obsidian-vault/analysis/CVPR_2026/Spatial_SSRL_Enhancing_Spatial_Understanding_via_Self_Supervised_Reinforcement_Learning.md|Spatial-SSRL: Enhancing Spatial Understanding via Self-Supervised Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Spatial_SSRL_Enhancing_Spatial_Understanding_via_Self_Supervised_Reinforcement_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Spatial-SSRL
+	- datasets: Spatial457, VSI-Bench, General VQA
+- [[obsidian-vault/analysis/CVPR_2026/STUR3D_Spatio_Temporal_Unified_Representation_Learning_for_3D_Object_Detection.md|STUR3D: Spatio-Temporal Unified Representation Learning for 3D Object Detection (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/STUR3D_Spatio_Temporal_Unified_Representation_Learning_for_3D_Object_Detection.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: STUR3D
+	- datasets: nuScenes val, nuScenes test
+- [[obsidian-vault/analysis/CVPR_2026/SwiftTailor_Efficient_3D_Garment_Generation_with_Geometry_Image_Representation.md|SwiftTailor: Efficient 3D Garment Generation with Geometry Image Representation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SwiftTailor_Efficient_3D_Garment_Generation_with_Geometry_Image_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SwiftTailor
+	- datasets: GCD-MM
+- [[obsidian-vault/analysis/CVPR_2026/Taming_Preference_Mode_Collapse_via_Directional_Decoupling_Alignment_in_Diffusion_Reinforcement_Learning.md|Taming Preference Mode Collapse via Directional Decoupling Alignment in Diffusion Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Taming_Preference_Mode_Collapse_via_Directional_Decoupling_Alignment_in_Diffusion_Reinforcement_Learning.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Directional Decoupling Alignment (D2-Align)
+	- datasets: HPDv2, DivGenBench, HPDv2 User Study
+- [[obsidian-vault/analysis/CVPR_2026/Taxonomy_Aware_Representation_Alignment_for_Hierarchical_Visual_Recognition_with_Large_Multimodal_Models.md|Taxonomy-Aware Representation Alignment for Hierarchical Visual Recognition with Large Multimodal Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Taxonomy_Aware_Representation_Alignment_for_Hierarchical_Visual_Recognition_with_Large_Multimodal_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: TARA (Taxonomy-Aware Representation Alignment)
+	- datasets: iNat21-Plant, iNat21-Animal, TerraIncognita
+- [[obsidian-vault/analysis/CVPR_2026/Tea_Adapter_Teacher_Adapter_for_Efficient_Conditional_Generation.md|Tea-Adapter: Teacher Adapter for Efficient Conditional Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Tea_Adapter_Teacher_Adapter_for_Efficient_Conditional_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Tea-Adapter
+	- datasets: Canny Edge, Depth Map, Pose
+- [[obsidian-vault/analysis/CVPR_2026/Test_Time_Alignment_of_Text_to_Image_Diffusion_Models_via_Null_Text_Embedding_Optimisation.md|Test-Time Alignment of Text-to-Image Diffusion Models via Null-Text Embedding Optimisation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Test_Time_Alignment_of_Text_to_Image_Diffusion_Models_via_Null_Text_Embedding_Optimisation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Null-Text Test-Time Alignment (Null-TTA)
+	- datasets: PickScore 目标对齐, HPSv2 目标对齐, JPEG 压缩性目标SD-v1.5
+- [[obsidian-vault/analysis/CVPR_2026/Text_guided_Feature_Disentanglement_for_Cross_modal_Gait_Recognition.md|Text-guided Feature Disentanglement for Cross-modal Gait Recognition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Text_guided_Feature_Disentanglement_for_Cross_modal_Gait_Recognition.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: TCFDNet
+	- datasets: SUSTech1K, FreeGait
+- [[obsidian-vault/analysis/CVPR_2026/The_Geometry_of_Robustness_Optimizing_Loss_Landscape_Curvature_and_Feature_Manifold_Alignment_for_Robust_Finetuning_of_Vision_Language_Models.md|The Geometry of Robustness: Optimizing Loss Landscape Curvature and Feature Manifold Alignment for Robust Finetuning of Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/The_Geometry_of_Robustness_Optimizing_Loss_Landscape_Curvature_and_Feature_Manifold_Alignment_for_Robust_Finetuning_of_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GRACE
+	- datasets: ImageNet-1K, OOD Average, Zero-Shot Average
+- [[obsidian-vault/analysis/CVPR_2026/Thermal_is_Always_Wild_Characterizing_and_Addressing_Challenges_in_Thermal_Only_Novel_View_Synthesis.md|Thermal is Always Wild: Characterizing and Addressing Challenges in Thermal-Only Novel View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Thermal_is_Always_Wild_Characterizing_and_Addressing_Challenges_in_Thermal_Only_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Wild Thermal (Photometric Stabilized 3DGS with Embedding-conditioned Emission)
+	- datasets: MSX, ThermalMix, MVTV
+- [[obsidian-vault/analysis/CVPR_2026/Thinking_in_Uncertainty_Mitigating_Hallucinations_in_MLRMs_with_Latent_Entropy_Aware_Decoding.md|Thinking in Uncertainty: Mitigating Hallucinations in MLRMs with Latent Entropy-Aware Decoding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Thinking_in_Uncertainty_Mitigating_Hallucinations_in_MLRMs_with_Latent_Entropy_Aware_Decoding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Latent Entropy-Aware Decoding (LEAD)
+	- datasets: VStar, RealWorldQA, MMHalu
+- [[obsidian-vault/analysis/CVPR_2026/TIPSv2_Advancing_Vision_Language_Pretraining_with_Enhanced_Patch_Text_Alignment.md|TIPSv2: Advancing Vision-Language Pretraining with Enhanced Patch-Text Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TIPSv2_Advancing_Vision_Language_Pretraining_with_Enhanced_Patch_Text_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: TIPSv2
+	- datasets: PASCAL Context, PASCAL VOC, ADE20K
+- [[obsidian-vault/analysis/CVPR_2026/TokenHand_Discrete_Token_Representation_for_Efficient_Hand_Mesh_Reconstruction.md|TokenHand: Discrete Token Representation for Efficient Hand Mesh Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TokenHand_Discrete_Token_Representation_for_Efficient_Hand_Mesh_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: TokenHand
+	- datasets: FreiHAND, DexYCB
+- [[obsidian-vault/analysis/CVPR_2026/Towards_Highly_Transferable_Vision_Language_Attack_via_Semantic_Augmented_Dynamic_Contrastive_Interaction.md|Towards Highly Transferable Vision-Language Attack via Semantic-Augmented Dynamic Contrastive Interaction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Towards_Highly_Transferable_Vision_Language_Attack_via_Semantic_Augmented_Dynamic_Contrastive_Interaction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: SADCA (Semantic-Augmented Dynamic Contrastive Attack)
+	- datasets: Flickr30K, RefCOCO+, MSCOCO
+- [[obsidian-vault/analysis/CVPR_2026/Transform_to_Transfer_Boosting_Adversarial_Attack_Transferability_on_Vision_Language_Pre_training_Models.md|Transform to Transfer: Boosting Adversarial Attack Transferability on Vision-Language Pre-training Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Transform_to_Transfer_Boosting_Adversarial_Attack_Transferability_on_Vision_Language_Pre_training_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Transform to Transfer Attack (TTA)
+	- datasets: Flickr30K Image-Text Retrieval, MSCOCO Image Captioning
+- [[obsidian-vault/analysis/CVPR_2026/UCAN_Unified_Convolutional_Attention_Network_for_Expansive_Receptive_Fields_in_Lightweight_Super_Resolution.md|UCAN: Unified Convolutional Attention Network for Expansive Receptive Fields in Lightweight Super-Resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UCAN_Unified_Convolutional_Attention_Network_for_Expansive_Receptive_Fields_in_Lightweight_Super_Resolution.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: UCAN (Unified Convolutional Attention Network)
+	- datasets: Set5, Urban100, Manga109
+- [[obsidian-vault/analysis/CVPR_2026/Uncertainty_guided_Compositional_Alignment_with_Part_to_Whole_Semantic_Representativeness_in_Hyperbolic_Vision_Language_Models.md|Uncertainty-guided Compositional Alignment with Part-to-Whole Semantic Representativeness in Hyperbolic Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Uncertainty_guided_Compositional_Alignment_with_Part_to_Whole_Semantic_Representativeness_in_Hyperbolic_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: UNCHA (UNcertainty-guided Compositional Hyperbolic Alignment)
+	- datasets: ImageNet 零样本分类, VOC 多标签分类, COCO 多标签分类
+- [[obsidian-vault/analysis/CVPR_2026/Understanding_and_Enforcing_Weight_Disentanglement_in_Task_Arithmetic.md|Understanding and Enforcing Weight Disentanglement in Task Arithmetic (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Understanding_and_Enforcing_Weight_Disentanglement_in_Task_Arithmetic.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: OrthoReg
+- [[obsidian-vault/analysis/CVPR_2026/Understanding_Task_Transfer_in_Vision_Language_Models.md|Understanding Task Transfer in Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Understanding_Task_Transfer_in_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: 基于完美差距因子（PGF）的任务可迁移性与可塑性分析框架
+	- datasets: BLINK, Jigsaw, Object Localisation
+- [[obsidian-vault/analysis/CVPR_2026/Unified_Customized_Generation_by_Disentangled_Reward_Modeling.md|Unified Customized Generation by Disentangled Reward Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Unified_Customized_Generation_by_Disentangled_Reward_Modeling.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: USO (Unified Simultaneous Optimization)
+	- datasets: USO-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Unified_Spherical_Frontend_Learning_Rotation_Equivariant_Representations_of_Spherical_Images_from_Any_Camera.md|Unified Spherical Frontend: Learning Rotation-Equivariant Representations of Spherical Images from Any Camera (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Unified_Spherical_Frontend_Learning_Rotation_Equivariant_Representations_of_Spherical_Images_from_Any_Camera.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Unified Spherical Frontend (USF)
+	- datasets: Spherical MNIST, PANDORA, Stanford 2D-3D-S
+- [[obsidian-vault/analysis/CVPR_2026/UniFusion_A_Unified_Image_Fusion_Framework_with_Robust_Representation_and_Source_Aware_Preservation.md|UniFusion: A Unified Image Fusion Framework with Robust Representation and Source-Aware Preservation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniFusion_A_Unified_Image_Fusion_Framework_with_Robust_Representation_and_Source_Aware_Preservation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: UniFusion
+	- datasets: M3FD
+- [[obsidian-vault/analysis/CVPR_2026/Unifying_Perception_and_Action_A_Hybrid_Modality_Pipeline_with_Implicit_Visual_Chain_of_Thought_for_Robotic_Action_Generation.md|Unifying Perception and Action: A Hybrid-Modality Pipeline with Implicit Visual Chain-of-Thought for Robotic Action Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Unifying_Perception_and_Action_A_Hybrid_Modality_Pipeline_with_Implicit_Visual_Chain_of_Thought_for_Robotic_Action_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VITA (Vision-Integrated Trajectory Alignment)
+	- datasets: CALVIN ABC-D, LIBERO, LIBERO-Long
+- [[obsidian-vault/analysis/CVPR_2026/UniPR_Unified_Object_level_Real_to_Sim_Perception_and_Reconstruction_from_a_Single_Stereo_Pair.md|UniPR: Unified Object-level Real-to-Sim Perception and Reconstruction from a Single Stereo Pair (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniPR_Unified_Object_level_Real_to_Sim_Perception_and_Reconstruction_from_a_Single_Stereo_Pair.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: UniPR
+	- datasets: LVS6D 50-object subset, LVS6D
+- [[obsidian-vault/analysis/CVPR_2026/UST_Hand_An_Uncertainty_aware_Spatiotemporal_Point_Cloud_Interaction_Network_for_3D_Self_supervised_Hand_Pose_Estimation.md|UST-Hand: An Uncertainty-aware Spatiotemporal Point Cloud Interaction Network for 3D Self-supervised Hand Pose Estimation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UST_Hand_An_Uncertainty_aware_Spatiotemporal_Point_Cloud_Interaction_Network_for_3D_Self_supervised_Hand_Pose_Estimation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: UST-Hand
+	- datasets: HanCo, DexYCB-MV, OakInk-MV
+- [[obsidian-vault/analysis/CVPR_2026/VA_p_Variational_Policy_Alignment_for_Pixel_Aware_Autoregressive_Generation.md|VA-p: Variational Policy Alignment for Pixel-Aware Autoregressive Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VA_p_Variational_Policy_Alignment_for_Pixel_Aware_Autoregressive_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VA-π
+	- datasets: ImageNet-1K class-conditional, ImageNet-1K, GenEval
+- [[obsidian-vault/analysis/CVPR_2026/VCP_Attack_Visual_Contrastive_Projection_for_Transferable_Black_Box_Targeted_Attacks_on_Large_Vision_Language_Models.md|VCP-Attack: Visual-Contrastive Projection for Transferable Black-Box Targeted Attacks on Large Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VCP_Attack_Visual_Contrastive_Projection_for_Transferable_Black_Box_Targeted_Attacks_on_Large_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VCP-Attack
+	- datasets: 开源LVLM, 闭源LVLM, InternVL3-14B
+- [[obsidian-vault/analysis/CVPR_2026/Velox_Learning_Representations_of_4D_Geometry_and_Appearance.md|Velox: Learning Representations of 4D Geometry and Appearance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Velox_Learning_Representations_of_4D_Geometry_and_Appearance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Velox
+	- datasets: Objaverse Reconstruction, Objaverse 3D Tracking, Video-to-4D
+- [[obsidian-vault/analysis/CVPR_2026/VerseCrafter_Dynamic_Realistic_Video_World_Model_with_4D_Geometric_Control.md|VerseCrafter: Dynamic Realistic Video World Model with 4D Geometric Control (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VerseCrafter_Dynamic_Realistic_Video_World_Model_with_4D_Geometric_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VerseCrafter
+	- datasets: VerseControl4D
+- [[obsidian-vault/analysis/CVPR_2026/VIRAL_Visual_Sim_to_Real_at_Scale_for_Humanoid_Loco_Manipulation.md|VIRAL: Visual Sim-to-Real at Scale for Humanoid Loco-Manipulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VIRAL_Visual_Sim_to_Real_at_Scale_for_Humanoid_Loco_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VIRAL
+	- datasets: Real-world loco-manipulation, Simulation teacher training, Sim-to-real transfer with domain randomization
+- [[obsidian-vault/analysis/CVPR_2026/VLA_Models_Are_More_Generalizable_Than_You_Think_Revisiting_Physical_and_Spatial_Modeling.md|VLA Models Are More Generalizable Than You Think: Revisiting Physical and Spatial Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VLA_Models_Are_More_Generalizable_Than_You_Think_Revisiting_Physical_and_Spatial_Modeling.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+	- methods: Feature Token Modulation (FTM) and Feature Linear Adaptation (FLA)
+	- datasets: LIBERO, LIBERO-V, LIBERO Novel View across perturbation scales
+- [[obsidian-vault/analysis/CVPR_2026/VLM_Guided_Group_Preference_Alignment_for_Diffusion_based_Human_Mesh_Recovery.md|VLM-Guided Group Preference Alignment for Diffusion-based Human Mesh Recovery (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VLM_Guided_Group_Preference_Alignment_for_Diffusion_based_Human_Mesh_Recovery.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VLM-Guided Group Preference Alignment for Diffusion-based HMR
+	- datasets: Human3.6M
+- [[obsidian-vault/analysis/CVPR_2026/VOLD_Reasoning_Transfer_from_LLMs_to_Vision_Language_Models_via_On_Policy_Distillation.md|VOLD: Reasoning Transfer from LLMs to Vision-Language Models via On-Policy Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VOLD_Reasoning_Transfer_from_LLMs_to_Vision_Language_Models_via_On_Policy_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VOLD
+	- datasets: MMMU-Pro, MathVision, MathVista
+- [[obsidian-vault/analysis/CVPR_2026/VQRAE_Representation_Quantization_Autoencoders_for_Multimodal_Understanding_Generation_and_Reconstruction.md|VQRAE: Representation Quantization Autoencoders for Multimodal Understanding, Generation and Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VQRAE_Representation_Quantization_Autoencoders_for_Multimodal_Understanding_Generation_and_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VQRAE
+	- datasets: ImageNet 256×256 50k validation, MME-Perception, TextVQA
+- [[obsidian-vault/analysis/CVPR_2026/When_Lines_Meet_Textures_Spatial_Frequency_Aligned_Diffusion_Features_for_Cross_Sparsity_Correspondence.md|When Lines Meet Textures: Spatial-Frequency Aligned Diffusion Features for Cross-Sparsity Correspondence (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/When_Lines_Meet_Textures_Spatial_Frequency_Aligned_Diffusion_Features_for_Cross_Sparsity_Correspondence.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: SFA-DIFT
+	- datasets: PSC6K, MS-PSC6K
+- [[obsidian-vault/analysis/CVPR_2026/When_LoRA_Betrays_Backdooring_Text_to_Image_Models_by_Masquerading_as_Benign_Adapters.md|When LoRA Betrays: Backdooring Text-to-Image Models by Masquerading as Benign Adapters (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/When_LoRA_Betrays_Backdooring_Text_to_Image_Models_by_Masquerading_as_Benign_Adapters.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Masquerade-LoRA (MasqLoRA)
+	- datasets: SD v1.5, SDXL 1.0
+- [[obsidian-vault/analysis/CVPR_2026/When_Pretty_Isnt_Useful_Investigating_Why_Modern_Text_to_Image_Models_Fail_as_Reliable_Training_Data_Generators.md|When Pretty Isn't Useful: Investigating Why Modern Text-to-Image Models Fail as Reliable Training Data Generators (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/When_Pretty_Isn_t_Useful_Investigating_Why_Modern_Text_to_Image_Models_Fail_as_Reliable_Training_Data_Generators.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Systematic Synth→Real Diagnosis and Benchmarking Framework
+	- datasets: ImageNet-1k, Density & Coverage, Cross-domain transfer
+- [[obsidian-vault/analysis/CVPR_2026/When_Robots_Obey_the_Patch_Universal_Transferable_Patch_Attacks_on_Vision_Language_Action_Models.md|When Robots Obey the Patch: Universal Transferable Patch Attacks on Vision-Language-Action Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/When_Robots_Obey_the_Patch_Universal_Transferable_Patch_Attacks_on_Vision_Language_Action_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: UPA-RFAS (Universal Patch Attack via Robust Feature, Attention, and Semantics)
+	- datasets: LIBERO
+- [[obsidian-vault/analysis/CVPR_2026/WildRayZer_Self_supervised_Large_View_Synthesis_in_Dynamic_Environments.md|WildRayZer: Self-supervised Large View Synthesis in Dynamic Environments (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/WildRayZer_Self_supervised_Large_View_Synthesis_in_Dynamic_Environments.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: WildRayZer
+	- datasets: D-RE10K, D-RE10K-iPhone
+- [[obsidian-vault/analysis/CVPR_2026/WPT_World_to_Policy_Transfer_via_Online_World_Model_Distillation.md|WPT: World-to-Policy Transfer via Online World Model Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/WPT_World_to_Policy_Transfer_via_Online_World_Model_Distillation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+	- methods: WPT
+	- datasets: nuScenes validation set, Bench2Drive
+- [[obsidian-vault/analysis/ICLR_2026/boldsymbolpartialinfty_Grid_A_Neural_Differential_Equation_Solver_with_Differentiable_Feature_Grids.md|$\\boldsymbol{\\partial^\\infty}$-Grid: A Neural Differential Equation Solver with Differentiable Feature Grids (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/boldsymbolpartialinfty_Grid_A_Neural_Differential_Equation_Solver_with_Differentiable_Feature_Grids.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: ∂∞-Grid
+	- datasets: 泊松方程图像重建
+- [[obsidian-vault/analysis/ICLR_2026/nabla_Reasoner_LLM_Reasoning_via_Test_Time_Gradient_Descent_in_Latent_Space.md|$\\nabla$-Reasoner: LLM Reasoning via Test-Time Gradient Descent in Latent Space (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/nabla_Reasoner_LLM_Reasoning_via_Test_Time_Gradient_Descent_in_Latent_Space.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Representation / Self-Supervised / Transfer
+	- methods: ∇-Reasoner
+	- datasets: MATH-500, AMC
+- [[obsidian-vault/analysis/ICLR_2026/ell_1_Latent_Distance_based_Continuous_time_Graph_Representation.md|$\ell_1$ Latent Distance based Continuous-time Graph Representation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ell_1_Latent_Distance_based_Continuous_time_Graph_Representation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+	- methods: ℓ1LD-CTGR
+	- datasets: Synthetic-α, HyperText, Infectious
+- [[obsidian-vault/analysis/ICLR_2026/ptextrm_less_Sampling_A_Robust_Hyperparameter_Free_Approach_for_LLM_Decoding.md|$p\\textrm{-less}$ Sampling: A Robust Hyperparameter-Free Approach for LLM Decoding (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ptextrm_less_Sampling_A_Robust_Hyperparameter_Free_Approach_for_LLM_Decoding.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: p-less sampling
+	- datasets: CSQA, GPQA, GSM8K
+- [[obsidian-vault/analysis/ICLR_2026/Noisier_Noise_Contrastive_Estimation_is_Almost_Maximum_Likelihood.md|``Noisier'’ Noise Contrastive Estimation is (Almost) Maximum Likelihood (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Noisier_Noise_Contrastive_Estimation_is_Almost_Maximum_Likelihood.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: Noisier Noise Contrastive Estimation (N²CE)
+	- datasets: SVHN, CelebA, CIFAR-10
+- [[obsidian-vault/analysis/ICLR_2026/A_Bayesian_Nonparametric_Framework_For_Learning_Disentangled_Representations.md|A Bayesian Nonparametric Framework For Learning Disentangled Representations (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Bayesian_Nonparametric_Framework_For_Learning_Disentangled_Representations.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Bayes-QLAE (Bayesian Quantized Latent Autoencoder)
+	- datasets: MPI3D
+- [[obsidian-vault/analysis/ICLR_2026/A_Brain_Graph_Foundation_Model_Pre_Training_and_Prompt_Tuning_across_Broad_Atlases_and_Disorders.md|A Brain Graph Foundation Model: Pre-Training and Prompt-Tuning across Broad Atlases and Disorders (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Brain_Graph_Foundation_Model_Pre_Training_and_Prompt_Tuning_across_Broad_Atlases_and_Disorders.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Representation / Self-Supervised / Transfer
+	- methods: BrainGFM
+	- datasets: ABIDE II, ADHD200, ADNI 2
+- [[obsidian-vault/analysis/ICLR_2026/A_Federated_Generalized_Expectation_Maximization_Algorithm_for_Mixture_Models_with_an_Unknown_Number_of_Components.md|A Federated Generalized Expectation-Maximization Algorithm for Mixture Models with an Unknown Number of Components (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Federated_Generalized_Expectation_Maximization_Algorithm_for_Mixture_Models_with_an_Unknown_Number_of_Components.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: FedGEM
+	- datasets: MNIST
+- [[obsidian-vault/analysis/ICLR_2026/A_Generalized_Geometric_Theoretical_Framework_of_Centroid_Discriminant_Analysis_for_Linear_Classification_of_Multi_dimensional_Data.md|A Generalized Geometric Theoretical Framework of Centroid Discriminant Analysis for Linear Classification of Multi-dimensional Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Generalized_Geometric_Theoretical_Framework_of_Centroid_Discriminant_Analysis_for_Linear_Classification_of_Multi_dimensional_Data.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+	- methods: Centroid Discriminant Analysis (CDA)
+	- datasets: 大规模单细胞小鼠脑数据
+- [[obsidian-vault/analysis/ICLR_2026/A_Minimum_Variance_Path_Principle_for_Accurate_and_Stable_Score_Based_Density_Ratio_Estimation.md|A Minimum Variance Path Principle for Accurate and Stable Score-Based Density Ratio Estimation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Minimum_Variance_Path_Principle_for_Accurate_and_Stable_Score_Based_Density_Ratio_Estimation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: MVP (Minimum Variance Path Principle)
+	- datasets: 高维互信息估计, 表格数据密度估计, Additive Noise 互信息估计
+- [[obsidian-vault/analysis/ICLR_2026/A_Primer_on_SO3_Action_Representations_in_Deep_Reinforcement_Learning.md|A Primer on SO(3) Action Representations in Deep Reinforcement Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Primer_on_SO3_Action_Representations_in_Deep_Reinforcement_Learning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: 局部切空间增量动作表示（Local Tangent Vector Delta Action Representation）
+	- datasets: Idealized Rotation Environment
+- [[obsidian-vault/analysis/ICLR_2026/A_Relative_Error_Based_Evaluation_Framework_of_Heterogeneous_Treatment_Effect_Estimators.md|A Relative Error-Based Evaluation Framework of Heterogeneous Treatment Effect Estimators (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Relative_Error_Based_Evaluation_Framework_of_Heterogeneous_Treatment_Effect_Estimators.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: 基于相对误差的鲁棒HTE评估框架（Robust Relative Error-based HTE Evaluation Framework）
+	- datasets: IHDP
+- [[obsidian-vault/analysis/ICLR_2026/A_Single_Architecture_for_Representing_Invariance_Under_Any_Space_Group.md|A Single Architecture for Representing Invariance Under Any Space Group (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Single_Architecture_for_Representing_Invariance_Under_Any_Space_Group.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Crystal Fourier Transformer (CFT)
+	- datasets: Materials Project
+- [[obsidian-vault/analysis/ICLR_2026/A_Statistical_Benchmark_for_Diffusion_Posterior_Sampling_Algorithms.md|A Statistical Benchmark for Diffusion-Posterior-Sampling Algorithms (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Statistical_Benchmark_for_Diffusion_Posterior_Sampling_Algorithms.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: A Statistical Benchmark for Diffusion-Posterior-Sampling Algorithms
+	- datasets: Denoising, Deconvolution, Imputation
+- [[obsidian-vault/analysis/ICLR_2026/A_Study_of_Posterior_Stability_in_Time_Series_Latent_Diffusion.md|A Study of Posterior Stability in Time-Series Latent Diffusion (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Study_of_Posterior_Stability_in_Time_Series_Latent_Diffusion.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Posterior-Stable Latent Diffusion (PSLD，后验稳定潜在扩散)
+	- datasets: MIMIC, WARDS, Earthquakes
+- [[obsidian-vault/analysis/ICLR_2026/A_Study_on_PAVE_Specification_for_Learnware.md|A Study on PAVE Specification for Learnware (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Study_on_PAVE_Specification_for_Learnware.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: Parameter Vector (PAVE) Specification
+	- datasets: NLP Datasets, Computer Vision Datasets, Medical LLM Benchmarks
+- [[obsidian-vault/analysis/ICLR_2026/A_Unified_Federated_Framework_for_Trajectory_Data_Preparation_via_LLMs.md|A Unified Federated Framework for Trajectory Data Preparation via LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Unified_Federated_Framework_for_Trajectory_Data_Preparation_via_LLMs.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: FedTDP
+	- datasets: GeoLife 异常检测, GeoLife 轨迹补全, 多任务平均
+- [[obsidian-vault/analysis/ICLR_2026/A2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation.md|A^2TG: Adaptive Anisotropic Textured Gaussians for Efficient 3D Scene Representation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation_ICLR_2026_a_2tg_adaptive_anisotropic_textured_gaussians_for_efficient_3d_scene_representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: A^2TG (Adaptive Anisotropic Textured Gaussians)
+	- datasets: DeepBlending, Mip-NeRF360
+- [[obsidian-vault/analysis/ICLR_2026/ABBA_Adapters_Efficient_and_Expressive_Fine_Tuning_of_Foundation_Models.md|ABBA-Adapters: Efficient and Expressive Fine-Tuning of Foundation Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ABBA_Adapters_Efficient_and_Expressive_Fine_Tuning_of_Foundation_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: ABBA-Adapters
+	- datasets: COMMONSENSE170K, COMMONSENSE170K, MATH (Mistral-7B
+- [[obsidian-vault/analysis/ICLR_2026/Accelerated_co_design_of_robots_through_morphological_pretraining.md|Accelerated co-design of robots through morphological pretraining (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Accelerated_co_design_of_robots_through_morphological_pretraining.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: 形态学预训练与零/少样本进化协同设计
+	- datasets: Phototaxis task in varied terrains, Morphological Evolution Performance, Cross-Over Success
+- [[obsidian-vault/analysis/ICLR_2026/Accelerated_Parallel_Tempering_via_Neural_Transports.md|Accelerated Parallel Tempering via Neural Transports (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Accelerated_Parallel_Tempering_via_Neural_Transports.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Accelerated Parallel Tempering (APT)
+	- datasets: DW-4, ManyWell-32
+- [[obsidian-vault/analysis/ICLR_2026/Accelerating_Benchmarking_of_Functional_Connectivity_Modeling_via_Structure_aware_Core_set_Selection.md|Accelerating Benchmarking of Functional Connectivity Modeling via Structure-aware Core-set Selection (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Accelerating_Benchmarking_of_Functional_Connectivity_Modeling_via_Structure_aware_Core_set_Selection.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SCLCS (Structure-aware Contrastive Learning for Core-set Selection)
+	- datasets: REST-meta-MDD, 计算成本
+- [[obsidian-vault/analysis/ICLR_2026/Accessible_Realistic_and_Fair_Evaluation_of_Positive_Unlabeled_Learning_Algorithms.md|Accessible, Realistic, and Fair Evaluation of Positive-Unlabeled Learning Algorithms (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Accessible_Realistic_and_Fair_Evaluation_of_Positive_Unlabeled_Learning_Algorithms.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: PU Benchmark with Proxy Accuracy/PAUC Model Selection and ILS Calibration
+	- datasets: CIFAR-10 Case 1, ImageNette Case 1, CIFAR-10 Case 2
+- [[obsidian-vault/analysis/ICLR_2026/Activation_Function_Design_Sustains_Plasticity_in_Continual_Learning.md|Activation Function Design Sustains Plasticity in Continual Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Activation_Function_Design_Sustains_Plasticity_in_Continual_Learning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: Smooth-Leaky 与 Randomized Smooth-Leaky（及其扩展 Bo-PReLU、R-SeLU）
+	- datasets: Permuted MNIST, Scaling Shock Stress Test
+- [[obsidian-vault/analysis/ICLR_2026/ActiveCQ_Active_Estimation_of_Causal_Quantities.md|ActiveCQ: Active Estimation of Causal Quantities (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ActiveCQ_Active_Estimation_of_Causal_Quantities.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: ActiveCQ (GP–CME 框架)
+	- datasets: LaLonde, Simulation, IHDP
+- [[obsidian-vault/analysis/ICLR_2026/Adapting_Self_Supervised_Representations_as_a_Latent_Space_for_Efficient_Generation.md|Adapting Self-Supervised Representations as a Latent Space for Efficient Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adapting_Self_Supervised_Representations_as_a_Latent_Space_for_Efficient_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Representation Tokenizer (RepTok)
+	- datasets: ImageNet 256×256, ImageNet 256×256 类别条件生成, MS-COCO zero-shot
+- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Augmentation_Aware_Latent_Learning_for_Robust_LiDAR_Semantic_Segmentation.md|Adaptive Augmentation-Aware Latent Learning for Robust LiDAR Semantic Segmentation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Augmentation_Aware_Latent_Learning_for_Robust_LiDAR_Semantic_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: A3Point
+	- datasets: SemanticKITTI → SemanticSTF, SynLiDAR → SemanticSTF
+- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Conformal_Guidance_for_Learning_under_Uncertainty.md|Adaptive Conformal Guidance for Learning under Uncertainty (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Conformal_Guidance_for_Learning_under_Uncertainty.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
+	- methods: Adaptive Conformal Guidance (AdaConG)
+	- datasets: CIFAR-100, CIFAR-10
+- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Debiasing_Tsallis_Entropy_for_Test_Time_Adaptation.md|Adaptive Debiasing Tsallis Entropy for Test-Time Adaptation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Debiasing_Tsallis_Entropy_for_Test_Time_Adaptation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Adaptive Debiasing Tsallis Entropy (ADTE)
+	- datasets: ImageNet, ImageNet-V2, ImageNet-K
+- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Space.md|Adaptive Thinking: Large Language Models Know When to Think in Latent Space (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Space.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Sonata (Self-Consistency-Guided Adapter for Thinking Allocation)
+	- datasets: AIME25, MATH-500, GSM8K
+- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Width_Neural_Networks.md|Adaptive Width Neural Networks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Width_Neural_Networks.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Adaptive Width Neural Networks (AWN)
+	- datasets: DoubleMoon, Spiral, SpiralHard
+- [[obsidian-vault/analysis/ICLR_2026/Addressing_divergent_representations_from_causal_interventions_on_neural_networks.md|Addressing divergent representations from causal interventions on neural networks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Addressing_divergent_representations_from_causal_interventions_on_neural_networks.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Modified Counterfactual Latent (CL) loss targeting causal subspaces
+	- datasets: Synthetic dataset, Boundless DAS, Synthetic OOD generalization
+- [[obsidian-vault/analysis/ICLR_2026/ADEPT_Continual_Pretraining_via_Adaptive_Expansion_and_Dynamic_Decoupled_Tuning.md|ADEPT: Continual Pretraining via Adaptive Expansion and Dynamic Decoupled Tuning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ADEPT_Continual_Pretraining_via_Adaptive_Expansion_and_Dynamic_Decoupled_Tuning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: ADEPT
+	- datasets: GSM8K, CMB, MedQA
+- [[obsidian-vault/analysis/ICLR_2026/Adversarial_Encoding_Perturbation_and_Synthesis_for_Set_Representation_Auxiliary_Learning.md|Adversarial Encoding Perturbation and Synthesis for Set Representation Auxiliary Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adversarial_Encoding_Perturbation_and_Synthesis_for_Set_Representation_Auxiliary_Learning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
+	- methods: SRAL (Set Representation Auxiliary Learning)
+	- datasets: Friendster, LIVEJ, Youshu
+- [[obsidian-vault/analysis/ICLR_2026/Aligning_Collaborative_View_Recovery_and_Tensorial_Subspace_Learning_via_Latent_Representation_for_Incomplete_Multi_View_Clustering.md|Aligning Collaborative View Recovery and Tensorial Subspace Learning via Latent Representation for Incomplete Multi-View Clustering (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Aligning_Collaborative_View_Recovery_and_Tensorial_Subspace_Learning_via_Latent_Representation_for_Incomplete_Multi_View_Clustering.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: ARSL-IMVC
+	- datasets: BBCSport, HW
+- [[obsidian-vault/analysis/ICLR_2026/All_Code_No_Thought_Language_Models_Struggle_to_Reason_in_Ciphered_Language.md|All Code, No Thought: Language Models Struggle to Reason in Ciphered Language (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/All_Code_No_Thought_Language_Models_Struggle_to_Reason_in_Ciphered_Language.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- datasets: MATH 500
+- [[obsidian-vault/analysis/ICLR_2026/Ambig_SWE_Interactive_Agents_to_Overcome_Underspecificity_in_Software_Engineering.md|Ambig-SWE: Interactive Agents to Overcome Underspecificity in Software Engineering (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Ambig_SWE_Interactive_Agents_to_Overcome_Underspecificity_in_Software_Engineering.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: Ambig-SWE
+	- datasets: Ambig-SWE
+- [[obsidian-vault/analysis/ICLR_2026/AMPED_Adaptive_Multi_objective_Projection_for_balancing_Exploration_and_skill_Diversification.md|AMPED: Adaptive Multi-objective Projection for balancing Exploration and skill Diversification (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AMPED_Adaptive_Multi_objective_Projection_for_balancing_Exploration_and_skill_Diversification.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: AMPED (Adaptive Multi-objective Projection for balancing Exploration and skill Diversification)
+	- datasets: URLB
+- [[obsidian-vault/analysis/ICLR_2026/An_Efficient_SEp_Invariant_Transport_Metric_Driven_by_Polar_Transport_Discrepancy_based_Representation.md|An Efficient SE(p)-Invariant Transport Metric Driven by Polar Transport Discrepancy-based Representation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/An_Efficient_SEp_Invariant_Transport_Metric_Driven_by_Polar_Transport_Discrepancy_based_Representation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: SEINT (SE(p)-Invariant Transport)
+	- datasets: ModelNet40-SE, QM9
+- [[obsidian-vault/analysis/ICLR_2026/Anatomy_aware_Representation_Learning_for_Medical_Ultrasound.md|Anatomy-aware Representation Learning for Medical Ultrasound (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Anatomy_aware_Representation_Learning_for_Medical_Ultrasound.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Anatomy-aware Representation Learning (ARL)
+	- datasets: Breast Cancer, Thyroid Cancer
+- [[obsidian-vault/analysis/ICLR_2026/Architecture_Agnostic_Test_Time_Adaptation_via_Backprop_Free_Embedding_Alignment.md|Architecture-Agnostic Test-Time Adaptation via Backprop-Free Embedding Alignment (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Architecture_Agnostic_Test_Time_Adaptation_via_Backprop_Free_Embedding_Alignment.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: Progressive Embedding Alignment (PEA)
+	- datasets: ImageNet-C, CIFAR100-C, CIFAR10-C
+- [[obsidian-vault/analysis/ICLR_2026/ATLAS_Adaptive_Transfer_Scaling_Laws_for_Multilingual_Pretraining_Finetuning_and_Decoding_the_Curse_of_Multilinguality.md|ATLAS: Adaptive Transfer Scaling Laws for Multilingual Pretraining, Finetuning, and Decoding the Curse of Multilinguality (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ATLAS_Adaptive_Transfer_Scaling_Laws_for_Multilingual_Pretraining_Finetuning_and_Decoding_the_Curse_of_Multilinguality.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: ADAPTIVE TRANSFER SCALING LAW (ATLAS)
+	- datasets: MADLAD-400
+- [[obsidian-vault/analysis/ICLR_2026/AutoEP_LLMs_Driven_Automation_of_Hyperparameter_Evolution_for_Metaheuristic_Algorithms.md|AutoEP: LLMs-Driven Automation of Hyperparameter Evolution for Metaheuristic Algorithms (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AutoEP_LLMs_Driven_Automation_of_Hyperparameter_Evolution_for_Metaheuristic_Algorithms.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: AutoEP
+	- datasets: TSP eil51, TSP dsj1000, CVRP N=200
+- [[obsidian-vault/analysis/ICLR_2026/BEAT_Visual_Backdoor_Attacks_on_VLM_based_Embodied_Agents_via_Contrastive_Trigger_Learning.md|BEAT: Visual Backdoor Attacks on VLM-based Embodied Agents via Contrastive Trigger Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/BEAT_Visual_Backdoor_Attacks_on_VLM_based_Embodied_Agents_via_Contrastive_Trigger_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: BEAT
+	- datasets: VAB-OmniGibson
+- [[obsidian-vault/analysis/ICLR_2026/Benchmarking_Empirical_Privacy_Protection_for_Adaptations_of_Large_Language_Models.md|Benchmarking Empirical Privacy Protection for Adaptations of Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Benchmarking_Empirical_Privacy_Protection_for_Adaptations_of_Large_Language_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
+	- methods: 预训练‑适配管道的整体隐私审计框架与基准
+	- datasets: SAMSum, GermanWiki, OOD平均
+- [[obsidian-vault/analysis/ICLR_2026/Beyond_Entity_Correlations_Disentangling_Event_Causal_Puzzles_in_Temporal_Knowledge_Graphs.md|Beyond Entity Correlations: Disentangling Event Causal Puzzles in Temporal Knowledge Graphs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Beyond_Entity_Correlations_Disentangling_Event_Causal_Puzzles_in_Temporal_Knowledge_Graphs.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: HEDRA (Heterogeneous Event causality Disentangling Representation learning Approach)
+	- datasets: ICEWS14
+- [[obsidian-vault/analysis/ICLR_2026/Binomial_Gradient_Based_Meta_Learning_for_Enhanced_Meta_Gradient_Estimation.md|Binomial Gradient-Based Meta-Learning for Enhanced Meta-Gradient Estimation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Binomial_Gradient_Based_Meta_Learning_for_Enhanced_Meta_Gradient_Estimation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: BinomMAML (BinomGBML applied to MAML)
+	- datasets: Synthetic sinusoid regression, miniImageNet 5-way 1-shot, miniImageNet 5-way 5-shot
+- [[obsidian-vault/analysis/ICLR_2026/BioX_Bridge_Model_Bridging_for_Unsupervised_Cross_Modal_Knowledge_Transfer_across_Biosignals.md|BioX-Bridge: Model Bridging for Unsupervised Cross-Modal Knowledge Transfer across Biosignals (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/BioX_Bridge_Model_Bridging_for_Unsupervised_Cross_Modal_Knowledge_Transfer_across_Biosignals.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: BioX-Bridge
+	- datasets: ISRUC, FOG
+- [[obsidian-vault/analysis/ICLR_2026/Causal_Discovery_in_the_Wild_A_Voting_Theoretic_Ensemble_Approach.md|Causal Discovery in the Wild: A Voting-Theoretic Ensemble Approach (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Causal_Discovery_in_the_Wild_A_Voting_Theoretic_Ensemble_Approach.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Bayes Est.（基于最优传输能力估计的特征级贝叶斯投票聚合）
+	- datasets: GP-ER, MLP-SF, Sachs
+- [[obsidian-vault/analysis/ICLR_2026/Causal_Structure_Learning_in_Hawkes_Processes_with_Complex_Latent_Confounder_Networks.md|Causal Structure Learning in Hawkes Processes with Complex Latent Confounder Networks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Causal_Structure_Learning_in_Hawkes_Processes_with_Complex_Latent_Confounder_Networks.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Two-Phase Iterative Discovery Algorithm
+	- datasets: Metropolitan cellular network sub-dataset, Larger synthetic causal graph
+- [[obsidian-vault/analysis/ICLR_2026/Characterization_and_Learning_of_Causal_Graphs_with_Latent_Confounders_and_Post_treatment_Selection_from_Interventional_Data.md|Characterization and Learning of Causal Graphs with Latent Confounders and Post-treatment Selection from Interventional Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Characterization_and_Learning_of_Causal_Graphs_with_Latent_Confounders_and_Post_treatment_Selection_from_Interventional_Data.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: F-FCI
+	- datasets: Synthetic graphs with latent confounders and post-treatment selection, Synthetic graphs with latent confounders and post-treatment selection (soft intervention, Synthetic graphs with latent confounders and post-treatment selection
+- [[obsidian-vault/analysis/ICLR_2026/Co_rewarding_Stable_Self_supervised_RL_for_Eliciting_Reasoning_in_Large_Language_Models.md|Co-rewarding: Stable Self-supervised RL for Eliciting Reasoning in Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Co_rewarding_Stable_Self_supervised_RL_for_Eliciting_Reasoning_in_Large_Language_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: Co-rewarding
+	- datasets: MATH500, GSM8K, CRUX
+- [[obsidian-vault/analysis/ICLR_2026/COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High_Quality_Text_to_Motion_Generation.md|COME: Advancing Representation Learning and Generative Modeling for High-Quality Text-to-Motion Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High_Quality_Text_to_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: COME (Continuous Motion Diffusion)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/ICLR_2026/Common_Corpus_The_Largest_Collection_of_Ethical_Data_for_LLM_Pre_Training.md|Common Corpus: The Largest Collection of Ethical Data for LLM Pre-Training (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Common_Corpus_The_Largest_Collection_of_Ethical_Data_for_LLM_Pre_Training.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Common Corpus
+	- datasets: MultiBLiMP
+- [[obsidian-vault/analysis/ICLR_2026/Composition_of_Memory_Experts_for_Diffusion_World_Models.md|Composition of Memory Experts for Diffusion World Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Composition_of_Memory_Experts_for_Diffusion_World_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Composition of Memory Experts (CoME)
+	- datasets: Memory Maze, RECON
+- [[obsidian-vault/analysis/ICLR_2026/Depth_Anything_3_Recovering_the_Visual_Space_from_Any_Views.md|Depth Anything 3: Recovering the Visual Space from Any Views (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Depth_Anything_3_Recovering_the_Visual_Space_from_Any_Views.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Depth Anything 3 (DA3)
+	- datasets: HiRoom, ETH3D, ScanNet++
+- [[obsidian-vault/analysis/ICLR_2026/Difficult_Examples_Hurt_Unsupervised_Contrastive_Learning_A_Theoretical_Perspective.md|Difficult Examples Hurt Unsupervised Contrastive Learning: A Theoretical Perspective (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Difficult_Examples_Hurt_Unsupervised_Contrastive_Learning_A_Theoretical_Perspective.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Difficulty-aware Contrastive Learning Framework (Sample Removal, Margin Tuning, Temperature Scaling, and Combined)
+	- datasets: CIFAR-10, CIFAR-100, STL-10
+- [[obsidian-vault/analysis/ICLR_2026/DiMeR_Disentangled_Mesh_Reconstruction_Model_with_Normal_only_Geometry_Training.md|DiMeR: Disentangled Mesh Reconstruction Model with Normal-only Geometry Training (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DiMeR_Disentangled_Mesh_Reconstruction_Model_with_Normal_only_Geometry_Training_a5d58f656555.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DiMeR
+	- datasets: GSO, OmniObject3D
+- [[obsidian-vault/analysis/ICLR_2026/Distributional_Equivalence_in_Linear_Non_Gaussian_Latent_Variable_Cyclic_Causal_Models_Characterization_and_Learning.md|Distributional Equivalence in Linear Non-Gaussian Latent-Variable Cyclic Causal Models: Characterization and Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Distributional_Equivalence_in_Linear_Non_Gaussian_Latent_Variable_Cyclic_Causal_Models_Characterization_and_Learning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: glvLiNG
+	- datasets: Erdős-Rényi随机图, l=1, avgdeg=1
+- [[obsidian-vault/analysis/ICLR_2026/Zero_shot_Gesture_Movement_Recognition.md|EMBRIDGE: ENHANCING GESTURE GENERALIZATION FROM EMG SIGNALS THROUGH CROSS-MODAL REPRESENTATION LEARNING (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Zero_shot_Gesture_Movement_Recognition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: EMBridge
+	- datasets: emg2pose unseen gestures, emg2pose in-dist. gestures, NinaPro in-dist. gestures
+- [[obsidian-vault/analysis/ICLR_2026/Equivariant_Splitting_Self_supervised_learning_from_incomplete_data.md|Equivariant Splitting: Self-supervised learning from incomplete data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Equivariant_Splitting_Self_supervised_learning_from_incomplete_data.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Equivariant Splitting (ES)
+	- datasets: Compressive Sensing, Image Inpainting, MRI
+- [[obsidian-vault/analysis/ICLR_2026/Escaping_the_Homophily_Trap_A_Threshold_free_Graph_Outlier_Detection_Framework_via_Clustering_guided_Edge_Reweighting.md|Escaping the Homophily Trap: A Threshold-free Graph Outlier Detection Framework via Clustering-guided Edge Reweighting (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Escaping_the_Homophily_Trap_A_Threshold_free_Graph_Outlier_Detection_Framework_via_Clustering_guided_Edge_Reweighting.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: CER-GOD
+	- datasets: Email, Amazon, Disney
+- [[obsidian-vault/analysis/ICLR_2026/Every_Language_Model_Has_a_Forgery_Resistant_Signature.md|Every Language Model Has a Forgery-Resistant Signature (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Every_Language_Model_Has_a_Forgery_Resistant_Signature.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Language Model Ellipse Signature (椭圆签名验证方法)
+	- datasets: Cross-model ellipse verification on four open-weight models, Ellipse parameter recovery on a 1M-parameter model, Cost analysis of ellipse extraction from OpenAI-like API
+- [[obsidian-vault/analysis/ICLR_2026/Exchangeability_of_GNN_Representations_with_Applications_to_Graph_Retrieval.md|Exchangeability of GNN Representations with Applications to Graph Retrieval (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Exchangeability_of_GNN_Representations_with_Applications_to_Graph_Retrieval.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+	- methods: GRAPHHASH
+	- datasets: cox2, ptc-fm
+- [[obsidian-vault/analysis/ICLR_2026/Exploratory_Causal_Inference_in_SAEnce.md|Exploratory Causal Inference in SAEnce (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Exploratory_Causal_Inference_in_SAEnce.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Neural Effect Search (NES)
+	- datasets: CelebA semi-synthetic RCT, ISTAnt real-world RCT
+- [[obsidian-vault/analysis/ICLR_2026/From_Language_to_Locomotion_Retargeting_free_Humanoid_Control_via_Motion_Latent_Guidance.md|From Language to Locomotion: Retargeting-free Humanoid Control via Motion Latent Guidance (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/From_Language_to_Locomotion_Retargeting_free_Humanoid_Control_via_Motion_Latent_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: RoboGhost
+	- datasets: HumanML - IsaacGym, HumanML3D, Kungfu - IsaacGym
+- [[obsidian-vault/analysis/ICLR_2026/From_Vicious_to_Virtuous_Cycles_Synergistic_Representation_Learning_for_Unsupervised_Video_Object_Centric_Learning.md|From Vicious to Virtuous Cycles: Synergistic Representation Learning for Unsupervised Video Object-Centric Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/From_Vicious_to_Virtuous_Cycles_Synergistic_Representation_Learning_for_Unsupervised_Video_Object_Centric_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Synergistic Representation Learning (SRL)
+	- datasets: MOVi-C, MOVi-E, YouTube-VIS 2021
+- [[obsidian-vault/analysis/ICLR_2026/GaussianFusion_Unified_3D_Gaussian_Representation_for_Multi_Modal_Fusion_Perception.md|GaussianFusion: Unified 3D Gaussian Representation for Multi-Modal Fusion Perception (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/GaussianFusion_Unified_3D_Gaussian_Representation_for_Multi_Modal_Fusion_Percept_c79ab99eee1d.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GaussianFusion
+	- datasets: nuScenes 3D Object Detection, nuScenes 3D Semantic Occupancy Prediction, nuScenes val
+- [[obsidian-vault/analysis/ICLR_2026/Generalization_of_RLVR_Using_Causal_Reasoning_as_a_Testbed.md|Generalization of RLVR Using Causal Reasoning as a Testbed (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Generalization_of_RLVR_Using_Causal_Reasoning_as_a_Testbed.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: RLVR（基于总变差距离的准确性奖励的GRPO/DAPO）
+	- datasets: RLCausal, CLadder 确定性反事实子集
+- [[obsidian-vault/analysis/ICLR_2026/Generating_metamers_of_human_scene_understanding.md|Generating metamers of human scene understanding (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Generating_metamers_of_human_scene_understanding.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: MetamerGen
+	- datasets: COCO-10k-test, Visual Genome Same-Different Task
+- [[obsidian-vault/analysis/ICLR_2026/Graphon_Cross_Validation_Assessing_Models_on_Network_Data.md|Graphon Cross-Validation: Assessing Models on Network Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Graphon_Cross_Validation_Assessing_Models_on_Network_Data.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: CV-imputation (K‑fold random‑imputation graphon cross‑validation)
+	- datasets: Synthetic Graphon 1, Political Blogs network, Coauthorship network
+- [[obsidian-vault/analysis/ICLR_2026/HAMLET_A_Hierarchical_and_Adaptive_Multi_Agent_Framework_for_Live_Embodied_Theatrics.md|HAMLET: A Hierarchical and Adaptive Multi-Agent Framework for Live Embodied Theatrics (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/HAMLET_A_Hierarchical_and_Adaptive_Multi_Agent_Framework_for_Live_Embodied_Theatrics.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: HAMLET
+	- datasets: HAMLET在线表演任务完成率, 响应策略综合评估, 人类评估一致性
+- [[obsidian-vault/analysis/ICLR_2026/HARP_Hallucination_Detection_via_Reasoning_Subspace_Projection.md|HARP: Hallucination Detection via Reasoning Subspace Projection (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/HARP_Hallucination_Detection_via_Reasoning_Subspace_Projection.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: HARP (HAllucination detection via Reasoning subspace Projection)
+	- datasets: TriviaQA, TruthfulQA, NQ Open
+- [[obsidian-vault/analysis/ICLR_2026/How_NOT_to_benchmark_your_SITE_metric_Beyond_Static_Leaderboards_and_Towards_Realistic_Evaluation.md|How NOT to benchmark your SITE metric Beyond Static Leaderboards and Towards Realistic Evaluation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/How_NOT_to_benchmark_your_SITE_metric_Beyond_Static_Leaderboards_and_Towards_Realistic_Evaluation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: 静态排序启发式（Static Ranking Heuristic）
+	- datasets: Standard Benchmark, Meta-Album Benchmark
+- [[obsidian-vault/analysis/ICLR_2026/Huxley_Gödel_Machine_Human_Level_Coding_Agent_Development_by_an_Approximation_of_the_Optimal_Self_Improving_Machine.md|Huxley-G\\\"odel Machine: Human-Level Coding Agent Development by an Approximation of the Optimal Self-Improving Machine (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Huxley_Gödel_Machine_Human_Level_Coding_Agent_Development_by_an_Approximation_of_the_Optimal_Self_Improving_Machine.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+	- methods: Huxley-Gödel Machine (HGM)
+	- datasets: SWE-Verified-60, Polyglot, SWE-Bench Verified
+- [[obsidian-vault/analysis/ICLR_2026/Huxley_Gödel_Machine_Human_Level_Coding_Agent_Development_by_an_Approximation_of_the_Optimal_Self_Improving_Machine.md|Huxley-Gödel Machine: Human-Level Coding Agent Development by an Approximation of the Optimal Self-Improving Machine (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Huxley_Gödel_Machine_Human_Level_Coding_Agent_Development_by_an_Approximation_of_the_Optimal_Self_Improving_Machine.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+	- methods: Huxley-Gödel Machine (HGM)
+	- datasets: SWE-Verified-60, Polyglot, SWE-Bench Verified
+- [[obsidian-vault/analysis/ICLR_2026/Independence_Test_for_Linear_Non_Gaussian_Data_and_Applications_in_Causal_Discovery.md|Independence Test for Linear Non-Gaussian Data and Applications in Causal Discovery (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Independence_Test_for_Linear_Non_Gaussian_Data_and_Applications_in_Causal_Discovery.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: LiNGIC (Linear Non-Gaussian Independence Criterion)
+	- datasets: 线性非高斯合成数据, Student-t, Downstream Direct-LiNGAM on synthetic Sachs data
+- [[obsidian-vault/analysis/ICLR_2026/Information_Shapes_Koopman_Representation.md|Information Shapes Koopman Representation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Information_Shapes_Koopman_Representation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: InformationKoopman
+	- datasets: Lorenz 63, Kármán Vortex, Dam Flow
+- [[obsidian-vault/analysis/ICLR_2026/Latent_Fourier_Transform.md|Latent Fourier Transform (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Latent_Fourier_Transform.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Latent Fourier Transform (LATENTFT)
+	- datasets: MTG-Jamendo Conditional Generation, MTG-Jamendo Blending, GTZAN Conditional Generation
+- [[obsidian-vault/analysis/ICLR_2026/Latent_Particle_World_Models_Self_supervised_Object_centric_Stochastic_Dynamics_Modeling.md|Latent Particle World Models: Self-supervised Object-centric Stochastic Dynamics Modeling (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Latent_Particle_World_Models_Self_supervised_Object_centric_Stochastic_Dynamics_Modeling.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Latent Particle World Models (LPWM)
+	- datasets: Sketchy-U, LanguageTable-A, Bridge-L
+- [[obsidian-vault/analysis/ICLR_2026/Latent_Speech_Text_Transformer.md|Latent Speech-Text Transformer (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Latent_Speech_Text_Transformer.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Latent Speech-Text Transformer (LST)
+	- datasets: HellaSwag, LibriSpeech ASR
+- [[obsidian-vault/analysis/ICLR_2026/Latent_Thinking_Optimization_Your_Latent_Reasoning_Language_Model_Secretly_Encodes_Reward_Signals_in_Its_Latent_Thoughts.md|Latent Thinking Optimization: Your Latent Reasoning Language Model Secretly Encodes Reward Signals in Its Latent Thoughts (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Latent_Thinking_Optimization_Your_Latent_Reasoning_Language_Model_Secretly_Encodes_Reward_Signals_in_Its_Latent_Thoughts.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Latent Thinking Optimization (LTO)
+	- datasets: GSM8K, GSM-Symbolic, SVAMP
+- [[obsidian-vault/analysis/ICLR_2026/Learning_Unified_Representation_of_3D_Gaussian_Splatting.md|Learning Unified Representation of 3D Gaussian Splatting (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Learning_Unified_Representation_of_3D_Gaussian_Splatting_bb3f48b32ad5.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SF‑VAE (Submanifold Field Variational Auto‑encoder)
+	- datasets: ShapeSplat
+- [[obsidian-vault/analysis/ICLR_2026/Let_Features_Decide_Their_Own_Solvers_Hybrid_Feature_Caching_for_Diffusion_Transformers.md|Let Features Decide Their Own Solvers: Hybrid Feature Caching for Diffusion Transformers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Let_Features_Decide_Their_Own_Solvers_Hybrid_Feature_Caching_for_Diffusion_Transformers.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: HyCa
+	- datasets: FLUX.1-dev, Qwen-Image, HunyuanVideo
+- [[obsidian-vault/analysis/ICLR_2026/LLM_DNA_Tracing_Model_Evolution_via_Functional_Representations.md|LLM DNA: Tracing Model Evolution via Functional Representations (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/LLM_DNA_Tracing_Model_Evolution_via_Functional_Representations.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: RepTrace
+	- datasets: LLM关系检测, 随机输入下的关系检测
+- [[obsidian-vault/analysis/ICLR_2026/Loc2_Interpretable_Cross_View_Localization_via_Depth_Lifted_Local_Feature_Matching.md|Loc$^{2}$: Interpretable Cross-View Localization via Depth-Lifted Local Feature Matching (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Loc_2_Interpretable_Cross_View_Localization_via_Depth_Lifted_Local_Feature_Match_da8cf91ad977.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Loc$^{2}$
+	- datasets: KITTI, VIGOR
+- [[obsidian-vault/analysis/ICLR_2026/MaskCO_Masked_Generation_Drives_Effective_Representation_Learning_and_Exploiting_for_Combinatorial_Optimization.md|MaskCO: Masked Generation Drives Effective Representation Learning and Exploiting for Combinatorial Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MaskCO_Masked_Generation_Drives_Effective_Representation_Learning_and_Exploiting_for_Combinatorial_Optimization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: MaskCO
+	- datasets: TSP-100, TSP-1000, CVRP-1000
+- [[obsidian-vault/analysis/ICLR_2026/MedGMAE_Gaussian_Masked_Autoencoders_for_Medical_Volumetric_Representation_Learning.md|MedGMAE: Gaussian Masked Autoencoders for Medical Volumetric Representation Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MedGMAE_Gaussian_Masked_Autoencoders_for_Medical_Volumetric_Representation_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MedGMAE
+	- datasets: AMOS multi-organ segmentation, FLARE'22 segmentation, SegTHOR segmentation
+- [[obsidian-vault/analysis/ICLR_2026/MetaEmbed_Scaling_Multimodal_Retrieval_at_Test_Time_with_Flexible_Late_Interaction.md|MetaEmbed: Scaling Multimodal Retrieval at Test-Time with Flexible Late Interaction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MetaEmbed_Scaling_Multimodal_Retrieval_at_Test_Time_with_Flexible_Late_Interaction.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: METAEMBED
+	- datasets: MMEB, ViDoRe v2
+- [[obsidian-vault/analysis/ICLR_2026/Modality_Alignment_across_Trees_on_Heterogeneous_Hyperbolic_Manifolds.md|Modality Alignment across Trees on Heterogeneous Hyperbolic Manifolds (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Modality_Alignment_across_Trees_on_Heterogeneous_Hyperbolic_Manifolds.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Alignment across Trees
+	- datasets: Cifar100, SUN
+- [[obsidian-vault/analysis/ICLR_2026/Moving_Beyond_Diffusion_Hierarchy_to_Hierarchy_Autoregression_for_fMRI_to_Image_Reconstruction.md|Moving Beyond Diffusion: Hierarchy-to-Hierarchy Autoregression for fMRI-to-Image Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Moving_Beyond_Diffusion_Hierarchy_to_Hierarchy_Autoregression_for_fMRI_to_Image_Reconstruction.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: MindHier
+	- datasets: NSD, THINGS-fMRI test set
+- [[obsidian-vault/analysis/ICLR_2026/MrRoPE_Mixed_radix_Rotary_Position_Embedding.md|MrRoPE: Mixed-radix Rotary Position Embedding (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MrRoPE_Mixed_radix_Rotary_Position_Embedding.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: MrRoPE-Pro (Mixed-radix RoPE Progressive)
+	- datasets: RULER, Infinite-Bench KV Retrieval, Infinite-Bench QA Dialogue
+- [[obsidian-vault/analysis/ICLR_2026/Navigating_the_Latent_Space_Dynamics_of_Neural_Models.md|Navigating the Latent Space Dynamics of Neural Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Navigating_the_Latent_Space_Dynamics_of_Neural_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/ICLR_2026/On_the_Alignment_Between_Supervised_and_Self_Supervised_Contrastive_Learning.md|On the Alignment Between Supervised and Self-Supervised Contrastive Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/On_the_Alignment_Between_Supervised_and_Self_Supervised_Contrastive_Learning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: 相似性空间耦合分析框架（Similarity-Space Coupling Analysis Framework）
+	- datasets: Tiny-ImageNet, CIFAR-100, Multiple datasets
+- [[obsidian-vault/analysis/ICLR_2026/On_the_Reasoning_Abilities_of_Masked_Diffusion_Language_Models.md|On the Reasoning Abilities of Masked Diffusion Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/On_the_Reasoning_Abilities_of_Masked_Diffusion_Language_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Idealized Masked Diffusion Model (MDM) with Planner and Predictor
+- [[obsidian-vault/analysis/ICLR_2026/Open_Set_Semantic_Gaussian_Splatting_SLAM_with_Expandable_Representation.md|Open-Set Semantic Gaussian Splatting SLAM with Expandable Representation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Open_Set_Semantic_Gaussian_Splatting_SLAM_with_Expandable_Representation_fa5af39ce6a2.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Open-Set Semantic Gaussian Splatting SLAM
+	- datasets: Replica
+- [[obsidian-vault/analysis/ICLR_2026/PA3FF_Learning_Part_Aware_Dense_3D_Feature_Field_For_Generalizable_Articulated_Object_Manipulation.md|PA3FF:Learning Part-Aware Dense 3D Feature Field For Generalizable Articulated Object Manipulation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/PA3FF_Learning_Part_Aware_Dense_3D_Feature_Field_For_Generalizable_Articulated_O_591e4e474026.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Part-Aware 3D Feature Field (PA3FF) with Part-Aware Diffusion Policy (PADP)
+	- datasets: PartInstruct, Real-world Open Bottle test, RLBench
+- [[obsidian-vault/analysis/ICLR_2026/Partition_Generative_Modeling_Masked_Modeling_Without_Masks.md|Partition Generative Modeling: Masked Modeling Without Masks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Partition_Generative_Modeling_Masked_Modeling_Without_Masks.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Partition Generative Model (PGM) / Partition Transformer
+	- datasets: OpenWebText, LM1B, ImageNet 256×256
+- [[obsidian-vault/analysis/ICLR_2026/PHyCLIP_ell_1_Product_of_Hyperbolic_Factors_Unifies_Hierarchy_and_Compositionality_in_Vision_Language_Representation_Learning.md|PHyCLIP: $\\ell_1$-Product of Hyperbolic Factors Unifies Hierarchy and Compositionality in Vision-Language Representation Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/PHyCLIP_ell_1_Product_of_Hyperbolic_Factors_Unifies_Hierarchy_and_Compositionality_in_Vision_Language_Representation_Learning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: PHyCLIP
+	- datasets: WordNet Hierarchical Classification, COCO Text→Image Retrieval, COCO Image→Text Retrieval
+- [[obsidian-vault/analysis/ICLR_2026/Point_Focused_Attention_Meets_Context_Scan_State_Space_Robust_Biological_Visual_Perception_for_Point_Cloud_Representation.md|Point-Focused Attention Meets Context-Scan State Space: Robust Biological Visual Perception for Point Cloud Representation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Point_Focused_Attention_Meets_Context_Scan_State_Space_Robust_Biological_Visual_Perception_for_Point_Cloud_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: PointLearner
+	- datasets: S3DIS, ScanObjectNN
+- [[obsidian-vault/analysis/ICLR_2026/Policy_Contrastive_Decoding_for_Robotic_Foundation_Models.md|Policy Contrastive Decoding for Robotic Foundation Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Policy_Contrastive_Decoding_for_Robotic_Foundation_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Policy Contrastive Decoding (PCD)
+	- datasets: SIMPLER, Real-world
+- [[obsidian-vault/analysis/ICLR_2026/Pose_Prior_Learner_Unsupervised_Categorical_Prior_Learning_for_Pose_Estimation.md|Pose Prior Learner: Unsupervised Categorical Prior Learning for Pose Estimation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Pose_Prior_Learner_Unsupervised_Categorical_Prior_Learning_for_Pose_Estimation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Pose Prior Learner (PPL)
+	- datasets: Human3.6m, Taichi, CUB-200-2011 Aligned
+- [[obsidian-vault/analysis/ICLR_2026/Pre_training_under_infinite_compute.md|Pre-training under infinite compute (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Pre_training_under_infinite_compute.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: 正则化参数缩放、集成与蒸馏方法
+	- datasets: DCLM 200M validation loss, Data efficiency at 200M tokens, Downstream tasks average error
+- [[obsidian-vault/analysis/ICLR_2026/ReactDance_Hierarchical_Representation_for_High_Fidelity_and_Coherent_Long_Form_Reactive_Dance_Generation.md|REACTDANCE: HIERARCHICAL REPRESENTATION FOR HIGH-FIDELITY AND COHERENT LONG-FORM REAC- TIVE DANCE GENERATION (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ReactDance_Hierarchical_Representation_for_High_Fidelity_and_Coherent_Long_Form_Reactive_Dance_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: ReactDance
+	- datasets: DD100
+- [[obsidian-vault/analysis/ICLR_2026/ReLaSH_Reconstructing_Joint_Latent_Spaces_for_Efficient_Generation_of_Synthetic_Hypergraphs_with_Hyperlink_Attributes.md|ReLaSH: Reconstructing Joint Latent Spaces for Efficient Generation of Synthetic Hypergraphs with Hyperlink Attributes (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ReLaSH_Reconstructing_Joint_Latent_Spaces_for_Efficient_Generation_of_Synthetic_Hypergraphs_with_Hyperlink_Attributes.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: ReLaSH
+	- datasets: MIMIC-III ICU patient profiles, Co-citation hypergraph generation, Recipe hypergraph generation
+- [[obsidian-vault/analysis/ICLR_2026/Relationship_Alignment_for_View_aware_Multi_view_Clustering.md|Relationship Alignment for View-aware Multi-view Clustering (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Relationship_Alignment_for_View_aware_Multi_view_Clustering.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: RAV
+	- datasets: NGs, YoutubeVideo, Cora
+- [[obsidian-vault/analysis/ICLR_2026/ReLi3D_Relightable_Multi_view_3D_Reconstruction_with_Disentangled_Illumination.md|ReLi3D: Relightable Multi-view 3D Reconstruction with Disentangled Illumination (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ReLi3D_Relightable_Multi_view_3D_Reconstruction_with_Disentangled_Illumination_5eeafb1d146e.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: ReLi3D
+	- datasets: Polyhaven + HDRI, Polyhaven + Blender Shiny, GSO + Stanford ORB
+- [[obsidian-vault/analysis/ICLR_2026/Revela_Dense_Retriever_Learning_via_Language_Modeling.md|Revela: Dense Retriever Learning via Language Modeling (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Revela_Dense_Retriever_Learning_via_Language_Modeling.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Revela
+	- datasets: CoIR, BRIGHT, BEIR
+- [[obsidian-vault/analysis/ICLR_2026/Revisiting_Weight_Regularization_for_Low_Rank_Continual_Learning.md|Revisiting Weight Regularization for Low-Rank Continual Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Revisiting_Weight_Regularization_for_Low_Rank_Continual_Learning.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: EWC-LoRA
+	- datasets: CIFAR-100, DomainNet, ImageNet-R
+- [[obsidian-vault/analysis/ICLR_2026/RL_Grokking_Recipe_How_Does_RL_Unlock_and_Transfer_New_Algorithms_in_LLMs.md|RL Grokking Recipe: How Does RL Unlock and Transfer New Algorithms in LLMs? (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/RL_Grokking_Recipe_How_Does_RL_Unlock_and_Transfer_New_Algorithms_in_LLMs.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: Staged RL with Per-Test Warm-Up (Two-Phase GRPO)
+	- datasets: Manufactoria-HAS, BouncingSim
+- [[obsidian-vault/analysis/ICLR_2026/Robust_Amortized_Bayesian_Inference_with_Self_Consistency_Losses_on_Unlabeled_Data.md|Robust Amortized Bayesian Inference with Self-Consistency Losses on Unlabeled Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Robust_Amortized_Bayesian_Inference_with_Self_Consistency_Losses_on_Unlabeled_Data.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
+	- methods: Semi-supervised Neural Posterior Estimation with Self-Consistency Loss (NPE + SC)
+	- datasets: Multivariate normal means, Air passenger traffic forecasting, Hodgkin-Huxley neuron model
+- [[obsidian-vault/analysis/ICLR_2026/SASFT_Sparse_Autoencoder_guided_Supervised_Finetuning_to_Mitigate_Unexpected_Code_Switching_in_LLMs.md|SASFT: Sparse Autoencoder-guided Supervised Finetuning to Mitigate Unexpected Code-Switching in LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/SASFT_Sparse_Autoencoder_guided_Supervised_Finetuning_to_Mitigate_Unexpected_Code_Switching_in_LLMs.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: SASFT
+	- datasets: Chinese CS Ratio, Russian CS Ratio, Korean CS Ratio
+- [[obsidian-vault/analysis/ICLR_2026/Scaling_Laws_and_Spectra_of_Shallow_Neural_Networks_in_the_Feature_Learning_Regime.md|Scaling Laws and Spectra of Shallow Neural Networks in the Feature Learning Regime (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Scaling_Laws_and_Spectra_of_Shallow_Neural_Networks_in_the_Feature_Learning_Regime.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: AMP状态演化框架（基于 LASSO 和矩阵压缩感知的神经网络训练分析）
+	- datasets: Power-law synthetic data
+- [[obsidian-vault/analysis/ICLR_2026/SesaHand_Enhancing_3D_Hand_Reconstruction_via_Controllable_Generation_with_Semantic_and_Structural_Alignment.md|SesaHand: Enhancing 3D Hand Reconstruction via Controllable Generation with Semantic and Structural Alignment (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/SesaHand_Enhancing_3D_Hand_Reconstruction_via_Controllable_Generation_with_Seman_96a366a50afa.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SesaHand
+	- datasets: MSCOCO, HIC, ReIH
+- [[obsidian-vault/analysis/ICLR_2026/SkyEvents_A_Large_Scale_Event_enhanced_UAV_Dataset_for_Robust_3D_Scene_Reconstruction.md|SkyEvents: A Large-Scale Event-enhanced UAV Dataset for Robust 3D Scene Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/SkyEvents_A_Large_Scale_Event_enhanced_UAV_Dataset_for_Robust_3D_Scene_Reconstru_5f0daf32f322.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GTA + RER (Geometry-constrained Timestamp Alignment + Region-wise Event Rendering loss)
+	- datasets: SkyEvents Scene2, SkyEvents Scene1
+- [[obsidian-vault/analysis/ICLR_2026/Sparkle_A_Robust_and_Versatile_Representation_for_Point_Cloud_based_Human_Motion_Capture.md|Sparkle: A Robust and Versatile Representation for Point Cloud-based Human Motion Capture (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Sparkle_A_Robust_and_Versatile_Representation_for_Point_Cloud_based_Human_Motion_Capture.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SparkleMotion
+	- datasets: Interhuman, GTA-Human-Point, HuMMan-Point
+- [[obsidian-vault/analysis/ICLR_2026/Study_of_Training_Dynamics_for_Memory_Constrained_Fine_Tuning.md|Study of Training Dynamics for Memory-Constrained Fine-Tuning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Study_of_Training_Dynamics_for_Memory_Constrained_Fine_Tuning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: TraDy
+	- datasets: MobileNetV2-w0.35, MobileNetV2 on Food, 所有架构与数据集
+- [[obsidian-vault/analysis/ICLR_2026/SurvHTE_Bench_A_Benchmark_for_Heterogeneous_Treatment_Effect_Estimation_in_Survival_Analysis.md|SurvHTE-Bench: A Benchmark for Heterogeneous Treatment Effect Estimation in Survival Analysis (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/SurvHTE_Bench_A_Benchmark_for_Heterogeneous_Treatment_Effect_Estimation_in_Survival_Analysis.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: SurvHTE-Bench
+	- datasets: ACTG Semi-synthetic, MIMIC-i Semi-synthetic
+- [[obsidian-vault/analysis/ICLR_2026/Task_free_Adaptive_Meta_Black_box_Optimization.md|Task-free Adaptive Meta Black-box Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Task_free_Adaptive_Meta_Black_box_Optimization.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: ABOM (Adaptive meta Black-box Optimization Model)
+	- datasets: BBOB f6, BBOB f8, UAV 路径规划
+- [[obsidian-vault/analysis/ICLR_2026/TD_JEPA_Latent_predictive_Representations_for_Zero_Shot_Reinforcement_Learning.md|TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/TD_JEPA_Latent_predictive_Representations_for_Zero_Shot_Reinforcement_Learning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: TD-JEPA
+	- datasets: DMCRGB, DMC, OGBenchRGB
+- [[obsidian-vault/analysis/ICLR_2026/Temporal_Sparse_Autoencoders_Leveraging_the_Sequential_Nature_of_Language_for_Interpretability.md|Temporal Sparse Autoencoders: Leveraging the Sequential Nature of Language for Interpretability (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Temporal_Sparse_Autoencoders_Leveraging_the_Sequential_Nature_of_Language_for_Interpretability.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Temporal Sparse Autoencoders (T-SAEs)
+	- datasets: Pythia-160m, Gemma2-2b
+- [[obsidian-vault/analysis/ICLR_2026/The_Coverage_Principle_How_Pre_Training_Enables_Post_Training.md|The Coverage Principle: How Pre-Training Enables Post-Training (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/The_Coverage_Principle_How_Pre_Training_Enables_Post_Training.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: 覆盖原理（Coverage Principle）及基于覆盖的算法干预（锦标赛选择、梯度归一化、测试时训练解码）
+	- datasets: 图推理任务
+- [[obsidian-vault/analysis/ICLR_2026/The_Hot_Mess_of_AI_How_Does_Misalignment_Scale_With_Model_Intelligence_and_Task_Complexity.md|The Hot Mess of AI: How Does Misalignment Scale With Model Intelligence and Task Complexity? (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/The_Hot_Mess_of_AI_How_Does_Misalignment_Scale_With_Model_Intelligence_and_Task_Complexity.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Error-Incoherence Analysis Framework (Bias-Variance Decomposition)
+	- datasets: GPQA, SWE-BENCH, MMLU
+- [[obsidian-vault/analysis/ICLR_2026/The_Shape_of_Adversarial_Influence_Characterizing_LLM_Latent_Spaces_with_Persistent_Homology.md|The Shape of Adversarial Influence: Characterizing LLM Latent Spaces with Persistent Homology (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/The_Shape_of_Adversarial_Influence_Characterizing_LLM_Latent_Spaces_with_Persistent_Homology.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Persistent Homology (PH) based topological analysis of LLM latent spaces
+	- datasets: Mistral 7B TaskTracker, Layer 1, Six LLMs
+- [[obsidian-vault/analysis/ICLR_2026/Theoretical_Guarantees_for_Causal_Discovery_on_Large_Random_Graphs.md|Theoretical Guarantees for Causal Discovery on Large Random Graphs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Theoretical_Guarantees_for_Causal_Discovery_on_Large_Random_Graphs.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/ICLR_2026/TileLang_Bridge_Programmability_and_Performance_in_Modern_Neural_Kernels.md|TileLang: Bridge Programmability and Performance in Modern Neural Kernels (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/TileLang_Bridge_Programmability_and_Performance_in_Modern_Neural_Kernels.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: TileLang
+	- datasets: Multi-Head Latent Attention, GEMM, Dequantized GEMM
+- [[obsidian-vault/analysis/ICLR_2026/To_View_Transform_or_Not_to_View_Transform_NeRF_based_Pre_training_Perspective.md|To View Transform or Not to View Transform: NeRF-based Pre-training Perspective (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/To_View_Transform_or_Not_to_View_Transform_NeRF_based_Pre_training_Perspective.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: NeRP3D
+	- datasets: nuScenes 3D目标检测, nuScenes 占据预测, nuScenes HD地图构建
+- [[obsidian-vault/analysis/ICLR_2026/Towards_Bridging_the_Gap_between_Large_Scale_Pretraining_and_Efficient_Finetuning_for_Humanoid_Control.md|Towards Bridging the Gap between Large-Scale Pretraining and Efficient Finetuning for Humanoid Control (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Towards_Bridging_the_Gap_between_Large_Scale_Pretraining_and_Efficient_Finetuning_for_Humanoid_Control.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: LIFT (Large-scale pretraIning and efficient FineTuning)
+	- datasets: Booster T1 sim-to-sim finetuning, Unitree G1 sim-to-sim finetuning (target speeds
+- [[obsidian-vault/analysis/ICLR_2026/Transformers_are_Inherently_Succinct.md|Transformers are Inherently Succinct (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Transformers_are_Inherently_Succinct.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: UHAT 简洁性测度
+- [[obsidian-vault/analysis/ICLR_2026/True_Self_Supervised_Novel_View_Synthesis_is_Transferable.md|True Self-Supervised Novel View Synthesis is Transferable (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/True_Self_Supervised_Novel_View_Synthesis_is_Transferable.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: XFactor
+	- datasets: RE10K, DL3DV
+- [[obsidian-vault/analysis/ICLR_2026/UniCon_Unified_Framework_for_Efficient_Contrastive_Alignment_via_Kernels.md|UniCon: Unified Framework for Efficient Contrastive Alignment via Kernels (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/UniCon_Unified_Framework_for_Efficient_Contrastive_Alignment_via_Kernels.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+- [[obsidian-vault/analysis/ICLR_2026/UniSplat_Unified_Spatio_Temporal_Fusion_via_3D_Latent_Scaffolds_for_Dynamic_Driving_Scene_Reconstruction.md|UniSplat: Unified Spatio-Temporal Fusion via 3D Latent Scaffolds for Dynamic Driving Scene Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/UniSplat_Unified_Spatio_Temporal_Fusion_via_3D_Latent_Scaffolds_for_Dynamic_Driving_Scene_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: UniSplat
+	- datasets: nuScenes
+- [[obsidian-vault/analysis/ICLR_2026/Unsupervised_Learning_of_Efficient_Exploration_Pre_training_Adaptive_Policies_via_Self_Imposed_Goals.md|Unsupervised Learning of Efficient Exploration: Pre-training Adaptive Policies via Self-Imposed Goals (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Unsupervised_Learning_of_Efficient_Exploration_Pre_training_Adaptive_Policies_via_Self_Imposed_Goals.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: ULEE
+	- datasets: 固定 μ_eval 任务, μ_train 上的监督元学习
+- [[obsidian-vault/analysis/ICLR_2026/Unsupervised_Representation_Learning_for_3D_Mesh_Parameterization_with_Semantic_and_Visibility_Objectives.md|Unsupervised Representation Learning for 3D Mesh Parameterization with Semantic and Visibility Objectives (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Unsupervised_Representation_Learning_for_3D_Mesh_Parameterization_with_Semantic_fb445667e240.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Semantic-Visibility-Aware UV Parameterization
+	- datasets: Visibility Metric, Semantic-Aware Metric, User Study
+- [[obsidian-vault/analysis/ICLR_2026/VITA_Vision_to_Action_Flow_Matching_Policy.md|VITA: Vision-to-Action Flow Matching Policy (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/VITA_Vision_to_Action_Flow_Matching_Policy.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+	- methods: VITA
+	- datasets: Inference Latency, Inference Memory, StoreDrawer OOD
+- [[obsidian-vault/analysis/ICLR_2026/WAFT_Warping_Alone_Field_Transforms_for_Optical_Flow.md|WAFT: Warping-Alone Field Transforms for Optical Flow (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/WAFT_Warping_Alone_Field_Transforms_for_Optical_Flow.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: WAFT
+	- datasets: Spring, Sintel, KITTI
+- [[obsidian-vault/analysis/ICLR_2026/WAVE_Learning_Unified_Versatile_Audio_Visual_Embeddings_with_Multimodal_LLM.md|WAVE: Learning Unified & Versatile Audio-Visual Embeddings with Multimodal LLM (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/WAVE_Learning_Unified_Versatile_Audio_Visual_Embeddings_with_Multimodal_LLM.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: WAVE
+	- datasets: MMEB-v2-Video, MMEB-v2-Video QA, AudioCaps
+- [[obsidian-vault/analysis/ICLR_2026/Why_Low_Precision_Transformer_Training_Fails_An_Analysis_on_Flash_Attention.md|Why Low-Precision Transformer Training Fails: An Analysis on Flash Attention (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Why_Low_Precision_Transformer_Training_Fails_An_Analysis_on_Flash_Attention.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Stabilized Flash Attention (检测并调整重复最大值缓解有偏舍入误差)
+	- datasets: GPT-2 Small pretraining on OpenWebText, GPT-2 Medium with AdamW
+- [[obsidian-vault/analysis/ICLR_2026/Why_We_Need_New_Benchmarks_for_Local_Intrinsic_Dimension_Estimation.md|Why We Need New Benchmarks for Local Intrinsic Dimension Estimation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Why_We_Need_New_Benchmarks_for_Local_Intrinsic_Dimension_Estimation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: 基于IDR、ME、ASE、ADI和MS的LID估计基准测试框架
+	- datasets: Gaussians - 非均匀密度, Spheres - 流形曲率, Spaghetti - 高维嵌入
+- [[obsidian-vault/analysis/ICLR_2026/WSM_Decay_Free_Learning_Rate_Schedule_via_Checkpoint_Merging_for_LLM_Pre_training.md|WSM: Decay-Free Learning Rate Schedule via Checkpoint Merging for LLM Pre-training (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/WSM_Decay_Free_Learning_Rate_Schedule_via_Checkpoint_Merging_for_LLM_Pre_training.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Warmup-Stable and Merge (WSM)
+	- datasets: MATH, HumanEval, MMLU-Pro
+- [[obsidian-vault/analysis/ICML_2026/LiteVSR_Lightweight_Adaptation_of_Frozen_Diffusion_Transformers_for_Video_Super-Resolution.md|LiteVSR: Lightweight Adaptation of Frozen Diffusion Transformers for Video Super-Resolution (ICML 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/ICML_2026/2026_LiteVSR_Lightweight_Adaptation_of_Frozen_Diffusion_Transformers_for_Video_Super_Resolution.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: LiteVSR
+	- datasets: REDS4, UDM10, SPMCS
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MotionBricks_Scalable_Real_Time_Motions_with_Modular_Latent_Generative_Model_and_Smart_Primitives.md|MotionBricks: Scalable Real-Time Motions with Modular Latent Generative Model and Smart Primitives (SIGGRAPH 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MotionBricks_Scalable_Real_Time_Motions_with_Modular_Latent_Generative_Model_and_Smart_Primitives.pdf|PDF]]
+	- topics: Real Time Motion Synthesis, Latent Motion Generation, Vector Quantization, Character Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Modular latent generative model, multi-head motion tokenizer, root-pose decoupling
+	- datasets: LaFAN1-G1, Bones-70k
+- [[obsidian-vault/analysis/TMM_2026/Multi-Modal_Motion_Retrieval_by_Learning_a_Fine-Grained_Joint_Embedding_Space.md|Multi-Modal Motion Retrieval by Learning a Fine-Grained Joint Embedding Space (TMM 2026)]]
+	- [[obsidian-vault/paperPDFs/TMM_2026/Multi-Modal_Motion_Retrieval_by_Learning_a_Fine-Grained_Joint_Embedding_Space.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Multi-Modal Fine-Grained Joint Embedding Framework
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/WACV_2026/ATM_Enhanced_Alignment_for_Text-to-Motion_Generation.md|ATM: Enhanced Alignment for Text-to-Motion Generation (WACV 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/WACV_2026/ATM:_Enhanced_Alignment_for_Text-to-Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: ATM (Aligned Text-to-Motion)
+	- datasets: HumanML3D, KIT

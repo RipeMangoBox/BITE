@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/data/Life Me/ResearchWY Vault/scripts/modebug_original100_four_baseline_vis_review_app.py", line 656, in <module>
+    main()
+  File "/data/Life Me/ResearchWY Vault/scripts/modebug_original100_four_baseline_vis_review_app.py", line 647, in main
+    demo.launch(
+  File "/home/ripemangobox/miniconda3/envs/TMR/lib/python3.10/site-packages/gradio/blocks.py", line 2635, in launch
+    ) = http_server.start_server(
+  File "/home/ripemangobox/miniconda3/envs/TMR/lib/python3.10/site-packages/gradio/http_server.py", line 157, in start_server
+    raise OSError(
+OSError: Cannot find empty port in range: 7864-7864. You can specify a different port by setting the GRADIO_SERVER_PORT environment variable or passing the `server_port` parameter to `launch()`.

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#111827}.axis{stroke:#9ca3af;stroke-width:1}.grid{stroke:#e5e7eb;stroke-width:1}.title{font-size:20px;font-weight:700}.label{font-size:13px;fill:#374151}.tick{font-size:12px;fill:#4b5563}.legend{font-size:13px}</style>
+<text x="78.0" y="34.0" text-anchor="start" class="title">MoLingo LDO Endpoint Difference</text>
+<text x="78.0" y="56.0" text-anchor="start" class="label">L2 distance to baseline arrays; diagnostic only</text>
+<line x1="78" y1="410.0" x2="862" y2="410.0" class="grid"/>
+<text x="68.0" y="414.0" text-anchor="end" class="tick">0</text>
+<line x1="78" y1="342.0" x2="862" y2="342.0" class="grid"/>
+<text x="68.0" y="346.0" text-anchor="end" class="tick">1.51e+03</text>
+<line x1="78" y1="274.0" x2="862" y2="274.0" class="grid"/>
+<text x="68.0" y="278.0" text-anchor="end" class="tick">3.02e+03</text>
+<line x1="78" y1="206.0" x2="862" y2="206.0" class="grid"/>
+<text x="68.0" y="210.0" text-anchor="end" class="tick">4.54e+03</text>
+<line x1="78" y1="138.0" x2="862" y2="138.0" class="grid"/>
+<text x="68.0" y="142.0" text-anchor="end" class="tick">6.05e+03</text>
+<line x1="78" y1="70.0" x2="862" y2="70.0" class="grid"/>
+<text x="68.0" y="74.0" text-anchor="end" class="tick">7.56e+03</text>
+<line x1="78" y1="410" x2="862" y2="410" class="axis"/>
+<line x1="78" y1="70" x2="78" y2="410" class="axis"/>
+<text x="208.7" y="438.0" text-anchor="middle" class="label">early</text>
+<rect x="152.7" y="114.3" width="49.8" height="295.7" fill="#059669"/>
+<text x="177.6" y="108.3" text-anchor="middle" class="tick">6.57e+03</text>
+<rect x="214.9" y="114.6" width="49.8" height="295.4" fill="#d97706"/>
+<text x="239.8" y="108.6" text-anchor="middle" class="tick">6.57e+03</text>
+<text x="470.0" y="438.0" text-anchor="middle" class="label">middle</text>
+<rect x="414.0" y="179.8" width="49.8" height="230.2" fill="#059669"/>
+<text x="438.9" y="173.8" text-anchor="middle" class="tick">5.12e+03</text>
+<rect x="476.2" y="181.7" width="49.8" height="228.3" fill="#d97706"/>
+<text x="501.1" y="175.7" text-anchor="middle" class="tick">5.08e+03</text>
+<text x="731.3" y="438.0" text-anchor="middle" class="label">late</text>
+<rect x="675.3" y="410.0" width="49.8" height="0.0" fill="#059669"/>
+<text x="700.2" y="404.0" text-anchor="middle" class="tick">0</text>
+<rect x="737.6" y="410.0" width="49.8" height="0.0" fill="#d97706"/>
+<text x="762.4" y="404.0" text-anchor="middle" class="tick">0</text>
+<rect x="78" y="451" width="14" height="14" fill="#059669"/>
+<text x="98.0" y="464.0" text-anchor="start" class="legend">seed 0</text>
+<rect x="188" y="451" width="14" height="14" fill="#d97706"/>
+<text x="208.0" y="464.0" text-anchor="start" class="legend">seed 1</text>
+</svg>

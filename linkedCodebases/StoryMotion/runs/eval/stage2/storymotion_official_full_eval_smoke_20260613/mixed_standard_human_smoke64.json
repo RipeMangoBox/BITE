@@ -1,0 +1,249 @@
+{
+  "batch_size": 16,
+  "cache_dir": "runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+  "cache_file": "val.pt",
+  "config_name": "config_dit_xy",
+  "created_at": "2026-06-13T18:52:04+0800",
+  "data_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/pulpmotion-data",
+  "device": "cuda:0",
+  "elapsed_sec": 12.243623971939087,
+  "evaluated_samples": 64,
+  "first_batch_summary": {
+    "cache_z_shape": [
+      16,
+      192,
+      75
+    ],
+    "completion_shape": [
+      16,
+      192,
+      75
+    ],
+    "outputs": {
+      "raw_input": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              16,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            300,
+            4
+          ]
+        },
+        "projection": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            300,
+            9,
+            2
+          ]
+        }
+      },
+      "raw_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              16,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            300,
+            4
+          ]
+        }
+      },
+      "x_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            300,
+            14
+          ]
+        },
+        "human": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            300,
+            199
+          ]
+        }
+      }
+    },
+    "sample_ids": [
+      "2011_-4GsCEopbd4_00008_001_a",
+      "2011_-4GsCEopbd4_00017_000_a",
+      "2011_-EuO6OFypLo_00002_000_a",
+      "2011_-EuO6OFypLo_00002_000_b",
+      "2011_-EuO6OFypLo_00020_000_a",
+      "2011_-MG8-wCvzpE_00002_000_a",
+      "2011_-MG8-wCvzpE_00002_001_a",
+      "2011_-RBjiJto4hc_00027_000_a",
+      "2011_-UAElWXbk3I_00000_000_a",
+      "2011_-UAElWXbk3I_00000_001_a",
+      "2011_-WW51YaWO-4_00007_000_a",
+      "2011_-WW51YaWO-4_00007_002_a",
+      "2011_-Y2wqkD2KVM_00040_000_a",
+      "2011_-fJwmmnPHok_00006_000_a",
+      "2011_-fJwmmnPHok_00007_000_a",
+      "2011_-fJwmmnPHok_00007_001_a"
+    ],
+    "x_input": {
+      "camera": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          16,
+          300,
+          14
+        ]
+      },
+      "human": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          16,
+          300,
+          199
+        ]
+      },
+      "projection": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          16,
+          300,
+          18
+        ]
+      }
+    }
+  },
+  "metric_checkpoint_status": {
+    "autoencoder_ckpts": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/autoencoder/aemmardm-xgmj0yjj-325.ckpt"
+    ],
+    "clatr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-text_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_decoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_std.pt"
+    ],
+    "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+    "tmr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_decoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_encoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-text_encoder.pt"
+    ]
+  },
+  "metric_keys": [
+    "test/tmr/R1",
+    "test/tmr/R2",
+    "test/tmr/R3",
+    "test/tmr/coverage",
+    "test/tmr/density",
+    "test/tmr/ftd",
+    "test/tmr/mm_distance",
+    "test/tmr/precision",
+    "test/tmr/recall",
+    "test/tmr/tmr_score"
+  ],
+  "metrics": {
+    "test/tmr/R1": 0.28125,
+    "test/tmr/R2": 0.390625,
+    "test/tmr/R3": 0.484375,
+    "test/tmr/coverage": 1.0,
+    "test/tmr/density": 0.8606837606837607,
+    "test/tmr/ftd": 338.0810852050781,
+    "test/tmr/mm_distance": 49.42442607879639,
+    "test/tmr/precision": 1.0,
+    "test/tmr/recall": 1.0,
+    "test/tmr/tmr_score": 17.780155181884766
+  },
+  "mode": "storymotion_generated_eval_with_pulpmotion_official_callbacks",
+  "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+  "pulp_root": "/data/public/ripemangobox/Motion/PulpMotion",
+  "records_path": "runs/eval/storymotion_official_full_eval_smoke_20260613/mixed_standard_human_smoke64.records.jsonl",
+  "run": {
+    "checkpoint": "runs/train/stage2/pulp_official_full_mixed_20260611/gpu0_train_mixed_full_b512_epochmatch_82688_20260611_2110/last.pt",
+    "joint_loss_mode": "element_mean",
+    "run_dir": "runs/train/stage2/pulp_official_full_mixed_20260611/gpu0_train_mixed_full_b512_epochmatch_82688_20260611_2110",
+    "step": 82688
+  },
+  "sample_range": [
+    0,
+    64
+  ],
+  "sampler": {
+    "eta": 0.0,
+    "name": "deterministic_ddim_start_x",
+    "num_steps": 50,
+    "observed_branch_policy": "inject q(z_gt,t,per_sample_noise) at every step; final merge gt observed branch",
+    "padding_policy": "inject q(z_gt,t,per_sample_noise) at every step; final merge gt padded frames",
+    "prediction_type": "START_X",
+    "time_grid": "round(linspace(T-1,0,num_steps)) unique_consecutive, includes 0"
+  },
+  "scope_note": "Uses PulpMotion official metric callbacks/evaluator components, but StoryMotion model and sampler are custom.",
+  "seed": 20260613,
+  "set_name": "mixed_",
+  "split": "test",
+  "task": "human",
+  "torch": {
+    "cuda_available": true,
+    "cuda_device": "NVIDIA GeForce RTX 5090",
+    "version": "2.8.0+cu128"
+  }
+}

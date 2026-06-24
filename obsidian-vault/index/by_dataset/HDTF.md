@@ -1,0 +1,83 @@
+---
+title: "Dataset: HDTF"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: HDTF
+
+- [[obsidian-vault/analysis/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditions.md|EchoMimic Lifelike Audio Driven Portrait Animations through Editable Landmark Conditioning (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditioning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EchoMimic
+	- datasets: HDTF, CelebV-HQ, Collected Dataset
+- [[obsidian-vault/analysis/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditions.md|EchoMimic Lifelike Audio Driven Portrait Animations through Editable Landmark Conditions (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditioning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EchoMimic
+	- datasets: HDTF, CelebV-HQ, Collected Dataset
+- [[obsidian-vault/analysis/CVPR_2025/Teller_Real_Time_Streaming_Audio_Driven_Portrait_Animation_with_Autoregressive_Motion_Generation.md|Teller: Real-Time Streaming Audio-Driven Portrait Animation with Autoregressive Motion Generation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/Teller_Real_Time_Streaming_Audio_Driven_Portrait_Animation_with_Autoregressive_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Teller
+	- datasets: HDTF
+- [[obsidian-vault/analysis/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.md|ActAvatar: Temporally-Aware Precise Action Control for Talking Avatars (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ActAvatar
+	- datasets: HDTF, Action Bench
+- [[obsidian-vault/analysis/CVPR_2026/Avatar_Forcing_Real_Time_Interactive_Head_Avatar_Generation_for_Natural_Conversation.md|Avatar Forcing: Real-Time Interactive Head Avatar Generation for Natural Conversation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Avatar_Forcing_Real_Time_Interactive_Head_Avatar_Generation_for_Natural_Conversation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Avatar Forcing
+	- datasets: RealTalk, HDTF, ViCo
+- [[obsidian-vault/analysis/CVPR_2026/EmoTaG_Emotion_Aware_Talking_Head_Synthesis_on_Gaussian_Splatting_with_Few_Shot_Personalization.md|EmoTaG: Emotion-Aware Talking Head Synthesis on Gaussian Splatting with Few-Shot Personalization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EmoTaG_Emotion_Aware_Talking_Head_Synthesis_on_Gaussian_Splatting_with_Few_Shot_Personalization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: EmoTaG
+	- datasets: HDTF, MEAD-derived emotional test set
+- [[obsidian-vault/analysis/CVPR_2026/InfinityHuman_Towards_Long_Term_Audio_Driven_Human_Animation.md|InfinityHuman: Towards Long-Term Audio-Driven Human Animation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/InfinityHuman_Towards_Long_Term_Audio_Driven_Human_Animation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InfinityHuman
+	- datasets: EMTD, HDTF
+- [[obsidian-vault/analysis/CVPR_2026/OMG_Avatar_One_shot_Multi_LOD_Gaussian_Head_Avatar.md|OMG-Avatar: One-shot Multi-LOD Gaussian Head Avatar (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OMG_Avatar_One_shot_Multi_LOD_Gaussian_Head_Avatar.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OMG-Avatar
+	- datasets: VFHQ, HDTF
+- [[obsidian-vault/analysis/CVPR_2026/PC_Talk_Precise_Facial_Animation_Control_for_Audio_Driven_Talking_Face_Generation.md|PC-Talk: Precise Facial Animation Control for Audio-Driven Talking Face Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PC_Talk_Precise_Facial_Animation_Control_for_Audio_Driven_Talking_Face_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PC-Talk
+	- datasets: HDTF, MEAD
+- [[obsidian-vault/analysis/CVPR_2026/Real_Time_Generation_of_Streamable_Talking_Portrait_Video_with_Reference_Guided_Deep_Compression_VAEs.md|Real-Time Generation of Streamable Talking Portrait Video with Reference-Guided Deep Compression VAEs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Real_Time_Generation_of_Streamable_Talking_Portrait_Video_with_Reference_Guided_Deep_Compression_VAEs.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Reference-Guided Causal Video VAE with Blockwise Autoregressive Rectified Flow Transformer
+	- datasets: HDTF, PortraitOneMin
+- [[obsidian-vault/analysis/CVPR_2026/STAvatar_Soft_Binding_and_Temporal_Density_Control_for_Monocular_3D_Head_Avatars_Reconstruction.md|STAvatar: Soft Binding and Temporal Density Control for Monocular 3D Head Avatars Reconstruction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/STAvatar_Soft_Binding_and_Temporal_Density_Control_for_Monocular_3D_Head_Avatars_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: STAvatar
+	- datasets: INSTA, PointAvatar, NerFace
+- [[obsidian-vault/analysis/CVPR_2026/SyncDreamer_Controllable_and_Expressive_Avatar_Generation_Beyond_the_Talking_Head.md|SyncDreamer: Controllable and Expressive Avatar Generation Beyond the Talking Head (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SyncDreamer_Controllable_and_Expressive_Avatar_Generation_Beyond_the_Talking_Head.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SyncDreamer
+	- datasets: HDTF

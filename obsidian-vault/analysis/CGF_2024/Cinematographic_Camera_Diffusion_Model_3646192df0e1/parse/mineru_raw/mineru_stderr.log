@@ -1,0 +1,40 @@
+2026-06-05 15:58:05.449 | INFO     | mineru.cli.client:run_orchestrated_cli:877 - Started local mineru-api at http://127.0.0.1:60393
+2026-06-05 15:58:07.327 | INFO     | __main__:create_app:262 - Request concurrency limited to 3
+INFO:     Started server process [1225015]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:60393 (Press CTRL+C to quit)
+2026-06-05 15:58:07.456 | INFO     | mineru.cli.client:run_planned_task:773 - Submitting batch 1/1 | 1 document, 1 page in this batch | 1 page total | task#1 [Cinematographic_Camera_Diffusion_Model]
+2026-06-05 15:58:09.595 | INFO     | mineru.backend.pipeline.pipeline_analyze:doc_analyze_streaming:183 - Pipeline processing-window multi-file run. doc_count=1, total_pages=1, window_size=64, total_batches=1
+2026-06-05 15:58:11.541 | INFO     | mineru.backend.pipeline.pipeline_analyze:doc_analyze_streaming:235 - Pipeline processing window batch 1/1: 1/1 pages, batch_pages=1, doc_slices=doc0:1-1
+2026-06-05 15:58:11.616 | INFO     | mineru.backend.pipeline.pipeline_analyze:batch_image_analyze:328 - GPU Memory: 24 GB, Batch Ratio: 8. 
+2026-06-05 15:58:11.616 | INFO     | mineru.backend.pipeline.model_init:__init__:207 - DocAnalysis init, this may take some times......
+2026-06-05 15:58:14.976 | INFO     | mineru.backend.pipeline.model_init:__init__:260 - DocAnalysis init done!
+2026-06-05 15:58:14.977 | INFO     | mineru.backend.pipeline.pipeline_analyze:custom_model_init:83 - model init cost: 3.3609564304351807
+
+Layout Predict:   0%|          | 0/1 [00:00<?, ?it/s]
+Layout Predict: 100%|██████████| 1/1 [00:00<00:00,  2.53it/s]
+Layout Predict: 100%|██████████| 1/1 [00:00<00:00,  2.53it/s]
+
+Table-ocr det: 0it [00:00, ?it/s]
+Table-ocr det: 0it [00:00, ?it/s]
+
+Table-wireless Predict: 0it [00:00, ?it/s]
+Table-wireless Predict: 0it [00:00, ?it/s]
+
+OCR-det ch:   0%|          | 0/13 [00:00<?, ?it/s]
+OCR-det ch:  46%|████▌     | 6/13 [00:00<00:00, 53.46it/s]
+OCR-det ch:  92%|█████████▏| 12/13 [00:00<00:00, 50.08it/s]
+OCR-det ch: 100%|██████████| 13/13 [00:00<00:00, 50.53it/s]
+
+Seal Predict: 0it [00:00, ?it/s]
+Seal Predict: 0it [00:00, ?it/s]
+
+Processing pages:   0%|          | 0/1 [00:00<?, ?it/s]
+Processing pages: 100%|██████████| 1/1 [00:00<00:00,  8.98it/s]
+2026-06-05 15:58:17.596 | INFO     | mineru.cli.client:run_planned_task:809 - Completed batch 1/1 | Processed 1/1 page | 1 of 1 batch finished | task#1 [Cinematographic_Camera_Diffusion_Model]
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1225015]
+[W605 15:58:28.432798863 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())

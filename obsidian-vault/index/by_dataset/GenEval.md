@@ -1,0 +1,215 @@
+---
+title: "Dataset: GenEval"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: GenEval
+
+- [[obsidian-vault/analysis/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.md|BAGEL: Emerging Properties in Unified Multimodal Pretraining (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: BAGEL
+	- datasets: MMMU, GenEval, WISE
+- [[obsidian-vault/analysis/arxiv_2026/Lance_Unified_Multimodal_Modeling_by_Multi-Task_Synergy.md|Lance: Unified Multimodal Modeling by Multi-Task Synergy (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Lance:_Unified_Multimodal_Modeling_by_Multi-Task_Synergy.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Lance
+	- datasets: GenEval, DPG-Bench, VBench
+- [[obsidian-vault/analysis/CVPR_2026/Compositional_Text_to_Image_Generation_Via_Region_aware_Bimodal_Direct_Preference_Optimization.md|Compositional Text-to-Image Generation Via Region-aware Bimodal Direct Preference Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Compositional_Text_to_Image_Generation_Via_Region_aware_Bimodal_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: BIDPO (Bimodal Direct Preference Optimization)
+	- datasets: T2I-CompBench, GenEval, DPG-Bench
+- [[obsidian-vault/analysis/CVPR_2026/CTCal_Rethinking_Text_to_Image_Diffusion_Models_via_Cross_Timestep_Self_Calibration.md|CTCal: Rethinking Text-to-Image Diffusion Models via Cross-Timestep Self-Calibration (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CTCal_Rethinking_Text_to_Image_Diffusion_Models_via_Cross_Timestep_Self_Calibration.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Cross-Timestep Self-Calibration (CTCAL)
+	- datasets: T2I-CompBench++, GenEval
+- [[obsidian-vault/analysis/CVPR_2026/Curriculum_Group_Policy_Optimization_Adaptive_Sampling_for_Unleashing_the_Potential_of_Text_to_Image_Generation.md|Curriculum Group Policy Optimization: Adaptive Sampling for Unleashing the Potential of Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Curriculum_Group_Policy_Optimization_Adaptive_Sampling_for_Unleashing_the_Potential_of_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Curriculum Group Policy Optimization (CGPO)
+	- datasets: GenEval, T2I-CompBench++, DPG Bench
+- [[obsidian-vault/analysis/CVPR_2026/Diffusion_Sampling_Path_Tells_More_An_Efficient_Plug_and_Play_Strategy_for_Sample_Filtering.md|Diffusion Sampling Path Tells More: An Efficient Plug-and-Play Strategy for Sample Filtering (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Diffusion_Sampling_Path_Tells_More_An_Efficient_Plug_and_Play_Strategy_for_Sample_Filtering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CFG-Rejection
+	- datasets: ImageNet, GenEval, DPG-Bench
+- [[obsidian-vault/analysis/CVPR_2026/dMLLM_TTS_Self_Verified_and_Efficient_Test_Time_Scaling_for_Diffusion_Multi_Modal_Large_Language_Models.md|dMLLM-TTS: Self-Verified and Efficient Test-Time Scaling for Diffusion Multi-Modal Large Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/dMLLM_TTS_Self_Verified_and_Efficient_Test_Time_Scaling_for_Diffusion_Multi_Modal_Large_Language_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: dMLLM-TTS
+	- datasets: GenEval
+- [[obsidian-vault/analysis/CVPR_2026/Expand_and_Prune_Maximizing_Trajectory_Diversity_for_Effective_GRPO_in_Generative_Models.md|Expand and Prune: Maximizing Trajectory Diversity for Effective GRPO in Generative Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Expand_and_Prune_Maximizing_Trajectory_Diversity_for_Effective_GRPO_in_Generative_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Pro-GRPO
+	- datasets: DrawBench, GenEval, PickScore evaluation training cost
+- [[obsidian-vault/analysis/CVPR_2026/GRPO_Guard_Mitigating_Implicit_Over_Optimization_in_Flow_Matching_via_Regulated_Clipping.md|GRPO-Guard: Mitigating Implicit Over-Optimization in Flow Matching via Regulated Clipping (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GRPO_Guard_Mitigating_Implicit_Over_Optimization_in_Flow_Matching_via_Regulated_Clipping.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: GRPO-Guard
+	- datasets: GenEval, PickScore, TextRender
+- [[obsidian-vault/analysis/CVPR_2026/Improving_Text_to_Image_Generation_with_Intrinsic_Self_Confidence_Rewards.md|Improving Text-to-Image Generation with Intrinsic Self-Confidence Rewards (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Improving_Text_to_Image_Generation_with_Intrinsic_Self_Confidence_Rewards.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SOLACE
+	- datasets: GenEval, OCR, CLIPScore
+- [[obsidian-vault/analysis/CVPR_2026/LazyVAR_Accelerating_Visual_Autoregressive_Models_via_Scale_wise_Token_Pruning_and_Parallel_Group_Decoding.md|LazyVAR: Accelerating Visual Autoregressive Models via Scale-wise Token Pruning and Parallel Group Decoding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LazyVAR_Accelerating_Visual_Autoregressive_Models_via_Scale_wise_Token_Pruning_and_Parallel_Group_Decoding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: LazyVAR
+	- datasets: GenEval, MJHQ-30K, HPSv2.1
+- [[obsidian-vault/analysis/CVPR_2026/MaskFocus_Focusing_Policy_Optimization_on_Critical_Steps_for_Masked_Image_Generation.md|MaskFocus: Focusing Policy Optimization on Critical Steps for Masked Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MaskFocus_Focusing_Policy_Optimization_on_Critical_Steps_for_Masked_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MaskFocus
+	- datasets: GenEval, DrawBench
+- [[obsidian-vault/analysis/CVPR_2026/NAMI_Efficient_Image_Generation_via_Bridged_Progressive_Rectified_Flow_Transformers.md|NAMI: Efficient Image Generation via Bridged Progressive Rectified Flow Transformers (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/NAMI_Efficient_Image_Generation_via_Bridged_Progressive_Rectified_Flow_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: NAMI (Bridged Progressive Rectified Flow Transformers)
+	- datasets: Inference Time, GenEval, DPG-Benchmark
+- [[obsidian-vault/analysis/CVPR_2026/OctoT2I_A_Self_Evolving_Agentic_Text_to_Image_Router.md|OctoT2I: A Self-Evolving Agentic Text-to-Image Router (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OctoT2I_A_Self_Evolving_Agentic_Text_to_Image_Router.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OctoT2I
+	- datasets: GenEval, T2ICompBench++, User Study
+- [[obsidian-vault/analysis/CVPR_2026/OmniGen2_Towards_Instruction_Aligned_Multimodal_Generation.md|OmniGen2: Towards Instruction-Aligned Multimodal Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OmniGen2_Towards_Instruction_Aligned_Multimodal_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OmniGen2
+	- datasets: GenEval, OneIG-Bench, Emu-Edit
+- [[obsidian-vault/analysis/CVPR_2026/OSPO_Object_Centric_Self_Improving_Preference_Optimization_for_Text_to_Image_Generation.md|OSPO: Object-Centric Self-Improving Preference Optimization for Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OSPO_Object_Centric_Self_Improving_Preference_Optimization_for_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: OSPO (Object-centric Self-improving Preference Optimization)
+	- datasets: T2I-CompBench++, DPGBench, GenEval
+- [[obsidian-vault/analysis/CVPR_2026/PromptEnhancer_Taming_Your_Rewriter_for_Text_to_Image_Generation_via_Fine_Grained_Reward.md|PromptEnhancer: Taming Your Rewriter for Text-to-Image Generation via Fine-Grained Reward (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PromptEnhancer_Taming_Your_Rewriter_for_Text_to_Image_Generation_via_Fine_Grained_Reward.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: PromptEnhancer
+	- datasets: GenEval, T2I-CompBench, T2I-Keypoints-Align
+- [[obsidian-vault/analysis/CVPR_2026/RAISE_Requirement_Adaptive_Evolutionary_Refinement_for_Training_Free_Text_to_Image_Alignment.md|RAISE: Requirement-Adaptive Evolutionary Refinement for Training-Free Text-to-Image Alignment (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RAISE_Requirement_Adaptive_Evolutionary_Refinement_for_Training_Free_Text_to_Image_Alignment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: RAISE
+	- datasets: GenEval, DrawBench
+- [[obsidian-vault/analysis/CVPR_2026/Rethinking_UMM_Visual_Generation_Masked_Modeling_for_Efficient_Image_Only_Pre_training.md|Rethinking UMM Visual Generation: Masked Modeling for Efficient Image-Only Pre-training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Rethinking_UMM_Visual_Generation_Masked_Modeling_for_Efficient_Image_Only_Pre_training.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: IOMM (Image-Only Training for UMMs)
+	- datasets: GenEval, WISE, DPGBench
+- [[obsidian-vault/analysis/CVPR_2026/Self_Evaluation_Unlocks_Any_Step_Text_to_Image_Generation.md|Self-Evaluation Unlocks Any-Step Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Self_Evaluation_Unlocks_Any_Step_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Self-Evaluating Model (Self-E)
+	- datasets: GenEval
+- [[obsidian-vault/analysis/CVPR_2026/SpatialReward_Verifiable_Spatial_Reward_Modeling_for_Fine_Grained_Spatial_Consistency_in_Text_to_Image_Generation.md|SpatialReward: Verifiable Spatial Reward Modeling for Fine-Grained Spatial Consistency in Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SpatialReward_Verifiable_Spatial_Reward_Modeling_for_Fine_Grained_Spatial_Consistency_in_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SpatialReward
+	- datasets: GenEval, SpatRelBench, Human spatial consistency judgments
+- [[obsidian-vault/analysis/CVPR_2026/Stepwise_Credit_Assignment_for_GRPO_on_Flow_Matching_Models.md|Stepwise Credit Assignment for GRPO on Flow-Matching Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Stepwise_Credit_Assignment_for_GRPO_on_Flow_Matching_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Stepwise-Flow-GRPO
+	- datasets: GenEval, Multiple, UnifiedReward-7B on GenEval
+- [[obsidian-vault/analysis/CVPR_2026/Synthetic_Curriculum_Reinforces_Compositional_Text_to_Image_Generation.md|Synthetic Curriculum Reinforces Compositional Text-to-Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Synthetic_Curriculum_Reinforces_Compositional_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: CompGen
+	- datasets: GenEval / DPG / TIFA / T2I-CompBench / DSG, GenEval, DSG
+- [[obsidian-vault/analysis/CVPR_2026/UniGen_1_5_Enhancing_Image_Generation_and_Editing_through_Reward_Unification_in_RL.md|UniGen-1.5: Enhancing Image Generation and Editing through Reward Unification in RL (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniGen_1_5_Enhancing_Image_Generation_and_Editing_through_Reward_Unification_in_RL.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: UniGen-1.5
+	- datasets: ImgEdit, GenEval, DPG-Bench
+- [[obsidian-vault/analysis/CVPR_2026/VA_p_Variational_Policy_Alignment_for_Pixel_Aware_Autoregressive_Generation.md|VA-p: Variational Policy Alignment for Pixel-Aware Autoregressive Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VA_p_Variational_Policy_Alignment_for_Pixel_Aware_Autoregressive_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VA-π
+	- datasets: ImageNet-1K class-conditional, ImageNet-1K, GenEval
+- [[obsidian-vault/analysis/CVPR_2026/VisionDirector_Vision_Language_Guided_Closed_Loop_Refinement_for_Generative_Image_Synthesis.md|VisionDirector: Vision-Language Guided Closed-Loop Refinement for Generative Image Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VisionDirector_Vision_Language_Guided_Closed_Loop_Refinement_for_Generative_Image_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VisionDirector
+	- datasets: LGBench, GenEval
+- [[obsidian-vault/analysis/CVPR_2026/Wan_Weaver_Interleaved_Multi_modal_Generation_via_Decoupled_Training.md|Wan-Weaver: Interleaved Multi-modal Generation via Decoupled Training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Wan_Weaver_Interleaved_Multi_modal_Generation_via_Decoupled_Training.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Wan-Weaver
+	- datasets: OpenING, WeaverBench, MMMU
+- [[obsidian-vault/analysis/ICLR_2026/Beyond_Text_to_Image_Liberating_Generation_with_a_Unified_Discrete_Diffusion_Model.md|Beyond Text-to-Image: Liberating Generation with a Unified Discrete Diffusion Model (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Beyond_Text_to_Image_Liberating_Generation_with_a_Unified_Discrete_Diffusion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Muddit
+	- datasets: GenEval, MS-COCO, VQAv2
+- [[obsidian-vault/analysis/ICLR_2026/Consolidating_Reinforcement_Learning_for_Multimodal_Discrete_Diffusion_Models.md|Consolidating Reinforcement Learning for Multimodal Discrete Diffusion Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Consolidating_Reinforcement_Learning_for_Multimodal_Discrete_Diffusion_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+	- methods: MaskGRPO
+	- datasets: GSM8K, MATH500, MBPP
+- [[obsidian-vault/analysis/ICLR_2026/Diffusion_Blend_Inference_Time_Multi_Preference_Alignment_for_Diffusion_Models.md|Diffusion Blend: Inference-Time Multi-Preference Alignment for Diffusion Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Diffusion_Blend_Inference_Time_Multi_Preference_Alignment_for_Diffusion_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Diffusion Blend（包含DB-MPA、DB-KLA、DB-MPA-LS三个算法）
+	- datasets: Short-DrawBench, GenEval, 推理时间
+- [[obsidian-vault/analysis/ICLR_2026/DiffusionNFT_Online_Diffusion_Reinforcement_with_Forward_Process.md|DiffusionNFT: Online Diffusion Reinforcement with Forward Process (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DiffusionNFT_Online_Diffusion_Reinforcement_with_Forward_Process.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+	- methods: Diffusion Negative-aware FineTuning (DiffusionNFT)
+	- datasets: GenEval, OCR, PickScore
+- [[obsidian-vault/analysis/ICLR_2026/FLUX_Reason_6M_PRISM_Bench_A_Million_Scale_Text_to_Image_Reasoning_Dataset_and_Comprehensive_Benchmark.md|FLUX-Reason-6M & PRISM-Bench: A Million-Scale Text-to-Image Reasoning Dataset and Comprehensive Benchmark (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FLUX_Reason_6M_PRISM_Bench_A_Million_Scale_Text_to_Image_Reasoning_Dataset_and_Comprehensive_Benchmark.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: FLUX-Reason-6M (合成数据集) & PRISM-Bench (评估基准)
+	- datasets: PRISM-Bench, GenEval
+- [[obsidian-vault/analysis/ICLR_2026/GLASS_Flows_Efficient_Inference_for_Reward_Alignment_of_Flow_and_Diffusion_Models.md|GLASS Flows: Efficient Inference for Reward Alignment of Flow and Diffusion Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/GLASS_Flows_Efficient_Inference_for_Reward_Alignment_of_Flow_and_Diffusion_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: GLASS Flows
+	- datasets: GenEval, SiT
+- [[obsidian-vault/analysis/ICLR_2026/Understanding_vs_Generation_Navigating_Optimization_Dilemma_in_Multimodal_Models.md|Understanding vs. Generation: Navigating Optimization Dilemma in Multimodal Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Understanding_vs_Generation_Navigating_Optimization_Dilemma_in_Multimodal_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Reason-Reflect-Refine (R3)
+	- datasets: GenEval++, Image-Text Alignment, Compositional VQA

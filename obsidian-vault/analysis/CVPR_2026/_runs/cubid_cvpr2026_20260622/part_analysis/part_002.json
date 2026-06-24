@@ -1,0 +1,103 @@
+{
+  "part_id": "part_002",
+  "section_role": "abstract, contributions, related work, method overview",
+  "method_evidence": [
+    {
+      "claim": "CubiD performs masked prediction across both spatial and dimensional axes simultaneously.",
+      "section": "3. Method",
+      "anchor": "We propose Cubic Discrete Diffusion (CubiD), which performs masked prediction across both spatial and dimensional axes simultaneously.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "CubiD treats the h × w × d tensor as a unified space with fine-grained masking.",
+      "section": "Contributions",
+      "anchor": "treating the h × w × d tensor as a unified space with fine-grained masking",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Dimension-wise quantization discretizes continuous high-dimensional features.",
+      "section": "3.1",
+      "anchor": "dimension-wise quantization that enables tractable discretization",
+      "confidence": 0.9
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "CubiD achieves 1.88 FID on ImageNet 256x256 with 768-dimensional discrete tokens.",
+      "table_or_figure": "N/A",
+      "metric": "FID",
+      "value": "1.88",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Method scales from 900M to 3.7B parameters.",
+      "table_or_figure": "N/A",
+      "metric": "Parameters",
+      "value": "900M to 3.7B",
+      "confidence": 0.9
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Figure 3",
+      "role_hint": "Overview of Cubic Discrete Diffusion",
+      "caption": "Figure 3. Overview of Cubic Discrete Diffusion. (a) High-dimensional Token Discretization... (b) Training via Dimension-wise Mask Modeling...",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_002",
+    "part_index": 2,
+    "part_count": 9,
+    "chunk_chars": 7036,
+    "latency_seconds": 5.909,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 2954,
+      "completion_tokens_est": 536,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3490,
+      "total_with_reasoning_tokens_est": 3490,
+      "estimated_cost_usd": 0.001751,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2105,
+      "completion_tokens_api": 475,
+      "total_tokens_api": 2580,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1465,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 475,
+        "prompt_tokens": 2105,
+        "total_tokens": 2580,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1465
+      },
+      "estimated_cost_usd_api": 0.001053,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 1788,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 477,
+        "api_usage_present": true
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Cubic Discrete Diffusion: Discrete Visual Generation on High-Dimensional Representation Tokens
+Part: 2/9
+Character span: 7064-14101
+
+=== PART CONTENT ===
+plex dependencies in high-dimensional tensors—learning both intra-position correlations (how dimensions relate within a spatial location) and inter-position patterns (how features propagate spatially)—through bidirectional attention over partially observed values.Second,it decouples generation complexity from dimensionality:unlike autoregressive methods that scale with O(hwd), our iterative refinement requires a fixed number of steps Tregardless of feature dimensionality,benefiting from the semantic redundancy inherent in high-dimensional representations.By transforming an intractable sequential process into hundreds of parallel iterations,CubiD makes high-dimensional discrete generation computationally feasible while maintaining the modeling capacity necessary for
+
+high-quality synthesis.
+
+Extensive experiments validate our approach．We first verify that dimension-wise quantization preserves both understanding and reconstruction capabilities of the original continuous representations.In ablation studies,we compare our fine-grained cubic masking against alternative strategies: treating spatial positions or dimensions as groups significantly degrades performance,confirming the necessity of element-wise masking across the 3D tensor. The method also exhibits strong scaling behavior from 90oM to 3.7B parameters and generalizes well across different representation encoders (DINOv2 [3O] and SigLIP2 [4O]). On ImageNet 256x256 [8],CubiD achieves a competitive 1.88 FID score with 768-dimensional discrete tokens,establishing that high-dimensional discrete generation is both feasible and effective.
+
+Our contributions are summarized as follows:
+
+·We demonstrate that proper discretization of highdimensional representation tokens can preserve their original semantic capabilities,establishing the viability of unified discrete representations for both understanding and generation.
+
+·We propose Cubic Discrete Diffusion,a novel method that addresses the fundamental modeling challenge of high-dimensional discrete generation by treating the h × w × d tensor as a unified space with fine-grained masking,making discrete generative models tractable at high dimensionality.
+
+· We achieve state-of-the-art discrete generation results on ImageNet 256x256,with strong scaling behavior from 900M to 3B parameters and generalization across different representation encoders,demonstrating the effectiveness of discrete diffusion for high-dimensional visual generation.
+
+## 2.Related Work
+
+Visual TokenizationVisual tokenization is commonly used to convert images into latent representations that support image reconstruction and generation.In the traditional VAE tokenizers [7,16],an encoder first compresses an image into a low-dimensional continuous latent map (typically with 4-32 dimensions) and then a decoder reconstructs the corresponding image with the latent as input. The encoder and decoder of these tokenizers are jointly trained for the reconstruction task.Building on this framework,discrete tokenizers further quantize each vector from the latent maps into one or several tokens [10,13,28,43,49,51],enabling discrete image generation．More recently,representationbased tokenizers [34,52,53] have emerged.Most of these methods use a frozen pretrained vision foundation model [3O,4O] as the encoder and further train additional adapters to project its outputs into low-dimensional latents. In contrast,RAE [53] directly uses high-dimensional DI-
+
+NOv2 [30] or SigLIP [4O] features as latents (768+ dimensions)without any adaptation,and a specially designed training schedule is applied to these high-dimensional latents to adapt the continuous diffusion models for generation.In this paper,we first transform high-dimensional features from vision foundation models into discrete tokens and then train generative models on those tokens.
+
+Discrete Visual Generation Discrete visual generation performs image generation based on sequences of discrete tokens. Autoregressive models [17,24,31,36, 42, 44, 48] generate tokens sequentially via the next-token prediction paradigm.Although these models can generate high-quality images,they require O(N） generation steps for N tokens, making this paradigm computationally expensive for highresolution images.To improve sampling efficiency,discrete diffusion models [3] have been introduced.Instead of generating tokens sequentially, they generate multiple tokens in parallel, thereby achieving higher efficiency. Like continuous diffusion models,discrete diffusion models also learn to restore corrupted tokens, with corruption defined by absorbing-state [3,26,29,45],uniform[1],or Gaussianlike transitions [1,26].Among these,the absorbing-state transition is the predominant choice due to its strong empirical performance [29]. It corrupts tokens into a special [MASK] state,aligning with representative masked generative models such as BERT[9] and MaskGIT[3]. Existing autoregressive and discrete diffusion models perform well when each image is represented by a small number of discrete tokens derived from low-dimensional latents.However,when representation-based tokenizers produce more tokens per latent,the total token count grows dramatically and existing models become impractical. Therefore,in this work,we extend discrete diffusion models to more efficiently handle tokens derived from high-dimensional latents.
+
+## 3.Method
+
+Our goal is to enable discrete generative modeling of highdimensional representation tokens from frozen pretrained encoders.This requires two steps:discretizing the continuous high-dimensional features,and modeling the resulting discrete token distribution.We frst review the necessary preliminaries:high-dimensional features from pretrained encoders and dimension-wise quantization that enables tractable discretization (Sec.3.1). The core challenge—and our main contribution—lies in modeling the joint distribution of the resulting h × w × d discrete tokens,an exponentially large space where traditional methods fail.We propose Cubic Discrete Diffusion (CubiD), which performs masked prediction across both spatial and dimensional axes simultaneously. By masking and predicting at the dimension level, CubiD captures complex interdimensional dependencies while enabling efcient parallel generation,transforming intractable sequential modeling into practical iterative refinement (Sec. 3.2).
+
+![](images/1eafac52892166386681d533f32eeef3d31b9776144cf80cb53cbe840b7de4d0.jpg)  
+Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes.

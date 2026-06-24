@@ -1,0 +1,116 @@
+{
+  "part_id": "part_006",
+  "section_role": "Evaluation and Results",
+  "method_evidence": [
+    {
+      "claim": "For conditional generation, we employ classifier-free guidance with a guidance scale of 6.0.",
+      "section": "5.1",
+      "anchor": "classifier-free guidance with a guidance scale of 6.0",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Audio-Omni achieves strong understanding performance, outperforming most unified models and approaching the level of dedicated understanding specialists.",
+      "table_or_figure": "Table 2",
+      "metric": "MMSU, MMAU",
+      "value": "outperforming most unified models",
+      "confidence": 0.9
+    },
+    {
+      "claim": "In generation tasks, our model demonstrates strong overall performance, consistently and significantly outperforming all other unified models. Notably, it further surpasses specialized expert models in T2M and TTS.",
+      "table_or_figure": "Table 3",
+      "metric": "FAD, WER",
+      "value": "surpasses specialized expert models in T2M and TTS",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Audio-Omni achieves the best performance on all metrics for editing.",
+      "table_or_figure": "Table 4",
+      "metric": "FAD, LSD, CLAP score",
+      "value": "best performance on all metrics",
+      "confidence": 0.9
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table 2",
+      "role_hint": "Understanding performance comparison",
+      "caption": "As shown in Table 2, Audio-Omni achieves strong understanding performance...",
+      "confidence": 0.9
+    },
+    {
+      "label": "Table 3",
+      "role_hint": "Generation performance comparison",
+      "caption": "In generation tasks, our model demonstrates strong overall performance...",
+      "confidence": 0.9
+    },
+    {
+      "label": "Table 4",
+      "role_hint": "Editing performance comparison",
+      "caption": "As shown in Table 4, Audio-Omni achieves the best performance on all metrics...",
+      "confidence": 0.9
+    },
+    {
+      "label": "Figure 4",
+      "role_hint": "Qualitative showcase of capabilities",
+      "caption": "Fig. 4. Qualitative showcase of Audio-Omni’s capabilities, including (a) knowledge-augmented generation, (b) in-context generation, (c) zero-shot voice conversion, and (d) zero-shot speech editing.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_006",
+    "part_index": 6,
+    "part_count": 13,
+    "chunk_chars": 5356,
+    "latency_seconds": 6.772,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 2449,
+      "completion_tokens_est": 733,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3182,
+      "total_with_reasoning_tokens_est": 3182,
+      "estimated_cost_usd": 0.001703,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 1896,
+      "completion_tokens_api": 635,
+      "total_tokens_api": 2531,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1256,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 635,
+        "prompt_tokens": 1896,
+        "total_tokens": 2531,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1256
+      },
+      "estimated_cost_usd_api": 0.001101,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 2443,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 637,
+        "api_usage_present": true
+      }
+    }
+  }
+}

@@ -1,0 +1,365 @@
+---
+title: "From None to All: Self-Supervised 3D Reconstruction via Novel View Synthesis"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/From_None_to_All_Self_Supervised_3D_Reconstruction_via_Novel_View_Synthesis.pdf
+project_link: "https://ranrhuang.github.io/nas3r/"
+code_link: null
+aliases:
+- FNASS3RNVS
+tags:
+- CVPR_2026
+- topic/vision_multimodal_applications
+- topic/vision_multimodal_applications/3d_rendering_reconstruction
+- topic/representation_self_supervised_transfer
+core_operator: 将高斯中心从“规范空间直接回归”改为“基于每视深度提升的局部到全局范式”，同时通过掩码注意力消除目标视图信息泄漏，使网络能从随机初始化端到端地仅靠2D光度一致性学习几何与相机。
+primary_logic: 深度引导的高斯提升与掩码解码器组合，提供了一个良性约束的优化景观，使得完全自监督的联合重建成为可能，无需任何3D标注或预训练先验。
+claims:
+- 在RealEstate10K上，NAS3R（随机初始化，无先验，无内参）PSNR达到23.130，显著超过最好的自监督方法SelfSplat（PSNR 19.152）和SPFSplat*（PSNR 21.306），并接近监督方法MVSplat（PSNR 24.012）。
+- 两视图相对姿态估计在RE10K上达到旋转AUC@10° 69.9、AUC@20° 78.4，平移AUC@10° 52.7、AUC@20° 66.3，不仅远超其他自监督方法，还接近甚至超过全监督特征匹配方法SuperPoint+SuperGlue。
+- 在BlendedMVS上深度估计，NAS3R的rel↓=0.206，τ↑=71.4，明显优于监督方法MVSplat（0.405/54.0），证明其从纯图像信号中学习精确几何的能力。
+- RE10K (2-view NVS) 上 PSNR↑ = 23.130
+---
+
+# From None to All: Self-Supervised 3D Reconstruction via Novel View Synthesis
+
+> [!tip] 核心洞察
+> 深度引导的高斯提升与掩码解码器组合，提供了一个良性约束的优化景观，使得完全自监督的联合重建成为可能，无需任何3D标注或预训练先验。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | 从无到全：通过新视角合成的自监督三维重建 |
+| 英文题名 | From None to All: Self-Supervised 3D Reconstruction via Novel View Synthesis |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2603.27455) · [Project](https://ranrhuang.github.io/nas3r/) |
+| Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/representation_self_supervised_transfer |
+| Method | NAS3R |
+| Dataset | RE10K, BlendedMVS, DL3DV |
+
+> [!tip] 效果简介
+> - RE10K (2-view NVS) 上，PSNR↑ 23.130 vs 19.152 (SelfSplat, 自监督最佳同类方法) (+3.978)。
+> - RE10K (2-view Pose) 上，Rotation AUC@20°↑ 78.4 vs 62.7 (SelfSplat) (+15.7)。
+> - BlendedMVS (2-view Depth) 上，rel↓ 0.206 vs 0.405 (MVSplat, 监督方法) (-0.199)。
+
+## 概述
+
+**问题瓶颈**：从无约束多视图图像中联合重建显式3D场景并估计相机参数，是一个高度欠定的“鸡与蛋”问题。现有方法要么依赖真值相机位姿/内参进行监督训练，要么需要强预训练先验（如DUSt3R、MASt3R）或点云蒸馏才能从随机初始化收敛，难以在完全无3D标注的条件下端到端学习。
+
+**核心方法**：NAS3R提出一个“从无到全”的自监督框架，仅通过2D光度一致性即可从随机初始化联合学习3D高斯原语、相机内外参和深度图。其关键设计包括：(1) **深度引导的高斯提升**——从每视深度预测出发，利用自预测位姿和内参将像素提升到3D空间，替代从规范空间直接回归3D点的范式；(2) **掩码注意力机制**——严格控制跨视图信息流，防止目标视图信息泄漏到上下文重建中；(3) **完全自监督训练**——无需任何真值位姿、内参或3D标注，仅依靠自预测相机渲染目标视图的MSE+LPIPS损失驱动学习。
+
+**主要结果**：在RealEstate10K双视图新视图合成任务上，NAS3R以PSNR 23.130显著超越最佳自监督方法SelfSplat（19.152）和SPFSplat*（21.306），并接近监督方法MVSplat（24.012）。在两视图姿态估计上，旋转AUC@20°达到78.4，不仅远超其他自监督方法，还接近甚至超过全监督特征匹配方法SuperPoint+SuperGlue。在BlendedMVS深度估计上，相对误差rel↓=0.206，明显优于监督方法MVSplat（0.405），证明其从纯图像信号中学习精确几何的能力。
+
+**方法定位**：NAS3R属于自监督3D高斯散点重建方法，与pixelSplat、MVSplat等监督方法以及SelfSplat、SPFSplat等自监督方法相比，其核心差异在于完全消除了对真值相机参数和预训练先验的依赖（见Table 1），通过局部到全局的深度提升范式和掩码解码器实现了从随机初始化的稳定端到端训练。
+
+## 背景与动机
+
+### 三维重建与新视角合成的范式演进
+
+从一组无约束二维图像恢复三维场景几何并合成任意新视角，是计算机视觉的核心问题。近年来，以3D高斯散点（3D Gaussian Splatting, 3DGS）为代表的显式表示方法，凭借其高保真渲染质量和实时推理速度，迅速成为新视角合成（Novel View Synthesis, NVS）的主流范式。然而，这一范式的成功高度依赖于两个关键前提：**精确的相机位姿**和**已知的相机内参**。主流监督方法如**pixelSplat**、**MVSplat**和**NoPoSplat**，均在训练和推理阶段要求提供真值相机外参和内参，这严重限制了其在真实无约束场景中的适用性。
+
+### 自监督方法的困境：“鸡与蛋”问题
+
+为摆脱对真值标注的依赖，近期工作开始探索自监督或弱监督路径。**SelfSplat**、**SPFSplat**、**PF3plat**等方法尝试仅通过光度一致损失来学习场景表示，但它们在训练时仍需要真值相机内参，且往往依赖预训练的视觉先验（如CroCoV2、DUSt3R、MASt3R）来提供几何初始化。这些方法面临一个根本性困境：**联合优化显式3D场景表示与相机参数是一个高度欠定的“鸡与蛋”问题**——没有准确的相机参数，无法重建正确的几何；没有正确的几何，又难以估计准确的相机参数。这种循环依赖使得从随机初始化出发的全自监督学习极难收敛，现有方法不得不借助强预训练先验或已知内参来打破僵局。
+
+### 信息泄漏：被忽视的优化陷阱
+
+更深层的问题在于跨视图信息流的设计。在典型的编码器-解码器架构中，目标视图的特征可以通过标准交叉注意力泄漏到上下文视图的3D重建过程中。这意味着网络可以利用目标视图的“未来信息”来“猜测”场景几何，而非真正从上下文视图中推理出正确的3D结构。这种**目标信息泄漏**在监督学习中被真值位姿的强信号所掩盖，但在自监督场景下，它会引导网络走向退化解，严重破坏几何与相机参数的联合学习。
+
+### NAS3R的动机：从无到全
+
+上述分析揭示了一个明确的研究缺口：**能否构建一个完全自监督的框架，从随机初始化出发，仅依靠二维光度一致性，端到端地联合学习3D高斯场景表示与相机参数，而无需任何真值标注、预训练先验或已知内参？** 这正是NAS3R（“From None to All”）的核心动机。其设计围绕两个关键洞察展开：
+
+1. **深度引导的局部到全局范式**：将高斯中心的获取方式从“规范空间直接回归”改为“基于每视深度预测提升至3D空间”，利用自预测的位姿和内参将2D深度图提升为3D点云。这种设计为优化景观提供了良性约束——深度预测与位姿估计相互制约，迫使网络学习几何一致的解。
+
+2. **掩码注意力消除信息泄漏**：通过掩码解码器严格调控跨视图交互——上下文令牌只能关注上下文令牌，目标令牌可关注上下文和目标令牌，但上下文令牌永远无法访问目标令牌。这从根本上杜绝了目标信息对场景重建的污染，确保所有几何信息必须从上下文视图中真实推理得出。
+
+这两个设计的组合，使得NAS3R能够在没有任何3D监督或预训练先验的条件下，从随机初始化稳定收敛，实现了真正的“从无到全”自监督三维重建。
+
+## 核心创新
+
+NAS3R的核心创新在于通过两个关键设计——**深度引导的局部到全局高斯提升范式**与**掩码解码器**——破解了自监督3D重建中“鸡与蛋”式的联合优化困境，使得网络能够从随机初始化出发，仅依靠2D光度一致性损失端到端地学习几何、相机与外观，无需任何3D标注、预训练先验或真实相机内参。
+
+### 从“鸡与蛋”到良性约束：深度提升范式
+
+在无真值监督的条件下，联合优化3D场景表示与相机参数本质上是一个高度欠定的问题：没有准确的相机参数无法重建正确的几何，而没有正确的几何又无法估计准确的相机。现有自监督方法（如**NoPoSplat**、**SPFSplat**）试图在规范空间直接回归3D高斯中心，但这种全局回归在训练初期极度依赖预训练先验或点云蒸馏预热才能稳定收敛。
+
+NAS3R将这一范式彻底重构为**局部到全局**的生成路径：模型首先在每个视图独立预测逐像素深度（通过DPT-based深度头，经Sigmoid激活后线性插值到近/远平面），再利用自预测的相机位姿和内参将这些深度值提升至3D空间，形成高斯中心。这一设计的关键在于——深度预测是一个局部、逐像素的操作，天然具有更强的约束和更友好的优化景观；而相机参数则通过共享的ViT编码器和掩码解码器从全局上下文推断。两者分工明确、相互制约，形成了一个“良性循环”：准确的深度提升需要正确的相机参数，而光度一致性的梯度又同时监督两者的学习。
+
+### 掩码注意力：阻断信息泄漏
+
+跨视图信息流控制是自监督学习的另一关键瓶颈。在标准交叉注意力中，目标视图的令牌可以无限制地关注上下文视图，这可能导致目标视图信息“泄漏”到高斯重建中，使得模型学会“记住”而非“推断”新视图的外观。NAS3R引入**掩码注意力**机制：上下文令牌只能关注上下文令牌，目标令牌可以关注上下文和目标令牌，但上下文令牌无法访问目标令牌。这一严格的单向信息流确保了高斯重建仅基于上下文视图，而目标视图仅用于监督信号的计算，从根本上杜绝了信息泄漏。
+
+### 完全自监督的相机学习
+
+与几乎所有现有自监督方法不同，NAS3R在训练时**不需要真实相机内参**。模型通过可学习的相机令牌从数据中自学习视场角（FOV），与6D旋转表示和4D齐次平移的外参联合预测。这一能力使得NAS3R可以处理真正无约束的图像——无需任何标定信息即可完成重建与新视图合成。实验表明，即使提供真实内参（NAS3R-I变体），性能提升也相对有限，证明模型自身已能学到准确的相机模型。
+
+### 统一的可微分渲染优化
+
+上述所有组件——高斯参数（中心、旋转四元数、尺度、不透明度、球谐系数）、相机外参和内参——均通过一个支持梯度回传至相机参数的CUDA-based 3DGS渲染器进行端到端优化。训练仅使用目标视图的MSE+LPIPS光度一致损失（γ=0.05），无任何显式3D监督。这一简洁而统一的优化框架是NAS3R能够从“无”到“全”的基础。
+
+## 整体框架
+
+NAS3R 是一个完全自监督的三维重建框架，其核心设计目标是在无任何真值标注（无相机位姿、无内参、无深度）且无预训练先验的条件下，从无约束多视图图像中联合推断显式三维场景表示与相机参数。框架的训练与推理流程如 Figure 2 所示，整体遵循“编码—跨视图交互—几何/相机联合预测—可微分渲染—光度监督”的闭环范式。
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/003_Figure_2.jpg]]
+*Figure 2: Training pipeline of NAS3R. Subscripts*
+
+### 问题形式化
+
+训练阶段，NAS3R 同时接收上下文视图 $\mathcal{I}_{\mathcal{C}}$ 和目标视图 $\mathcal{I}_{\mathcal{T}}$ 作为输入，二者共同构成完整视图集合 $\mathcal{T} = \mathcal{I}_{\mathcal{C}} \cup \mathcal{I}_{\mathcal{T}}$。框架包含两个核心映射：
+
+- **三维高斯重建映射** $f_{\theta} : \mathcal{T}_{\mathcal{C}} \mapsto \{\boldsymbol{\mathcal{G}}^{v}\}_{v=1}^{V_{\mathcal{C}}}$：将上下文图像映射为每视图的像素对齐高斯原语，包括中心位置、旋转四元数、尺度、不透明度和球谐系数。
+- **相机预测映射** $f_{\phi} : \mathcal{T} \mapsto \{K^{v}, P^{v}\}_{v=1}^{V}$：为所有视图估计内参 $K^v$ 和外参 $P^v$。
+
+在此基础上，可微分渲染函数 $\mathcal{R}$ 将上下文视图的高斯原语与预测的目标视图相机参数作为输入，渲染出目标视图 $\hat{\mathcal{I}}_{\mathcal{T}}$。模型通过渲染图像与真实目标图像之间的光度一致性进行端到端训练，损失函数为 MSE 与 LPIPS 的加权组合：
+
+$$\mathcal{L}_{\mathrm{render}} = \frac{1}{V_{\mathcal{T}}} \sum \|I - \hat{I}\|_{2} + \gamma \,\mathrm{LPIPS}(I, \hat{I})$$
+
+其中 $\gamma=0.05$。推理阶段，模型仅需上下文图像即可预测相机参数并重建完整三维场景。
+
+### 流水线模块
+
+NAS3R 的训练流水线由以下核心模块串联构成：
+
+1. **共享权重 ViT 编码器**：将每个视图的图像 patchify 后编码为特征令牌，所有视图共享同一编码器权重，确保特征空间的一致性。
+
+2. **掩码解码器**：通过掩码交叉注意力实现受控的跨视图信息交换。关键设计在于上下文令牌只能关注上下文令牌，而目标令牌可以关注上下文和目标令牌——这一非对称掩码机制严格防止目标视图信息泄漏到高斯重建过程中，是保证自监督优化收敛性的核心约束。
+
+3. **相机预测头**：从精炼后的可学习相机令牌出发，预测每视图的外参（6D 旋转表示 + 4D 齐次平移）和内参（以视场角 FOV 参数化）。相机预测同时利用上下文和目标视图的信息，但目标视图的像素级细节被掩码隔离。
+
+4. **深度预测头**：基于 DPT 架构预测每像素深度值，通过 Sigmoid 激活并线性插值到预设的近/远平面，获得正值深度图。随后利用自预测的上下文相机位姿和内参，将深度图提升至三维空间，生成像素对齐的高斯中心。
+
+5. **高斯参数头**：同样基于 DPT 架构，从精炼的上下文令牌预测每个高斯的旋转四元数、尺度、不透明度和球谐系数。
+
+6. **可微分 3DGS 渲染器**：基于 CUDA 实现的可微分三维高斯泼溅渲染器，支持对相机位姿、内参和高斯参数的反向传播梯度计算，是整个自监督优化回路的关键使能技术。
+
+### 核心设计决策
+
+框架的两个关键设计决策直接回应了“无真值监督下联合优化场景与相机”这一瓶颈问题：
+
+- **深度引导的局部到全局范式**：不同于此前方法在规范空间直接回归三维点（依赖强先验才能收敛），NAS3R 在每视图局部空间预测深度，再利用自估计的位姿和内参将其提升至全局三维空间。这一设计将高度欠定的联合优化问题解耦为局部几何预测与全局对齐两个子问题，显著改善了优化景观。
+
+- **掩码注意力机制**：通过显式控制跨视图信息流，确保上下文视图的高斯重建仅基于上下文视图自身的信息，而不会从目标视图“偷看”到答案。这一约束是消除训练初期“鸡与蛋”困境的关键——若上下文重建能访问目标视图信息，模型将倾向于学习恒等映射而非真正的三维理解。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/001_Figure_1.jpg]]
+*Figure 1: NAS3R is a self-supervised framework that requires no ground-truth annotations and no pretrained priors during training, and jointly infers 3D Gassian parameters, camera intrinsics and extrinsics and depth maps, also enabling high-quality novel view synthesis*
+
+## 核心模块与公式推导
+
+NAS3R 的训练流水线由五个核心模块串联构成，所有模块从随机初始化开始，仅通过目标视图的光度一致性损失端到端联合优化。整体架构如 Figure 2 所示。
+
+### 3.1 问题形式化
+
+给定一组无约束的多视图图像 $\mathcal{T} = \mathcal{I}_{\mathcal{C}} \cup \mathcal{I}_{\mathcal{T}} = \{I^v\}_{v=1}^{V}$，其中 $\mathcal{I}_{\mathcal{C}}$ 为上下文视图（用于场景重建），$\mathcal{I}_{\mathcal{T}}$ 为目标视图（仅用于监督）。NAS3R 定义两个映射：
+
+**三维高斯重建映射**：模型 $f_{\theta}$ 将上下文图像映射为每视图的像素对齐高斯原语：
+
+$$f_{\theta} : \mathcal{T}_{\mathcal{C}} \mapsto \{\boldsymbol{\mathcal{G}}^{v}\}_{v=1}^{V_{\mathcal{C}}}$$
+
+其中 $\boldsymbol{\mathcal{G}}^{v} = \{\mu, r, s, \alpha, c\}$ 分别表示高斯中心位置、旋转四元数、尺度、不透明度和球谐系数。
+
+**相机预测映射**：相机预测器 $f_{\phi}$ 为所有视图估计内参 $K^v$ 和外参 $P^v$：
+
+$$f_{\phi} : \mathcal{T} \mapsto \{K^{v}, P^{v}\}_{v=1}^{V}$$
+
+**自监督渲染**：渲染函数 $\mathcal{R}$ 将上下文视图的高斯原语与预测的目标相机参数映射到渲染的目标视图：
+
+$$\mathcal{R} : \{\boldsymbol{\mathcal{G}}^{v}\}_{v=1}^{V_{\mathcal{C}}}, \{K^{v}, P^{v}\}_{v=1+V_{\mathcal{C}}}^{V} \mapsto \hat{\mathcal{I}}_{\mathcal{T}}$$
+
+**光度损失**：训练目标为 MSE 与 LPIPS 的加权组合（$\gamma=0.05$）：
+
+$$\mathcal{L}_{\mathrm{render}} = \frac{1}{V_{\mathcal{T}}} \sum \|I - \hat{I}\|_{2} + \gamma \,\mathrm{LPIPS}(I, \hat{I})$$
+
+### 3.2 共享权重 ViT 编码器
+
+所有视图图像经 patchify 后，由共享权重的 ViT 编码器独立处理，生成特征令牌 $\mathcal{F}^v$。每个视图的特征令牌与一个可学习的相机令牌拼接，用于后续的相机参数预测。
+
+### 3.3 掩码解码器
+
+掩码解码器是控制跨视图信息流的关键模块。其核心操作定义为：
+
+$$G^{v} = \mathrm{MaskedDecoder}(\mathcal{F}^{v}, \mathcal{F}^{1:K})$$
+
+其中 $K=V_{\mathcal{C}}$（上下文视图）或 $K=V$（目标视图），取决于当前处理的视图类型。掩码注意力机制严格规定：
+- **上下文令牌**只能关注上下文令牌，禁止获取目标视图信息；
+- **目标令牌**可关注上下文令牌和目标令牌自身。
+
+这一设计从根本上消除了目标视图信息泄漏到高斯重建中的可能，是 NAS3R 能在无真值监督下稳定学习几何的核心机制。
+
+### 3.4 相机预测头
+
+经过掩码解码器精炼后的相机令牌被送入相机预测头，输出：
+- **外参**：6D 连续旋转表示 + 4D 齐次平移向量，构成 $P^v \in \mathbb{R}^{3 \times 4}$；
+- **内参**：以视场角（FOV）形式参数化，构成 $K^v$。
+
+### 3.5 深度预测头与高斯中心提升
+
+深度预测头基于 DPT 架构，从精炼的上下文令牌预测每像素深度值。深度值通过 Sigmoid 激活后线性插值到预设的近/远平面，得到正值深度图。随后，利用自预测的上下文相机位姿 $P^v$ 和内参 $K^v$，将深度图提升至三维空间，获得高斯中心 $\mu$。这一“局部到全局”范式是 NAS3R 区别于以往直接从规范空间回归 3D 点方法的核心创新，为随机初始化训练提供了良性约束的优化景观。
+
+### 3.6 高斯参数头
+
+另一并行的 DPT 头从精炼上下文令牌预测其余高斯参数：旋转四元数 $r$、尺度 $s$、不透明度 $\alpha$ 和球谐系数 $c$。
+
+### 3.7 可微分 3DGS 渲染器
+
+NAS3R 采用基于 CUDA 的可微分 3D Gaussian Splatting 渲染器，支持对相机位姿、内参和高斯参数的反向传播梯度。渲染器接收上下文视图的高斯原语和目标视图的预测相机参数，生成渲染图像 $\hat{\mathcal{I}}_{\mathcal{T}}$，并与真值目标图像计算 $\mathcal{L}_{\mathrm{render}}$，梯度回传至所有模块实现端到端联合优化。
+
+## 实验与分析
+
+### 核心实验设计
+
+NAS3R的实验验证围绕一个核心问题展开：**在完全无3D标注、无预训练先验、甚至无相机内参的条件下，能否仅通过2D光度一致性学习精确的3D几何与相机参数？** 为此，实验设计覆盖了三个递进的评估维度：
+
+1. **新视图合成质量** — 验证自监督渲染信号的最终输出保真度；
+2. **相机姿态估计精度** — 验证网络是否真正从图像信号中恢复了可泛化的几何理解；
+3. **深度估计准确性** — 验证隐式几何学习是否产生了物理上一致的场景结构。
+
+训练数据采用RealEstate10K（RE10K）作为主训练集，域外泛化测试覆盖ACID、DTU、DL3DV、BlendedMVS和ScanNet++五个数据集。所有对比方法均按原作者设置复现，需要预热的基线（NoPoSplat*、SPFSplat*）采用公平的10k步DUSt3R点云蒸馏预热以支持随机初始化。
+
+---
+
+### 主结果：双视图新视图合成
+
+Table 2报告了无监督先验设置下的双视图NVS核心结果。在RE10K域内测试上，NAS3R以**PSNR 23.130**显著超越所有自监督方法，相比最佳同类方法SelfSplat（PSNR 19.152）提升**+3.978 dB**，并逼近全监督方法MVSplat（PSNR 24.012）。在域外泛化测试上，NAS3R同样保持领先：ACID上PSNR 25.030（vs. SelfSplat 22.251）、DL3DV上PSNR 21.351（vs. SelfSplat 18.685，DL3DV训练时PSNR达20.069）。
+
+**关键洞察**：NAS3R在无任何真值监督下的NVS质量，已接近需要真值位姿和内参的监督方法MVSplat（差距仅0.882 dB），而SelfSplat等自监督方法与监督方法的差距通常在4-5 dB以上。这证明深度引导的高斯提升范式从根本上改善了自监督优化的收敛景观。
+
+定性结果（Figure 3）进一步验证了这一结论：在RE10K、ACID、DTU、DL3DV四个场景下，NAS3R渲染的目标视图在几何一致性和纹理细节上均明显优于SelfSplat和SPFSplat*，尤其在遮挡边界和细薄结构区域优势显著。
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/005_Figure_3.jpg]]
+*Figure 3: Comparison of NVS results across different methods. The leftmost column shows the two-view context images. From top to bottom, the settings are RE10K, RE10K→ACID, RE10K→DTU, and RE10K→DL3DV*
+
+---
+
+### 相机姿态估计：从图像信号中恢复几何
+
+Table 3报告了双视图相对姿态估计的AUC指标。在RE10K上，NAS3R实现**旋转AUC@10° 69.9、AUC@20° 78.4，平移AUC@10° 52.7、AUC@20° 66.3**，不仅远超自监督方法SelfSplat（旋转AUC@20° 62.7），还接近甚至超过全监督特征匹配方法SuperPoint+SuperGlue（旋转AUC@20° 76.5）。
+
+**这一结果的意义**：NAS3R从未见过任何真值位姿或匹配标注，仅通过渲染损失的反向传播学习相机参数，却能达到与经典特征匹配流程相当的姿态精度。这证明掩码注意力机制成功防止了目标视图信息泄漏，迫使网络通过真正的几何推理而非捷径学习来预测相机参数。
+
+域外泛化测试同样表现稳健：ACID上旋转AUC@20°达57.0（SelfSplat仅31.8），DL3DV上达49.7（SelfSplat仅25.3）。Figure 4的姿态轨迹可视化直观展示了NAS3R预测的相机轨迹与真值的高度一致性，即使在5视图和10视图的多视图设置下也能保持全局一致的相机布局。
+
+---
+
+### 深度估计：隐式几何学习的质量验证
+
+Table 4在BlendedMVS上的深度估计对比揭示了NAS3R最令人意外的能力：**rel↓=0.206，τ↑=71.4**，不仅大幅超越自监督方法SelfSplat（rel↓=0.451），甚至**显著优于全监督方法MVSplat（rel↓=0.405，τ↑=54.0）**。
+
+这一反直觉结果的核心原因在于：MVSplat依赖cost volume进行深度推理，其深度估计受限于特征匹配的质量和cost volume的分辨率；而NAS3R通过深度引导的高斯提升，将深度预测直接耦合到3D高斯渲染的端到端优化中，光度一致性损失为深度预测提供了比显式深度监督更密集、更全局的梯度信号。Figure 5的高斯重建与深度渲染可视化证实，NAS3R恢复的深度图在物体边界和细薄结构处具有更清晰的边缘和更准确的相对排序。
+
+---
+
+### 消融研究：关键设计选择的有效性
+
+**渐进式帧间隔课程学习**（Table 10）：将RE10K上PSNR从21.020提升至23.130（+2.11 dB），姿态AUC@20°从50.2提升至64.9（+14.7）。这一消融揭示了自监督联合优化的一个关键挑战：训练初期，当相机预测和几何重建都高度不准确时，梯度信号噪声极大。渐进式课程（从相邻帧开始，逐步增加帧间隔）为优化提供了一个由易到难的平滑路径，避免了早期训练的发散。
+
+**输入视图数的影响**（Table 8）：从2视图增至10视图，NVS PSNR从23.130持续提升至27.093，姿态AUC@20°从64.9升至75.5。这表明NAS3R的多视图机制能够有效聚合跨视图信息，且性能随视图数增加而单调改善，未出现信息饱和或冲突退化。
+
+**训练数据规模**（Table 7）：将训练数据从RE10K扩展至RE10K+DL3DV后，ScanNet++上的NVS PSNR从14.836升至16.316，BlendedMVS深度rel↓从0.206降至0.145。这证明NAS3R的自监督范式具有良好的数据可扩展性，更多样化的训练数据直接转化为更强的泛化能力。
+
+**自监督预训练对下游微调的价值**（Table 9）：在BlendedMVS上，自监督预训练+监督微调的深度rel↓=0.119，优于纯自监督（0.145）和从零开始的监督训练（0.133）；姿态AUC@20°从66.8升至71.3。这表明自监督学习学到的几何表征为下游任务提供了强力初始化，且这种预训练完全无需任何标注成本。
+
+**真实内参的影响**（Table 11）：NAS3R-I变体（使用真值内参训练）在RE10K上PSNR达24.134，比自学习内参版本（23.130）提升约1.0 dB，但仍未达到监督方法MVSplat的水平。这表明内参自学习是可行的，但精确的内参先验仍能为优化提供有益的约束。
+
+---
+
+### 方法需求对比与效率分析
+
+Table 1系统对比了各方法在训练和推理阶段对真值位姿、真值内参和预训练先验的依赖。NAS3R是唯一在训练阶段**完全不需要真值位姿、真值内参和预训练先验**的方法，且在推理阶段也仅需上下文图像作为输入。相比之下，SelfSplat和SPFSplat仍需真值内参训练，NoPoSplat和AnySplat依赖预训练权重或伪标签。
+
+推理效率方面（Table 13），NAS3R在NVIDIA A6000 GPU上双视图推理约需0.35秒，参数量与MVSplat相当，FLOPs略高但仍在可接受范围内。考虑到NAS3R同时输出3D高斯、相机参数和深度图，这一效率已具备实用价值。
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/020_Table_13.jpg]]
+*Table 13: Inference efficiency on an NVIDIA A6000 GPU*
+
+---
+
+### 失败模式与局限性
+
+尽管NAS3R在自监督设定下取得了突破性进展，实验也揭示了若干局限性：
+
+1. **表面几何精度不足**：Table 9显示，即使自监督预训练后微调，深度rel↓=0.119仍与真值监督方法存在差距。3D高斯散点的显式表示擅长渲染外观，但难以恢复精确的表面几何，这是高斯表示本身的固有限制。
+
+2. **极端低纹理场景退化**：在DTU等包含大量弱纹理区域的数据集上，NVS质量下降明显（PSNR约15.7），姿态估计精度也相应降低。光度一致性信号在纹理缺失区域提供的信息量不足，导致几何学习退化。
+
+3. **训练数据规模尚未充分探索**：当前实验主要在RE10K（约70K样本）和DL3DV（约11K样本）上进行，更大规模（百万级至十亿级）无约束图像上的自监督预训练潜力尚未验证。Table 7的趋势表明数据扩展能持续带来收益，但天花板未知。
+
+4. **非朗伯表面处理不足**：镜面反射、透明物体等违反朗伯假设的表面，光度一致性损失可能提供误导性梯度，导致几何和外观的联合估计失败。当前方法未包含针对此类表面的特殊处理机制。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/002_Table_1.jpg]]
+*Table 1: Training and inference requirements of different methods. Training columns indicate the need for ground-truth camera poses and intrinsics, while inference columns indicate whether contextview camera parameters are required as model inputs*
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/004_Table_2.jpg]]
+*Table 2: Performance comparison of in-domain and out-of-domain two-view novel view synthesis for models trained with no supervised 3D priors. The best results among self-supervised methods are highlighted. ∗ indicates the variants with random initialization*
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/007_Table_3.jpg]]
+*Table 3: Performance comparison of two-view pose estimation (AUC, %) on RE10K, ACID and DL3DV datasets. All NVS models are trained on RE10K with no supervised 3D priors. ∗ indicates the SPFSplat variant trained with random initialization*
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/009_Table_4.jpg]]
+*Table 4: Comparison of two-view depth estimation results on BlendedMVS dataset*
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/015_Table_10.jpg]]
+*Table 10: Ablation on progressive interval curriculum on RE10K*
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/011_Table_8.jpg]]
+*Table 8: Performance on novel view synthesis and pose estimation with varying number of input views*
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/014_Table_7.jpg]]
+*Table 7: Performance on NVS and pose estimation (ScanNet++) and depth estimation (BlendedMVS) with increasing training data*
+
+![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/013_Table_9.jpg]]
+*Table 9: Self-supervised pretraining improves downstream finetuning. Supervised finetuning from self-supervised pretrained weights (3) outperforms both self-supervised learning (1) and supervised training from scratch (2) on BlendedMVS*
+
+## 方法谱系与知识库定位
+
+### 1. 在3D高斯泼溅（3DGS）新视图合成谱系中的位置
+
+NAS3R处于**自监督3DGS新视图合成**这一新兴子领域的前沿。该谱系从监督方法向自监督方法演进的脉络如下：
+
+**监督NVS方法**构成了该谱系的起点。**pixelSplat**（Charatan et al., ECCV 2024）和**MVSplat**（Chen et al., NeurIPS 2024）分别利用DINO特征和UniMatch cost volume进行跨视图特征匹配，在给定真值相机位姿和内参的条件下实现高质量新视图合成。**NoPoSplat**（Ye et al., CVPR 2025）进一步探索了无先验的监督NVS，但其随机初始化变体仍需DUSt3R点云蒸馏进行预热。这些方法的核心依赖是**真值相机参数**——训练时必须有精确的位姿和内参作为输入。
+
+**自监督NVS方法**试图摆脱这一依赖。**SelfSplat**（Shen et al., 2025）使用CroCoV2特征进行自监督训练，但仍需真值内参。**SPFSplat**（Lee et al., 2025）共享主干网络同时预测姿态和高斯参数，其随机初始化变体（SPFSplat\*）依赖DUSt3R点云蒸馏预热，且训练时仍需真值内参。**PF3plat**（2025）和**SPFSplatV2**（2025）分别使用混合先验和MASt3R先验，同样需要真值内参。**AnySplat**（2025）采用了与NAS3R相似的局部到全局范式，但依赖预训练VGGT权重与伪标签，并非真正的“从零开始”自监督学习。
+
+NAS3R在该谱系中的独特定位在于：它是**首个完全不需要任何真值标注（位姿、内参、深度）和预训练先验**即可从随机初始化端到端训练的方法。Table 1明确对比了各方法的训练需求——NAS3R是唯一在“训练所需真值位姿”和“训练所需真值内参”两列均标记为“✗”的自监督方法。
+
+### 2. 核心方法论创新：因果机制分析
+
+NAS3R相对于上述基线的方法论突破可归纳为两个因果性设计选择：
+
+**（1）深度引导的高斯提升替代直接3D回归。** 监督方法（pixelSplat, MVSplat）和部分自监督方法（NoPoSplat\*, SPFSplat\*）在规范空间中直接回归3D高斯中心，训练初期高度依赖预训练先验或点云蒸馏来提供合理的初始化。NAS3R改为：每视深度预测通过Sigmoid激活并线性插值到近/远平面，再利用自预测的位姿和内参将深度提升至3D空间（Section 3.2）。这一“局部到全局”范式将高度欠定的联合优化问题分解为更易优化的子问题——先学习局部深度一致性，再通过预测的相机参数建立全局几何。
+
+**（2）掩码注意力消除目标信息泄漏。** 标准交叉注意力允许上下文令牌关注目标令牌，可能导致目标视图信息“泄漏”到高斯重建中，使网络学习到捷径而非真正的3D几何。NAS3R通过掩码注意力严格规定：上下文令牌只能关注上下文令牌，目标令牌可以关注上下文和目标令牌（Section 3.2, Eq. 5）。这一设计与深度引导提升形成互补——前者提供良性约束的优化景观，后者防止优化走向退化解。
+
+这两个设计选择的组合效应在消融实验中得到验证：渐进式帧间隔课程学习（Table 10）将RE10K上PSNR从21.020提升至23.130，姿态AUC@20°从50.2提升至64.9，表明良好的优化策略对收敛至关重要。
+
+### 3. 适用边界
+
+**已验证的适用场景：**
+- **中等规模室内/室外场景**：RealEstate10K（房地产视频）、DL3DV（多样化场景）、ACID（航拍自然场景）上的域内和跨域泛化均表现优异（Table 2）。
+- **多视图重建**：2至10视图输入均可处理，且性能随视图数增加持续提升（Table 8：2视图PSNR 23.130，10视图PSNR 27.093）。
+- **下游任务迁移**：自监督预训练权重可作为监督微调的强力初始化，在BlendedMVS上深度估计rel↓从0.145降至0.119，姿态AUC@20°从66.8升至71.3（Table 9）。
+
+**已知局限：**
+- **精确表面几何恢复**：尽管自监督学习能学习一致几何，添加少量真值深度监督微调仍能进一步提高深度重建精度（Table 9），表明3D高斯散点难以完全恢复精确的表面几何。这是3DGS表示的固有局限，非NAS3R方法独有。
+- **数据规模探索有限**：文章主要在RealEstate10K（约10万样本）和DL3DV（约1万样本）等中等规模数据集上验证，更大规模（数十亿级）无约束图像数据上的训练效果尚未探索。
+- **极端退化场景**：低纹理、非朗伯物体等场景的处理能力未专门评估，这些场景可能对纯光度一致性优化构成挑战。
+
+### 4. 开放问题与未来方向
+
+1. **大规模自监督预训练**：在数十亿级无约束图像数据集上进行自监督预训练，能否使下游任务（深度估计、姿态估计、3D重建）性能进一步大幅提升？这类似于NLP和2D视觉中的基础模型范式，但3D领域的验证尚属空白。
+
+2. **几何正则化的引入**：如何在保持全自监督的前提下，引入更细粒度的几何正则化（如多视图立体一致性约束）来改善深度和表面重建质量？当前框架仅依赖光度一致性损失，可能在某些场景下产生几何歧义。
+
+3. **动态场景与复杂材质**：当前方法主要针对静态场景设计，扩展到动态物体、透明/反射表面等复杂情况需要新的建模和优化策略。
+
+4. **与预训练先验的协同**：Table 5和Table 6显示，当NAS3R接受真值内参（NAS3R-I）或与监督先验结合时，性能可进一步提升（如RE10K上PSNR达24.238，接近监督方法MVSplat的24.012）。如何在保持自监督灵活性的同时，选择性地利用可用的弱先验信息，是一个有实践价值的方向。
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/From_None_to_All_Self_Supervised_3D_Reconstruction_via_Novel_View_Synthesis.pdf]]

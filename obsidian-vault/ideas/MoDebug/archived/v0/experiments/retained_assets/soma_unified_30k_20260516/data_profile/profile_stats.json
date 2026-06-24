@@ -1,0 +1,334 @@
+{
+  "date": "2026-05-16",
+  "experiment_path": "paperIDEAs/MoDebug/experiments/soma_unified_30k_20260516",
+  "evaluator": "modebug_build_soma_unified_30k_manifest",
+  "protocol": "DS-reviewed metadata-only 30k caption-motion pair selection; training blocked until BVH-to-HumanML3D feature conversion is validated",
+  "data_source": {
+    "metadata_csv": "/home/ripemangobox/Coding/Github/Motion/datasets/kimodo/metadata/seed_metadata_v004.csv",
+    "temporal_jsonl": "/home/ripemangobox/Coding/Github/Motion/datasets/kimodo/metadata/seed_metadata_v002_temporal_labels.jsonl",
+    "soma_uniform_tar": "/data/soma_uniform.tar.gz"
+  },
+  "condition_pair": "not_applicable",
+  "role": "diagnostic",
+  "used_for": "selection",
+  "limitations": [
+    "Selection is based on KIMODO metadata and temporal labels only.",
+    "BVH file existence inside the gzip tarball is not exhaustively verified because full tar listing requires reading a 45GB compressed archive.",
+    "MoMask/MoGenTS training requires HumanML3D-style feature conversion and loader smoke before this manifest can be used as model input."
+  ],
+  "source_exists": {
+    "metadata_csv": true,
+    "temporal_jsonl": true,
+    "soma_uniform_tar": true
+  },
+  "source_sizes": {
+    "metadata_csv_bytes": 146411608,
+    "temporal_jsonl_bytes": 58447630,
+    "soma_uniform_tar_bytes": 45188088297
+  },
+  "metadata_rows": 142220,
+  "temporal_rows": 142220,
+  "mirror_rows": 71088,
+  "original_rows": 71132,
+  "missing_text_rows": 0,
+  "missing_temporal_rows": 0,
+  "eligible_rows": 58281,
+  "selected_rows": 30000,
+  "n_evaluable": "30000/30000",
+  "n/evaluable": "30000/30000",
+  "coverage": "metadata rows filtered to original, text-present, temporal-label-present, 40<=estimated_20fps_frames<200, and SOMA uniform path present",
+  "full_dataset_event_count_distribution": {
+    "1": 39173,
+    "2": 46534,
+    "3": 38031,
+    "4": 11527,
+    "5": 3169,
+    "6": 1158,
+    "7": 516,
+    "8": 440,
+    "9": 682,
+    "10": 150,
+    "11": 120,
+    "12": 102,
+    "13": 48,
+    "14": 14,
+    "15": 18,
+    "16": 32,
+    "17": 8,
+    "18": 14,
+    "19": 20,
+    "20": 4,
+    "21": 14,
+    "22": 16,
+    "23": 18,
+    "24": 24,
+    "25": 6,
+    "26": 20,
+    "27": 10,
+    "28": 24,
+    "29": 8,
+    "30": 6,
+    "31": 20,
+    "32": 42,
+    "33": 40,
+    "34": 16,
+    "35": 10,
+    "37": 16,
+    "38": 4,
+    "39": 10,
+    "40": 8,
+    "41": 4,
+    "42": 6,
+    "43": 2,
+    "44": 6,
+    "45": 2,
+    "46": 2,
+    "47": 4,
+    "48": 8,
+    "49": 2,
+    "51": 6,
+    "52": 6,
+    "53": 4,
+    "54": 8,
+    "55": 10,
+    "56": 14,
+    "57": 6,
+    "58": 12,
+    "60": 6,
+    "63": 6,
+    "64": 4,
+    "65": 2,
+    "67": 2,
+    "68": 4,
+    "69": 2,
+    "70": 6,
+    "71": 2,
+    "77": 6,
+    "78": 6
+  },
+  "selected_event_count_distribution": {
+    "1": 7846,
+    "2": 11057,
+    "3": 8363,
+    "4": 2214,
+    "5": 431,
+    "6": 73,
+    "7": 12,
+    "8": 2,
+    "9": 2
+  },
+  "split_counts": {
+    "test": 3000,
+    "train": 24000,
+    "val": 3000
+  },
+  "package_top20": [
+    [
+      "Locomotion",
+      74488
+    ],
+    [
+      "Communication",
+      21493
+    ],
+    [
+      "Interactions",
+      14643
+    ],
+    [
+      "Dances",
+      11006
+    ],
+    [
+      "Gaming",
+      8700
+    ],
+    [
+      "Everyday",
+      5816
+    ],
+    [
+      "Sport",
+      3993
+    ],
+    [
+      "Other",
+      2081
+    ]
+  ],
+  "category_top20": [
+    [
+      "Basic Locomotion Neutral",
+      33430
+    ],
+    [
+      "Baseline",
+      22878
+    ],
+    [
+      "Gestures",
+      17590
+    ],
+    [
+      "Object Manipulation",
+      11620
+    ],
+    [
+      "Dancing",
+      11006
+    ],
+    [
+      "Object Interaction",
+      10817
+    ],
+    [
+      "Basic Locomotion Styles",
+      10746
+    ],
+    [
+      "Advanced Locomotion",
+      6036
+    ],
+    [
+      "Sports",
+      3973
+    ],
+    [
+      "Communication",
+      3723
+    ],
+    [
+      "Unusual Locomotion",
+      3242
+    ],
+    [
+      "Other",
+      2081
+    ],
+    [
+      "Consuming",
+      1388
+    ],
+    [
+      "Household",
+      1318
+    ],
+    [
+      "Stunts",
+      858
+    ],
+    [
+      "Environments",
+      614
+    ],
+    [
+      "Complex Actions",
+      540
+    ],
+    [
+      "Looking and Pointing",
+      180
+    ],
+    [
+      "Magic",
+      160
+    ],
+    [
+      "Martial Arts",
+      20
+    ]
+  ],
+  "selected_package_top20": [
+    [
+      "Locomotion",
+      15651
+    ],
+    [
+      "Communication",
+      4970
+    ],
+    [
+      "Interactions",
+      3320
+    ],
+    [
+      "Dances",
+      2373
+    ],
+    [
+      "Gaming",
+      1564
+    ],
+    [
+      "Everyday",
+      869
+    ],
+    [
+      "Sport",
+      845
+    ],
+    [
+      "Other",
+      408
+    ]
+  ],
+  "caption_word_count_quantiles": {
+    "0": 5.0,
+    "0.1": 7.0,
+    "0.25": 8.0,
+    "0.5": 10.0,
+    "0.75": 13.0,
+    "0.9": 17.0,
+    "1": 32.0
+  },
+  "duration_20fps_quantiles": {
+    "0": 11.0,
+    "0.1": 59.0,
+    "0.25": 80.0,
+    "0.5": 114.0,
+    "0.75": 167.0,
+    "0.9": 252.0,
+    "1": 3602.0
+  },
+  "selected_caption_word_count_quantiles": {
+    "0": 5.0,
+    "0.1": 7.0,
+    "0.25": 8.0,
+    "0.5": 10.0,
+    "0.75": 14.0,
+    "0.9": 17.0,
+    "1": 30.0
+  },
+  "selected_duration_20fps_quantiles": {
+    "0": 40.0,
+    "0.1": 58.0,
+    "0.25": 75.0,
+    "0.5": 102.0,
+    "0.75": 135.0,
+    "0.9": 166.0,
+    "1": 199.0
+  },
+  "duplicate_caption_count": 5269,
+  "selection_policy": {
+    "unit": "caption-motion pair",
+    "target_n": 30000,
+    "seed": 20260516,
+    "mirror_policy": "exclude mirror rows; reserve mirrors as possible train-only augmentation after leakage review",
+    "split": {
+      "train": 0.8,
+      "val": 0.1,
+      "test": 0.1
+    },
+    "leakage_key": "take_date|take_name|take_actor|base_filename_without__M",
+    "caption_priority": [
+      "content_natural_desc_1",
+      "content_natural_desc_2",
+      "content_natural_desc_3",
+      "content_natural_desc_4",
+      "content_technical_description",
+      "content_short_description",
+      "content_short_description_2"
+    ],
+    "frame_filter": "40 <= floor(move_duration_frames/6) < 200"
+  }
+}

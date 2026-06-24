@@ -1,0 +1,10 @@
+{
+  "source_root": "/data/Life Me/ResearchWY Vault/artifacts/remote/4090/modebug_text_condition_sample_level_20260528/text_condition_sample_level_20260528",
+  "role": "diagnostic",
+  "used_for": "observation",
+  "limitations": [
+    "text/null only; no random or counterfactual semantic-specificity control",
+    "semantic_steps are manual prompt phrases, not temporal boundaries",
+    "metric_value is an internal trace relative_l2 value, not a final evaluator"
+  ]
+}

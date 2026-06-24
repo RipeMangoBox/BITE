@@ -1,0 +1,128 @@
+{
+  "part_id": "part_001",
+  "section_role": "Abstract and Introduction",
+  "method_evidence": [
+    {
+      "claim": "CubiD performs fine-grained masking throughout the high-dimensional discrete representation—any dimension at any position can be masked and predicted from partial observations.",
+      "section": "Abstract",
+      "anchor": "CubiD performs fine-grained masking throughout the high-dimensional discrete representation—any dimension at any position can be masked and predicted from partial observations.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We propose Cubic Discrete Diffusion (CubiD), a masked diffusion method for high-dimensional discrete generation.",
+      "section": "1. Introduction",
+      "anchor": "We propose Cubic Discrete Diffusion (CubiD), a masked diffusion method [1,3,26] for high-dimensional discrete generation.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Our key insight is to perform finegrained masking across the three-dimensional h × w × d tensor.",
+      "section": "1. Introduction",
+      "anchor": "Our key insight is to perform finegrained masking across the three-dimensional h × w × d tensor.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "CubiD starts from a fully masked tensor and iteratively refines it through progressive unmasking, randomly selecting tokens across the entire tensor to unmask at each step.",
+      "section": "1. Introduction",
+      "anchor": "during generation, CubiD starts from a fully masked tensor and iteratively refines it through progressive unmasking, randomly selecting tokens across the entire tensor to unmask at each step until reaching the complete representation.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "CubiD achieves state-of-the-art discrete generation on ImageNet-256.",
+      "table_or_figure": "Abstract",
+      "metric": "state-of-the-art",
+      "value": "state-of-the-art",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Dimension-wise quantized features achieve nearly identical performance to continuous features on multimodal understanding tasks.",
+      "table_or_figure": "Table 3",
+      "metric": "performance",
+      "value": "nearly identical",
+      "confidence": 0.9
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Figure 1",
+      "role_hint": "Comparison of discrete visual generation approaches",
+      "caption": "Comparison of discrete visual generation approaches. (a) Low-dimensional token generation... (b) High-dimensional token generation... Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor...",
+      "confidence": 0.95
+    },
+    {
+      "label": "Figure 2",
+      "role_hint": "Generated samples from CubiD",
+      "caption": "Generated samples from CubiD. Class-conditional generation results on ImageNet 256×256 using high-dimensional representation tokens from DINOv2-B encoder, demonstrating fine details and textures across diverse categories.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table 3",
+      "role_hint": "Validation of dimension-wise quantization preserving semantic quality",
+      "caption": "We validate this approach on multimodal understanding tasks: dimension-wise quantized features achieve nearly identical performance to continuous features, while VQ suffers substantial degradation (Table 3).",
+      "confidence": 0.9
+    }
+  ],
+  "source_links": [
+    {
+      "label": "Code",
+      "url": "https://github.com/YuqingWang1029/CubiD",
+      "anchor": "Code is available at: https://github.com/YuqingWang1029/CubiD",
+      "confidence": 1.0
+    }
+  ],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_001",
+    "part_index": 1,
+    "part_count": 9,
+    "chunk_chars": 7864,
+    "latency_seconds": 10.861,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3201,
+      "completion_tokens_est": 1109,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 4310,
+      "total_with_reasoning_tokens_est": 4310,
+      "estimated_cost_usd": 0.002357,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2223,
+      "completion_tokens_api": 852,
+      "total_tokens_api": 3075,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1583,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 852,
+        "prompt_tokens": 2223,
+        "total_tokens": 3075,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1583
+      },
+      "estimated_cost_usd_api": 0.001432,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 3698,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 854,
+        "api_usage_present": true
+      }
+    }
+  }
+}

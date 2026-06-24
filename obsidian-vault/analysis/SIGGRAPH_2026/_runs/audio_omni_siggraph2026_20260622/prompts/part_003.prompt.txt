@@ -1,0 +1,68 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Audio-Omni: Extending Multi-modal Understanding to Versatile Audio Generation and Editing
+Part: 3/13
+Character span: 10853-18084
+
+=== PART CONTENT ===
+owards this unified goal. However, they exhibit critical limitations. Some approaches rely on orchestrating separate expert models via tool invocation [Huang et al. 2024b], which lacks the benefits of end-toend optimization. Other models, while more integrated, typically focus on a limited subset of audio domains, such as speech-only [AI et al. 2025; An et al. 2024] or music-only generation [Liu et al. 2024a], failing to provide a truly universal solution. To address these shortcomings, we propose Audio-Omni, the first framework to unify understanding, generation, and editing across all general sound, music, and speech domains. Our approach provides a cohesive, endto-end solution that overcomes the fragmentation of specialized models and the domain limitations of existing unified efforts.
+
+## 3 Audio Editing Dataset Construction
+
+Table 1. Statistics of our proposed audio editing dataset AudioEdit.
+<table><tr><td>Task Type</td><td>Data Source</td><td>Train Samples</td><td>Test Samples</td></tr><tr><td rowspan="2">Add</td><td>Real Data</td><td>50K</td><td>500</td></tr><tr><td>Synthesis Data</td><td>150K</td><td>1</td></tr><tr><td rowspan="2">Remove</td><td>Real Data</td><td>50K</td><td>500</td></tr><tr><td>Synthesis Data</td><td>150K</td><td>1</td></tr><tr><td rowspan="2">Extract</td><td>Real Data</td><td>50K</td><td>500</td></tr><tr><td>Synthesis Data</td><td>150K</td><td>-</td></tr><tr><td>Style Transfer</td><td>Real Data</td><td>500K</td><td>500</td></tr><tr><td>Total</td><td></td><td>1,100K</td><td>2,000</td></tr></table>
+
+An obstacle to advancing instruction-guided audio editing is the scarcity of large-scale paired datasets. While pioneering works like [Lan et al. 2025; Tao et al. 2025; Wang et al. 2023b] have proposed synthetic pipelines, their reliance on mixing isolated audio segments introduces a significant domain gap from real-world audio, where sounds are integrated. Furthermore, these methods often falter on complex tasks like audio style transfer, struggling to disentangle acoustic style from core content attributes such as temporal structure and pitch. To address these limitations, we introduce AudioEdit, a large-scale dataset constructed via a novel hybrid pipeline that integrates real-world data mining with scalable synthesis.
+
+Our pipeline, illustrated in Figure 2, features two complementary branches to generate a dataset with both real-world acoustic fidelity and large-scale diversity. The Real Data Branch mines authentic editing pairs from real-world datasets VGGSound [Chen et al. 2020]. First, we employ a powerful MLLM (Gemini 2.5 Pro) to identify the primary sound-emitting object categories within each source audio clip. Then, we deploy SAM-Audio [Shi et al. 2025], a state-of-the-art audio segmentation model, to perform source separation based on the identified categories. This step disentangles the source audio into a target track, containing the audio of the specified object, and a corresponding residual track. Subsequently, all separated tracks undergo rigorous multi-stage filtering to ensure quality. Starting from over 540K category-labeled samples, we apply VAD1 filtering (retaining ∼347K pairs) followed by CLAP [Elizalde et al. 2023]-based semantic alignment (retaining ∼50K pairs, approximately 9.2% overall retention). Human validation on a subset achieves approximately 83% agreement, confirming pipeline quality. This process yields high-quality source-target pairs for add, remove, and extract tasks. For style transfer, we expand the filtered targets by prompting Gemini to generate semantically related but different keywords (prompt template in Appendix 1.1), then apply CLAP filtering again, yielding approximately 500K pairs. We use ZETA [Manor and Michaeli 2024] to transform each target to the new style while preserving temporal structure and pitch, then mix the transformed audio back with the residual track to form the final edited output. Concurrently, our Synthesis Data Branch ensures scale and diversity by programmatically generating soundscapes with the Scaper toolkit [Salamon et al. 2017]. This is achieved by randomly mixing foreground events from ESC-50 [Piczak 2015] into 10-second backgrounds from AudioCaps [Kim et al. 2019], applying randomized parameters including onset time, SNR (0-3 dB), pitch shifts (-3 to +3 semitones), and time-stretch factors (0.8-1.2). This automated process efficiently yields a large volume of precisely annotated data for our add, remove, and extract tasks.
+
+Through this meticulously designed hybrid pipeline, we construct AudioEdit, a large-scale, high-quality dataset for instruction-guided audio editing. In total, AudioEdit comprises over 1M samples covering add, remove, extract, and style transfer audio editing tasks, with detailed statistics presented in Table 1.
+
+## 4 Method
+
+In this section, we describe the architecture of Audio-Omni and its training strategies.
+
+![](images/d0ecdb6de943e481f6cfaf58d925c8afc8d41ebb67eebfa99b7aa751cf143366.jpg)  
+Fig. 2. Overview of the hybrid pipeline for constructing our AudioEdit dataset. The pipeline consists of two parallel branches to ensure both data authenticity and scale. The Real Data Branch (left) mines editing pairs from real-world datasets (e.g., VGGSound) by first using an MLLM (Gemini) for category identification, followed by a dedicated segmentation model (SAM-Audio) for source separation. Concurrently, the Synthesis Data Branch (right) leverages the Scaper toolkit to programmatically generate a large volume of precisely annotated editing scenarios. This hybrid strategy yields a dataset that combines the acoustic fidelity of natural audio with the large-scale diversity needed for robust model training.
+
+## 4.1 Preliminary
+
+Rectified Flow. Our generative backbone is built upon the framework of Rectified Flow [Liu et al. 2022], a powerful class of generative models. Unlike traditional diffusion models that often follow stochastic paths, Rectified Flow simplifies the generation process by modeling a straight-line trajectory between noise and data. This trajectory connects a random noise sample $\mathbf { x } _ { 1 } \sim { \cal N } ( \mathbf { 0 } , \mathbf { I } )$ to a data sample $\mathbf { x } _ { 0 }$ via a simple ordinary differential equation (ODE) with a constant velocity field ${ \bf v } = { \bf x } _ { 1 } - { \bf x } _ { 0 }$ . The ODE is defined for a time variable ?? ∈ [0, 1] as:
+
+$$
+\frac { d { \bf x } _ { t } } { d t } = { \bf v } .\tag{1}
+$$
+
+The solution at any time ?? along this linear path is given by the interpolation:
+
+$$
+\begin{array} { r } { { \bf x } _ { t } = ( 1 - t ) { \bf x } _ { 0 } + t { \bf x } _ { 1 } . } \end{array}\tag{2}
+$$
+
+A neural network, denoted $v _ { \theta } ( \mathbf { x } _ { t } , t , \mathbf { c } )$ , is trained to predict this velocity field v conditioned on the noisy state $\mathbf { x } _ { t } ,$ time ?? , and a set of conditioning signals c. During inference, generation starts from a random noise sample $\mathbf { x } _ { 1 }$ at $t \ = \ 1$ , and the ODE in Equation 1 is solved backwards to $t = 0$ using a numerical solver, guided by the predictions of ???? . The training objective for $v _ { \theta }$ is detailed in Section 4.3.

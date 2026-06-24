@@ -1,0 +1,277 @@
+{
+  "run_id": "20260617T075552Z",
+  "source_backup": "obsidian-vault/paper_list.csv.bak_20260617T075552Z",
+  "total": 14,
+  "ok": 14,
+  "failed": 0,
+  "downloaded": 14,
+  "reused": 0,
+  "results": [
+    {
+      "row_index": 3292,
+      "csv_line": 3294,
+      "title": "Lance: Unified Multimodal Modeling by Multi-Task Synergy",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/arxiv_2026/Lance:_Unified_Multimodal_Modeling_by_Multi-Task_Synergy.pdf",
+      "source_url": "https://arxiv.org/pdf/2605.18678.pdf",
+      "bytes": 35807040,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2605.18678.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "35807040"
+        }
+      ]
+    },
+    {
+      "row_index": 3293,
+      "csv_line": 3295,
+      "title": "EVA01: Unified Native 3D Understanding and Generation via Mixture-of-Transformers",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/arxiv_2026/EVA01:_Unified_Native_3D_Understanding_and_Generation_via_Mixture-of-Transformers.pdf",
+      "source_url": "https://arxiv.org/pdf/2605.16745.pdf",
+      "bytes": 50191172,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2605.16745.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "50191172"
+        }
+      ]
+    },
+    {
+      "row_index": 3294,
+      "csv_line": 3296,
+      "title": "OmniMotion-X: Versatile Multimodal Whole-Body Motion Generation",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/arxiv_2025/OmniMotion-X:_Versatile_Multimodal_Whole-Body_Motion_Generation.pdf",
+      "source_url": "https://arxiv.org/pdf/2510.19789.pdf",
+      "bytes": 1985832,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2510.19789.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "1985832"
+        }
+      ]
+    },
+    {
+      "row_index": 3295,
+      "csv_line": 3297,
+      "title": "OmniMotion: Multimodal Motion Generation with Continuous Masked Autoregression",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/arxiv_2025/OmniMotion:_Multimodal_Motion_Generation_with_Continuous_Masked_Autoregression.pdf",
+      "source_url": "https://arxiv.org/pdf/2510.14954.pdf",
+      "bytes": 4941155,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2510.14954.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "4941155"
+        }
+      ]
+    },
+    {
+      "row_index": 3296,
+      "csv_line": 3298,
+      "title": "Matrix-Game 3.0: Real-Time and Streaming Interactive World Model with Long-Horizon Memory",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/arxiv_2026/Matrix-Game_3.0:_Real-Time_and_Streaming_Interactive_World_Model_with_Long-Horizon_Memory.pdf",
+      "source_url": "https://arxiv.org/pdf/2604.08995.pdf",
+      "bytes": 23717745,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2604.08995.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "23717745"
+        }
+      ]
+    },
+    {
+      "row_index": 3297,
+      "csv_line": 3299,
+      "title": "Matrix-Game 2.0: An Open-Source, Real-Time, and Streaming Interactive World Model",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/arxiv_2025/Matrix-Game_2.0:_An_Open-Source,_Real-Time,_and_Streaming_Interactive_World_Model.pdf",
+      "source_url": "https://arxiv.org/pdf/2508.13009.pdf",
+      "bytes": 37452352,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2508.13009.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "37452352"
+        }
+      ]
+    },
+    {
+      "row_index": 3298,
+      "csv_line": 3300,
+      "title": "FlowAct-R1: Towards Interactive Humanoid Video Generation",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/arxiv_2026/FlowAct-R1:_Towards_Interactive_Humanoid_Video_Generation.pdf",
+      "source_url": "https://arxiv.org/pdf/2601.10103.pdf",
+      "bytes": 4366675,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2601.10103.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "4366675"
+        }
+      ]
+    },
+    {
+      "row_index": 3299,
+      "csv_line": 3301,
+      "title": "FLAME: Adaptive Mixture-of-Experts for Continual Multimodal Multi-Task Learning",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/arxiv_2026/FLAME:_Adaptive_Mixture-of-Experts_for_Continual_Multimodal_Multi-Task_Learning.pdf",
+      "source_url": "https://arxiv.org/pdf/2605.09355.pdf",
+      "bytes": 9032143,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2605.09355.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "9032143"
+        }
+      ]
+    },
+    {
+      "row_index": 3300,
+      "csv_line": 3302,
+      "title": "SAMP: Stochastic Scene-Aware Motion Prediction",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/ICCV_2021/SAMP:_Stochastic_Scene-Aware_Motion_Prediction.pdf",
+      "source_url": "https://arxiv.org/pdf/2108.08284.pdf",
+      "bytes": 8422834,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2108.08284.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "8422834"
+        }
+      ]
+    },
+    {
+      "row_index": 3301,
+      "csv_line": 3303,
+      "title": "SceneDiffuser: Diffusion-based Generation, Optimization, and Planning in 3D Scenes",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2023/SceneDiffuser:_Diffusion-based_Generation,_Optimization,_and_Planning_in_3D_Scenes.pdf",
+      "source_url": "https://arxiv.org/pdf/2301.06015.pdf",
+      "bytes": 22645998,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2301.06015.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "22645998"
+        }
+      ]
+    },
+    {
+      "row_index": 3302,
+      "csv_line": 3304,
+      "title": "HUMANISE: Language-conditioned Human Motion Generation in 3D Scenes",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/NEURIPS_2022/HUMANISE:_Language-conditioned_Human_Motion_Generation_in_3D_Scenes.pdf",
+      "source_url": "https://arxiv.org/pdf/2210.09729.pdf",
+      "bytes": 16196442,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2210.09729.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "16196442"
+        }
+      ]
+    },
+    {
+      "row_index": 3303,
+      "csv_line": 3305,
+      "title": "PriorMDM: Human Motion Diffusion as a Generative Prior",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/ICLR_2024/PriorMDM:_Human_Motion_Diffusion_as_a_Generative_Prior.pdf",
+      "source_url": "https://arxiv.org/pdf/2303.01418.pdf",
+      "bytes": 3433197,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2303.01418.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "3433197"
+        }
+      ]
+    },
+    {
+      "row_index": 3304,
+      "csv_line": 3306,
+      "title": "InterDiff: Generating 3D Human-Object Interactions with Physics-Informed Diffusion",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/ICCV_2023/InterDiff:_Generating_3D_Human-Object_Interactions_with_Physics-Informed_Diffusion.pdf",
+      "source_url": "https://arxiv.org/pdf/2308.16905.pdf",
+      "bytes": 22874331,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2308.16905.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "22874331"
+        }
+      ]
+    },
+    {
+      "row_index": 3305,
+      "csv_line": 3307,
+      "title": "GTA-Human: Playing for 3D Human Recovery",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/TPAMI_2024/GTA-Human:_Playing_for_3D_Human_Recovery.pdf",
+      "source_url": "https://arxiv.org/pdf/2110.07588.pdf",
+      "bytes": 16947402,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2110.07588.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "16947402"
+        }
+      ]
+    }
+  ]
+}

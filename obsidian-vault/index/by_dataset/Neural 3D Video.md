@@ -1,0 +1,23 @@
+---
+title: "Dataset: Neural 3D Video"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: Neural 3D Video
+
+- [[obsidian-vault/analysis/CVPR_2026/SparseCam4D_Spatio_Temporally_Consistent_4D_Reconstruction_from_Sparse_Cameras.md|SparseCam4D: Spatio-Temporally Consistent 4D Reconstruction from Sparse Cameras (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SparseCam4D_Spatio_Temporally_Consistent_4D_Reconstruction_from_Sparse_Cameras.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: SparseCam4D
+	- datasets: Technicolor, Neural 3D Video, Nvidia Dynamic Scenes
+- [[obsidian-vault/analysis/ICLR_2026/Mango_GS_Enhancing_Spatio_Temporal_Consistency_in_Dynamic_Scenes_Reconstruction_using_Multi_Frame_Node_Guided_4D_Gaussian_Splatting.md|Mango-GS: Enhancing Spatio-Temporal Consistency in Dynamic Scenes Reconstruction using Multi-Frame Node-Guided 4D Gaussian Splatting (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Mango_GS_Enhancing_Spatio_Temporal_Consistency_in_Dynamic_Scenes_Reconstruction_df1c4f8104b2.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Mango-GS
+	- datasets: Neural 3D Video, HyperNeRF-vrig

@@ -1,0 +1,56 @@
+------------ Options -------------
+base_dim: 512
+batch_size: 32
+beta_schedule: linear
+checkpoints_dir: /data/public/ripemangobox/Motion/experiments/MoDebug/motionclr/formal_candidates/trace3_formal_train_ds_review_20260603_gpu0/baseline/checkpoints
+clip_grad_norm: 1
+cond_mask_prob: 0.1
+continue_ckpt: latest.tar
+dataset_name: t2m
+debug: False
+decay_rate: 0.9
+diffusion_steps: 1000
+dim_mults: [2, 2, 2, 2]
+dropout: 0.1
+edit_mode: False
+feat_bias: 5
+is_continue: False
+latent_dim: 512
+log_every: 50
+lr: 0.0002
+model_ema: True
+model_ema_decay: 0.9999
+model_ema_steps: 32
+name: trace3_baseline_seed0_steps50000
+no_adagn: False
+no_eff: True
+num_layers: 8
+num_train_steps: 50000
+opt_path: 
+prediction_type: sample
+save_interval: 5000
+seed: 0
+self_attention: True
+text_latent_dim: 256
+time_dim: 512
+update_lr_steps: 5000
+vis_attn: False
+weight_decay: 0.01
+-------------- End ----------------
+
+ Loading train mode HumanML3D train dataset ...
+  0%|          | 0/23384 [00:00<?, ?it/s]  2%|▏         | 461/23384 [00:00<00:04, 4607.71it/s]  4%|▍         | 951/23384 [00:00<00:04, 4778.05it/s]  6%|▌         | 1458/23384 [00:00<00:04, 4907.22it/s]  8%|▊         | 1957/23384 [00:00<00:04, 4937.39it/s] 11%|█         | 2462/23384 [00:00<00:04, 4975.81it/s] 13%|█▎        | 2960/23384 [00:00<00:04, 4971.61it/s] 15%|█▍        | 3462/23384 [00:00<00:03, 4985.17it/s] 17%|█▋        | 3969/23384 [00:00<00:03, 5009.22it/s] 19%|█▉        | 4483/23384 [00:00<00:03, 5048.81it/s] 21%|██▏       | 4988/23384 [00:01<00:03, 5038.17it/s] 23%|██▎       | 5492/23384 [00:01<00:03, 5037.49it/s] 26%|██▌       | 5996/23384 [00:01<00:03, 4988.85it/s] 28%|██▊       | 6495/23384 [00:01<00:03, 4974.30it/s] 30%|██▉       | 6993/23384 [00:01<00:04, 3573.89it/s] 32%|███▏      | 7484/23384 [00:01<00:04, 3886.91it/s] 34%|███▍      | 7980/23384 [00:01<00:03, 4156.47it/s] 36%|███▋      | 8479/23384 [00:01<00:03, 4375.01it/s] 38%|███▊      | 8981/23384 [00:01<00:03, 4548.75it/s] 40%|████      | 9460/23384 [00:02<00:03, 4616.33it/s] 43%|████▎     | 9947/23384 [00:02<00:02, 4688.22it/s] 45%|████▍     | 10428/23384 [00:02<00:02, 4716.24it/s] 47%|████▋     | 10927/23384 [00:02<00:02, 4795.23it/s] 49%|████▉     | 11425/23384 [00:02<00:02, 4847.81it/s] 51%|█████     | 11916/23384 [00:02<00:02, 4864.35it/s] 53%|█████▎    | 12410/23384 [00:02<00:02, 4884.25it/s] 55%|█████▌    | 12901/23384 [00:02<00:02, 4872.74it/s] 57%|█████▋    | 13395/23384 [00:02<00:02, 4892.00it/s] 59%|█████▉    | 13890/23384 [00:02<00:01, 4906.62it/s] 62%|██████▏   | 14385/23384 [00:03<00:01, 4915.07it/s] 64%|██████▎   | 14878/23384 [00:03<00:01, 4914.18it/s] 66%|██████▌   | 15374/23384 [00:03<00:01, 4927.37it/s] 68%|██████▊   | 15876/23384 [00:03<00:01, 4953.61it/s] 70%|███████   | 16372/23384 [00:03<00:01, 4586.63it/s] 72%|███████▏  | 16837/23384 [00:03<00:01, 3824.35it/s] 74%|███████▍  | 17306/23384 [00:03<00:01, 4040.46it/s] 76%|███████▌  | 17731/23384 [00:04<00:02, 2763.00it/s] 78%|███████▊  | 18200/23384 [00:04<00:01, 3153.04it/s] 80%|███████▉  | 18672/23384 [00:04<00:01, 3504.69it/s] 82%|████████▏ | 19145/23384 [00:04<00:01, 3801.38it/s] 84%|████████▍ | 19605/23384 [00:04<00:00, 4006.72it/s] 86%|████████▌ | 20046/23384 [00:04<00:00, 4112.57it/s] 88%|████████▊ | 20523/23384 [00:04<00:00, 4294.36it/s] 90%|████████▉ | 20973/23384 [00:04<00:00, 4343.39it/s] 92%|█████████▏| 21431/23384 [00:04<00:00, 4411.35it/s] 94%|█████████▎| 21883/23384 [00:04<00:00, 4391.57it/s] 95%|█████████▌| 22330/23384 [00:05<00:00, 4374.39it/s] 97%|█████████▋| 22773/23384 [00:05<00:00, 4344.63it/s] 99%|█████████▉| 23217/23384 [00:05<00:00, 4371.27it/s]100%|██████████| 23384/23384 [00:05<00:00, 4430.03it/s]
+/home/ripemangobox/miniconda3/envs/event-t2m/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+Completing loading t2m dataset
+
+Initializing model ...
+The T2M Unet mask the text prompt by 0.1 prob. in training
+dims:  [263, 1024, 1024, 1024, 1024] mults:  [2, 2, 2, 2]
+Diffusion_config:
+ FrozenDict([('num_train_timesteps', 1000), ('beta_start', 0.0001), ('beta_end', 0.02), ('beta_schedule', 'linear'), ('trained_betas', None), ('variance_type', 'fixed_small'), ('clip_sample', False), ('prediction_type', 'sample'), ('thresholding', False), ('dynamic_thresholding_ratio', 0.995), ('clip_sample_range', 1.0), ('sample_max_value', 1.0), ('timestep_spacing', 'leading'), ('steps_offset', 0), ('rescale_betas_zero_snr', False), ('_use_default_values', ['thresholding', 'beta_end', 'timestep_spacing', 'trained_betas', 'sample_max_value', 'steps_offset', 'clip_sample_range', 'dynamic_thresholding_ratio', 'beta_start', 'rescale_betas_zero_snr'])])
+Start experiment: 2026-06-03_15:25:51
+{
+  "manifest": "/data/public/ripemangobox/Motion/experiments/MoDebug/motionclr/formal_candidates/trace3_formal_train_ds_review_20260603_gpu0/baseline/manifest.json",
+  "actual_steps": 50000
+}

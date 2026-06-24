@@ -1,0 +1,32 @@
+<!-- part 7/13 chars 34040-40065 -->
+
+-to-audio models.
+
+In-Context Generation. Our model demonstrates strong in-context learning. Given a piano recording and the instruction “Generate a dramatic cinematic chord progression that builds tension,” it extracts the piano’s timbre and applies it to the newly synthesized piece.
+
+Zero-Shot Voice Conversion and Speech Editing. During speech training, we randomly mask either speaker identity or speech content, forcing the model to infer the missing component from context. This naturally enables zero-shot voice conversion and speech editing at inference time without task-specific supervision.
+
+These capabilities demonstrate that Audio-Omni goes beyond a standard multi-task model, exhibiting inherited intelligence and flexible zero-shot control across diverse audio generation scenarios.
+
+## 5.4 Ablation Studies
+
+To validate our design choices, we conduct a series of ablation studies in this section, more ablation studies are included in the Appendix 1.3.
+
+Ablation on Dataset Composition. To assess the impact of our data sources, we evaluate three training configurations: using only synthetic data, only real-world data, or a mix of both. As shown in Table 5, the mixed-data approach yields the best overall performance. This suggests a synergy where synthetic data provides broad coverage of diverse editing operations, while real-world data contributes crucial acoustic realism and fidelity. Notably, training on synthetic data alone is insufficient for achieving robust generalization to the acoustic complexities of real-world audio.
+
+Table 5. Ablation study on dataset composition for audio editing training.
+<table><tr><td>Setting</td><td>KL↓</td><td>IS↑</td><td>FD↓</td><td>FAD↓</td><td>LSD↓</td></tr><tr><td>Only Real</td><td>1.27</td><td>5.54</td><td>20.69</td><td>2.67</td><td>1.84</td></tr><tr><td>Only Synthesis</td><td>1.93</td><td>5.04</td><td>37.96</td><td>3.80</td><td>5.17</td></tr><tr><td>Syn. + Real (Ours)</td><td>1.30</td><td>5.93</td><td>20.48</td><td>2.48</td><td>1.82</td></tr></table>
+
+Table 6. Ablation study on conditioning injection strategies.
+<table><tr><td>Context</td><td>Cat.</td><td>T2A↓ V2A↓</td><td></td><td>TTS↓ AE↓</td></tr><tr><td>mm， trans，sync，mel</td><td>none</td><td>40.91</td><td>25.61</td><td>32.46 5.47</td></tr><tr><td>mm， trans，sync</td><td>mel</td><td>38.26</td><td>26.46 25.88</td><td>4.03</td></tr><tr><td>mm， trans</td><td>sync，mel</td><td>28.90</td><td>18.55 19.33</td><td>3.62</td></tr><tr><td>mm</td><td>trans， sync， mel</td><td>60.58</td><td>56.88</td><td>59.20 4.88</td></tr></table>
+
+Ablation on Conditioning Strategies. We perform an ablation study to identify the optimal method for integrating our multimodal conditions. We compare four distinct injection strategies by varying how features including multimodal (mm), transcript (trans), synchronization (sync), and mel-spectrogram (mel) are delivered to the DiT backbone, either via cross-attention (Context) or channel-wise concatenation (Cat). As shown in Table 6, the results consistently demonstrate the superiority of one particular configuration across all tasks. This optimal strategy involves providing high-level conditions (mm, trans) as flexible Context, while simultaneously concatenating low-level conditions (sync, mel) with the input noise. This result provides the insight for future research on the optimal conditioning strategy for unified audio generation.
+
+Table 7. Ablation study on the source of conditional features from the MLLM.
+<table><tr><td rowspan="2">Feature Source</td><td colspan="2">T2A</td><td colspan="2">T2M</td></tr><tr><td>IS↑</td><td>FD↓</td><td>IS↑</td><td>FAD↓</td></tr><tr><td>Last Layer (-1)</td><td>9.36</td><td>4.21</td><td>2.90</td><td>3.26</td></tr><tr><td>Penultimate Layer (-2)</td><td>11.26</td><td>2.75</td><td>3.46</td><td>3.05</td></tr><tr><td>MetaQuery</td><td>7.44</td><td>8.34</td><td>2.38</td><td>8.15</td></tr><tr><td>Query</td><td>8.55</td><td>5.31</td><td>2.69</td><td>4.22</td></tr></table>
+
+Ablation on Feature Source Selection. We ablate four strategies for extracting conditional features from the frozen MLLM, with results on T2A and T2M tasks shown in Table 7. The methods include using the Last Layer (-1) embeddings, the Penultimate Layer (-2) embeddings, MetaQuery (which appends learnable tokens to the input sequence, following [Pan et al. 2025]), and Query mechanism (which uses learnable tokens to attend to the penultimate layer features via cross-attention). Our results indicate that for audio generative tasks, using the unfiltered feature sequence from the penultimate layer is the most effective conditioning strategy. The penultimate layer’s superiority confirms that the final layer is overly specialized for text prediction, whereas the penultimate layer retains richer, uncompressed semantic and acoustic details. Furthermore, complex query mechanisms proved detrimental, suggesting that high-fidelity audio synthesis is sensitive to information bottlenecks and benefits most from direct access to dense features.
+
+## 6 Conclusion
+
+In this work, we introduced Audio-Omni, the first end-to-end framework to unify audio understanding, generation, and editing across the full spectrum of sound, music, and speech. Our decoupled architecture successfully synergizes a frozen MLLM for high-level reasoning with a trainable DiT, guided by a hybrid conditioning mechanism that separates high-level semantic and low-level signal features. To address a critical data bottleneck, we also constructed AudioEdit, a large-scale dataset of over one million instructionguided editing pairs. Extensive experiments demonstrate that our single unified model not only matches or surpasses the performance of specialized expert models but also exhibits remarkable inherited abilities, including knowledge-augmented reasoning and zero-shot cross-lingual control, inherited from the MLLM. We believe Audio-Omni provides a powerful and scalable baseline that highlights a promising path toward universal generative audio intelligence.

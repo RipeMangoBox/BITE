@@ -1,0 +1,64 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Audio-Omni: Extending Multi-modal Understanding to Versatile Audio Generation and Editing
+Part: 6/13
+Character span: 29483-34840
+
+=== PART CONTENT ===
+ional generation, we employ classifier-free guidance with a guidance scale of 6.0.
+
+## 5.2 Evaluation Metrics
+
+To evaluate Audio-Omni, we employ a comprehensive suite of metrics for its understanding, generation, and editing capabilities. For understanding, we report scores on the MMSU [Wang et al. 2025b] and MMAU [Sakshi et al. 2024] benchmarks to assess multi-task reasoning. For generation, we measure distributional similarity and quality using KL divergence, Inception Score (IS), Fréchet Audio Distance (FAD), and Fréchet Distance (FD) on PANNs [Kong et al. 2020] embeddings. Speech synthesis performance is specifically evaluated using Word Error Rate (WER). For editing, we use Log-Spectral Distance (LSD) to measure fidelity and content preservation, and FAD to assess perceptual quality.
+
+## 5.3 Main Results
+
+In this section, we present quantitative and qualitative results for Audio-Omni, evaluating its performance on understanding, generation, and editing tasks against a wide range of specialized and unified models.
+
+5.3.1 Overall Performance. As shown in Table 2, Table 3, and Table 4, Audio-Omni demonstrates strong and comprehensive capabilities across understanding, generation, and editing tasks.
+
+Understanding. Benefiting from our decoupled architecture, Audio-Omni inherits a strong understanding ability from the frozen MLLM core, whose audio encoder has been pre-trained on a large-scale audio-related data, enabling strong performance on multi-domain audio tasks [Xu et al. 2025]. We evaluate on MMSU (covering 47 spoken-language tasks) and MMAU (evaluating 27 reasoning skills across sound, music, and speech). As shown in Table 2, Audio-Omni achieves strong understanding performance, outperforming most unified models and approaching the level of dedicated understanding specialists.
+
+Generation and Editing. For generation tasks, Audio-Omni exhibits state-of-the-art or highly competitive performance. We report the FAD on standard test sets: AudioCaps for T2A, Musicaps for T2M, VGGSound for V2A, and V2M-bench for V2M. For speech synthesis, we evaluate WER on the Seed-TTS [Anastassiou et al. 2024] en benchmark. In generation tasks, our model demonstrates strong overall performance, consistently and significantly outperforming all other unified models. Notably, it further surpasses specialized expert models in T2M and TTS. For editing, we report the average FAD and LSD across four tasks (add, remove, extract, style transfer) on our proposed AudioEdit test set. We additionally report the CLAP score (averaged over add, extract, and style transfer) to evaluate instruction adherence. As shown in Table 4, Audio-Omni achieves the best performance on all metrics, with detailed per-task results in Appendix Table A3.
+
+In summary, Table 2, Table 3, and Table 4 validate the effectiveness of our unified framework: Audio-Omni inherits strong understanding capabilities from the frozen MLLM while achieving state-of-the-art or highly competitive results across generation and editing tasks, demonstrating that a single unified model can serve as a strong generalist across the full spectrum of audio tasks.
+
+5.3.2 Zero-shot Cross-lingual Text-to-Audio Generation. A remarkable ability of our framework is its zero-shot cross-lingual generation, inherited from the frozen MLLM’s multilingual understanding. As shown in Appendix Table A2, Audio-Omni maintains strong performance across multiple languages (CN, ES, DE, FR, JP) despite being trained on English, with quality comparable to English-only specialist models.
+
+5.3.3 Inherited Abilities and Zero-Shot Capabilities. We further highlight several representative capabilities of Audio-Omni. The first two are emergent abilities inherited from the frozen MLLM’s world knowledge and in-context reasoning, while the latter two are enabled by our masking-based training strategy. We qualitatively showcase these in Figure 4.  
+![](images/ce1542d5eaa3f157e053702367273de7787c315c7efe802f5b932f0ceae44316.jpg)  
+Fig. 4. Qualitative showcase of Audio-Omni’s capabilities, including (a) knowledge-augmented generation, (b) in-context generation, (c) zero-shot voice conversion, and (d) zero-shot speech editing.
+
+Knowledge-Augmented Generation. Audio-Omni successfully handles knowledge-intensive prompts that require external world knowledge. For instance, when prompted with “Generate music using the instrument Jimi Hendrix played in a happy mood.” it correctly infers the instrument is an electric guitar and synthesizes a corresponding melody, a task beyond standard text-to-audio models.
+
+In-Context Generation. Our model demonstrates strong in-context learning. Given a piano recording and the instruction “Generate a dramatic cinematic chord progression that builds tension,” it extracts the piano’s timbre and applies it to the newly synthesized piece.
+
+Zero-Shot Voice Conversion and Speech Editing. During speech training, we randomly mask either speaker identity or speech content, forcing the model to infer the missing component from context. This naturally enables zero-shot voice conversion and speech editing at inference time without task-specific supervision.
+
+These capabilities demonstrate that Audio-Omni goes beyond a standard multi-task model, exhibiting inherited intelligence and flexible zero-shot control across diverse audio generation scenarios.

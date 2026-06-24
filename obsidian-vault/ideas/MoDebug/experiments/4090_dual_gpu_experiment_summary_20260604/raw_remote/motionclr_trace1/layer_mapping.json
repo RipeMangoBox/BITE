@@ -1,0 +1,128 @@
+[
+  {
+    "layer_id": 0,
+    "module": "unet.downs.0.0",
+    "cross_attention_module": "unet.downs.0.0.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 1,
+    "module": "unet.downs.0.1",
+    "cross_attention_module": "unet.downs.0.1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 2,
+    "module": "unet.downs.1.0",
+    "cross_attention_module": "unet.downs.1.0.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 3,
+    "module": "unet.downs.1.1",
+    "cross_attention_module": "unet.downs.1.1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 4,
+    "module": "unet.downs.2.0",
+    "cross_attention_module": "unet.downs.2.0.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 5,
+    "module": "unet.downs.2.1",
+    "cross_attention_module": "unet.downs.2.1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 6,
+    "module": "unet.downs.3.0",
+    "cross_attention_module": "unet.downs.3.0.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 7,
+    "module": "unet.downs.3.1",
+    "cross_attention_module": "unet.downs.3.1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 8,
+    "module": "unet.ups.0.1",
+    "cross_attention_module": "unet.ups.0.1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 9,
+    "module": "unet.ups.0.2",
+    "cross_attention_module": "unet.ups.0.2.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 10,
+    "module": "unet.ups.1.1",
+    "cross_attention_module": "unet.ups.1.1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 11,
+    "module": "unet.ups.1.2",
+    "cross_attention_module": "unet.ups.1.2.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 12,
+    "module": "unet.ups.2.1",
+    "cross_attention_module": "unet.ups.2.1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 13,
+    "module": "unet.ups.2.2",
+    "cross_attention_module": "unet.ups.2.2.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 14,
+    "module": "unet.ups.3.1",
+    "cross_attention_module": "unet.ups.3.1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 15,
+    "module": "unet.ups.3.2",
+    "cross_attention_module": "unet.ups.3.2.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 16,
+    "module": "unet.mid_block1",
+    "cross_attention_module": "unet.mid_block1.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  },
+  {
+    "layer_id": 17,
+    "module": "unet.mid_block2",
+    "cross_attention_module": "unet.mid_block2.clr_attn.cross_attention",
+    "cross_attention_class": "CrossAttention",
+    "has_self_attention": true
+  }
+]

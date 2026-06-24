@@ -1,0 +1,125 @@
+---
+title: "Dataset: ImageNet-1K"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: ImageNet-1K
+
+- [[obsidian-vault/analysis/CVPR_2022/A_ViT_Adaptive_Tokens_for_Efficient_Vision_Transformer.md|A-ViT: Adaptive Tokens for Efficient Vision Transformer (CVPR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2022/A_ViT_Adaptive_Tokens_for_Efficient_Vision_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: A-ViT
+	- datasets: ImageNet-1K
+- [[obsidian-vault/analysis/ICML_2022/Understanding_The_Robustness_in_Vision_Transformers.md|Understanding The Robustness in Vision Transformers (ICML 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/ICML_2022/Understanding_The_Robustness_in_Vision_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Fully Attentional Networks (FANs)
+	- datasets: ImageNet-C, ImageNet-1K, Cityscapes-C
+- [[obsidian-vault/analysis/CVPR_2026/ANTS_Adaptive_Negative_Textual_Space_Shaping_for_OOD_Detection_via_Test_Time_MLLM_Understanding_and_Reasoning.md|ANTS: Adaptive Negative Textual Space Shaping for OOD Detection via Test-Time MLLM Understanding and Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ANTS_Adaptive_Negative_Textual_Space_Shaping_for_OOD_Detection_via_Test_Time_MLLM_Understanding_and_Reasoning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: ANTS (Adaptive Negative Textual Space Shaping)
+	- datasets: ImageNet-1K, OpenOOD, CUB-200-2011
+- [[obsidian-vault/analysis/CVPR_2026/BiGain_Unified_Token_Compression_for_Joint_Generation_and_Classification.md|BiGain: Unified Token Compression for Joint Generation and Classification (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/BiGain_Unified_Token_Compression_for_Joint_Generation_and_Classification.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: BiGain (包含 BiGain_TM 即 L-GTM，BiGain_TD 即 IE-KVD)
+	- datasets: Oxford-IIIT Pets, ImageNet-100, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/DMGD_Train_Free_Dataset_Distillation_with_Semantic_Distribution_Matching_in_Diffusion_Models.md|DMGD: Train-Free Dataset Distillation with Semantic-Distribution Matching in Diffusion Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DMGD_Train_Free_Dataset_Distillation_with_Semantic_Distribution_Matching_in_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DMGD (Dual Matching Guided Diffusion)
+	- datasets: ImageNet-Woof, ImageNet-Nette, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Grid_Distillation_Compositional_Image_Distillation_via_Structured_Generative_Grids.md|Grid Distillation: Compositional Image Distillation via Structured Generative Grids (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Grid_Distillation_Compositional_Image_Distillation_via_Structured_Generative_Grids.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Grid Distillation
+	- datasets: ImageWoof, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/HierAmp_Coarse_to_Fine_Autoregressive_Amplification_for_Generative_Dataset_Distillation.md|HierAmp: Coarse-to-Fine Autoregressive Amplification for Generative Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/HierAmp_Coarse_to_Fine_Autoregressive_Amplification_for_Generative_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HIERAMP
+	- datasets: CIFAR-10, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/IMS3_Breaking_Distributional_Aggregation_in_Diffusion_Based_Dataset_Distillation.md|IMS3: Breaking Distributional Aggregation in Diffusion-Based Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IMS3_Breaking_Distributional_Aggregation_in_Diffusion_Based_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ImS³ (Inversion-Matching + Selective Subgroup Sampling)
+	- datasets: ImageWoof, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Is_Bin_Generation_Indispensable_A_Bin_Generation_Free_Dataset_Quantization_via_Semantic_Perspective.md|Is Bin Generation Indispensable? A Bin-Generation-Free Dataset Quantization via Semantic Perspective (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Is_Bin_Generation_Indispensable_A_Bin_Generation_Free_Dataset_Quantization_via_Semantic_Perspective.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Bin-Generation-Free Dataset Quantization (BGFDQ)
+	- datasets: CIFAR-10, CIFAR-100, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Learnability_Guided_Diffusion_for_Dataset_Distillation.md|Learnability-Guided Diffusion for Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learnability_Guided_Diffusion_for_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Learnability-Guided Diffusion (LGD)
+	- datasets: ImageNette, ImageWoof, ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Mitigating_The_Distribution_Shift_of_Diffusion_based_Dataset_Distillation.md|Mitigating The Distribution Shift of Diffusion-based Dataset Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mitigating_The_Distribution_Shift_of_Diffusion_based_Dataset_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: RSM+CGS
+	- datasets: ImageNet-1K, ImageNette, ImageWoof
+- [[obsidian-vault/analysis/CVPR_2026/Rethinking_Dataset_Distillation_Hard_Truths_about_Soft_Labels.md|Rethinking Dataset Distillation: Hard Truths about Soft Labels (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Rethinking_Dataset_Distillation_Hard_Truths_about_Soft_Labels.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CA2D (Compute-Aware Dataset Distillation) / CAD-Prune (Compute-Aware Difficulty Pruning)
+	- datasets: ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/Sparsity_as_a_Key_Unlocking_New_Insights_from_Latent_Structures_for_Out_of_Distribution_Detection.md|Sparsity as a Key: Unlocking New Insights from Latent Structures for Out-of-Distribution Detection (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Sparsity_as_a_Key_Unlocking_New_Insights_from_Latent_Structures_for_Out_of_Distribution_Detection.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: EPD (Energy Profile Divergence) with Top‑k Sparse Autoencoder
+	- datasets: ImageNet-1K
+- [[obsidian-vault/analysis/CVPR_2026/The_Geometry_of_Robustness_Optimizing_Loss_Landscape_Curvature_and_Feature_Manifold_Alignment_for_Robust_Finetuning_of_Vision_Language_Models.md|The Geometry of Robustness: Optimizing Loss Landscape Curvature and Feature Manifold Alignment for Robust Finetuning of Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/The_Geometry_of_Robustness_Optimizing_Loss_Landscape_Curvature_and_Feature_Manifold_Alignment_for_Robust_Finetuning_of_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GRACE
+	- datasets: ImageNet-1K, OOD Average, Zero-Shot Average
+- [[obsidian-vault/analysis/CVPR_2026/VA_p_Variational_Policy_Alignment_for_Pixel_Aware_Autoregressive_Generation.md|VA-p: Variational Policy Alignment for Pixel-Aware Autoregressive Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VA_p_Variational_Policy_Alignment_for_Pixel_Aware_Autoregressive_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VA-π
+	- datasets: ImageNet-1K class-conditional, ImageNet-1K, GenEval
+- [[obsidian-vault/analysis/CVPR_2026/ViT3_Unlocking_Test_Time_Training_in_Vision.md|ViT$^3$: Unlocking Test-Time Training in Vision (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ViT_3_Unlocking_Test_Time_Training_in_Vision.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ViT^3 (Vision Test-Time Training)
+	- datasets: ImageNet-1K, COCO, ADE20K
+- [[obsidian-vault/analysis/ICLR_2026/A_Hidden_Semantic_Bottleneck_in_Conditional_Embeddings_of_Diffusion_Transformers.md|A Hidden Semantic Bottleneck in Conditional Embeddings of Diffusion Transformers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Hidden_Semantic_Bottleneck_in_Conditional_Embeddings_of_Diffusion_Transformers.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Generative / Diffusion / Flow
+	- methods: 条件嵌入剪枝（Conditional Embedding Pruning）
+	- datasets: ImageNet-1K
+- [[obsidian-vault/analysis/ICLR_2026/DiffusionBlocks_Block_wise_Neural_Network_Training_via_Diffusion_Interpretation.md|DiffusionBlocks Block-wise Neural Network Training via Diffusion Interpretation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DiffusionBlocks_Block_wise_Neural_Network_Training_via_Diffusion_Interpretation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: DiffusionBlocks：将残差网络划分为块, 为每个块分配噪声尺度, 并使用扩散式去噪损失独立训练每个块
+	- datasets: ImageNet-1K, CIFAR-100, Tiny-ImageNet
+- [[obsidian-vault/analysis/ICLR_2026/DTO_KD_Dynamic_Trade_off_Optimization_for_Effective_Knowledge_Distillation.md|DTO-KD: Dynamic Trade-off Optimization for Effective Knowledge Distillation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DTO_KD_Dynamic_Trade_off_Optimization_for_Effective_Knowledge_Distillation.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: DTO-KD
+	- datasets: ImageNet-1K, COCO

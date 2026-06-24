@@ -1,0 +1,1028 @@
+---
+title: "Topic: Other / Unclear"
+type: paper-index
+dimension: topic
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Topic: Other / Unclear
+
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Clebsch_Method_for_Free-surface_Vortical_Flow_Simulation.md|A Clebsch Method for Free-surface Vortical Flow Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Clebsch_Method_for_Free_surface_Vortical_Flow_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Free-Surface Clebsch Solver
+	- datasets: Bubble ring evolution, Paddling propulsion with waves, Single hole sink vortex
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Fast_Unsmoothed_Aggregation_Algebraic_Multigrid_Framework_for_the_Large-scale_Simulation_of_Incompressible_Flow.md|A Fast Unsmoothed Aggregation Algebraic Multigrid Framework for the Large-scale Simulation of Incompressible Flow (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Fast_Unsmoothed_Aggregation_Algebraic_Multigrid_Framework_for_the_Large_scale_Simulation_of_Incompressible_Flow.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: UAAMG（非光滑聚合代数多重网格）结合SIMD-VDB
+	- datasets: Poisson Compact Scene, Viscosity Unit Test, River Fall
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_General_Two-stage_Initialization_for_Sag-free_Deformable_Simulations.md|A General Two-stage Initialization for Sag-free Deformable Simulations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_General_Two_stage_Initialization_for_Sag_free_Deformable_Simulations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Two-Stage Initialization
+	- datasets: Mass-spring tetrahedral mesh, Cloth hat simulation, FEM plant
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Moving_Eulerian-Lagrangian_Particle_Method_for_Thin_Film_and_Foam_Simulation.md|A Moving Eulerian-Lagrangian Particle Method for Thin Film and Foam Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Moving_Eulerian_Lagrangian_Particle_Method_for_Thin_Film_and_Foam_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Moving Eulerian-Lagrangian Particles (MELP) and multi-MELP
+	- datasets: Equilibrium thickness convergence, Plateau border dihedral angle validation, Partition surface curvature validation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Practical_Model_for_Realistic_Butterfly_Flight_Simulation.md|A Practical Model for Realistic Butterfly Flight Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Practical_Model_for_Realistic_Butterfly_Flight_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于力场的蝴蝶飞行仿真模型 (Force-based Butterfly Flight Simulation Model)
+	- datasets: 消融用户研究, 蝴蝶集群仿真, 蝴蝶集群旅行仿真
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Adaptive_Rigidification_of_Elastic_Solids.md|Adaptive Rigidification of Elastic Solids (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Adaptive_Rigidification_of_Elastic_Solids.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adaptive Rigidification of Elastic Solids
+	- datasets: Tire, Blob, Wheel
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Adjoint_Nonlinear_Ray_Tracing.md|Adjoint Nonlinear Ray Tracing (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Adjoint_Nonlinear_Ray_Tracing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adjoint Nonlinear Ray Tracing
+	- datasets: GRIN透镜恢复
+- [[obsidian-vault/analysis/SIGGRAPH_2022/As-locally-uniform-as-possible_Reshaping_of_Vector_Clip_Art.md|As-locally-uniform-as-possible Reshaping of Vector Clip Art (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/As_locally_uniform_as_possible_Reshaping_of_Vector_Clip_Art.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: As-Locally-Uniform-As-Possible (ALUP) Reshaping
+	- datasets: 用户对比研究
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Automatic_Quantization_for_Physics-based_Simulation.md|Automatic Quantization for Physics-based Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Automatic_Quantization_for_Physics_based_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Automatic Quantization (AutoQuantizer)
+	- datasets: Large-scale Eulerian smoke, Large-scale MLS-MPM fluid
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A𝛿_Autodiff_for_Discontinuous_Programs_Applied_to_Shaders.md|A𝛿: Autodiff for Discontinuous Programs — Applied to Shaders (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Autodiff_for_Discontinuous_Programs_Applied_to_Shaders.pdf|PDF]]
+	- topics: Other / Unclear
+- [[obsidian-vault/analysis/SIGGRAPH_2022/CCP_Configurable_Crowd_Profiles.md|CCP: Configurable Crowd Profiles (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CCP_Configurable_Crowd_Profiles.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: CCP
+- [[obsidian-vault/analysis/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.md|CLIP2StyleGAN: Unsupervised Extraction of StyleGAN Edit Directions (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: CLIP2StyleGAN
+	- datasets: FFHQ / StyleGAN生成人脸
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Closed-loop_Control_of_Direct_Ink_Writing_via_Reinforcement_Learning.md|Closed-loop Control of Direct Ink Writing via Reinforcement Learning (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Closed_loop_Control_of_Direct_Ink_Writing_via_Reinforcement_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: 基于强化学习的直接墨水书写闭环控制器 (RL-Closed-Loop DIW Controller)
+	- datasets: Simulated printing tasks with constant deposition, Simulated printing tasks with dynamic/noisy deposition, Simulated infill printing under noise
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Clustered_Vector_Textures.md|Clustered Vector Textures (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Clustered_Vector_Textures.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Clustered Vector Textures
+	- datasets: 聚类对比基线
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Co-optimization_of_Design_and_Fabrication_Plans_for_Carpentry.md|Co-optimization of Design and Fabrication Plans for Carpentry (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Co_optimization_of_Design_and_Fabrication_Plans_for_Carpentry.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+	- methods: ICEE (Iterative Contraction and Expansion on E-graphs) with Bag-of-Parts (BOP) E-graph
+	- datasets: 多个木质家具模型, 五个代表性模型
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Compatible_Intrinsic_Triangulations.md|Compatible Intrinsic Triangulations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Compatible_Intrinsic_Triangulations.pdf|PDF]]
+	- topics: Other / Unclear
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.md|Computational Design of Passive Grippers (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Computational Design of Passive Grippers
+	- datasets: 物体特征覆盖
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computing_Sparse_Integer-constrained_Cones_for_Conformal_Parameterizations.md|Computing Sparse Integer-constrained Cones for Conformal Parameterizations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computing_Sparse_Integer_constrained_Cones_for_Conformal_Parameterizations.pdf|PDF]]
+	- topics: Other / Unclear
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Covector_Fluids.md|Covector Fluids (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Covector_Fluids.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Covector Fluids (CF) / CF+MCM
+	- datasets: Leapfrogging test, Overall simulation workload
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dark_Stereo_Improving_Depth_Perception_Under_Low_Luminance.md|Dark Stereo: Improving Depth Perception Under Low Luminance (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dark_Stereo_Improving_Depth_Perception_Under_Low_Luminance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dark Stereo (Stereo-preserving Contrast Enhancement)
+	- datasets: VR主观偏好实验
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DCT-Net_Domain-calibrated_Translation_for_Portrait_Stylization.md|DCT-Net: Domain-calibrated Translation for Portrait Stylization (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DCT_Net_Domain_calibrated_Translation_for_Portrait_Stylization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DCT-Net
+	- datasets: CelebA
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.md|Designing Perceptual Puzzles by Differentiating Probabilistic Programs (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 可微分概率编程（Differentiable Probabilistic Programming）
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dev2PQ_Planar_Quadrilateral_Strip_Remeshing_of_Developable_Surfaces.md|Dev2PQ: Planar Quadrilateral Strip Remeshing of Developable Surfaces (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dev2PQ_Planar_Quadrilateral_Strip_Remeshing_of_Developable_Surfaces.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dev2PQ
+	- datasets: Clothoid解析可展曲面
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Disentangling_Random_and_Cyclic_Effects_in_Time-lapse_Sequences.md|Disentangling Random and Cyclic Effects in Time-lapse Sequences (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Disentangling_Random_and_Cyclic_Effects_in_Time_lapse_Sequences.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: TLGAN (Cyclic Conditioning GAN)
+	- datasets: 自数据集, Mielipidepalsta数据集
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EARS_Efficiency-aware_Russian_Roulette_and_Splitting.md|EARS: Efficiency-aware Russian Roulette and Splitting (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EARS_Efficiency_aware_Russian_Roulette_and_Splitting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: EARS (Efficiency-Aware Russian Roulette and Splitting)
+	- datasets: Pool scene, Kitchen scene, All five test scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Ecoclimates_Climate-response_Modeling_of_Vegetation.md|Ecoclimates: Climate-response Modeling of Vegetation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Ecoclimates_Climate_response_Modeling_of_Vegetation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Ecoclimates: Climate-response Modeling of Vegetation
+	- datasets: 不同气候条件下的森林消亡与恢复, 与 Makowski et al. 2019 的微气候比较
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Efficient_Kinetic_Simulation_of_Two-Phase_Flows.md|Efficient Kinetic Simulation of Two-Phase Flows (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Efficient_Kinetic_Simulation_of_Two_Phase_Flows.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Volume-Preserving LBM-MPM Coupling
+	- datasets: Sand drop in beaker
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EMBER_Exact_Mesh_Booleans_via_Efficient_and_Robust_Local_Arrangements.md|EMBER: Exact Mesh Booleans via Efficient and Robust Local Arrangements (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EMBER_Exact_Mesh_Booleans_via_Efficient_and_Robust_Local_Arrangements.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+	- methods: EMBER
+	- datasets: Thingi10K
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Face_Extrusion_Quad_Meshes.md|Face Extrusion Quad Meshes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Face_Extrusion_Quad_Meshes.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 训练数据原语数量扩充 (Training Data Primitives Enrichment)
+	- datasets: SCAN, Colors, COGS
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Facial_Hair_Tracking_for_High_Fidelity_Performance_Capture.md|Facial Hair Tracking for High Fidelity Performance Capture (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Facial_Hair_Tracking_for_High_Fidelity_Performance_Capture.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dynamic Facial Hair Capture Pipeline
+	- datasets: 面部表演序列
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Free2CAD_Parsing_Freehand_Drawings_Into_CAD_Commands.md|Free2CAD: Parsing Freehand Drawings Into CAD Commands (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Free2CAD_Parsing_Freehand_Drawings_Into_CAD_Commands.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Free2CAD
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Generalized_Resampled_Importance_Sampling_Foundations_of_ReSTIR.md|Generalized Resampled Importance Sampling: Foundations of ReSTIR (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Generalized_Resampled_Importance_Sampling_Foundations_of_ReSTIR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Generalized Resampled Importance Sampling (GRIS) and ReSTIR PT
+	- datasets: Carousel, Paris Opera House, Kitchen
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Hogel-free_Holography.md|Hogel-free Holography (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Hogel_free_Holography.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D
+	- methods: Multimodal Neural Acoustic Fields (MNAF)
+	- datasets: SoundSpaces Same Environment, SoundSpaces Novel Environment, Replay
+- [[obsidian-vault/analysis/arxiv_2023/MDSC_Towards_Evaluating_the_Style_Consistency_Between_Music_and_Dance.md|MDSC: Towards Evaluating the Style Consistency Between Music and Dance (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/MDSC_Towards_Evaluating_the_Style_Consistency_Between_Music_and_Dance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Benchmark / Evaluation
+	- methods: MDSC (Music-Dance Style Consistency)
+	- datasets: AIST++ & AIOZ-GDANCE 测试集, 生成动作
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Practical_Walk-on-Boundary_Method_for_Boundary_Value_Problems.md|A Practical Walk-on-Boundary Method for Boundary Value Problems (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Practical_Walk_on_Boundary_Method_for_Boundary_Value_Problems.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Walk-on-Boundary (WoB)
+	- datasets: 内部 Dirichlet 问题在凸/非凸二维域
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Acting_as_Inverse_Inverse_Planning.md|Acting as Inverse Inverse Planning (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Acting_as_Inverse_Inverse_Planning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: Inverse Inverse Planning
+	- datasets: Grid-world depiction task: Helping, Grid-world depiction task: Hindering, Grid-world depiction task: Indifference
+- [[obsidian-vault/analysis/AAAI_2024/FAVOR_Full_Body_AR_driven_Virtual_Object_Rearrangement_Guided_by_Instruction_Text.md|FAVOR Full Body AR driven Virtual Object Rearrangement Guided by Instruction Text (AAAI 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2024/FAVOR_Full_Body_AR_driven_Virtual_Object_Rearrangement_Guided_by_Instruction_Text.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment
+	- methods: FAVORITE
+	- datasets: Perceptual Study, Grasp Quality
+- [[obsidian-vault/analysis/CVPR_2024/GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis.md|GEARS Local Geometry aware Hand object Interaction Synthesis (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: GEARS
+	- datasets: GRAB, InterCap
+- [[obsidian-vault/analysis/ICLR_2024/Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_Accompaniment.md|Duolando Follower GPT with Off Policy Reinforcement Learning for Dance Accompaniment (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_Accompaniment.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+	- methods: Duolando
+	- datasets: DD100
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Heat_Method_for_Generalized_Signed_Distance.md|A Heat Method for Generalized Signed Distance (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Heat_Method_for_Generalized_Signed_Distance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Intrinsic Triangulation Framework (内蕴三角剖分框架)
+	- datasets: Thingi10k 数据集上的内蕴 Delaunay 翻转
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Generalized_Ray_Formulation_For_Wave-Optical_Light_Transport.md|A Generalized Ray Formulation For Wave-Optical Light Transport (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Generalized_Ray_Formulation_For_Wave_Optical_Light_Transport.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Generalized Ray Backward Light Transport (sample–solve)
+	- datasets: Snake enclosure, CD scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Statistical_Approach_to_Monte_Carlo_Denoising.md|A Statistical Approach to Monte Carlo Denoising (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Statistical_Approach_to_Monte_Carlo_Denoising.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: Statistical Denoising Method (StatMC)
+	- datasets: Wooden Staircase, Bathroom, Salle de Bain
+- [[obsidian-vault/analysis/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.md|BAGEL: Emerging Properties in Unified Multimodal Pretraining (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: BAGEL
+	- datasets: MMMU, GenEval, WISE
+- [[obsidian-vault/analysis/arxiv_2025/Centaur_Robust_End_to_End_Autonomous_Driving_with_Test_Time_Training.md|Centaur: Robust End-to-End Autonomous Driving with Test-Time Training (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Centaur_Robust_End_to_End_Autonomous_Driving_with_Test_Time_Training.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: Centaur
+	- datasets: navtest, navsafe
+- [[obsidian-vault/analysis/arxiv_2025/LongPerceptualThoughts_Distilling_System_2_Reasoning_for_System_1_Perception.md|LongPerceptualThoughts: Distilling System-2 Reasoning for System-1 Perception (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/LongPerceptualThoughts_Distilling_System_2_Reasoning_for_System_1_Perception.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: LongPerceptualThoughts 三阶段数据合成与偏好优化框架
+	- datasets: CV-Bench, V* Bench, MMVP
+- [[obsidian-vault/analysis/arxiv_2025/NOOUGAT_Towards_Unified_Online_and_Offline_Multi_Object_Tracking.md|NOOUGAT: Towards Unified Online and Offline Multi-Object Tracking (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/NOOUGAT_Towards_Unified_Online_and_Offline_Multi_Object_Tracking.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Graph / Geometric / Structured Data
+	- methods: NOOUGAT
+	- datasets: DanceTrack, SportsMOT, MOT17
+- [[obsidian-vault/analysis/arxiv_2025/Qwen3_VL_Technical_Report.md|Qwen3-VL Technical Report (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Qwen3_VL_Technical_Report.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Qwen3-VL
+	- datasets: MMLU-Pro, HallusionBench, MIA-Bench
+- [[obsidian-vault/analysis/arxiv_2025/TOMGPT_Reliable_Text_Only_Training_Approach_for_Cost_Effective_Multi_modal_Large_Language_Model.md|TOMGPT: Reliable Text-Only Training Approach for Cost-Effective Multi-modal Large Language Model (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/TOMGPT_Reliable_Text_Only_Training_Approach_for_Cost_Effective_Multi_modal_LLM.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: TOMGPT
+	- datasets: MME, LVLM
+- [[obsidian-vault/analysis/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.md|ZTRS: Zero-Imitation End-to-end Autonomous Driving with Trajectory Scoring (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: ZTRS (Zero-Imitation Trajectory Scoring with Exhaustive Policy Optimization)
+	- datasets: Navhard, Navtest, HUGSIM
+- [[obsidian-vault/analysis/CVPR_2025/EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Object_Interactions_in_the_Wild.md|EasyHOI Unleashing the Power of Large Models for Reconstructing Hand Object Interactions in the Wild (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Object_Interactions_in_the_Wild.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: EasyHOI
+	- datasets: Arctic
+- [[obsidian-vault/analysis/CVPR_2025/SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations.md|SkillMimic Learning Reusable Basketball Skills from Demonstrations (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Graph / Geometric / Structured Data
+	- methods: SkillMimic
+	- datasets: BallPlay-M Heading task, BallPlay-M Circling task, BallPlay-M Throwing task
+- [[obsidian-vault/analysis/CVPR_2025/SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition_with_Oriented_Deformation.md|SODA4MER Dynamic Stereotype Theory Induced Micro expression Recognition with Oriented Deformation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition_with_Oriented_Deformation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: SODA4MER
+	- datasets: SMIC-HS, CASME II, SAMM
+- [[obsidian-vault/analysis/MM_2025/AC4AU_Regulatory_Focus_Micro_Expression_Analysis.md|AC4AU Regulatory Focus Micro Expression Analysis (MM 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/MM_2025/AC4AU_Regulatory_Focus_Micro_Expression_Analysis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: AC4AU
+	- datasets: CD6ME
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.md|PhysicsFC Learning User Controlled Skills for a Physics Based Football Player Controller (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PhysicsFC
+	- datasets: Dribble Skill, Trap Skill, Move Skill
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.md|PhysicsFC: Learning User-Controlled Skills for a Physics-Based Football Player Controller (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PhysicsFC
+	- datasets: Dribble Skill, Trap Skill, Move Skill
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.md|SkillMimic v2 Learning Robust and Generalizable Interaction Skills from Sparse and Noisy Demonstrations (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Safety / Privacy / Robustness
+	- methods: SkillMimic-V2
+	- datasets: BallPlay-M, ParaHome
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.md|SkillMimic-V2: Learning Robust and Generalizable Interaction Skills from Sparse and Noisy Demonstrations (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Safety / Privacy / Robustness
+	- methods: SkillMimic-V2
+	- datasets: BallPlay-M, ParaHome
+- [[obsidian-vault/analysis/arxiv_2026/From_Raw_Experience_to_Skill_Consumption_A_Systematic_Study_of_Model_Generated_Agent_Skills.md|From Raw Experience to Skill Consumption: A Systematic Study of Model-Generated Agent Skills (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/From_Raw_Experience_to_Skill_Consumption_A_Systematic_Study_of_Model_Generated_Agent_Skills.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: Meta-Skill Guided Extraction
+	- datasets: SpreadsheetBench, ALFWorld, SWE-bench-Verified
+- [[obsidian-vault/analysis/arxiv_2026/SkillOpt_Executive_Strategy_for_Self_Evolving_Agent_Skills.md|SkillOpt: Executive Strategy for Self-Evolving Agent Skills (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/SkillOpt_Executive_Strategy_for_Self_Evolving_Agent_Skills.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: SkillOpt
+	- datasets: SearchQA, SpreadsheetBench, OfficeQA
+- [[obsidian-vault/analysis/CVPR_2026/phi_DPO_Fairness_Direct_Preference_Optimization_Approach_to_Continual_Learning_in_Large_Multimodal_Models.md|$\phi$-DPO: Fairness Direct Preference Optimization Approach to Continual Learning in Large Multimodal Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/phi_DPO_Fairness_Direct_Preference_Optimization_Approach_to_Continual_Learning_in_Large_Multimodal_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Safety / Privacy / Robustness
+	- methods: ϕ-DPO (FaiDPO)
+	- datasets: MLLM-CL Domain, MLLM-CL Ability, CoIN
+- [[obsidian-vault/analysis/CVPR_2026/L2DGS_Low_Light_Dynamic_Gaussian_Splatting.md|$L^{2}DGS$: Low-Light Dynamic Gaussian Splatting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/L_2_DGS_Low_Light_Dynamic_Gaussian_Splatting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: L²DGS (Low‑Light Dynamic Gaussian Splatting)
+	- datasets: 真实低光照动态视频 $L^2 DyV$
+- [[obsidian-vault/analysis/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.md|ActAvatar: Temporally-Aware Precise Action Control for Talking Avatars (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ActAvatar
+	- datasets: HDTF, Action Bench
+- [[obsidian-vault/analysis/CVPR_2026/Active_Inference_for_Micro_Gesture_Recognition_EFE_Guided_Temporal_Sampling_and_Adaptive_Learning.md|Active Inference for Micro-Gesture Recognition: EFE-Guided Temporal Sampling and Adaptive Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Active_Inference_for_Micro_Gesture_Recognition_EFE_Guided_Temporal_Sampling_and_Adaptive_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: UAAI
+	- datasets: SMG
+- [[obsidian-vault/analysis/CVPR_2026/Adaptive_Anisotropic_Gaussian_Splatting_for_Multi_contrast_MRI_Arbitrary_Scale_Super_Resolution_with_Anatomy_Guidance.md|Adaptive Anisotropic Gaussian Splatting for Multi-contrast MRI Arbitrary-Scale Super-Resolution with Anatomy Guidance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Adaptive_Anisotropic_Gaussian_Splatting_for_Multi_contrast_MRI_Arbitrary_Scale_Super_Resolution_with_Anatomy_Guidance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: GaussM2ASR
+	- datasets: IXI, fastMRI
+- [[obsidian-vault/analysis/CVPR_2026/Adversarial_Style_Optimization_Enhancing_VLM_Jailbreaks_by_GRPO_based_Stylistic_Triggers_Optimization.md|Adversarial Style Optimization: Enhancing VLM Jailbreaks by GRPO-based Stylistic Triggers Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Adversarial_Style_Optimization_Enhancing_VLM_Jailbreaks_by_GRPO_based_Stylistic_Triggers_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- methods: Adversarial Style Optimization (ASO)
+	- datasets: MM-SafetyBench
+- [[obsidian-vault/analysis/CVPR_2026/Agent4FaceForgery_Multi_Agent_LLM_Framework_for_Realistic_Face_Forgery_Detection.md|Agent4FaceForgery: Multi-Agent LLM Framework for Realistic Face Forgery Detection (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Agent4FaceForgery_Multi_Agent_LLM_Framework_for_Realistic_Face_Forgery_Detection.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Agent4FaceForgery
+	- datasets: Celeb-DF, WildDeepfake, DF40
+- [[obsidian-vault/analysis/CVPR_2026/Attack_for_Defense_Adversarial_Agents_for_Point_Prompt_Optimization_Empowering_Segment_Anything_Model.md|Attack for Defense: Adversarial Agents for Point Prompt Optimization Empowering Segment Anything Model (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Attack_for_Defense_Adversarial_Agents_for_Point_Prompt_Optimization_Empowering_Segment_Anything_Model.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: Point Prompt Defender (PPD)
+	- datasets: PASCAL VOC, ISIC, Kvasir
+- [[obsidian-vault/analysis/CVPR_2026/AudioAvatar_Personalized_Audio_driven_Whole_body_Talking_Avatars.md|AudioAvatar: Personalized Audio-driven Whole-body Talking Avatars (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AudioAvatar_Personalized_Audio_driven_Whole_body_Talking_Avatars.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: AudioAvatar
+- [[obsidian-vault/analysis/CVPR_2026/AutoTraces_Autoregressive_Trajectory_Forecasting_via_Multimodal_Large_Language_Models.md|AutoTraces: Autoregressive Trajectory Forecasting via Multimodal Large Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AutoTraces_Autoregressive_Trajectory_Forecasting_via_Multimodal_Large_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: AutoTraces
+	- datasets: SCAND, GoStanford, RECON
+- [[obsidian-vault/analysis/CVPR_2026/Beyond_Sequential_Tools_A_Unified_VLM_Agent_System_for_Photographic_Post_Processing_via_Dynamic_Multi_Expert_Fusion.md|Beyond Sequential Tools: A Unified VLM Agent System for Photographic Post-Processing via Dynamic Multi-Expert Fusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Beyond_Sequential_Tools_A_Unified_VLM_Agent_System_for_Photographic_Post_Processing_via_Dynamic_Multi_Expert_Fusion.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- methods: Unified VLM Agent System for Photographic Post-Processing via Dynamic Multi-Expert Fusion
+	- datasets: Real-1000 Group 1, Real-1000 Group 2
+- [[obsidian-vault/analysis/CVPR_2026/BiProLoRA_Bilevel_Prompt_LoRA_for_Real_Scene_Recovery.md|BiProLoRA: Bilevel Prompt LoRA for Real Scene Recovery (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/BiProLoRA_Bilevel_Prompt_LoRA_for_Real_Scene_Recovery.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment
+	- methods: BiProLoRA (Bilevel Prompt LoRA)
+	- datasets: DARKFACE, ExDark, RTTS
+- [[obsidian-vault/analysis/CVPR_2026/COPE_Consistent_Occlusion_and_Prompt_Enhancement_Network_for_Occluded_Person_Re_identification.md|COPE: Consistent Occlusion and Prompt Enhancement Network for Occluded Person Re-identification (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/COPE_Consistent_Occlusion_and_Prompt_Enhancement_Network_for_Occluded_Person_Re_identification.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment
+	- methods: COPE
+	- datasets: Occluded-Duke
+- [[obsidian-vault/analysis/CVPR_2026/CoRoGS_Contextual_Gaussian_Splatting_for_Robust_Large_Deviation_View_Synthesis.md|CoRoGS: Contextual Gaussian Splatting for Robust Large-Deviation View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CoRoGS_Contextual_Gaussian_Splatting_for_Robust_Large_Deviation_View_Synthesis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow, Safety / Privacy / Robustness
+	- methods: CoRoGS (Context-Aware Gaussian Splatting)
+	- datasets: KITTI, KITTI & Waymo
+- [[obsidian-vault/analysis/CVPR_2026/Differentiable_Adaptive_4D_Structured_Illumination_for_Joint_Capture_of_Shape_and_Reflectance.md|Differentiable Adaptive 4D Structured Illumination for Joint Capture of Shape and Reflectance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Differentiable_Adaptive_4D_Structured_Illumination_for_Joint_Capture_of_Shape_and_Reflectance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Differentiable Adaptive 4D Structured Illumination
+	- datasets: 物理物体
+- [[obsidian-vault/analysis/CVPR_2026/Differentiable_Laplacian_Matrix_Guided_Superpixel_Segmentation.md|Differentiable Laplacian Matrix Guided Superpixel Segmentation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Differentiable_Laplacian_Matrix_Guided_Superpixel_Segmentation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
+	- methods: Differentiable Laplacian Matrix Guided Superpixel Segmentation
+	- datasets: BSDS500, NYUv2
+- [[obsidian-vault/analysis/CVPR_2026/DiGraphHal_Bench_Evaluating_Multimodal_Large_Language_Models_on_Complex_Directed_Graphs.md|DiGraphHal-Bench: Evaluating Multimodal Large Language Models on Complex Directed Graphs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DiGraphHal_Bench_Evaluating_Multimodal_Large_Language_Models_on_Complex_Directed_Graphs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: DiGraphHal-Bench (基准构建与评估框架，包含两阶段可验证管理管道及四层次任务体系)
+	- datasets: DiGraphHal-Bench
+- [[obsidian-vault/analysis/CVPR_2026/DK_DDIL_Adaptive_Knowledge_Retention_for_Dynamic_Domain_Incremental_Learning_in_Medical_Imaging.md|DK-DDIL: Adaptive Knowledge Retention for Dynamic Domain-Incremental Learning in Medical Imaging (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DK_DDIL_Adaptive_Knowledge_Retention_for_Dynamic_Domain_Incremental_Learning_in_Medical_Imaging.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DK-DDIL
+	- datasets: Skin Pathology Diagnosis, Cyst-X, OfficeHome
+- [[obsidian-vault/analysis/CVPR_2026/Dual_Graph_Regularized_Deep_Unfolding_Network_for_Guided_Depth_Map_Super_resolution.md|Dual Graph Regularized Deep Unfolding Network for Guided Depth Map Super-resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Dual_Graph_Regularized_Deep_Unfolding_Network_for_Guided_Depth_Map_Super_resolution.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Graph / Geometric / Structured Data
+	- methods: LapNet
+	- datasets: NYU v2, Sintel, DIDOE
+- [[obsidian-vault/analysis/CVPR_2026/DualMirage_Hunting_Stealthy_Multimodal_LLM_Agents_via_CAPTCHAs_with_Contour_and_Adversarial_Illusions.md|DualMirage: Hunting Stealthy Multimodal LLM Agents via CAPTCHAs with Contour and Adversarial Illusions (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DualMirage_Hunting_Stealthy_Multimodal_LLM_Agents_via_CAPTCHAs_with_Contour_and_Adversarial_Illusions.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: DualMirage
+	- datasets: Illusion-Selfie2Anime, All configurations, All challenge configurations
+- [[obsidian-vault/analysis/CVPR_2026/EpiAgent_An_Agent_Centric_System_for_Ancient_Inscription_Restoration.md|EpiAgent: An Agent-Centric System for Ancient Inscription Restoration (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EpiAgent_An_Agent_Centric_System_for_Ancient_Inscription_Restoration.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Agent / RL / Planning
+	- methods: EpiAgent
+	- datasets: Testing Set S, Testing Set R-I
+- [[obsidian-vault/analysis/CVPR_2026/EventGait_Towards_Robust_Gait_Recognition_with_Event_Streams.md|EventGait: Towards Robust Gait Recognition with Event Streams (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EventGait_Towards_Robust_Gait_Recognition_with_Event_Streams.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: EventGait
+	- datasets: SUSTech1K-E, CCGR-Mini-E, DVS128-Gait
+- [[obsidian-vault/analysis/CVPR_2026/Evidential_Neural_Radiance_Fields.md|Evidential Neural Radiance Fields (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Evidential_Neural_Radiance_Fields.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Evidential Neural Radiance Fields (Evidential NeRF)
+	- datasets: LF, LLFF, RobustNeRF
+- [[obsidian-vault/analysis/CVPR_2026/FINER_MLLMs_Hallucinate_under_Fine_grained_Negative_Queries.md|FINER: MLLMs Hallucinate under Fine-grained Negative Queries (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FINER_MLLMs_Hallucinate_under_Fine_grained_Negative_Queries.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment
+	- methods: FINER-Tuning
+	- datasets: FINER-CompreCap, FINER-DOCCI, DASH
+- [[obsidian-vault/analysis/CVPR_2026/FlashMesh_Faster_and_Better_Autoregressive_Mesh_Synthesis_via_Structured_Speculation.md|FlashMesh: Faster and Better Autoregressive Mesh Synthesis via Structured Speculation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FlashMesh_Faster_and_Better_Autoregressive_Mesh_Synthesis_via_Structured_Speculation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: FlashMesh
+	- datasets: ShapeNetV2 / gObjaverse 测试集
+- [[obsidian-vault/analysis/CVPR_2026/Flow4DGS_SLAM_Optical_Flow_Guided_4D_Gaussian_Splatting_SLAM.md|Flow4DGS-SLAM: Optical Flow-Guided 4D Gaussian Splatting SLAM (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Flow4DGS_SLAM_Optical_Flow_Guided_4D_Gaussian_Splatting_SLAM.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: Flow4DGS-SLAM
+	- datasets: TUM RGB-D, BONN
+- [[obsidian-vault/analysis/CVPR_2026/Fresco_Frequency_Spatial_Consistent_Optimization_for_Fine_Grained_Head_Avatar_Modeling.md|Fresco: Frequency-Spatial Consistent Optimization for Fine-Grained Head Avatar Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Fresco_Frequency_Spatial_Consistent_Optimization_for_Fine_Grained_Head_Avatar_Modeling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Fresco
+	- datasets: NeRSemble
+- [[obsidian-vault/analysis/CVPR_2026/From_Exploration_to_Exploitation_A_Two_Stage_Entropy_RLVR_Approach_for_Noise_Tolerant_MLLM_Training.md|From Exploration to Exploitation: A Two-Stage Entropy RLVR Approach for Noise-Tolerant MLLM Training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/From_Exploration_to_Exploitation_A_Two_Stage_Entropy_RLVR_Approach_for_Noise_Tolerant_MLLM_Training.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: Two-Stage Entropy-Guided GRPO
+	- datasets: ScreenSpot, COCO-derived OVOD
+- [[obsidian-vault/analysis/CVPR_2026/GaussianFluent_Gaussian_Simulation_for_Dynamic_Scenes_with_Mixed_Materials.md|GaussianFluent: Gaussian Simulation for Dynamic Scenes with Mixed Materials (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GaussianFluent_Gaussian_Simulation_for_Dynamic_Scenes_with_Mixed_Materials.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: GaussianFluent
+	- datasets: Internal Texture Filling, Dynamic Scene Simulation
+- [[obsidian-vault/analysis/CVPR_2026/Generalizable_Radio_Frequency_Radiance_Fields_for_Spatial_Spectrum_Synthesis.md|Generalizable Radio-Frequency Radiance Fields for Spatial Spectrum Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Generalizable_Radio_Frequency_Radiance_Fields_for_Spatial_Spectrum_Synthesis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: GRaF
+	- datasets: Synthetic indoor RF spatial-spectrum scenes
+- [[obsidian-vault/analysis/CVPR_2026/Gradient_Knows_Best_Mixed_Precision_Quantization_via_Gradient_Guided_Bit_Allocation_for_Super_Resolution.md|Gradient Knows Best: Mixed-Precision Quantization via Gradient-Guided Bit Allocation for Super-Resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Gradient_Knows_Best_Mixed_Precision_Quantization_via_Gradient_Guided_Bit_Allocation_for_Super_Resolution.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: Gradient-Guided Mixed-Precision Quantization with Dynamic Activation Range Normalization (GBA+DAN)
+	- datasets: Urban100, Set5, Test2K
+- [[obsidian-vault/analysis/CVPR_2026/GTR_Turbo_Merged_Checkpoint_is_Secretly_a_Free_Teacher_for_Agentic_VLM_Training.md|GTR-Turbo: Merged Checkpoint is Secretly a Free Teacher for Agentic VLM Training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GTR_Turbo_Merged_Checkpoint_is_Secretly_a_Free_Teacher_for_Agentic_VLM_Training.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- methods: GTR-Turbo
+	- datasets: Points24, ALFWorld, Android-in-the-Wild
+- [[obsidian-vault/analysis/CVPR_2026/Hearing_the_Room_Through_the_Shape_of_the_Drum_Modal_Guided_Sound_Recovery_from_Multi_Point_Surface_Vibrations.md|Hearing the Room Through the Shape of the Drum: Modal-Guided Sound Recovery from Multi-Point Surface Vibrations (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Hearing_the_Room_Through_the_Shape_of_the_Drum_Modal_Guided_Sound_Recovery_from_Multi_Point_Surface_Vibrations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Modal-Guided Sound Recovery
+	- datasets: 多物体测试集
+- [[obsidian-vault/analysis/CVPR_2026/IMAIA_Interactive_Maps_AI_Assistant_for_Travel_Planning_and_Geo_Spatial_Intelligence.md|IMAIA: Interactive Maps AI Assistant for Travel Planning and Geo-Spatial Intelligence (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IMAIA_Interactive_Maps_AI_Assistant_for_Travel_Planning_and_Geo_Spatial_Intelligence.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Agent / RL / Planning
+	- methods: IMAIA (Interactive Maps AI Assistant)
+	- datasets: POI Detection, Walking Time, Venue Candidate Ranking
+- [[obsidian-vault/analysis/CVPR_2026/LATA_Laplacian_Assisted_Transductive_Adaptation_for_Conformal_Uncertainty_in_Medical_VLMs.md|LATA: Laplacian-Assisted Transductive Adaptation for Conformal Uncertainty in Medical VLMs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LATA_Laplacian_Assisted_Transductive_Adaptation_for_Conformal_Uncertainty_in_Medical_VLMs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: LATA (Laplacian-Assisted Transductive Adaptation)
+	- datasets: Average over 9 medical adaptation tasks
+- [[obsidian-vault/analysis/CVPR_2026/Linear_Fundamental_Matrix_Estimation_from_7_or_5_Points.md|Linear Fundamental Matrix Estimation from 7 or 5 Points (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Linear_Fundamental_Matrix_Estimation_from_7_or_5_Points.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: V-Umlaut线性基础矩阵求解器 (7-point V-Umlaut linear F-matrix solver)
+	- datasets: PhotoTourism, Aachen Day-Night v1.1
+- [[obsidian-vault/analysis/CVPR_2026/LLM_Guided_Probabilistic_Fusion_for_Label_Efficient_Document_Layout_Analysis.md|LLM-Guided Probabilistic Fusion for Label-Efficient Document Layout Analysis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LLM_Guided_Probabilistic_Fusion_for_Label_Efficient_Document_Layout_Analysis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
+	- methods: LLM-Guided Probabilistic Fusion for Label-Efficient Document Layout Analysis
+	- datasets: PubLayNet, DocLayNet
+- [[obsidian-vault/analysis/CVPR_2026/Mapping_Networks.md|Mapping Networks (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mapping_Networks.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Mapping Networks
+	- datasets: MNIST, FashionMNIST, Celeb-DF
+- [[obsidian-vault/analysis/CVPR_2026/Mark4D_Temporally_Consistent_Watermarking_for_4D_Gaussian_Splatting.md|Mark4D: Temporally-Consistent Watermarking for 4D Gaussian Splatting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mark4D_Temporally_Consistent_Watermarking_for_4D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: Mark4D
+	- datasets: D-NeRF + DyNeRF
+- [[obsidian-vault/analysis/CVPR_2026/MASQuant_Modality_Aware_Smoothing_Quantization_for_Multimodal_Large_Language_Models.md|MASQuant: Modality-Aware Smoothing Quantization for Multimodal Large Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MASQuant_Modality_Aware_Smoothing_Quantization_for_Multimodal_Large_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MASQuant (Modality-Aware Smoothing Quantization)
+	- datasets: MMMU, LibriSpeech, Qwen2.5-VL-7B Prefill Speed
+- [[obsidian-vault/analysis/CVPR_2026/MedFG_VQA_Low_Frequency_Memory_and_Graph_Attention_for_Lightweight_Medical_VQA.md|MedFG-VQA: Low-Frequency Memory and Graph Attention for Lightweight Medical VQA (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MedFG_VQA_Low_Frequency_Memory_and_Graph_Attention_for_Lightweight_Medical_VQA.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Graph / Geometric / Structured Data, Systems / Efficiency / Compression
+	- methods: MedFG-VQA
+	- datasets: SynMedVQA, SLAKE, PathVQA
+- [[obsidian-vault/analysis/CVPR_2026/MMGait_Towards_Multi_Modal_Gait_Recognition.md|MMGait: Towards Multi-Modal Gait Recognition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MMGait_Towards_Multi_Modal_Gait_Recognition.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D
+	- methods: OmniGait
+	- datasets: MMGait
+- [[obsidian-vault/analysis/CVPR_2026/MoDES_Accelerating_Mixture_of_Experts_Multimodal_Large_Language_Models_via_Dynamic_Expert_Skipping.md|MoDES: Accelerating Mixture-of-Experts Multimodal Large Language Models via Dynamic Expert Skipping (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MoDES_Accelerating_Mixture_of_Experts_Multimodal_Large_Language_Models_via_Dynamic_Expert_Skipping.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D
+	- methods: MoDES
+	- datasets: Kimi-VL-A3B-Instruct, Qwen3-VL-MoE-30B-A3B-Instruct
+- [[obsidian-vault/analysis/CVPR_2026/MS_2Gait_A_Multi_Scale_Spatio_Temporal_Fusion_Network_for_LiDAR_based_Gait_Recognition.md|MS^2Gait: A Multi-Scale Spatio-Temporal Fusion Network for LiDAR-based Gait Recognition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MS_2Gait_A_Multi_Scale_Spatio_Temporal_Fusion_Network_for_LiDAR_based_Gait_Recognition.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: MS^2Gait
+	- datasets: SUSTech1K, Free-Gait
+- [[obsidian-vault/analysis/CVPR_2026/Neighbor_GRPO_Contrastive_ODE_Policy_Optimization_Aligns_Flow_Models.md|Neighbor GRPO: Contrastive ODE Policy Optimization Aligns Flow Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Neighbor_GRPO_Contrastive_ODE_Policy_Optimization_Aligns_Flow_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Representation / Self-Supervised / Transfer
+	- methods: Neighbor GRPO
+	- datasets: HPDv2 测试集
+- [[obsidian-vault/analysis/CVPR_2026/NERFIFY_A_Multi_Agent_Framework_for_Turning_NeRF_Papers_into_Code.md|NERFIFY: A Multi-Agent Framework for Turning NeRF Papers into Code (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/NERFIFY_A_Multi_Agent_Framework_for_Turning_NeRF_Papers_into_Code.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: NERFIFY
+	- datasets: NERFIFY-BENCH Set 1, NERFIFY-BENCH Set 2, NERFIFY-BENCH 全部 30 篇论文
+- [[obsidian-vault/analysis/CVPR_2026/Node_RF_Learning_Generalized_Continuous_Space_Time_Scene_Dynamics_with_Neural_ODE_based_NeRFs.md|Node-RF: Learning Generalized Continuous Space-Time Scene Dynamics with Neural ODE-based NeRFs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Node_RF_Learning_Generalized_Continuous_Space_Time_Scene_Dynamics_with_Neural_ODE_based_NeRFs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Node-RF
+	- datasets: Bouncing Balls, Pendulum, Oscillating Ball
+- [[obsidian-vault/analysis/CVPR_2026/NOWA_Null_space_Optical_Watermark_for_Invisible_Capture_Fingerprinting_and_Tamper_Localization.md|NOWA: Null-space Optical Watermark for Invisible Capture Fingerprinting and Tamper Localization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/NOWA_Null_space_Optical_Watermark_for_Invisible_Capture_Fingerprinting_and_Tamper_Localization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: NOWA (Null-space Optical Watermark)
+	- datasets: EditGuard test set, JPEG Compression Q=70, Gaussian Noise σ=5
+- [[obsidian-vault/analysis/CVPR_2026/OMG_Avatar_One_shot_Multi_LOD_Gaussian_Head_Avatar.md|OMG-Avatar: One-shot Multi-LOD Gaussian Head Avatar (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OMG_Avatar_One_shot_Multi_LOD_Gaussian_Head_Avatar.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OMG-Avatar
+	- datasets: VFHQ, HDTF
+- [[obsidian-vault/analysis/CVPR_2026/Omni_Attack_Adversarial_Attacks_on_Open_Ended_VQA_in_Black_Box_Multimodal_LLMs.md|Omni-Attack: Adversarial Attacks on Open-Ended VQA in Black-Box Multimodal LLMs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Omni_Attack_Adversarial_Attacks_on_Open_Ended_VQA_in_Black_Box_Multimodal_LLMs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: Omni-Attack
+	- datasets: AdvRobustBench, NIPS2017 Split
+- [[obsidian-vault/analysis/CVPR_2026/OmniZip_Learning_a_Unified_and_Lightweight_Lossless_Compressor_for_Multi_Modal_Data.md|OmniZip: Learning a Unified and Lightweight Lossless Compressor for Multi-Modal Data (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OmniZip_Learning_a_Unified_and_Lightweight_Lossless_Compressor_for_Multi_Modal_Data.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D
+	- methods: OmniZip
+	- datasets: CLIC-M, TouchandGo, enwik9
+- [[obsidian-vault/analysis/CVPR_2026/PhyGaP_Physically_Grounded_Gaussians_with_Polarization_Cues.md|PhyGaP: Physically-Grounded Gaussians with Polarization Cues (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PhyGaP_Physically_Grounded_Gaussians_with_Polarization_Cues.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PhyGaP
+	- datasets: PANDORA, Mitsuba3, SMVP - Relighting
+- [[obsidian-vault/analysis/CVPR_2026/PosterOmni_Generalized_Artistic_Poster_Creation_via_Task_Distillation_and_Unified_Reward_Feedback.md|PosterOmni: Generalized Artistic Poster Creation via Task Distillation and Unified Reward Feedback (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PosterOmni_Generalized_Artistic_Poster_Creation_via_Task_Distillation_and_Unified_Reward_Feedback.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: PosterOmni
+	- datasets: PosterOmni-Bench-en
+- [[obsidian-vault/analysis/CVPR_2026/PQDT_Pseudo_Query_Dual_Transformer_for_Robust_Point_Cloud_Restoration.md|PQDT: Pseudo-Query Dual Transformer for Robust Point Cloud Restoration (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PQDT_Pseudo_Query_Dual_Transformer_for_Robust_Point_Cloud_Restoration.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: PQDT
+	- datasets: ShapeNet-55/34, PFS, ShapeNetCar-Occ
+- [[obsidian-vault/analysis/CVPR_2026/PR_MaGIC_Prompt_Refinement_Via_Mask_Decoder_Gradient_Flow_For_In_Context_Segmentation.md|PR-MaGIC: Prompt Refinement Via Mask Decoder Gradient Flow For In-Context Segmentation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PR_MaGIC_Prompt_Refinement_Via_Mask_Decoder_Gradient_Flow_For_In_Context_Segmentation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: PR-MaGIC
+	- datasets: FSS-1000, COCO-20i, LVIS-92i
+- [[obsidian-vault/analysis/CVPR_2026/R_C2_Cycle_Consistent_Reinforcement_Learning_Improves_Multimodal_Reasoning.md|R-C2: Cycle-Consistent Reinforcement Learning Improves Multimodal Reasoning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/R_C2_Cycle_Consistent_Reinforcement_Learning_Improves_Multimodal_Reasoning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: R-C2 (Cross-Modal Cycle Consistency Reward)
+	- datasets: ScienceQA, ChartQA, MathVista
+- [[obsidian-vault/analysis/CVPR_2026/R2_Seg_Training_Free_OOD_Medical_Tumor_Segmentation_via_Anatomical_Reasoning_and_Statistical_Rejection.md|R2-Seg: Training-Free OOD Medical Tumor Segmentation via Anatomical Reasoning and Statistical Rejection (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/R2_Seg_Training_Free_OOD_Medical_Tumor_Segmentation_via_Anatomical_Reasoning_and_Statistical_Rejection.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: R2-Seg
+	- datasets: 五种OOD肿瘤类型, 肝、胰腺肿瘤
+- [[obsidian-vault/analysis/CVPR_2026/RF4D_Neural_Radar_Fields_for_Novel_View_Synthesis_in_Outdoor_Dynamic_Scenes.md|RF4D:Neural Radar Fields for Novel View Synthesis in Outdoor Dynamic Scenes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RF4D_Neural_Radar_Fields_for_Novel_View_Synthesis_in_Outdoor_Dynamic_Scenes.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: RF4D
+	- datasets: Oxford RobotCar, Boreas
+- [[obsidian-vault/analysis/CVPR_2026/Scalable_Multi_View_Subspace_Clustering_with_Tensorized_Anchor_Guidance.md|Scalable Multi-View Subspace Clustering with Tensorized Anchor Guidance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Scalable_Multi_View_Subspace_Clustering_with_Tensorized_Anchor_Guidance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: SMVS-TAG (Scalable Multi-view Subspace Clustering with Tensorized Anchor Guidance)
+	- datasets: Dermatology, Scene15, COIL100
+- [[obsidian-vault/analysis/CVPR_2026/SDTrack_A_Baseline_for_Event_based_Tracking_via_Spiking_Neural_Networks.md|SDTrack: A Baseline for Event-based Tracking via Spiking Neural Networks (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SDTrack_A_Baseline_for_Event_based_Tracking_via_Spiking_Neural_Networks.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: SDTrack Pipeline
+	- datasets: FE108
+- [[obsidian-vault/analysis/CVPR_2026/SEATrack_Simple_Efficient_and_Adaptive_Multimodal_Tracker.md|SEATrack: Simple, Efficient, and Adaptive Multimodal Tracker (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SEATrack_Simple_Efficient_and_Adaptive_Multimodal_Tracker.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SEATrack
+	- datasets: LasHeR, DepthTrack, VisEvent
+- [[obsidian-vault/analysis/CVPR_2026/Seele_A_Unified_Acceleration_Framework_for_Real_Time_Gaussian_Splatting_on_Mobile_Devices.md|Seele: A Unified Acceleration Framework for Real-Time Gaussian Splatting on Mobile Devices (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Seele_A_Unified_Acceleration_Framework_for_Real_Time_Gaussian_Splatting_on_Mobile_Devices.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: SEELE
+	- datasets: 综合, Mip-NeRF360
+- [[obsidian-vault/analysis/CVPR_2026/ST4R_Splat_Spatio_Temporal_Referring_Segmentation_in_4D_Gaussian_Splatting.md|ST4R-Splat: Spatio-Temporal Referring Segmentation in 4D Gaussian Splatting (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ST4R_Splat_Spatio_Temporal_Referring_Segmentation_in_4D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: ST4R-Splat
+	- datasets: HyperNeRF
+- [[obsidian-vault/analysis/CVPR_2026/TaskForce_Cooperative_Multi_agent_Reinforcement_Learning_for_Multi_task_Optimization.md|TaskForce: Cooperative Multi-agent Reinforcement Learning for Multi-task Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TaskForce_Cooperative_Multi_agent_Reinforcement_Learning_for_Multi_task_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: TaskForce
+	- datasets: NYU-v2, Cityscapes
+- [[obsidian-vault/analysis/CVPR_2026/TESO_Online_Tracking_of_Essential_Matrix_by_Stochastic_Optimization.md|TESO: Online Tracking of Essential Matrix by Stochastic Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TESO_Online_Tracking_of_Essential_Matrix_by_Stochastic_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: TESO
+	- datasets: CARLA-Drift, KITTI, MAN TruckScenes
+- [[obsidian-vault/analysis/CVPR_2026/Think_360deg_Beyond_Depth_Evaluating_the_Width_centric_Reasoning_Capability_of_MLLMs.md|Think 360deg: Beyond Depth: Evaluating the Width-centric Reasoning Capability of MLLMs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Think_360deg_Beyond_Depth_Evaluating_the_Width_centric_Reasoning_Capability_of_MLLMs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: Think360°（多模态宽度推理基准）与 ToT-Eval（思维树评估协议）
+	- datasets: Think360°
+- [[obsidian-vault/analysis/CVPR_2026/Thinking_in_Dynamics_How_Multimodal_Large_Language_Models_Perceive_Track_and_Reason_Dynamics_in_Physical_4D_World.md|Thinking in Dynamics: How Multimodal Large Language Models Perceive, Track, and Reason Dynamics in Physical 4D World (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Thinking_in_Dynamics_How_Multimodal_Large_Language_Models_Perceive_Track_and_Reason_Dynamics_in_Physical_4D_World.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D
+	- methods: Spatio-Temporal Textual Cognitive Map (ST-TCM) and Mask-Guided Fusion
+	- datasets: Dyn-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Tokenization_Allows_Multimodal_Large_Language_Models_to_Understand_Generate_and_Edit_Architectural_Floor_Plans.md|Tokenization Allows Multimodal Large Language Models to Understand, Generate and Edit Architectural Floor Plans (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Tokenization_Allows_Multimodal_Large_Language_Models_to_Understand_Generate_and_Edit_Architectural_Floor_Plans.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
+	- methods: HouseMind
+	- datasets: RPLAN
+- [[obsidian-vault/analysis/CVPR_2026/Towards_Real_World_Document_Parsing_via_Realistic_Scene_Synthesis_and_Document_Aware_Training.md|Towards Real-World Document Parsing via Realistic Scene Synthesis and Document-Aware Training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Towards_Real_World_Document_Parsing_via_Realistic_Scene_Synthesis_and_Document_Aware_Training.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Realistic Scene Synthesis + Document-Aware Training (DocHumming model)
+	- datasets: OmniDocBench, XFUND, Wild-OmniDocBench
+- [[obsidian-vault/analysis/CVPR_2026/Towards_Reasoning_Preserving_Unlearning_in_Multimodal_Large_Language_Models.md|Towards Reasoning-Preserving Unlearning in Multimodal Large Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Towards_Reasoning_Preserving_Unlearning_in_Multimodal_Large_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: R-MUSE
+	- datasets: RMLLMU-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Towards_Robust_Multimodal_Large_Language_Models_Against_Jailbreak_Attacks.md|Towards Robust Multimodal Large Language Models Against Jailbreak Attacks (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Towards_Robust_Multimodal_Large_Language_Models_Against_Jailbreak_Attacks.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness, Vision / Multimodal / 3D
+	- methods: SAFEMLLM
+	- datasets: ImgJP on LLaVA-7B, GCG on LLaVA-7B, AutoDAN on LLaVA-7B
+- [[obsidian-vault/analysis/CVPR_2026/Training_One_Model_to_Master_Cross_Level_Agentic_Actions_via_Reinforcement_Learning.md|Training One Model to Master Cross-Level Agentic Actions via Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Training_One_Model_to_Master_Cross_Level_Agentic_Actions_via_Reinforcement_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- datasets: Minecraft open-world task benchmark, mixed-space SFT dataset, ID/OOD task sets
+- [[obsidian-vault/analysis/CVPR_2026/U4D_Uncertainty_Aware_4D_World_Modeling_from_LiDAR_Sequences.md|U4D: Uncertainty-Aware 4D World Modeling from LiDAR Sequences (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/U4D_Uncertainty_Aware_4D_World_Modeling_from_LiDAR_Sequences.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: U4D
+	- datasets: nuScenes, SemanticKITTI, KITTI-360
+- [[obsidian-vault/analysis/CVPR_2026/U2Flow_Uncertainty_Aware_Unsupervised_Optical_Flow_Estimation.md|U^2Flow: Uncertainty-Aware Unsupervised Optical Flow Estimation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/U_2Flow_Uncertainty_Aware_Unsupervised_Optical_Flow_Estimation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: U^2Flow
+	- datasets: KITTI 2015, Sintel, Sintel Clean test
+- [[obsidian-vault/analysis/CVPR_2026/UETrack_A_Unified_and_Efficient_Framework_for_Single_Object_Tracking.md|UETrack: A Unified and Efficient Framework for Single Object Tracking (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UETrack_A_Unified_and_Efficient_Framework_for_Single_Object_Tracking.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: UETrack
+	- datasets: LaSOT, GOT-10k, VOT-RGBD22
+- [[obsidian-vault/analysis/CVPR_2026/Uncertainty_Aware_Exploratory_Direct_Preference_Optimization_for_Multimodal_Large_Language_Models.md|Uncertainty-Aware Exploratory Direct Preference Optimization for Multimodal Large Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Uncertainty_Aware_Exploratory_Direct_Preference_Optimization_for_Multimodal_Large_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: UE-DPO (Uncertainty-aware Exploratory Direct Preference Optimization)
+	- datasets: Object-Hal, MMHal-Bench, AMBER-g
+- [[obsidian-vault/analysis/CVPR_2026/Uncertainty_Aware_Knowledge_Distillation_for_Multimodal_Large_Language_Models.md|Uncertainty-Aware Knowledge Distillation for Multimodal Large Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Uncertainty_Aware_Knowledge_Distillation_for_Multimodal_Large_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: Beta-KD (Beta-weighted Knowledge Distillation)
+	- datasets: ScienceQA, MMEP, MMBench_dev
+- [[obsidian-vault/analysis/CVPR_2026/UniT_Unified_Multimodal_Chain_of_Thought_Test_time_Scaling.md|UniT: Unified Multimodal Chain-of-Thought Test-time Scaling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UniT_Unified_Multimodal_Chain_of_Thought_Test_time_Scaling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: UniT
+	- datasets: OneIG-Bench, CompBench, ImgEdit
+- [[obsidian-vault/analysis/CVPR_2026/W2W_Language_Model_Based_Trajectory_Prediction_with_Reinforcement_Learning.md|W2W: Language-Model-Based Trajectory Prediction with Reinforcement Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/W2W_Language_Model_Based_Trajectory_Prediction_with_Reinforcement_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Agent / RL / Planning
+	- methods: W2W (Write-to-Walk)
+	- datasets: ETH-UCY, SDD
+- [[obsidian-vault/analysis/ICLR_2026/nabla_Reasoner_LLM_Reasoning_via_Test_Time_Gradient_Descent_in_Latent_Space.md|$\\nabla$-Reasoner: LLM Reasoning via Test-Time Gradient Descent in Latent Space (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/nabla_Reasoner_LLM_Reasoning_via_Test_Time_Gradient_Descent_in_Latent_Space.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Representation / Self-Supervised / Transfer
+	- methods: ∇-Reasoner
+	- datasets: MATH-500, AMC
+- [[obsidian-vault/analysis/ICLR_2026/A_Brain_Graph_Foundation_Model_Pre_Training_and_Prompt_Tuning_across_Broad_Atlases_and_Disorders.md|A Brain Graph Foundation Model: Pre-Training and Prompt-Tuning across Broad Atlases and Disorders (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Brain_Graph_Foundation_Model_Pre_Training_and_Prompt_Tuning_across_Broad_Atlases_and_Disorders.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Representation / Self-Supervised / Transfer
+	- methods: BrainGFM
+	- datasets: ABIDE II, ADHD200, ADNI 2
+- [[obsidian-vault/analysis/ICLR_2026/A_Stitch_in_Time_Saves_Nine_Proactive_Self_Refinement_for_Language_Models.md|A Stitch in Time Saves Nine: Proactive Self-Refinement for Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Stitch_in_Time_Saves_Nine_Proactive_Self_Refinement_for_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: ProActive Self-Refinement (PASR)
+	- datasets: GSM8K, MATH, AIME24
+- [[obsidian-vault/analysis/ICLR_2026/A_Two_Phase_Deep_Learning_Framework_for_Adaptive_Time_Stepping_in_High_Speed_Flow_Modeling.md|A Two-Phase Deep Learning Framework for Adaptive Time-Stepping in High-Speed Flow Modeling (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Two_Phase_Deep_Learning_Framework_for_Adaptive_Time_Stepping_in_High_Speed_Flow_Modeling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ShockCast
+	- datasets: Circular Blast, Coal Dust Explosion
+- [[obsidian-vault/analysis/ICLR_2026/Achieving_Olympia_Level_Geometry_Large_Language_Model_Agent_via_Complexity_Boosting_Reinforcement_Learning.md|Achieving Olympia-Level Geometry Large Language Model Agent via Complexity Boosting Reinforcement Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Achieving_Olympia_Level_Geometry_Large_Language_Model_Agent_via_Complexity_Boosting_Reinforcement_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Agent / RL / Planning
+	- methods: InternGeometry
+	- datasets: IMO 50
+- [[obsidian-vault/analysis/ICLR_2026/Activation_Steering_with_a_Feedback_Controller.md|Activation Steering with a Feedback Controller (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Activation_Steering_with_a_Feedback_Controller.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Proportional-Integral-Derivative (PID) Steering
+	- datasets: Jailbreak Attack, Toxicity Mitigation
+- [[obsidian-vault/analysis/ICLR_2026/Building_spatial_world_models_from_sparse_transitional_episodic_memories.md|Building spatial world models from sparse transitional episodic memories (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Building_spatial_world_models_from_sparse_transitional_episodic_memories_1e9241541b44.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ESWM (Episodic Spatial World Model)
+	- datasets: Open Arena, Random Wall, Random Wall Navigation
+- [[obsidian-vault/analysis/ICLR_2026/Compactness_and_Consistency_A_Conjoint_Framework_for_Deep_Graph_Clustering.md|Compactness and Consistency: A Conjoint Framework for Deep Graph Clustering (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Compactness_and_Consistency_A_Conjoint_Framework_for_Deep_Graph_Clustering.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Graph / Geometric / Structured Data
+	- methods: CoCo
+	- datasets: Cora, AMAP, BAT
+- [[obsidian-vault/analysis/ICLR_2026/DriveVLA_W0_World_Models_Amplify_Data_Scaling_Law_in_Autonomous_Driving.md|DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DriveVLA_W0_World_Models_Amplify_Data_Scaling_Law_in_Autonomous_Driving_1311ad3bd77a.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: DriveVLA-W0
+	- datasets: NAVSIM v1, NAVSIM v2, In-house 70M frames
+- [[obsidian-vault/analysis/ICLR_2026/Dynamic_Novel_View_Synthesis_in_High_Dynamic_Range.md|Dynamic Novel View Synthesis in High Dynamic Range (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Dynamic_Novel_View_Synthesis_in_High_Dynamic_Range_c7124ba0dcb7.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: HDR-4DGS
+	- datasets: HDR-4D-Syn, HDR-4D-Real
+- [[obsidian-vault/analysis/ICLR_2026/Efficient_LVSM_Faster_Cheaper_and_Better_Large_View_Synthesis_Model_via_Decoupled_Co_Refinement_Attention.md|Efficient-LVSM: Faster, Cheaper, and Better Large View Synthesis Model via Decoupled Co-Refinement Attention (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Efficient_LVSM_Faster_Cheaper_and_Better_Large_View_Synthesis_Model_via_Decouple_f97270a5835a.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Efficient-LVSM
+	- datasets: RealEstate10K, ABO, GSO
+- [[obsidian-vault/analysis/ICLR_2026/Evaluating_and_Improving_Cultural_Awareness_of_Reward_Models_for_LLM_Alignment.md|Evaluating and Improving Cultural Awareness of Reward Models for LLM Alignment (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Evaluating_and_Improving_Cultural_Awareness_of_Reward_Models_for_LLM_Alignment.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: Think-as-Locals
+	- datasets: M-RewardBench, CARB, 综合
+- [[obsidian-vault/analysis/ICLR_2026/Flash_Mono_Feed_Forward_Accelerated_Gaussian_Splatting_Monocular_SLAM.md|Flash-Mono: Feed-Forward Accelerated Gaussian Splatting Monocular SLAM (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Flash_Mono_Feed_Forward_Accelerated_Gaussian_Splatting_Monocular_SLAM_774a8b41cda9.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: Flash‑Mono
+	- datasets: ScanNetV1, ScanNet / BundleFusion, KITTI Odometry
+- [[obsidian-vault/analysis/ICLR_2026/Fracture_GS_Dynamic_Fracture_Simulation_with_Physics_Integrated_Gaussian_Splatting.md|Fracture-GS: Dynamic Fracture Simulation with Physics-Integrated Gaussian Splatting (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Fracture_GS_Dynamic_Fracture_Simulation_with_Physics_Integrated_Gaussian_Splatti_ec080bbb2d3d.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: Fracture-GS
+	- datasets: Ficus, Teapot, Table fracture simulation scenes
+- [[obsidian-vault/analysis/ICLR_2026/Latent_Visual_Reasoning.md|Latent Visual Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Latent_Visual_Reasoning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+	- methods: Latent Visual Reasoning (LVR)
+	- datasets: MMVP, V*, V*_D.A.
+- [[obsidian-vault/analysis/ICLR_2026/MedGMAE_Gaussian_Masked_Autoencoders_for_Medical_Volumetric_Representation_Learning.md|MedGMAE: Gaussian Masked Autoencoders for Medical Volumetric Representation Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MedGMAE_Gaussian_Masked_Autoencoders_for_Medical_Volumetric_Representation_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MedGMAE
+	- datasets: AMOS multi-organ segmentation, FLARE'22 segmentation, SegTHOR segmentation
+- [[obsidian-vault/analysis/ICLR_2026/Obscure_but_Effective_Classical_Chinese_Jailbreak_Prompt_Optimization_via_Bio_Inspired_Search.md|Obscure but Effective: Classical Chinese Jailbreak Prompt Optimization via Bio-Inspired Search (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Obscure_but_Effective_Classical_Chinese_Jailbreak_Prompt_Optimization_via_Bio_Inspired_Search.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: CC-BOS
+	- datasets: AdvBench
+- [[obsidian-vault/analysis/ICLR_2026/OccDriver_Future_Occupancy_Guided_Dual_branch_Trajectory_Planner_in_Autonomous_Driving.md|OccDriver: Future Occupancy Guided Dual-branch Trajectory Planner in Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/OccDriver_Future_Occupancy_Guided_Dual_branch_Trajectory_Planner_in_Autonomous_D_fbeed04774ba.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OccDriver
+	- datasets: nuPlan Val14, nuPlan Test14-Hard
+- [[obsidian-vault/analysis/ICLR_2026/ORCaS_Unsupervised_Depth_Completion_via_Occluded_Region_Completion_as_Supervision.md|ORCaS: Unsupervised Depth Completion via Occluded Region Completion as Supervision (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ORCaS_Unsupervised_Depth_Completion_via_Occluded_Region_Completion_as_Supervision.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ORCaS (Occluded Region Completion as Supervision)
+	- datasets: VOID1500, NYUv2, KITTI DC
+- [[obsidian-vault/analysis/ICLR_2026/Probing_to_Refine_Reinforcement_Distillation_of_LLM_Reasoners_via_Explanatory_Inversion.md|Probing to Refine: Reinforcement Distillation of LLM Reasoners via Explanatory Inversion (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Probing_to_Refine_Reinforcement_Distillation_of_LLM_Reasoners_via_Explanatory_Inversion.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: ExGRPO (Explanatory GRPO)
+	- datasets: 样本效率:SQA和CSQA, 平均训练令牌效率对比
+- [[obsidian-vault/analysis/ICLR_2026/ResWorld_Temporal_Residual_World_Model_for_End_to_End_Autonomous_Driving.md|ResWorld: Temporal Residual World Model for End-to-End Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ResWorld_Temporal_Residual_World_Model_for_End_to_End_Autonomous_Driving_0aa5048f38c3.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ResWorld
+	- datasets: nuScenes, NAVSIM
+- [[obsidian-vault/analysis/ICLR_2026/Rethinking_Driving_World_Model_as_Synthetic_Data_Generator_for_Perception_Tasks.md|Rethinking Driving World Model as Synthetic Data Generator for Perception Tasks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Rethinking_Driving_World_Model_as_Synthetic_Data_Generator_for_Perception_Tasks_e3902bf4ec4f.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Data Curation / Synthesis
+	- datasets: nuScenes, DriveObj3D
+- [[obsidian-vault/analysis/ICLR_2026/Rethinking_LLM_Evaluation_Can_We_Evaluate_LLMs_with_200_Less_Data.md|Rethinking LLM Evaluation: Can We Evaluate LLMs with 200× Less Data? (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Rethinking_LLM_Evaluation_Can_We_Evaluate_LLMs_with_200_Less_Data.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: EssenceBench
+	- datasets: HellaSwag, ARC, GSM8K
+- [[obsidian-vault/analysis/ICLR_2026/RPG_A_Repository_Planning_Graph_for_Unified_and_Scalable_Codebase_Generation.md|RPG: A Repository Planning Graph for Unified and Scalable Codebase Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/RPG_A_Repository_Planning_Graph_for_Unified_and_Scalable_Codebase_Generation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Graph / Geometric / Structured Data
+	- methods: ZeroRepo
+	- datasets: RepoCraft
+- [[obsidian-vault/analysis/ICLR_2026/Sparsity_Forcing_Reinforcing_Token_Sparsity_of_MLLMs.md|Sparsity Forcing: Reinforcing Token Sparsity of MLLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Sparsity_Forcing_Reinforcing_Token_Sparsity_of_MLLMs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression, Agent / RL / Planning
+	- methods: Sparsity Forcing
+	- datasets: MME, VideoMME
+- [[obsidian-vault/analysis/ICLR_2026/T1_Tool_integrated_Verification_for_Test_time_Compute_Scaling_in_Small_Language_Models.md|T1: Tool-integrated Verification for Test-time Compute Scaling in Small Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/T1_Tool_integrated_Verification_for_Test_time_Compute_Scaling_in_Small_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: Tool-integrated Verification (T1)
+	- datasets: MATH500, GSM8K
+- [[obsidian-vault/analysis/ICLR_2026/Taming_Hierarchical_Image_Coding_Optimization_A_Spectral_Regularization_Perspective.md|Taming Hierarchical Image Coding Optimization: A Spectral Regularization Perspective (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Taming_Hierarchical_Image_Coding_Optimization_A_Spectral_Regularization_Perspective.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: DHIC-Regu (Explicit Spectral Regularization for Hierarchical Coding)
+	- datasets: Kodak, CLIC Pro, Tecnick
+- [[obsidian-vault/analysis/ICLR_2026/Topological_Anomaly_Quantification_for_Semi_supervised_Graph_Anomaly_Detection.md|Topological Anomaly Quantification for Semi-supervised Graph Anomaly Detection (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Topological_Anomaly_Quantification_for_Semi_supervised_Graph_Anomaly_Detection.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
+	- methods: TAQ-GAD
+	- datasets: Amazon, T-Finance
+- [[obsidian-vault/analysis/ICLR_2026/TSLM_Tree_Structured_Language_Modeling_for_Divergent_Thinking.md|TSLM: Tree-Structured Language Modeling for Divergent Thinking (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/TSLM_Tree_Structured_Language_Modeling_for_Divergent_Thinking.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: TSLM (Tree-Structured Language Modeling)
+	- datasets: Game of 24, Gridworld, ProntoQA
+- [[obsidian-vault/analysis/ICLR_2026/Video_STAR_Reinforcing_Open_Vocabulary_Action_Recognition_with_Tools.md|Video-STAR: Reinforcing Open-Vocabulary Action Recognition with Tools (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Video_STAR_Reinforcing_Open_Vocabulary_Action_Recognition_with_Tools.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D
+	- methods: Video-STAR
+	- datasets: Kinetics-400, UCF-101, Kinetics-600 (split
+- [[obsidian-vault/analysis/ICLR_2026/VLM4VLA_Revisiting_Vision_Language_Models_in_Vision_Language_Action_Models.md|VLM4VLA: Revisiting Vision-Language-Models in Vision-Language-Action Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/VLM4VLA_Revisiting_Vision_Language_Models_in_Vision_Language_Action_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: VLM4VLA
+	- datasets: Calvin ABC-D, SimplerEnv-Bridge, Libero-10
+- [[obsidian-vault/analysis/ICLR_2026/Webscale_RL_Automated_Data_Pipeline_for_Scaling_RL_Data_to_Pretraining_Levels.md|Webscale-RL: Automated Data Pipeline for Scaling RL Data to Pretraining Levels (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Webscale_RL_Automated_Data_Pipeline_for_Scaling_RL_Data_to_Pretraining_Levels.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression, LLM / Reasoning / Alignment
+	- methods: Webscale-RL
+	- datasets: Average across 7 benchmarks, Gap to Qwen2.5-7B, MMLU-pro
+- [[obsidian-vault/analysis/ICLR_2026/Wide_In_Narrow_Out_Revokable_Decoding_for_Efficient_and_Effective_DLLMs.md|Wide-In, Narrow-Out: Revokable Decoding for Efficient and Effective DLLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Wide_In_Narrow_Out_Revokable_Decoding_for_Efficient_and_Effective_DLLMs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression, LLM / Reasoning / Alignment
+	- methods: Wide-In, Narrow-Out (WINO)
+	- datasets: GSM8K, ARC-E
+- [[obsidian-vault/analysis/ICLR_2026/YoNoSplat_You_Only_Need_One_Model_for_Feedforward_3D_Gaussian_Splatting.md|YoNoSplat: You Only Need One Model for Feedforward 3D Gaussian Splatting (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/YoNoSplat_You_Only_Need_One_Model_for_Feedforward_3D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: YoNoSplat
+	- datasets: RealEstate10K, ScanNet++, DL3DV

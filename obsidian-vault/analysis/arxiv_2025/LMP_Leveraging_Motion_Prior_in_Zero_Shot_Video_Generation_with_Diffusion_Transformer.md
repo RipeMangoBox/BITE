@@ -1,0 +1,412 @@
+---
+title: "LMP: Leveraging Motion Prior in Zero-Shot Video Generation with Diffusion Transformer"
+type: paper
+paper_level: A
+venue: arXiv
+year: 2025
+pdf_ref: paperPDFs/arxiv_2025/LMP_Leveraging_Motion_Prior_in_Zero_Shot_Video_Generation_with_Diffusion_Transformer.pdf
+aliases:
+- LLMP
+- LMP
+tags:
+- arxiv_2025
+- topic/vision_multimodal_applications
+- topic/vision_multimodal_applications/image_and_video_generation
+- topic/generative_models_diffusion
+core_operator: 利用MM-DiT统一自注意力中token的全局视野，通过前景-背景解耦提取参考视频运动token，以重加权注入方式控制运动传递强度，并通过梯度下降抑制参考外观影响，从而在冻结的DiT模型上实现零样本运动控制。
+primary_logic: DiT将文本和视频patch token统一处理，使得参考视频的运动信息可以直接作为附加token参与目标视频的自注意力计算；通过注意力图分离前景、重加权ref token和抑制外观梯度，可以在不改变模型参数的情况下实现运动传递与外观解耦。
+claims:
+- 在DAVIS数据集上，LMP的Motion Fidelity达到0.90，显著高于DMT的0.85，表明运动参考更准确。
+- 去除FBDM后，MF从0.90骤降至0.77，证明前景-背景分离对准确运动传递至关重要。
+- 去除ASM后，帧一致性从0.96下降至0.93，且参考主体外观会干扰目标视频，验证了外观分离的有效性。
+- 在图像到视频任务中，生成的兔子能从不同初始位置和大小启动，但遵循参考视频中汽车的运动模式，表明运动与视频结构成功解耦。
+---
+
+# LMP: Leveraging Motion Prior in Zero-Shot Video Generation with Diffusion Transformer
+
+> [!tip] 核心洞察
+> DiT将文本和视频patch token统一处理，使得参考视频的运动信息可以直接作为附加token参与目标视频的自注意力计算；通过注意力图分离前景、重加权ref token和抑制外观梯度，可以在不改变模型参数的情况下实现运动传递与外观解耦。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | LMP：在基于扩散Transformer的零样本视频生成中利用运动先验 |
+| 英文题名 | LMP: Leveraging Motion Prior in Zero-Shot Video Generation with Diffusion Transformer |
+| 会议/期刊 | arXiv 2025 |
+| Links | [paper](https://arxiv.org/abs/2505.14167) · [Code](https://github.com/black-forest-labs/flux) · [arXiv](https://arxiv.org/abs/2403.20193) |
+| Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/generative_models_diffusion |
+| Method | LMP (Leveraging Motion Prior) |
+| Dataset | DAVIS |
+
+> [!tip] 效果简介
+> - DAVIS (GPT annotated) 上，Motion Fidelity (MF) 0.90 vs 0.85 (DMT) (+0.05)；Frame Consistency (Cons.) 0.96 vs 0.94 (DMT) (+0.02)；Image-Text Alignment (Align) 25.68 vs 23.60 (DMT) (+2.08)。
+
+## 概述
+
+**问题瓶颈**：当前基于扩散Transformer（DiT）架构的视频生成模型仅依赖文本提示，难以实现精细的运动控制。现有零样本运动迁移方法均基于UNet架构，且不支持图像到视频（I2V）设置，无法在DiT模型上实现即插即用的运动控制。
+
+**核心思路**：LMP（Leveraging Motion Prior）利用DiT中多模态扩散Transformer（MM-DiT）统一自注意力的全局视野，通过三个关键模块——前景-背景解耦（FBDM）、重加权运动传递（RMTM）和外观分离（ASM）——在完全冻结的预训练DiT模型上实现零样本运动控制。其核心洞察在于：DiT将文本和视频patch token统一处理，使参考视频的运动信息可直接作为附加token参与目标视频的自注意力计算；通过注意力图分离前景、重加权参考token的键值、以及梯度抑制外观信息，可在不改变模型参数的前提下实现运动传递与外观解耦。
+
+**方法定位**：LMP以预训练的CogVideoX-5B为去噪主干，在文本到视频（T2V）和图像到视频（I2V）两种设定下工作。与当前最优零样本运动迁移方法DMT（基于UNet）相比，LMP是首个在DiT架构上实现即插即用运动控制的框架。
+
+**主要结果**：在DAVIS数据集上，LMP的运动保真度（Motion Fidelity）达到0.90，显著优于DMT的0.85；帧一致性（Frame Consistency）达0.96，图文对齐（Image-Text Alignment）和PickScore也分别以25.68和20.69领先DMT的23.60和18.95。消融实验证实，去除FBDM后运动保真度骤降至0.77，去除ASM后帧一致性降至0.93，验证了前景-背景分离和外观抑制的关键作用。在图像到视频任务中，LMP成功实现了运动模式与目标主体初始位置、尺寸的解耦。
+
+## 背景与动机
+
+### 问题背景：视频生成中的运动控制困境
+
+近年来，基于扩散模型（Diffusion Models）的视频生成取得了显著进展，尤其是基于扩散Transformer（Diffusion Transformer, DiT）架构的模型（如CogVideoX-5B）在文本到视频（T2V）和图像到视频（I2V）任务中展现出强大的生成能力。然而，一个核心瓶颈依然存在：**仅依赖文本提示难以实现对生成视频中运动模式的精细控制**。文本描述天然具有模糊性——"一个人跑步"无法精确指定跑步的步频、幅度或轨迹——这使得用户无法将一段参考视频中的特定运动模式迁移到新的生成内容中。
+
+### 现有方法的缺口：UNet依赖与DiT适配缺失
+
+零样本运动迁移（zero-shot motion transfer）旨在从参考视频中提取运动信息，并将其注入目标视频的生成过程，而无需针对特定运动进行微调。现有方法（如DMT）虽然在这一任务上取得了进展，但存在两个关键局限：
+
+1. **架构依赖**：现有零样本运动迁移方法均基于UNet架构设计，其运动注入机制深度耦合于UNet的交叉注意力与空间自注意力结构。当底层生成模型从UNet切换到DiT时，这些方法无法直接迁移。
+
+2. **任务覆盖不足**：当前方法主要针对文本到视频（T2V）设置，不支持图像到视频（I2V）场景下的运动迁移，限制了其在实际应用中的灵活性。
+
+随着DiT架构逐渐成为视频生成的主流选择（如CogVideoX、HunyuanVideo等），**如何在冻结的DiT模型上实现即插即用的零样本运动控制**成为一个亟待解决的研究问题。
+
+### DiT架构的独特机遇
+
+DiT架构的核心特征在于其统一自注意力机制（MM-DiT）：文本提示token和视频patch token被拼接后共同参与自注意力计算，如公式所示：
+
+$$A = softmax([Q^p, Q^v][K^p, K^v]^\top / \sqrt{d_k}), \quad h = A \cdot [V^p, V^v]$$
+
+这种设计意味着，**参考视频的运动信息可以直接作为附加token参与目标视频的自注意力计算**，而无需修改模型结构。这一特性为在DiT上实现运动迁移提供了天然的技术切入点：如果能够从参考视频中提取出纯净的运动token（排除外观和背景干扰），并将其注入目标视频的去噪过程，就有可能在冻结模型参数的条件下实现运动传递。
+
+### 核心挑战：运动-外观-背景的解耦
+
+然而，直接注入参考视频token面临三重耦合问题：
+
+- **前景-背景耦合**：参考视频的token同时包含运动主体和背景信息，背景的静态纹理和结构会干扰目标视频的场景生成。
+- **运动-外观耦合**：参考视频中主体的外观特征（颜色、纹理、形状）会通过注意力机制泄漏到目标视频中，改变目标主体的视觉特征。
+- **传递强度不可控**：缺乏机制来调节运动参考的强度，可能导致运动过度约束或文本一致性下降。
+
+### 本文动机
+
+基于上述分析，本文提出**LMP（Leveraging Motion Prior）**框架，旨在充分利用DiT架构的统一注意力特性，通过三个核心模块——前景-背景解耦（FBDM）、重加权运动传递（RMTM）和外观分离（ASM）——在冻结的CogVideoX-5B模型上实现零样本运动迁移，同时支持文本到视频和图像到视频两种设置。
+
+## 核心创新
+
+LMP的核心创新在于将零样本运动迁移从UNet架构迁移至DiT架构，并围绕DiT统一自注意力的全局视野特性，构建了三个即插即用的模块化机制，实现了在冻结的预训练模型上对运动与外观的解耦控制。
+
+### 1. 从UNet到DiT：运动迁移范式的架构跃迁
+
+现有零样本运动迁移方法（如DMT）均构建于UNet架构之上，其运动信息注入依赖于UNet的跨注意力机制，且不支持图像到视频的设置。LMP首次将运动迁移引入DiT架构，其核心洞察在于：**DiT将文本提示token和视频patch token统一在自注意力中处理**，这使得参考视频的运动信息可以直接作为附加token参与目标视频的自注意力计算，无需修改模型结构或微调参数。
+
+具体而言，在MM-DiT的每一层自注意力中，目标视频的查询（Q）可以同时访问自身的键值对（K, V）以及参考视频前景token的键值对（$\hat{K}_{ref}^v$, $\hat{V}_{ref}^v$），从而在去噪过程中持续注入运动参考信号。这一设计充分利用了DiT架构的天然优势：统一的token空间消除了UNet中跨注意力与自注意力分离所带来的信息瓶颈。
+
+### 2. 前景-背景解耦：运动信号的精准提取
+
+在UNet架构中，运动迁移通常将整个参考视频帧的信息混合注入，背景区域的干扰会污染目标视频的生成。LMP通过**前景-背景解耦模块（FBDM）**解决了这一问题。
+
+FBDM利用DiT内部的注意力图实现动态分离：首先使用LLM从参考视频提示中提取主体词汇，然后在文本-视频注意力图中定位与该词汇高响应的token，同时利用视频-文本注意力图进行交叉验证，最终仅将前景运动主体对应的token用于运动传递。这一过程的因果逻辑在于：**只有运动主体的token才携带有效的运动信息，背景token的注入会引入无关的空间结构，导致目标视频中出现幽灵背景或运动失真**。
+
+消融实验验证了这一设计的决定性作用：去除FBDM后，运动保真度（MF）从0.90骤降至0.77（Table 2），生成视频中目标可能消失或出现额外元素（Fig. 8）。
+
+### 3. 重加权运动传递：运动强度与外观保留的平衡
+
+运动信息的直接注入存在一个关键矛盾：参考视频的键值对同时包含运动模式和主体外观信息，过强的参考会导致目标视频主体外观被参考主体扭曲。LMP通过**重加权运动传递模块（RMTM）**引入了一个简洁而有效的控制机制：
+
+$$A = softmax( [Q_{tar}^{p}, Q_{tar}^{v}] [K_{tar}^{p}, \lambda \cdot \hat{K}_{ref}^{v}]^{\top} / \sqrt{d_k} ), \quad h = A \cdot [V_{tar}^{p}, V_{tar}^{v}, \hat{V}_{ref}^{v}]$$
+
+其中重加权系数 $\lambda = 0.98$ 对参考视频的键进行缩放，降低了参考token在注意力计算中的响应强度。这一设计的因果机制在于：**通过抑制参考键的注意力分数，可以减少目标视频token对参考外观信息的响应，同时保留了运动模式的关键信息**。实验表明，该系数在平衡运动保真度与外观保留方面起到了关键的调节作用。
+
+### 4. 外观抑制：从隐式分离到显式梯度优化
+
+RMTM的重加权机制只能隐式地减弱外观干扰，当参考主体与目标主体外观差异较大时，残留的外观信息仍会泄漏到目标视频中。LMP进一步提出了**外观分离模块（ASM）**，将外观抑制转化为一个显式的优化问题。
+
+ASM的核心操作是：计算参考提示token与目标视频token之间的注意力图 $A'$，取其中响应值最高的前1/5个token的平均值作为外观损失 $\mathcal{L}$，然后通过梯度下降直接更新目标视频的隐藏状态：
+
+$$h' = h - \beta \cdot \nabla \mathcal{L}$$
+
+这一过程的因果逻辑在于：**参考提示token与目标视频token之间的高注意力响应区域，正是参考主体外观信息向目标视频泄漏的通道**；通过最小化这些区域的响应，可以主动抑制外观传递，同时保持已建立的运动模式。
+
+消融实验验证了ASM的必要性：去除ASM后，帧一致性（Cons.）从0.96下降至0.93，且参考主体外观会扭曲目标主体（Table 2, Fig. 8）。
+
+### 5. 模块协同与时序调度
+
+三个模块并非独立运作，而是在去噪过程的不同阶段协同工作（Fig. 3, Algorithm 1）：在前 $T_1=40$ 步去噪中，FBDM和RMTM共同作用，建立运动参考；在 $T_2=45$ 到 $T_3=35$ 步之间，ASM介入抑制外观泄漏。这种时序调度反映了扩散模型去噪过程的特性：早期步骤决定整体运动结构，后期步骤细化外观细节，因此在运动建立后、外观固化前进行外观抑制最为有效。
+
+### 6. 真实视频的即插即用扩展
+
+对于真实参考视频，LMP通过**真实视频运动传递（RVMT）**模块实现了即插即用的扩展。与依赖DDIM反转的方法不同，RVMT直接向真实视频的潜在编码添加噪声进行去噪同步（$z_t' = \lambda_t \cdot z_0' + (1-\lambda_t) \cdot \epsilon$），避免了反转过程引入的误差累积，使得真实视频的运动信息可以被实时提取并注入目标生成过程。
+
+### 创新点总结
+
+| 创新维度 | 基线方法（UNet/DMT） | LMP（DiT） | 因果机制 |
+|---------|---------------------|-----------|---------|
+| 架构适配 | 依赖跨注意力注入运动 | 利用统一自注意力拼接参考token | DiT的全局token视野消除了信息瓶颈 |
+| 前景提取 | 无分离，全帧混合 | FBDM动态分离前景token | 仅运动主体token携带有效运动信号 |
+| 运动传递强度 | 无控制机制 | RMTM重加权系数 $\lambda$ | 抑制参考键响应以平衡运动与外观 |
+| 外观解耦 | 隐式，易泄漏 | ASM显式梯度优化 | 最小化参考-目标注意力响应以阻断外观泄漏 |
+| 真实视频支持 | 依赖DDIM反转 | RVMT直接加噪同步 | 避免反转误差累积 |
+
+这些创新共同构成了一个完整的零样本运动控制框架，在冻结的CogVideoX-5B模型上实现了即插即用的运动迁移，无需任何微调或额外训练。
+
+## 整体框架
+
+LMP（Leveraging Motion Prior）是一个面向基于扩散Transformer（DiT）架构视频生成模型的零样本运动传递框架。其核心设计动机在于：当前DiT模型（如**CogVideoX-5B**）仅依赖文本提示难以实现精细的运动控制，而现有的零样本运动迁移方法均基于UNet架构，无法在冻结的DiT模型上即插即用地完成运动注入。LMP利用MM-DiT统一自注意力中token的全局视野，在不修改预训练模型参数的前提下，将参考视频的运动信息作为附加token参与目标视频的去噪生成过程，同时通过外观抑制机制防止参考主体特征泄漏。
+
+### 整体流水线
+
+LMP的推理过程在预训练的MM-DiT去噪主干网络（CogVideoX-5B，参数完全冻结）中展开，总去噪步数T=50。在每个MM-DiT块内，流水线按去噪阶段分为两个核心环节（Figure 3）：
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/003_Figure_3.jpg]]
+*Figure 3: The pipeline of our LMP framework in each MM-DiT block. For the first ??1 denoising steps, we use FBDM and RMTM to enable the target video to reference the motion from the reference video. For denoising steps*
+
+1. **运动传递阶段（去噪步数 0 至 T₁=40）**：同时运行两条去噪路径——目标视频路径和参考视频路径。参考视频路径通过直接添加噪声（真实视频场景，公式10）或标准前向扩散（合成视频场景）获得带噪潜在编码，与目标视频路径在相同噪声时间步上同步去噪。在此阶段，**前景-背景解耦模块（FBDM）** 从参考视频中分离出运动主体的前景token，随后**重加权运动传递模块（RMTM）** 将这些前景token的键（K）和值（V）注入目标视频的自注意力计算中，使目标视频token能够参考参考视频的运动模式。
+
+2. **外观抑制阶段（去噪步数 T₂=45 至 T₃=35）**：停止运动传递后，**外观分离模块（ASM）** 介入。该模块计算参考prompt token与目标视频token之间的注意力图，取响应值最高的前1/5个token的平均值作为外观损失，通过梯度下降（学习率β=100）更新目标视频的隐藏状态，从而显式地去除参考视频中主体外观对目标视频的干扰。
+
+整个框架的输入包括：目标文本提示（及可选的初始图像）、参考视频及其文本提示。输出为一段遵循参考视频运动模式但保持目标提示语义和外观一致性的视频。Figure 1展示了LMP在文本到视频和图像到视频两种设置下的整体框架。
+
+### 模块关系与数据流
+
+四个核心模块的协作关系如下：
+
+- **FBDM** 是运动传递的前置条件。它利用参考视频路径中文本-视频和视频-文本两个方向的注意力图，通过LLM提取参考提示中的主体词汇，识别高响应token作为前景token，实现前景与背景的动态解耦。若跳过此模块，背景信息会严重干扰运动传递，导致运动保真度（MF）从0.90骤降至0.77（Table 2）。
+
+- **RMTM** 是运动传递的执行核心。在目标视频的自注意力中，查询（Q）来自目标视频的prompt token和视频patch token，而键（K）和值（V）则额外拼接了参考视频前景token的键值对。通过引入重加权系数λ=0.98对参考键进行缩放（公式6），RMTM在运动传递强度与目标外观保留之间取得平衡。
+
+- **ASM** 是外观解耦的保障。尽管RMTM仅注入前景token且进行了重加权，参考主体的外观信息仍可能通过注意力机制泄漏到目标视频中。ASM通过梯度下降直接优化目标视频的隐藏状态，最小化参考prompt与目标视频token之间的注意力响应，从而抑制外观干扰。消融实验表明，去除ASM后帧一致性从0.96下降至0.93，且参考主体外观会扭曲目标主体（Table 2，Figure 8）。
+
+- **RVMT**（真实视频运动传递）是面向真实参考视频的适配模块。对于真实视频，不使用DDIM反转，而是直接向原始视频添加噪声进行去噪同步，以更小的计算代价获取实时参考运动token。
+
+### 输入输出规范
+
+| 输入项 | 说明 |
+|--------|------|
+| 目标文本提示 | 描述期望生成视频的语义内容 |
+| 目标初始图像（可选） | 图像到视频设置下的起始帧 |
+| 参考视频 | 提供运动模式的源视频 |
+| 参考视频文本提示 | 描述参考视频内容的提示，用于FBDM提取主体词汇 |
+
+| 输出项 | 说明 |
+|--------|------|
+| 目标视频 | 遵循参考视频运动模式、保持目标语义和外观一致性的生成视频 |
+
+整个框架的关键优势在于：所有模块均作用于注意力计算和隐藏状态层面，无需微调预训练DiT模型的任何参数，实现了真正的零样本即插即用运动控制。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/001_Figure_1.jpg]]
+*Figure 1: Our LMP framework enables DiT-based video generation models to produce target videos that reference the motion from a reference video in both text-to-video and image-to-video settings. The green dashed box indicates the reference image*
+
+## 核心模块与公式推导
+
+LMP 框架在冻结的 **CogVideoX-5B** 预训练 DiT 模型上工作，其核心由三个即插即用的模块构成：**前景-背景解耦模块（FBDM）**、**重加权运动传递模块（RMTM）** 和 **外观分离模块（ASM）**。三个模块按去噪阶段依次介入：在去噪步 $t \in [0, T_1]$ 内执行 FBDM 与 RMTM，使目标视频获取参考运动；在 $t \in [T_2, T_3]$ 内执行 ASM，抑制参考视频主体外观对目标视频的泄漏（图3、算法1）。
+
+### 前景-背景解耦模块（FBDM）
+
+FBDM 的目标是从参考视频中分离出运动主体的前景 token，避免背景信息干扰运动传递。其核心机制利用 MM-DiT 中文本与视频 token 的双向注意力图：
+
+- 首先使用 LLM 从参考视频的文本提示中提取主体词汇（如“car”、“rabbit”）。
+- 计算**文本到视频注意力图**：以主体词汇对应的 prompt token 作为 query，检索所有视频 token 的响应值。
+- 计算**视频到文本注意力图**：以每个视频 token 为 query，检索主体词汇 prompt token 的响应值。
+- 将两个注意力图中高响应的视频 token 交集作为**前景 token**，其余归为背景，实现动态、无需额外训练的前景-背景分离（图2）。
+
+该模块是运动传递的基础——消融实验中去除 FBDM 后，运动保真度（MF）从 0.90 骤降至 0.77（Table 2），生成视频中目标可能消失或出现额外元素（图8）。
+
+### 重加权运动传递模块（RMTM）
+
+RMTM 将 FBDM 提取的参考视频前景 token 注入目标视频的自注意力计算中。在 MM-DiT 的统一自注意力框架下，目标视频 token 的 query 可以同时访问自身和参考视频的 key-value 对。
+
+**扩展自注意力**（公式5）：
+$$A = \text{softmax}\left( [Q_{tar}^{\mathcal{P}}, Q_{tar}^{v}] [K_{tar}^{\mathcal{P}}, K_{tar}^{v}, \hat{K}_{ref}^{v}]^{\top} / \sqrt{d_k} \right)$$
+$$h = A \cdot [V_{tar}^{\mathcal{P}}, V_{tar}^{v}, \hat{V}_{ref}^{v}]$$
+
+其中 $Q_{tar}^{\mathcal{P}}, Q_{tar}^{v}$ 分别为目标视频的 prompt token 和视频 token 的 query；$\hat{K}_{ref}^{v}, \hat{V}_{ref}^{v}$ 为参考视频前景 token 的 key 和 value。仅目标视频 token 被允许访问参考 token，参考 token 自身不参与注意力更新。
+
+**重加权机制**（公式6）：
+$$A = \text{softmax}\left( [Q_{tar}^{p}, Q_{tar}^{v}] [K_{tar}^{p}, \lambda \cdot \hat{K}_{ref}^{v}]^{\top} / \sqrt{d_k} \right)$$
+$$h = A \cdot [V_{tar}^{p}, V_{tar}^{v}, \hat{V}_{ref}^{v}]$$
+
+通过重加权系数 $\lambda = 0.98$ 缩放参考视频的 key，控制运动传递的强度：$\lambda$ 越大，目标视频越倾向于复制参考运动；$\lambda$ 越小，目标视频越保留自身文本引导的生成内容。这一设计在运动保真度与文本一致性之间取得平衡。
+
+### 外观分离模块（ASM）
+
+即使仅注入运动 token，参考视频中主体的外观信息仍可能通过注意力机制泄漏到目标视频中。ASM 通过梯度下降主动抑制这种外观干扰。
+
+**外观注意力图**（公式7）：
+$$A' = \text{softmax}\left( [Q_{ref}^{p}, Q_{tar}^{v}] [K_{ref}^{p}, K_{tar}^{v}]^{\top} / \sqrt{d_k} \right)$$
+
+计算参考视频 prompt token 与目标视频 token 之间的注意力图，该图捕获了参考主体外观信息在目标视频中的响应强度。
+
+**外观损失**（公式8）：
+$$\mathcal{L} = \frac{1}{k} \sum_{j=1}^{k} a_{(j)}, \quad k = \lceil n / 5 \rceil$$
+
+取注意力图中响应值最高的前 $1/5$ 个 token 的平均值作为损失，其中 $n$ 为目标视频 token 总数，$a_{(j)}$ 为降序排列后的注意力值。
+
+**梯度下降更新**（公式9）：
+$$h' = h - \beta \cdot \nabla \mathcal{L}$$
+
+通过梯度下降直接更新目标视频的隐藏状态 $h$，学习率 $\beta = 100$，最小化外观损失，从而去除参考主体外观对目标视频的影响。消融实验表明，去除 ASM 后帧一致性从 0.96 下降至 0.93，且参考主体外观会扭曲目标主体（Table 2、图8）。
+
+### 真实视频运动传递（RVMT）
+
+对于真实参考视频，LMP 不采用 DDIM 反转（因其计算开销大且可能引入误差），而是直接向原视频潜在编码添加噪声进行去噪同步（公式10）：
+$$z_t' = \lambda_t \cdot z_0' + (1 - \lambda_t) \cdot \epsilon$$
+
+其中 $z_0'$ 为真实视频的潜在编码，$\lambda_t$ 为噪声调度系数，$\epsilon \sim \mathcal{N}(0, I)$ 为高斯噪声。加噪后的 $z_t'$ 与目标视频的 $z_t$ 处于相同的噪声水平，可同步进行去噪，从而实时获取参考运动 token。
+
+### 统一优化目标
+
+LMP 的整体优化目标建立在标准视频扩散模型的噪声预测损失之上（公式1）：
+$$\mathcal{L} = \mathbb{E}_{\mathbf{z}_0, c, \epsilon \sim \mathcal{N}(0, I), t} \left[ \| \epsilon - \epsilon_{\varphi}(\mathbf{z}_t, t, \mathbf{c}) \|_2^2 \right]$$
+
+引入参考运动信息 $\mathcal{M}_{ref}$ 后，运动传递的优化目标扩展为（公式4）：
+$$\mathcal{L} = \mathbb{E}_{\mathbf{z}_0, c, \epsilon \sim \mathcal{N}(0, I), t} \left[ \| \epsilon - \epsilon_{\theta}(\mathbf{z}_t, t, \mathbf{c}, \mathcal{M}_{ref}) \|_2^2 \right]$$
+
+其中 $\epsilon_{\theta}$ 为冻结的 DiT 去噪网络，$\mathcal{M}_{ref}$ 通过 FBDM、RMTM 和 ASM 三个模块在推理过程中动态注入，无需对模型参数进行任何微调。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/002_Figure_2.jpg]]
+*Figure 2: The core idea of our FBDM. We achieve disentanglement of the foreground and background by utilizing textvideo attention maps and video-text attention maps*
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/010_Figure_9.jpg]]
+*Figure 9: Attention maps of reference video and target video*
+
+## 实验与分析
+
+### 主实验结果
+
+在DAVIS数据集上的定量对比表明，LMP在零样本运动传递任务上全面超越了现有最优方法DMT和CogVideoX-5B基线模型。Table 1展示了四项核心指标的对比结果：
+
+**运动保真度（Motion Fidelity, MF）** 是衡量生成视频是否准确复现参考视频运动模式的关键指标。LMP取得了0.90的MF分数，相比DMT的0.85提升了0.05，表明通过前景-背景解耦和重加权运动传递，生成视频能够更精确地捕捉参考视频中的运动轨迹和动态特征。
+
+**帧一致性（Frame Consistency, Cons.）** 评估生成视频的时间连贯性。LMP达到0.96，优于DMT的0.94和基线的0.95，说明运动传递过程并未破坏视频帧间的平滑过渡，外观分离模块有效抑制了参考视频外观信息对目标视频时间结构的干扰。
+
+**图文对齐度（Image-Text Alignment, Align）** 反映生成视频与目标文本提示的语义一致性。LMP取得25.68，显著高于DMT的23.60（+2.08），证明重加权机制在注入运动信息的同时较好地保留了文本控制能力，避免了运动参考对语义内容的过度支配。
+
+**PickScore（Pick.）** 作为综合质量评估指标，LMP获得20.69，领先DMT的18.95（+1.74），进一步验证了方法的整体优越性。
+
+所有对比方法均在相同的预训练CogVideoX-5B模型、相同的去噪步数（T=50）和统一的超参数设置下进行评估，指标计算采用一致的CLIP模型和预训练跟踪器，保证了实验的公平性。
+
+### 消融实验
+
+为验证各核心模块的贡献，论文进行了系统的消融研究（Table 2）：
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/011_Table_2.jpg]]
+*Table 2: The quantity results of ablation study*
+
+**去除前景-背景解耦模块（w/o FBDM）** 导致运动保真度从0.90骤降至0.77，降幅达0.13，是所有消融中影响最大的退化。如Fig. 8定性结果所示，缺少前景分离时，参考视频的背景信息会混入目标生成过程，导致目标视频中出现额外元素或主体消失。这一结果表明，前景-背景解耦是实现准确运动传递的基础——只有将运动主体从背景中精确剥离，才能避免无关视觉信息对目标视频的污染。
+
+**去除外观分离模块（w/o ASM）** 使帧一致性从0.96下降至0.93，同时运动保真度也有所降低。定性结果显示，参考视频中主体的外观特征（如颜色、纹理）会泄漏到目标视频中，扭曲目标主体的视觉特征，进而削弱运动参考的准确性。这验证了ASM通过梯度下降抑制参考外观信息的必要性。
+
+两个模块的协同作用体现在：FBDM确保运动信息的纯净性，RMTM控制运动传递的强度，而ASM则防止外观信息的跨视频污染。三者共同构成了LMP在冻结DiT模型上实现零样本运动控制的核心机制。
+
+### 定性分析
+
+**文本到视频运动传递（Fig. 4）** 展示了LMP在更改主体和背景提示后的生成效果。参考视频中的运动模式（如行走、奔跑、旋转）被成功迁移到具有不同外观特征的目标主体上，背景也可根据新提示独立变化，实现了运动与视觉内容的解耦。
+
+**图像到视频运动传递（Fig. 5）** 进一步验证了运动与视频结构的解耦能力。以兔子跟随汽车运动模式为例，生成的兔子可以从与参考汽车完全不同的初始位置和尺寸出发，但仍准确遵循汽车的运动轨迹。同样，宇航员能够以相同的运动模式生成，但外观与参考视频中的主体截然不同。这证明LMP提取的运动先验是结构无关的，可灵活应用于不同空间配置的目标。
+
+**与基线方法的对比（Fig. 6, Fig. 7）** 显示，CogVideoX-5B基线仅凭文本提示无法实现精细运动控制，生成的运动模式与参考视频差异较大；DMT虽能传递部分运动信息，但在保持目标主体外观一致性方面存在不足。LMP在运动保真度和外观保持两个维度上均表现出明显优势。
+
+### 注意力图可视化
+
+Fig. 9通过可视化参考视频和目标视频的注意力图，直观验证了FBDM和RMTM的有效性。文本-视频注意力图能够准确定位与主体词汇高响应的前景区域，视频-文本注意力图则从另一方向确认了前景token的语义对应关系。在运动传递过程中，目标视频token对参考前景token的注意力分布呈现出与运动模式一致的空间-时间模式，表明运动信息通过自注意力机制被有效捕获和传递。
+
+### 失败模式与局限
+
+尽管LMP在多数场景下表现优异，论文指出以下潜在失败模式：
+
+1. **多主体遮挡场景**：当前FBDM依赖LLM提取的单一主体词汇进行前景定位，当参考视频中存在多个相互遮挡或交互的运动主体时，前景分离的精度可能下降。
+2. **外观相似性冲突**：当参考主体与目标主体外观高度相似时，ASM的梯度下降可能误移除目标自身的特征信息，导致生成质量退化。
+3. **极端运动复杂度**：对于快速运动、大幅度形变或非刚性运动，MF指标使用的预训练跟踪器可能存在鲁棒性不足的问题，影响运动保真度评估的准确性。
+
+这些局限为后续研究指明了方向：多主体运动解耦、自适应外观分离阈值、以及更鲁棒的运动评估指标。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/009_Table_1.jpg]]
+*Table 1: Quantity results on baseline method and SOTA method and ours. Higher values indicate better performance*
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/006_Figure_6.jpg]]
+*Figure 6: Quality comparison results on different methods in text-to-video setting*
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/007_Figure_7.jpg]]
+*Figure 7: Quality comparison results on different methods in image-to-video setting. The green dashed box indicates the reference image*
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/008_Figure_8.jpg]]
+*Figure 8: Quality results of ablation studies. The original videos are available in supplementary material*
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/004_Figure_4.jpg]]
+*Figure 4: The text-to-video results of our LMP framework. The original videos are available in the supplementary material*
+
+![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/005_Figure_5.jpg]]
+*Figure 5: The image-to-video results of our LMP framework. The original videos are available in the supplementary material*
+
+## 方法谱系与知识库定位
+
+### 1. 与现有方法的关系
+
+#### 1.1 零样本运动迁移的架构迁移
+
+LMP 的核心贡献在于将零样本运动迁移从 UNet 架构迁移到 DiT（Diffusion Transformer）架构。现有零样本运动迁移方法（如 **DMT**）均基于 UNet 骨干网络设计，利用 UNet 中空间自注意力与时间注意力的分离结构实现运动注入。然而，DiT 架构中文本 token 与视频 patch token 在统一自注意力中交互，原有 UNet 的注入策略无法直接复用。LMP 首次在冻结的 DiT 模型（**CogVideoX-5B**）上实现即插即用的运动控制，填补了该架构空白。
+
+#### 1.2 与 DMT 的机制差异
+
+DMT 作为当前零样本运动迁移的 SOTA 方法，通过在 UNet 的特定层注入参考视频的空间特征实现运动传递。LMP 与其存在三个关键机制差异：
+
+- **注入粒度**：DMT 注入整帧特征，LMP 通过前景-背景解耦仅注入运动主体的前景 token，避免背景信息干扰。
+- **控制机制**：DMT 缺乏显式的运动传递强度控制，LMP 引入重加权系数 λ 平衡运动参考与文本一致性。
+- **外观解耦**：DMT 未处理参考主体外观泄漏问题，LMP 通过梯度下降主动抑制参考外观对目标视频的干扰。
+
+定量对比（Table 1）显示，LMP 在 Motion Fidelity 上达到 0.90，高于 DMT 的 0.85（+0.05），同时帧一致性（0.96 vs 0.94）和图文对齐（25.68 vs 23.60）均有提升，验证了上述机制差异的实际收益。
+
+#### 1.3 与基于 DiT 的运动控制方法的关系
+
+在 DiT 架构的运动控制领域，现有方法多依赖额外训练或微调（如 MotionCtrl、DragNUWA 等需要训练适配器或 ControlNet 类模块）。LMP 属于零样本范式，无需任何训练或模型参数更新，直接利用预训练 DiT 的自注意力机制实现运动传递。这一特性使其具有更强的即插即用能力和模型兼容性，但同时也受限于预训练模型的生成能力边界。
+
+### 2. 适用边界
+
+#### 2.1 适用场景
+
+- **文本到视频运动迁移**：给定参考视频和目标文本提示，生成遵循参考运动但主体/背景可替换的视频。
+- **图像到视频运动迁移**：给定参考视频和目标初始图像，生成从该图像出发但遵循参考运动模式的视频。这是 DMT 等现有方法不支持的能力。
+- **真实视频作为参考**：通过直接噪声添加（RVMT 模块）支持真实视频作为运动参考，无需 DDIM 反转。
+
+#### 2.2 边界条件
+
+- **模型依赖**：当前仅验证于 CogVideoX-5B，对其他 DiT 模型（如 HunyuanVideo、Wan）的迁移需要验证自注意力结构的兼容性。
+- **主体分离能力**：FBDM 依赖 LLM 提取主体词汇和注意力图响应，当参考视频包含多个相互遮挡或交互的运动主体时，前景 token 的准确分离可能退化。
+- **外观相似性风险**：当参考主体与目标主体外观相似时，ASM 的梯度下降可能误移除目标自身特征，需人工验证边界情况。
+- **计算开销**：ASM 在推理过程中引入梯度下降步骤，增加了推理延迟，具体开销论文未量化。
+
+### 3. 局限与开放问题
+
+#### 3.1 已识别的局限
+
+论文未在 verified_analysis 中提供明确的局限性声明（limitations 字段为空），以下基于方法设计和实验结果推断潜在局限：
+
+- **多主体运动**：FBDM 基于单一主体词汇提取前景 token，对多个运动主体的场景缺乏显式处理机制。
+- **运动复杂度**：MF 指标使用的预训练跟踪器对遮挡、快速运动或非刚性形变的鲁棒性未经验证，可能影响运动保真度评估的可靠性。
+- **长视频生成**：在极长视频生成中，运动参考的稳定性是否会随时间衰减，论文未进行实验验证。
+
+#### 3.2 开放问题
+
+1. **多主体交互场景**：当参考视频包含多个相互遮挡或交互的运动主体时，FBDM 如何准确分离并传递各自的运动模式？
+2. **外观抑制的边界**：当参考主体与目标主体外观高度相似时，ASM 是否会误移除目标自身特征？需要针对性的边界测试。
+3. **λ 的最优取值规律**：重加权系数 λ 在不同运动复杂度、场景类型下的最优取值是否存在可归纳的规律？
+4. **计算效率优化**：ASM 梯度下降在推理中引入的计算开销能否通过轻量化优化（如减少迭代步数、近似梯度）降低？
+5. **真实视频噪声添加 vs DDIM 反转**：RVMT 的直接噪声添加方法与 DDIM 反转相比，在运动保真度上是否存在系统性的差距？
+6. **评估指标的可靠性**：MF 指标依赖的预训练跟踪器对遮挡、快速运动或形变的鲁棒性如何？Align 和 Cons. 使用的具体 CLIP 模型变体是什么？
+7. **跨模型泛化**：该方法能否直接迁移到更大规模的 DiT 模型（如 HunyuanVideo、Wan）或其他多模态框架？自注意力结构的兼容性需要逐一验证。
+8. **时序稳定性**：在极长视频（如超过 100 帧）生成中，运动参考的稳定性是否会随时间衰减？是否需要额外的时序一致性约束？
+
+### 4. 知识库定位
+
+LMP 处于**零样本视频运动迁移**与**DiT 架构视频生成**的交叉点。其核心知识贡献包括：
+
+- **DiT 自注意力机制的创造性利用**：揭示了 MM-DiT 统一自注意力天然支持跨视频 token 交互的特性，为后续 DiT 架构的零样本控制方法提供了范式参考。
+- **前景-背景解耦的注意力驱动方案**：无需额外分割模型，利用 DiT 内部注意力图实现运动主体与背景的动态分离，具有架构内省（introspection）的特点。
+- **重加权注入与外观抑制的组合策略**：通过 λ 加权控制运动传递强度和梯度下降抑制外观泄漏，形成了一套完整的运动-外观解耦方案。
+
+该方法可被视为 DiT 时代对 UNet 时代零样本运动迁移方法的继承与升级，其技术路线对后续 DiT 架构的零样本可控生成研究具有参考价值。
+
+## 原文 PDF
+
+![[paperPDFs/arxiv_2025/LMP_Leveraging_Motion_Prior_in_Zero_Shot_Video_Generation_with_Diffusion_Transformer.pdf]]

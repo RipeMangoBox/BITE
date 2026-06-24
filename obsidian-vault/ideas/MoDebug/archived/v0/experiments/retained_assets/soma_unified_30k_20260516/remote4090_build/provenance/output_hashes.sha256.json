@@ -1,0 +1,10 @@
+{
+  "selected_30k_text_motion_manifest.tsv": "6088aa82d4784367ffc9e7e18b396bf4ceb64f953f313c46265220befb4c8a8e",
+  "missing_motion.tsv": "2a6bb63f22b98f578df2751a2dcbaa9df959b8ce17cfb5195e90ea331aeef0a5",
+  "train_text_motion_manifest.tsv": "87526d76b32d9bc1c58bd38f7fd05da0486301219337f92a62e777aca1eb3c7a",
+  "val_text_motion_manifest.tsv": "08a1a1acdd263fdb3ef585ef387b35c197e15cd35407d173352f58e1a92ed9db",
+  "test_text_motion_manifest.tsv": "c83bee8a2460549b3646eb8a4ab2744197f458c369f0ddb9f86d2dfd2ddbde2b",
+  "train.txt": "4cec5b6aab84b0e46ceac01bd6c657b78e16d1340c36c7737cbe4443385ab2cf",
+  "val.txt": "e7b64a683b257449b8cb59e795dbbd70b801b6b4accff771a60afc8124f40957",
+  "test.txt": "c9f1252e3bbb60ecb3b0fc415a19a589f2772cbef7d12ddaa5875232934dc785"
+}

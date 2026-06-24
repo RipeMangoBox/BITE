@@ -1,0 +1,29 @@
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/fabric/__init__.py:41: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/torch/nn/modules/transformer.py:515: UserWarning: The PyTorch API of nested tensors is in prototype stage and will change in the near future. We recommend specifying layout=torch.jagged when constructing a nested tensor, as this layout receives active development, has better operator coverage, and works with torch.compile. (Triggered internally at /pytorch/aten/src/ATen/NestedTensorImpl.cpp:178.)
+  output = torch._nested_tensor_from_mask(
+--> Autoaligner loaded from checkpoint
+--> TMR loaded from checkpoint
+{"elapsed_sec": 78.68660378456116, "eta_sec": 1218.2899326581507, "processed": 640, "target": 10549, "task": "human"}
+{"elapsed_sec": 155.86771965026855, "eta_sec": 1128.7014792487025, "processed": 1280, "target": 10549, "task": "human"}
+{"elapsed_sec": 232.93340301513672, "eta_sec": 1046.8657992800076, "processed": 1920, "target": 10549, "task": "human"}
+{"elapsed_sec": 310.57972025871277, "eta_sec": 969.2271035729908, "processed": 2560, "target": 10549, "task": "human"}
+{"elapsed_sec": 387.73774456977844, "eta_sec": 890.4639640135317, "processed": 3200, "target": 10549, "task": "human"}
+{"elapsed_sec": 464.8005950450897, "eta_sec": 812.0695812910174, "processed": 3840, "target": 10549, "task": "human"}
+{"elapsed_sec": 542.541995048523, "eta_sec": 734.9748589172959, "processed": 4480, "target": 10549, "task": "human"}
+{"elapsed_sec": 619.9509286880493, "eta_sec": 657.3659359076992, "processed": 5120, "target": 10549, "task": "human"}
+{"elapsed_sec": 698.0506868362427, "eta_sec": 580.3758227879803, "processed": 5760, "target": 10549, "task": "human"}
+{"elapsed_sec": 774.6185104846954, "eta_sec": 502.17065625015647, "processed": 6400, "target": 10549, "task": "human"}
+{"elapsed_sec": 851.437135219574, "eta_sec": 424.3881970860064, "processed": 7040, "target": 10549, "task": "human"}
+{"elapsed_sec": 929.4373173713684, "eta_sec": 347.20776868990316, "processed": 7680, "target": 10549, "task": "human"}
+{"elapsed_sec": 1006.3767960071564, "eta_sec": 269.61705268028265, "processed": 8320, "target": 10549, "task": "human"}
+{"elapsed_sec": 1085.9980285167694, "eta_sec": 192.59496286977082, "processed": 8960, "target": 10549, "task": "human"}
+{"elapsed_sec": 1162.5112974643707, "eta_sec": 114.91908555142582, "processed": 9600, "target": 10549, "task": "human"}
+{"elapsed_sec": 1240.7773869037628, "eta_sec": 37.441427007154566, "processed": 10240, "target": 10549, "task": "human"}
+{"elapsed_sec": 1277.9060411453247, "eta_sec": 0.0, "processed": 10549, "target": 10549, "task": "human"}
+{"elapsed_sec": 1278.0793716907501, "keys": 10, "records": "runs/eval/stage2/human_completion_dependency_20260617/human_text_zero_camera_full.records.jsonl", "samples": 10549, "task": "human", "wrote": "runs/eval/stage2/human_completion_dependency_20260617/human_text_zero_camera_full.json"}

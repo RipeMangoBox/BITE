@@ -1,0 +1,399 @@
+---
+title: "VAR RL Done Right: Tackling Asynchronous Policy Conflicts in Visual Autoregressive Generation"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/VAR_RL_Done_Right_Tackling_Asynchronous_Policy_Conflicts_in_Visual_Autoregressive_Generation.pdf
+project_link: null
+code_link: "https://github.com/ByteVisionLab/NextFlow"
+aliases:
+- NRVPMEG
+- VRDRTAPCVAG
+tags:
+- CVPR_2026
+- topic/vision_multimodal_applications
+- topic/generative_models_diffusion
+- topic/benchmarks_datasets_evaluation
+- topic/vision_multimodal_applications/image_and_video_generation
+core_operator: 核心调节变量是在中间时间步（m=256）引入的VMR（价值即中期回报），它将完整序列的KL正则化RL分解为前缀和后缀两个阶段，每个阶段独立优化，同时保持策略族最优解不变。配合PANW（每步权重归一化）平衡梯度，以及MP（掩码传播）精确聚焦关键令牌，共同缓解冲突。
+primary_logic: 通过理论证明，在中间时间步引入的软价值函数不会改变KL正则化问题在VAR策略族内的最优解，从而可以在不降低全局目标的前提下，通过两阶段分解提供更密集、更低方差的反馈，显著稳定训练；同时，利用令牌网格尺寸逆比的损失权重和基于奖励反馈的掩码传播，有效处理了跨尺度的梯度不平衡和信用分配问题。
+claims:
+- NextFlow-RL在CVTG-2K上相较NextFlow基线将Word Accuracy从0.5536提升至0.7841，NED从0.7816提升至0.9081，CLIPScore也明显提高。
+- 训练曲线显示，结合VMR的部分前缀尺度GRPO显著优于全尺度GRPO，表明两阶段分解有效缓解了策略冲突。
+- 在HPSv2评测中，NextFlow-RL在所有类别中大幅超越NextFlow，并在多个子类中达到SOTA，如Animals、Plants、Food等，整体All指标从8.43提升至10.64。
+- 消融实验证实，掩码传播（MP）将Word Accuracy从0.6855提升至0.7071，NED从0.8601提升至0.8699。
+---
+
+# VAR RL Done Right: Tackling Asynchronous Policy Conflicts in Visual Autoregressive Generation
+
+> [!tip] 核心洞察
+> 通过理论证明，在中间时间步引入的软价值函数不会改变KL正则化问题在VAR策略族内的最优解，从而可以在不降低全局目标的前提下，通过两阶段分解提供更密集、更低方差的反馈，显著稳定训练；同时，利用令牌网格尺寸逆比的损失权重和基于奖励反馈的掩码传播，有效处理了跨尺度的梯度不平衡和信用分配问题。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | VAR强化学习正解：应对视觉自回归生成中的异步策略冲突 |
+| 英文题名 | VAR RL Done Right: Tackling Asynchronous Policy Conflicts in Visual Autoregressive Generation |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2601.02256) · [Code](https://github.com/ByteVisionLab/NextFlow) |
+| Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation #topic/vision_multimodal_applications/image_and_video_generation |
+| Method | NextFlow-RL (VMR + PANW + MP enhanced GRPO) |
+| Dataset | CVTG-2K, HPSv2 Benchmark |
+
+> [!tip] 效果简介
+> - CVTG-2K 上，Word Accuracy 0.7841 vs 0.5536 (+0.2305)；NED 0.9081 vs 0.7816 (+0.1265)；CLIPScore 0.8224 vs 0.8068 (+0.0156)。
+> - HPSv2 Benchmark (All categories avg) 上，HPSv2 Score (All) 10.64 vs 8.43 (+2.21)。
+
+## 概述
+
+视觉自回归（VAR）模型在生成过程中，不同时间步的查询令牌数量呈现剧烈波动——从粗粒度到细粒度跨越多个数量级——导致任务相似性发生根本性变化。当直接应用标准强化学习（RL）优化时，这种异质性引发**异步策略冲突**：GRPO方法无法稳定地为不同尺度分配信用，训练过程振荡且收敛至次优解。
+
+本文提出**NextFlow-RL**框架，通过三个协同组件解决上述瓶颈：
+
+1. **VMR（价值即中期回报）**：在中间时间步（m=256）引入软价值函数，将完整序列的KL正则化RL分解为前缀和后缀两个独立优化阶段。理论证明，该分解不改变VAR策略族的最优解，同时为早期步骤提供更密集、更低方差的反馈信号。
+2. **PANW（每步权重归一化）**：基于令牌网格尺寸逆比设计损失权重，平衡跨尺度梯度幅度。
+3. **MP（掩码传播）**：沿多尺度层次结构反向传播奖励相关掩码，精确聚焦关键令牌的信用分配。
+
+在CVTG-2K文本渲染任务上，NextFlow-RL将Word Accuracy从0.5536提升至0.7841（+41.6%），NED从0.7816提升至0.9081。在HPSv2人类偏好评测中，整体评分从8.43跃升至10.64，在Animals、Plants、Food等多个子类达到SOTA水平。消融实验证实，掩码传播单独贡献约2.2%的Word Accuracy增益，而两阶段分解是训练稳定性的核心保障。
+
+**方法定位**：NextFlow-RL属于针对VAR架构的RL微调方法，其两阶段分解框架具有理论可迁移性，但目前仅在文本渲染和人类偏好两类奖励函数上完成验证。代码已开源（https://github.com/ByteVisionLab/NextFlow）。
+
+## 背景与动机
+
+### 视觉自回归生成的兴起与强化学习微调的机遇
+
+视觉自回归（Visual Autoregressive, VAR）生成模型近年来取得了显著进展。与传统的扩散模型（如 **FLUX.1 dev** (Black Forest Labs, 2024)、**SD3.5 Large** (Esser et al., 2024)）不同，VAR 模型采用“下一尺度预测”（next-scale prediction）的范式，从粗粒度到细粒度逐步生成图像令牌，在推理效率和生成质量之间展现出独特的优势。**NextFlow** 作为该范式下的代表性模型，通过将视觉生成重新表述为序列建模问题，为文本到图像的生成任务提供了新的技术路径。
+
+与此同时，强化学习（RL）在语言模型中的成功激发了将其应用于视觉生成模型微调的兴趣。通过将图像质量评估模型（如 HPSv3）或文本识别引擎（如 OCR）作为奖励信号，RL 可以直接优化生成模型以对齐人类偏好或满足特定的任务约束（如精确的文本渲染）。Group Relative Policy Optimization（GRPO）作为一种高效的策略优化方法，因其无需额外价值函数模型的特点，成为此类微调任务的首选方案。
+
+### 异步策略冲突：VAR 强化学习中的核心瓶颈
+
+然而，将标准 GRPO 直接应用于 VAR 生成过程时，会遭遇一个尚未被充分认识的根本性挑战——**异步策略冲突**（asynchronous policy conflicts）。该冲突源于 VAR 生成过程的独特结构特性：
+
+如图 1 所示，在 VAR 的生成过程中，不同时间步的查询令牌（query token）数量波动极为剧烈。早期步骤（粗粒度尺度）仅涉及极少量令牌（例如 1×1 或 2×2 的网格），而后期步骤（细粒度尺度）则需要处理数百甚至数千个令牌。这种令牌数量的指数级增长导致不同时间步之间的**任务相似性发生剧烈变化**：早期步骤负责布局和全局结构，后期步骤负责局部细节和纹理。当 RL 优化器试图同时为所有时间步分配信用（credit）时，这种异质性使得梯度信号在粗粒度和细粒度尺度之间产生冲突——对某一尺度有利的更新可能对另一尺度有害。
+
+具体而言，标准 GRPO 面临两个层面的困境：
+
+1. **反馈稀疏与高方差**：完整的生成轨迹仅在最终时间步 $T$ 获得单一的奖励信号 $R(\mathbf{s}_T)$。对于早期步骤而言，该信号需要通过漫长的因果链反向传播，导致梯度估计方差极大，训练不稳定。
+
+2. **梯度不平衡**：不同时间步的令牌网格尺寸 $(h_t \times w_t)$ 差异悬殊，若采用均匀的损失权重，细粒度步骤将主导梯度更新，使得粗粒度步骤的关键决策（如物体位置、文字布局）难以得到有效优化。
+
+### 现有方法的局限与本文动机
+
+现有的 RL 微调方法（包括标准 GRPO 及其变体）均未针对 VAR 的这一结构特性进行专门设计。它们隐式地假设所有时间步具有同质的语义粒度和相似的任务结构，因此在面对异步策略冲突时表现次优。实验证据（Figure 2）表明，在部分前缀尺度上进行监督式 RL 训练，其效果反而优于全尺度训练——这一反直觉的现象直接印证了跨尺度策略冲突的存在。
+
+本文的核心动机在于：**能否在不改变 KL 正则化 RL 问题在 VAR 策略族内的最优解的前提下，为训练过程提供更密集、更低方差的反馈，并平衡跨尺度的梯度贡献？** 这一问题的解决将为 VAR 模型的 RL 微调开辟一条稳定且高效的路径，使其能够充分发挥在文本渲染、偏好对齐等任务上的潜力。
+
+## 核心创新
+
+NextFlow-RL 的核心创新在于**识别并系统性地缓解了视觉自回归（VAR）生成中 RL 优化特有的异步策略冲突**。VAR 模型在不同时间步生成的查询令牌数量剧烈波动——从早期粗粒度尺度的少量令牌到后期细粒度尺度的大量令牌（Figure 1）——导致各步之间的任务相似性急剧变化。这种异质性使得标准的 GRPO 方法无法稳定地为不同尺度分配信用，训练过程不稳定且最终性能次优。
+
+针对这一瓶颈，本文提出了一套由三个协同组件构成的框架，在不改变全局最优解的前提下，从根本上重构了信用分配与梯度流动机制：
+
+### 1. 价值即中期回报（VMR）：将单阶段 RL 分解为两阶段优化
+
+VMR 是核心调节变量。作者在中间时间步 $m$（默认 $m=256$，对应 $16\times16$ 令牌网格）引入一个**软价值函数** $V_m^*(\mathbf{s}_m)$，将完整的 KL 正则化 RL 问题分解为前缀（$\pi_{1:m-1}$）和后缀（$\pi_{m:T-1}$）两个子问题：
+
+- **后缀优化**：以最终奖励 $R(\mathbf{s}_T)$ 为目标，通过 GRPO 更新 $\pi_{m:T-1}$；
+- **前缀优化**：以 $V_m^*(\mathbf{s}_m)$ 为奖励信号，通过 GRPO 更新 $\pi_{1:m-1}$，其中 $V_m^*$ 通过风险敏感蒙特卡洛估计器 $\widehat{V}_m(\mathbf{s}_m) = \eta \log\left(\frac{1}{K}\sum_{k=1}^K \exp(R^{(k)}/\eta)\right)$ 计算。
+
+**理论保证**：作者证明了在 VAR 策略族内，引入 $V_m^*$ 的分解**不改变 KL 正则化问题的最优解**。这意味着两阶段优化在降低方差、提供密集反馈的同时，不会牺牲全局目标的上限。训练曲线（Figure 2）直接验证了这一点：结合 VMR 的部分前缀尺度 GRPO 显著优于全尺度 GRPO，证明两阶段分解有效缓解了跨尺度策略冲突。
+
+### 2. 每步权重归一化（PANW）：平衡跨尺度梯度量级
+
+由于不同时间步的令牌网格尺寸 $h_t \times w_t$ 差异可达数个数量级，标准 GRPO 中每步损失均匀加权会导致梯度量级严重失衡。PANW 引入基于网格尺寸逆比的权重：
+
+$$k_t = \frac{1}{(h_t \times w_t)^\alpha}$$
+
+其中 $\alpha$ 为衰减指数（消融实验表明 $\alpha \in [0.6, 0.8]$ 最优），并在每步内进行归一化。这一设计确保粗粒度步（少量令牌）和细粒度步（大量令牌）对总损失的贡献保持平衡，避免了梯度被令牌数量主导的问题。
+
+### 3. 掩码传播（MP）：精确聚焦关键令牌
+
+在 VAR 的多尺度层次结构中，并非所有令牌对最终奖励同等重要。MP 从与奖励直接相关的输出区域（如文本渲染任务中的文字区域）构建初始掩码，然后**沿多尺度层次反向传播**——从细粒度尺度向粗粒度尺度逐层扩散（Figure 4）。这使得 RL 优化能够精确聚焦于影响奖励的关键令牌，避免无关区域的噪声干扰信用分配。消融实验证实，MP 将 Word Accuracy 从 0.6855 提升至 0.7071，NED 从 0.8601 提升至 0.8699（Table 4a）。
+
+### 创新总结：从单阶段到结构感知的两阶段 GRPO
+
+| 改进维度 | 基线方法（vanilla GRPO） | NextFlow-RL |
+|---------|----------------------|-------------|
+| RL 目标结构 | 单阶段，全序列优化 | 两阶段分解（VMR 在 $m$ 步拆分） |
+| 每步损失权重 | 均匀加权 | PANW：$1/(h_t w_t)^\alpha$ 逆网格尺寸加权 |
+| 信用分配掩码 | 无掩码 | MP：奖励驱动的时空反向传播掩码 |
+
+这三个组件形成闭环：VMR 提供更低方差的密集反馈，PANW 平衡跨步梯度，MP 精确分配令牌级信用。三者协同工作，使得 NextFlow-RL 在 CVTG-2K 上将 Word Accuracy 从 0.5536 提升至 0.7841（+41.6%），在 HPSv2 上将整体评分从 8.43 提升至 10.64（+26.2%），同时训练过程保持稳定。
+
+## 整体框架
+
+NextFlow‑RL 的整体管线围绕 **两阶段 GRPO** 展开，核心目标是在不改变 KL 正则化问题最优解的前提下，将 VAR 生成的全序列 RL 优化分解为前缀与后缀两个独立训练的阶段，从而缓解异步策略冲突。管线由三个协同模块构成：**VMR（价值即中期回报）**、**PANW（每步权重归一化）** 和 **MP（掩码传播）**，它们共同作用于预训练的 NextFlow 骨干网络之上。
+
+### 输入输出流
+
+- **输入**：文本提示（prompt），经 NextFlow 的文本编码器处理后作为条件信号。
+- **生成过程**：NextFlow 以 VAR 方式自回归地生成多尺度令牌序列 $\mathbf{a}_1, \mathbf{a}_2, \dots, \mathbf{a}_{T-1}$，每个时间步 $t$ 的查询令牌数量由网格尺寸 $h_t \times w_t$ 决定（从粗粒度到细粒度急剧增长，如 Table 6 所示）。最终状态 $\mathbf{s}_T$ 经解码器输出图像。
+- **奖励信号**：根据任务类型，从最终图像计算奖励 $R(\mathbf{s}_T)$（文本渲染任务使用 OCR 奖励，人类偏好任务使用 HPSv3 奖励）。
+- **输出**：经 RL 微调后的策略 $\pi^\theta$，生成质量与奖励对齐度显著提升。
+
+### 模块关系与执行流程
+
+整个管线如 **Figure 3** 所示，可分为以下步骤：
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/003_Figure_3.jpg]]
+*Figure 3: The pipeline of our two-stage GRPO is as follows: we use Monte Carlo estimation to compute the reward for*
+
+1. **中间步选定**：在总时间步 $T$ 中选定一个中间步 $m$（默认 $m=256$），将生成序列切分为前缀 $\pi_{1:m-1}$ 和后缀 $\pi_{m:T-1}$。
+
+2. **VMR 估计**：对于前缀的最终状态 $\mathbf{s}_m$，利用 $K$ 个在线策略样本的终末奖励，通过风险敏感蒙特卡洛估计器计算中间软价值 $\widehat{V}_m(\mathbf{s}_m)$：
+   $$\widehat V _ { m } ( { \bf s } _ { m } ) = \eta \log \left( \frac { 1 } { K } \sum _ { k = 1 } ^ { K } \exp \Bigl ( \frac { 1 } { \eta } R ^ { ( k ) } ( { \bf s } _ { T } ) \Bigr ) \right)$$
+   该估计值作为前缀阶段的奖励信号，提供密集、低方差的反馈。
+
+3. **两阶段 GRPO 优化**：
+   - **后缀阶段**：以最终奖励 $R(\mathbf{s}_T)$ 为目标，优化 $\pi_{m:T-1}$，并施加局部 KL 惩罚。
+   - **前缀阶段**：以 $\widehat{V}_m(\mathbf{s}_m)$ 为目标，优化 $\pi_{1:m-1}$，同样施加局部 KL 惩罚。
+   两个阶段交替训练（细粒度交替策略：每 3 次前缀更新后 1 次后缀更新，见 Table 4b）。
+
+4. **PANW 加权**：在每个时间步的 GRPO 损失中，引入每步权重归一化：
+   $$k _ { t } = \frac { 1 } { ( h _ { t } \times w _ { t } ) ^ { \alpha } }$$
+   其中 $\alpha \in [0.6, 0.8]$ 为衰减指数。该权重按令牌网格尺寸的逆比缩放各步损失，平衡粗粒度步（令牌少）与细粒度步（令牌多）之间的梯度量级差异，防止大尺度步主导优化。
+
+5. **MP 掩码传播**：从最终奖励相关的输出区域（如 OCR 检测到的文本边界框）构建初始二元掩码，沿 VAR 的多尺度层次结构反向传播（从细尺度到粗尺度，如 **Figure 4** 所示），精确定位对奖励有贡献的令牌。在 GRPO 的优势函数计算中，仅对被掩码标记的关键令牌分配信用，抑制无关区域的噪声梯度。
+
+### 关键设计决策
+
+- **VMR 的理论保证**：在 VAR 策略族的 KL 正则化问题中，引入中间软价值 $V_m^*(\mathbf{s}_m)$ 不会改变最优策略（Equation 5 的分解与原始问题等价），因此两阶段优化在理论上无损于全局目标。
+- **PANW 的归一化方式**：除按网格尺寸缩放外，还在每个时间步内对 $k_t$ 进行步级归一化，确保各步损失贡献的量级可比。
+- **MP 的传播机制**：掩码传播利用 VAR 架构中相邻尺度间的空间对应关系，通过上采样和逻辑与操作逐层传递，保证粗尺度掩码与细尺度关键区域的空间一致性。
+
+### 与基线的关系
+
+NextFlow‑RL 以预训练的 **NextFlow** 作为初始策略，在其基础上叠加上述三个模块。相较于标准的全序列 GRPO（vanilla GRPO），两阶段分解使每个阶段内的令牌长度保持可比，显著缓解了因令牌数量剧烈波动导致的异步策略冲突（见 **Figure 2** 的训练曲线对比）。消融实验证实，VMR、PANW 和 MP 各自独立贡献于性能提升，且组合使用时效果最优。
+
+## 核心模块与公式推导
+
+### 3.1 异步策略冲突的形式化诊断
+
+VAR（Visual Autoregressive）生成过程可形式化为一个确定性马尔可夫决策过程（MDP）。在每个时间步 $t$，模型基于当前状态 $\mathbf{s}_t$（已生成的部分图像）采样动作 $\mathbf{a}_t$（新增的令牌网格），并确定性地转移至 $\mathbf{s}_{t+1}$。核心瓶颈在于：**不同时间步的查询令牌数量波动剧烈**——从粗粒度到细粒度尺度跨越数个数量级（参见 Figure 1），导致任务相似性剧烈变化，产生异步策略冲突。在RL优化时，这种异质性使得标准的GRPO方法无法稳定地为不同尺度分配信用，训练不稳定且次优。
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/001_Figure_1.jpg]]
+*Figure 1: The number of query tokens across different timesteps in VAR generation fluctuates significantly, leading to varying task similarities and potential policy conflicts during RL optimization*
+
+### 3.2 KL正则化RL的最优解
+
+在KL正则化强化学习框架下，最优策略具有闭式解。给定旧策略 $\pi_{\mathrm{old}}$ 和温度参数 $\eta$，最优策略正比于旧策略与指数型最优Q值的乘积：
+
+$$\pi ^ { * } ( \mathbf { a } _ { t } \mid \mathbf { s } _ { t } ) \propto \pi _ { \mathrm { o l d } } ( \mathbf { a } _ { t } \mid \mathbf { s } _ { t } ) \exp \left( \frac { 1 } { \eta } Q ^ { * } ( \mathbf { s } _ { t } , \mathbf { a } _ { t } ) \right) \tag{1}$$
+
+其中最优动作价值函数 $Q^{*}(\mathbf{s}_t, \mathbf{a}_t)$ 定义为在最优策略下未来终末奖励的条件期望：
+
+$$Q ^ { * } ( \mathbf { s } _ { t } , \mathbf { a } _ { t } ) = \mathbb { E } _ { \pi ^ { * } } \left[ R ( \mathbf { s } _ { T } ) \mid \mathbf { s } _ { t } , \mathbf { a } _ { t } \right] \tag{2}$$
+
+由于VAR的确定性转移特性，$Q^{*}$ 可进一步表达为旧策略下的风险敏感期望形式，这为后续的中间价值函数设计提供了理论基础。
+
+### 3.3 VMR：价值即中期回报
+
+**核心洞察**：通过理论证明，在中间时间步 $m$ 引入的软价值函数不会改变KL正则化问题在VAR策略族内的最优解，从而可以在不降低全局目标的前提下，通过两阶段分解提供更密集、更低方差的反馈。
+
+#### 3.3.1 中间步软价值函数
+
+定义中间时间步 $m$ 的软价值函数（VMR）为：
+
+$$V _ { m } ^ { * } ( \mathbf { s } _ { m } ) = \eta \log \mathbb { E } _ { \pi _ { \mathrm { o l d } } } \Big [ \exp \Big ( \frac { 1 } { \eta } R ( \mathbf { s } _ { T } ) \Big ) \Big | \mathbf { s } _ { m } \Big ] \tag{4}$$
+
+该函数度量了从状态 $\mathbf{s}_m$ 出发，在旧策略下所能获得的终末奖励的风险敏感期望。**关键理论保证**：在VAR策略族内，引入 $V_m^{*}$ 作为前缀段的替代奖励不会改变原KL正则化问题的最优解，但能显著降低前缀段梯度估计的方差。
+
+#### 3.3.2 两阶段分解
+
+基于VMR，完整的KL正则化RL问题被分解为后缀和前缀两个耦合子问题：
+
+$$\begin{array} { r l } & { \mathrm { S u f f i x : ~ } \underset { \pi _ { m : T - 1 } } { \operatorname* { m a x } } ~ \mathbb { E } \big [ R ( \mathbf { s } _ { T } ) ~ | ~ \mathbf { s } _ { m } \big ] - \eta \mathrm { K L } \big ( \pi _ { m : T - 1 } ~ \lVert ~ \boldsymbol { \pi } _ { \mathrm { o l d } , m : T - 1 } \big ) , } \\ & { \mathrm { P r e f i x : ~ } \underset { \pi _ { 1 : m - 1 } } { \operatorname* { m a x } } ~ \mathbb { E } \big [ V _ { m } ^ { * } ( \mathbf { s } _ { m } ) \big ] - \eta \mathrm { K L } \big ( \pi _ { 1 : m - 1 } ~ \lVert ~ \pi _ { \mathrm { o l d } , 1 : m - 1 } \big ) . } \end{array} \tag{5}$$
+
+- **后缀段**（$\pi_{m:T-1}$）：直接最大化终末奖励 $R(\mathbf{s}_T)$，与标准GRPO一致。
+- **前缀段**（$\pi_{1:m-1}$）：以 $V_m^{*}$ 为替代奖励进行优化，获得密集的中间反馈。
+
+这种阶段式分解使每段内的令牌长度保持可比，显著稳定训练。Figure 3 展示了完整的两阶段GRPO流水线。
+
+#### 3.3.3 蒙特卡洛估计
+
+实际训练中，$V_m^{*}$ 通过 $K$ 个在线策略终末奖励的风险敏感蒙特卡洛估计器近似：
+
+$$\widehat V _ { m } ( { \bf s } _ { m } ) = \eta \log \left( \frac { 1 } { K } \sum _ { k = 1 } ^ { K } \exp \Bigl ( \frac { 1 } { \eta } R ^ { ( k ) } ( { \bf s } _ { T } ) \Bigr ) \right) \tag{10}$$
+
+消融实验（Table 5）表明 $K=2$ 在稳定性和性能之间达到最佳折衷。
+
+### 3.4 PANW：每步权重归一化
+
+VAR生成中，不同时间步的令牌网格尺寸 $(h_t, w_t)$ 差异巨大，若使用均匀权重会导致梯度严重不平衡。PANW（Per-Action Normalization Weighting）基于令牌网格尺寸的逆比对每步损失进行归一化：
+
+$$k _ { t } = \frac { 1 } { ( h _ { t } \times w _ { t } ) ^ { \alpha } } \tag{9}$$
+
+其中 $\alpha \in [0, 1]$ 为衰减指数，控制归一化强度。消融实验（Table 3b）显示 $\alpha$ 在 $[0.6, 0.8]$ 区间效果最佳：$\alpha=0.6$ 获得最高 Word Accuracy（0.7136），$\alpha=0.8$ 获得最高 CLIPScore（0.8172）。该权重在每步内进一步进行均值归一化，确保总损失尺度稳定。
+
+### 3.5 MP：掩码传播
+
+为精确聚焦影响终末奖励的关键令牌，MP（Mask Propagation）利用奖励反馈构建空间注意力掩码，并沿多尺度层次结构反向传播（Figure 4）。
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/004_Figure_4.jpg]]
+*Figure 4: Our token masks are propagated in reverse through the model’s multi-scale hierarchy, moving from finer to coarser feature scales*
+
+具体流程：
+1. **初始掩码构建**：从直接决定奖励的输出组件（如文本渲染区域）生成初始二元掩码。
+2. **反向传播**：将掩码从精细尺度逐层传播至粗糙尺度，利用VAR架构中固有的尺度间空间对应关系。
+3. **信用聚焦**：仅对被掩码标记的令牌计算策略梯度，屏蔽无关区域的梯度贡献。
+
+消融实验（Table 4a）证实MP将 Word Accuracy 从 0.6855 提升至 0.7071，NED 从 0.8601 提升至 0.8699，而 CLIPScore 几乎不变——表明MP在不损害全局语义对齐的前提下，精准强化了任务关键区域的生成质量。
+
+### 3.6 模块协同机制
+
+三个模块形成互补闭环：
+- **VMR** 在时间维度上分解异步冲突，提供低方差的密集反馈；
+- **PANW** 在空间-尺度维度上平衡梯度幅度，防止粗粒度步主导优化；
+- **MP** 在空间维度上精确分配信用，消除无关区域的梯度噪声。
+
+三者共同作用于GRPO框架，使NextFlow-RL在CVTG-2K上相较NextFlow基线将 Word Accuracy 从 0.5536 提升至 0.7841，NED 从 0.7816 提升至 0.9081（Table 1）。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/002_Figure_2.jpg]]
+*Figure 2: Comparison of training curves between vanilla GRPO and GRPO with VMR across varying prefix scales*
+
+## 实验与分析
+
+### 主要结果：文本渲染任务（CVTG-2K）
+
+NextFlow-RL 在 CVTG-2K 文本渲染基准上实现了对基线模型的全面超越。如表1所示，经过 RL 优化后，Word Accuracy 从 NextFlow 基线的 0.5536 跃升至 0.7841（+0.2305），NED（归一化编辑距离）从 0.7816 提升至 0.9081（+0.1265），CLIPScore 也从 0.8068 提高至 0.8224。这一提升使得 NextFlow-RL 在开源模型中达到最优，并逼近闭源系统 GPT Image 1 的性能水平。
+
+**瓶颈突破机制**：这一显著提升的核心在于两阶段 GRPO 框架有效缓解了 VAR 生成中的异步策略冲突。在文本渲染任务中，早期时间步（粗粒度尺度）的令牌需要确定文字的全局布局和结构，而后期时间步（细粒度尺度）负责精确渲染字符细节。标准 GRPO 将最终 OCR 奖励均匀归因于所有时间步，导致早期布局决策无法获得足够密集的反馈信号。VMR 通过在中间步 m=256 引入软价值函数，将问题分解为前缀优化（最大化中间价值）和后缀优化（最大化最终奖励），使早期步能通过蒙特卡洛估计的 VMR 获得稳定的中间反馈，从而显著改善布局决策质量。
+
+**OCR 奖励设计的贡献**：实验采用的奖励函数由三部分组成：完整性（Comp，基于 OCR 检测到的文本区域覆盖度）、相似度（Sim，基于检测文本与目标文本的字符级匹配）以及长度惩罚（Pen，防止模型生成冗余文本）。这一复合奖励设计确保优化目标同时关注文本的存在性、准确性和简洁性。消融实验中观察到，移除长度惩罚会导致模型倾向于生成额外字符以“刷高”完整性分数，验证了惩罚项的必要性。
+
+### 主要结果：人类偏好优化（HPSv2）
+
+在 HPSv2 基准上，NextFlow-RL 在所有类别中均大幅超越 NextFlow 基线，整体 All 指标从 8.43 提升至 10.64（+2.21）。如表2所示，在 Animals、Plants、Food 等多个子类中达到或超越当前最优水平。这一结果表明，本文提出的 RL 框架不仅能优化可自动评估的 OCR 指标，还能有效对齐人类审美偏好。
+
+**与扩散模型的对比**：值得注意的是，NextFlow-RL 在多个类别中超越了基于扩散的 SOTA 模型 FLUX.1 dev（Black Forest Labs, 2024）和 SD3.5 Large（Esser et al., 2024），表明 VAR 架构配合适当的 RL 优化在图像质量方面具有竞争力。然而，论文未提供与这些扩散模型在训练计算量或推理速度方面的系统对比，该结论的公平性需要读者结合模型规模自行判断。
+
+### 消融实验：VMR 中间步选择
+
+中间步 m 的选择直接影响两阶段分解的粒度和训练稳定性。如表3(a)所示，实验在 K=2、训练步数 300 的条件下对比了不同 m 值的影响。结果显示，m=128 获得最高的 Word Accuracy（0.6677），而 m=256 的性能接近（0.6565）。论文选择 m=256 作为默认配置，主要基于以下考虑：(1) m=256 对应的前缀令牌网格尺寸（16×16）与后缀尺寸兼容性更好，便于掩码传播机制的实现；(2) 过小的 m 值会导致前缀段过短，中间价值估计的方差增大。表6提供了不同前缀分辨率对应的令牌数量参考，帮助理解 m 选择的空间。
+
+**局限性提示**：当前 m 的选择基于固定分辨率的经验搜索，对于不同分辨率或长宽比的生成任务，最优 m 值可能不同。论文未提供自动选择 m 的机制，这是方法泛化性的一个开放问题。
+
+### 消融实验：PANW 衰减指数
+
+Per-Action Normalization Weighting 中的衰减指数 α 控制着不同时间步损失权重的平衡程度。α=0 对应均匀权重，α=1 对应严格按令牌网格尺寸的倒数加权。如表3(b)所示，α 在 [0.6, 0.8] 区间内表现最佳：α=0.6 获得最高 Word Accuracy（0.7136），α=0.8 获得最高 CLIPScore（0.8172）。这表明适度的尺度感知加权优于极端加权方案——完全均匀（α=0）无法缓解大尺度步的梯度主导问题，而过度加权（α=1）可能过度抑制粗粒度步的学习信号。
+
+**训练曲线分析**：Figure 7（左）展示了不同 α 值下的训练动态。较小的 α 值在训练初期收敛更快但后期波动较大，较大的 α 值训练更稳定但收敛较慢。α=0.6 在收敛速度和最终性能之间取得了最佳平衡。
+
+### 消融实验：掩码传播（MP）
+
+掩码传播机制通过将奖励相关的空间掩码从最终输出反向传播至早期尺度，精确聚焦对奖励有直接贡献的令牌。如表4(a)所示，在训练步数 400 时，启用 MP 将 Word Accuracy 从 0.6855 提升至 0.7071（+0.0216），NED 从 0.8601 提升至 0.8699（+0.0098），而 CLIPScore 几乎不变（0.8159 vs 0.8167）。CLIPScore 未显著变化的原因在于，CLIP 嵌入对全局语义敏感而对局部文本渲染精度不敏感，这与 MP 主要改善字符级精度的预期一致。
+
+**机制分析**：Figure 4 展示了掩码传播的过程：从最终尺度的 OCR 检测区域构建初始掩码，通过 VAR 的多尺度层次结构反向传播至粗粒度尺度。这一过程确保早期布局决策仅关注最终会包含文本的空间位置，避免将信用错误分配给背景区域。Figure 7（右）的训练曲线显示，MP 在训练中后期（约 200 步后）开始显现优势，表明掩码引导的信用分配需要一定的训练积累才能发挥作用。
+
+### 消融实验：交替训练策略
+
+两阶段 GRPO 需要交替优化前缀和后缀策略。如表4(b)所示，细粒度交替方案（每 3 次前缀更新后进行 1 次后缀更新）显著优于粗粒度方案（如每 10 次前缀更新后 1 次后缀更新）。细粒度交替使前缀策略能及时响应后缀策略的变化，保持两个子问题的协同优化。过于稀疏的后缀更新会导致前缀优化基于过时的后缀策略，降低整体效率。
+
+### 消融实验：VMR 估计器采样数
+
+VMR 的蒙特卡洛估计器使用 K 个在线样本的终末奖励进行风险敏感估计。如表5所示，在训练步数 300 时，K=2 在稳定性和性能之间达到最佳折衷：Word Accuracy 为 0.6677，优于 K=1（0.6501）和 K=4（0.6589）。K=1 时估计方差过大导致训练不稳定，K=4 时虽然估计更精确但增加了计算开销且未带来性能提升，可能与过度保守的值估计抑制了探索有关。
+
+### 失败模式与局限性
+
+**任务泛化边界**：当前验证仅覆盖文本渲染（OCR reward）和人类偏好（HPSv3 reward）两类任务。对于需要精确空间推理的任务（如物体布局、多区域条件生成），VMR 的中间价值函数设计可能需要针对性的奖励分解策略，直接迁移的有效性尚待验证。
+
+**训练数据偏差**：训练提示通过区域计数过滤进行校准（见 Figure 8），使训练分布与评估分布匹配。这一策略虽然提升了评估性能，但可能降低模型对极长尾分布（如包含 5 个以上文本区域的复杂场景）的泛化能力。过滤策略引入的分布偏移程度需要进一步量化分析。
+
+**VMR 估计精度**：K=2 的蒙特卡洛估计在高度随机的生成环境中可能不够精确。当后缀策略的奖励方差较大时，VMR 估计的噪声会通过前缀优化传播，可能导致次优的早期决策。论文未分析奖励方差对 VMR 估计质量的影响阈值。
+
+**架构依赖性**：方法的理论分析基于 VAR 特有的多尺度自回归结构。对于标准自回归模型（逐令牌生成）或扩散模型（迭代去噪），异步策略冲突的表现形式和 VMR 的分解策略需要重新设计。论文明确将这一迁移性问题列为开放问题。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/007_Table_1.jpg]]
+*Table 1: Quantitative results on the CVTG-2K dataset. Bold denotes the best performance, underline denotes the second-best for each metric. Seedream 3.0 and GPT Image 1 are highlighted as proprietary/closed-source systems*
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/008_Table_2.jpg]]
+*Table 2: Comparison of different models across various categories. The best results are in bold, and the second-best are underlined*
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/009_Table.jpg]]
+*Table: (a) Ablation on the choice of m, with K = 2 at step 300. (b) Ablation on decay exponent α, measured at step 400*
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/010_Table_4.jpg]]
+*Table 4: Ablation studies on Mask Propagation (MP) and alternating training schemes*
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/011_Table_5.jpg]]
+*Table 5: Ablation on K, evaluated at step 300*
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/012_Figure_7.jpg]]
+*Figure 7: Ablations on training configurations. Left: varying decay exponent α; Right: enabling/disabling MP*
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/013_Table_6.jpg]]
+*Table 6: Related tokens corresponding to different prefix resolutions are provided. Note that the method also supports varying aspect ratios*
+
+![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/014_Figure_8.jpg]]
+*Figure 8: Distributions over the number of text-rendering regions (1, 2, 3, 4, 5, and*
+
+## 方法谱系与知识库定位
+
+### 1. 问题定位：VAR生成中的异步策略冲突
+
+本文的核心贡献在于首次系统性地诊断并解决了视觉自回归（VAR）模型在强化学习微调中面临的**异步策略冲突（Asynchronous Policy Conflicts）**问题。如图1所示，VAR模型在生成过程中，不同时间步的查询令牌（query token）数量从粗粒度到细粒度呈数量级波动（例如从16×16到1024×1024），导致各时间步的任务相似性剧烈变化。当标准的GRPO方法被直接应用于此类序列时，不同尺度的时间步在梯度贡献上严重不平衡，信用分配（credit assignment）变得极不稳定，训练过程出现振荡甚至发散。
+
+这一发现将VAR的RL优化问题从“如何设计奖励函数”提升到“如何设计优化算法以适应生成过程的结构异质性”层面。与扩散模型（如**FLUX.1 dev**, Black Forest Labs 2024；**SD3.5 Large**, Esser et al., 2024）和next-scale预测模型（如**Qwen-Image**）不同，VAR模型的逐尺度生成范式天然引入了这种异步性，而现有RL方法（如GRPO、PPO）并未针对此特性进行适配。
+
+### 2. 方法谱系：从单阶段GRPO到两阶段分解
+
+**NextFlow-RL**的方法设计遵循一个清晰的演进逻辑：在GRPO框架内，通过三个协同组件逐步解决异步冲突问题。
+
+**基线方法**：标准GRPO将整个VAR生成序列视为单一优化问题，对所有时间步施加统一的KL正则化和信用分配。如图2训练曲线所示，当使用部分前缀尺度（partial-prefix scale）进行监督RL时，其性能显著优于全尺度（full-scale）GRPO，这直接验证了“全序列统一优化存在内在冲突”的核心假设。
+
+**第一层改进——VMR（价值即中期回报）**：本文在理论层面证明，在中间时间步$m$引入软价值函数$V_m^*(s_m)$（Equation 4）不会改变KL正则化问题在VAR策略族内的最优解（见Equation 5的两阶段分解）。这意味着可以将完整序列优化拆分为前缀（$\pi_{1:m-1}$优化$V_m^*$）和后缀（$\pi_{m:T-1}$优化最终奖励$R(s_T)$）两个独立阶段，每个阶段各自维护局部KL惩罚。这一分解的因果机制在于：前缀阶段仅需最大化中间价值，从而获得比稀疏终末奖励更密集、更低方差的反馈信号；后缀阶段则专注于精细尺度的最终奖励优化。该方法在理论上属于**结构保持分解（structure-preserving decomposition）**，与分层强化学习中的选项框架（options framework）有形式上的相似性，但本文的分解是精确等价而非近似。
+
+**第二层改进——PANW（每步权重归一化）**：即使分解为两阶段，同一阶段内不同时间步的令牌网格尺寸仍存在差异。PANW通过权重$k_t = 1/(h_t \times w_t)^\alpha$（Equation 9）对每时间步的损失进行归一化，其中$\alpha \in [0.6, 0.8]$为衰减指数。消融实验（Table 3b）表明，$\alpha=0.6$获得最高Word Accuracy（0.7136），$\alpha=0.8$获得最高CLIPScore（0.8172），验证了逆网格尺寸加权的有效性。
+
+**第三层改进——MP（掩码传播）**：为进一步精确化信用分配，MP从奖励相关的输出区域（如OCR识别框）构建初始掩码，沿多尺度层次结构反向传播（Figure 4），仅对关键令牌施加优化信号。消融实验（Table 4a）证实，MP将Word Accuracy从0.6855提升至0.7071，NED从0.8601提升至0.8699。
+
+### 3. 与现有方法的区别与联系
+
+**与GRPO/PPO的关系**：NextFlow-RL并非替代GRPO，而是在其框架内引入结构感知的改进。VMR可视为一种**中间奖励塑形（intermediate reward shaping）**，但与传统势函数塑形不同，它不改变最优策略，仅通过降低方差来稳定训练。PANW和MP分别从梯度量级和空间聚焦两个维度增强GRPO的信用分配能力。
+
+**与扩散模型RL微调的区别**：扩散模型（如DDPO、DPOK）通常在所有去噪步骤上均匀施加RL信号，因为扩散步骤的令牌数量恒定。VAR的逐尺度特性使得这一均匀假设不成立，因此NextFlow-RL的方法设计具有**架构特异性**——其有效性依赖于VAR的多尺度令牌结构，对扩散模型或标准自回归模型的迁移性需进一步验证（见下文局限）。
+
+**与分层RL的关联**：两阶段分解在形式上类似于分层RL中的子目标（subgoal）方法，但本文通过理论证明确保了分解的精确等价性，而非近似子目标。此外，中间步$m$的选择（Table 3a表明$m=256$在兼容性和性能间取得平衡）目前依赖人工设定，如何自动选择最优$m$是开放问题之一。
+
+### 4. 适用边界与实验覆盖范围
+
+**已验证的任务类型**：
+- **文本渲染任务**（CVTG-2K）：使用置信度感知的OCR奖励（Equation 15），NextFlow-RL将Word Accuracy从0.5536提升至0.7841，NED从0.7816提升至0.9081（Table 1）。
+- **人类偏好优化任务**（HPSv2 Benchmark）：使用HPSv3奖励模型，NextFlow-RL在All类别上从8.43提升至10.64，在Animals、Plants、Food等多个子类中达到SOTA（Table 2）。
+
+**未验证的扩展方向**：
+- 其他条件生成任务（如物体布局、风格迁移、图像编辑）尚未测试。
+- 训练数据通过区域计数过滤进行校准（Figure 8），过滤策略可能引入分布偏移，影响对极长尾分布的泛化能力。
+- 中间值函数的蒙特卡洛估计仅使用少量样本（$K=2$），在高度随机环境下可能不够精确（Table 5显示$K=2$在稳定性和性能间达到最佳折衷，但更大$K$的影响未充分探索）。
+
+### 5. 局限性与开放问题
+
+**已识别的局限**：
+1. **架构依赖性**：方法基于VAR特定的多尺度令牌结构设计，对扩散模型（如FLUX、SD3.5）或标准自回归模型的迁移性尚不明确。
+2. **任务覆盖有限**：仅验证了文本渲染和人类偏好两类任务，尚未扩展到更广泛的条件生成场景。
+3. **中间步选择需人工设定**：$m=256$的选择基于经验（与最优$m=128$接近但更适合掩码机制），缺乏自动选择机制。
+4. **VMR估计器精度**：$K=2$的蒙特卡洛估计在高度随机奖励环境下可能引入偏差。
+
+**开放问题**：
+1. 如何自动选择最优中间步$m$以适应不同分辨率和任务难度？
+2. VMR估计器中的温度参数$\eta$对训练有何影响，是否可与$K$协同优化？
+3. 掩码传播机制在更复杂的奖励函数（如多模态判别模型、CLIP分数）下如何设计？
+4. 两阶段框架能否推广至更多阶段的层次化分解，以进一步降低方差？
+5. 本文的RL方法是否适用于其他next-scale预测生成模型（如视频生成、3D生成）？
+
+### 6. 知识库定位
+
+**方法学贡献**：NextFlow-RL提出了一套**面向异质序列的结构保持RL优化框架**，其核心思想——通过理论等价的中间价值分解来降低方差——可推广至任何具有多尺度或层次结构的序列生成任务。该方法在VAR生成领域首次建立了RL优化的理论基础（Equation 1-5），并为后续工作提供了可复用的组件（VMR、PANW、MP）。
+
+**实验基准贡献**：在CVTG-2K文本渲染和HPSv2人类偏好两个基准上建立了新的SOTA，为VAR模型的RL微调提供了强基线。与闭源系统（如**GPT Image 1**, OpenAI 2025）的对比（Table 1）表明，NextFlow-RL在文本渲染任务上已接近甚至超越部分商业系统。
+
+**后续工作锚点**：本文的开放问题（自动选择$m$、多阶段分解、跨架构迁移）为后续研究提供了明确方向。特别是将VMR框架推广至扩散模型或视频生成模型，可能催生新的跨架构RL优化方法。
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/VAR_RL_Done_Right_Tackling_Asynchronous_Policy_Conflicts_in_Visual_Autoregressive_Generation.pdf]]

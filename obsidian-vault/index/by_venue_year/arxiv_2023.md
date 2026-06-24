@@ -1,0 +1,133 @@
+---
+title: "Venue_Year: arxiv_2023"
+type: paper-index
+dimension: venue_year
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Venue_Year: arxiv_2023
+
+- [[obsidian-vault/analysis/arxiv_2023/AnimateAnything_Fine_Grained_Open_Domain_Image_Animation_with_Motion_Guidance.md|AnimateAnything: Fine-Grained Open Domain Image Animation with Motion Guidance (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/AnimateAnything_Fine_Grained_Open_Domain_Image_Animation_with_Motion_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnimateAnything
+	- datasets: MSR-VTT
+- [[obsidian-vault/analysis/arxiv_2023/Control_A_Video_Controllable_Text_to_Video_Diffusion_Models_with_Motion_Prior_and_Reward_Feedback_Learning.md|Control-A-Video: Controllable Text-to-Video Diffusion Models with Motion Prior and Reward Feedback Learning (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Control_A_Video_Controllable_Text_to_Video_Diffusion_Models_with_Motion_Prior_and_Reward_Feedback_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Control-A-Video
+- [[obsidian-vault/analysis/arxiv_2023/Customizing_Motion_in_Text_to_Video_Diffusion_Models.md|Customizing Motion in Text-to-Video Diffusion Models (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Customizing_Motion_in_Text_to_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: NewMove
+	- datasets: Jester, User Study
+- [[obsidian-vault/analysis/arxiv_2023/Dancing_Avatar_Pose_and_Text_Guided_Human_Motion_Videos_Synthesis_with_Image_Diffusion_Model.md|Dancing Avatar: Pose and Text-Guided Human Motion Videos Synthesis with Image Diffusion Model (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Dancing_Avatar_Pose_and_Text_Guided_Human_Motion_Videos_Synthesis_with_Image_Diffusion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Dancing Avatar
+	- datasets: Human Motion Video Generation
+- [[obsidian-vault/analysis/arxiv_2023/Decouple_Content_and_Motion_for_Conditional_Image_to_Video_Generation.md|Decouple Content and Motion for Conditional Image-to-Video Generation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Decouple_Content_and_Motion_for_Conditional_Image_to_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: D-VDM（Decoupled Video Diffusion Model）与 ED-VDM（Efficient Decoupled Video Diffusion Model）
+	- datasets: MHAD, NATOPS, BAIR
+- [[obsidian-vault/analysis/arxiv_2023/DragNUWA_Fine_grained_Control_in_Video_Generation_by_Integrating_Text_Image_and_Trajectory.md|DragNUWA: Fine-grained Control in Video Generation by Integrating Text, Image, and Trajectory (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/DragNUWA_Fine_grained_Control_in_Video_Generation_by_Integrating_Text_Image_and_Trajectory.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DragNUWA
+- [[obsidian-vault/analysis/arxiv_2023/Explainable_Multimodal_Emotion_Recognition.md|Explainable Multimodal Emotion Recognition (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Explainable_Multimodal_Emotion_Recognition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: EMER (Explainable Multimodal Emotion Recognition)
+	- datasets: EMER dataset
+- [[obsidian-vault/analysis/arxiv_2023/LaMD_Latent_Motion_Diffusion_for_Image_Conditional_Video_Generation.md|LaMD: Latent Motion Diffusion for Image-Conditional Video Generation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/LaMD_Latent_Motion_Diffusion_for_Image_Conditional_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LaMD (Latent Motion Diffusion)
+	- datasets: BAIR Robot Pushing, Landscape, CATER-GEN-v2
+- [[obsidian-vault/analysis/arxiv_2023/LAMP_Learn_A_Motion_Pattern_for_Few_Shot_Based_Video_Generation.md|LAMP: Learn A Motion Pattern for Few-Shot-Based Video Generation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/LAMP_Learn_A_Motion_Pattern_for_Few_Shot_Based_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LAMP
+	- datasets: Custom evaluation set, User study
+- [[obsidian-vault/analysis/arxiv_2023/MagicProp_Diffusion_based_Video_Editing_via_Motion_aware_Appearance_Propagation.md|MagicProp: Diffusion-based Video Editing via Motion-aware Appearance Propagation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/MagicProp_Diffusion_based_Video_Editing_via_Motion_aware_Appearance_Propagation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MagicProp
+- [[obsidian-vault/analysis/arxiv_2023/MDSC_Towards_Evaluating_the_Style_Consistency_Between_Music_and_Dance.md|MDSC: Towards Evaluating the Style Consistency Between Music and Dance (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/MDSC_Towards_Evaluating_the_Style_Consistency_Between_Music_and_Dance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Benchmark / Evaluation
+	- methods: MDSC (Music-Dance Style Consistency)
+	- datasets: AIST++ & AIOZ-GDANCE 测试集, 生成动作
+- [[obsidian-vault/analysis/arxiv_2023/Motion_Conditioned_Diffusion_Model_for_Controllable_Video_Synthesis.md|Motion-Conditioned Diffusion Model for Controllable Video Synthesis (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Motion_Conditioned_Diffusion_Model_for_Controllable_Video_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MCDiff (Motion-Conditioned Diffusion Model)
+	- datasets: TaiChi-HD, Human3.6M, TaiChi-HD / Human3.6M
+- [[obsidian-vault/analysis/arxiv_2023/Motion_Conditioned_Image_Animation_for_Video_Editing.md|Motion-Conditioned Image Animation for Video Editing (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Motion_Conditioned_Image_Animation_for_Video_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MoCA (Motion-Conditioned Image Animation)
+	- datasets: VideoEdit Benchmark
+- [[obsidian-vault/analysis/arxiv_2023/MotionCrafter_One_Shot_Motion_Customization_of_Diffusion_Models.md|MotionCrafter: One-Shot Motion Customization of Diffusion Models (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/MotionCrafter_One_Shot_Motion_Customization_of_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionCrafter
+- [[obsidian-vault/analysis/arxiv_2023/MotionDirector_Motion_Customization_of_Text_to_Video_Diffusion_Models.md|MotionDirector: Motion Customization of Text-to-Video Diffusion Models (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/MotionDirector_Motion_Customization_of_Text_to_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MotionDirector
+	- datasets: UCF Sports Action, LOVEU-TGVE-2023
+- [[obsidian-vault/analysis/arxiv_2023/MotionZero_Exploiting_Motion_Priors_for_Zero_shot_Text_to_Video_Generation.md|MotionZero:Exploiting Motion Priors for Zero-shot Text-to-Video Generation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/MotionZero_Exploiting_Motion_Priors_for_Zero_shot_Text_to_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MotionZero
+	- datasets: Motion Correctness, Textual Alignment
+- [[obsidian-vault/analysis/arxiv_2023/MoVideo_Motion_Aware_Video_Generation_with_Diffusion_Models.md|MoVideo: Motion-Aware Video Generation with Diffusion Models (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/MoVideo_Motion_Aware_Video_Generation_with_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MoVideo
+	- datasets: UCF-101, MSR-VTT, DAVIS
+- [[obsidian-vault/analysis/arxiv_2023/NOVIS_A_Case_for_End_to_End_Near_Online_Video_Instance_Segmentation.md|NOVIS: A Case for End-to-End Near-Online Video Instance Segmentation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/NOVIS_A_Case_for_End_to_End_Near_Online_Video_Instance_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: NOVIS
+	- datasets: YouTube-VIS 2019, YouTube-VIS 2021, OVIS
+- [[obsidian-vault/analysis/arxiv_2023/TeG_DG_Textually_Guided_Domain_Generalization_for_Face_Anti_Spoofing.md|TeG-DG: Textually Guided Domain Generalization for Face Anti-Spoofing (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/TeG_DG_Textually_Guided_Domain_Generalization_for_Face_Anti_Spoofing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: TeG-DG
+	- datasets: I&C&M to O, O&C&M to I, O&C&I to M
+- [[obsidian-vault/analysis/arxiv_2023/VideoComposer_Compositional_Video_Synthesis_with_Motion_Controllability.md|VideoComposer: Compositional Video Synthesis with Motion Controllability (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/VideoComposer_Compositional_Video_Synthesis_with_Motion_Controllability.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: VideoComposer
+	- datasets: Custom set, MSR-VTT
+- [[obsidian-vault/analysis/arxiv_2023/VideoControlNet_A_Motion_Guided_Video_to_Video_Translation_Framework_by_Using_Diffusion_Model_with_ControlNet.md|VideoControlNet: A Motion-Guided Video-to-Video Translation Framework by Using Diffusion Model with ControlNet (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/VideoControlNet_A_Motion_Guided_Video_to_Video_Translation_Framework_by_Using_Diffusion_Model_with_ControlNet.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoControlNet
+	- datasets: User Study, DAVIS

@@ -1,0 +1,340 @@
+---
+title: "Plant Taxonomy Meets Plant Counting: A Fine-Grained, Taxonomic Dataset for Counting Hundreds of Plant Species"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/Plant_Taxonomy_Meets_Plant_Counting_A_Fine_Grained_Taxonomic_Dataset_for_Counting_Hundreds_of_Plant_Species.pdf
+project_link: null
+code_link: "https://github.com/tiny-smart/TPC-268"
+aliases:
+- T2
+tags:
+- CVPR_2026
+- topic/representation_self_supervised_transfer
+- topic/benchmarks_datasets_evaluation
+- topic/representation_self_supervised_transfer/representation_learning
+core_operator: 将完整的林奈分类学层次结构显式嵌入类别无关计数任务，并采用基于物种‑组织对的不相交数据集划分，强制模型在分类学间隙上进行评估，从而暴露并衡量模型从已知物种向分类学相关未知物种的泛化能力。
+primary_logic: 植物的自然多样性天然携带着一个层级化的分类学先验；通过为每个计数实例标注完整的分类学路径和多级组织结构，可以将传统的单类别计数提升为层次化的类别无关计数，使模型不仅学习‘如何计数’，还学习在分类学约束下进行细粒度的跨物种泛化。
+claims:
+- 论文将植物计数明确定义为类别无关计数(CAC)问题，通过视觉示例学习‘如何计数’，避免为每个物种训练独立模型。
+- 每个计数实例被嵌入林奈分类学层次，使得计数任务具备分类学意识，标注可在多个分类层级上聚合。
+- 数据集划分通过混合整数线性规划（MILP）实现，确保训练/验证/测试集在物种‑组织级别上严格不相交，同时平衡观测尺度和密度。
+- 在TPC-268上，回归式方法LOCA取得了最佳测试性能(3-shot MAE 17.51)，而仅依赖全局自注意力的模型（如CACViT）在测试集上泛化较差，表明细粒度、跨尺度的植物计数仍极具挑战。
+---
+
+# Plant Taxonomy Meets Plant Counting: A Fine-Grained, Taxonomic Dataset for Counting Hundreds of Plant Species
+
+> [!tip] 核心洞察
+> 植物的自然多样性天然携带着一个层级化的分类学先验；通过为每个计数实例标注完整的分类学路径和多级组织结构，可以将传统的单类别计数提升为层次化的类别无关计数，使模型不仅学习‘如何计数’，还学习在分类学约束下进行细粒度的跨物种泛化。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | 植物分类学遇见植物计数：一个用于计数数百种植物的细粒度、分类学数据集 |
+| 英文题名 | Plant Taxonomy Meets Plant Counting: A Fine-Grained, Taxonomic Dataset for Counting Hundreds of Plant Species |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2603.21229) · [Code](https://github.com/tiny-smart/TPC-268) |
+| Topic | #topic/representation_self_supervised_transfer #topic/benchmarks_datasets_evaluation #topic/representation_self_supervised_transfer/representation_learning |
+| Method | TPC-268 (大规模分类学植物计数数据集与基准) |
+| Dataset | TPC-268 test set, Cross-dataset transfer FSC-147 → TPC-268 |
+
+> [!tip] 效果简介
+> - TPC-268 test set 上，MAE 16.90 (CountGD with 3 visual exemplars + full taxonomy text prompt) vs 19.52 (CountGD with 3 visual exemplars only) (-2.62)；MAE 17.51 (LOCA 3-shot) vs 19.47 (DAVE 1-shot) (-1.96)。
+> - Cross-dataset transfer FSC-147 → TPC-268 上，MAE change TPC-268→TPC-268 (in-domain training) vs FSC-147→TPC-268: CountTR 38.62 (+225% vs. in-domain) (显著增加，表明跨域泛化极难)。
+
+## 概述
+
+植物计数是农业、生态监测和植物科学中的基础任务，但长期以来，计算机视觉社区主要关注人群、车辆等刚性对象的计数，忽视了植物领域独有的挑战。植物天然具备丰富的生物多样性、细粒度形态差异、非刚性结构以及随生长阶段和环境变化的表型可塑性，这使得现有计数方法在植物场景中泛化能力极差。同时，缺少一个大规模、带有完整分类学标注的植物计数基准，导致社区难以系统研究跨物种、跨尺度的类别无关计数。
+
+针对这一瓶颈，本文提出了 **TPC-268**，一个面向植物计数的细粒度分类学数据集与基准。TPC-268 包含 10,000 张图像和 678,050 个标注实例，覆盖 268 个可计数植物类别，横跨组织、器官、个体和种群四个生物组织层级，以及从显微到遥感的多种观测尺度。该数据集的核心创新在于将植物计数明确定义为**类别无关计数（Class-Agnostic Counting, CAC）**问题——模型通过视觉示例学习“如何计数”的一般概念，而非为每个物种训练独立模型；同时，每个计数实例被嵌入完整的林奈分类学层次结构，使计数任务具备分类学意识，标注可在界、门、纲、目、科、属、种七个层级上聚合。
+
+为确保基准评估的公平性，论文通过**混合整数线性规划（MILP）**将数据集划分为训练/验证/测试集，强制三个子集在物种-组织级别上严格不相交，同时平衡观测尺度和实例密度。这一划分策略杜绝了训练类别泄露到测试集的可能性，使评估聚焦于模型对分类学相关但未见过的物种的泛化能力。
+
+在 TPC-268 上，回归式方法 **LOCA** 取得了最佳测试性能（3-shot MAE 17.51），而仅依赖全局自注意力的模型（如 CACViT）在验证集表现良好但在测试集上泛化显著下降，表明细粒度、跨尺度的植物计数仍极具挑战。跨数据集迁移实验进一步揭示了域差距的严重性：从通用计数数据集 FSC-147 迁移到 TPC-268 时，CountTR 的 MAE 增加 225%。此外，在 CountGD 上逐步引入分类学文本信息（物种名称→完整分类学路径）可将 MAE 从 19.52 降至 16.90，验证了分类学先验对计数精度的正向作用。
+
+**方法定位**：TPC-268 本身是一个数据集与基准贡献，它将植物分类学的层级结构显式嵌入类别无关计数框架，属于**数据驱动的领域基准构建**工作。在方法谱系上，它继承并扩展了 CAC 范式（如 **LOCA**、**DAVE**、**CACViT** 等方法），同时引入分类学感知的评估维度，将传统的单类别计数提升为层次化的跨物种泛化问题。与现有通用计数数据集（如 FSC-147、CARPK）相比，TPC-268 首次将生物组织层级和完整分类学路径作为计数任务的内在组成部分，为植物科学和计算机视觉的交叉研究提供了新的基准平台。
+
+## 背景与动机
+
+### 植物计数的独特挑战
+
+视觉计数是计算机视觉中的基础任务，在人群分析、细胞计数和生态监测等领域具有广泛应用。然而，现有视觉计数方法主要围绕刚性对象（如人群和车辆）设计，当面对植物时，其泛化能力急剧下降。如图1所示，植物计数与通用物体计数之间存在不可忽视的鸿沟，这种鸿沟源于植物固有的四重特性：
+
+1. **丰富的生物多样性**：植物界涵盖数十万物种，不同物种在形态、纹理和结构上差异巨大，远超传统计数数据集中有限的对象类别。
+2. **细粒度差异**：亲缘关系相近的植物物种（如同属不同种）在视觉上高度相似，其计数需要模型具备细粒度判别能力。
+3. **非刚性结构**：植物器官（如叶片、花朵）具有高度可变的形状和姿态，缺乏刚性对象那种稳定的几何先验。
+4. **时空变异**：同一植物在不同生长阶段、不同季节和不同环境条件下呈现截然不同的外观（表型可塑性），进一步增加了计数的难度。
+
+这些特性使得植物计数成为一个极具挑战性但尚未被充分探索的研究领域。
+
+### 现有数据集的根本缺陷
+
+过去十年间，计算机视觉社区引入了大量视觉计数数据集（见表1），涵盖了人群、车辆、动物、细胞等多种对象。然而，这些数据集存在两个根本性缺陷，使其无法支撑植物计数研究：
+
+**缺陷一：类别单一，缺乏生物多样性。** 现有数据集通常只包含少数几个类别（大多为1-5类），且对象类型高度同质化。例如，FSC-147虽然引入了类别无关计数（Class-Agnostic Counting, CAC）范式，但其147个类别仍以刚性日常物体为主，植物类别极为有限且缺乏系统性的分类学组织。这导致在此类数据集上训练的模型过度拟合于刚性对象的视觉特征，无法捕捉植物世界中丰富的形态多样性。
+
+**缺陷二：缺少分类学标注，无法研究跨物种泛化。** 植物学拥有成熟的林奈分类学层次结构（界-门-纲-目-科-属-种），这一层级化先验天然地为跨物种泛化提供了约束框架。然而，现有数据集完全没有利用这一结构：它们既不记录物种的分类学归属，也不在数据集划分中考虑分类学的独立性。这使得社区无法系统性地研究模型从已知物种向分类学相关但视觉未知物种的泛化能力——而这恰恰是农业监测和生态研究中的核心需求。
+
+### 本文动机与核心思路
+
+针对上述缺口，本文提出将植物计数明确框架化为**类别无关计数（CAC）问题**：给定少量视觉示例，模型学习“如何计数”的一般概念，而非为每个物种训练独立模型。在此基础上，本文做出两项关键贡献：
+
+1. **引入TPC-268数据集**：一个包含10,000张图像、678,050个标注实例、覆盖268个可计数植物类别的大规模基准。该数据集涵盖四个生物组织层级（组织、器官、个体、种群），跨越显微、近距摄影和无人机遥感三种观测尺度，并包含从实验室到野外的多种环境条件（见图2）。
+
+2. **嵌入完整的分类学层次结构**：通过为每个计数实例标注从界到种的完整林奈分类学路径，使计数任务具备“分类学意识”。这一设计允许在多个分类层级上聚合标注，并支持基于物种-组织对的不相交数据集划分，从而强制模型在分类学间隙上进行评估——即测试集中的物种在训练集中完全不可见，但其分类学上级类别（如同科、同属）可能出现在训练集中。
+
+通过这一框架，TPC-268不仅是一个更大规模的植物计数数据集，更是一个系统性的测试平台，用于衡量模型在分类学约束下的细粒度跨物种泛化能力。
+
+## 核心创新
+
+本工作的核心创新并非提出一种新的计数模型架构，而是**将植物计数重新定义为类别无关计数（Class-Agnostic Counting, CAC）问题，并通过大规模、细粒度、分类学感知的数据集构建与划分策略，系统性地暴露并衡量现有方法在植物领域的泛化瓶颈**。其关键创新点可归纳为以下三个相互关联的层面。
+
+### 1. 分类学感知的计数任务定义
+
+传统视觉计数数据集将每个类别视为独立实体，模型通常需要为每个物种训练专用计数器。本工作首次将完整的林奈分类学层次结构显式嵌入CAC任务：每个计数实例不仅拥有点标注和边界框，还携带从界（Kingdom）到种（Species）的完整7级分类学路径，以及组织层级（tissue, organ, organism, population）标签。这一设计将计数任务从“数某一类物体”提升为“在分类学约束下学习如何计数”，使模型能够在分类学相关但物种不同的实例上进行零样本推理。
+
+**这一任务定义的因果作用在于**：植物的自然多样性天然携带层级化的分类学先验，通过为每个实例标注分类学路径，可以显式地研究模型从已知物种向分类学相关未知物种的泛化能力——这是现有CAC基准（如FSC-147）无法提供的评估维度。
+
+### 2. 基于物种-组织对的不相交数据集划分
+
+现有CAC数据集（如FSC-147）的类别划分通常较为粗糙，难以严格杜绝训练类别信息泄露到测试集。本工作将数据集划分形式化为一个**混合整数线性规划（MILP）多目标优化问题**，以物种-组织对（species-organization pair）为原子单元进行分配，确保训练集、验证集、测试集在物种-组织级别上**严格不相交**。MILP目标函数同时优化三个约束：
+
+- **观测尺度覆盖**：确保每个子集均包含显微、近距、遥感等所有观测尺度；
+- **密度平衡**：最小化各子集间平均实例密度的偏差，最终达到平均67.81实例/图像的均衡分布；
+- **比例遵循**：维持预设的训练/验证/测试图像数量比例。
+
+这一划分策略是评估类别无关计数泛化能力的决定性证据：模型在测试时面对的是训练中从未见过的物种-组织组合，任何性能提升都必须来自对“计数”这一通用概念的真正学习，而非对特定类别的记忆。
+
+### 3. 分类学文本作为可插拔的先验提示
+
+本工作进一步探索了将分类学信息作为文本提示注入现有CAC模型的可行性。在基于文本引导的计数模型CountGD上，逐步引入分类学文本信息：
+
+- 仅使用3个视觉示例：MAE 19.52；
+- 加入物种名称文本提示：MAE降至17.53；
+- 进一步加入完整分类学文本（界至种）：MAE进一步降至16.90。
+
+这一消融实验表明，**分类学信息本身即构成一种有效的先验**，即使以简单的文本拼接形式注入，也能持续降低计数误差（累计降低2.62 MAE）。这为未来设计能够深度利用分类学层次结构的模型架构提供了明确的经验证据。
+
+### 与现有工作的本质差异
+
+与FSC-147等通用CAC数据集相比，TPC-268的核心差异不在于规模（虽然其10,000张图像、678,050个标注实例、268个可计数类别的规模已显著超越现有植物计数数据集），而在于其**任务设计哲学**：TPC-268将植物分类学的层级结构从背景知识转化为任务的内在组成部分，从而将CAC的研究从“跨类别泛化”推进到“跨分类学间隙泛化”这一更具挑战性且对农业、生态监测等实际应用更有意义的层面。
+
+## 整体框架
+
+本工作并非提出一种新的计数模型架构，而是构建了一个**大规模、分类学感知的植物计数基准与评估框架**，其核心是一个名为 **TPC-268** 的数据集及配套的类别无关计数（Class-Agnostic Counting, CAC）实验体系。整体框架围绕三个相互嵌套的层次组织：**数据构造与标注层**、**分类学嵌入层**、**基准评估层**。
+
+### 数据构造与标注层
+
+TPC-268 包含 10,000 张图像和 678,050 个标注实例，覆盖 268 个可计数植物类别。这些类别按生物组织层级划分为四层——组织（tissue）、器官（organ）、个体（organism）、种群（population），并跨越显微、近距摄影、无人机遥感等多种观测尺度。约 80% 的标注由专业标注团队在三个月内从零创建，所有标注经过植物表型研究人员的严格三轮审核。
+
+标注协议遵循 CAC 社区的标准点-框规程：为每个实例的结构中心提供点标注，并为每张图像提供三个实例的边界框作为视觉示例（exemplars）。每个计数实例同时携带其完整的林奈分类学路径（界-门-纲-目-科-属-种）和生物组织类别标签。
+
+### 分类学嵌入层
+
+框架的关键创新在于将植物计数**显式地嵌入分类学层次结构**。对于每个物种，构建一个 7 维整数编码向量：
+
+$$v = [id_{\mathrm{king}}, id_{\mathrm{phy}}, id_{\mathrm{cls}}, id_{\mathrm{ord}}, id_{\mathrm{fam}}, id_{\mathrm{gen}}, id_{\mathrm{spec}}]$$
+
+其中每个维度对应一个分类学等级，通过映射函数 $\phi_h : \mathcal{C}_h \to \{1, 2, \dots, |\mathcal{C}_h|\}$ 将类别名转换为整数索引。这一设计使得计数标注可以在任意分类学层级上聚合，为后续的层次化泛化实验提供了结构化的先验。
+
+### 基准评估层
+
+基准评估的核心机制是**物种-组织对级别的不相交数据集划分**。划分被形式化为一个多目标优化问题，通过混合整数线性规划（MILP）求解，目标函数为：
+
+$$\operatorname*{min} \sum_{k \in \mathcal{S}} \Bigg( \lambda_{\mathrm{ing}} \big| \sum_{u \in \mathcal{U}} n_u x_{u,k} - \hat{N}_k \big| + \lambda_{\mathrm{pts}} \big| \sum_{u \in \mathcal{U}} p_u x_{u,k} - \hat{P}_k \big| \Bigg)$$
+
+约束条件包括：每个原子单元（物种-组织对）必须恰好分配给一个子集（$\sum_{k \in S} x_{u,k} = 1$）；训练集必须包含每个生物组织类别的至少一个单元（$\sum_{u \in \mathcal{U}_o} x_{u,\mathrm{train}} \geq 1$）；所有子集必须覆盖全部观测尺度。该划分确保训练/验证/测试集在物种-组织级别上严格不交叠，同时平衡了实例密度（平均 67.81 实例/图像）和观测尺度分布，从而杜绝类别泄露，保证零样本计数评估的公平性。
+
+评估流程接受多种 CAC 模型作为可插拔组件——包括基于回归的方法（如 **LOCA**）、基于检测的方法（如 **DAVE**）、基于 ViT 的方法（如 **CACViT**）以及文本引导的方法（如 **CountGD**）——在统一的划分和指标（MAE、RMSE、$R^2$）下进行系统比较。分类学信息可通过文本提示的形式注入（如对 CountGD 输入完整分类学描述），也可通过特征空间的 t-SNE 可视化分析模型在分类学维度上的表征分布。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/001_Figure_1.jpg]]
+*Figure 1: Counting plants versus counting generic objects. Plants inherently exhibit rich biodiversity, fine-grained variations, non-rigid structures, and time-space variations, which collectively create a nonnegligible gap against generic objects*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/004_Figure_3.jpg]]
+*Figure 3: Treemap of plant taxonomic hierarchy in TPC-268. Each nested rectangle represents a specific taxonomic rank, from Kingdom (Plantae), Phylum (e.g., Angiosperms), Class (e.g., Magnoliopsida, Liliopsida), Order (e.g., Rosales, Poales), Family (e.g., Rosaceae, Poaceae), Genus (e.g., Prunus, Zea), to Species (e.g., Prunus persica, Zea mays). Box area represents the number of images for that taxonomic unit*
+
+## 核心模块与公式推导
+
+### 3.1 类别无关计数框架
+
+论文将植物计数形式化为**类别无关计数（Class-Agnostic Counting, CAC）** 问题。给定一张查询图像和若干视觉示例（exemplar），模型需要学习“如何计数”这一通用概念，而非为每个物种训练独立模型。每个计数实例被显式嵌入林奈分类学层次结构，使计数任务具备分类学意识，标注可在界、门、纲、目、科、属、种七个层级上聚合。
+
+### 3.2 数据集划分的MILP优化
+
+为保证训练/验证/测试集在物种‑组织级别上严格不相交，同时平衡观测尺度和实例密度，论文将数据集划分建模为多目标优化问题，并通过混合整数线性规划（MILP）求解。
+
+**决策变量**：设 $\mathcal{U}$ 为所有原子单元（物种‑组织对）的集合，$x_{u,k} \in \{0,1\}$ 表示单元 $u$ 是否分配给子集 $k \in \mathcal{S} = \{\text{train}, \text{val}, \text{test}\}$。
+
+**目标函数**：
+
+$$\operatorname*{min} \sum_{k \in \mathcal{S}} \Bigg( \lambda_{\mathrm{ing}} \Big| \sum_{u \in \mathcal{U}} n_u x_{u,k} - \hat{N}_k \Big| + \lambda_{\mathrm{pts}} \Big| \sum_{u \in \mathcal{U}} p_u x_{u,k} - \hat{P}_k \Big| \Bigg)$$
+
+其中 $n_u$ 为单元 $u$ 的图像数量，$p_u$ 为单元 $u$ 的平均标注点数，$\hat{N}_k$ 和 $\hat{P}_k$ 分别为子集 $k$ 的目标图像数和目标平均点数，$\lambda_{\mathrm{ing}}$ 和 $\lambda_{\mathrm{pts}}$ 为权重系数。该目标函数最小化各子集实际分配值与目标值的加权绝对偏差。
+
+**唯一分配约束**：
+
+$$\sum_{k \in \mathcal{S}} x_{u,k} = 1, \quad \forall u \in \mathcal{U}$$
+
+每个原子单元必须恰好分配给一个子集，确保划分互斥且完备。
+
+**训练集覆盖约束**：
+
+$$\sum_{u \in \mathcal{U}_o} x_{u,\mathrm{train}} \geq 1, \quad \forall o \in \mathcal{O}$$
+
+其中 $\mathcal{O}$ 为生物组织类别集合（如气孔、花、整株），$\mathcal{U}_o$ 为属于组织类别 $o$ 的单元子集。该约束强制训练集至少包含每个组织类别的一个单元，保证特征学习的完整性。
+
+**观测尺度覆盖验证**：
+
+$$\sum_{u \in \mathcal{U}_t} x_{u,k} \geq 1, \quad \forall t \in \mathcal{T}, \forall k \in \mathcal{S}$$
+
+其中 $\mathcal{T}$ 为观测尺度集合（显微、近距、遥感），$\mathcal{U}_t$ 为属于尺度 $t$ 的单元子集。该约束确保所有子集均覆盖全部观测尺度。若MILP求解后不满足此条件，则重新优化。
+
+通过MILP优化，最终划分实现了平均密度67.81实例/图像的跨子集平衡。
+
+### 3.3 分类学层次编码
+
+为支持层次化泛化实验，每个物种被编码为一个7维整数向量：
+
+$$v = [id_{\mathrm{king}}, id_{\mathrm{phy}}, id_{\mathrm{cls}}, id_{\mathrm{ord}}, id_{\mathrm{fam}}, id_{\mathrm{gen}}, id_{\mathrm{spec}}]$$
+
+对于每个分类学层次 $h$，构建从类别名到整数索引的映射：
+
+$$\phi_h: \mathcal{C}_h \to \{1, 2, \dots, |\mathcal{C}_h|\}$$
+
+其中 $\mathcal{C}_h$ 为层次 $h$ 的类别集合。该编码使模型可在不同分类学粒度上评估跨物种泛化能力。
+
+### 3.4 标注协议
+
+标注遵循CAC标准点‑框协议：在每个实例的结构中心提供点标注，并为每张图像提供三个实例的边界框作为视觉示例。约80%的图像由专业标注团队从零开始标注，并经过植物表型研究人员的三轮审核。
+
+## 实验与分析
+
+### 实验设置与基准方法
+
+为系统评估类别无关计数（CAC）方法在植物领域的表现，论文在TPC-268上对多种代表性基线进行了统一基准测试。这些方法涵盖了两大范式：基于回归的方法（**LOCA**、**CACViT**、**CounTR**、**CACFT**、**DAVE**）和基于检测的方法（**DAVE**、**TasselnetV4**）。所有方法均采用标准的点-框标注协议进行训练，评估指标包括平均绝对误差（MAE）、均方根误差（RMSE）和决定系数（$R^2$）。实验设置覆盖1-shot、3-shot和5-shot三种示例数条件，以考察模型对视觉示例数量的敏感度。
+
+值得强调的是，TPC-268的数据集划分通过混合整数线性规划（MILP）实现，确保训练集、验证集和测试集在物种‑组织对级别上严格不相交。这一设计杜绝了任何训练类别泄露到测试集的可能性，使得所有评估本质上都是零样本跨物种计数，为公平比较不同方法的泛化能力提供了保障。
+
+### 主结果：现有CAC方法在植物计数上的表现
+
+Table 2汇总了各方法在TPC-268测试集上的性能。核心发现如下：
+
+**回归方法整体优于检测方法。** 在3-shot设置下，基于回归的LOCA取得测试MAE 17.51、RMSE 38.37、$R^2$ 0.78的最佳性能，优于基于检测的DAVE（1-shot MAE 19.47）和TasselnetV4（3-shot MAE 20.31）。这表明在植物场景中，直接回归密度图或计数原型的策略比显式检测每个实例更为稳健——植物实例常呈现严重的重叠、遮挡和非刚性形变，使得检测框的精确回归变得困难。
+
+**全局自注意力的陷阱。** 值得注意的是，依赖全局自注意力的Transformer架构（如CACViT和TasselnetV4）在验证集上表现强劲，但在测试集上泛化显著恶化。例如，CACViT在3-shot下验证MAE为15.82，但测试MAE升至20.16。论文分析认为，植物场景中实例的视觉外观高度依赖于物种、组织层级、生长阶段和成像条件，全局自注意力可能过度拟合训练集中特定物种的视觉模式，而难以泛化到分类学上不相交的测试物种。
+
+**示例数量的收益递减。** 将示例数从1-shot增加到3-shot通常带来显著提升（如LOCA从MAE 19.63降至17.51），但从3-shot到5-shot的增益有限（LOCA 5-shot MAE 17.33）。这说明在植物计数中，少量视觉示例（约3个）已能提供足够的类别信息，但进一步增加示例并不能解决跨物种泛化的根本困难。
+
+### 跨数据集迁移：揭示领域鸿沟
+
+Table 3展示了跨数据集迁移实验的结果，这是验证植物计数领域独特性的关键证据。当将在通用计数数据集FSC-147或动物计数数据集上训练的模型直接应用于TPC-268时，性能出现灾难性下降：
+
+- **CounTR**从FSC-147迁移到TPC-268，MAE从域内训练的12.13飙升至38.62，相对增幅达**+225%**；
+- **CACViT**的MAE从10.83升至26.73（**+147%**）；
+- **LOCA**的MAE从10.72升至24.70（**+130%**）。
+
+即使在FSC-147上表现最好的模型，迁移到TPC-268后MAE也超过24，远高于在TPC-268上域内训练的同等模型（LOCA域内MAE 17.51）。这一结果强有力地证明：植物计数与通用物体计数之间存在不可忽视的领域鸿沟，现有CAC模型从刚性、标准化对象中学到的“计数概念”无法直接迁移到具有丰富生物多样性和表型可塑性的植物领域。
+
+### 细粒度分类学性能分析
+
+论文进一步对LOCA在不同分类学层级上的表现进行了细粒度拆解。在科的层级上，性能差异显著：十字花科（Brassicaceae）MAE高达62.4，禾本科（Poaceae）为54.7，而蔷薇科（Rosaceae）仅为14.1。在属的层级上，差异更为极端：芸薹属（Brassica）MAE达141.5，玉蜀黍属（Zea）为67.4，而李属（Prunus）仅为8.5。
+
+这种巨大的类间性能差异揭示了当前CAC模型的核心失效模式：模型对某些植物类群（如十字花科中形态高度相似的种子和果实）的细粒度差异缺乏分辨能力。即使在训练中见过同科的其他物种，模型仍难以泛化到分类学上相近但视觉上存在微妙差异的物种。这提示未来的模型设计需要显式利用分类学层次结构作为归纳偏置。
+
+### 消融实验：分类学文本信息的作用
+
+Table 4展示了在文本引导的计数模型CountGD上逐步引入分类学信息的消融结果。以3个视觉示例为基础（MAE 19.52），加入物种名称文本后MAE降至17.53，进一步加入完整分类学文本（包含界、门、纲、目、科、属、种）后MAE进一步降至**16.90**。这一连续下降趋势表明，分类学信息能够为模型提供超越视觉示例的补充判别线索，帮助模型在混淆性较高的植物实例间做出更准确的计数判断。
+
+然而，将通用植物预训练模型BioCLIP2作为LOCA的骨干网络替换ResNet-50后，测试MAE从17.51急剧恶化至34.75，$R^2$从0.78降至0.29。这一负向迁移表明，通用植物分类预训练所学的表征与细粒度计数任务所需的空间定位和实例判别能力之间存在显著的不匹配，直接将分类学知识以预训练权重的形式注入计数模型并非有效策略。
+
+### 可视化分析：特征空间的分类学结构
+
+Figure 6通过t-SNE可视化展示了LOCA原型特征在测试集上的分布。当按分类学目（Order）着色时，特征空间呈现出一定的聚类结构，但不同目之间存在大量重叠区域。当按生物组织层级（Tissue、Organ、Organism）着色时，特征分布呈现出更清晰的分离趋势，表明模型对组织层级的区分能力优于对分类学类别的区分能力。这从特征层面解释了为什么跨物种泛化困难——模型尚未学习到与分类学层级相对应的结构化表征空间。
+
+### 定性结果与失败模式
+
+Figure 12提供了多种方法在TPC-268上的定性计数结果。在低密度、清晰场景中，各方法均能给出合理估计；但在高密度、严重重叠的场景（如数百粒种子的显微图像）中，所有方法都倾向于严重低估。此外，在低光照（Figure 9）、复杂背景（Figure 10）和同一物种不同生长阶段（Figure 7）的条件下，计数误差显著增大。这些失败模式共同指向一个核心瓶颈：现有CAC模型缺乏对植物实例在极端密度、环境退化和表型变异下的鲁棒感知能力，而分类学信息的有效利用可能是突破这一瓶颈的关键方向。
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/011_Figure_7.jpg]]
+*Figure 7: Examples of the same species at different growth stages in our TPC–268. The images span early seedling, vegetative development, tasseling, and final maturity*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/013_Figure_9.jpg]]
+*Figure 9: Examples of images captured in dark or low-illumination environments from our TPC–268. Reduced contrast, color distortion, and shadow-induced ambiguity complicate instance perception*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/014_Figure_10.jpg]]
+*Figure 10: Examples of real-world scenarios in our TPC–268. Natural backgrounds, occluding structures, and cluttered surroundings reflect practical field conditions*
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/003_Table_1.jpg]]
+*Table 1: Representative visual counting datasets introduced by the computer vision community in the past ten years*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/007_Table_2.jpg]]
+*Table 2: Comparison with the state-of-the-art CAC approaches on the TPC–268 dataset. Best performance is in boldface*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/008_Table_3.jpg]]
+*Table 3: Results of cross-dataset transfer. A→B denotes model trained on dataset A and tested on the test set of dataset B. Red/Blue indicate MAE increase/decrease compared to training and testing on the same dataset (A→A)*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/010_Table_4.jpg]]
+*Table 4: Performance of CountGD on the TPC–268 test set with different prompts. The species and taxonomic information are provided in text*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/009_Figure_6.jpg]]
+*Figure 6: t-SNE visualization of LOCA [49] prototype features on the test set. Different colors indicate different groups*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/016_Figure_12.jpg]]
+*Figure 12: Qualitative results of representative counting methods on our TPC–268. The examples cover diverse plant forms, observation scales, and density levels*
+
+![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/012_Figure_8.jpg]]
+*Figure 8: Examples of different biological organizations from the same species in our TPC–268. Tissue-level, organ-level, and wholeplant-level images show distinct texture patterns and structural characteristics*
+
+## 方法谱系与知识库定位
+
+### 任务定位：类别无关计数的植物学特化
+
+TPC-268 将植物计数明确框定为**类别无关计数**（Class-Agnostic Counting, CAC）问题——模型通过少量视觉示例学习“如何计数”这一通用概念，而非为每个物种训练独立计数器。这一框架直接继承了 CAC 领域的工作范式，但将其推向了一个此前未被探索的极端领域：具有丰富生物多样性、细粒度差异、非刚性结构和表型可塑性的植物世界。
+
+与现有 CAC 基准（如 FSC-147 以日用物体为主）相比，TPC-268 的核心区分性在于**将完整的林奈分类学层次结构显式嵌入计数任务**。每个计数实例不仅拥有点标注和示例框，还携带从界到种的七级分类学路径及生物组织层级标签。这一设计使得计数任务从传统的扁平类别无关计数，升级为具有分类学意识的层次化计数——模型不仅需要学会“如何计数”，还需要在分类学约束下进行跨物种泛化。
+
+### 基准方法谱系
+
+论文在 TPC-268 上系统评估了三类 CAC 方法，形成了清晰的方法谱系：
+
+**回归式方法**以 **LOCA** 为代表，在测试集上取得了最佳性能（3-shot MAE 17.51, RMSE 38.37, R² 0.78）。LOCA 通过原型学习和局部特征匹配来建模示例与目标实例之间的对应关系，其相对优势表明，在植物计数这种细粒度、跨尺度的场景中，基于局部特征回归的策略优于纯检测或全局自注意力的方案。
+
+**检测式方法**以 **DAVE** 为代表，性能整体弱于回归式方法（1-shot MAE 19.47），这与植物实例边界模糊、重叠严重的特点一致——检测范式对清晰实例边界的依赖在植物场景中成为瓶颈。
+
+**基于自注意力的方法**呈现出显著的验证-测试泛化鸿沟：**CACViT** 和 **TasselnetV4** 在验证集上表现强劲，但在测试集上泛化严重退化。这一现象指向全局自注意力机制在训练分布内可能过度拟合了物种特定的视觉模式，而无法迁移到未见过的分类学类群。这构成了植物计数领域的一个重要方法学发现：在分类学独立划分下，模型的跨物种泛化能力比验证集性能更能反映真实能力。
+
+此外，论文探索了**文本引导的计数方法** **CountGD**，通过将分类学信息以文本提示的形式注入模型：仅使用 3 个视觉示例时 MAE 为 19.52，加入物种名称后降至 17.53，进一步加入完整分类学文本后降至 16.90。这一消融序列直接证明了分类学先验对计数精度的因果性提升作用。
+
+### 跨域迁移的适用边界
+
+跨数据集迁移实验揭示了现有 CAC 方法的严重域局限性（Table 3）。当将在 FSC-147（通用物体）上训练的模型直接迁移到 TPC-268 时，性能出现灾难性退化：**CountTR** 的 MAE 从域内训练的 12.01 飙升至 38.62（+225%），**CACViT** 从 10.82 升至 26.73（+147%），**LOCA** 从 10.72 升至 24.70（+130%）。即使是在动物计数数据集上预训练的模型，迁移到植物领域同样面临巨大性能损失。这一定量证据表明，植物计数与通用物体计数之间存在不可忽视的领域鸿沟，现有 CAC 方法的泛化能力在植物领域仍然非常有限。
+
+值得注意的是，即使在同一领域内（TPC-268 域内训练），模型的细粒度性能也存在显著差异。LOCA 在十字花科（Brassicaceae）上的 MAE 高达 62.4，在芸薹属（Brassica）上更是达到 141.5，而在蔷薇科（Rosaceae）上仅为 14.1。这种分类学层次上的性能异质性表明，现有方法对某些植物类群的细粒度差异仍然难以分辨。
+
+### 知识迁移的失败与启示
+
+一个值得关注的反面发现是：将 LOCA 的 ResNet-50 骨干替换为通用植物预训练模型 **BioCLIP2** 后，测试 MAE 从 17.51 升至 34.75，R² 从 0.78 降至 0.29。这表明，通用的植物视觉表征并不天然适应细粒度分类学计数任务——预训练目标与计数目标之间存在显著的对齐缺口。这一发现对跨学科知识迁移策略的设计提出了更高要求：简单的“预训练+微调”范式可能不足以弥合植物分类学知识与实例计数之间的语义鸿沟。
+
+### 局限与开放问题
+
+当前基准揭示的方法学局限和开放问题包括：
+
+1. **分类学层次结构的利用不足**：现有方法仅将分类学信息作为扁平文本提示（如 CountGD 实验），尚未有方法能够原生地利用完整的林奈层次结构进行层次化推理。如何设计能够显式建模分类学树结构约束的 CAC 架构，是一个开放的方法学挑战。
+
+2. **极端泛化场景未覆盖**：当前划分保证训练/测试集在物种级别不相交，但未系统评估在更高分类学层次（如同科不同属、同目不同科）上的泛化能力。模型能否仅凭高层次分类学先验，对完全未见过的同科物种进行有意义的计数，仍待验证。
+
+3. **生物组织层级作为条件输入**：数据集标注了组织、器官、个体、种群四个生物组织层级，但现有方法未将其作为显式条件输入。将组织层级信息融入模型，可能进一步提升跨尺度、跨器官的计数鲁棒性。
+
+4. **长尾物种的公平性评估**：数据集物种分布呈重尾特性，某些稀有物种样本极少，现有评估以整体 MAE 为主，可能掩盖模型在长尾物种上的性能崩溃。
+
+5. **混合物种计数场景缺失**：当前基准聚焦于单物种计数，但在真实的农业与生态监测中，多物种共存的混合计数才是实际需求。如何从单物种 CAC 扩展到多物种混合计数，是通往实际应用的关键一步。
+
+6. **植物特异性预训练策略**：BioCLIP2 的失败表明，需要设计专门针对植物计数任务的预训练策略，而非简单复用通用植物分类模型。如何将分类学知识、组织层级信息和计数目标在预训练阶段有效融合，是一个值得深入探索的方向。
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/Plant_Taxonomy_Meets_Plant_Counting_A_Fine_Grained_Taxonomic_Dataset_for_Counting_Hundreds_of_Plant_Species.pdf]]

@@ -1,0 +1,216 @@
+case_index,model_label,sample_outcome,sample_id,frame_index,delta_l2
+0,MotionGPT,success,hml_orig100_train_003__full,0,55.3646110189
+0,MotionGPT,success,hml_orig100_train_003__full,1,549.7868787931
+0,MotionGPT,success,hml_orig100_train_003__full,2,530.9456844600
+0,MotionGPT,success,hml_orig100_train_003__full,3,646.5630616695
+0,MotionGPT,success,hml_orig100_train_003__full,4,722.5787264340
+0,MotionGPT,success,hml_orig100_train_003__full,5,847.0651166591
+1,MotionGPT,failure,hml_orig100_train_037__full,0,10.4622776664
+1,MotionGPT,failure,hml_orig100_train_037__full,1,298.0683663981
+1,MotionGPT,failure,hml_orig100_train_037__full,2,226.8037834421
+1,MotionGPT,failure,hml_orig100_train_037__full,3,190.1583673841
+1,MotionGPT,failure,hml_orig100_train_037__full,4,204.2933574319
+1,MotionGPT,failure,hml_orig100_train_037__full,5,174.7971164237
+2,MoLingo,success,hml_orig100_train_003__full,0,28.8014350259
+2,MoLingo,success,hml_orig100_train_003__full,1,30.0790464887
+2,MoLingo,success,hml_orig100_train_003__full,2,30.7456850933
+2,MoLingo,success,hml_orig100_train_003__full,3,31.5219461726
+2,MoLingo,success,hml_orig100_train_003__full,4,32.0068953811
+2,MoLingo,success,hml_orig100_train_003__full,5,32.4444718281
+2,MoLingo,success,hml_orig100_train_003__full,6,32.8722091220
+2,MoLingo,success,hml_orig100_train_003__full,7,33.1608099919
+2,MoLingo,success,hml_orig100_train_003__full,8,33.2820551535
+2,MoLingo,success,hml_orig100_train_003__full,9,33.3452516975
+2,MoLingo,success,hml_orig100_train_003__full,10,33.3889494826
+2,MoLingo,success,hml_orig100_train_003__full,11,33.4470304839
+2,MoLingo,success,hml_orig100_train_003__full,12,33.5057953132
+2,MoLingo,success,hml_orig100_train_003__full,13,33.5375659503
+2,MoLingo,success,hml_orig100_train_003__full,14,33.4944656634
+2,MoLingo,success,hml_orig100_train_003__full,15,33.3193233430
+2,MoLingo,success,hml_orig100_train_003__full,16,33.0863976121
+2,MoLingo,success,hml_orig100_train_003__full,17,32.8089663428
+2,MoLingo,success,hml_orig100_train_003__full,18,32.4878255684
+2,MoLingo,success,hml_orig100_train_003__full,19,32.1863295772
+2,MoLingo,success,hml_orig100_train_003__full,20,31.8284873914
+2,MoLingo,success,hml_orig100_train_003__full,21,31.4065474585
+2,MoLingo,success,hml_orig100_train_003__full,22,31.0927375196
+2,MoLingo,success,hml_orig100_train_003__full,23,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,24,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,25,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,26,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,27,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,28,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,29,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,30,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,31,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,32,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,33,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,34,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,35,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,36,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,37,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,38,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,39,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,40,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,41,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,42,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,43,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,44,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,45,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,46,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,47,0.0000000000
+2,MoLingo,success,hml_orig100_train_003__full,48,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,0,38.1722252883
+3,MoLingo,failure,hml_orig100_train_002__full,1,39.2144727560
+3,MoLingo,failure,hml_orig100_train_002__full,2,40.0030039068
+3,MoLingo,failure,hml_orig100_train_002__full,3,40.8331211210
+3,MoLingo,failure,hml_orig100_train_002__full,4,41.1220186558
+3,MoLingo,failure,hml_orig100_train_002__full,5,41.3468229883
+3,MoLingo,failure,hml_orig100_train_002__full,6,41.5344718054
+3,MoLingo,failure,hml_orig100_train_002__full,7,41.7079659811
+3,MoLingo,failure,hml_orig100_train_002__full,8,41.8627523848
+3,MoLingo,failure,hml_orig100_train_002__full,9,41.9900944536
+3,MoLingo,failure,hml_orig100_train_002__full,10,42.0758981971
+3,MoLingo,failure,hml_orig100_train_002__full,11,42.1277617200
+3,MoLingo,failure,hml_orig100_train_002__full,12,42.1581748802
+3,MoLingo,failure,hml_orig100_train_002__full,13,42.1712858823
+3,MoLingo,failure,hml_orig100_train_002__full,14,42.1741541438
+3,MoLingo,failure,hml_orig100_train_002__full,15,42.1775304471
+3,MoLingo,failure,hml_orig100_train_002__full,16,42.1876324493
+3,MoLingo,failure,hml_orig100_train_002__full,17,42.2004273777
+3,MoLingo,failure,hml_orig100_train_002__full,18,42.2059987123
+3,MoLingo,failure,hml_orig100_train_002__full,19,42.2028205579
+3,MoLingo,failure,hml_orig100_train_002__full,20,42.1915843292
+3,MoLingo,failure,hml_orig100_train_002__full,21,42.1728162107
+3,MoLingo,failure,hml_orig100_train_002__full,22,42.1420623736
+3,MoLingo,failure,hml_orig100_train_002__full,23,42.0959549073
+3,MoLingo,failure,hml_orig100_train_002__full,24,42.0388719794
+3,MoLingo,failure,hml_orig100_train_002__full,25,41.9684877280
+3,MoLingo,failure,hml_orig100_train_002__full,26,41.8696827565
+3,MoLingo,failure,hml_orig100_train_002__full,27,41.7318301925
+3,MoLingo,failure,hml_orig100_train_002__full,28,41.5573580960
+3,MoLingo,failure,hml_orig100_train_002__full,29,41.3360949915
+3,MoLingo,failure,hml_orig100_train_002__full,30,41.0874871357
+3,MoLingo,failure,hml_orig100_train_002__full,31,40.7995982077
+3,MoLingo,failure,hml_orig100_train_002__full,32,40.4890605532
+3,MoLingo,failure,hml_orig100_train_002__full,33,40.1436717171
+3,MoLingo,failure,hml_orig100_train_002__full,34,39.6888765037
+3,MoLingo,failure,hml_orig100_train_002__full,35,39.2687936871
+3,MoLingo,failure,hml_orig100_train_002__full,36,38.9369667390
+3,MoLingo,failure,hml_orig100_train_002__full,37,38.6541092830
+3,MoLingo,failure,hml_orig100_train_002__full,38,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,39,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,40,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,41,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,42,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,43,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,44,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,45,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,46,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,47,0.0000000000
+3,MoLingo,failure,hml_orig100_train_002__full,48,0.0000000000
+4,MoMask original,success,hml_orig100_train_003__full,0,261.4763724382
+4,MoMask original,success,hml_orig100_train_003__full,1,283.9979117684
+4,MoMask original,success,hml_orig100_train_003__full,2,293.5300473128
+4,MoMask original,success,hml_orig100_train_003__full,3,298.0609515654
+4,MoMask original,success,hml_orig100_train_003__full,4,307.9537207373
+4,MoMask original,success,hml_orig100_train_003__full,5,321.3596045168
+4,MoMask original,success,hml_orig100_train_003__full,6,323.3777152374
+4,MoMask original,success,hml_orig100_train_003__full,7,321.4220968908
+4,MoMask original,success,hml_orig100_train_003__full,8,324.4682064066
+4,MoMask original,success,hml_orig100_train_003__full,9,328.1707444332
+4,MoMask original,success,hml_orig100_train_003__full,10,330.0359929135
+4,MoMask original,success,hml_orig100_train_003__full,11,321.8439300905
+4,MoMask original,success,hml_orig100_train_003__full,12,300.8145934114
+4,MoMask original,success,hml_orig100_train_003__full,13,277.9884339622
+4,MoMask original,success,hml_orig100_train_003__full,14,264.1918054336
+4,MoMask original,success,hml_orig100_train_003__full,15,256.8112625943
+4,MoMask original,success,hml_orig100_train_003__full,16,252.6574822437
+4,MoMask original,success,hml_orig100_train_003__full,17,247.8268926919
+4,MoMask original,success,hml_orig100_train_003__full,18,245.0320101172
+4,MoMask original,success,hml_orig100_train_003__full,19,252.5267632401
+4,MoMask original,success,hml_orig100_train_003__full,20,254.4534629520
+4,MoMask original,success,hml_orig100_train_003__full,21,249.7321968036
+4,MoMask original,success,hml_orig100_train_003__full,22,265.0407575740
+5,MoMask original,failure,hml_orig100_train_001__full,0,266.1955734688
+5,MoMask original,failure,hml_orig100_train_001__full,1,286.3692739486
+5,MoMask original,failure,hml_orig100_train_001__full,2,310.5337346759
+5,MoMask original,failure,hml_orig100_train_001__full,3,334.2534836514
+5,MoMask original,failure,hml_orig100_train_001__full,4,346.8649901818
+5,MoMask original,failure,hml_orig100_train_001__full,5,351.2020105095
+5,MoMask original,failure,hml_orig100_train_001__full,6,351.0731686251
+5,MoMask original,failure,hml_orig100_train_001__full,7,346.2642649458
+5,MoMask original,failure,hml_orig100_train_001__full,8,338.8023481314
+5,MoMask original,failure,hml_orig100_train_001__full,9,331.5336539453
+5,MoMask original,failure,hml_orig100_train_001__full,10,328.4319107838
+5,MoMask original,failure,hml_orig100_train_001__full,11,326.9851388070
+5,MoMask original,failure,hml_orig100_train_001__full,12,325.6049160129
+5,MoMask original,failure,hml_orig100_train_001__full,13,324.9763419952
+5,MoMask original,failure,hml_orig100_train_001__full,14,325.4270366537
+5,MoMask original,failure,hml_orig100_train_001__full,15,324.9710758989
+5,MoMask original,failure,hml_orig100_train_001__full,16,322.2828869320
+5,MoMask original,failure,hml_orig100_train_001__full,17,317.4706721628
+5,MoMask original,failure,hml_orig100_train_001__full,18,308.9027501382
+5,MoMask original,failure,hml_orig100_train_001__full,19,302.9965847925
+5,MoMask original,failure,hml_orig100_train_001__full,20,285.6739550402
+6,MoGenTS,success,hml_orig100_train_003__full,0,431.2493240287
+6,MoGenTS,success,hml_orig100_train_003__full,1,388.3064435574
+6,MoGenTS,success,hml_orig100_train_003__full,2,425.3179600247
+6,MoGenTS,success,hml_orig100_train_003__full,3,469.5704702325
+6,MoGenTS,success,hml_orig100_train_003__full,4,530.6478127273
+6,MoGenTS,success,hml_orig100_train_003__full,5,592.6035215012
+6,MoGenTS,success,hml_orig100_train_003__full,6,628.1602073121
+6,MoGenTS,success,hml_orig100_train_003__full,7,649.8123237921
+6,MoGenTS,success,hml_orig100_train_003__full,8,652.5789969204
+6,MoGenTS,success,hml_orig100_train_003__full,9,646.7453484919
+6,MoGenTS,success,hml_orig100_train_003__full,10,639.1697444159
+6,MoGenTS,success,hml_orig100_train_003__full,11,625.5536425886
+6,MoGenTS,success,hml_orig100_train_003__full,12,592.6188564845
+6,MoGenTS,success,hml_orig100_train_003__full,13,529.8806466558
+6,MoGenTS,success,hml_orig100_train_003__full,14,478.0487324807
+6,MoGenTS,success,hml_orig100_train_003__full,15,462.6707770317
+6,MoGenTS,success,hml_orig100_train_003__full,16,458.4174866403
+6,MoGenTS,success,hml_orig100_train_003__full,17,434.3374039654
+6,MoGenTS,success,hml_orig100_train_003__full,18,418.8600233459
+6,MoGenTS,success,hml_orig100_train_003__full,19,435.8627335810
+6,MoGenTS,success,hml_orig100_train_003__full,20,457.9669015825
+6,MoGenTS,success,hml_orig100_train_003__full,21,478.7489526395
+6,MoGenTS,success,hml_orig100_train_003__full,22,490.0187023664
+7,MoGenTS,failure,hml_orig100_train_002__full,0,573.5847676716
+7,MoGenTS,failure,hml_orig100_train_002__full,1,560.3909887412
+7,MoGenTS,failure,hml_orig100_train_002__full,2,547.4956787134
+7,MoGenTS,failure,hml_orig100_train_002__full,3,452.5174892577
+7,MoGenTS,failure,hml_orig100_train_002__full,4,381.0862072188
+7,MoGenTS,failure,hml_orig100_train_002__full,5,354.1682620510
+7,MoGenTS,failure,hml_orig100_train_002__full,6,355.6260922099
+7,MoGenTS,failure,hml_orig100_train_002__full,7,383.6548653803
+7,MoGenTS,failure,hml_orig100_train_002__full,8,417.9585938567
+7,MoGenTS,failure,hml_orig100_train_002__full,9,429.3179514499
+7,MoGenTS,failure,hml_orig100_train_002__full,10,424.0496067592
+7,MoGenTS,failure,hml_orig100_train_002__full,11,421.1023903008
+7,MoGenTS,failure,hml_orig100_train_002__full,12,418.5734758976
+7,MoGenTS,failure,hml_orig100_train_002__full,13,417.7961659623
+7,MoGenTS,failure,hml_orig100_train_002__full,14,430.5943167601
+7,MoGenTS,failure,hml_orig100_train_002__full,15,450.1917968133
+7,MoGenTS,failure,hml_orig100_train_002__full,16,462.5325813575
+7,MoGenTS,failure,hml_orig100_train_002__full,17,464.3124729370
+7,MoGenTS,failure,hml_orig100_train_002__full,18,469.3865627730
+7,MoGenTS,failure,hml_orig100_train_002__full,19,473.2546923735
+7,MoGenTS,failure,hml_orig100_train_002__full,20,466.6719338772
+7,MoGenTS,failure,hml_orig100_train_002__full,21,452.6582128368
+7,MoGenTS,failure,hml_orig100_train_002__full,22,442.1444567747
+7,MoGenTS,failure,hml_orig100_train_002__full,23,437.1171646835
+7,MoGenTS,failure,hml_orig100_train_002__full,24,434.3906151352
+7,MoGenTS,failure,hml_orig100_train_002__full,25,455.5431298295
+7,MoGenTS,failure,hml_orig100_train_002__full,26,520.1305853785
+7,MoGenTS,failure,hml_orig100_train_002__full,27,596.1983471969
+7,MoGenTS,failure,hml_orig100_train_002__full,28,657.3516267343
+7,MoGenTS,failure,hml_orig100_train_002__full,29,694.5283044339
+7,MoGenTS,failure,hml_orig100_train_002__full,30,749.2719049472
+7,MoGenTS,failure,hml_orig100_train_002__full,31,823.3899123828
+7,MoGenTS,failure,hml_orig100_train_002__full,32,889.9935233725
+7,MoGenTS,failure,hml_orig100_train_002__full,33,912.9353355111
+7,MoGenTS,failure,hml_orig100_train_002__full,34,901.1888181280
+7,MoGenTS,failure,hml_orig100_train_002__full,35,880.7865086293
+7,MoGenTS,failure,hml_orig100_train_002__full,36,854.0611883886
+7,MoGenTS,failure,hml_orig100_train_002__full,37,677.8333645210

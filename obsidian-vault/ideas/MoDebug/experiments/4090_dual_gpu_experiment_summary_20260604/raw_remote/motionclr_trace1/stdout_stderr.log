@@ -1,0 +1,49 @@
+/home/ripemangobox/miniconda3/envs/event-t2m/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+Reading ./checkpoints/t2m/release/opt.txt
+base_dim: 512
+batch_size: 64
+beta_schedule: linear
+checkpoints_dir: ./checkpoints
+clip_grad_norm: 1
+cond_mask_prob: 0.1
+continue_ckpt: latest.tar
+dataset_name: t2m
+debug: False
+decay_rate: 0.9
+diffusion_steps: 1000
+dim_mults: [2, 2, 2, 2]
+dropout: 0.1
+feat_bias: 5
+is_continue: False
+latent_dim: 512
+log_every: 500
+lr: 0.0001
+model_ema: True
+model_ema_decay: 0.9999
+model_ema_steps: 32
+name: self_attn—fulllayer-ffn-drop0_1-lr1e4
+no_adagn: False
+no_eff: True
+num_layers: 8
+num_train_steps: 50000
+prediction_type: sample
+save_interval: 10000
+seed: 0
+self_attention: True
+text_latent_dim: 256
+time_dim: 512
+update_lr_steps: 5000
+vis_attn: False
+weight_decay: 0.01
+
+Initializing model ...
+The T2M Unet mask the text prompt by 0.1 prob. in training
+dims:  [263, 1024, 1024, 1024, 1024] mults:  [2, 2, 2, 2]
+
+Loading EMA model from ./checkpoints/t2m/release/model/latest.tar with 50173 iterations
+{
+  "manifest": "/data/public/ripemangobox/Motion/experiments/MoDebug/motionclr/formal_candidates/trace1_formal_layer_sweep_ds_review_20260603_gpu1/manifest.json",
+  "summary": "/data/public/ripemangobox/Motion/experiments/MoDebug/motionclr/formal_candidates/trace1_formal_layer_sweep_ds_review_20260603_gpu1/summary.json",
+  "num_summary_rows": 123
+}

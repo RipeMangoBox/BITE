@@ -1,0 +1,85 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Audio-Omni: Extending Multi-modal Understanding to Versatile Audio Generation and Editing
+Part: 4/13
+Character span: 17284-25241
+
+=== PART CONTENT ===
+rac { d { \bf x } _ { t } } { d t } = { \bf v } .\tag{1}
+$$
+
+The solution at any time ?? along this linear path is given by the interpolation:
+
+$$
+\begin{array} { r } { { \bf x } _ { t } = ( 1 - t ) { \bf x } _ { 0 } + t { \bf x } _ { 1 } . } \end{array}\tag{2}
+$$
+
+A neural network, denoted $v _ { \theta } ( \mathbf { x } _ { t } , t , \mathbf { c } )$ , is trained to predict this velocity field v conditioned on the noisy state $\mathbf { x } _ { t } ,$ time ?? , and a set of conditioning signals c. During inference, generation starts from a random noise sample $\mathbf { x } _ { 1 }$ at $t \ = \ 1$ , and the ODE in Equation 1 is solved backwards to $t = 0$ using a numerical solver, guided by the predictions of ???? . The training objective for $v _ { \theta }$ is detailed in Section 4.3.
+
+## 4.2 Model Architecture
+
+As illustrated in Figure 3, our Audio-Omni framework is built upon a decoupled architecture comprising a frozen MLLM for understanding and a trainable DiT-based backbone for versatile audio generation and editing.
+
+Understanding Module. Our understanding module is a pre-trained and frozen MLLM, which serves as the primary reasoning and understanding core of our framework. It processes a diverse set of inputs, including a textual instruction $( \mathrm { { T } _ { i n } ) }$ , an audio waveform $( \mathbf { A } _ { \mathrm { i n } } )$ , and a video $( \mathbf { V } _ { \mathrm { i n } } )$ , after they are tokenized by their respective encoders. The MLLM fulfills a dual role within our framework. For understanding tasks, it directly generates textual responses based on the multimodal inputs. For generative tasks, its crucial function is to produce a powerful conditioning signal for the generative module. To this end, we extract the hidden states from its penultimate layer (i.e., the second-to-last hidden state), as we empirically find that this provides a more generalizable and richer semantic representation for downstream generative tasks compared to the final layer (see Sec. 5.4). We denote this multimodal feature as $\mathbf { F } _ { \mathrm { m m } } \in \mathbb { R } ^ { L _ { \mathrm { m m } } \times D _ { \mathrm { m m } } }$ . Generative Module. The generative module consists of a DiT backbone, trained with a Rectified Flow objective, which synthesizes the final audio waveform. This module is conditioned on two distinct streams of features, allowing it to handle a wide array of tasks.
+
+The first stream, which we term High-Level Semantic Features, provides the primary instructional signal for the synthesis process. This stream is formed by concatenating the multimodal features Fmm from the MLLM with a transcript-derived feature $\mathbf { F } _ { \mathrm { t r a n s } }$ for speech-related tasks:
+
+$$
+{ \bf c } _ { \mathrm { h i g h } } = \mathrm { C o n c a t } ( { \bf F } _ { \mathrm { m m } } , { \bf F } _ { \mathrm { t r a n s } } ) .\tag{3}
+$$
+
+The feature $\mathbf { F _ { t r a n s } }$ is produced by a Transcript Encoder, which performs a character-level encoding of the input transcript $\mathbf { T } _ { \mathrm { t r a n s } }$ (for TTS/VC tasks). Specifically, it first converts the text into a sequence of character embeddings, which are then processed by a ConvNeXtV2- based architecture.
+
+The second stream, termed Low-Level Signal Features, provides concrete, temporally-aligned references crucial for editing and synchronization tasks. This stream is formed by concatenating features from a reference audio and a video sync signal:
+
+$$
+{ \bf c } _ { \mathrm { l o w } } = \mathrm { C o n c a t } ( { \bf F } _ { \mathrm { s y n c } } , { \bf F } _ { \mathrm { m e l } } ) .\tag{4}
+$$
+
+The mel-spectrogram feature, $\mathbf { F } _ { \mathrm { m e l } } .$ , is extracted by a Mel Encoder from either a reference audio $\mathbf { A } _ { \mathrm { r e f } }$ (for editing) or a speech prompt $\mathrm { \Delta S _ { p r o m p t } }$ (for voice conversion). The synchronization feature, $\mathbf { F _ { s y n c ; } }$ , is extracted from the input video $\mathbf { V } _ { \mathrm { i n } }$ by a pre-trained Synchformer [Iashin et al. 2024] model.
+
+![](images/08ccd110d72fe2d40068bee961bc5ff6254ff9fa1a8d2a52b2629b8246331845.jpg)  
+Fig. 3. The Audio-Omni Framework. Our framework utilizes a decoupled design with two distinct conditioning streams to guide a trainable DiT backbone. The High-Level Semantic Features stream provides global, instructional guidance. It is formed by concatenating features from a frozen MLLM (MM Features) with character-level embeddings from a trainable Transcript Encoder. The Low-Level Signal Features stream offers precise, temporal guidance for editing and synchronization. It combines features from Synchformer and Mel Encoder. These two streams are injected into the DiT via different mechanisms: the high-level stream as context for cross-attention, and the low-level stream concatenated with the input noise and time embedding.
+
+These two conditioning streams are injected into the DiT backbone through distinct mechanisms tailored to their properties. The High-Level Semantic Features $( \mathbf { c } _ { \mathrm { h i g h } } )$ are injected as context via crossattention, allowing the model to flexibly query abstract instructions at each step of the generation process. In contrast, the Low-Level Signal Features $( \mathbf { c } _ { \mathrm { l o w } } )$ are first fused with a time embedding via elementwise addition, and this combined signal is then concatenated with the VAE-encoded noisy audio latent (x?? ) to form the main input to the DiT. This concatenation provides strong, frame-by-frame guidance, ensuring precise alignment for editing and synchronization tasks. The DiT backbone then processes this composite input to predict the velocity field, and its final denoised latent output is passed to a VAE Decoder to reconstruct the audio waveform.
+
+## 4.3 Training Objective
+
+We train our Audio-Omni end-to-end using a single, unified loss based on the Rectified Flow objective. For each training sample, we aim to train the network ???? to predict the constant velocity $\textbf { v } = \textbf { x } _ { 1 } - \textbf { x } _ { 0 }$ , where $\mathbf { x } _ { 0 }$ is the VAE-encoded latent of the target audio and $\mathbf { x } _ { 1 }$ is a random noise sample from ${ \cal N } ( 0 , { \bf { I } } )$ . Following the standard RF training procedure, we first sample a random timestep ?? from a uniform distribution U (0, 1). This timestep is used to create an interpolated latent state ${ \bf x } _ { t } = ( 1 - t ) { \bf x } _ { 0 } + t { \bf x } _ { 1 }$ 1. The training objective is then to minimize the mean squared error between the network’s predicted velocity and the ground-truth velocity v. The loss function, $\mathcal { L } ,$ is defined as:
+
+$$
+\mathcal { L } = \mathbb { E } _ { t \sim \mathcal { U } ( 0 , 1 ) , \mathbf { x } _ { 0 } , \mathbf { x } _ { 1 } , \mathbf { c } } \left[ | | v _ { \theta } ( \mathbf { x } _ { t } , t , \mathbf { c } ) - ( \mathbf { x } _ { 1 } - \mathbf { x } _ { 0 } ) | | ^ { 2 } \right]\tag{5}
+$$
+
+Table 2. Quantitative results on multimodal understanding benchmarks.
+<table><tr><td>Methods</td><td>MMSU↑</td><td>MMAU↑</td></tr><tr><td>SpecializedModels</td><td></td><td></td></tr><tr><td>Audio Flamingo3 [Goel et al. 2025]</td><td>61.40</td><td>72.42</td></tr><tr><td>Qwen2-Audio-Instruct [Chu et al. 2024]</td><td>53.27</td><td>57.40</td></tr><tr><td>Qwen2.5-Omni-3B [Xu et al.2025]</td><td>56.83</td><td>63.30</td></tr><tr><td colspan="3">UnifiedModels</td></tr><tr><td>Ming-Omni [AI et al.2025]</td><td>47.53</td><td>70.80</td></tr><tr><td>Unified-IO2 [Lu et al. 2024]</td><td>30.74</td><td>3.20</td></tr><tr><td>MuMuLLaMA[Liu et al.2024a]</td><td>6.32</td><td>12.87</td></tr><tr><td>Audio-Omni</td><td>56.83</td><td>63.30</td></tr></table>
+
+where c represents the full set of conditioning signals available for the given training sample.
+
+## 5 Experiments

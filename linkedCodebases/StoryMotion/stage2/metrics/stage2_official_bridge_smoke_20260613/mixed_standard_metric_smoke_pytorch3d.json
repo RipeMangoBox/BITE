@@ -1,0 +1,1133 @@
+{
+  "cache_dir": "runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+  "contract": {
+    "camera": {
+      "all_keys_ok": true,
+      "all_shapes_ok": true,
+      "batches": 4,
+      "checks": [
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "camera",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-4GsCEopbd4_00008_001_a",
+            "2011_-4GsCEopbd4_00017_000_a",
+            "2011_-EuO6OFypLo_00002_000_a",
+            "2011_-EuO6OFypLo_00002_000_b",
+            "2011_-EuO6OFypLo_00020_000_a",
+            "2011_-MG8-wCvzpE_00002_000_a",
+            "2011_-MG8-wCvzpE_00002_001_a",
+            "2011_-RBjiJto4hc_00027_000_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "camera",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-UAElWXbk3I_00000_000_a",
+            "2011_-UAElWXbk3I_00000_001_a",
+            "2011_-WW51YaWO-4_00007_000_a",
+            "2011_-WW51YaWO-4_00007_002_a",
+            "2011_-Y2wqkD2KVM_00040_000_a",
+            "2011_-fJwmmnPHok_00006_000_a",
+            "2011_-fJwmmnPHok_00007_000_a",
+            "2011_-fJwmmnPHok_00007_001_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "camera",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-nkqrSaJf1g_00012_000_b",
+            "2011_-qK58CZslAs_00001_000_a",
+            "2011_-rq6IBVPcBU_00001_000_a",
+            "2011_-tUodP_Wus4_00031_000_a",
+            "2011_-tUodP_Wus4_00031_001_a",
+            "2011_-zIzLRgwdxA_00019_000_a",
+            "2011_-zIzLRgwdxA_00019_001_a",
+            "2011_00pBYZ1yofs_00026_000_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "camera",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_00pBYZ1yofs_00026_001_a",
+            "2011_06KH47jZbG0_00062_000_a",
+            "2011_06KH47jZbG0_00062_001_a",
+            "2011_0IxeTLiovq8_00000_000_a",
+            "2011_0IxeTLiovq8_00000_001_a",
+            "2011_0JXwzlRcYWk_00043_000_a",
+            "2011_0LzZVYshI7s_00001_000_a",
+            "2011_0LzZVYshI7s_00001_001_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        }
+      ]
+    },
+    "human": {
+      "all_keys_ok": true,
+      "all_shapes_ok": true,
+      "batches": 4,
+      "checks": [
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "human",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-4GsCEopbd4_00008_001_a",
+            "2011_-4GsCEopbd4_00017_000_a",
+            "2011_-EuO6OFypLo_00002_000_a",
+            "2011_-EuO6OFypLo_00002_000_b",
+            "2011_-EuO6OFypLo_00020_000_a",
+            "2011_-MG8-wCvzpE_00002_000_a",
+            "2011_-MG8-wCvzpE_00002_001_a",
+            "2011_-RBjiJto4hc_00027_000_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "human",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-UAElWXbk3I_00000_000_a",
+            "2011_-UAElWXbk3I_00000_001_a",
+            "2011_-WW51YaWO-4_00007_000_a",
+            "2011_-WW51YaWO-4_00007_002_a",
+            "2011_-Y2wqkD2KVM_00040_000_a",
+            "2011_-fJwmmnPHok_00006_000_a",
+            "2011_-fJwmmnPHok_00007_000_a",
+            "2011_-fJwmmnPHok_00007_001_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "human",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-nkqrSaJf1g_00012_000_b",
+            "2011_-qK58CZslAs_00001_000_a",
+            "2011_-rq6IBVPcBU_00001_000_a",
+            "2011_-tUodP_Wus4_00031_000_a",
+            "2011_-tUodP_Wus4_00031_001_a",
+            "2011_-zIzLRgwdxA_00019_000_a",
+            "2011_-zIzLRgwdxA_00019_001_a",
+            "2011_00pBYZ1yofs_00026_000_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "human",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_00pBYZ1yofs_00026_001_a",
+            "2011_06KH47jZbG0_00062_000_a",
+            "2011_06KH47jZbG0_00062_001_a",
+            "2011_0IxeTLiovq8_00000_000_a",
+            "2011_0IxeTLiovq8_00000_001_a",
+            "2011_0JXwzlRcYWk_00043_000_a",
+            "2011_0LzZVYshI7s_00001_000_a",
+            "2011_0LzZVYshI7s_00001_001_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        }
+      ]
+    },
+    "joint": {
+      "all_keys_ok": true,
+      "all_shapes_ok": true,
+      "batches": 4,
+      "checks": [
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "joint",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-4GsCEopbd4_00008_001_a",
+            "2011_-4GsCEopbd4_00017_000_a",
+            "2011_-EuO6OFypLo_00002_000_a",
+            "2011_-EuO6OFypLo_00002_000_b",
+            "2011_-EuO6OFypLo_00020_000_a",
+            "2011_-MG8-wCvzpE_00002_000_a",
+            "2011_-MG8-wCvzpE_00002_001_a",
+            "2011_-RBjiJto4hc_00027_000_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "joint",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-UAElWXbk3I_00000_000_a",
+            "2011_-UAElWXbk3I_00000_001_a",
+            "2011_-WW51YaWO-4_00007_000_a",
+            "2011_-WW51YaWO-4_00007_002_a",
+            "2011_-Y2wqkD2KVM_00040_000_a",
+            "2011_-fJwmmnPHok_00006_000_a",
+            "2011_-fJwmmnPHok_00007_000_a",
+            "2011_-fJwmmnPHok_00007_001_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "joint",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-nkqrSaJf1g_00012_000_b",
+            "2011_-qK58CZslAs_00001_000_a",
+            "2011_-rq6IBVPcBU_00001_000_a",
+            "2011_-tUodP_Wus4_00031_000_a",
+            "2011_-tUodP_Wus4_00031_001_a",
+            "2011_-zIzLRgwdxA_00019_000_a",
+            "2011_-zIzLRgwdxA_00019_001_a",
+            "2011_00pBYZ1yofs_00026_000_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        },
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "joint",
+          "padding_mask_shape": [
+            8,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            8,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            8,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            8,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_00pBYZ1yofs_00026_001_a",
+            "2011_06KH47jZbG0_00062_000_a",
+            "2011_06KH47jZbG0_00062_001_a",
+            "2011_0IxeTLiovq8_00000_000_a",
+            "2011_0IxeTLiovq8_00000_001_a",
+            "2011_0JXwzlRcYWk_00043_000_a",
+            "2011_0LzZVYshI7s_00001_000_a",
+            "2011_0LzZVYshI7s_00001_001_a"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        }
+      ]
+    }
+  },
+  "created_at": "2026-06-13T16:22:51+0800",
+  "elapsed_sec": 16.264271020889282,
+  "first_output_summary": {
+    "batch": {
+      "camera_intrinsics": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          300,
+          4
+        ]
+      },
+      "camera_segments": {
+        "device": "cuda:0",
+        "dtype": "torch.int64",
+        "shape": [
+          8,
+          300
+        ]
+      },
+      "caption_feat": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          1024
+        ]
+      },
+      "caption_mask": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.bool",
+          "shape": [
+            8,
+            77
+          ]
+        },
+        "human": {
+          "device": "cuda:0",
+          "dtype": "torch.bool",
+          "shape": [
+            8,
+            77
+          ]
+        }
+      },
+      "caption_raw": {
+        "camera": [
+          "The camera moves laterally to the left (trucking left) for the entire shot.",
+          "The camera remains static throughout the entire shot.",
+          "The camera begins with a trucking right-pull-out motion, followed by a continuous trucking right motion.",
+          "The camera starts static and transitions to a boom top position during the shot.",
+          "The camera starts with a pull-out motion and then remains static for the rest of the shot.",
+          "The camera starts static, then trucks right, and later trucks left. The exact lengths of each motion are not specified.",
+          "The camera starts static, then trucks left for the remaining frames.",
+          "The camera begins with a boom top shot, then trucks right for the remaining frames."
+        ],
+        "human": [
+          "A person leans forward and bends their head towards the table, focusing intently on an object in front of them.",
+          "A person stands still and turns his head slightly to the right.",
+          "A person walks forward, swings their arms, and steps over a staircase.",
+          "A person walks forward, extends their arms outward, and then turns slightly to the right.",
+          "A person stands still and turns his head slightly to the right.",
+          "A person stands still and points their right hand towards another individual.",
+          "A person extends their right arm forward and then pulls it back, moving their head slightly as they do so.",
+          "A person extends their arms forward, reaches out to another person, and then embraces them by placing their hands on the other's shoulders."
+        ]
+      },
+      "clatr_caption": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          77,
+          512
+        ]
+      },
+      "clatr_mask": {
+        "device": "cuda:0",
+        "dtype": "torch.bool",
+        "shape": [
+          8,
+          77
+        ]
+      },
+      "index": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "padding_mask": {
+        "device": "cuda:0",
+        "dtype": "torch.bool",
+        "shape": [
+          8,
+          300
+        ]
+      },
+      "proj_joints": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          300,
+          18
+        ]
+      },
+      "sample_id": [
+        "2011_-4GsCEopbd4_00008_001_a",
+        "2011_-4GsCEopbd4_00017_000_a",
+        "2011_-EuO6OFypLo_00002_000_a",
+        "2011_-EuO6OFypLo_00002_000_b",
+        "2011_-EuO6OFypLo_00020_000_a",
+        "2011_-MG8-wCvzpE_00002_000_a",
+        "2011_-MG8-wCvzpE_00002_001_a",
+        "2011_-RBjiJto4hc_00027_000_a"
+      ],
+      "tmr_caption": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          168,
+          768
+        ]
+      },
+      "tmr_mask": {
+        "device": "cuda:0",
+        "dtype": "torch.bool",
+        "shape": [
+          8,
+          168
+        ]
+      },
+      "x_cond": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          1024
+        ]
+      }
+    },
+    "outputs": {
+      "raw_input": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              8,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            300,
+            4
+          ]
+        },
+        "projection": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            300,
+            9,
+            2
+          ]
+        }
+      },
+      "raw_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              8,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            300,
+            4
+          ]
+        }
+      },
+      "x_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            300,
+            14
+          ]
+        },
+        "human": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            300,
+            199
+          ]
+        }
+      }
+    },
+    "x_input": {
+      "camera": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          300,
+          14
+        ]
+      },
+      "human": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          300,
+          199
+        ]
+      },
+      "projection": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          8,
+          300,
+          18
+        ]
+      }
+    }
+  },
+  "metric_checkpoint_status": {
+    "autoencoder_ckpts": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/autoencoder/aemmardm-xgmj0yjj-325.ckpt"
+    ],
+    "clatr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-text_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_decoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_std.pt"
+    ],
+    "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+    "tmr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_decoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_encoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-text_encoder.pt"
+    ]
+  },
+  "metric_errors": {},
+  "metric_results": {
+    "camera": {
+      "metric_keys": [
+        "test/captions/fscore",
+        "test/captions/precision",
+        "test/captions/recall",
+        "test/clatr/R1",
+        "test/clatr/R2",
+        "test/clatr/R3",
+        "test/clatr/clatr_score",
+        "test/clatr/coverage",
+        "test/clatr/density",
+        "test/clatr/fcd",
+        "test/clatr/mm_distance",
+        "test/clatr/precision",
+        "test/clatr/recall"
+      ],
+      "metrics": {
+        "test/captions/fscore": 0.6374495029449463,
+        "test/captions/precision": 0.6926023960113525,
+        "test/captions/recall": 0.6339902877807617,
+        "test/clatr/R1": 0.625,
+        "test/clatr/R2": 0.8125,
+        "test/clatr/R3": 0.9375,
+        "test/clatr/clatr_score": 54.7199592590332,
+        "test/clatr/coverage": 1.0,
+        "test/clatr/density": 1.111904761904762,
+        "test/clatr/fcd": 92.99259185791016,
+        "test/clatr/mm_distance": 24.368473052978516,
+        "test/clatr/precision": 1.0,
+        "test/clatr/recall": 0.9714285714285715
+      },
+      "ok": true
+    },
+    "human": {
+      "metric_keys": [
+        "test/tmr/R1",
+        "test/tmr/R2",
+        "test/tmr/R3",
+        "test/tmr/coverage",
+        "test/tmr/density",
+        "test/tmr/ftd",
+        "test/tmr/mm_distance",
+        "test/tmr/precision",
+        "test/tmr/recall",
+        "test/tmr/tmr_score"
+      ],
+      "metrics": {
+        "test/tmr/R1": 0.3125,
+        "test/tmr/R2": 0.4375,
+        "test/tmr/R3": 0.71875,
+        "test/tmr/coverage": 1.0,
+        "test/tmr/density": 0.8119047619047619,
+        "test/tmr/ftd": 448.8247985839844,
+        "test/tmr/mm_distance": 49.98586368560791,
+        "test/tmr/precision": 1.0,
+        "test/tmr/recall": 1.0,
+        "test/tmr/tmr_score": 15.766265869140625
+      },
+      "ok": true
+    },
+    "joint": {
+      "metric_keys": [
+        "test/captions/fscore",
+        "test/captions/precision",
+        "test/captions/recall",
+        "test/clatr/R1",
+        "test/clatr/R2",
+        "test/clatr/R3",
+        "test/clatr/clatr_score",
+        "test/clatr/coverage",
+        "test/clatr/density",
+        "test/clatr/fcd",
+        "test/clatr/mm_distance",
+        "test/clatr/precision",
+        "test/clatr/recall",
+        "test/proj/coverage",
+        "test/proj/density",
+        "test/proj/error",
+        "test/proj/g_fpd",
+        "test/proj/outscreen",
+        "test/proj/precision",
+        "test/proj/r_fpd",
+        "test/proj/recall",
+        "test/tmr/R1",
+        "test/tmr/R2",
+        "test/tmr/R3",
+        "test/tmr/coverage",
+        "test/tmr/density",
+        "test/tmr/ftd",
+        "test/tmr/mm_distance",
+        "test/tmr/precision",
+        "test/tmr/recall",
+        "test/tmr/tmr_score"
+      ],
+      "metrics": {
+        "test/captions/fscore": 0.4451754093170166,
+        "test/captions/precision": 0.5200408697128296,
+        "test/captions/recall": 0.42820578813552856,
+        "test/clatr/R1": 0.5,
+        "test/clatr/R2": 0.65625,
+        "test/clatr/R3": 0.8125,
+        "test/clatr/clatr_score": 43.37070083618164,
+        "test/clatr/coverage": 0.8857142857142858,
+        "test/clatr/density": 0.9119047619047619,
+        "test/clatr/fcd": 188.76138305664062,
+        "test/clatr/mm_distance": 27.4588885307312,
+        "test/clatr/precision": 1.0,
+        "test/clatr/recall": 0.8857142857142858,
+        "test/proj/coverage": 0.0,
+        "test/proj/density": 0.0,
+        "test/proj/error": 0.0,
+        "test/proj/g_fpd": 0.0,
+        "test/proj/outscreen": 0.038842346519231796,
+        "test/proj/precision": 0.0,
+        "test/proj/r_fpd": 0.23600879311561584,
+        "test/proj/recall": 0.0,
+        "test/tmr/R1": 0.3125,
+        "test/tmr/R2": 0.40625,
+        "test/tmr/R3": 0.6875,
+        "test/tmr/coverage": 1.0,
+        "test/tmr/density": 0.7666666666666666,
+        "test/tmr/ftd": 585.3568725585938,
+        "test/tmr/mm_distance": 49.965179443359375,
+        "test/tmr/precision": 1.0,
+        "test/tmr/recall": 1.0,
+        "test/tmr/tmr_score": 16.545364379882812
+      },
+      "ok": true
+    }
+  },
+  "metric_status": "run",
+  "mode": "official_bridge_smoke",
+  "run": {
+    "checkpoint": "runs/train/stage2/pulp_official_full_mixed_20260611/gpu0_train_mixed_full_b512_epochmatch_82688_20260611_2110/last.pt",
+    "joint_loss_mode": "element_mean",
+    "run_dir": "runs/train/stage2/pulp_official_full_mixed_20260611/gpu0_train_mixed_full_b512_epochmatch_82688_20260611_2110",
+    "step": 82688
+  },
+  "sample_range": [
+    0,
+    32
+  ],
+  "samples": 32,
+  "timestep": 500
+}

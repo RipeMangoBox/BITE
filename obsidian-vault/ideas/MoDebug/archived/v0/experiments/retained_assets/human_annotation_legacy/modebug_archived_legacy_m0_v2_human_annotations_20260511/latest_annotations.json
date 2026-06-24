@@ -1,0 +1,1922 @@
+{
+  "motiongpt::m0v2_omission_order_001__full": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_001__full",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person walks forward, turns left, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_001__drop": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_001__drop",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person walks forward, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_001__replace": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_001__replace",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person walks forward, turns right, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_001__shuffle": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_001__shuffle",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person sits down, turns left, then walks forward",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_001__repeat": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_001__repeat",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person walks forward, turns left twice, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_001__full": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_001__full",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person walks forward, turns left, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_001__drop": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_001__drop",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person walks forward, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_001__replace": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_001__replace",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person walks forward, turns right, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_001__shuffle": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_001__shuffle",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person sits down, turns left, then walks forward",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_001__repeat": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_001__repeat",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person walks forward, turns left twice, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_001__full": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_001__full",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person walks forward, turns left, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_001__drop": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_001__drop",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person walks forward, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_001__replace": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_001__replace",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person walks forward, turns right, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_001__shuffle": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_001__shuffle",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person sits down, turns left, then walks forward",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_001__repeat": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_001__repeat",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person walks forward, turns left twice, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_001__full": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_001__full",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person walks forward, turns left, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/000_m0v2_omission_order_001__full.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/000_m0v2_omission_order_001__full.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/000_m0v2_omission_order_001__full.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_001__drop": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_001__drop",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person walks forward, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/001_m0v2_omission_order_001__drop.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/001_m0v2_omission_order_001__drop.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/001_m0v2_omission_order_001__drop.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_001__replace": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_001__replace",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person walks forward, turns right, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/002_m0v2_omission_order_001__replace.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/002_m0v2_omission_order_001__replace.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/002_m0v2_omission_order_001__replace.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_001__shuffle": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_001__shuffle",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person sits down, turns left, then walks forward",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/003_m0v2_omission_order_001__shuffle.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/003_m0v2_omission_order_001__shuffle.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/003_m0v2_omission_order_001__shuffle.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_001__repeat": {
+    "updated": "2026-05-11T18:21:53",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_001__repeat",
+    "base_id": "m0v2_omission_order_001",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person walks forward, turns left twice, then sits down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/004_m0v2_omission_order_001__repeat.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/004_m0v2_omission_order_001__repeat.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/004_m0v2_omission_order_001__repeat.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_002__full": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_002__full",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person stands up, claps, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_002__drop": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_002__drop",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person stands up, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_002__replace": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_002__replace",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person stands up, waves, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_002__shuffle": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_002__shuffle",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person kneels down, claps, then stands up",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_002__repeat": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_002__repeat",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person stands up, claps twice, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_002__full": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_002__full",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person stands up, claps, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_002__drop": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_002__drop",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person stands up, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_002__replace": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_002__replace",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person stands up, waves, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_002__shuffle": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_002__shuffle",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person kneels down, claps, then stands up",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_002__repeat": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_002__repeat",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person stands up, claps twice, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_002__full": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_002__full",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person stands up, claps, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_002__drop": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_002__drop",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person stands up, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_002__replace": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_002__replace",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person stands up, waves, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_002__shuffle": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_002__shuffle",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person kneels down, claps, then stands up",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_002__repeat": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_002__repeat",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person stands up, claps twice, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_002__full": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_002__full",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person stands up, claps, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/005_m0v2_omission_order_002__full.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/005_m0v2_omission_order_002__full.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/005_m0v2_omission_order_002__full.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_002__drop": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_002__drop",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person stands up, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/006_m0v2_omission_order_002__drop.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/006_m0v2_omission_order_002__drop.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/006_m0v2_omission_order_002__drop.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_002__replace": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_002__replace",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person stands up, waves, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/007_m0v2_omission_order_002__replace.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/007_m0v2_omission_order_002__replace.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/007_m0v2_omission_order_002__replace.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_002__shuffle": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_002__shuffle",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person kneels down, claps, then stands up",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/008_m0v2_omission_order_002__shuffle.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/008_m0v2_omission_order_002__shuffle.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/008_m0v2_omission_order_002__shuffle.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_002__repeat": {
+    "updated": "2026-05-11T18:21:54",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_002__repeat",
+    "base_id": "m0v2_omission_order_002",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person stands up, claps twice, then kneels down",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/009_m0v2_omission_order_002__repeat.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/009_m0v2_omission_order_002__repeat.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/009_m0v2_omission_order_002__repeat.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_003__full": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_003__full",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person walks backward, jumps once, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_003__drop": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_003__drop",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person walks backward, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_003__replace": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_003__replace",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person walks backward, kicks once, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_003__shuffle": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_003__shuffle",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person turns around, jumps once, then walks backward",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_omission_order_003__repeat": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_omission_order_003__repeat",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person walks backward, jumps twice, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_003__full": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_003__full",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person walks backward, jumps once, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_003__drop": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_003__drop",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person walks backward, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_003__replace": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_003__replace",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person walks backward, kicks once, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_003__shuffle": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_003__shuffle",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person turns around, jumps once, then walks backward",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_omission_order_003__repeat": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "momask",
+    "prompt_id": "m0v2_omission_order_003__repeat",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person walks backward, jumps twice, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_003__full": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_003__full",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person walks backward, jumps once, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_003__drop": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_003__drop",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person walks backward, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_003__replace": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_003__replace",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person walks backward, kicks once, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_003__shuffle": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_003__shuffle",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person turns around, jumps once, then walks backward",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_omission_order_003__repeat": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "mogents",
+    "prompt_id": "m0v2_omission_order_003__repeat",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person walks backward, jumps twice, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_003__full": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_003__full",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "full",
+    "prompt": "a person walks backward, jumps once, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/010_m0v2_omission_order_003__full.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/010_m0v2_omission_order_003__full.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/010_m0v2_omission_order_003__full.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_003__drop": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_003__drop",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "drop",
+    "prompt": "a person walks backward, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/011_m0v2_omission_order_003__drop.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/011_m0v2_omission_order_003__drop.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/011_m0v2_omission_order_003__drop.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_003__replace": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_003__replace",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "replace",
+    "prompt": "a person walks backward, kicks once, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/012_m0v2_omission_order_003__replace.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/012_m0v2_omission_order_003__replace.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/012_m0v2_omission_order_003__replace.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_003__shuffle": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_003__shuffle",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "shuffle",
+    "prompt": "a person turns around, jumps once, then walks backward",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/013_m0v2_omission_order_003__shuffle.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/013_m0v2_omission_order_003__shuffle.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/013_m0v2_omission_order_003__shuffle.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_omission_order_003__repeat": {
+    "updated": "2026-05-11T18:21:55",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_omission_order_003__repeat",
+    "base_id": "m0v2_omission_order_003",
+    "category": "omission_order",
+    "condition": "repeat",
+    "prompt": "a person walks backward, jumps twice, then turns around",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/014_m0v2_omission_order_003__repeat.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/014_m0v2_omission_order_003__repeat.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/014_m0v2_omission_order_003__repeat.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_frequency_001__full": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_frequency_001__full",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "full",
+    "prompt": "a person jumps twice and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_frequency_001__drop": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_frequency_001__drop",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "drop",
+    "prompt": "a person jumps once and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_frequency_001__replace": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_frequency_001__replace",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "replace",
+    "prompt": "a person kicks twice and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_frequency_001__shuffle": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_frequency_001__shuffle",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "shuffle",
+    "prompt": "a person waves one hand and then jumps twice",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "motiongpt::m0v2_frequency_001__repeat": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "motiongpt",
+    "prompt_id": "m0v2_frequency_001__repeat",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "repeat",
+    "prompt": "a person jumps three times and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_frequency_001__full": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "momask",
+    "prompt_id": "m0v2_frequency_001__full",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "full",
+    "prompt": "a person jumps twice and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_frequency_001__drop": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "momask",
+    "prompt_id": "m0v2_frequency_001__drop",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "drop",
+    "prompt": "a person jumps once and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_frequency_001__replace": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "momask",
+    "prompt_id": "m0v2_frequency_001__replace",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "replace",
+    "prompt": "a person kicks twice and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_frequency_001__shuffle": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "momask",
+    "prompt_id": "m0v2_frequency_001__shuffle",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "shuffle",
+    "prompt": "a person waves one hand and then jumps twice",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "momask::m0v2_frequency_001__repeat": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "momask",
+    "prompt_id": "m0v2_frequency_001__repeat",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "repeat",
+    "prompt": "a person jumps three times and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_frequency_001__full": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "mogents",
+    "prompt_id": "m0v2_frequency_001__full",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "full",
+    "prompt": "a person jumps twice and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_frequency_001__drop": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "mogents",
+    "prompt_id": "m0v2_frequency_001__drop",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "drop",
+    "prompt": "a person jumps once and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_frequency_001__replace": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "mogents",
+    "prompt_id": "m0v2_frequency_001__replace",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "replace",
+    "prompt": "a person kicks twice and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_frequency_001__shuffle": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "mogents",
+    "prompt_id": "m0v2_frequency_001__shuffle",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "shuffle",
+    "prompt": "a person waves one hand and then jumps twice",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "mogents::m0v2_frequency_001__repeat": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "mogents",
+    "prompt_id": "m0v2_frequency_001__repeat",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "repeat",
+    "prompt": "a person jumps three times and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "missing",
+      "primary_path": null,
+      "video_path": null,
+      "native_output_path": null,
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_frequency_001__full": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_frequency_001__full",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "full",
+    "prompt": "a person jumps twice and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/015_m0v2_frequency_001__full.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/015_m0v2_frequency_001__full.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/015_m0v2_frequency_001__full.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_frequency_001__drop": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_frequency_001__drop",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "drop",
+    "prompt": "a person jumps once and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/016_m0v2_frequency_001__drop.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/016_m0v2_frequency_001__drop.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/016_m0v2_frequency_001__drop.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_frequency_001__replace": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_frequency_001__replace",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "replace",
+    "prompt": "a person kicks twice and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/017_m0v2_frequency_001__replace.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/017_m0v2_frequency_001__replace.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/017_m0v2_frequency_001__replace.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_frequency_001__shuffle": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_frequency_001__shuffle",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "shuffle",
+    "prompt": "a person waves one hand and then jumps twice",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/018_m0v2_frequency_001__shuffle.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/018_m0v2_frequency_001__shuffle.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/018_m0v2_frequency_001__shuffle.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  },
+  "eventt2m::m0v2_frequency_001__repeat": {
+    "updated": "2026-05-11T18:21:57",
+    "model": "eventt2m",
+    "prompt_id": "m0v2_frequency_001__repeat",
+    "base_id": "m0v2_frequency_001",
+    "category": "frequency",
+    "condition": "repeat",
+    "prompt": "a person jumps three times and then waves one hand",
+    "label": "OK",
+    "description": "",
+    "label_definition": {
+      "OK": "The motion is reasonable for the current prompt.",
+      "ERROR": "The motion generated from the current prompt is unreasonable."
+    },
+    "artifact": {
+      "primary_kind": "video",
+      "primary_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/019_m0v2_frequency_001__repeat.mp4",
+      "video_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/videos/019_m0v2_frequency_001__repeat.mp4",
+      "native_output_path": "/data/Life Me/ResearchWY Vault/artifacts/modebug_battery_m0_v2_20260508/archived_legacy_m0_v2_20260510/results/eventt2m/native_outputs/joints/019_m0v2_frequency_001__repeat.npy",
+      "trace_summary_path": null
+    },
+    "role": "human_diagnostic_label",
+    "limitations": "Human OK/ERROR label and description are diagnostic and not a final evaluator."
+  }
+}

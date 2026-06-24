@@ -1,0 +1,148 @@
+{
+  "part_id": "part_006",
+  "section_role": "Ablation studies and analysis of CubiD",
+  "method_evidence": [
+    {
+      "claim": "Masking ratio r is sampled from a truncated Gaussian distribution with μ=1.0 and varying σ.",
+      "section": "4.3",
+      "anchor": "We sample the masking ratio r from a truncated Gaussian distribution (Eq.2) with μ = 1.O and varying standard deviation o.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Per-element masking independently masks individual elements across the h×w×d tensor.",
+      "section": "4.3",
+      "anchor": "Perelement masking,our approach that independently masks individual elements across the tensor.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Learned mask token achieves best performance.",
+      "section": "4.3",
+      "anchor": "Learned: treating the mask token as a learnable parameter. The learned mask token achieves the best performance (gFID=5.33).",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Optimal masking ratio standard deviation σ=0.10 achieves gFID=5.33.",
+      "table_or_figure": "Table 4a",
+      "metric": "gFID",
+      "value": "5.33",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Per-element masking achieves gFID=5.33, outperforming per-dim (120.03) and per-spatial (22.22).",
+      "table_or_figure": "Table 4b",
+      "metric": "gFID",
+      "value": "5.33",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Learned mask token achieves gFID=5.33, random mask token achieves 56.38.",
+      "table_or_figure": "Table 4c",
+      "metric": "gFID",
+      "value": "5.33",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Performance saturates around 512 inference steps with gFID=5.25.",
+      "table_or_figure": "Table 4d",
+      "metric": "gFID",
+      "value": "5.25",
+      "confidence": 0.95
+    },
+    {
+      "claim": "3.7B model achieves gFID=4.68, improving over 946M (5.25) and 1.4B (4.91).",
+      "table_or_figure": "Table 4e",
+      "metric": "gFID",
+      "value": "4.68",
+      "confidence": 0.95
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table 4a",
+      "role_hint": "Mask ratio distribution ablation",
+      "caption": "Effect of standard deviation σ in truncated Gaussian masking ratio distribution.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Table 4b",
+      "role_hint": "Masking strategy ablation",
+      "caption": "Comparison of per-dim, per-spatial, and per-element masking strategies.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Table 4c",
+      "role_hint": "Mask token design ablation",
+      "caption": "Comparison of fixed, random, and learned mask token values.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Table 4d",
+      "role_hint": "Inference steps ablation",
+      "caption": "Effect of inference steps T on generation quality.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Figure 5",
+      "role_hint": "Qualitative comparison of masking strategies",
+      "caption": "Qualitative comparison of different masking strategies. Top row: Per-dim masking. Middle row: Per-spatial masking. Bottom row: Our per-element masking.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_006",
+    "part_index": 6,
+    "part_count": 9,
+    "chunk_chars": 6504,
+    "latency_seconds": 10.204,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 2795,
+      "completion_tokens_est": 986,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3781,
+      "total_with_reasoning_tokens_est": 3781,
+      "estimated_cost_usd": 0.002074,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2236,
+      "completion_tokens_api": 948,
+      "total_tokens_api": 3184,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1596,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 948,
+        "prompt_tokens": 2236,
+        "total_tokens": 3184,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1596
+      },
+      "estimated_cost_usd_api": 0.001521,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 3286,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 950,
+        "api_usage_present": true
+      }
+    }
+  }
+}

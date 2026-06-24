@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#111827}.axis{stroke:#9ca3af;stroke-width:1}.grid{stroke:#e5e7eb;stroke-width:1}.legend{font-size:13px}.tick{font-size:12px;fill:#4b5563}.title{font-size:20px;font-weight:700}.label{font-size:13px;fill:#374151}</style>
+<text x="78.0" y="34.0" text-anchor="start" class="title">MotionGPT Layer R-Precision Top2 Trend</text>
+<text x="78.0" y="56.0" text-anchor="start" class="label">R-Precision Top2 higher is better</text>
+<line x1="78" y1="70.0" x2="942" y2="70.0" class="grid"/>
+<text x="68.0" y="74.0" text-anchor="end" class="tick">0.589</text>
+<line x1="78" y1="163.0" x2="942" y2="163.0" class="grid"/>
+<text x="68.0" y="167.0" text-anchor="end" class="tick">0.58</text>
+<line x1="78" y1="256.0" x2="942" y2="256.0" class="grid"/>
+<text x="68.0" y="260.0" text-anchor="end" class="tick">0.57</text>
+<line x1="78" y1="349.0" x2="942" y2="349.0" class="grid"/>
+<text x="68.0" y="353.0" text-anchor="end" class="tick">0.561</text>
+<line x1="78" y1="442.0" x2="942" y2="442.0" class="grid"/>
+<text x="68.0" y="446.0" text-anchor="end" class="tick">0.551</text>
+<line x1="78" y1="442" x2="942" y2="442" class="axis"/>
+<line x1="78" y1="70" x2="78" y2="442" class="axis"/>
+<line x1="78.0" y1="442" x2="78.0" y2="447" class="axis"/>
+<text x="78.0" y="464.0" text-anchor="middle" class="tick">0</text>
+<line x1="235.1" y1="442" x2="235.1" y2="447" class="axis"/>
+<text x="235.1" y="464.0" text-anchor="middle" class="tick">2</text>
+<line x1="392.2" y1="442" x2="392.2" y2="447" class="axis"/>
+<text x="392.2" y="464.0" text-anchor="middle" class="tick">4</text>
+<line x1="549.3" y1="442" x2="549.3" y2="447" class="axis"/>
+<text x="549.3" y="464.0" text-anchor="middle" class="tick">6</text>
+<line x1="706.4" y1="442" x2="706.4" y2="447" class="axis"/>
+<text x="706.4" y="464.0" text-anchor="middle" class="tick">8</text>
+<line x1="863.5" y1="442" x2="863.5" y2="447" class="axis"/>
+<text x="863.5" y="464.0" text-anchor="middle" class="tick">10</text>
+<line x1="942.0" y1="442" x2="942.0" y2="447" class="axis"/>
+<text x="942.0" y="464.0" text-anchor="middle" class="tick">11</text>
+<text x="490.0" y="494.0" text-anchor="middle" class="label">Layer</text>
+<polyline fill="none" stroke="#2563eb" stroke-width="2.6" points="78.0,314.4 156.5,212.5 235.1,237.9 313.6,187.0 392.2,116.9 470.7,416.3 549.3,95.7 627.8,240.1 706.4,240.1 784.9,252.8 863.5,167.9 942.0,240.1"/>
+<circle cx="78.0" cy="314.4" r="3" fill="#2563eb"/>
+<circle cx="156.5" cy="212.5" r="3" fill="#2563eb"/>
+<circle cx="235.1" cy="237.9" r="3" fill="#2563eb"/>
+<circle cx="313.6" cy="187.0" r="3" fill="#2563eb"/>
+<circle cx="392.2" cy="116.9" r="3" fill="#2563eb"/>
+<circle cx="470.7" cy="416.3" r="3" fill="#2563eb"/>
+<circle cx="549.3" cy="95.7" r="3" fill="#2563eb"/>
+<circle cx="627.8" cy="240.1" r="3" fill="#2563eb"/>
+<circle cx="706.4" cy="240.1" r="3" fill="#2563eb"/>
+<circle cx="784.9" cy="252.8" r="3" fill="#2563eb"/>
+<circle cx="863.5" cy="167.9" r="3" fill="#2563eb"/>
+<circle cx="942.0" cy="240.1" r="3" fill="#2563eb"/>
+<rect x="78" y="468" width="14" height="14" fill="#2563eb"/>
+<text x="98.0" y="480.0" text-anchor="start" class="legend">SA</text>
+<polyline fill="none" stroke="#059669" stroke-width="2.6" points="78.0,178.5 156.5,282.5 235.1,291.0 313.6,286.8 392.2,299.5 470.7,225.2 549.3,252.8 627.8,257.1 706.4,278.3 784.9,271.9 863.5,373.9 942.0,386.6"/>
+<circle cx="78.0" cy="178.5" r="3" fill="#059669"/>
+<circle cx="156.5" cy="282.5" r="3" fill="#059669"/>
+<circle cx="235.1" cy="291.0" r="3" fill="#059669"/>
+<circle cx="313.6" cy="286.8" r="3" fill="#059669"/>
+<circle cx="392.2" cy="299.5" r="3" fill="#059669"/>
+<circle cx="470.7" cy="225.2" r="3" fill="#059669"/>
+<circle cx="549.3" cy="252.8" r="3" fill="#059669"/>
+<circle cx="627.8" cy="257.1" r="3" fill="#059669"/>
+<circle cx="706.4" cy="278.3" r="3" fill="#059669"/>
+<circle cx="784.9" cy="271.9" r="3" fill="#059669"/>
+<circle cx="863.5" cy="373.9" r="3" fill="#059669"/>
+<circle cx="942.0" cy="386.6" r="3" fill="#059669"/>
+<rect x="198" y="468" width="14" height="14" fill="#059669"/>
+<text x="218.0" y="480.0" text-anchor="start" class="legend">CA</text>
+</svg>

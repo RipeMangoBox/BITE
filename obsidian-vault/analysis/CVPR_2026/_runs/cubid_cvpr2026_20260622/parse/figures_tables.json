@@ -1,0 +1,709 @@
+[
+  {
+    "label": "Figure 1",
+    "type": "figure",
+    "caption": "Figure 1.Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor—any dimension at any position can be masked and predicted independently-enabling effcient generation in T< h ×w ×d iterations while capturing both spatial and dimensional correlations.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/rf_full_regions/page_001_Figure_1_c1621dbf36eb.jpg",
+    "bbox": [
+      511.0,
+      332.0,
+      846.0,
+      570.0
+    ],
+    "cluster_bbox": [
+      511.0,
+      332.0,
+      846.0,
+      570.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/d287d4edcee3d59bdb2e666ca97757c51596999395e11b502ade0a87654a23c0.jpg",
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/a3e02756e743b4e4f4460e944f34f02be83145c2496be01c4352459600d3111a.jpg"
+    ],
+    "page": 0,
+    "cluster_size": 2,
+    "raw_items": [
+      {
+        "type": "image",
+        "page": 0,
+        "bbox": [
+          558.0,
+          332.0,
+          789.0,
+          430.0
+        ],
+        "caption": "(b) High-dim Token Generation",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/d287d4edcee3d59bdb2e666ca97757c51596999395e11b502ade0a87654a23c0.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      },
+      {
+        "type": "image",
+        "page": 0,
+        "bbox": [
+          511.0,
+          443.0,
+          846.0,
+          570.0
+        ],
+        "caption": "Figure 1.Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor—any dimension at any position can be masked and predicted independently-enabling effcient generation in T< h ×w ×d iterations while capturing both spatial and dimensional correlations.",
+        "label": "Figure 1",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/a3e02756e743b4e4f4460e944f34f02be83145c2496be01c4352459600d3111a.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ],
+    "full_region_source": "pdf_crop",
+    "full_region_origin_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens_origin.pdf",
+    "full_region_bbox_pdf": [
+      307.836,
+      258.192,
+      522.648,
+      456.192
+    ],
+    "full_region_bbox_content": [
+      511.0,
+      332.0,
+      846.0,
+      570.0
+    ],
+    "middle_visual_blocks": [
+      {
+        "page": 0,
+        "type": "image",
+        "bbox": [
+          342.0,
+          263.0,
+          483.0,
+          341.0
+        ],
+        "caption": "",
+        "source_path": ""
+      },
+      {
+        "page": 0,
+        "type": "image",
+        "bbox": [
+          313.0,
+          351.0,
+          518.0,
+          452.0
+        ],
+        "caption": "",
+        "source_path": ""
+      }
+    ]
+  },
+  {
+    "label": "Figure",
+    "type": "figure",
+    "caption": "Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/b6415517082ec51d32360678bde13fe75befb4f79bb1cb2919b75efbe675fa9c.jpg",
+    "bbox": [
+      145.0,
+      140.0,
+      849.0,
+      323.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/b6415517082ec51d32360678bde13fe75befb4f79bb1cb2919b75efbe675fa9c.jpg"
+    ],
+    "page": 1,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "image",
+        "page": 1,
+        "bbox": [
+          145.0,
+          140.0,
+          849.0,
+          323.0
+        ],
+        "caption": "Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories.",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/b6415517082ec51d32360678bde13fe75befb4f79bb1cb2919b75efbe675fa9c.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  },
+  {
+    "label": "Figure",
+    "type": "figure",
+    "caption": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1eafac52892166386681d533f32eeef3d31b9776144cf80cb53cbe840b7de4d0.jpg",
+    "bbox": [
+      143.0,
+      142.0,
+      849.0,
+      276.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1eafac52892166386681d533f32eeef3d31b9776144cf80cb53cbe840b7de4d0.jpg"
+    ],
+    "page": 3,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "image",
+        "page": 3,
+        "bbox": [
+          143.0,
+          142.0,
+          849.0,
+          276.0
+        ],
+        "caption": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes.",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1eafac52892166386681d533f32eeef3d31b9776144cf80cb53cbe840b7de4d0.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  },
+  {
+    "label": "Figure 4",
+    "type": "figure",
+    "caption": "Figure4.InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/81cc91a110464149186ceac2ffd68c0691231fc6e3f1adeee405b9e1f4af80d9.jpg",
+    "bbox": [
+      143.0,
+      138.0,
+      849.0,
+      272.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/81cc91a110464149186ceac2ffd68c0691231fc6e3f1adeee405b9e1f4af80d9.jpg"
+    ],
+    "page": 4,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "image",
+        "page": 4,
+        "bbox": [
+          143.0,
+          138.0,
+          849.0,
+          272.0
+        ],
+        "caption": "Figure4.InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details.",
+        "label": "Figure 4",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/81cc91a110464149186ceac2ffd68c0691231fc6e3f1adeee405b9e1f4af80d9.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  },
+  {
+    "label": "Table 1",
+    "type": "table",
+    "caption": "Table 1.Model sizes and architecture configurations of CubiD.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1000149da4e70c155544383dd878f3a5bbb3f0dca5ef8a4930200af0a5796113.jpg",
+    "bbox": [
+      552.0,
+      378.0,
+      810.0,
+      438.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1000149da4e70c155544383dd878f3a5bbb3f0dca5ef8a4930200af0a5796113.jpg"
+    ],
+    "page": 4,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "table",
+        "page": 4,
+        "bbox": [
+          552.0,
+          378.0,
+          810.0,
+          438.0
+        ],
+        "caption": "Table 1.Model sizes and architecture configurations of CubiD.",
+        "label": "Table 1",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/1000149da4e70c155544383dd878f3a5bbb3f0dca5ef8a4930200af0a5796113.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  },
+  {
+    "label": "Table 4",
+    "type": "table",
+    "caption": "Table 4.Ablation studies on CubiD design choices.Gray rows indicate best results.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/f28ceaedec30c9a8b05bec29b34ba97876681e385e0da14ddd258030dbf15a7f.jpg",
+    "bbox": [
+      545.0,
+      170.0,
+      633.0,
+      228.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/f28ceaedec30c9a8b05bec29b34ba97876681e385e0da14ddd258030dbf15a7f.jpg"
+    ],
+    "page": 5,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          545.0,
+          170.0,
+          633.0,
+          228.0
+        ],
+        "caption": "Table 4.Ablation studies on CubiD design choices.Gray rows indicate best results.",
+        "label": "Table 4",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/f28ceaedec30c9a8b05bec29b34ba97876681e385e0da14ddd258030dbf15a7f.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  },
+  {
+    "label": "Table",
+    "type": "table",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/7a5708444105cb3dc8b486ebfc8d2e17a2506c09fe6edc4eb87c95a5b4de4a9d.jpg",
+    "bbox": [
+      699.0,
+      170.0,
+      861.0,
+      228.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/7a5708444105cb3dc8b486ebfc8d2e17a2506c09fe6edc4eb87c95a5b4de4a9d.jpg"
+    ],
+    "page": 5,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          699.0,
+          170.0,
+          861.0,
+          228.0
+        ],
+        "caption": "",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/7a5708444105cb3dc8b486ebfc8d2e17a2506c09fe6edc4eb87c95a5b4de4a9d.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  },
+  {
+    "label": "Table 2",
+    "type": "table",
+    "caption": "Table 2. Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2).",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/rf_full_regions/page_006_Table_2_18451403a218.jpg",
+    "bbox": [
+      143.0,
+      181.0,
+      482.0,
+      276.0
+    ],
+    "cluster_bbox": [
+      143.0,
+      181.0,
+      482.0,
+      276.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/52ffa3593d0c2ab904d634a84ab50a973fedcd8b2e62d8e0e29383367e8f9f36.jpg",
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/21b8d47205a41cd0375d3e581a074537f385304f9828cc2bf39629a5bdf3e1e0.jpg"
+    ],
+    "page": 5,
+    "cluster_size": 2,
+    "raw_items": [
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          143.0,
+          181.0,
+          302.0,
+          276.0
+        ],
+        "caption": "Table 2. Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2).",
+        "label": "Table 2",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/52ffa3593d0c2ab904d634a84ab50a973fedcd8b2e62d8e0e29383367e8f9f36.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      },
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          325.0,
+          181.0,
+          482.0,
+          275.0
+        ],
+        "caption": "",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/21b8d47205a41cd0375d3e581a074537f385304f9828cc2bf39629a5bdf3e1e0.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ],
+    "full_region_source": "pdf_crop",
+    "full_region_origin_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens_origin.pdf",
+    "full_region_bbox_pdf": [
+      82.62,
+      138.6,
+      299.88,
+      223.344
+    ],
+    "full_region_bbox_content": [
+      143.0,
+      181.0,
+      482.0,
+      276.0
+    ],
+    "middle_visual_blocks": [
+      {
+        "page": 5,
+        "type": "table",
+        "bbox": [
+          88.0,
+          144.0,
+          185.0,
+          219.0
+        ],
+        "caption": "",
+        "source_path": ""
+      },
+      {
+        "page": 5,
+        "type": "table",
+        "bbox": [
+          199.0,
+          144.0,
+          295.0,
+          218.0
+        ],
+        "caption": "",
+        "source_path": ""
+      }
+    ]
+  },
+  {
+    "label": "Table",
+    "type": "table",
+    "caption": "(d) Inference steps.Effect of inference steps T. (f) Representation encoder. DI-NOv2 vs. SigLIP2.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/rf_full_regions/page_006_Table_1a71602ebb4c.jpg",
+    "bbox": [
+      717.0,
+      295.0,
+      826.0,
+      444.0
+    ],
+    "cluster_bbox": [
+      717.0,
+      295.0,
+      826.0,
+      444.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/49628e85330cfadf32b5c6fc436ff5af901181df67aecaff1c51a03755a7819c.jpg",
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/fb238e65b05fac3f215c6e3a94fac5dd54b6ac8d6fffaf2751a8d7cbf230f50e.jpg"
+    ],
+    "page": 5,
+    "cluster_size": 2,
+    "raw_items": [
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          730.0,
+          295.0,
+          821.0,
+          366.0
+        ],
+        "caption": "(d) Inference steps.Effect of inference steps T.",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/49628e85330cfadf32b5c6fc436ff5af901181df67aecaff1c51a03755a7819c.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      },
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          717.0,
+          395.0,
+          826.0,
+          444.0
+        ],
+        "caption": "(f) Representation encoder. DI-NOv2 vs. SigLIP2.",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/fb238e65b05fac3f215c6e3a94fac5dd54b6ac8d6fffaf2751a8d7cbf230f50e.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ],
+    "full_region_source": "pdf_crop",
+    "full_region_origin_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens_origin.pdf",
+    "full_region_bbox_pdf": [
+      433.908,
+      228.888,
+      510.408,
+      356.4
+    ],
+    "full_region_bbox_content": [
+      717.0,
+      295.0,
+      826.0,
+      444.0
+    ],
+    "middle_visual_blocks": [
+      {
+        "page": 5,
+        "type": "table",
+        "bbox": [
+          447.0,
+          234.0,
+          503.0,
+          290.0
+        ],
+        "caption": "",
+        "source_path": ""
+      },
+      {
+        "page": 5,
+        "type": "table",
+        "bbox": [
+          439.0,
+          313.0,
+          506.0,
+          352.0
+        ],
+        "caption": "",
+        "source_path": ""
+      }
+    ]
+  },
+  {
+    "label": "Table",
+    "type": "table",
+    "caption": "(c)Mask value.Fixed,random, or learned mask token.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/rf_full_regions/page_006_Table_00e81ee9c115.jpg",
+    "bbox": [
+      529.0,
+      301.0,
+      651.0,
+      449.0
+    ],
+    "cluster_bbox": [
+      529.0,
+      301.0,
+      651.0,
+      449.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/aff8842b99e866741cc7f799a0467c8263e7e970d230026f72abda63e945c8fe.jpg",
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/fb7d8e814c4cf395a81d4589797ebcef32618299a474d7fad1ab95086c8e7970.jpg"
+    ],
+    "page": 5,
+    "cluster_size": 2,
+    "raw_items": [
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          529.0,
+          301.0,
+          651.0,
+          359.0
+        ],
+        "caption": "(c)Mask value.Fixed,random, or learned mask token.",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/aff8842b99e866741cc7f799a0467c8263e7e970d230026f72abda63e945c8fe.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      },
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          539.0,
+          390.0,
+          642.0,
+          449.0
+        ],
+        "caption": "",
+        "label": "",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/fb7d8e814c4cf395a81d4589797ebcef32618299a474d7fad1ab95086c8e7970.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ],
+    "full_region_source": "pdf_crop",
+    "full_region_origin_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens_origin.pdf",
+    "full_region_bbox_pdf": [
+      318.852,
+      233.64,
+      403.308,
+      360.36
+    ],
+    "full_region_bbox_content": [
+      529.0,
+      301.0,
+      651.0,
+      449.0
+    ],
+    "middle_visual_blocks": [
+      {
+        "page": 5,
+        "type": "table",
+        "bbox": [
+          324.0,
+          239.0,
+          399.0,
+          285.0
+        ],
+        "caption": "",
+        "source_path": ""
+      },
+      {
+        "page": 5,
+        "type": "table",
+        "bbox": [
+          330.0,
+          309.0,
+          393.0,
+          356.0
+        ],
+        "caption": "",
+        "source_path": ""
+      }
+    ]
+  },
+  {
+    "label": "Table 3",
+    "type": "table",
+    "caption": "Table 3.Understanding performance onLLaVA benchmarks with different quantization methods.Evaluation using SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/6ba7b681cfe8598e6842dd8f9e9cb7755b4ca6b8eed5d8c62da05eef29f1e6a0.jpg",
+    "bbox": [
+      151.0,
+      354.0,
+      472.0,
+      415.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/6ba7b681cfe8598e6842dd8f9e9cb7755b4ca6b8eed5d8c62da05eef29f1e6a0.jpg"
+    ],
+    "page": 5,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "table",
+        "page": 5,
+        "bbox": [
+          151.0,
+          354.0,
+          472.0,
+          415.0
+        ],
+        "caption": "Table 3.Understanding performance onLLaVA benchmarks with different quantization methods.Evaluation using SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation.",
+        "label": "Table 3",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/6ba7b681cfe8598e6842dd8f9e9cb7755b4ca6b8eed5d8c62da05eef29f1e6a0.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  },
+  {
+    "label": "Figure 5",
+    "type": "figure",
+    "caption": "Figure 5.Qualitative comparison of different masking strategies.Top row:Per-dim masking completely fails,producing severe texture-like artifacts.Middle row:Per-spatial masking generates images with significant local inconsistencies and blurry details.Bottom row: Our per-element masking produces clear, coherent images with fine details.The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/256b80b327cb9f2125c251a19b11d58fdd665d7bfbc6da1d27984bb0afbe3cfe.jpg",
+    "bbox": [
+      516.0,
+      140.0,
+      851.0,
+      390.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/256b80b327cb9f2125c251a19b11d58fdd665d7bfbc6da1d27984bb0afbe3cfe.jpg"
+    ],
+    "page": 6,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "image",
+        "page": 6,
+        "bbox": [
+          516.0,
+          140.0,
+          851.0,
+          390.0
+        ],
+        "caption": "Figure 5.Qualitative comparison of different masking strategies.Top row:Per-dim masking completely fails,producing severe texture-like artifacts.Middle row:Per-spatial masking generates images with significant local inconsistencies and blurry details.Bottom row: Our per-element masking produces clear, coherent images with fine details.The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes.",
+        "label": "Figure 5",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/256b80b327cb9f2125c251a19b11d58fdd665d7bfbc6da1d27984bb0afbe3cfe.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  },
+  {
+    "label": "Table 5",
+    "type": "table",
+    "caption": "Table 5.Discrete generationmethodsonImageNet[8256x256.LatentDimdenotes theoriginaldimensionalityofthelatentspace (featureseforevectorquantizationforlow-dimensionalmethods,beforeandafterdimension-wiseuantizationforCubiD).Resultsith superscript\"redenoterejectionsampling.CubiDisthefirstandonlydiscretemethodtodirectlygeneratewithnativehigh-dimensional representation tokens (768d),while allother methods use compressed or low-dimensional tokens (mostly below 32).",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/cf10699f5945bf115313d7219c8520ad8872ad231fd723c19abd6a84a706d983.jpg",
+    "bbox": [
+      197.0,
+      141.0,
+      794.0,
+      401.0
+    ],
+    "source_paths": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/cf10699f5945bf115313d7219c8520ad8872ad231fd723c19abd6a84a706d983.jpg"
+    ],
+    "page": 7,
+    "cluster_size": 1,
+    "raw_items": [
+      {
+        "type": "table",
+        "page": 7,
+        "bbox": [
+          197.0,
+          141.0,
+          794.0,
+          401.0
+        ],
+        "caption": "Table 5.Discrete generationmethodsonImageNet[8256x256.LatentDimdenotes theoriginaldimensionalityofthelatentspace (featureseforevectorquantizationforlow-dimensionalmethods,beforeandafterdimension-wiseuantizationforCubiD).Resultsith superscript\"redenoterejectionsampling.CubiDisthefirstandonlydiscretemethodtodirectlygeneratewithnativehigh-dimensional representation tokens (768d),while allother methods use compressed or low-dimensional tokens (mostly below 32).",
+        "label": "Table 5",
+        "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/CVPR_2026/_runs/cubid_cvpr2026_20260622/parse/mineru_raw/Cubic_Discrete_Diffusion_Discrete_Visual_Generation_on_High_Dimensional_Representation_Tokens/auto/images/cf10699f5945bf115313d7219c8520ad8872ad231fd723c19abd6a84a706d983.jpg",
+        "extra_captions": [],
+        "unassigned_extra_captions": [],
+        "caption_repair": ""
+      }
+    ]
+  }
+]

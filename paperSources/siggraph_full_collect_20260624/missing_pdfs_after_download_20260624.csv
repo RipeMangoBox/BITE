@@ -1,0 +1,1007 @@
+venue,state,paper_title,paper_link,project_link_or_github_link,sort
+SIGGRAPH 2025,,3DGS2: Near Second-order Converging 3D Gaussian Splatting,,https://s2025.conference-schedule.org/presentation/?id=papers_716&sess=sess119,"SIGGRAPH 2025 / Splatting Bigger, Faster, and Adaptive"
+SIGGRAPH 2025,,4D Gaussian Videos with Motion Layering,,https://s2025.conference-schedule.org/presentation/?id=papers_853&sess=sess125,SIGGRAPH 2025 / Gaussian Reconstruction
+SIGGRAPH 2025,,"60,000nits Full-color Native RGB Single Junction 3,386PPI Micro-OLED",,https://s2025.conference-schedule.org/presentation/?id=pos_126&sess=sess403,SIGGRAPH 2025 / Displays & Optics
+SIGGRAPH 2025,,A Deep Learning-based Virtual Oculoplastic Surgery Simulator,,https://s2025.conference-schedule.org/presentation/?id=papers_574&sess=sess144,SIGGRAPH 2025 / Interactive Reality & Perception
+SIGGRAPH 2025,,A Fully-statistical Wave Scattering Model for Heterogeneous Surfaces,,https://s2025.conference-schedule.org/presentation/?id=papers_198&sess=sess129,SIGGRAPH 2025 / Beautiful Materials
+SIGGRAPH 2025,,A Hybrid Near-wall Model for Kinetic Simulation of Turbulent Boundary Layer Flows,,https://s2025.conference-schedule.org/presentation/?id=papers_237&sess=sess136,SIGGRAPH 2025 / Unconventional Fluids
+SIGGRAPH 2025,,A Large-Étendue Direct-View Holographic Display System,,https://s2025.conference-schedule.org/presentation/?id=pos_149&sess=sess403,SIGGRAPH 2025 / Displays & Optics
+SIGGRAPH 2025,,A Monte Carlo Rendering Framework for Simulating Optical Heterodyne Detection,,https://s2025.conference-schedule.org/presentation/?id=papers_247&sess=sess159,"SIGGRAPH 2025 / Computational Imaging, Lighting & Display"
+SIGGRAPH 2025,,A Neural Particle Level Set Method for Dynamic Interface Tracking,,https://s2025.conference-schedule.org/presentation/?id=paperstog_117&sess=sess138,SIGGRAPH 2025 / This is Fluid Simulation
+SIGGRAPH 2025,,A Novel Maxwellian Optics Combining Spherical Multi Pinholes and TMD for Enhanced Field of View,,https://s2025.conference-schedule.org/presentation/?id=pos_279&sess=sess403,SIGGRAPH 2025 / Displays & Optics
+SIGGRAPH 2025,,A Polyhedral Construction of Empty Spheres in Discrete Distance Fields,,https://s2025.conference-schedule.org/presentation/?id=papers_1267&sess=sess104,SIGGRAPH 2025 / What's the Point?
+SIGGRAPH 2025,,A Versatile Quaternion-Based Constrained Rigid Body Dynamics,,https://s2025.conference-schedule.org/presentation/?id=papers_633&sess=sess135,SIGGRAPH 2025 / Rigid Bodies & Contacts
+SIGGRAPH 2025,,ANIME-Rod: Adjustable Nonlinear Isotropic Materials for Elastic Rods,,https://s2025.conference-schedule.org/presentation/?id=papers_1094&sess=sess147,SIGGRAPH 2025 / Stable & Accurate Elasticity
+SIGGRAPH 2025,,Accelerated Gamut Discovery via Massive Parallelization,,https://s2025.conference-schedule.org/presentation/?id=papers_867&sess=sess155,SIGGRAPH 2025 / Numerics & Parallelization
+SIGGRAPH 2025,,Adaptive Phase-Field-FLIP for Very Large Scale Two-Phase Fluid Simulation,,https://s2025.conference-schedule.org/presentation/?id=papers_516&sess=sess138,SIGGRAPH 2025 / This is Fluid Simulation
+SIGGRAPH 2025,,Adding Regional Control for Continuous Remeshing via Attention Flows,,https://s2025.conference-schedule.org/presentation/?id=pos_268&sess=sess399,SIGGRAPH 2025 / 3D & Geometry
+SIGGRAPH 2025,,Aerial 3D Display With Ultra-Wide Viewing Zone Using Polarization Characteristics of LCDs,,https://s2025.conference-schedule.org/presentation/?id=pos_188&sess=sess403,SIGGRAPH 2025 / Displays & Optics
+SIGGRAPH 2025,,AlignTex: Pixel-Precise Texture Generation from Multi-view Artwork,,https://s2025.conference-schedule.org/presentation/?id=papers_402&sess=sess130,"SIGGRAPH 2025 / Textures, Tiles & Codes"
+SIGGRAPH 2025,,An Infinity Mirror Without Apparent Mirroring,,https://s2025.conference-schedule.org/presentation/?id=pos_256&sess=sess403,SIGGRAPH 2025 / Displays & Optics
+SIGGRAPH 2025,,Anime Colorization Using Segment Matching With Candidate Colors,,https://s2025.conference-schedule.org/presentation/?id=pos_265&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Anywhere Door Experience: Projection Mapping for Enhancing Entertainment and Immersion,,https://s2025.conference-schedule.org/presentation/?id=pos_119&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,Appearance-Preserving Scene Aggregation for Level-of-Detail Rendering,,https://s2025.conference-schedule.org/presentation/?id=paperstog_118&sess=sess123,SIGGRAPH 2025 / Neural Materials & LOD
+SIGGRAPH 2025,,Appearance-aware Multi-view SVBRDF Reconstruction via Deep Reinforcement Learning,,https://s2025.conference-schedule.org/presentation/?id=papers_924&sess=sess133,SIGGRAPH 2025 / More Than it Looks Like
+SIGGRAPH 2025,,Arenite: A Physics-based Sandstone Simulator,,https://s2025.conference-schedule.org/presentation/?id=papers_988&sess=sess136,SIGGRAPH 2025 / Unconventional Fluids
+SIGGRAPH 2025,,Augmented Vertex Block Descent,,https://s2025.conference-schedule.org/presentation/?id=papers_909&sess=sess147,SIGGRAPH 2025 / Stable & Accurate Elasticity
+SIGGRAPH 2025,,AutoKeyframe: Autoregressive Keyframe Generation for Human Motion Synthesis and Editing,,https://s2025.conference-schedule.org/presentation/?id=papers_578&sess=sess143,SIGGRAPH 2025 / All About Motion & Deformation
+SIGGRAPH 2025,,Automated Task Scheduling for Cloth and Deformable Body Simulations in Heterogeneous Computing Environments,,https://s2025.conference-schedule.org/presentation/?id=papers_298&sess=sess151,SIGGRAPH 2025 / Cloth & Other Thin Things
+SIGGRAPH 2025,,Automatic Interpretation of Ancient Egyptian Texts for Education and Research,,https://s2025.conference-schedule.org/presentation/?id=pos_284&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,"Beyond Automation: Fostering Agency Between Humans, Algorithms, and Machines in Computational Design for Digital Fabrication",,https://s2025.conference-schedule.org/presentation/?id=pos_194&sess=sess401,SIGGRAPH 2025 / Art & Design
+SIGGRAPH 2025,,Boolean Operation for CAD Models Using a Hybrid Representation,,https://s2025.conference-schedule.org/presentation/?id=papers_974&sess=sess120,SIGGRAPH 2025 / CAD & B-Reps
+SIGGRAPH 2025,,BrepDiff: Single-Stage B-rep Diffusion Model,,https://s2025.conference-schedule.org/presentation/?id=papers_781&sess=sess120,SIGGRAPH 2025 / CAD & B-Reps
+SIGGRAPH 2025,,C-Tubes: Design and Optimization of Tubular Structures Composed of Developable Strips,,https://s2025.conference-schedule.org/presentation/?id=papers_1261&sess=sess158,SIGGRAPH 2025 / Geometry in Action
+SIGGRAPH 2025,,C5D: Sequential Continuous Convex Collision Detection Using Cone Casting,,https://s2025.conference-schedule.org/presentation/?id=papers_256&sess=sess135,SIGGRAPH 2025 / Rigid Bodies & Contacts
+SIGGRAPH 2025,,Cirrus: Adaptive Hybrid Particle-Grid Flow Maps on GPU,,https://s2025.conference-schedule.org/presentation/?id=papers_879&sess=sess145,"SIGGRAPH 2025 / Flow, Flow, Flow Your Boat"
+SIGGRAPH 2025,,Clebsch Gauge Fluid on Particle Flow Maps,,https://s2025.conference-schedule.org/presentation/?id=papers_903&sess=sess145,"SIGGRAPH 2025 / Flow, Flow, Flow Your Boat"
+SIGGRAPH 2025,,Closed-form Generalized Winding Numbers of Rational Parametric Curves for Robust Containment Queries,,https://s2025.conference-schedule.org/presentation/?id=papers_744&sess=sess112,"SIGGRAPH 2025 / Cages, Deformation, & Interpolation"
+SIGGRAPH 2025,,Co-Speech Gesture and Facial Expression Generation for Non-Photorealistic 3D Characters,,https://s2025.conference-schedule.org/presentation/?id=pos_150&sess=sess400,SIGGRAPH 2025 / Animation & Simulation
+SIGGRAPH 2025,,Cobra: Efficient Line Art COlorization with BRoAder References,,https://s2025.conference-schedule.org/presentation/?id=papers_539&sess=sess149,SIGGRAPH 2025 / Do it With Style & Fashion
+SIGGRAPH 2025,,Collaborative On-Sensor Array Cameras,,https://s2025.conference-schedule.org/presentation/?id=papers_986&sess=sess159,"SIGGRAPH 2025 / Computational Imaging, Lighting & Display"
+SIGGRAPH 2025,,Color Matching and Biomimicry for Multi-material Dental 3D Printing,,https://s2025.conference-schedule.org/presentation/?id=papers_845&sess=sess124,SIGGRAPH 2025 / Microstructures & Materials
+SIGGRAPH 2025,,ColorSurge: Bringing Vibrancy and Efficiency to Automatic Video Colorization via Dual-Branch Fusion,,https://s2025.conference-schedule.org/presentation/?id=papers_1108&sess=sess141,SIGGRAPH 2025 / Very Vivid Videos
+SIGGRAPH 2025,,Compensating Spatiotemporally Inconsistent Observations for Online Dynamic 3D Gaussian Splatting,,https://s2025.conference-schedule.org/presentation/?id=papers_655&sess=sess157,"SIGGRAPH 2025 / Filtering Super-Res, & Visual Quality"
+SIGGRAPH 2025,,Computational Modeling of Gothic Microarchitecture,,https://s2025.conference-schedule.org/presentation/?id=papers_457&sess=sess124,SIGGRAPH 2025 / Microstructures & Materials
+SIGGRAPH 2025,,Confidence Estimation of Few-Shot Patch-Based Learning for Anime-Style Colorization,,https://s2025.conference-schedule.org/presentation/?id=pos_104&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Conformal First Passage for Epsilon-free Walk-on-Spheres,,https://s2025.conference-schedule.org/presentation/?id=papers_1475&sess=sess121,SIGGRAPH 2025 / Make Some Noise
+SIGGRAPH 2025,,Controllable Complex Freezing Dynamics Simulation on Thin Films,,https://s2025.conference-schedule.org/presentation/?id=papers_577&sess=sess136,SIGGRAPH 2025 / Unconventional Fluids
+SIGGRAPH 2025,,Controllable Tracking-Based Video Frame Interpolation,,https://s2025.conference-schedule.org/presentation/?id=papers_191&sess=sess141,SIGGRAPH 2025 / Very Vivid Videos
+SIGGRAPH 2025,,Cora: Correspondence-aware image editing using few step diffusion,,https://s2025.conference-schedule.org/presentation/?id=papers_467&sess=sess152,SIGGRAPH 2025 / Deep Image Editing
+SIGGRAPH 2025,,Correct your balance heuristic: Optimizing balance-style multiple importance sampling weights,,https://s2025.conference-schedule.org/presentation/?id=papers_117&sess=sess127,SIGGRAPH 2025 / Monte-Carlo Rendering & Sampling
+SIGGRAPH 2025,,Creating Fluid-Interactive Virtual Agents by an Efficient Simulator with Local-domain Control,,https://s2025.conference-schedule.org/presentation/?id=papers_472&sess=sess137,SIGGRAPH 2025 / Robots in the World
+SIGGRAPH 2025,,CueTip: An Interactive and Explainable Physics-aware Pool Assistant,,https://s2025.conference-schedule.org/presentation/?id=papers_1166&sess=sess137,SIGGRAPH 2025 / Robots in the World
+SIGGRAPH 2025,,Curl Quantization for Automatic Placement of Knit Singularities,,https://s2025.conference-schedule.org/presentation/?id=papers_906&sess=sess158,SIGGRAPH 2025 / Geometry in Action
+SIGGRAPH 2025,,DAMO: A Deep Solver for Arbitrary Marker Configuration in Optical Motion Capture,,https://s2025.conference-schedule.org/presentation/?id=paperstog_120&sess=sess111,SIGGRAPH 2025 / Loco/Motion Capture
+SIGGRAPH 2025,,DC-VSR: Spatially and Temporally Consistent Video Super-Resolution with Video Diffusion Prior,,https://s2025.conference-schedule.org/presentation/?id=papers_932&sess=sess157,"SIGGRAPH 2025 / Filtering Super-Res, & Visual Quality"
+SIGGRAPH 2025,,Data-Efficient Discovery of Hyperelastic TPMS Metamaterials with Extreme Energy Dissipation,,https://s2025.conference-schedule.org/presentation/?id=papers_1431&sess=sess124,SIGGRAPH 2025 / Microstructures & Materials
+SIGGRAPH 2025,,DeFillet: Detection and Removal of Fillet Regions in Polygonal CAD Models,,https://s2025.conference-schedule.org/presentation/?id=papers_552&sess=sess120,SIGGRAPH 2025 / CAD & B-Reps
+SIGGRAPH 2025,,DeepMill: Neural Accessibility Learning for Subtractive Manufacturing,,https://s2025.conference-schedule.org/presentation/?id=papers_512&sess=sess158,SIGGRAPH 2025 / Geometry in Action
+SIGGRAPH 2025,,Deformable Beta Splatting,,https://s2025.conference-schedule.org/presentation/?id=papers_920&sess=sess119,"SIGGRAPH 2025 / Splatting Bigger, Faster, and Adaptive"
+SIGGRAPH 2025,,DesignManager: An Agent-Powered Copilot for Designers to Integrate AI Design Tools into Creative Workflows,,https://s2025.conference-schedule.org/presentation/?id=papers_1076&sess=sess102,SIGGRAPH 2025 / Linear & Non-Linear AI Designs
+SIGGRAPH 2025,,Designing 3D Anisotropic Frame Fields with Odeco Tensors,,https://s2025.conference-schedule.org/presentation/?id=papers_706&sess=sess140,"SIGGRAPH 2025 / Shapes, Surfaces & Forms"
+SIGGRAPH 2025,,Designing Balancing Toys Through Mass and Shape Optimization,,https://s2025.conference-schedule.org/presentation/?id=pos_214&sess=sess399,SIGGRAPH 2025 / 3D & Geometry
+SIGGRAPH 2025,,Designing Pin-pression Gripper and Learning its Dexterous Grasping with Online In-hand Adjustment,,https://s2025.conference-schedule.org/presentation/?id=papers_688&sess=sess137,SIGGRAPH 2025 / Robots in the World
+SIGGRAPH 2025,,Differentiable Geometric Acoustic Path Tracing using Time-Resolved Path Replay Backpropagation,,https://s2025.conference-schedule.org/presentation/?id=papers_887&sess=sess131,SIGGRAPH 2025 / Differentiable & Inverse Rendering
+SIGGRAPH 2025,,Diffusing Winding Gradients (DWG): A Parallel and Scalable Method for 3D Reconstruction from Unoriented Point Clouds,,https://s2025.conference-schedule.org/presentation/?id=paperstog_105&sess=sess103,SIGGRAPH 2025 / Reconstruction & Neural Fields
+SIGGRAPH 2025,,Digital Animation of Powder-Snow Avalanches,,https://s2025.conference-schedule.org/presentation/?id=papers_564&sess=sess136,SIGGRAPH 2025 / Unconventional Fluids
+SIGGRAPH 2025,,Digitizing Devotion: Virtual Religious Spaces for Cultural Preservation and Transmission,,https://s2025.conference-schedule.org/presentation/?id=pos_115&sess=sess401,SIGGRAPH 2025 / Art & Design
+SIGGRAPH 2025,,Discrete Torsion of Connection Forms on Simplicial Meshes,,https://s2025.conference-schedule.org/presentation/?id=papers_946&sess=sess140,"SIGGRAPH 2025 / Shapes, Surfaces & Forms"
+SIGGRAPH 2025,,Disentangled Phoneme-Prosody Mapping for Controllable 3D Facial Animation,,https://s2025.conference-schedule.org/presentation/?id=pos_246&sess=sess400,SIGGRAPH 2025 / Animation & Simulation
+SIGGRAPH 2025,,DiversePuppetry: An Immersive Multi-User Puppetry System Based on Asymmetric Interaction,,https://s2025.conference-schedule.org/presentation/?id=pos_144&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,Divide-and-Conquer Embedding,,https://s2025.conference-schedule.org/presentation/?id=papers_757&sess=sess118,SIGGRAPH 2025 / Directions in Parameterization
+SIGGRAPH 2025,,Don’t Splat your Gaussians: Volumetric Ray-Traced Primitives for Modeling and Rendering Scattering and Emissive Media,,https://s2025.conference-schedule.org/presentation/?id=paperstog_109&sess=sess119,"SIGGRAPH 2025 / Splatting Bigger, Faster, and Adaptive"
+SIGGRAPH 2025,,Drag Your Gaussian: Effective Drag-Based Editing  with Score Distillation for 3D Gaussian Splatting,,https://s2025.conference-schedule.org/presentation/?id=papers_195&sess=sess128,SIGGRAPH 2025 / Diffusion & Generation
+SIGGRAPH 2025,,DreamCraft: Interactive 3D Scene Creation From Editable Panorama in Virtual Reality,,https://s2025.conference-schedule.org/presentation/?id=pos_287&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,DreamMask: Boosting Open-vocabulary Panoptic Segmentation with Synthetic Data,,https://s2025.conference-schedule.org/presentation/?id=papers_687&sess=sess142,"SIGGRAPH 2025 / Image Representation,  Editing, & Generation"
+SIGGRAPH 2025,,Dress-1-to-3: Single Image to Simulation-Ready 3D Outfit with Diffusion Prior and Differentiable Physics,,https://s2025.conference-schedule.org/presentation/?id=papers_660&sess=sess114,SIGGRAPH 2025 / Tailor Made
+SIGGRAPH 2025,,Dual-Band Feature Fusion for Neural Global Illumination with Multi-Frequency Reflections,,https://s2025.conference-schedule.org/presentation/?id=papers_1080&sess=sess115,SIGGRAPH 2025 / Illuminating Light
+SIGGRAPH 2025,,DualMS: Implicit Dual-Channel Minimal Surface Optimization for Heat Exchanger Design,,https://s2025.conference-schedule.org/presentation/?id=papers_790&sess=sess158,SIGGRAPH 2025 / Geometry in Action
+SIGGRAPH 2025,,DuetGen: Music Driven Two-Person Dance Generation via Hierarchical Masked Modeling,,https://s2025.conference-schedule.org/presentation/?id=papers_1165&sess=sess150,SIGGRAPH 2025 / Motion From X
+SIGGRAPH 2025,,Dust in Time: Exploring Embodied Experience of Time via an Interactive Installation,,https://s2025.conference-schedule.org/presentation/?id=pos_278&sess=sess401,SIGGRAPH 2025 / Art & Design
+SIGGRAPH 2025,,Dynamic Concepts Personalization from Single Videos,,https://s2025.conference-schedule.org/presentation/?id=papers_415&sess=sess148,SIGGRAPH 2025 / Stabilize and Personalize Your Pixels
+SIGGRAPH 2025,,Dynamic Mesh Processing on the GPU,,https://s2025.conference-schedule.org/presentation/?id=papers_496&sess=sess134,SIGGRAPH 2025 / Lightning Fast Geometry
+SIGGRAPH 2025,,Dynamic Skinning: Kinematics-Driven Cartoon Effects for Articulated Characters,,https://s2025.conference-schedule.org/presentation/?id=pos_225&sess=sess400,SIGGRAPH 2025 / Animation & Simulation
+SIGGRAPH 2025,,EDGE: Epsilon-Difference Gradient Evolution for Buffer-Free Flow Maps,,https://s2025.conference-schedule.org/presentation/?id=papers_902&sess=sess145,"SIGGRAPH 2025 / Flow, Flow, Flow Your Boat"
+SIGGRAPH 2025,,EVA: Expressive Virtual Avatars from Multi-view Videos,,https://s2025.conference-schedule.org/presentation/?id=papers_651&sess=sess122,SIGGRAPH 2025 / The Shape of You
+SIGGRAPH 2025,,Echoes of the Coliseum: Towards 3D Live streaming of Sports Events,,https://s2025.conference-schedule.org/presentation/?id=papers_1268&sess=sess105,SIGGRAPH 2025 / Reconstruct it All
+SIGGRAPH 2025,,EditDuet: A Multi-Agent System for Video Non-Linear Editing,,https://s2025.conference-schedule.org/presentation/?id=papers_1476&sess=sess102,SIGGRAPH 2025 / Linear & Non-Linear AI Designs
+SIGGRAPH 2025,,Efficient Proxy Raytracer for Optical Systems Using Implicit Neural Representations,,https://s2025.conference-schedule.org/presentation/?id=pos_198&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,Elastic Locomotion with Mixed Second-order Differentiation,,https://s2025.conference-schedule.org/presentation/?id=papers_698&sess=sess111,SIGGRAPH 2025 / Loco/Motion Capture
+SIGGRAPH 2025,,Elevating 3D Models: High-Quality Texture and Geometry Refinement from a Low-Quality Model,,https://s2025.conference-schedule.org/presentation/?id=papers_807&sess=sess130,"SIGGRAPH 2025 / Textures, Tiles & Codes"
+SIGGRAPH 2025,,Emulating Emulsion: A Compact Physically-Based Model for Film Colour,,https://s2025.conference-schedule.org/presentation/?id=pos_253&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Encoded Marker Clusters for Auto-Labeling in Optical Motion Capture,,https://s2025.conference-schedule.org/presentation/?id=paperstog_115&sess=sess111,SIGGRAPH 2025 / Loco/Motion Capture
+SIGGRAPH 2025,,End-to-end Surface Optimization for Light Control,,https://s2025.conference-schedule.org/presentation/?id=paperstog_112&sess=sess140,"SIGGRAPH 2025 / Shapes, Surfaces & Forms"
+SIGGRAPH 2025,,Escher Tile Deformation via Closed-Form Solution,,https://s2025.conference-schedule.org/presentation/?id=papers_677&sess=sess130,"SIGGRAPH 2025 / Textures, Tiles & Codes"
+SIGGRAPH 2025,,Evaluating Skin Tone Biases in Virtual Human Rendering,,https://s2025.conference-schedule.org/presentation/?id=pos_310&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,Evaluating the Effectiveness of Configurable Virtual Reality System for Multi-sensory Spatial Audio Training,,https://s2025.conference-schedule.org/presentation/?id=pos_361&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,Exploring AI Frame Interpolation Techniques for Watercolour Animation,,https://s2025.conference-schedule.org/presentation/?id=pos_127&sess=sess401,SIGGRAPH 2025 / Art & Design
+SIGGRAPH 2025,,Exploring Distance Management in Immersive Combat Sports Training With Encountered-Type Haptic Feedback,,https://s2025.conference-schedule.org/presentation/?id=pos_226&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,Exploring Real-Time Water Surface Simulation for Immersive Virtual Reality Using Marker-Based Tracking,,https://s2025.conference-schedule.org/presentation/?id=pos_200&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,FaceExpressions-70k: A Dataset of Perceived Expression Differences,,https://s2025.conference-schedule.org/presentation/?id=papers_489&sess=sess144,SIGGRAPH 2025 / Interactive Reality & Perception
+SIGGRAPH 2025,,Facial Microscopic Structures Synthesis from a Single Unconstrained Image,,https://s2025.conference-schedule.org/presentation/?id=papers_1437&sess=sess110,SIGGRAPH 2025 / Get a Head
+SIGGRAPH 2025,,Faraday Cage Estimation of Normals for Point Clouds and Ribbon Sketches,,https://s2025.conference-schedule.org/presentation/?id=papers_1241&sess=sess104,SIGGRAPH 2025 / What's the Point?
+SIGGRAPH 2025,,Fast Determination and Computation of Self-intersections for NURBS Surfaces,,https://s2025.conference-schedule.org/presentation/?id=paperstog_107&sess=sess134,SIGGRAPH 2025 / Lightning Fast Geometry
+SIGGRAPH 2025,,Fast Physics-Based Modeling of Knots and Ties using Templates,,https://s2025.conference-schedule.org/presentation/?id=papers_293&sess=sess114,SIGGRAPH 2025 / Tailor Made
+SIGGRAPH 2025,,Feature-Aligned Parametrization in Penner Coordinates,,https://s2025.conference-schedule.org/presentation/?id=papers_1362&sess=sess118,SIGGRAPH 2025 / Directions in Parameterization
+SIGGRAPH 2025,,Feature-Preserving Mesh Repair via Restricted Power Diagram,,https://s2025.conference-schedule.org/presentation/?id=papers_612&sess=sess116,SIGGRAPH 2025 / Extract & Repair
+SIGGRAPH 2025,,"Feeling Blue or Seeing Red? Investigating the effect of light color, shadow and realism on the perception of emotion of real and virtual humans",,https://s2025.conference-schedule.org/presentation/?id=papers_1040&sess=sess133,SIGGRAPH 2025 / More Than it Looks Like
+SIGGRAPH 2025,,Field Smoothness-Controlled Partition for Quadrangulation,,https://s2025.conference-schedule.org/presentation/?id=papers_765&sess=sess118,SIGGRAPH 2025 / Directions in Parameterization
+SIGGRAPH 2025,,Fluid Simulation on Compressible Flow Maps,,https://s2025.conference-schedule.org/presentation/?id=papers_899&sess=sess145,"SIGGRAPH 2025 / Flow, Flow, Flow Your Boat"
+SIGGRAPH 2025,,Foliager: Procedural Forest Generation From Natural Language Using Scientific Data and AI,,https://s2025.conference-schedule.org/presentation/?id=pos_283&sess=sess401,SIGGRAPH 2025 / Art & Design
+SIGGRAPH 2025,,From Style to Identity: AI Pipelines for Visual and Character Coherence in Film,,https://s2025.conference-schedule.org/presentation/?id=pos_120&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Full-Color Natural Light Holographic Video Camera,,https://s2025.conference-schedule.org/presentation/?id=pos_182&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,G-FED: G-Buffer Guided Frame Extrapolation in Video Diffusion Models,,https://s2025.conference-schedule.org/presentation/?id=pos_130&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,GAIA: Generative Animatable Interactive Avatars with Expression-conditioned Gaussians,,https://s2025.conference-schedule.org/presentation/?id=papers_1111&sess=sess122,SIGGRAPH 2025 / The Shape of You
+SIGGRAPH 2025,,GSHeadRelight: Fast Relightability for 3D Gaussian Head Synthesis,,https://s2025.conference-schedule.org/presentation/?id=papers_269&sess=sess117,SIGGRAPH 2025 / Light & Relight
+SIGGRAPH 2025,,Gaussian Compression for Precomputed Indirect Illumination,,https://s2025.conference-schedule.org/presentation/?id=papers_1413&sess=sess115,SIGGRAPH 2025 / Illuminating Light
+SIGGRAPH 2025,,Gaussian Fluids: A Grid-Free Fluid Solver based on Gaussian Spatial Representation,,https://s2025.conference-schedule.org/presentation/?id=papers_290&sess=sess138,SIGGRAPH 2025 / This is Fluid Simulation
+SIGGRAPH 2025,,Gaze Entropy and Driver Safety: Understanding Cognitive Failure and Situational Response Before Take-over,,https://s2025.conference-schedule.org/presentation/?id=pos_146&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,Generating Past and Future in Digital Painting Processes,,https://s2025.conference-schedule.org/presentation/?id=papers_476&sess=sess142,"SIGGRAPH 2025 / Image Representation,  Editing, & Generation"
+SIGGRAPH 2025,,Guided Lens Sampling for Efficient Monte Carlo Circle-of-Confusion Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_230&sess=sess113,SIGGRAPH 2025 / Beautiful Effects
+SIGGRAPH 2025,Wait,Guiding-Based Importance Sampling for Walk on Stars,http://arxiv.org/abs/2410.18944,https://s2025.conference-schedule.org/presentation/?id=papers_138&sess=sess121,SIGGRAPH 2025 / Make Some Noise
+SIGGRAPH 2025,,Hand Gesture-Driven Vertical Teleportation: Navigating Complex Height Differences in VR,,https://s2025.conference-schedule.org/presentation/?id=pos_276&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,Haunting Horizons: Human–AI Auto-Cartography of Tasmanian Island Experience,,https://s2025.conference-schedule.org/presentation/?id=pos_245&sess=sess401,SIGGRAPH 2025 / Art & Design
+SIGGRAPH 2025,,HexHex: Highspeed Extraction of Hexahedral Meshes,,https://s2025.conference-schedule.org/presentation/?id=papers_1379&sess=sess116,SIGGRAPH 2025 / Extract & Repair
+SIGGRAPH 2025,,Hide A Bit: A Training-Free and High-Fidelity Steganography Method for 3D Gaussian Splatting Based on Bit Manipulation and RSA Encryption,,https://s2025.conference-schedule.org/presentation/?id=pos_244&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,High-performance CPU Cloth Simulation Using Domain-decomposed Projective Dynamics,,https://s2025.conference-schedule.org/presentation/?id=papers_714&sess=sess151,SIGGRAPH 2025 / Cloth & Other Thin Things
+SIGGRAPH 2025,,Histogram Stratification for Spatio-Temporal Reservoir Sampling,,https://s2025.conference-schedule.org/presentation/?id=papers_1010&sess=sess127,SIGGRAPH 2025 / Monte-Carlo Rendering & Sampling
+SIGGRAPH 2025,,Hybrid Tours: A Clip-based System for,,https://s2025.conference-schedule.org/presentation/?id=papers_1534&sess=sess102,SIGGRAPH 2025 / Linear & Non-Linear AI Designs
+SIGGRAPH 2025,,Hyper-Dimensional Deformation Simulation,,https://s2025.conference-schedule.org/presentation/?id=papers_1058&sess=sess143,SIGGRAPH 2025 / All About Motion & Deformation
+SIGGRAPH 2025,,HyperParamBRDF: Fast Parametric Reflectance via Hypernetworks and Physics-Based Simulation,,https://s2025.conference-schedule.org/presentation/?id=pos_357&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,IMLS-Splatting: Efficient Mesh Reconstruction from Multi-view Images via Point Representation,,https://s2025.conference-schedule.org/presentation/?id=papers_1183&sess=sess103,SIGGRAPH 2025 / Reconstruction & Neural Fields
+SIGGRAPH 2025,,Image-space Adaptive Sampling for Fast Inverse Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_305&sess=sess131,SIGGRAPH 2025 / Differentiable & Inverse Rendering
+SIGGRAPH 2025,,In Search of Empty Spheres: 3D Apollonius Diagrams on GPU,,https://s2025.conference-schedule.org/presentation/?id=papers_610&sess=sess134,SIGGRAPH 2025 / Lightning Fast Geometry
+SIGGRAPH 2025,Wait,Instance Segmentation of Scene Sketches Using Natural Image Priors,http://arxiv.org/abs/2502.09608,https://s2025.conference-schedule.org/presentation/?id=papers_224&sess=sess152,SIGGRAPH 2025 / Deep Image Editing
+SIGGRAPH 2025,,Instant Self-Intersection Repair for 3D Meshes,,https://s2025.conference-schedule.org/presentation/?id=papers_596&sess=sess116,SIGGRAPH 2025 / Extract & Repair
+SIGGRAPH 2025,,Interactive Camerawork Authoring System for Free-Viewpoint Dance Contents,,https://s2025.conference-schedule.org/presentation/?id=pos_297&sess=sess399,SIGGRAPH 2025 / 3D & Geometry
+SIGGRAPH 2025,,Interactive Object Insertion With Differentiable Rendering,,https://s2025.conference-schedule.org/presentation/?id=pos_274&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,Interactive Optimization of Scaffolded Procedural Patterns,,https://s2025.conference-schedule.org/presentation/?id=papers_588&sess=sess132,SIGGRAPH 2025 / Packing in Structure
+SIGGRAPH 2025,,Interactive Trailers and Posters That Enhance Viewing Intentions Through ‘Breaking the Fourth Wall’,,https://s2025.conference-schedule.org/presentation/?id=pos_209&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,Intersection-Free Garment Retargeting,,https://s2025.conference-schedule.org/presentation/?id=papers_102&sess=sess114,SIGGRAPH 2025 / Tailor Made
+SIGGRAPH 2025,,Inverse Design of Discrete Interlocking Materials with Desired Mechanical Behavior,,https://s2025.conference-schedule.org/presentation/?id=papers_640&sess=sess124,SIGGRAPH 2025 / Microstructures & Materials
+SIGGRAPH 2025,,Inverse Geometric Locomotion,,https://s2025.conference-schedule.org/presentation/?id=papers_840&sess=sess111,SIGGRAPH 2025 / Loco/Motion Capture
+SIGGRAPH 2025,,James-Stein Gradient Combiner for Inverse Monte Carlo Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_901&sess=sess131,SIGGRAPH 2025 / Differentiable & Inverse Rendering
+SIGGRAPH 2025,,Kernel Predicting Neural Shadow Maps,,https://s2025.conference-schedule.org/presentation/?id=papers_426&sess=sess113,SIGGRAPH 2025 / Beautiful Effects
+SIGGRAPH 2025,Wait,LAM: Large Avatar Model for One-shot Animatable Gaussian Head,http://arxiv.org/abs/2502.17796,https://s2025.conference-schedule.org/presentation/?id=papers_829&sess=sess110,SIGGRAPH 2025 / Get a Head
+SIGGRAPH 2025,,Leapfrog Flow Maps for Real-Time Fluid Simulation,,https://s2025.conference-schedule.org/presentation/?id=papers_689&sess=sess145,"SIGGRAPH 2025 / Flow, Flow, Flow Your Boat"
+SIGGRAPH 2025,,Learning to Assemble with Alternative Plans,,https://s2025.conference-schedule.org/presentation/?id=papers_150&sess=sess137,SIGGRAPH 2025 / Robots in the World
+SIGGRAPH 2025,,Learning to Draw Is Learning to See: Analyzing Eye Tracking Patterns for Assisted Observational Drawing,,https://s2025.conference-schedule.org/presentation/?id=papers_1090&sess=sess139,"SIGGRAPH 2025 / Moving, Seeing, Touching & Eating in VR"
+SIGGRAPH 2025,,Lightning-fast Boundary Element Method,,https://s2025.conference-schedule.org/presentation/?id=papers_944&sess=sess121,SIGGRAPH 2025 / Make Some Noise
+SIGGRAPH 2025,,Linear-Time Transport with Rectified Flows,,https://s2025.conference-schedule.org/presentation/?id=papers_122&sess=sess155,SIGGRAPH 2025 / Numerics & Parallelization
+SIGGRAPH 2025,,MAGNET: Muscle Activation Generation Networks for Diverse Human Movement,,https://s2025.conference-schedule.org/presentation/?id=papers_277&sess=sess156,SIGGRAPH 2025 / Physics-Based Human Characters
+SIGGRAPH 2025,,Manu-Grid: UI for Parameter Estimation of Tilt Angle Extended Generalized Projection Function in Illustrations,,https://s2025.conference-schedule.org/presentation/?id=pos_220&sess=sess399,SIGGRAPH 2025 / 3D & Geometry
+SIGGRAPH 2025,,MiSo: A DSL for robust and efficient MINIMIZE and SOLVE problems,,https://s2025.conference-schedule.org/presentation/?id=papers_1052&sess=sess155,SIGGRAPH 2025 / Numerics & Parallelization
+SIGGRAPH 2025,,Minecraft to 3D: A Pipeline for High-Fidelity Reconstruction of Minecraft Worlds,,https://s2025.conference-schedule.org/presentation/?id=pos_372&sess=sess399,SIGGRAPH 2025 / 3D & Geometry
+SIGGRAPH 2025,Wait,MoVer: Motion Verification for Motion Graphics Animations,http://arxiv.org/abs/2502.13372,https://s2025.conference-schedule.org/presentation/?id=papers_1116&sess=sess102,SIGGRAPH 2025 / Linear & Non-Linear AI Designs
+SIGGRAPH 2025,,Modeling and Rendering Glow Discharge,,https://s2025.conference-schedule.org/presentation/?id=papers_632&sess=sess113,SIGGRAPH 2025 / Beautiful Effects
+SIGGRAPH 2025,,Moment Bounds are Differentiable: Efficiently Approximating Measures in Inverse Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_886&sess=sess131,SIGGRAPH 2025 / Differentiable & Inverse Rendering
+SIGGRAPH 2025,Wait,Monocular Online Reconstruction with Enhanced Detail Preservation,http://arxiv.org/abs/2505.07887,https://s2025.conference-schedule.org/presentation/?id=papers_533&sess=sess125,SIGGRAPH 2025 / Gaussian Reconstruction
+SIGGRAPH 2025,,Monte Carlo PDE simulation in participating media,,https://s2025.conference-schedule.org/presentation/?id=papers_271&sess=sess121,SIGGRAPH 2025 / Make Some Noise
+SIGGRAPH 2025,,Multi-Dimensional Procedural Wave Noise,,https://s2025.conference-schedule.org/presentation/?id=papers_1206&sess=sess121,SIGGRAPH 2025 / Make Some Noise
+SIGGRAPH 2025,Wait,Multi-Person Interaction Generation from Two-Person Motion Priors,http://arxiv.org/abs/2505.17860,https://s2025.conference-schedule.org/presentation/?id=papers_718&sess=sess154,SIGGRAPH 2025 / Rigging & Interaction
+SIGGRAPH 2025,,Multiple Importance Reweighting for Path Guiding,,https://s2025.conference-schedule.org/presentation/?id=papers_113&sess=sess127,SIGGRAPH 2025 / Monte-Carlo Rendering & Sampling
+SIGGRAPH 2025,Wait,MyTimeMachine: Personalized Facial Age Transformation,http://arxiv.org/abs/2411.14521,https://s2025.conference-schedule.org/presentation/?id=papers_611&sess=sess122,SIGGRAPH 2025 / The Shape of You
+SIGGRAPH 2025,,NAM: Neural Adjoint Maps for refinement of shape correspondences,,https://s2025.conference-schedule.org/presentation/?id=papers_1494&sess=sess126,SIGGRAPH 2025 / Learning & Shapes
+SIGGRAPH 2025,Wait,NeST: Neural Stress Tensor Tomography by leveraging 3D Photoelasticity,http://arxiv.org/abs/2406.10212,https://s2025.conference-schedule.org/presentation/?id=paperstog_111&sess=sess105,SIGGRAPH 2025 / Reconstruct it All
+SIGGRAPH 2025,Wait,Nested Attention: Semantic-aware Attention Values for Concept Personalization,http://arxiv.org/abs/2501.01407,https://s2025.conference-schedule.org/presentation/?id=papers_362&sess=sess148,SIGGRAPH 2025 / Stabilize and Personalize Your Pixels
+SIGGRAPH 2025,,NeurCross: A Neural Approach to Computing Cross Fields for Quad Mesh Generation,,https://s2025.conference-schedule.org/presentation/?id=papers_449&sess=sess118,SIGGRAPH 2025 / Directions in Parameterization
+SIGGRAPH 2025,,Neural BRDF Importance Sampling by Reparameterization,,https://s2025.conference-schedule.org/presentation/?id=papers_665&sess=sess123,SIGGRAPH 2025 / Neural Materials & LOD
+SIGGRAPH 2025,,"Neural Co-Optimization of Structural Topology, Manufacturable Layers, and Path Orientations for Fiber-Reinforced Composites",,https://s2025.conference-schedule.org/presentation/?id=papers_1122&sess=sess124,SIGGRAPH 2025 / Microstructures & Materials
+SIGGRAPH 2025,,Neural Importance Sampling of Many Lights,,https://s2025.conference-schedule.org/presentation/?id=papers_1339&sess=sess115,SIGGRAPH 2025 / Illuminating Light
+SIGGRAPH 2025,,Noise-Coded Illumination for Forensic and Photometric Video Analysis,,https://s2025.conference-schedule.org/presentation/?id=paperstog_124&sess=sess159,"SIGGRAPH 2025 / Computational Imaging, Lighting & Display"
+SIGGRAPH 2025,,OctGPT: Octree-based Multiscale Autoregressive Models for 3D Shape Generation,,https://s2025.conference-schedule.org/presentation/?id=papers_203&sess=sess126,SIGGRAPH 2025 / Learning & Shapes
+SIGGRAPH 2025,,Offset Geometric Contact,,https://s2025.conference-schedule.org/presentation/?id=papers_1039&sess=sess135,SIGGRAPH 2025 / Rigid Bodies & Contacts
+SIGGRAPH 2025,,On Planar Shape Interpolation With Logarithmic Metric Blending,,https://s2025.conference-schedule.org/presentation/?id=papers_779&sess=sess112,"SIGGRAPH 2025 / Cages, Deformation, & Interpolation"
+SIGGRAPH 2025,,On-the-fly Reconstruction for Large-Scale Novel View Synthesis from Unposed Images,,https://s2025.conference-schedule.org/presentation/?id=papers_1024&sess=sess125,SIGGRAPH 2025 / Gaussian Reconstruction
+SIGGRAPH 2025,,One Model to Rig Them All: Diverse Skeleton Rigging with UniRig,,https://s2025.conference-schedule.org/presentation/?id=papers_1237&sess=sess154,SIGGRAPH 2025 / Rigging & Interaction
+SIGGRAPH 2025,,Optimal r-Adaptive In-Timestep Remeshing for Elastodynamics,,https://s2025.conference-schedule.org/presentation/?id=papers_1036&sess=sess147,SIGGRAPH 2025 / Stable & Accurate Elasticity
+SIGGRAPH 2025,,Order Matters: Learning Element Ordering for Graphic Design Generation,,https://s2025.conference-schedule.org/presentation/?id=papers_531&sess=sess102,SIGGRAPH 2025 / Linear & Non-Linear AI Designs
+SIGGRAPH 2025,,PAAP: Performer-Aware Automatic Panning System,,https://s2025.conference-schedule.org/presentation/?id=pos_187&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,PDT: Point Distribution Transformation with Diffusion Models,,https://s2025.conference-schedule.org/presentation/?id=papers_921&sess=sess128,SIGGRAPH 2025 / Diffusion & Generation
+SIGGRAPH 2025,,PLT: Part-Wise Latent Tokens as Adaptable Motion Priors for Physically Simulated Characters,,https://s2025.conference-schedule.org/presentation/?id=papers_378&sess=sess156,SIGGRAPH 2025 / Physics-Based Human Characters
+SIGGRAPH 2025,,PS-CAD: Local Geometry Guidance via Prompting and Selection for CAD Reconstruction,,https://s2025.conference-schedule.org/presentation/?id=paperstog_106&sess=sess120,SIGGRAPH 2025 / CAD & B-Reps
+SIGGRAPH 2025,,PaRas: A Rasterizer for Large-Scale Parametric Surfaces,,https://s2025.conference-schedule.org/presentation/?id=papers_526&sess=sess133,SIGGRAPH 2025 / More Than it Looks Like
+SIGGRAPH 2025,,Painless Differentiable Rotation Dynamics,,https://s2025.conference-schedule.org/presentation/?id=papers_1511&sess=sess135,SIGGRAPH 2025 / Rigid Bodies & Contacts
+SIGGRAPH 2025,,PartEdit: Fine-Grained Image Editing using Pre-Trained Diffusion Models,,https://s2025.conference-schedule.org/presentation/?id=papers_1255&sess=sess152,SIGGRAPH 2025 / Deep Image Editing
+SIGGRAPH 2025,,Patch-Grid: An Efficient and Feature-Preserving Neural Implicit Surface Representation,,https://s2025.conference-schedule.org/presentation/?id=paperstog_119&sess=sess140,"SIGGRAPH 2025 / Shapes, Surfaces & Forms"
+SIGGRAPH 2025,,Photoreal Scene Reconstruction from an Egocentric Device,,https://s2025.conference-schedule.org/presentation/?id=papers_1286&sess=sess125,SIGGRAPH 2025 / Gaussian Reconstruction
+SIGGRAPH 2025,,Physically Controllable Relighting of Photographs,,https://s2025.conference-schedule.org/presentation/?id=papers_582&sess=sess117,SIGGRAPH 2025 / Light & Relight
+SIGGRAPH 2025,,Physically-Based Compositing of 2D Graphics,,https://s2025.conference-schedule.org/presentation/?id=pos_227&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Physics-inspired Estimation of Optimal Cloth Mesh Resolution,,https://s2025.conference-schedule.org/presentation/?id=papers_289&sess=sess151,SIGGRAPH 2025 / Cloth & Other Thin Things
+SIGGRAPH 2025,,PhysicsFC: Learning User-Controlled Skills for a Physics-Based Football Player Controller,,https://s2025.conference-schedule.org/presentation/?id=papers_334&sess=sess156,SIGGRAPH 2025 / Physics-Based Human Characters
+SIGGRAPH 2025,,Piecewise Ruled Approximation for Freeform Mesh Surfaces,,https://s2025.conference-schedule.org/presentation/?id=papers_593&sess=sess140,"SIGGRAPH 2025 / Shapes, Surfaces & Forms"
+SIGGRAPH 2025,,Pocket Time-Lapse,,https://s2025.conference-schedule.org/presentation/?id=papers_140&sess=sess142,"SIGGRAPH 2025 / Image Representation,  Editing, & Generation"
+SIGGRAPH 2025,,Policy-Space Diffusion for Physics-Based Character Animation,,https://s2025.conference-schedule.org/presentation/?id=paperstog_102&sess=sess156,SIGGRAPH 2025 / Physics-Based Human Characters
+SIGGRAPH 2025,,Polynomial 2D Biharmonic Coordinates for High-order Cages,,https://s2025.conference-schedule.org/presentation/?id=papers_747&sess=sess112,"SIGGRAPH 2025 / Cages, Deformation, & Interpolation"
+SIGGRAPH 2025,,Position-Normal Manifold for Efficient Glint Rendering on High-Resolution Normal Maps,,https://s2025.conference-schedule.org/presentation/?id=papers_358&sess=sess129,SIGGRAPH 2025 / Beautiful Materials
+SIGGRAPH 2025,,Power-Linear Polar Directional Fields,,https://s2025.conference-schedule.org/presentation/?id=papers_128&sess=sess118,SIGGRAPH 2025 / Directions in Parameterization
+SIGGRAPH 2025,,Practical Inverse Rendering of Textured and Translucent Appearance,,https://s2025.conference-schedule.org/presentation/?id=papers_521&sess=sess117,SIGGRAPH 2025 / Light & Relight
+SIGGRAPH 2025,,Practical Stylized Nonlinear Monte Carlo Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_702&sess=sess127,SIGGRAPH 2025 / Monte-Carlo Rendering & Sampling
+SIGGRAPH 2025,,"Predicting Accidents in Conditional Autonomous Driving: A Multimodal Approach Integrating Human Misuse, Biometric Indicators, and Spatial Complexity",,https://s2025.conference-schedule.org/presentation/?id=pos_294&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,Predicting Colors in Unpainted Gaps for Anime-Style Illustration,,https://s2025.conference-schedule.org/presentation/?id=pos_289&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Predicting Fabric Appearance Through Thread Scattering and Inversion,,https://s2025.conference-schedule.org/presentation/?id=papers_672&sess=sess129,SIGGRAPH 2025 / Beautiful Materials
+SIGGRAPH 2025,,Preserving Intangible Cultural Heritage of Megalithic Sites Using Immersive Mobile XR,,https://s2025.conference-schedule.org/presentation/?id=pos_252&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,Pretraining Support for Cheerleading Stunts Using Virtual Reality,,https://s2025.conference-schedule.org/presentation/?id=pos_239&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,PrimitiveAnything: Human-Crafted 3D Primitive Assembly Generation with Auto-Regressive transformer,,https://s2025.conference-schedule.org/presentation/?id=papers_1074&sess=sess132,SIGGRAPH 2025 / Packing in Structure
+SIGGRAPH 2025,,"Progressive Dynamics++: A Framework for Stable, Continuous, and Consistent Animation Across Resolution and Time",,https://s2025.conference-schedule.org/presentation/?id=papers_1019&sess=sess151,SIGGRAPH 2025 / Cloth & Other Thin Things
+SIGGRAPH 2025,,Putting Rigid Bodies to Rest,,https://s2025.conference-schedule.org/presentation/?id=papers_1035&sess=sess135,SIGGRAPH 2025 / Rigid Bodies & Contacts
+SIGGRAPH 2025,,QRBTF - AI QR Code Generator,,https://s2025.conference-schedule.org/presentation/?id=pos_356&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,QUASAR: Quad-based Adaptive Streaming And Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_1248&sess=sess144,SIGGRAPH 2025 / Interactive Reality & Perception
+SIGGRAPH 2025,,Quadric-Based Silhouette Sampling for Differentiable Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_116&sess=sess131,SIGGRAPH 2025 / Differentiable & Inverse Rendering
+SIGGRAPH 2025,,Quadtree Tall Cells for Eulerian Liquid Simulation,,https://s2025.conference-schedule.org/presentation/?id=papers_485&sess=sess138,SIGGRAPH 2025 / This is Fluid Simulation
+SIGGRAPH 2025,,RELATE3D: REfocusing Latent Adapter for Targeted local Enhancement and Editing in 3D Generation,,https://s2025.conference-schedule.org/presentation/?id=papers_454&sess=sess128,SIGGRAPH 2025 / Diffusion & Generation
+SIGGRAPH 2025,,RNA: Relightable Neural Assets,,https://s2025.conference-schedule.org/presentation/?id=paperstog_114&sess=sess123,SIGGRAPH 2025 / Neural Materials & LOD
+SIGGRAPH 2025,,Radiance Surfaces: Optimizing Surface Representations with a 5D Radiance Field Loss,,https://s2025.conference-schedule.org/presentation/?id=papers_872&sess=sess105,SIGGRAPH 2025 / Reconstruct it All
+SIGGRAPH 2025,,Rags2Riches: Computational Garment Reuse,,https://s2025.conference-schedule.org/presentation/?id=papers_811&sess=sess114,SIGGRAPH 2025 / Tailor Made
+SIGGRAPH 2025,,ReStyle3D: Scene-Level Appearance Transfer with Semantic Correspondences,,https://s2025.conference-schedule.org/presentation/?id=papers_497&sess=sess149,SIGGRAPH 2025 / Do it With Style & Fashion
+SIGGRAPH 2025,,Real-Time Knit Deformation and Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_730&sess=sess151,SIGGRAPH 2025 / Cloth & Other Thin Things
+SIGGRAPH 2025,,Real-Time Multispectral Lighting Reproduction,,https://s2025.conference-schedule.org/presentation/?id=pos_326&sess=sess403,SIGGRAPH 2025 / Displays & Optics
+SIGGRAPH 2025,,Reassemble by Packing: Path-Valid Spectral Placement for 3D Fragment Assembly,,https://s2025.conference-schedule.org/presentation/?id=pos_367&sess=sess399,SIGGRAPH 2025 / 3D & Geometry
+SIGGRAPH 2025,,Reconstructing Graphic Design Posters via Visual Decomposition and Semantic Layer Translation,,https://s2025.conference-schedule.org/presentation/?id=pos_358&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Rectangular Surface Parameterization,,https://s2025.conference-schedule.org/presentation/?id=papers_656&sess=sess118,SIGGRAPH 2025 / Directions in Parameterization
+SIGGRAPH 2025,,Relightable Full-Body Gaussian Codec Avatars,,https://s2025.conference-schedule.org/presentation/?id=papers_1137&sess=sess122,SIGGRAPH 2025 / The Shape of You
+SIGGRAPH 2025,,RenderFormer: Transformer-based Neural Rendering of Triangle Meshes with Global Illumination,,https://s2025.conference-schedule.org/presentation/?id=papers_160&sess=sess115,SIGGRAPH 2025 / Illuminating Light
+SIGGRAPH 2025,,Reservoir Splatting for Temporal Path Resampling and Motion Blur,,https://s2025.conference-schedule.org/presentation/?id=papers_435&sess=sess113,SIGGRAPH 2025 / Beautiful Effects
+SIGGRAPH 2025,,Revisiting Tradition and Beyond: A Customized Bilateral Filtering Framework for Point Cloud Denoising,,https://s2025.conference-schedule.org/presentation/?id=papers_812&sess=sess104,SIGGRAPH 2025 / What's the Point?
+SIGGRAPH 2025,,RigAnything: Template-Free Autoregressive Rigging for Diverse 3D Assets,,https://s2025.conference-schedule.org/presentation/?id=papers_181&sess=sess154,SIGGRAPH 2025 / Rigging & Interaction
+SIGGRAPH 2025,,SAWNA: Space-Aware Text to Image Generation,,https://s2025.conference-schedule.org/presentation/?id=pos_281&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,SEE-2-SOUND: Zero-Shot Spatial Environment-to-Spatial Sound,,https://s2025.conference-schedule.org/presentation/?id=pos_105&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,SOAP: Style-Omniscient Animatable Portraits,,https://s2025.conference-schedule.org/presentation/?id=papers_745&sess=sess110,SIGGRAPH 2025 / Get a Head
+SIGGRAPH 2025,,ScaffoldAvatar: High-Fidelity Gaussian Avatars with Patch Expressions,,https://s2025.conference-schedule.org/presentation/?id=papers_1048&sess=sess153,SIGGRAPH 2025 / Avatars
+SIGGRAPH 2025,,Scalable Volume Rendering of Billion-Cell CFD Simulations Using VFX Pipelines,,https://s2025.conference-schedule.org/presentation/?id=pos_243&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,Segment-based Light Transport Simulation,,https://s2025.conference-schedule.org/presentation/?id=papers_468&sess=sess115,SIGGRAPH 2025 / Illuminating Light
+SIGGRAPH 2025,,Semantically Consistent Text-to-Motion with Unsupervised Styles,,https://s2025.conference-schedule.org/presentation/?id=papers_410&sess=sess150,SIGGRAPH 2025 / Motion From X
+SIGGRAPH 2025,,Shape Space Spectra,,https://s2025.conference-schedule.org/presentation/?id=papers_139&sess=sess140,"SIGGRAPH 2025 / Shapes, Surfaces & Forms"
+SIGGRAPH 2025,,Simulating the Mechanics of Ant Swarm Aggregations,,https://s2025.conference-schedule.org/presentation/?id=pos_207&sess=sess400,SIGGRAPH 2025 / Animation & Simulation
+SIGGRAPH 2025,,Single Edge Collapse Quad-Dominant Mesh Reduction,,https://s2025.conference-schedule.org/presentation/?id=papers_104&sess=sess116,SIGGRAPH 2025 / Extract & Repair
+SIGGRAPH 2025,,Single View Garment Reconstruction Using Diffusion Mapping Via Pattern Coordinates,,https://s2025.conference-schedule.org/presentation/?id=papers_478&sess=sess114,SIGGRAPH 2025 / Tailor Made
+SIGGRAPH 2025,,Sketch-based Fluid Video Generation Using Motion-Guided Diffusion Models in Still Landscape Images,,https://s2025.conference-schedule.org/presentation/?id=pos_320&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Sketch3DVE: Sketch-based 3D-Aware Scene Video Editing,,https://s2025.conference-schedule.org/presentation/?id=papers_296&sess=sess141,SIGGRAPH 2025 / Very Vivid Videos
+SIGGRAPH 2025,,SkillMimic-V2: Learning Robust and Generalizable Interaction Skills from Sparse and Noisy Demonstrations,,https://s2025.conference-schedule.org/presentation/?id=papers_407&sess=sess154,SIGGRAPH 2025 / Rigging & Interaction
+SIGGRAPH 2025,,Skylight: Real-Time Projection Mapping for Surgical Navigation Leveraging Skin-Adhered Fiducials,,https://s2025.conference-schedule.org/presentation/?id=pos_364&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,Smartphone-Based Simple HMD With Multiple Mirrors and Lenticular Lens for Ultra-Wide Field of View,,https://s2025.conference-schedule.org/presentation/?id=pos_164&sess=sess403,SIGGRAPH 2025 / Displays & Optics
+SIGGRAPH 2025,,Sobol' Sequences with Guaranteed-Quality 2D Projections,,https://s2025.conference-schedule.org/presentation/?id=papers_126&sess=sess127,SIGGRAPH 2025 / Monte-Carlo Rendering & Sampling
+SIGGRAPH 2025,,Spatial Adaptivity for Solving PDEs on Manifolds With the Closest Point Method,,https://s2025.conference-schedule.org/presentation/?id=pos_249&sess=sess399,SIGGRAPH 2025 / 3D & Geometry
+SIGGRAPH 2025,,Spatiotemporally Consistent Indoor Lighting Estimation with Diffusion Priors,,https://s2025.conference-schedule.org/presentation/?id=papers_1270&sess=sess117,SIGGRAPH 2025 / Light & Relight
+SIGGRAPH 2025,,Sphere Carving: Bounding Volumes for Signed Distance Fields,,https://s2025.conference-schedule.org/presentation/?id=papers_420&sess=sess134,SIGGRAPH 2025 / Lightning Fast Geometry
+SIGGRAPH 2025,,Spherical Lighting with Spherical Harmonics Hessian,,https://s2025.conference-schedule.org/presentation/?id=papers_722&sess=sess113,SIGGRAPH 2025 / Beautiful Effects
+SIGGRAPH 2025,,Splat and Replace: 3D Reconstruction with Repetitive Elements,,https://s2025.conference-schedule.org/presentation/?id=papers_1022&sess=sess105,SIGGRAPH 2025 / Reconstruct it All
+SIGGRAPH 2025,,Spline Deformation Field,,https://s2025.conference-schedule.org/presentation/?id=papers_646&sess=sess103,SIGGRAPH 2025 / Reconstruction & Neural Fields
+SIGGRAPH 2025,,SpotLessSplats: Ignoring Distractors in 3D Gaussian Splatting,,https://s2025.conference-schedule.org/presentation/?id=paperstog_123&sess=sess105,SIGGRAPH 2025 / Reconstruct it All
+SIGGRAPH 2025,,SqueezeMe: Mobile-Ready Distillation of Gaussian Full-Body Avatars,,https://s2025.conference-schedule.org/presentation/?id=papers_192&sess=sess153,SIGGRAPH 2025 / Avatars
+SIGGRAPH 2025,,Stable Cosserat Rods,,https://s2025.conference-schedule.org/presentation/?id=papers_283&sess=sess147,SIGGRAPH 2025 / Stable & Accurate Elasticity
+SIGGRAPH 2025,,Stable-Makeup: When Real-World Makeup Transfer Meets Diffusion Model,,https://s2025.conference-schedule.org/presentation/?id=papers_809&sess=sess149,SIGGRAPH 2025 / Do it With Style & Fashion
+SIGGRAPH 2025,,Sticking Information in Plain Sight: Encoding and Detecting Hidden Stickers in the Real World,,https://s2025.conference-schedule.org/presentation/?id=pos_269&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Stitch-A-Shape: Bottom-up Learning for B-Rep Generation,,https://s2025.conference-schedule.org/presentation/?id=papers_546&sess=sess120,SIGGRAPH 2025 / CAD & B-Reps
+SIGGRAPH 2025,,Stochastic Preconditioning for Neural Field Optimization,,https://s2025.conference-schedule.org/presentation/?id=papers_492&sess=sess103,SIGGRAPH 2025 / Reconstruction & Neural Fields
+SIGGRAPH 2025,,StreamME: Simplify 3D Gaussian Avatar within Live Stream,,https://s2025.conference-schedule.org/presentation/?id=papers_366&sess=sess153,SIGGRAPH 2025 / Avatars
+SIGGRAPH 2025,,Streaming-Aware Neural Monte Carlo Rendering Framework with Unified Denoising-Compression and Client Collaboration,,https://s2025.conference-schedule.org/presentation/?id=papers_686&sess=sess133,SIGGRAPH 2025 / More Than it Looks Like
+SIGGRAPH 2025,,Stressful Tree Modeling: Breaking Branches with Strands,,https://s2025.conference-schedule.org/presentation/?id=papers_1219&sess=sess158,SIGGRAPH 2025 / Geometry in Action
+SIGGRAPH 2025,,Stroke Imprint: Knitting Reassurance Into Anxious Moments,,https://s2025.conference-schedule.org/presentation/?id=pos_374&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,Stroke Transfer for Participating Media,,https://s2025.conference-schedule.org/presentation/?id=papers_207&sess=sess113,SIGGRAPH 2025 / Beautiful Effects
+SIGGRAPH 2025,,StructInbet: Integrating Explicit Structural Guidance Into Inbetween Frame Generation,,https://s2025.conference-schedule.org/presentation/?id=pos_314&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,StructRe: Rewriting for Structured Shape Modeling,,https://s2025.conference-schedule.org/presentation/?id=paperstog_116&sess=sess132,SIGGRAPH 2025 / Packing in Structure
+SIGGRAPH 2025,,Style Customization of Text-to-Vector Generation with Image Diffusion Priors,,https://s2025.conference-schedule.org/presentation/?id=papers_835&sess=sess149,SIGGRAPH 2025 / Do it With Style & Fashion
+SIGGRAPH 2025,,SugART: Mixed Reality Sugar Painting for Intangible Cultural Heritage Learning at Home,,https://s2025.conference-schedule.org/presentation/?id=pos_202&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,Super Resolution for Humans,,https://s2025.conference-schedule.org/presentation/?id=pos_177&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,SurfelPlus: A Surfel-Based Global Illumination Solution Optimized for Low-End Graphics Hardware,,https://s2025.conference-schedule.org/presentation/?id=pos_124&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,SwiftSketch: A Diffusion Model for Image-to-Vector Sketch Generation,,https://s2025.conference-schedule.org/presentation/?id=papers_264&sess=sess128,SIGGRAPH 2025 / Diffusion & Generation
+SIGGRAPH 2025,,Synchronized tracing of primitive-based implicit volumes,,https://s2025.conference-schedule.org/presentation/?id=paperstog_121&sess=sess133,SIGGRAPH 2025 / More Than it Looks Like
+SIGGRAPH 2025,,Taking Control: Procedural Diffusion Guidance for Architectural Facade Editing,,https://s2025.conference-schedule.org/presentation/?id=pos_190&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,TeGA: Texture Space Gaussian Avatars for High-Resolution Dynamic Head Modeling,,https://s2025.conference-schedule.org/presentation/?id=papers_858&sess=sess122,SIGGRAPH 2025 / The Shape of You
+SIGGRAPH 2025,,TetWeave: Isosurface Extraction using On-The-Fly Delaunay Tetrahedral Grids for Gradient-Based Mesh Optimization,,https://s2025.conference-schedule.org/presentation/?id=papers_493&sess=sess116,SIGGRAPH 2025 / Extract & Repair
+SIGGRAPH 2025,,Text-based Animatable 3D Avatars with Morphable Model Alignment,,https://s2025.conference-schedule.org/presentation/?id=papers_666&sess=sess110,SIGGRAPH 2025 / Get a Head
+SIGGRAPH 2025,,Texture Size Reduction Through Symmetric Overlap and Texture Carving,,https://s2025.conference-schedule.org/presentation/?id=paperstog_108&sess=sess130,"SIGGRAPH 2025 / Textures, Tiles & Codes"
+SIGGRAPH 2025,,The Gesture Lives On: A VR-Driven Puppet Performance in Immersive Space,,https://s2025.conference-schedule.org/presentation/?id=pos_165&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,The Mokume Dataset and Inverse Modeling of Solid Wood Textures,,https://s2025.conference-schedule.org/presentation/?id=papers_650&sess=sess130,"SIGGRAPH 2025 / Textures, Tiles & Codes"
+SIGGRAPH 2025,,"Tiny is not small enough: High quality, low-resource facial animation models through hybrid knowledge distillation",,https://s2025.conference-schedule.org/presentation/?id=papers_1216&sess=sess153,SIGGRAPH 2025 / Avatars
+SIGGRAPH 2025,,To Infinity and Beyond: a GPU-Driven Memory Sharing Pipeline to Generate and Process Infinite Synthetic Data,,https://s2025.conference-schedule.org/presentation/?id=pos_173&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,TokenVerse: Versatile Multi-concept Personalization in Token Modulation Space,,https://s2025.conference-schedule.org/presentation/?id=papers_396&sess=sess148,SIGGRAPH 2025 / Stabilize and Personalize Your Pixels
+SIGGRAPH 2025,,Topological Offsets,,https://s2025.conference-schedule.org/presentation/?id=papers_348&sess=sess116,SIGGRAPH 2025 / Extract & Repair
+SIGGRAPH 2025,,Towards Accelerating Polarization Path tracing of Multi-Bounce Smith Microfacet BSDFs,,https://s2025.conference-schedule.org/presentation/?id=pos_201&sess=sess406,SIGGRAPH 2025 / Rendering
+SIGGRAPH 2025,,Towards Comprehensive Neural Materials: Dynamic Structure-Preserving Synthesis with Accurate Silhouette at Instant Inference Speed,,https://s2025.conference-schedule.org/presentation/?id=papers_303&sess=sess123,SIGGRAPH 2025 / Neural Materials & LOD
+SIGGRAPH 2025,,Towards Understanding Depth Perception in Foveated Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_251&sess=sess144,SIGGRAPH 2025 / Interactive Reality & Perception
+SIGGRAPH 2025,,"Train Once, Generate Anywhere: Discretization Agnostic Neural Cellular Automata Using SPH Method",,https://s2025.conference-schedule.org/presentation/?id=pos_204&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,Transformer IMU Calibrator: Dynamic On-body IMU Calibration for Inertial Motion Capture,,https://s2025.conference-schedule.org/presentation/?id=papers_1351&sess=sess139,"SIGGRAPH 2025 / Moving, Seeing, Touching & Eating in VR"
+SIGGRAPH 2025,,Transforming Unstructured Hair Strands into Procedural Hair Grooms,,https://s2025.conference-schedule.org/presentation/?id=papers_566&sess=sess153,SIGGRAPH 2025 / Avatars
+SIGGRAPH 2025,,TransparentGS: Fast Inverse Rendering of Transparent Objects with Gaussians,,https://s2025.conference-schedule.org/presentation/?id=papers_825&sess=sess125,SIGGRAPH 2025 / Gaussian Reconstruction
+SIGGRAPH 2025,,Two-Stage Sketch-Based Smoke Illustration Generation Using Stream Function,,https://s2025.conference-schedule.org/presentation/?id=pos_325&sess=sess404,"SIGGRAPH 2025 / Images, Video & Computer Vision"
+SIGGRAPH 2025,,UltraMeshRenderer: Efficient Structure and Management of GPU Out-of-core Memory for Real-time Rendering of Gigantic 3D Meshes,,https://s2025.conference-schedule.org/presentation/?id=papers_832&sess=sess134,SIGGRAPH 2025 / Lightning Fast Geometry
+SIGGRAPH 2025,,Uncertainty for SVBRDF Acquisition using Frequency Analysis,,https://s2025.conference-schedule.org/presentation/?id=papers_129&sess=sess133,SIGGRAPH 2025 / More Than it Looks Like
+SIGGRAPH 2025,,"Unified Pressure, Surface Tension and Friction for SPH Fluids",,https://s2025.conference-schedule.org/presentation/?id=paperstog_110&sess=sess136,SIGGRAPH 2025 / Unconventional Fluids
+SIGGRAPH 2025,,Unsupervised Decomposition of 3D Shapes into Expressive and Editable Extruded Profile Primitives,,https://s2025.conference-schedule.org/presentation/?id=papers_817&sess=sess126,SIGGRAPH 2025 / Learning & Shapes
+SIGGRAPH 2025,,VR-Doh: Hands-on 3D Modeling in Virtual Reality,,https://s2025.conference-schedule.org/presentation/?id=papers_318&sess=sess144,SIGGRAPH 2025 / Interactive Reality & Perception
+SIGGRAPH 2025,,Variable Shared Template for Consistent Non-rigid ICP,,https://s2025.conference-schedule.org/presentation/?id=papers_791&sess=sess104,SIGGRAPH 2025 / What's the Point?
+SIGGRAPH 2025,,Variational Elastodynamic Simulation,,https://s2025.conference-schedule.org/presentation/?id=papers_1014&sess=sess147,SIGGRAPH 2025 / Stable & Accurate Elasticity
+SIGGRAPH 2025,,Variational Green and Biharmonic Coordinates for 2D Polynomial Cages,,https://s2025.conference-schedule.org/presentation/?id=papers_1370&sess=sess112,"SIGGRAPH 2025 / Cages, Deformation, & Interpolation"
+SIGGRAPH 2025,,Variational Surface Reconstruction Using Natural Neighbors,,https://s2025.conference-schedule.org/presentation/?id=papers_881&sess=sess103,SIGGRAPH 2025 / Reconstruction & Neural Fields
+SIGGRAPH 2025,,Vector-Valued Monte Carlo Integration Using Ratio Control Variates,,https://s2025.conference-schedule.org/presentation/?id=papers_635&sess=sess127,SIGGRAPH 2025 / Monte-Carlo Rendering & Sampling
+SIGGRAPH 2025,,ViSA: Physics-based Virtual Stunt Actors for Ballistic Stunts,,https://s2025.conference-schedule.org/presentation/?id=papers_278&sess=sess156,SIGGRAPH 2025 / Physics-Based Human Characters
+SIGGRAPH 2025,,VirCHEW Reality: On-Face Kinesthetic Feedback for Enhancing Food-Intake Experience in Virtual Reality,,https://s2025.conference-schedule.org/presentation/?id=papers_761&sess=sess139,"SIGGRAPH 2025 / Moving, Seeing, Touching & Eating in VR"
+SIGGRAPH 2025,,Virtualized 3D Gaussians: Flexible Cluster-based Level-of-Detail System for Real-Time Rendering of Composed Scenes,,https://s2025.conference-schedule.org/presentation/?id=papers_204&sess=sess119,"SIGGRAPH 2025 / Splatting Bigger, Faster, and Adaptive"
+SIGGRAPH 2025,,Weight Illusion Induced by AR Visual Effects on the Arm,,https://s2025.conference-schedule.org/presentation/?id=pos_291&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,What is HDR? Perceptual Impact of Luminance and Contrast in Immersive Displays,,https://s2025.conference-schedule.org/presentation/?id=papers_312&sess=sess144,SIGGRAPH 2025 / Interactive Reality & Perception
+SIGGRAPH 2025,,When Gaussian Meets Surfel: Ultra-fast High-fidelity Radiance Field Rendering,,https://s2025.conference-schedule.org/presentation/?id=papers_1192&sess=sess119,"SIGGRAPH 2025 / Splatting Bigger, Faster, and Adaptive"
+SIGGRAPH 2025,,"When Mud Toys Meet Digital M(B)uddies: How ""Play With Earth"" Bridges Traditional Craftsmanship and AI-Assisted Creation",,https://s2025.conference-schedule.org/presentation/?id=pos_208&sess=sess405,SIGGRAPH 2025 / Interactive Techniques
+SIGGRAPH 2025,,WishGI: Lightweight Static Global Illumination Baking via Spherical Harmonics Fitting,,https://s2025.conference-schedule.org/presentation/?id=papers_1332&sess=sess115,SIGGRAPH 2025 / Illuminating Light
+SIGGRAPH 2025,,You Can Grow Here: A Therapeutic VR Journey for Anxiety Management,,https://s2025.conference-schedule.org/presentation/?id=pos_353&sess=sess402,SIGGRAPH 2025 / Augmented & Virtual Reality
+SIGGRAPH 2025,,pOps: Photo-Inspired Diffusion Operators,,https://s2025.conference-schedule.org/presentation/?id=papers_270&sess=sess142,"SIGGRAPH 2025 / Image Representation,  Editing, & Generation"
+SIGGRAPH 2025,,xADA: Controllable and Expressive Audio-Driven Animation,,https://s2025.conference-schedule.org/presentation/?id=papers_866&sess=sess150,SIGGRAPH 2025 / Motion From X
+SIGGRAPH 2022,Wait,A Compact Representation of Measured BRDFs Using Neural Processes,https://shuangz.com/publications.htm,https://shuangz.com/publications.htm,"TOG Paper / Neural Objects, Materials and Illumination"
+SIGGRAPH 2022,Wait,A Comparison of Zoom-in Transition Methods for Multiscale VR,https://doi.org/10.1145/3532719.3543237,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,A Fast Text-driven Approach for Generating Artistic Content,https://doi.org/10.1145/3532719.3543208,,Poster / Art & Design
+SIGGRAPH 2022,Wait,A GPU-accelerated Hydrodynamics Solver for Atmosphere-fire Interactions,https://doi.org/10.1145/3532719.3543263,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,A GPU-based Multilevel Additive Schwarz Preconditioner for Cloth and Deformable Body Simulation,https://wanghmin.github.io/publications.html,https://wanghmin.github.io/publications.html,Technical Paper / New Wrinkles in Cloth and Shells
+SIGGRAPH 2022,,A Large Scale Benchmark and an Inclusion-based Algorithm for Continuous Collision Detection,,,"TOG Paper / Benchmarks, Datasets and Learning"
+SIGGRAPH 2022,Wait,A Large-scale Comparison of Tetrahedral and Hexahedral Elements for Solving Elliptic PDEs With the Finite Element Method,https://doi.org/10.1145/3508372,,"TOG Paper / Benchmarks, Datasets and Learning"
+SIGGRAPH 2022,Wait,A Theoretical Analysis of Compactness of the Light Transport Operator,https://maverick.inria.fr/~Cyril.Soler/DALI/,https://maverick.inria.fr/~Cyril.Soler/DALI/,Technical Paper / Ray Tracing & Monte Carlo Methods
+SIGGRAPH 2022,Wait,A Unified Newton Barrier Method for Multibody Dynamics,https://www.math.ucla.edu/~minchen/,,Technical Paper / Contact and Fracture
+SIGGRAPH 2022,Wait,A Well-aligned Dataset for Learning Image Signal Processing on Smartphones From a High-end Camera,https://doi.org/10.1145/3532719.3543252,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,ASSET: Autoregressive Semantic Scene Editing With Transformers at High Resolutions,https://people.cs.umass.edu/~dliu/projects/ASSET/,https://github.com/DifanLiu/ASSET,Technical Paper / Image/Video Editing and Generation
+SIGGRAPH 2022,Wait,Accommodative Holography: Improving Accommodation Response for Perceptually Realistic Holographic Displays,https://dongyeon93.github.io/2022/05/09/accommodative-holography.html,https://dongyeon93.github.io/2022/05/09/accommodative-holography.html,"Technical Paper / Display, Write, and Unwrap"
+SIGGRAPH 2022,Wait,Accurate Diffuse Lighting From Spherical Gaussian Lights,https://doi.org/10.1145/3532719.3543209,,Poster / Display & Rendering
+SIGGRAPH 2022,,"Affine Body Dynamics: Fast, Stable, and Intersection-free Simulation of Stiff Materials",,,Technical Paper / Contact and Fracture
+SIGGRAPH 2022,Wait,Alpha Wrapping With an Offset,https://hal.inria.fr/hal-03688637/,https://hal.inria.fr/hal-03688637/,Technical Paper / Reconstruction
+SIGGRAPH 2022,Wait,Alpha-functions — Piecewise-linear Approximation From Noisy and Hermite Data,https://www.cg.tu-berlin.de/research/projects/alpha-functions/,https://www.cg.tu-berlin.de/research/projects/alpha-functions/,Technical Paper / Reconstruction
+SIGGRAPH 2022,Wait,"An Efficient B-spline Lagrangian/Eulerian Method for Compressible Flow, Shock Waves, and Fracturing Solids",https://www.math.ucla.edu/~minchen/,,TOG Paper / Contact and Fracture
+SIGGRAPH 2022,Wait,An Inverse Procedural Modeling Pipeline for SVBRDF Maps,https://doi.org/10.1145/3502431,,TOG Paper / Volumes and Materials
+SIGGRAPH 2022,Wait,Animating Portrait Line Drawings From a Single Face Photo and a Speech Signal,https://doi.org/10.1145/3528233.3530720,https://github.com/AnimatePortrait/AnimatePortrait,Technical Paper / Faces and Facial Animation
+SIGGRAPH 2022,Wait,Artist Controlled Fracture Design Using Impurity Maps,https://doi.org/10.1145/3532719.3543202,,Poster / Animation
+SIGGRAPH 2022,Wait,Audio-driven Violin Performance Animation With Clear Fingering and Bowing,https://doi.org/10.1145/3532719.3543240,,Poster / Animation
+SIGGRAPH 2022,Wait,Auditory Stimuli Degrade Visual Performance in Virtual Reality,https://doi.org/10.1145/3532719.3543220,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Automatic Alignment and Completion of Point Cloud Environments Using XR Data,https://doi.org/10.1145/3532719.3543258,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,Automatic Generation of a 3D Braid Hair Model From a Single Image,https://doi.org/10.1145/3532719.3543216,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,"Blending Camera and 77 GHz Radar Sensing for Equitable, Robust Plethysmography",https://visual.ee.ucla.edu/equi_pleth_camera_rf.htm/,https://visual.ee.ucla.edu/equi_pleth_camera_rf.htm/,Technical Paper / Computational Photography
+SIGGRAPH 2022,Wait,Blow-up Print: Rapidly 3D Printing Inflatable Objects in the Compressed State,https://doi.org/10.1145/3532719.3543230,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,Centimeter-wave Free-space Neural Time-of-flight Imaging,https://doi.org/10.1145/3522671,,TOG Paper / Computational Photography
+SIGGRAPH 2022,Wait,Character Articulation Through Profile Curves,https://graphics.pixar.com/library/ProfileMover/index.html,https://graphics.pixar.com/library/ProfileMover/index.html,Technical Paper / Character Animation
+SIGGRAPH 2022,Wait,Compact Poisson Filters for Fast Fluid Simulation,https://doi.org/10.1145/3528233.3530737,,Technical Paper / Fluid Simulation
+SIGGRAPH 2022,Wait,Compression and Interactive Visualization of Terabyte Scale Volumetric RGBA Data With Voxel-scale Details,https://doi.org/10.1145/3532719.3543256,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,Computational Design of Knit Templates,https://make4all.org/portfolio/computational-design-of-knit-templates/,https://make4all.org/portfolio/computational-design-of-knit-templates/,TOG Paper / Computational Design and Fabrication
+SIGGRAPH 2022,Wait,Computational Mirror Cup and Saucer Art,https://doi.org/10.1145/3517120,,TOG Paper / Computational Design and Fabrication
+SIGGRAPH 2022,Wait,Computational Object-wrapping Rope Nets,https://doi.org/10.1145/3476829,,"TOG Paper / Sketches, Strokes, and Ropes"
+SIGGRAPH 2022,Wait,Constant-cost Spatio-angular Prefiltering of Glinty Appearance Using Tensor Decomposition,https://wangningbei.github.io/2022/CONSTGLINTS.html,https://wangningbei.github.io/2022/CONSTGLINTS.html,"TOG Paper / Sampling, Reconstruction & Appearance"
+SIGGRAPH 2022,Wait,Context-aware Risk Degree Prediction for Smartphone Zombies,https://doi.org/10.1145/3532719.3543197,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,Deep Compliant Control,https://mrl.snu.ac.kr/publications,,Technical Paper / Physics-Based Character Control
+SIGGRAPH 2022,,DeepVideoFaceEditing: Sketch-based Deep Editing of Face Videos,,,Technical Paper / Faces and Facial Animation
+SIGGRAPH 2022,Wait,Denoising and Guided Upsampling of Monte Carlo Path Traced Low Resolution Renderings,https://doi.org/10.1145/3532719.3543250,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,Determining the Orientation of Low Resolution Images of a De-Bruijn Tracking Pattern With a CNN,https://doi.org/10.1145/3532719.3543259,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,Development of 3D Projection Mapping From a Moving Vehicle to Observe From Inside and Outside of the Vehicle,https://doi.org/10.1145/3532719.3543247,,Poster / Art & Design
+SIGGRAPH 2022,Wait,Development of Exergame to Resolve Deconditioning in Children With Orthostatic Dysregulation,https://doi.org/10.1145/3532719.3543212,,Poster / Adaptive/Assistive Technology
+SIGGRAPH 2022,Wait,DiffCloth: Differentiable Cloth Simulation With Dry Frictional Contact,https://people.csail.mit.edu/liyifei/publication/diffcloth-differentiable-cloth-simulator/,https://people.csail.mit.edu/liyifei/publication/diffcloth-differentiable-cloth-simulator/,TOG Paper / New Wrinkles in Cloth and Shells
+SIGGRAPH 2022,Wait,DiffPD: Differentiable Projective Dynamics,https://doi.org/10.1145/3490168,,TOG Paper / An Ode to Solvers
+SIGGRAPH 2022,,Diffeomorphic Neural Surface Parameterization for 3D and Reflectance Recovery,,,"Technical Paper / Neural Objects, Materials and Illumination"
+SIGGRAPH 2022,Wait,Do We Measure What We Perceive? Comparison of Perceptual and Computed Differences Between Hand Animations,https://doi.org/10.1145/3532719.3543233,,Poster / Animation
+SIGGRAPH 2022,Wait,Dual-layer Light Source With Textured Lighting Gel,https://doi.org/10.1145/3532719.3543227,,Poster / Art & Design
+SIGGRAPH 2022,Wait,DynaPix: Normal Map Pixelization for Dynamic Lighting,https://doi.org/10.1145/3532719.3543238,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,Dynamic Optimal Space Partitioning for Redirected Walking in Multi-user Environment,http://cga.yonsei.ac.kr/publications/Dynamic_Optimal_Space_Partitioning_for_Redirected_Walking_in_Multi-user_Environment,http://cga.yonsei.ac.kr/publications/Dynamic_Optimal_Space_Partitioning_for_Redirected_Walking_in_Multi-user_Environment,"Technical Paper / Design, Direct, Plan & Program"
+SIGGRAPH 2022,,Dynamic Vertex Hierarchies for View-dependent Progressive Meshes,,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,Easy Rearward Visibility by the Control of Eye Direction in Viewing Panoramic Images With HMD,https://doi.org/10.1145/3532719.3543210,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Energetically Consistent Inelasticity for Optimization Time Integration,https://www.math.ucla.edu/~minchen/,,Technical Paper / An Ode to Solvers
+SIGGRAPH 2022,Wait,Ensemble Metropolis Light Transport,https://doi.org/10.1145/3472294,,TOG Paper / Ray Tracing & Monte Carlo Methods
+SIGGRAPH 2022,Wait,Escherization With Large Deformations Based on As-rigid-as-possible Shape Modeling,https://doi.org/10.1145/3487017,,TOG Paper / Cloth & Patterns
+SIGGRAPH 2022,Wait,Evaluating the Quality of a Synthesized Motion With the Fréchet Motion Distance,https://doi.org/10.1145/3532719.3543228,,Poster / Animation
+SIGGRAPH 2022,Wait,Filament Based Plasma,https://www3.math.tu-berlin.de/geometrie/wp_padilla/filament-based-plasma/,https://www3.math.tu-berlin.de/geometrie/wp_padilla/filament-based-plasma/,Technical Paper / Phenomenological Animation
+SIGGRAPH 2022,Wait,Fine Wrinkling on Coarsely Meshed Thin Shells,https://doi.org/10.1145/3462758,,TOG Paper / New Wrinkles in Cloth and Shells
+SIGGRAPH 2022,Wait,Free-viewpoint Indoor Neural Relighting from Multi-view Stereo,https://doi.org/10.1145/3469842,,TOG Paper / Large Scenes and Fast Neural Rendering
+SIGGRAPH 2022,Wait,GAN Applied to Wave Function Collapse for Procedural Map Generation,https://doi.org/10.1145/3532719.3543198,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,Generating 3D Human Texture From a Single Image With Sampling and Refinement,https://doi.org/10.1145/3532719.3543204,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,Generating Diverse Indoor Furniture Arrangements,https://doi.org/10.1145/3532719.3543244,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,Generation of Traditional Japanese Patterns From Natural Patterns With StyleGAN,https://doi.org/10.1145/3532719.3543221,,Poster / Art & Design
+SIGGRAPH 2022,Wait,GravityPack: Exploring a Wearable Gravity Display for Immersive Interaction Using Liquid-based System,https://doi.org/10.1145/3532719.3543218,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Guided Bubbles and Wet Foam for Realistic Whitewater Simulation,http://alexey.stomakhin.com/research/whitewater.html,http://alexey.stomakhin.com/research/whitewater.html,Technical Paper / Fluid Simulation
+SIGGRAPH 2022,Wait,HDR Lighting Dilation for Dynamic Range Reduction on Virtual Production Stages,https://doi.org/10.1145/3532719.3543243,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,HYFAR: A Textile Soft Actuator for Haptic Clothing Interfaces,https://doi.org/10.1145/3532719.3543239,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,HiVideo: Hierarchical Browsing Interface for Educational Videos,https://doi.org/10.1145/3532719.3543226,,Poster / Adaptive/Assistive Technology
+SIGGRAPH 2022,Wait,Hierarchical Cross-parameterization for the Morphing of Deforming Meshes,https://doi.org/10.1145/3532719.3543229,,Poster / Animation
+SIGGRAPH 2022,Wait,High Dynamic Range and Super-resolution From Raw Image Bursts,https://www.archives-ouvertes.fr/hal-03740564/,https://www.archives-ouvertes.fr/hal-03740564/,Technical Paper / Computational Photography
+SIGGRAPH 2022,Wait,High-low Tech Ombro-Cinéma,https://doi.org/10.1145/3532719.3543225,,Poster / Art & Design
+SIGGRAPH 2022,Wait,Hybrid Prediction for Games’ Rollback Netcode,https://doi.org/10.1145/3532719.3543199,,Poster / Adaptive/Assistive Technology
+SIGGRAPH 2022,Wait,Immersive-Labeler: Immersive Annotation of Large-scale 3D Point Clouds in Virtual Reality,https://doi.org/10.1145/3532719.3543249,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Implicit Neural Representation for Physics-driven Actuated Soft Bodies,https://cgl.ethz.ch/publications/papers/paperYan22a.php,https://cgl.ethz.ch/publications/papers/paperYan22a.php,"Technical Paper / Benchmarks, Datasets and Learning"
+SIGGRAPH 2022,,In Situ Segmentation of Turbulent Flow With Topological Data Analysis,,,Poster / Modeling & Geometry
+SIGGRAPH 2022,,Inclusive Character Creator: A Showcase of Inclusive Design for 3D Character Creators,,,Poster / Art & Design
+SIGGRAPH 2022,Wait,Interactive Editing of Monocular Depth,https://doi.org/10.1145/3532719.3543235,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,Kuchibashi: 3D-printed Tweezers Bioinspired by the New Caledonian Crow’s Beak,https://doi.org/10.1145/3532719.3543254,,Poster / Art & Design
+SIGGRAPH 2022,Wait,Learning From Documents in the Wild to Improve Document Unwarping,https://doi.org/10.1145/3528233.3530756,,"Technical Paper / Display, Write, and Unwrap"
+SIGGRAPH 2022,Wait,Learning Soccer Juggling Skills With Layer-wise Mixture of Experts,https://www.cs.ubc.ca/~van/papers/2022-SIGGRAPH-juggle/index.html,https://github.com/ZhaomingXie/soccer_juggle_release,Technical Paper / Physics-Based Character Control
+SIGGRAPH 2022,Wait,Learning a Personalized Generative Prior for Face Images,https://doi.org/10.1145/3532719.3543215,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,Learning to Use Chopsticks in Diverse Gripping Styles,https://doi.org/10.1145/3528223.3530057,,Technical Paper / Physics-Based Character Control
+SIGGRAPH 2022,,LeviPrint: Contactless Fabrication Using Full Acoustic Manipulation of Elongated Parts,,,Technical Paper / Computational Design and Fabrication
+SIGGRAPH 2022,Wait,Local Scale Adaptation for Augmenting Hand Shape Models,https://doi.org/10.1145/3532719.3543246,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,Loki: A Unified Multiphysics Simulation Framework for Production,http://alexey.stomakhin.com/research/loki.html,http://alexey.stomakhin.com/research/loki.html,Technical Paper / An Ode to Solvers
+SIGGRAPH 2022,Wait,MatBuilder: Mastering Sampling Uniformity Over Projections,https://projet.liris.cnrs.fr/matbuilder/,https://projet.liris.cnrs.fr/matbuilder/,"Technical Paper / Sampling, Reconstruction & Appearance"
+SIGGRAPH 2022,Wait,MetaPo: A Robotic Meta Portal for Interspace Communication,https://doi.org/10.1145/3532719.3543255,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Modeling 3D Hair by Outlining Hair Cards,https://doi.org/10.1145/3532719.3543214,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,Modeling and Rendering Non-Euclidean Spaces Approximated With Concatenated Polytopes,https://doi.org/10.1145/3528223.3530186,,Technical Paper / Ray Tracing & Monte Carlo Methods
+SIGGRAPH 2022,Wait,Motion Puzzle: Arbitrary Motion Style Transfer by Body Part,https://lava.kaist.ac.kr/?page_id=6467,https://lava.kaist.ac.kr/?page_id=6467,TOG Paper / Character Animation
+SIGGRAPH 2022,Wait,Möbius Convolutions for Spherical CNNs,https://doi.org/10.1145/3528233.3530724,,Technical Paper / Convolutions and Neural Fields
+SIGGRAPH 2022,Wait,Near-gaze Visualisations of Empathic Communication Cues in Mixed Reality Collaboration,https://doi.org/10.1145/3532719.3543213,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Neural Dual Contouring,https://arxiv.org/abs/2202.01999,https://github.com/czq142857/NDC,Technical Paper / Neural Geometry Processing
+SIGGRAPH 2022,Wait,New Types of Smooth Subdivision Algorithms,https://doi.org/10.1145/3532719.3543261,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,Newton’s Fractals on Surfaces via Bicomplex Algebra,https://doi.org/10.1145/3532719.3543211,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,Node Graph Optimization Using Differentiable Proxies,https://graphics.cs.yale.edu/publications/node-graph-optimization-using-differentiable-proxies,https://graphics.cs.yale.edu/publications/node-graph-optimization-using-differentiable-proxies,Technical Paper / Volumes and Materials
+SIGGRAPH 2022,Wait,Non-line-of-sight Transient Rendering,https://doi.org/10.1145/3532719.3543223,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,Novel View Synthesis of Human Interactions From Sparse Multi-view Videos,https://chingswy.github.io/easymocap-public-doc/works/multinb.html,https://chingswy.github.io/easymocap-public-doc/works/multinb.html,"Technical Paper / Neural Pets, People and Avatars"
+SIGGRAPH 2022,Wait,On the Influence of Dynamic Illumination in the Perception of Translucency,https://doi.org/10.1145/3548814.3551462,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,OptiTrap: Optimal Trap Trajectories for Acoustic Levitation Displays,https://doi.org/10.1145/3517746,,"TOG Paper / Display, Write, and Unwrap"
+SIGGRAPH 2022,,Optical Aberration Correction in Postprocessing Using Imaging Simulation,,,TOG Paper / Computational Photography
+SIGGRAPH 2022,Wait,PAVEL: Decorative Patterns With Packed Volumetric Elements,https://doi.org/10.1145/3502802,,TOG Paper / Cloth & Patterns
+SIGGRAPH 2022,Wait,PCEDNet: A Lightweight Neural Network for Fast and Interactive Edge Detection in 3D Point Clouds,https://doi.org/10.1145/3481804,,TOG Paper / Neural Geometry Processing
+SIGGRAPH 2022,Wait,Palette: Image-to-image Diffusion Models,https://iterative-refinement.github.io/palette/,https://iterative-refinement.github.io/palette/,Technical Paper / Image/Video Editing and Generation
+SIGGRAPH 2022,Wait,Parallax Background Texture Generation,https://doi.org/10.1145/3532719.3543260,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,Penetration-free Projective Dynamics on the GPU,https://www.math.ucla.edu/~minchen/,,Technical Paper / Contact and Fracture
+SIGGRAPH 2022,Wait,Photon-driven Neural Reconstruction for Path Guiding,https://doi.org/10.1145/3476828,,"TOG Paper / Neural Objects, Materials and Illumination"
+SIGGRAPH 2022,Wait,Physics Informed Neural Fields for Smoke Reconstruction With Sparse Data,https://people.mpi-inf.mpg.de/~mchu/#publications,,Technical Paper / Fluid Simulation
+SIGGRAPH 2022,Wait,Physics-based Character Control Using Conditional GAIL,https://doi.org/10.1145/3532719.3543224,,Poster / Animation
+SIGGRAPH 2022,Wait,Physics-based Character Controllers Using Conditional VAEs,https://sites.google.com/view/jungdam/publications,,Technical Paper / Physics-Based Character Control
+SIGGRAPH 2022,Wait,Physics-based Combustion Simulation,https://dl.acm.org/doi/10.1145/3526213,,TOG Paper / Phenomenological Animation
+SIGGRAPH 2022,Wait,Practical Level-of-detail Aggregation of Fur Appearance,https://sites.cs.ucsb.edu/~lingqi/project_page/fur_aggregation/index.html,https://sites.cs.ucsb.edu/~lingqi/project_page/fur_aggregation/index.html,Technical Paper / Volumes and Materials
+SIGGRAPH 2022,Wait,Procedural Texturing of Solid Wood With Knots,http://www.ma-la.com/procedural_knots.html,http://www.ma-la.com/procedural_knots.html,Technical Paper / Volumes and Materials
+SIGGRAPH 2022,Wait,Programmable Eclairs,https://doi.org/10.1145/3532719.3543251,,Poster / Art & Design
+SIGGRAPH 2022,Wait,ProjecString: Turning an Everyday String Curtain Into an Interactive Projection Display,https://doi.org/10.1145/3532719.3543203,,Poster / Art & Design
+SIGGRAPH 2022,Wait,Pseudo-3D Scene Modeling for Virtual Reality Using Stylized Novel View Synthesis,https://doi.org/10.1145/3532719.3543232,,Poster / Modeling & Geometry
+SIGGRAPH 2022,Wait,QuickPose: Real-time Multi-view Multi-person Pose Estimation in Crowded Scenes,https://doi.org/10.1145/3528233.3530746,,Technical Paper / Character Animation
+SIGGRAPH 2022,Wait,R2E2: Low-latency Path Tracing of Terabyte-scale Scenes Using Thousands of Cloud CPUs,https://r2e2.dev/,https://r2e2.dev/,Technical Paper / Ray Tracing & Monte Carlo Methods
+SIGGRAPH 2022,Wait,RHapTor: Rendering Haptic Torques for Virtual Reality,https://doi.org/10.1145/3532719.3543248,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,ReLU Fields: The Little Non-linearity That Could,https://geometry.cs.ucl.ac.uk/group_website/projects/2022/relu_fields/,https://geometry.cs.ucl.ac.uk/group_website/projects/2022/relu_fields/,Technical Paper / Large Scenes and Fast Neural Rendering
+SIGGRAPH 2022,Wait,Real-time Controllable Motion Transition for Characters,http://www.cad.zju.edu.cn/home/jin/SigMotion2022/SigMotion2022.htm,http://www.cad.zju.edu.cn/home/jin/SigMotion2022/SigMotion2022.htm,Technical Paper / Character Animation
+SIGGRAPH 2022,Wait,Real-time Lens Distortion Algorithm on Embedded GPU Systems,https://doi.org/10.1145/3532719.3543241,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,Recording and Replaying Psychomotor User Actions in VR,https://doi.org/10.1145/3532719.3543253,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Rendering of Scratched Transparent Materials Using Precomputed SV-BSDFs,https://doi.org/10.1145/3532719.3543207,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,Rendering of Subjective Speckle Formed by Rough Statistical Surfaces,https://doi.org/10.1145/3472293,,"TOG Paper / Reflectance, Shading Models and Shaders"
+SIGGRAPH 2022,Wait,SNeRF: Stylized Neural Implicit Representations for 3D Scenes,https://research.facebook.com/publications/snerf-stylized-neural-implicit-representations-for-3d-scenes/,https://research.facebook.com/publications/snerf-stylized-neural-implicit-representations-for-3d-scenes/,"Technical Paper / Learning ""In Style"""
+SIGGRAPH 2022,Wait,SVBRDF Estimation Using a Normal Sorting Technique,https://doi.org/10.1145/3532719.3543242,,Poster / Image Processing & Computer Vision
+SIGGRAPH 2022,Wait,Scattering From Elliptical Hair Fibers Based on Microfacet Theory,https://doi.org/10.1145/3532719.3543236,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,Self-Sampling for Neural Point Cloud Consolidation,https://doi.org/10.1145/3470645,,TOG Paper / Neural Geometry Processing
+SIGGRAPH 2022,Wait,Semantically Supervised Appearance Decomposition for Virtual Staging From a Single Panorama,https://arxiv.org/abs/2205.13150,https://arxiv.org/abs/2205.13150,"Technical Paper / Sampling, Reconstruction & Appearance"
+SIGGRAPH 2022,Wait,Shape Dithering for 3D Printing,https://cuttlefish.de/publications,,"Technical Paper / Sampling, Reconstruction & Appearance"
+SIGGRAPH 2022,Wait,Shoot360: Normal View Video Creation From City Panorama Footage,https://doi.org/10.1145/3528233.3530702,,Technical Paper / Image/Video Editing and Generation
+SIGGRAPH 2022,Wait,Simulating Brittle Fracture With Material Points,https://doi.org/10.1145/3522573,,TOG Paper / Contact and Fracture
+SIGGRAPH 2022,Wait,Simulation and Optimization of Magnetoelastic Thin Shells,https://doi.org/10.1145/3528223.3530142,,Technical Paper / New Wrinkles in Cloth and Shells
+SIGGRAPH 2022,Wait,Skeletonization via Local Separators,https://doi.org/10.1145/3459233,,TOG Paper / Shape Analysis & Approximation
+SIGGRAPH 2022,Wait,Sketch2Pose: Estimating a 3D Character Pose From a Bitmap Sketch,http://www-ens.iro.umontreal.ca/~brodtkir/projects/sketch2pose/,https://github.com/kbrodt/sketch2pose,"Technical Paper / Sketches, Strokes, and Ropes"
+SIGGRAPH 2022,Wait,SofGAN: A Portrait Image Generator With Dynamic Styling,https://doi.org/10.1145/3470848,,"TOG Paper / Learning ""In Style"""
+SIGGRAPH 2022,Wait,Sparsity-specific Code Optimization Using Expression Trees,https://doi.org/10.1145/3520484,,"TOG Paper / Design, Direct, Plan & Program"
+SIGGRAPH 2022,Wait,Spatial Augmented Reality Assistance System With Accelerometer and Projection Mapping at Cleaning Activities,https://doi.org/10.1145/3532719.3543245,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Sphere: A Novel Approach to 3D and Active Sound Localization,https://doi.org/10.1145/3532719.3543206,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,Stability-aware Simplification of Curve Networks,http://www-labs.iro.umontreal.ca/~bmpix/curve_networks/,http://www-labs.iro.umontreal.ca/~bmpix/curve_networks/,"Technical Paper / Sketches, Strokes, and Ropes"
+SIGGRAPH 2022,Wait,Stereoscopic Transparent Display Visible With Naked Eye,https://doi.org/10.1145/3532719.3543205,,Poster / Display & Rendering
+SIGGRAPH 2022,Wait,StrokeStyles: Stroke-based Segmentation and Stylization of Fonts,https://doi.org/10.1145/3505246,,"TOG Paper / Sketches, Strokes, and Ropes"
+SIGGRAPH 2022,Wait,StyleFusion: Disentangling Spatial Segments in StyleGAN-generated Images,https://doi.org/10.1145/3527168,,"TOG Paper / Learning ""In Style"""
+SIGGRAPH 2022,,Subdivision Based Convolutional Networks,,,TOG Paper / Convolutions and Neural Fields
+SIGGRAPH 2022,Wait,Symmetry-driven 3D Reconstruction From Concept Sketches,https://ns.inria.fr/d3/SymmetrySketch/,https://gitlab.inria.fr/fhahnlei/symmetric-sketch,"Technical Paper / Sketches, Strokes, and Ropes"
+SIGGRAPH 2022,Wait,Synchronized Hand Difference Visualization for Piano Learning,https://doi.org/10.1145/3532719.3543196,,Poster / Adaptive/Assistive Technology
+SIGGRAPH 2022,Wait,Synthesis of Frame Field-aligned Multi-laminar Structures,https://doi.org/10.1145/3516522,,"TOG Paper / Design, Direct, Plan & Program"
+SIGGRAPH 2022,Wait,TCB-spline-based Image Vectorization,https://doi.org/10.1145/3513132,,TOG Paper / Meshing & Mapping
+SIGGRAPH 2022,Wait,TextureMe: High-quality Textured Scene Reconstruction in Real Time,https://doi.org/10.1145/3503926,,TOG Paper / Reconstruction
+SIGGRAPH 2022,,The Hierarchical Subspace Iteration Method for Laplace-Beltrami Eigenproblems,,,"TOG Paper / Benchmarks, Datasets and Learning"
+SIGGRAPH 2022,Wait,The Power Particle-in-Cell Method,https://www.math.ucla.edu/~minchen/,,Technical Paper / Fluid Simulation
+SIGGRAPH 2022,Wait,TightCap: 3D Human Shape Capture With Clothing Tightness Field,https://doi.org/10.1145/3478518,,"TOG Paper / Neural Pets, People and Avatars"
+SIGGRAPH 2022,Wait,TopoCut: Fast and Robust Planar Cutting of Arbitrary Domains,http://www.geometry.caltech.edu/pubs.html,http://www.geometry.caltech.edu/pubs.html,Technical Paper / Shape Analysis & Approximation
+SIGGRAPH 2022,Wait,True Seams: Modeling Seams in Digital Garments,https://seddi.com/research/trueseams/,https://seddi.com/research/trueseams/,Technical Paper / New Wrinkles in Cloth and Shells
+SIGGRAPH 2022,,Typefaces Structural Transformations Regularized Using Differential Evolution for Personalized Visual Accessibility,,,Poster / Adaptive/Assistive Technology
+SIGGRAPH 2022,Wait,Umbrella Meshes: Elastic Mechanisms for Freeform Shape Deployment,https://gcm.epfl.ch/publications/2022/UmbrellaMeshes/index.php,https://gcm.epfl.ch/publications/2022/UmbrellaMeshes/index.php,Technical Paper / Computational Design and Fabrication
+SIGGRAPH 2022,Wait,Unbiased and Consistent Rendering Using Biased Estimators,https://research.nvidia.com/publication/2022-07_unbiased-and-consistent-rendering-using-biased-estimators,https://research.nvidia.com/publication/2022-07_unbiased-and-consistent-rendering-using-biased-estimators,Technical Paper / Volumes and Materials
+SIGGRAPH 2022,Wait,Unified Many-worlds Browsing of Arbitrary Physics-based Animations,https://graphics.stanford.edu/papers/umwb/,https://graphics.stanford.edu/papers/umwb/,Technical Paper / Phenomenological Animation
+SIGGRAPH 2022,Wait,Unsupervised Shape Completion via Deep Prior in the Neural Tangent Kernel Perspective,https://doi.org/10.1145/3459234,,TOG Paper / Reconstruction
+SIGGRAPH 2022,Wait,Variational Quadratic Shape Functions for Polygons and Polyhedra,https://ls7-gv.cs.tu-dortmund.de/people/bunge_astrid/bunge_astrid.html,https://github.com/mkazhdan/VariationalPolyShapeFunctions,Technical Paper / An Ode to Solvers
+SIGGRAPH 2022,Wait,Virtual Production in Action: A Creative Implementation of Expanded Cinematography and Narratives,https://doi.org/10.1145/3532719.3543231,,Poster / Art & Design
+SIGGRAPH 2022,Wait,VoLux-GAN: A Generative Model for 3D Face Synthesis With HDRI Relighting,https://feitongt.github.io/VoLux-GAN/,https://feitongt.github.io/VoLux-GAN/,Technical Paper / Faces and Facial Animation
+SIGGRAPH 2022,Wait,WallPlan: Synthesizing Floorplans by Learning to Generate Wall Graphs,https://cgjiahui.github.io/wallplan.html,https://cgjiahui.github.io/wallplan.html,"Technical Paper / Design, Direct, Plan & Program"
+SIGGRAPH 2022,,Which Cross Fields Can Be Quadrangulated? Global Parameterization From Prescribed Holonomy Signatures,,,Technical Paper / Meshing & Mapping
+SIGGRAPH 2022,Wait,ZIGEN: A Windowing System Enabling Multitasking Among 3D and 2D Applications in Immersive Environments,https://doi.org/10.1145/3532719.3543200,,Poster / Augmented & Virtual Realities
+SIGGRAPH 2022,Wait,geoTangle: Interactive Design of Geodesic Tangle Patterns on Surfaces,https://doi.org/10.1145/3487909,,TOG Paper / Cloth & Patterns
+SIGGRAPH 2023,Wait,A Full-wave Reference Simulator for Computing Surface Reflectance,https://blaire9989.github.io/assets/1_BEMsim3D/project.html,https://github.com/blaire9989/BEMsim3D/,Technical Paper / Material Rendering
+SIGGRAPH 2023,Wait,A Hybrid Generator Architecture for Controllable Face Synthesis,https://research.nvidia.com/publication/2023-08_hybrid-generator-architecture-controllable-face-synthesis,https://research.nvidia.com/publication/2023-08_hybrid-generator-architecture-controllable-face-synthesis,Technical Paper / Making Faces With Neural Avatars
+SIGGRAPH 2023,Wait,A Practical Wave Optics Reflection Model for Hair and Fur,https://mandyxmq.github.io/research/wavefiber_3d.html,https://mandyxmq.github.io/research/wavefiber_3d.html,Technical Paper / A Material World
+SIGGRAPH 2023,Wait,A Realistic Surface-based Cloth Rendering Model,http://junqiuzhu.com/,http://junqiuzhu.com/,Technical Paper / A Material World
+SIGGRAPH 2023,Wait,A Sparse Non-parametric BRDF Model,https://hal.science/hal-03654734/,https://hal.science/hal-03654734/,TOG Paper / A Material World
+SIGGRAPH 2023,Wait,A Temporal Coherent Topology Optimization Approach for Assembly Planning of Bespoke Frame Structures,https://kiki007.github.io/publication/temporalcoherenttopologyoptimization/,https://kiki007.github.io/publication/temporalcoherenttopologyoptimization/,Technical Paper / From Knitting to Circuits
+SIGGRAPH 2023,Wait,"An Extensible, Data-oriented Architecture for High-performance, Many-world Simulation",https://madrona-engine.github.io/,https://madrona-engine.github.io/,Technical Paper / Your GPU Is Somewhere Else
+SIGGRAPH 2023,Wait,Anatomically Detailed Simulation of Human Torso,https://tml.stanford.edu/publications/2023/anatomically-detailed-simulation-human-torso,https://tml.stanford.edu/publications/2023/anatomically-detailed-simulation-human-torso,Technical Paper / Motion Recipes and Simulation
+SIGGRAPH 2023,Wait,ArrangementNet: Learning Scene Arrangements for Vectorized Indoor Scene Modeling,https://doi.org/10.1145/3592122,https://github.com/zssjh/ArrangementNet,Technical Paper / Not Just for Cubists
+SIGGRAPH 2023,Wait,As-continuous-as-possible Extrusion-based Fabrication of Surface Models,https://fanchao98.github.io/ACAP%20page/acap.html,https://fanchao98.github.io/ACAP%20page/acap.html,TOG Paper / From Knitting to Circuits
+SIGGRAPH 2023,Wait,AvatarMAV: Fast 3D Head Avatar Reconstruction Using Motion-aware Neural Voxels,https://liuyebin.com/avatarmav/,https://liuyebin.com/avatarmav/,Technical Paper / Neural Capturing
+SIGGRAPH 2023,Wait,AvatarReX: Real-time Expressive Full-body Avatars,https://liuyebin.com/AvatarRex/,https://liuyebin.com/AvatarRex/,Technical Paper / NeRFs for Avatars
+SIGGRAPH 2023,Wait,B-rep Matching for Collaborating Across CAD Systems,https://homes.cs.washington.edu/~adriana/,,"Technical Paper / Surfaces, Strips, Lights"
+SIGGRAPH 2023,Wait,Bidirectional GaitNet: A Bidirectional Prediction Model of Human Gait and Anatomical Conditions,https://sites.google.com/mrl.snu.ac.kr/jungnam/home,,Technical Paper / Motion Recipes and Simulation
+SIGGRAPH 2023,Wait,Bodyformer: Semantics-guided 3D Body Gesture Synthesis With Transformer,https://i.cs.hku.hk/~taku/publication.html,,Technical Paper / Knowing What To Do With Your Hands
+SIGGRAPH 2023,Wait,CT2Hair: High-fidelity 3D Hair Modeling Using Computed Tomography,http://yuefanshen.net/CTHair,https://github.com/facebookresearch/CT2Hair,Technical Paper / Modeling Shells and Hair
+SIGGRAPH 2023,Wait,ClipFace: Text-guided Editing of Textured 3D Morphable Models,https://shivangi-aneja.github.io/projects/clipface/,https://github.com/shivangi-aneja/ClipFace,Technical Paper / Making Faces With Neural Avatars
+SIGGRAPH 2023,Wait,ColorfulCurves: Palette-aware Lightness Control and Color Editing via Sparse Optimization,https://cragl.cs.gmu.edu/colorfulcurves/,https://github.com/tedchao/ColorfulCurves,Technical Paper / Colorful Topics In Imaging
+SIGGRAPH 2023,Wait,Computational Exploration of Multistable Elastic Knots,https://infoscience.epfl.ch/record/302408,https://infoscience.epfl.ch/record/302408,Technical Paper / Modeling Shells and Hair
+SIGGRAPH 2023,Wait,Computing the Singularities of Rational Parametric Surfaces Using Moving Planes,https://s2023.siggraph.org/presentation/?id=paperstog_121&sess=sess137,,"TOG Paper / Surfaces, Strips, Lights"
+SIGGRAPH 2023,Wait,Constraint-based Simulation of Passive Suction Cups,https://eulaliecoevoet.com/publications/,https://eulaliecoevoet.com/publications/,TOG Paper / Fabrication-Oriented Design
+SIGGRAPH 2023,Wait,"Coupling Conduction, Convection, and Radiative Transfer in a Single Path-space: Application to Infrared Rendering",https://www.irit.fr/STORM/site/coupling-conduction-convection-and-radiative-transfer-in-a-single-path-space/,https://www.irit.fr/STORM/site/coupling-conduction-convection-and-radiative-transfer-in-a-single-path-space/,Technical Paper / Pushing the Boundaries
+SIGGRAPH 2023,Wait,DARAM: Dynamic Avatar-human Motion Remapping Technique for Realistic Virtual Stair Ascending Motions,https://ssw03270.github.io/2023-05/t1,https://ssw03270.github.io/2023-05/t1,Technical Paper / Motion Recipes and Simulation
+SIGGRAPH 2023,Wait,DE-NeRF: DEcoupled Neural Radiance Fields for View-consistent Appearance Editing and High-frequency Environmental Relighting,http://geometrylearning.com/,,Technical Paper / NeRFs on Earth
+SIGGRAPH 2023,Wait,Data-driven Digital Lighting Design for Residential Indoor Spaces,https://doi.org/10.1145/3582001,,"TOG Paper / Surfaces, Strips, Lights"
+SIGGRAPH 2023,Wait,Deep Real-time Volumetric Rendering Using Multi-feature Fusion,https://onethousandwu.com/publication/mrpnn,https://onethousandwu.com/publication/mrpnn,Technical Paper / Gotta Go Fast!
+SIGGRAPH 2023,Wait,Deep SVBRDF Estimation From Single Image Under Learned Planar Lighting,https://doi.org/10.1145/3588432.3591559,,Technical Paper / Neural Capturing
+SIGGRAPH 2023,Wait,Denoising-aware Adaptive Sampling for Monte Carlo Ray Tracing,https://arthurfirmino.com/,,Technical Paper / Neural Light Transport
+SIGGRAPH 2023,Wait,"Dense, Interlocking-free and Scalable Spectral Packing of Generic 3D Objects",https://inkbit3d.com/packing/,https://inkbit3d.com/packing/,Technical Paper / From Knitting to Circuits
+SIGGRAPH 2023,Wait,Deployable Strip Structures,https://www.geometrie.tuwien.ac.at/pottmann/,,"Technical Paper / Surfaces, Strips, Lights"
+SIGGRAPH 2023,Wait,Differentiable Stripe Patterns for Inverse Design of Structured Surfaces,http://crl.ethz.ch/publications/index.html,,"Technical Paper / Surfaces, Strips, Lights"
+SIGGRAPH 2023,Wait,Differential Frequency Heterodyne Time-of-flight Imaging for Instantaneous Depth and Velocity Estimation,https://doi.org/10.1145/3546939,,TOG Paper / Beyond The Headset
+SIGGRAPH 2023,Wait,Differential Operators on Sketches via Alpha Contours,http://www-labs.iro.umontreal.ca/~bmpix/,,"Technical Paper / Contours, Conformality, Coarsening, and Coordinates"
+SIGGRAPH 2023,Wait,Diffusion Image Analogies,https://dcgi.fel.cvut.cz/home/sykorad/dia.html,https://github.com/subrtadel/DIA,Technical Paper / Neural Image Generation and Editing
+SIGGRAPH 2023,Wait,ETER: Elastic Tessellation for Real-time Pixel-accurate Rendering of Large-scale NURBS Models,http://staff.ustc.edu.cn/~lgliu/Projects/2023_ETER/default.html,http://staff.ustc.edu.cn/~lgliu/Projects/2023_ETER/default.html,Technical Paper / Gotta Go Fast!
+SIGGRAPH 2023,Wait,Effect-based Multi-viewer Caching for Cloud-native Rendering,https://doi.org/10.1145/3592431,,Technical Paper / Your GPU Is Somewhere Else
+SIGGRAPH 2023,Wait,Efficient Embeddings in Exact Arithmetic,https://doi.org/10.1145/3592445,,"Technical Paper / Contours, Conformality, Coarsening, and Coordinates"
+SIGGRAPH 2023,Wait,Efficient Video Portrait Reenactment via Grid-based Codebook,https://doi.org/10.1145/3588432.3591509,,Technical Paper / Making Faces With Neural Avatars
+SIGGRAPH 2023,Wait,End-to-end Procedural Material Capture With Proxy-free Mixed-integer Optimization,https://cdfg.mit.edu/publications/diffmatv2,https://cdfg.mit.edu/publications/diffmatv2,Technical Paper / Material Acquisition
+SIGGRAPH 2023,Wait,Eventfulness for Interactive Video Alignment,https://doi.org/10.1145/3592118,,Technical Paper / Image and Video Editing
+SIGGRAPH 2023,Wait,Evolutionary Piecewise Developable Approximations,https://ustc-gcl-f.github.io/projects/EvolutionaryDevelop/EvoDevelop.html,https://ustc-gcl-f.github.io/projects/EvolutionaryDevelop/EvoDevelop.html,Technical Paper / All About Meshes
+SIGGRAPH 2023,Wait,Example-based Motion Synthesis via Generative Motion Matching,http://weiyuli.xyz/GenMM/,https://github.com/wyysf-98/GenMM,Technical Paper / Character Animation
+SIGGRAPH 2023,Wait,Fast GPU-based Two-way Continuous Collision Handling,https://wanghmin.github.io/publications.html,,TOG Paper / Simulating and Detecting Collisions
+SIGGRAPH 2023,Wait,Film Grain Rendering and Parameter Estimation,https://doi.org/10.1145/3592127,,Technical Paper / Does Anybody Know How I Got Here?
+SIGGRAPH 2023,Wait,Fluid-solid Coupling in Kinetic Two-phase Flow Simulation,https://pages.saclay.inria.fr/mathieu.desbrun/m@pubs.html,https://pages.saclay.inria.fr/mathieu.desbrun/m@pubs.html,Technical Paper / Going With the Flow
+SIGGRAPH 2023,Wait,Focal Path Guiding for Light Transport Simulation,https://graphics.cg.uni-saarland.de/publications/rath-2023-focal-guiding.html,https://github.com/iRath96/focal-guiding,Technical Paper / Neural Light Transport
+SIGGRAPH 2023,Wait,Galaxy Maps: Localized Foliations for Bijective Volumetric Mapping,https://doi.org/10.1145/3592410,,Technical Paper / Marvelous Mappings
+SIGGRAPH 2023,Wait,Generating Procedural Materials From Text or Image Prompts,https://yiweihu.netlify.app/uploads/hu2023gen/project.html,https://yiweihu.netlify.app/uploads/hu2023gen/project.html,Technical Paper / A Material World
+SIGGRAPH 2023,Wait,Generative Design of Sheet Metal Structures,https://homes.cs.washington.edu/~adriana/,,Technical Paper / Fabrication-Oriented Design
+SIGGRAPH 2023,Wait,Geometric Optimisation via Spectral Shifting,https://romeric.github.io/goss.html,https://romeric.github.io/goss.html,TOG Paper / Geometric Optimization
+SIGGRAPH 2023,Wait,GestureDiffuCLIP: Gesture Diffusion Model With CLIP Latents,https://pku-mocca.github.io/GestureDiffuCLIP-Page/,https://pku-mocca.github.io/GestureDiffuCLIP-Page/,Technical Paper / Knowing What To Do With Your Hands
+SIGGRAPH 2023,Wait,HiGAN+: Handwriting Imitation GAN With Disentangled Representations,https://doi.org/10.1145/3550070,https://github.com/ganji15/HiGANplus,TOG Paper / Magical Sketching
+SIGGRAPH 2023,Wait,How Important Are Detailed Hand Motions for Communication for a Virtual Character Through the Lens of Charades?,https://research.birmingham.ac.uk/en/publications/how-important-are-detailed-hand-motions-for-communication-for-a-v,https://research.birmingham.ac.uk/en/publications/how-important-are-detailed-hand-motions-for-communication-for-a-v,TOG Paper / Knowing What To Do With Your Hands
+SIGGRAPH 2023,Wait,Image Vectorization and Editing via Linear Gradient Layer Decomposition,https://cragl.cs.gmu.edu/gradientlayers/,https://cragl.cs.gmu.edu/gradientlayers/,Technical Paper / Colorful Topics In Imaging
+SIGGRAPH 2023,Wait,In-Timestep Remeshing for Contacting Elastodynamics,https://zferg.us/research/in-timestep-remeshing/,https://zferg.us/research/in-timestep-remeshing/,Technical Paper / Simulating and Detecting Collisions
+SIGGRAPH 2023,Wait,Inkjet 4D Print: Self-folding Tessellated Origami Objects by Inkjet UV Printing,https://narumi.me/inkjet4dprint,https://narumi.me/inkjet4dprint,Technical Paper / Fabrication-Oriented Design
+SIGGRAPH 2023,Wait,Kernel-based Frame Interpolation for Spatio-temporally Adaptive Rendering,https://studios.disneyresearch.com/2023/07/23/kernel-based-frame-interpolation-for-spatio-temporally-adaptive-rendering/,https://studios.disneyresearch.com/2023/07/23/kernel-based-frame-interpolation-for-spatio-temporally-adaptive-rendering/,Technical Paper / Gotta Go Fast!
+SIGGRAPH 2023,Wait,Key-locked Rank One Editing for Text-to-image Personalization,https://research.nvidia.com/labs/par/Perfusion/,https://research.nvidia.com/labs/par/Perfusion/,Technical Paper / Image and Video Editing
+SIGGRAPH 2023,Wait,Large-scale Terrain,https://s2023.siggraph.org/presentation/?id=paperstog_101&sess=sess110,,TOG Paper / Procedural Modeling
+SIGGRAPH 2023,Wait,LatentAvatar: Learning Latent Expression Code for Expressive Neural Head Avatar,https://liuyebin.com/latentavatar/,https://liuyebin.com/latentavatar/,Technical Paper / NeRFs for Avatars
+SIGGRAPH 2023,Wait,"Listen, Denoise, Action! Audio-Driven Motion Synthesis with Diffusion Models",https://www.speech.kth.se/research/listen-denoise-action/,https://www.speech.kth.se/research/listen-denoise-action/,Technical Paper / Knowing What To Do With Your Hands
+SIGGRAPH 2023,Wait,Locally Attentional SDF Diffusion for Controllable 3D Shape Generation,https://zhengxinyang.github.io/projects/LAS-Diffusion.html,https://github.com/Zhengxinyang/LAS-Diffusion,Technical Paper / Diffusion for Geometry
+SIGGRAPH 2023,Wait,Meso-facets for Goniochromatic 3D Printing,https://doi.org/10.1145/3592137,,Technical Paper / Fabricating Appearance
+SIGGRAPH 2023,Wait,Metameric: Spectral Uplifting via Controllable Color Constraints,https://graphics.tudelft.nl/Publications-new/2023/RE23/,https://graphics.tudelft.nl/Publications-new/2023/RE23/,Technical Paper / Material Rendering
+SIGGRAPH 2023,Wait,Micro-Mesh Construction,https://micromesh.di.unimi.it/,https://micromesh.di.unimi.it/,Technical Paper / All About Meshes
+SIGGRAPH 2023,Wait,Microfacet Theory for Non-uniform Heightfields,https://research.nvidia.com/labs/rtr/microfacet-theory-non-uniform-heightfields/,https://research.nvidia.com/labs/rtr/microfacet-theory-non-uniform-heightfields/,Technical Paper / A Material World
+SIGGRAPH 2023,Wait,MoiréTag: Angular Measurement and Tracking With a Passive Marker,https://doi.org/10.1145/3588432.3591538,,Technical Paper / Beyond The Headset
+SIGGRAPH 2023,Wait,NeRF-Texture: Texture Synthesis With Neural Radiance Fields,https://yihua7.github.io/NeRF-Texture-web/,https://github.com/yihua7/NeRF-Texture,Technical Paper / Material Rendering
+SIGGRAPH 2023,Wait,NeuSample: Importance Sampling for Neural Materials,https://cseweb.ucsd.edu/~viscomp/projects/neusample/,https://github.com/bing-xu-graphics/neusample_release,Technical Paper / Material Rendering
+SIGGRAPH 2023,Wait,Neural Parametric Mixtures for Path Guiding,https://neuropara.github.io/,https://neuropara.github.io/,Technical Paper / Neural Light Transport
+SIGGRAPH 2023,Wait,Neural Partitioning Pyramids for Denoising Monte Carlo Renderings,https://balint.io/nppd/,https://balint.io/nppd/,Technical Paper / Gotta Go Fast!
+SIGGRAPH 2023,Wait,Neural Prefiltering for Correlation-aware Levels of Detail,https://weiphil.github.io/portfolio/neural_lod,https://weiphil.github.io/portfolio/neural_lod,Technical Paper / Neural Light Transport
+SIGGRAPH 2023,Wait,Neural Progressive Meshes,https://www.cs.toronto.edu/~jacobson/,,Technical Paper / Deep Geometric Learning
+SIGGRAPH 2023,Wait,OctFormer: Octree-based Transformers for 3D Point Clouds,https://wang-ps.github.io/octformer.html,https://github.com/octree-nn/octformer,Technical Paper / Deep Geometric Learning
+SIGGRAPH 2023,Wait,P2M: A Fast Solver for Querying Distance From Point to Mesh Surface,https://doi.org/10.1145/3592439,,Technical Paper / Simulating and Detecting Collisions
+SIGGRAPH 2023,Wait,Parsing-conditioned Anime Translation: A New Dataset and Method,https://github.com/zsl2018/StyleAnime,https://github.com/zsl2018/StyleAnime,TOG Paper / Image and Video Editing
+SIGGRAPH 2023,Wait,Perspective-correct VR Passthrough Without Reprojection,https://doi.org/10.1145/3588432.3591534,,Technical Paper / Seeing What's in Front of Your Eyes
+SIGGRAPH 2023,Wait,Polynomial 2D Green Coordinates for Polygonal Cages,https://portfolio.exppad.com/research.html,,"Technical Paper / Contours, Conformality, Coarsening, and Coordinates"
+SIGGRAPH 2023,Wait,Procedural Metamaterials: A Unified Procedural Graph for Metamaterial Design,https://cfg.mit.edu/publications/procedural-metamaterials,https://cfg.mit.edu/publications/procedural-metamaterials,TOG Paper / Procedural Modeling
+SIGGRAPH 2023,Wait,Progressive Null-tracking for Volumetric Rendering,https://cs.dartmouth.edu/~wjarosz/publications/misso23progressive.html,https://github.com/ZackMisso/ProgressiveNullTracking_Siggraph2023,Technical Paper / Neural Light Transport
+SIGGRAPH 2023,Wait,QuestEnvSim: Environment-aware Simulated Motion Tracking From Sparse Sensor Input,https://sunny-codes.github.io/projects/questenvsim.html,https://sunny-codes.github.io/projects/questenvsim.html,Technical Paper / Interaction
+SIGGRAPH 2023,Wait,Real-time Radiance Fields for Single-image Portrait View Synthesis,https://doi.org/10.1145/3592460,,Technical Paper / Gotta Go Fast!
+SIGGRAPH 2023,Wait,Recursive Control Variates for Inverse Rendering,https://rgl.epfl.ch/publications/Nicolet2023Recursive,https://rgl.epfl.ch/publications/Nicolet2023Recursive,Technical Paper / Does Anybody Know How I Got Here?
+SIGGRAPH 2023,Wait,Restricted Delaunay Triangulation for Explicit Surface Reconstruction,https://doi.org/10.1145/3533768,,TOG Paper / Surface Reconstruction
+SIGGRAPH 2023,Wait,Sag-free Initialization for Strand-based Hybrid Hair Simulation,https://graphics.cs.utah.edu/research/projects/sag-free-hair/,https://graphics.cs.utah.edu/research/projects/sag-free-hair/,Technical Paper / Modeling Shells and Hair
+SIGGRAPH 2023,Wait,Second-order Stencil Descent for Interior-point Hyperelasticity,https://www.math.ucla.edu/multiples/publication/,,"Technical Paper / Fast, Large and Learned Deformables"
+SIGGRAPH 2023,Wait,Semantics and Scheduling for Machine Knitting Compilers,https://textiles-lab.github.io/publications/2023-knitout-semantics/,https://github.com/textiles-lab/fenced-tangle-supplemental,Technical Paper / From Knitting to Circuits
+SIGGRAPH 2023,Wait,Semi-supervised Reference-based Sketch Extraction Using a Contrastive Learning Framework,https://chanuku.github.io/Semi_ref2sketch/,https://github.com/Chanuku/semi_ref2sketch_code,Technical Paper / Magical Sketching
+SIGGRAPH 2023,Wait,ShapeCoder: Discovering Abstractions for Visual Programs From Unstructured Primitives,https://github.com/rkjones4/shapecoder,,Technical Paper / Not Just for Cubists
+SIGGRAPH 2023,Wait,Single-shot Implicit Morphable Faces With Consistent Texture Parameterization,https://doi.org/10.1145/3588432.3591494,,Technical Paper / Deep Geometric Learning
+SIGGRAPH 2023,Wait,SketchFaceNeRF: Sketch-based Facial Generation and Editing in Neural Radiance Fields,http://geometrylearning.com/,,Technical Paper / NeRFs for Avatars
+SIGGRAPH 2023,Wait,Spectral Coarsening With Hodge Laplacians,https://doi.org/10.1145/3588432.3591544,,"Technical Paper / Contours, Conformality, Coarsening, and Coordinates"
+SIGGRAPH 2023,Wait,Stealth Shaper: Reflectivity Optimization as Surface Stylization,https://kenji-tojo.github.io/publications/stealthshaper/,https://kenji-tojo.github.io/publications/stealthshaper/,Technical Paper / Fabricating Appearance
+SIGGRAPH 2023,Wait,StripMaker: Perception-driven Learned Vector Sketch Consolidation,https://www.cs.ubc.ca/labs/imager/tr/2023/stripmaker/,https://www.cs.ubc.ca/labs/imager/tr/2023/stripmaker/,Technical Paper / Magical Sketching
+SIGGRAPH 2023,Wait,Sum-of-squares Collision Detection for Curved Shapes and Paths,https://doi.org/10.1145/3588432.3591507,,Technical Paper / Simulating and Detecting Collisions
+SIGGRAPH 2023,Wait,Surface Simplification Using Intrinsic Error Metrics,https://markjgillespie.com/Research/intrinsic-coarsening/index.html,https://markjgillespie.com/Research/intrinsic-coarsening/index.html,Technical Paper / All About Meshes
+SIGGRAPH 2023,Wait,Surface and Edge Detection for Primitive Fitting of Point Clouds,https://doi.org/10.1145/3588432.3591522,,Technical Paper / Surface Reconstruction
+SIGGRAPH 2023,Wait,Synthesizing Dexterous Nonprehensile Pregrasp for Ungraspable Objects,https://tml.stanford.edu/publications/2023/synthesizing-dexterous-nonprehensile-pregrasp-ungraspable-objects,https://github.com/Ericcsr/contact_planning_dexterous_hand,Technical Paper / Knowing What To Do With Your Hands
+SIGGRAPH 2023,Wait,Temporal Set Inversion for Animated Implicits,https://www.cryvosh.com/TemporalSetInversion/,https://www.cryvosh.com/TemporalSetInversion/,Technical Paper / Gotta Go Fast!
+SIGGRAPH 2023,Wait,The Statistics of Eye Movements and Binocular Disparities in VR Gaming Headsets Should Drive Headset Design,https://dro.dur.ac.uk/36175/,https://dro.dur.ac.uk/36175/,TOG Paper / Seeing What's in Front of Your Eyes
+SIGGRAPH 2023,Wait,Topology Driven Approximation to Rational Surface-surface Intersection via Interval Algebraic Topology Analysis,https://doi.org/10.1145/3592452,,Technical Paper / Geometric Optimization
+SIGGRAPH 2023,Wait,Trim Regions for Online Computation of From-Region Potentially Visible Sets,https://www.tugraz.at/institute/icg/research/team-schmalstieg/,https://www.tugraz.at/institute/icg/research/team-schmalstieg/,Technical Paper / Your GPU Is Somewhere Else
+SIGGRAPH 2023,Wait,Ultra-high Resolution SVBRDF Recovery From a Single Image,https://doi.org/10.1145/3593798,,TOG Paper / Material Acquisition
+SIGGRAPH 2023,Wait,UrbanBIS: A Large-scale Benchmark for Fine-grained Urban Building Instance Segmentation,https://vcc.tech/UrbanBIS,https://vcc.tech/UrbanBIS,Technical Paper / Procedural Modeling
+SIGGRAPH 2023,Wait,Variational Shape Reconstruction via Quadric Error Metrics,https://filesender.renater.fr/?s=download&token=659700ce-9529-4118-b8d4-bf0b7323aa9b,,Technical Paper / Surface Reconstruction
+SIGGRAPH 2023,Wait,Virtual Mirrors: Non-line-of-sight Imaging Beyond the Third Bounce,https://graphics.unizar.es/projects/VirtualMirrors_2023/,https://graphics.unizar.es/projects/VirtualMirrors_2023/,Technical Paper / NeRFs on Earth
+SIGGRAPH 2023,Wait,Étendue Expansion in Holographic Near Eye Displays Through Sparse Eye-box Generation Using Lens Array Eyepiece,https://doi.org/10.1145/3592441,,Technical Paper / Seeing What's in Front of Your Eyes
+SIGGRAPH 2023,Wait,∇-Prox: Differentiable Proximal Algorithm Modeling for Large-scale Optimization,https://light.princeton.edu/publication/delta_prox/,https://github.com/princeton-computational-imaging/Delta-Prox,"Technical Paper / Surfaces, Strips, Lights"
+SIGGRAPH 2024,Wait,2D Gaussian Splatting for Geometrically Accurate Radiance Fields,https://doi.org/10.1145/3641519.3657428,,Technical Paper / Fast Radiance Fields
+SIGGRAPH 2024,Wait,3D Gaussian Blendshapes for Head Avatar Animation,https://doi.org/10.1145/3641519.3657462,,Technical Paper / 3D Head Avatars From Data
+SIGGRAPH 2024,Wait,3D Gaussian Splatting With Deferred Reflection,https://doi.org/10.1145/3641519.3657456,,Technical Paper / NeRFs and Lighting
+SIGGRAPH 2024,Wait,3D-Layers: Bringing Layer-based Color Editing to VR Painting,https://doi.org/10.1145/3658183,,Technical Paper / Virtual Interaction and Real Devices
+SIGGRAPH 2024,Wait,A Construct-optimize Approach to Sparse View Synthesis Without Camera Pose,https://cseweb.ucsd.edu/~ravir/,https://cseweb.ucsd.edu/~ravir/,Technical Paper / Radiance Field Processing
+SIGGRAPH 2024,Wait,A Dual-Particle Approach for Incompressible SPH Fluids,https://doi.org/10.1145/3649888,,TOG Paper / Fluids
+SIGGRAPH 2024,Wait,A Dynamic Duo of Finite Elements and Material Points,https://doi.org/10.1145/3641519.3657449,,Technical Paper / Simulation With Contact
+SIGGRAPH 2024,Wait,A Framework for Solving Parabolic Partial Differential Equations on Discrete Domains,https://doi.org/10.1145/3666087,,TOG Paper / Geometric Modeling & Analysis
+SIGGRAPH 2024,Wait,A Free-space Diffraction BSDF,https://ssteinberg.xyz/2024/04/05/free_space_diffractions_bsdf/,https://github.com/ssteinberg/fsdBSDFpaper,Technical Paper / Appearance Models
+SIGGRAPH 2024,Wait,A Fully-correlated Anisotropic Micrograin BSDF Model,https://hal.science/hal-04567402,https://hal.science/hal-04567402,Technical Paper / Appearance Models
+SIGGRAPH 2024,Wait,A Hierarchical 3D Gaussian Representation for Real-time Rendering of Very Large Scenes,https://s2024.conference-program.org/presentation/?id=papers_367&sess=sess111,,Technical Paper / Fast Radiance Fields
+SIGGRAPH 2024,Wait,A Linear Method to Consistently Orient Normals of a 3D Point Cloud,https://doi.org/10.1145/3641519.3657429,,Technical Paper / Shape Analysis
+SIGGRAPH 2024,Wait,A Neural Network Model for Efficient Musculoskeletal-driven Skin Deformation,https://doi.org/10.1145/3658135,,Technical Paper / Simulating Deformation
+SIGGRAPH 2024,Wait,A Unified Differentiable Boolean Operator With Fuzzy Logic,https://doi.org/10.1145/3641519.3657484,,Technical Paper / Editing and Deformation
+SIGGRAPH 2024,Wait,A Vortex Particle-on-mesh Method for Soap Film Simulation,https://doi.org/10.1145/3658165,,Technical Paper / Fluids and Flows
+SIGGRAPH 2024,Wait,AONeuS: A Neural Rendering Framework for Acoustic-optical Sensor Fusion,https://doi.org/10.1145/3641519.3657446,,"Technical Paper / Sound, Light, Radiofrequency"
+SIGGRAPH 2024,Wait,Accelerating Saccadic Response Through Spatial and Temporal Cross-modal Misalignments,https://doi.org/10.1145/3641519.3657432,,"Technical Paper / Sound, Light, Radiofrequency"
+SIGGRAPH 2024,Wait,Adaptive Grid Generation for Discretizing Implicit Complexes,https://doi.org/10.1145/3658215,,Technical Paper / Geometric Modeling & Analysis
+SIGGRAPH 2024,Wait,Alignment Conditions for NURBS-based Design of Mixed Tension-compression Grid Shells,https://www.mmiki.jp/home/project-gamera,https://www.mmiki.jp/home/project-gamera,Technical Paper / Geometric Modeling & Analysis
+SIGGRAPH 2024,Wait,An Induce-on-Boundary Magnetostatic Solver for Grid-based Ferrofluids,https://doi.org/10.1145/3658124,,Technical Paper / Fluids and Flows
+SIGGRAPH 2024,Wait,Analogist: Out-of-the-box Visual In-context Learning With Image Diffusion Model,https://doi.org/10.1145/3658136,,"Technical Paper / Perception, Image, Video"
+SIGGRAPH 2024,Wait,Aperture-aware Lens Design,https://doi.org/10.1145/3641519.3657398,,Technical Paper / Computational Cameras and Displays
+SIGGRAPH 2024,Wait,Area ReSTIR: Resampling for Real-time Defocus and Antialiasing,https://graphics.cs.utah.edu/research/projects/area-restir/,https://github.com/guiqi134/Area-ReSTIR,"Technical Paper / Rendering, Sampling and Tracing"
+SIGGRAPH 2024,Wait,Audio Matters Too! Enhancing Markerless Motion Capture With Audio Signals for String Performance Capture,https://doi.org/10.1145/3658235,,Technical Paper / Motion Capture
+SIGGRAPH 2024,Wait,Automatic Digital Garment Initialization From Sewing Patterns,https://doi.org/10.1145/3658128,,Technical Paper / Clothing Geometry
+SIGGRAPH 2024,Wait,Biharmonic Coordinates and Their Derivatives for Triangular 3D Cages,https://doi.org/10.1145/3658208,,Technical Paper / Editing and Deformation
+SIGGRAPH 2024,Wait,Bilateral Guided Radiance Field Processing,https://doi.org/10.1145/3658148,,Technical Paper / Radiance Field Processing
+SIGGRAPH 2024,Wait,Binary Opacity Grids: Capturing Fine Geometric Detail for Mesh-based View Synthesis,https://doi.org/10.1145/3658130,,Technical Paper / Radiance Field Processing
+SIGGRAPH 2024,Wait,BlockFusion: Expandable 3D Scene Generation Using Latent Tri-plane Extrapolation,https://doi.org/10.1145/3658188,,Technical Paper / Generative 3D Geometry
+SIGGRAPH 2024,Wait,BoostMVSNeRFs: Boosting MVS-based NeRFs to Generalizable View Synthesis in Large-scale Scenes,https://doi.org/10.1145/3641519.3657416,,Technical Paper / Fast Radiance Fields
+SIGGRAPH 2024,Wait,BrepGen: A B-rep Generative Diffusion Model With Structured Latent Geometry,https://doi.org/10.1145/3658129,,Technical Paper / Generative 3D Geometry and Editing
+SIGGRAPH 2024,Wait,CLAY: A Controllable Large-scale Generative Model for Creating High-quality 3D Assets,https://doi.org/10.1145/3658146,,Technical Paper / Generative 3D Geometry and Editing
+SIGGRAPH 2024,Wait,CWF: Consolidating Weak Features in High-quality Mesh Simplification,https://doi.org/10.1145/3658159,,Technical Paper / Geometric Modeling & Analysis
+SIGGRAPH 2024,Wait,Capacitive Touch Sensing on General 3D Surfaces,https://vcg.isti.cnr.it/publication/2024/PPSC24-3dTouch/,https://vcg.isti.cnr.it/publication/2024/PPSC24-3dTouch/,Technical Paper / Virtual Interaction and Real Devices
+SIGGRAPH 2024,Wait,CharacterGen: Efficient 3D Character Generation From Single Images With Multi-view Pose Canonicalization,https://doi.org/10.1145/3658217,,Technical Paper / 3D People and Their Habitats
+SIGGRAPH 2024,Wait,Coin3D: Controllable and Interactive 3D Assets Generation With Proxy-guided Conditioning,https://doi.org/10.1145/3641519.3657425,,Technical Paper / Generative 3D Geometry
+SIGGRAPH 2024,Wait,"ColorVideoVDP: A Visual Difference Predictor for Image, Video, and Display Distortions",https://s2024.conference-program.org/presentation/?id=papers_236&sess=sess135,,"Technical Paper / Perception, Image, Video"
+SIGGRAPH 2024,Wait,Compressed Skinning for Facial Blendshapes,https://doi.org/10.1145/3641519.3657477,,Technical Paper / 3D People and Their Habitats
+SIGGRAPH 2024,Wait,Computational Homogenization for Inverse Design of Surface-based Inflatables,https://www.epfl.ch/labs/gcm/publications/,,Technical Paper / 3D Fabrication
+SIGGRAPH 2024,Wait,Computational Illusion Knitting,https://doi.org/10.1145/3658231,,"Technical Paper / Art, illusion, Fabrication"
+SIGGRAPH 2024,Wait,ConceptLab: Creative Concept Generation using VLM-Guided Diffusion Prior Constraints,https://doi.org/10.1145/3659578,,TOG Paper / Controllable Image Generation and Completion
+SIGGRAPH 2024,Wait,Consistent Point Orientation for Manifold Surfaces via Boundary Integration,https://doi.org/10.1145/3641519.3657475,,Technical Paper / Shape Analysis
+SIGGRAPH 2024,Wait,Contact Detection Between Curved Fibres: High Order Makes a Difference,https://elan.inrialpes.fr/people/bertails/,https://elan.inrialpes.fr/people/bertails/,Technical Paper / Simulation With Contact
+SIGGRAPH 2024,Wait,ContourCraft: Learning to Resolve Intersections in Neural Multi-garment Simulations,https://doi.org/10.1145/3641519.3657408,,Technical Paper / Cloth Simulation
+SIGGRAPH 2024,Wait,Controllable Neural Style Transfer for Dynamic Meshes,https://doi.org/10.1145/3641519.3657474,,Technical Paper / Dynamic Radiance Fields
+SIGGRAPH 2024,Wait,Creating LEGO Figurines From Single Images,https://doi.org/10.1145/3658167,,"Technical Paper / Art, illusion, Fabrication"
+SIGGRAPH 2024,Wait,Cricket: A Self-powered Chirping Pixel,https://doi.org/10.1145/3658196,,"Technical Paper / Sound, Light, Radiofrequency"
+SIGGRAPH 2024,Wait,Cross-image Attention for Zero-shot Appearance Transfer,https://doi.org/10.1145/3641519.3657423,,"Technical Paper / Art, illusion, Fabrication"
+SIGGRAPH 2024,Wait,Curvature-driven Conformal Deformations,https://doi.org/10.1145/3658145,,Technical Paper / Editing and Deformation
+SIGGRAPH 2024,Wait,Cyclogenesis: Simulating Hurricanes and Tornadoes,http://computationalsciences.org/publications/amador-herrera-2024-cyclogenesis.html,http://computationalsciences.org/publications/amador-herrera-2024-cyclogenesis.html,Technical Paper / Simulating Nature
+SIGGRAPH 2024,Wait,DAE-Net: Deforming Auto-Encoder for Fine-grained Shape Co-segmentation,https://doi.org/10.1145/3641519.3657528,,Technical Paper / 3D Shape Analysis
+SIGGRAPH 2024,Wait,DMHomo: Learning Homography with Diffusion Models,https://doi.org/10.1145/3652207,,TOG Paper / Consistent Text-to-Image
+SIGGRAPH 2024,Wait,DeadWood: Including disturbance and decay in the depiction of digital nature,https://doi.org/10.1145/3641816,,TOG Paper / Procedural Geometry
+SIGGRAPH 2024,Wait,Deep Fourier-based Arbitrary-scale Super-resolution for Real-time Rendering,https://doi.org/10.1145/3641519.3657439,,"Technical Paper / Hair, Fabrics, and Super-Resolution"
+SIGGRAPH 2024,Wait,Deep Sketch Vectorization via Implicit Surface Extraction,https://doi.org/10.1145/3658197,,Technical Paper / Vector Graphics
+SIGGRAPH 2024,Wait,DiffCAD: Weakly-supervised Probabilistic CAD Model Retrieval and Alignment From an RGB Image,https://doi.org/10.1145/3658236,,Technical Paper / 3D Shape Analysis
+SIGGRAPH 2024,Wait,DiffSound: Differentiable Modal Sound Rendering and Inverse Rendering for Diverse Inference Tasks,https://doi.org/10.1145/3641519.3657493,,"Technical Paper / Sound, Light, Radiofrequency"
+SIGGRAPH 2024,Wait,Differentiable Geodesic Distance for Intrinsic Minimization on Triangle Meshes,https://doi.org/10.1145/3658122,,Technical Paper / Shape Analysis
+SIGGRAPH 2024,Wait,Differentiable Voronoi Diagrams for Simulation of Cell-based Mechanical Systems,https://doi.org/10.1145/3658152,,Technical Paper / Simulating Nature
+SIGGRAPH 2024,Wait,Differentiable solver for time-dependent deformation problems with contact,https://doi.org/10.1145/3657648,,TOG Paper / Simulation With Contact
+SIGGRAPH 2024,Wait,Diffusion Illusions: Hiding Images in Plain Sight,https://doi.org/10.1145/3641519.3657500,,"Technical Paper / Art, illusion, Fabrication"
+SIGGRAPH 2024,Wait,Dragon's Path: Synthesizing User-centered Flying Creature Animation Paths for Outdoor Augmented Reality Experiences,https://doi.org/10.1145/3641519.3657397,,Technical Paper / Virtual Interaction and Real Devices
+SIGGRAPH 2024,Wait,DreamFont3D: Personalized Text-to-3D Artistic Font Generation,https://doi.org/10.1145/3641519.3657476,,Technical Paper / Generative 3D Geometry
+SIGGRAPH 2024,Wait,DressCode: Autoregressively Sewing and Generating Garments From Text Guidance,https://doi.org/10.1145/3658147,,Technical Paper / Clothing Geometry
+SIGGRAPH 2024,Wait,EASI-Tex: Edge-Aware Mesh Texturing from Single Image,https://doi.org/10.1145/3658222,,Technical Paper / Material Texture Generation and Painting
+SIGGRAPH 2024,Wait,Efficient Debris-flow Simulation for Steep Terrain Erosion,https://doi.org/10.1145/3658213,,Technical Paper / Fluids and Flows
+SIGGRAPH 2024,Wait,Eulerian-Lagrangian Fluid Simulation on Particle Flow Maps,https://doi.org/10.1145/3658180,,Technical Paper / Fluids
+SIGGRAPH 2024,Wait,EyeIR: Single Eye Image Inverse Rendering in the Wild,https://doi.org/10.1145/3641519.3657506,,Technical Paper / NeRFs and Lighting
+SIGGRAPH 2024,Wait,Fabricable 3D Wire Art,https://kenji-tojo.github.io/publications/fab3dwire/,https://github.com/kenji-tojo/fab3dwire,"Technical Paper / Art, illusion, Fabrication"
+SIGGRAPH 2024,Wait,Factorized Motion Fields for Fast Sparse Input Dynamic View Synthesis,https://doi.org/10.1145/3641519.3657498,,Technical Paper / Dynamic Radiance Fields
+SIGGRAPH 2024,Wait,Filter-Guided Diffusion for Controllable Image Generation,https://doi.org/10.1145/3641519.3657489,,Technical Paper / Controllable Image Generation and Completion
+SIGGRAPH 2024,Wait,FlexScale: Modeling and Characterization of Flexible Scaled Sheets,https://doi.org/10.1145/3658175,,Technical Paper / 3D Fabrication
+SIGGRAPH 2024,Wait,Flexible Motion In-betweening With Diffusion Models,https://doi.org/10.1145/3641519.3657414,,Technical Paper / Character Animation From Data
+SIGGRAPH 2024,Wait,Fluid Control With Laplacian Eigenfunctions,https://doi.org/10.1145/3641519.3657468,,Technical Paper / Fluids
+SIGGRAPH 2024,Wait,From Microfacets to Participating Media: A Unified Theory of Light Transport With Stochastic Geometry,https://cs.dartmouth.edu/~wjarosz/publications/seyb24from.html,https://cs.dartmouth.edu/~wjarosz/publications/seyb24from.html,Technical Paper / Appearance Models
+SIGGRAPH 2024,Wait,GEM3D: GEnerative Medial Abstractions for 3D Shape Synthesis,https://doi.org/10.1145/3641519.3657415,,Technical Paper / Generative 3D Geometry and Editing
+SIGGRAPH 2024,Wait,GIPC: Fast and stable Gauss-Newton optimization of IPC barrier energy,https://doi.org/10.1145/3643028,,TOG Paper / Simulation With Contact
+SIGGRAPH 2024,Wait,GPU-accelerated Rendering of Vector Brush Strokes,https://s2024.conference-program.org/presentation/?id=papers_343&sess=sess101,,Technical Paper / Vector Graphics
+SIGGRAPH 2024,Wait,GaussianPrediction: Dynamic 3D Gaussian Prediction for Motion Extrapolation and Free View Synthesis,https://doi.org/10.1145/3641519.3657417,,Technical Paper / Dynamic Radiance Fields
+SIGGRAPH 2024,Wait,Generative Escher Meshes,https://doi.org/10.1145/3641519.3657452,,"Technical Paper / Art, illusion, Fabrication"
+SIGGRAPH 2024,Wait,Going With the Flow,https://www.yousufsoliman.com/projects/GoingWithTheFlow/index.html,https://www.yousufsoliman.com/projects/GoingWithTheFlow/index.html,Technical Paper / Fluids and Flows
+SIGGRAPH 2024,Wait,HAISOR: Human-Aware Indoor Scene Optimization via Deep Reinforcement Learning,https://geometrylearning.com/HAISOR/,https://geometrylearning.com/HAISOR/,TOG Paper / 3D People and Their Habitats
+SIGGRAPH 2024,Wait,HQ3DAvatar: High Quality Implicit 3D Head Avatar,https://s2024.conference-program.org/presentation/?id=paperstog_109&sess=sess122,,TOG Paper / 3D Head Avatars From Data
+SIGGRAPH 2024,Wait,Hand-Object Interaction Controller (HOIC): Deep Reinforcement Learning for Reconstructing Interactions With Physics,https://doi.org/10.1145/3641519.3657505,,Technical Paper / Motion Capture
+SIGGRAPH 2024,Wait,HeadArtist: Text-conditioned 3D Head Generation With Self Score Distillation,https://doi.org/10.1145/3641519.3657512,,Technical Paper / 3D Face Generator and Animation
+SIGGRAPH 2024,Wait,High-quality Surface Reconstruction Using Gaussian Surfels,https://doi.org/10.1145/3641519.3657441,,Technical Paper / Reconstruction
+SIGGRAPH 2024,Wait,Holographic Parallax Improves 3D Perceptual Realism,https://doi.org/10.1145/3658168,,"Technical Paper / VR, Eye Tracking, Perception"
+SIGGRAPH 2024,Wait,I2V-Adapter: A General Image-to-Video Adapter for Diffusion Models,https://doi.org/10.1145/3641519.3657407,,Technical Paper / Video Generation
+SIGGRAPH 2024,Wait,Implicit Surface Tension for SPH Fluid Simulation,https://doi.org/10.1145/3631936,,TOG Paper / Fluids
+SIGGRAPH 2024,Wait,Implicit Swept Volume SDF: Enabling Continuous Collision-free Trajectory Generation for Arbitrary Shapes,https://doi.org/10.1145/3658181,,Technical Paper / 3D Shape Analysis
+SIGGRAPH 2024,Wait,Importance Sampling BRDF Derivatives,https://doi.org/10.1145/3648611,,TOG Paper / Differentiable Rendering
+SIGGRAPH 2024,Wait,In the Quest for Scale-Optimal Mappings,https://doi.org/10.1145/3627102,,TOG Paper / Mappings and Fields
+SIGGRAPH 2024,Wait,Interactive Design of Stylized Walking Gaits for Robotic Characters,https://doi.org/10.1145/3658227,,"Technical Paper / 2D, 3D, Robot"
+SIGGRAPH 2024,Wait,InvertAvatar: Incremental GAN Inversion for Generalized Head Avatars,https://doi.org/10.1145/3641519.3657478,,Technical Paper / 3D Head Avatars From Data
+SIGGRAPH 2024,Wait,Joint Stroke Tracing and Correspondence for 2D Animation,https://markmohr.github.io/JoSTC/,https://markmohr.github.io/JoSTC/,"TOG Paper / 2D, 3D, Robot"
+SIGGRAPH 2024,Wait,Kinetic Simulation of Turbulent Multifluid Flows,https://pages.saclay.inria.fr/mathieu.desbrun/m@pubs.html,https://pages.saclay.inria.fr/mathieu.desbrun/m@pubs.html,Technical Paper / Fluids and Flows
+SIGGRAPH 2024,Wait,LGTM: Local-to-Global Text-driven Human Motion Diffusion Model,https://doi.org/10.1145/3641519.3657422,,Technical Paper / Character Animation From Data
+SIGGRAPH 2024,Wait,LOOSECONTROL: Lifting ControlNet for Generalized Depth Conditioning,https://doi.org/10.1145/3641519.3657525,,Technical Paper / Controllable Image Generation and Completion
+SIGGRAPH 2024,Wait,Lagrangian Covector Fluid With Free Surface,https://doi.org/10.1145/3641519.3657514,,Technical Paper / Fluids
+SIGGRAPH 2024,Wait,Latent L-systems: Transformer-based Tree Generator,https://doi.org/10.1145/3627101,,TOG Paper / Procedural Geometry
+SIGGRAPH 2024,Wait,LayGA: Layered Gaussian Avatars for Animatable Clothing Transfer,https://doi.org/10.1145/3641519.3657501,,Technical Paper / Clothing Geometry
+SIGGRAPH 2024,Wait,Learning Images Across Scales Using Adversarial Training,https://doi.org/10.1145/3658190,,"Technical Paper / Perception, Image, Video"
+SIGGRAPH 2024,Wait,Learning Physically Realizable Skills for Online Packing of General 3D Shapes,https://doi.org/10.1145/3603544,,TOG Paper / Character Control
+SIGGRAPH 2024,Wait,Learning a Generalized Physical Face Model From Data,https://doi.org/10.1145/3658189,,Technical Paper / 3D Head Avatars From Data
+SIGGRAPH 2024,Wait,Lifting Directional Fields to Minimal Sections,https://doi.org/10.1145/3658198,,Technical Paper / Mappings and Fields
+SIGGRAPH 2024,Wait,Light Codes for Fast Two-Way Human-Centric Visual Communication,https://doi.org/10.1145/3617682,,"TOG Paper / Sound, Light, Radiofrequency"
+SIGGRAPH 2024,Wait,LightFormer: Light-oriented Global Neural Rendering in Dynamic Scene,https://doi.org/10.1145/3658229,,Technical Paper / NeRFs and Lighting
+SIGGRAPH 2024,Wait,Lightning-fast Method of Fundamental Solutions,https://pages.saclay.inria.fr/mathieu.desbrun/m@pubs.html,https://gitlab.inria.fr/geomerix/public/mfs-chol,Technical Paper / Fluids
+SIGGRAPH 2024,Wait,Lite2Relight: 3D-aware Single Image Portrait Relighting,https://doi.org/10.1145/3641519.3657470,,Technical Paper / NeRFs and Lighting
+SIGGRAPH 2024,Wait,MERCI: Mixed curvature-based elements for computing equilibria of thin elastic ribbons,https://doi.org/10.1145/3674502,,TOG Paper / Cloth Simulation
+SIGGRAPH 2024,Wait,MVD^2: Efficient Multiview 3D Reconstruction for Multiview Diffusion,https://doi.org/10.1145/3641519.3657403,,Technical Paper / Reconstruction
+SIGGRAPH 2024,Wait,MaPa: Text-driven Photorealistic Material Painting for 3D Shapes,https://doi.org/10.1145/3641519.3657504,,Technical Paper / Material Texture Generation and Painting
+SIGGRAPH 2024,Wait,Matting by Generation,https://doi.org/10.1145/3641519.3657519,,Technical Paper / Lighting and Matting With Image Generation
+SIGGRAPH 2024,Wait,Mesh Neural Cellular Automata,https://doi.org/10.1145/3658127,,Technical Paper / Generative 3D Geometry and Editing
+SIGGRAPH 2024,Wait,Minkowski Penalties: Robust Differentiable Constraint Enforcement for Vector Graphics,https://minarcik.com/minkowski-penalties/,,Technical Paper / Vector Graphics
+SIGGRAPH 2024,Wait,Modal Folding: Discovering Smooth Folding Patterns for Sheet Materials Using Strain-space Modes,https://doi.org/10.1145/3641519.3657401,,Technical Paper / 3D Fabrication
+SIGGRAPH 2024,Wait,Modeling Ambient Scene Dynamics for Free-view Synthesis,https://doi.org/10.1145/3641519.3657488,,Technical Paper / Dynamic Radiance Fields
+SIGGRAPH 2024,Wait,Modeling Hair Strands With Roving Capsules,https://doi.org/10.1145/3641519.3657450,,"Technical Paper / Hair, Fabrics, and Super-Resolution"
+SIGGRAPH 2024,Wait,MonoGaussianAvatar: Monocular Gaussian Point-based Head Avatar,https://doi.org/10.1145/3641519.3657499,,Technical Paper / 3D Head Avatars From Data
+SIGGRAPH 2024,Wait,N-BVH: Neural Ray Queries With Bounding Volume Hierarchies,https://weiphil.github.io/portfolio/neural_bvh,https://weiphil.github.io/portfolio/neural_bvh,Technical Paper / Spatial Data Structures
+SIGGRAPH 2024,Wait,NICER: A New and Improved Consumed Endurance and Recovery Metric to Quantify Muscle Fatigue of Mid-air Interactions,https://doi.org/10.1145/3658230,,Technical Paper / Virtual Interaction and Real Devices
+SIGGRAPH 2024,Wait,Navigation-driven Approximate Convex Decomposition,https://jimmylands.com/projects/navacd.html,https://jimmylands.com/projects/navacd.html,Technical Paper / Shape Analysis
+SIGGRAPH 2024,Wait,NeLT: Object-oriented Neural Light Transfer,https://doi.org/10.1145/3596491,,TOG Paper / NeRFs and Lighting
+SIGGRAPH 2024,Wait,NeRF as a Non-distant Environment Emitter in Physics-based Inverse Rendering,https://shuangz.com/projects/pbir-nerf-sg24/,https://shuangz.com/projects/pbir-nerf-sg24/,Technical Paper / NeRFs and Lighting
+SIGGRAPH 2024,Wait,NeurCADRecon: Neural Representation for Reconstructing CAD Surfaces by Enforcing Zero Gaussian Curvature,https://doi.org/10.1145/3658171,,Technical Paper / Reconstruction
+SIGGRAPH 2024,Wait,Neural Bounding,https://wenxin-liu.github.io/neural_bounding/,https://wenxin-liu.github.io/neural_bounding/,Technical Paper / Spatial Data Structures
+SIGGRAPH 2024,Wait,Neural Control Variates With Automatic Integration,https://doi.org/10.1145/3641519.3657395,,Technical Paper / Monte Carlo for PDEs
+SIGGRAPH 2024,Wait,Neural Gaussian Scale-space Fields,https://doi.org/10.1145/3658163,,Technical Paper / Spatial Data Structures
+SIGGRAPH 2024,Wait,Neural Geometry Fields for Meshes,https://cseweb.ucsd.edu/~ravir/,https://cseweb.ucsd.edu/~ravir/,Technical Paper / Mappings and Fields
+SIGGRAPH 2024,Wait,Neural Monte Carlo Fluid Simulation,https://doi.org/10.1145/3641519.3657438,,Technical Paper / Monte Carlo for PDEs
+SIGGRAPH 2024,Wait,NeuralTO: Neural Reconstruction and View Synthesis of Translucent Objects,http://ren-bo.net/,,Technical Paper / Reconstruction
+SIGGRAPH 2024,Wait,Online Neural Path Guiding with Normalized Anisotropic Spherical Gaussians,https://doi.org/10.1145/3649310,,"TOG Paper / Rendering, Denoising & Path Guiding"
+SIGGRAPH 2024,Wait,Part123: Part-aware 3D Reconstruction From a Single-view Image,https://doi.org/10.1145/3641519.3657482,,Technical Paper / Reconstruction
+SIGGRAPH 2024,Wait,Perceptual Evaluation of Steered Retinal Projection,https://doi.org/10.1145/3641519.3657486,,"Technical Paper / VR, Eye Tracking, Perception"
+SIGGRAPH 2024,Wait,Physical Non-inertial Poser (PNP): Modeling Non-inertial Effects in Sparse-inertial Human Motion Capture,https://doi.org/10.1145/3641519.3657436,,Technical Paper / Motion Capture
+SIGGRAPH 2024,Wait,Physics-based Scene Layout Generation From Human Motion,https://doi.org/10.1145/3641519.3657517,,Technical Paper / 3D People and Their Habitats
+SIGGRAPH 2024,Wait,Physics-informed Learning of Characteristic Trajectories for Smoke Reconstruction,https://doi.org/10.1145/3641519.3657483,,Technical Paper / Motion Capture
+SIGGRAPH 2024,Wait,Position-based Nonlinear Gauss-Seidel for Quasistatic Hyperelasticity,https://doi.org/10.1145/3658154,,Technical Paper / Simulating Deformation
+SIGGRAPH 2024,Wait,Preconditioned Nonlinear Conjugate Gradient Method for Real-time Interior-point Hyperelasticity,https://doi.org/10.1145/3641519.3657490,,Technical Paper / Simulation With Contact
+SIGGRAPH 2024,Wait,Progressive Dynamics for Cloth and Shell Animation,https://eriszhang.github.io/publication/progressive-dynamics/,https://eriszhang.github.io/publication/progressive-dynamics/,Technical Paper / Cloth Simulation
+SIGGRAPH 2024,Wait,Promptable Game Models: Text-Guided Game Simulation via Masked Diffusion Models,https://doi.org/10.1145/3635705,,TOG Paper / Video Generation
+SIGGRAPH 2024,Wait,Proxy Asset Generation for Cloth Simulation in Games,https://doi.org/10.1145/3658177,,Technical Paper / Clothing Geometry
+SIGGRAPH 2024,Wait,Proxy Tracing: Unbiased Reciprocal Estimation for Optimized Sampling in BDPT,https://doi.org/10.1145/3658216,,"Technical Paper / Rendering, Sampling and Tracing"
+SIGGRAPH 2024,Wait,QT-Font: High-efficiency Font Synthesis via Quadtree-based Diffusion Models,https://doi.org/10.1145/3641519.3657451,,Technical Paper / Vector Graphics
+SIGGRAPH 2024,Wait,Quad-optimized Low-discrepancy Sequences,https://perso.liris.cnrs.fr/victor.ostromoukhov/publications/publications_abstracts.html#SIGGRAPH2024,https://perso.liris.cnrs.fr/victor.ostromoukhov/publications/publications_abstracts.html#SIGGRAPH2024,"Technical Paper / Rendering, Sampling and Tracing"
+SIGGRAPH 2024,Wait,RTG-SLAM: Real-time 3D Reconstruction at Scale Using Gaussian Splatting,https://doi.org/10.1145/3641519.3657455,,Technical Paper / Fast Radiance Fields
+SIGGRAPH 2024,Wait,Radar Fields: Frequency-space Neural Scene Representations for FMCW Radar,https://doi.org/10.1145/3641519.3657510,,"Technical Paper / Sound, Light, Radiofrequency"
+SIGGRAPH 2024,Wait,ReFiNe: Recursive Field Networks for Cross-modal Multi-scene Representation,https://doi.org/10.1145/3641519.3657526,,Technical Paper / Spatial Data Structures
+SIGGRAPH 2024,Wait,Reach for the Arcs: Reconstructing Surfaces From SDFs via Tangent Points,https://doi.org/10.1145/3641519.3657419,,Technical Paper / Reconstruction
+SIGGRAPH 2024,Wait,Real-Time Neural Appearance Models,https://doi.org/10.1145/3659577,,TOG Paper / Appearance Models
+SIGGRAPH 2024,Wait,Real-time Hair Rendering With Hair Meshes,https://doi.org/10.1145/3641519.3657521,,"Technical Paper / Hair, Fabrics, and Super-Resolution"
+SIGGRAPH 2024,Wait,Real-time Neural Woven Fabric Rendering,https://doi.org/10.1145/3641519.3657496,,"Technical Paper / Hair, Fabrics, and Super-Resolution"
+SIGGRAPH 2024,Wait,Real-time Path Guiding Using Bounding Voxel Sampling,https://suikasibyl.github.io/vxpg,https://suikasibyl.github.io/vxpg,"Technical Paper / Rendering, Denoising & Path Guiding"
+SIGGRAPH 2024,Wait,Real-time Physically Guided Hair Interpolation,https://doi.org/10.1145/3658176,,"Technical Paper / Hair, Fabrics, and Super-Resolution"
+SIGGRAPH 2024,Wait,Real-time Wing Deformation Simulations for Flying Insects,https://doi.org/10.1145/3641519.3657434,,Technical Paper / Simulating Nature
+SIGGRAPH 2024,Wait,RealFill: Reference-driven Generation for Authentic Image Completion,https://doi.org/10.1145/3658237,,Technical Paper / Controllable Image Generation and Completion
+SIGGRAPH 2024,Wait,Recompose Grammars for Procedural Architecture,https://niklaus.houska.ch/publications/recompose-grammars-for-procedural-architecture/,https://niklaus.houska.ch/publications/recompose-grammars-for-procedural-architecture/,Technical Paper / Procedural Geometry
+SIGGRAPH 2024,Wait,Rip-NeRF: Anti-aliasing Radiance Fields With Ripmap-encoded Platonic Solids,https://junchenliu77.github.io/Rip-NeRF/,https://github.com/JunchenLiu77/Rip-NeRF,Technical Paper / Radiance Field Processing
+SIGGRAPH 2024,Wait,"S3: Speech, Script, and Scene Driven Head and Eye Animation",https://s2024.conference-program.org/presentation/?id=papers_481&sess=sess116,,Technical Paper / 3D Face Generator and Animation
+SIGGRAPH 2024,Wait,SMERF: Streamable Memory Efficient Radiance Fields for Real-time Large-scene Exploration,https://doi.org/10.1145/3658193,,Technical Paper / Fast Radiance Fields
+SIGGRAPH 2024,Wait,ST-4DGS: Spatial-Temporally Consistent 4D Gaussian Splatting for Efficient Dynamic Scene Rendering,https://doi.org/10.1145/3641519.3657520,,Technical Paper / Dynamic Radiance Fields
+SIGGRAPH 2024,Wait,Saccade-contingent Rendering,https://doi.org/10.1145/3641519.3657420,,"Technical Paper / VR, Eye Tracking, Perception"
+SIGGRAPH 2024,Wait,Scale-invariant Monocular Depth Estimation via SSI Depth,https://doi.org/10.1145/3641519.3657523,,Technical Paper / Computational Cameras and Displays
+SIGGRAPH 2024,Wait,Seamless Parametrization in Penner Coordinates,https://doi.org/10.1145/3658202,,Technical Paper / Mappings and Fields
+SIGGRAPH 2024,Wait,Self-Supervised High Dynamic Range Imaging: What Can Be Learned from a Single 8-bit Video?,https://doi.org/10.1145/3648570,https://github.com/banterle/Zeroshot-HDRV,"TOG Paper / Perception, Image, Video"
+SIGGRAPH 2024,Wait,Semantic Shape Editing With Parametric Implicit Templates,https://doi.org/10.1145/3641519.3657421,,Technical Paper / Editing and Deformation
+SIGGRAPH 2024,Wait,Separate-and-Enhance: Compositional Finetuning for Text-to-image Diffusion Models,https://doi.org/10.1145/3641519.3657527,,Technical Paper / Controllable Image Generation and Completion
+SIGGRAPH 2024,Wait,Singular Foliations for Knit Graph Design,https://rahulmitra.xyz/projects/knitting_foliations/,https://rahulmitra.xyz/projects/knitting_foliations/,Technical Paper / Clothing Geometry
+SIGGRAPH 2024,Wait,Smooth Bijective Projection in a High-order Shell,https://doi.org/10.1145/3658207,,Technical Paper / Mappings and Fields
+SIGGRAPH 2024,Wait,Soft Pneumatic Actuator Design Using Differentiable Simulation,https://cims.nyu.edu/gcl/publications.html,,"Technical Paper / 2D, 3D, Robot"
+SIGGRAPH 2024,Wait,Solid Knitting,https://doi.org/10.1145/3658123,,Technical Paper / 3D Fabrication
+SIGGRAPH 2024,Wait,Spatial and Surface Correspondence Field for Interaction Transfer,https://doi.org/10.1145/3658169,,Technical Paper / 3D People and Their Habitats
+SIGGRAPH 2024,Wait,Spice-E: Structural Priors in 3D Diffusion Using Cross-Entity Attention,https://s2024.conference-program.org/presentation/?id=papers_719&sess=sess140,,Technical Paper / Generative 3D Geometry
+SIGGRAPH 2024,Wait,Split-Aperture 2-in-1 Computational Cameras,https://doi.org/10.1145/3658225,,Technical Paper / Computational Cameras and Displays
+SIGGRAPH 2024,Wait,Split-and-Fit: Learning B-Reps via Structure-aware Voronoi Partitioning,https://doi.org/10.1145/3658155,,Technical Paper / 3D Shape Analysis
+SIGGRAPH 2024,Wait,Stabler Neo-Hookean Simulation: Absolute Eigenvalue Filtering for Projected Newton,https://doi.org/10.1145/3641519.3657433,,Technical Paper / Simulating Deformation
+SIGGRAPH 2024,Wait,Stochastic Computation of Barycentric Coordinates,https://pages.saclay.inria.fr/mathieu.desbrun/m@pubs.html,https://pages.saclay.inria.fr/mathieu.desbrun/m@pubs.html,Technical Paper / Monte Carlo for PDEs
+SIGGRAPH 2024,Wait,StopThePop: Sorted Gaussian Splatting for View-consistent Real-time Rendering,https://doi.org/10.1145/3658187,,Technical Paper / Fast Radiance Fields
+SIGGRAPH 2024,Wait,Strategy and Skill Learning for Physics-based Table Tennis Animation,https://doi.org/10.1145/3641519.3657437,,Technical Paper / Character Control
+SIGGRAPH 2024,Wait,Streetscapes: Large-scale Consistent Street View Generation Using Autoregressive Video Diffusion,https://doi.org/10.1145/3641519.3657513,,Technical Paper / Consistent Text-to-Image
+SIGGRAPH 2024,Wait,Subject-Diffusion: Open Domain Personalized Text-to-image Generation Without Test-time Fine-tuning,https://doi.org/10.1145/3641519.3657469,,Technical Paper / Consistent Text-to-Image
+SIGGRAPH 2024,Wait,Super-resolution Cloth Animation With Spatial and Temporal Coherence,https://doi.org/10.1145/3658143,,Technical Paper / Cloth Simulation
+SIGGRAPH 2024,Wait,Surface-filling Curve Flows via Implicit Medial Axes,https://doi.org/10.1145/3658158,,Technical Paper / Procedural Geometry
+SIGGRAPH 2024,Wait,TIP-Editor: An Accurate 3D Editor Following Both Text-prompts and Image-prompts,https://doi.org/10.1145/3658205,,Technical Paper / Generative 3D Geometry and Editing
+SIGGRAPH 2024,Wait,Taming Diffusion Probabilistic Models for Character Control,https://aiganimation.github.io/CAMDM/,https://aiganimation.github.io/CAMDM/,Technical Paper / Character Animation From Data
+SIGGRAPH 2024,Wait,Tele-Aloha: A Telepresence System With Low-budget and High-authenticity Using Sparse RGB Cameras,https://doi.org/10.1145/3641519.3657491,,Technical Paper / Computational Cameras and Displays
+SIGGRAPH 2024,Wait,Temporal Acoustic Point Holography,https://doi.org/10.1145/3641519.3657443,,Technical Paper / Virtual Interaction and Real Devices
+SIGGRAPH 2024,Wait,Temporally Stable Metropolis Light Transport Denoising Using Recurrent Transformer Blocks,https://czzzzh.github.io/MLTD/index.html,https://czzzzh.github.io/MLTD/index.html,"Technical Paper / Rendering, Denoising & Path Guiding"
+SIGGRAPH 2024,Wait,TensoSDF: Roughness-aware Tensorial Representation for Robust Geometry and Material Reconstruction,https://doi.org/10.1145/3658211,,Technical Paper / Radiance Field Processing
+SIGGRAPH 2024,Wait,Terrain Amplification Using Multi Scale Erosion,https://doi.org/10.1145/3658200,,Technical Paper / Procedural Geometry
+SIGGRAPH 2024,Wait,TexPainter: Generative Mesh Texturing With Multi-view Consistency,https://doi.org/10.1145/3641519.3657494,,Technical Paper / Material Texture Generation and Painting
+SIGGRAPH 2024,Wait,Text-guided Synthesis of Crowd Animation,https://doi.org/10.1145/3641519.3657516,,"Technical Paper / 2D, 3D, Robot"
+SIGGRAPH 2024,Wait,Text-to-vector Generation With Neural Path Representation,https://doi.org/10.1145/3658204,,Technical Paper / Vector Graphics
+SIGGRAPH 2024,Wait,The Chosen One: Consistent Characters in Text-to-image Diffusion Models,https://doi.org/10.1145/3641519.3657430,,Technical Paper / Consistent Text-to-Image
+SIGGRAPH 2024,Wait,The Method of Moving Frames for Surface Global Parametrization,https://doi.org/10.1145/3604282,,TOG Paper / Mappings and Fields
+SIGGRAPH 2024,Wait,Toonify3D: StyleGAN-based 3D Stylized Face Generator,http://wonjongg.me/publications/,,Technical Paper / 3D Face Generator and Animation
+SIGGRAPH 2024,Wait,Towards Unstructured Unlabeled Optical Mocap: A Video Helps!,https://doi.org/10.1145/3641519.3657522,,Technical Paper / Motion Capture
+SIGGRAPH 2024,Wait,Training-free Consistent Text-to-image Generation,https://doi.org/10.1145/3658157,,Technical Paper / Consistent Text-to-Image
+SIGGRAPH 2024,Wait,Transparent Image Layer Diffusion Using Latent Transparency,https://doi.org/10.1145/3658150,,Technical Paper / Lighting and Matting With Image Generation
+SIGGRAPH 2024,Wait,Ultra Inertial Poser: Scalable Motion Capture and Tracking From Sparse Inertial Sensors and Ultra-Wideband Ranging,https://doi.org/10.1145/3641519.3657465,,Technical Paper / Motion Capture
+SIGGRAPH 2024,Wait,Universal Facial Encoding of Codec Avatars From VR Headsets,https://doi.org/10.1145/3658234,,Technical Paper / 3D Head Avatars From Data
+SIGGRAPH 2024,Wait,VR-GS: A Physical Dynamics-aware Interactive Gaussian Splatting System in Virtual Reality,https://doi.org/10.1145/3641519.3657448,,Technical Paper / Virtual Interaction and Real Devices
+SIGGRAPH 2024,Wait,VRMM: A Volumetric Relightable Morphable Head Model,https://doi.org/10.1145/3641519.3657406,,Technical Paper / 3D People and Their Habitats
+SIGGRAPH 2024,Wait,Variational Feature Extraction in Scientific Visualization,https://doi.org/10.1145/3658219,,Technical Paper / 3D Shape Analysis
+SIGGRAPH 2024,Wait,Velocity-based Monte Carlo Fluids,https://rsugimoto.net/VelMCFluidsProject/,https://rsugimoto.net/VelMCFluidsProject/,Technical Paper / Monte Carlo for PDEs
+SIGGRAPH 2024,Wait,Versatile Vision Foundation Model for Image and Video Colorization,https://doi.org/10.1145/3641519.3657509,,"Technical Paper / Perception, Image, Video"
+SIGGRAPH 2024,Wait,Vertex Block Descent,https://doi.org/10.1145/3658179,,Technical Paper / Simulating Deformation
+SIGGRAPH 2024,Wait,View-Independent Adjoint Light Tracing for Lighting Design Optimization,https://doi.org/10.1145/3662180,,TOG Paper / Differentiable Rendering
+SIGGRAPH 2024,Wait,Woven Fabric Capture With a Reflection-transmission Photo Pair,https://doi.org/10.1145/3641519.3657410,,Technical Paper / Differentiable Rendering
+SIGGRAPH 2024,Wait,X-SLAM: Scalable Dense SLAM for Task-aware Optimization Using CSFD,https://doi.org/10.1145/3658233,,Technical Paper / Geometric Modeling & Analysis
+SIGGRAPH 2024,Wait,ZeroGrads: Learning Local Surrogates for Non-differentiable Graphics,https://doi.org/10.1145/3658173,,Technical Paper / Differentiable Rendering
+SIGGRAPH ASIA 2022,Wait,A Biologically Inspired Hair Aging Model,https://www.inf.ufrgs.br/~mwalter/hairaging/,https://www.inf.ufrgs.br/~mwalter/hairaging/,Technical Paper / Cloth and Hair Simulation
+SIGGRAPH ASIA 2022,Wait,A High Frame Rate Affordable Nystagmus Detection Method with Smartphones Used in Outpatient Clinic,https://doi.org/10.1145/3550082.3564164,,Poster / Computer Vision and Image Understanding
+SIGGRAPH ASIA 2022,Wait,A Monte Carlo Method for Fluid Simulation,https://riouxld21.github.io/research/publication/2022-mcfluid/,https://riouxld21.github.io/research/publication/2022-mcfluid/,Technical Paper / Fluid Simulation
+SIGGRAPH ASIA 2022,Wait,A Neural Galerkin Solver for Accurate Surface Reconstruction,https://github.com/huangjh-pub/neural-galerkin,https://github.com/huangjh-pub/neural-galerkin,Technical Paper / Reconstruction and Repair
+SIGGRAPH ASIA 2022,Wait,A Non-Associated MSCC Model for Simulating Structured and Destructured Clays,https://doi.org/10.1145/3550082.3564174,,Poster / Material Simulation
+SIGGRAPH ASIA 2022,Wait,A Novel Solution to Manufacturing Multi-Color Medical Preoperative Models with Transparent Shells,https://doi.org/10.1145/3550082.3564192,,Poster / Display and Print Technologies
+SIGGRAPH ASIA 2022,Wait,A Study on Sonification Method of Simulator-Based Ski Training for People with Visual Impairment,https://doi.org/10.1145/3550082.3564172,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,AIP: Adversarial Interaction Priors for Multi-Agent Physics-based Character Control,https://doi.org/10.1145/3550082.3564207,,Poster / Animating Human Characters
+SIGGRAPH ASIA 2022,Wait,Accelerated and Optimized Search of Imperceptible Color Vibration for Embedding Information into LCD images,https://doi.org/10.1145/3550082.3564190,,Poster / Image and Video Processing Applications
+SIGGRAPH ASIA 2022,Wait,Adaptive real-time interactive rendering of gigantic multi-resolution models,https://doi.org/10.1145/3550082.3564170,,Poster / Rendering Techniques
+SIGGRAPH ASIA 2022,Wait,Adjusting Level of Abstraction for Stylized Image Composition,https://doi.org/10.1145/3550082.3564193,,Poster / Image and Video Processing Applications
+SIGGRAPH ASIA 2022,Wait,Affordable Spectral Measurements of Translucent Materials,https://cgg.mff.cuni.cz/publications/affordable-spectral-measurements-of-translucent-materials/,https://cgg.mff.cuni.cz/publications/affordable-spectral-measurements-of-translucent-materials/,Technical Paper / Acquisition
+SIGGRAPH ASIA 2022,Wait,AgileAvatar: Stylized 3D Avatar Creation via Cascaded Domain Bridging,https://tiancheng-zhi.github.io/,,Technical Paper / Faces and Avatars
+SIGGRAPH ASIA 2022,Wait,Anime-Like Motion Transfer with Optimal Viewpoints,https://doi.org/10.1145/3550082.3564212,,Poster / Animating Human Characters
+SIGGRAPH ASIA 2022,Wait,Artist-directed Modeling of Competitively Growing Corals,https://doi.org/10.1145/3550082.3564171,,Poster / Geometry and Modeling
+SIGGRAPH ASIA 2022,Wait,Assemble Them All: Physics-Based Planning for Generalizable Assembly by Disassembly,http://assembly.csail.mit.edu/,http://assembly.csail.mit.edu/,Technical Paper / Computer-Aided Design
+SIGGRAPH ASIA 2022,Wait,Automatic Deformation-based animation of 3D mesh,https://doi.org/10.1145/3550082.3564184,,Poster / Geometry and Modeling
+SIGGRAPH ASIA 2022,Wait,BoolSurf : Boolean Operations on Surfaces,https://pellacini.di.uniroma1.it/publications/boolsurf22/boolsurf22.html,https://pellacini.di.uniroma1.it/publications/boolsurf22/boolsurf22.html,Technical Paper / Geometric Operations
+SIGGRAPH ASIA 2022,Wait,CAD2Sketch: Generating Concept Sketches from CAD Sequences,https://ns.inria.fr/d3/cad2sketch/,https://ns.inria.fr/d3/cad2sketch/,Technical Paper / Computer-Aided Design
+SIGGRAPH ASIA 2022,,Codeless Content Creator System: Anyone Can Make Their Own Mixed Reality Content Without Relying on Software Developer Tools,,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,,Cognitionaware automatic viewpoint selection in scenes with crowds of objects,,,Poster / Image and Video Processing Applications
+SIGGRAPH ASIA 2022,,Cohand VR: Towards A Shareable Immersive Experience via Wearable Gesture Interface between VR Audiences and External Audiences,,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,Color Animated Full-parallax High-definition Computer-generated Hologram,https://doi.org/10.1145/3550082.3564162,,Poster / Display and Print Technologies
+SIGGRAPH ASIA 2022,,Color LightField: Estimation of View-point Dependant Color Dispersion Pattern In Waveguide Display,,,Poster / Computer Vision and Image Understanding
+SIGGRAPH ASIA 2022,Wait,Color-Perception-Guided Display Power Reduction for Virtual Reality,https://budmonde.com/projects/vr-power-saver,https://budmonde.com/projects/vr-power-saver,Technical Paper / Perception in VR and AR
+SIGGRAPH ASIA 2022,Wait,Combining Augmented and Virtual Reality Experiences for Immersive Fire Drills,https://doi.org/10.1145/3550082.3564195,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,Computer Generated Hologram Optimization for Lens Aberration,https://doi.org/10.1145/3550082.3564191,,Poster / Display and Print Technologies
+SIGGRAPH ASIA 2022,Wait,Computing Medial Axis Transform with Feature Preservation via Restricted Power Diagram,https://sites.google.com/view/ningnawang/publications/matfp?pli=1,https://sites.google.com/view/ningnawang/publications/matfp?pli=1,Technical Paper / Distances and Matching
+SIGGRAPH ASIA 2022,Wait,Constant Time Median Filter using 2D Wavelet Matrix,https://cgenglab.github.io/labpage/en/publication/sigga22_wmatrix_median/,https://cgenglab.github.io/labpage/en/publication/sigga22_wmatrix_median/,Technical Paper / Material and Rendering
+SIGGRAPH ASIA 2022,Wait,Continuous deformation based panelization for design rationalization,https://doi.org/10.1145/3550469.3555414,,Technical Paper / Everything Interactive and Dynamic
+SIGGRAPH ASIA 2022,,Control VAE: Model-Based Learning of Generative Controllers for Physics-Based Characters,,,Technical Paper / Character Animation
+SIGGRAPH ASIA 2022,,"Cross-platforming ""School life metaverse"" user experience",,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,Curl-Flow: Boundary-Respecting Pointwise Incompressible Velocity Interpolation for Grid-Based Fluids,https://jumyung-jc-chang.com/research/CurlFlowSA22,https://jumyung-jc-chang.com/research/CurlFlowSA22,Technical Paper / Fluid Simulation
+SIGGRAPH ASIA 2022,Wait,Declarative Specification for Unstructured Mesh Editing Algorithms,https://doi.org/10.1145/3550454.3555513,,Technical Paper / Geometric Operations
+SIGGRAPH ASIA 2022,Wait,Deep Adaptive Sampling and Reconstruction using Analytic Distributions,https://studios.disneyresearch.com/2022/11/30/deep-adaptive-sampling-and-reconstruction-using-analytic-distributions/,https://studios.disneyresearch.com/2022/11/30/deep-adaptive-sampling-and-reconstruction-using-analytic-distributions/,Technical Paper / Sampling and Reconstruction
+SIGGRAPH ASIA 2022,Wait,Depth of Field Aware Differentiable Rendering,https://doi.org/10.1145/3550454.3555521,,Technical Paper / Differentiable Rendering
+SIGGRAPH ASIA 2022,Wait,Differentiable rendering using RGBXY derivatives and optimal transport,https://jkxing.github.io/academic/publication/DROT,https://github.com/jkxing/DROT,Technical Paper / Differentiable Rendering
+SIGGRAPH ASIA 2022,Wait,Disentangled Image Colorization via Global Anchors,https://doi.org/10.1145/3550454.3555432,,Technical Paper / Stylization and Colorization
+SIGGRAPH ASIA 2022,Wait,Dressing Avatars: Deep Photorealistic Appearance for Physically Simulated Clothing,https://research.facebook.com/publications/dressing-avatars-deep-photorealistic-appearance-for-physically-simulated-clothing/,https://research.facebook.com/publications/dressing-avatars-deep-photorealistic-appearance-for-physically-simulated-clothing/,Technical Paper / Cloth and Hair Simulation
+SIGGRAPH ASIA 2022,Wait,Effects of Font Type and Weight on Reading in VR,https://doi.org/10.1145/3550082.3564182,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,Efficient Differentiation of Pixel Reconstruction Filters for Path-Space Differentiable Rendering,https://shuangz.com/projects2/psdr-pixel-sa22/,https://shuangz.com/projects2/psdr-pixel-sa22/,Technical Paper / Differentiable Rendering
+SIGGRAPH ASIA 2022,Wait,Efficient Drone Exploration in Real Unknown Environments,https://doi.org/10.1145/3550082.3564205,,Poster / Computer Vision and Image Understanding
+SIGGRAPH ASIA 2022,Wait,Efficient Light Probes for Real-time Global Illumination,https://doi.org/10.1145/3550454.3555452,,"Technical Paper / Radiance Fields, Bases, and Probes"
+SIGGRAPH ASIA 2022,Wait,Exact 3D Path Generation via 3D Cam-Linkage Mechanisms,https://sutd-cgl.github.io/supp/Publication/projects/2022-SIGAsia-3DCamLinkage/index.html,https://sutd-cgl.github.io/supp/Publication/projects/2022-SIGAsia-3DCamLinkage/index.html,Technical Paper / Shape Generation
+SIGGRAPH ASIA 2022,,Eye on the Ball: The effect of visual cues on virtual throwing,,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,FDNeRF: Few-shot Dynamic Neural Radiance Fields for Face Reconstruction and Expression Editing,https://fdnerf.github.io/,https://fdnerf.github.io/,"Technical Paper / Radiance Fields, Bases, and Probes"
+SIGGRAPH ASIA 2022,Wait,Fast Dynamic Radiance Fields with Time-Aware Neural Voxels,https://doi.org/10.1145/3550469.3555383,,"Technical Paper / Radiance Fields, Bases, and Probes"
+SIGGRAPH ASIA 2022,Wait,Fast Editing of Singularities in Field-Aligned Stripe Patterns,https://yutanoma.com/projects/singularity-editing,https://yutanoma.com/projects/singularity-editing,Technical Paper / Maps and Fields
+SIGGRAPH ASIA 2022,Wait,Fast Octree Neighborhood Search for SPH Simulations,https://animation.rwth-aachen.de/publication/0579/,https://animation.rwth-aachen.de/publication/0579/,Technical Paper / Fluid Simulation
+SIGGRAPH ASIA 2022,Wait,Fast Stabilization of Inducible Magnet Simulation,https://doi.org/10.1145/3550469.3555410,,Technical Paper / Simulation of Everything
+SIGGRAPH ASIA 2022,Wait,FloRen: Real-time High-quality Human Performance Rendering via Appearance Flow Using Sparse RGB Cameras,https://doi.org/10.1145/3550469.3555409,,Technical Paper / Material and Rendering
+SIGGRAPH ASIA 2022,Wait,Fluidic Topology Optimization with an Anisotropic Mixture Model,https://people.csail.mit.edu/liyifei/publication/anisotropic-stokes-fluidic-device/,https://people.csail.mit.edu/liyifei/publication/anisotropic-stokes-fluidic-device/,Technical Paper / Fluid Simulation
+SIGGRAPH ASIA 2022,Wait,Fused BVH to Ray Trace Level of Detail Meshes,https://doi.org/10.1145/3550082.3564211,,Poster / Rendering Techniques
+SIGGRAPH ASIA 2022,Wait,Globally Injective Flattening via a Reduced Harmonic Subspace,https://www.youtube.com/watch?v=r1KNaTRI0JM,https://www.youtube.com/watch?v=r1KNaTRI0JM,Technical Paper / Maps and Fields
+SIGGRAPH ASIA 2022,,Hanging Print: Plastic Extrusion for Catenary Weaving in Mid Air,,,Poster / Display and Print Technologies
+SIGGRAPH ASIA 2022,Wait,Hierarchical Layout Blending with Recursive Optimal Correspondence,https://vcc.tech/research/2022/HierarchiLayout,https://github.com/lyf7115/LayoutBlending,Technical Paper / Geometric Operations
+SIGGRAPH ASIA 2022,,HrtDown: Document Processor for Executable Linear Algebra Papers,,,Technical Paper / VR and Interaction
+SIGGRAPH ASIA 2022,Wait,Human Performance Modeling and Rendering via Neural Animated Mesh,https://zhaofuq.github.io/NeuralAM/,https://zhaofuq.github.io/NeuralAM/,Technical Paper / Rendering Systems
+SIGGRAPH ASIA 2022,Wait,Hydrophobic and Hydrophilic Solid-Fluid Interaction,https://jinyuan-liu.github.io/projects/2022hydro/,https://jinyuan-liu.github.io/projects/2022hydro/,Technical Paper / Solids and Fluids
+SIGGRAPH ASIA 2022,Wait,IDE-3D: Interactive Disentangled Editing for High-Resolution 3D-aware Portrait Synthesis,https://doi.org/10.1145/3550454.3555506,,Technical Paper / VR and Interaction
+SIGGRAPH ASIA 2022,,Improving Co-speech gesture rule-map generation via wild pose matching with gesture units,,,Poster / Animating Human Characters
+SIGGRAPH ASIA 2022,Wait,InfiniteShader: Color Changeable 3D Printed Objects using Bi-Stable Thermochromic Materials,https://doi.org/10.1145/3550082.3564209,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,Interactive exploration of tension-compression mixed shells,https://www.mmiki.jp/home/project-godzilla,https://www.food4rhino.com/en/resource/godzilla,Technical Paper / Everything Interactive and Dynamic
+SIGGRAPH ASIA 2022,Wait,Internal-External Boundary Attentions for Transparent Object Segmentation,https://doi.org/10.1145/3550082.3564183,,Poster / Computer Vision and Image Understanding
+SIGGRAPH ASIA 2022,Wait,Investigating the Effects of Synchronized Visuo-Tactile Stimuli for Inducing Kinesthetic Illusion in Observational Learning of Whole-Body Movements,https://doi.org/10.1145/3550082.3564168,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,Isotropic ARAP energy using Cauchy-Green invariants,https://www.floydmchitalu.com/publications,https://github.com/LamWS/iARAP,Technical Paper / Simulation of Everything
+SIGGRAPH ASIA 2022,,It's Me: VR-based Journaling for Improved Cognitive Self-Regulation,,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,Language-driven Diversified Image Retargeting,https://doi.org/10.1145/3550082.3564169,,Poster / Image and Video Processing Applications
+SIGGRAPH ASIA 2022,Wait,LaplacianFusion: Detailed 3D Clothed-Human Body Reconstruction,https://doi.org/10.1145/3550454.3555511,,Technical Paper / Faces and Avatars
+SIGGRAPH ASIA 2022,Wait,Learning Reconstructability for Drone Aerial Path Planning,https://vcc.tech/research/2022/DroneRecon,https://vcc.tech/research/2022/DroneRecon,Technical Paper / Acquisition
+SIGGRAPH ASIA 2022,Wait,Learning Virtual Chimeras by Dynamic Motion Reassembly,https://doi.org/10.1145/3550454.3555489,,Technical Paper / Character Animation
+SIGGRAPH ASIA 2022,Wait,Learning to Generate 3D Shapes from a Single Example,http://www.cs.columbia.edu/cg/SingleShapeGen/,https://github.com/ChrisWu1997/SingleShapeGen,Technical Paper / Shape Generation
+SIGGRAPH ASIA 2022,Wait,Learning to Relight Portrait Images via a Virtual Light Stage and Synthetic-to-Real Adaptation,https://doi.org/10.1145/3550454.3555442,,Technical Paper / Rendering Systems
+SIGGRAPH ASIA 2022,Wait,Learning-Based Bending Stiffness Parameter Estimation by a Drape Tester,https://www.youtube.com/watch?v=4PfgBnVCeNY,https://github.com/DrapeTester/ClothDrapeTester,Technical Paper / Cloth and Hair Simulation
+SIGGRAPH ASIA 2022,Wait,Learning-based Inverse Rendering of Complex Indoor Scenes with Differentiable Monte Carlo Raytracing,https://jingsenzhu.github.io/invrend/,https://jingsenzhu.github.io/invrend/,Technical Paper / Differentiable Rendering
+SIGGRAPH ASIA 2022,Wait,Lightweight Neural Basis Functions for All-Frequency Shading,https://starry316.github.io/sigas2022/index.html,https://starry316.github.io/sigas2022/index.html,"Technical Paper / Radiance Fields, Bases, and Probes"
+SIGGRAPH ASIA 2022,Wait,LuisaRender: A High-Performance Rendering Framework with Layered and Unified Interfaces on Stream Architectures,http://luisa-render.com/,http://luisa-render.com/,Technical Paper / Rendering Systems
+SIGGRAPH ASIA 2022,Wait,MEMformer: Transformer-based 3D Human Motion Estimation from MoCap Markers,https://doi.org/10.1145/3550082.3564197,,Poster / Animating Human Characters
+SIGGRAPH ASIA 2022,Wait,"MMGrip: A Handheld Multimodal Haptic Device Combining Vibration, Impact, and Shear for Realistic Expression of Contact",https://doi.org/10.1145/3550082.3564177,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,Make Your Own Sprites: Aliasing-Aware and Cell-Controllable Pixelization,https://orca.cardiff.ac.uk/id/eprint/152816/,https://github.com/WuZongWei6/Pixelization,Technical Paper / Image Generation
+SIGGRAPH ASIA 2022,Wait,Masked Lip-Sync Prediction by Audio-Visual Contextual Exploitation in Transformers,https://hangz-nju-cuhk.github.io/projects/AV-CAT,https://hangz-nju-cuhk.github.io/projects/AV-CAT,"Technical Paper / Face, Speech, and Gesture"
+SIGGRAPH ASIA 2022,Wait,MeshTaichi: A Compiler for Efficient Mesh-based Operations,https://github.com/taichi-dev/meshtaichi,https://github.com/taichi-dev/meshtaichi,Technical Paper / Geometric Operations
+SIGGRAPH ASIA 2022,Wait,Method of Creating Video Content that Cause The Sensation of Falling,https://doi.org/10.1145/3550082.3564208,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,Metric-KNN is All You Need,https://doi.org/10.1145/3550082.3564198,,Poster / Machine Learning for Computer Graphics
+SIGGRAPH ASIA 2022,Wait,Mixed Variational Finite Elements for Implicit Simulation of Deformables,https://doi.org/10.1145/3550469.3555418,,Technical Paper / Solids and Fluids
+SIGGRAPH ASIA 2022,Wait,Motion In-betweening for Physically Simulated Characters,https://doi.org/10.1145/3550082.3564186,,Poster / Animating Human Characters
+SIGGRAPH ASIA 2022,Wait,NeRFFaceEditing: Disentangled Face Editing in Neural Radiance Fields,http://geometrylearning.com/NeRFFaceEditing/,http://geometrylearning.com/NeRFFaceEditing/,Technical Paper / Image Editing and Manipulation
+SIGGRAPH ASIA 2022,Wait,NeuLighting: Neural Lighting for Free Viewpoint Outdoor Scene Relighting with Unconstrained Photo Collections,https://doi.org/10.1145/3550469.3555384,,"Technical Paper / Radiance Fields, Bases, and Probes"
+SIGGRAPH ASIA 2022,Wait,Neural Bidirectional Texture Function Compression and Rendering,https://doi.org/10.1145/3550082.3564188,,Poster / Computer Vision and Image Understanding
+SIGGRAPH ASIA 2022,Wait,Neural Cloth Simulation,https://hbertiche.github.io/NeuralClothSim/,https://hbertiche.github.io/NeuralClothSim/,Technical Paper / Cloth and Hair Simulation
+SIGGRAPH ASIA 2022,Wait,No-code Digital Human for Conversational Behavior,https://doi.org/10.1145/3550082.3564175,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,Optimal Composition Recommendation for Portrait Photography,https://doi.org/10.1145/3550082.3564206,,Poster / Image and Video Processing Applications
+SIGGRAPH ASIA 2022,Wait,Palette-based Image Search with Color Weights,https://doi.org/10.1145/3550082.3564203,,Poster / Computer Vision and Image Understanding
+SIGGRAPH ASIA 2022,Wait,Pattern-Based Cloth Registration and Sparse-View Animation,https://doi.org/10.1145/3550454.3555448,,Technical Paper / Acquisition
+SIGGRAPH ASIA 2022,Wait,Physical Interaction: Reconstructing Hand-object Interactions with Physics,http://xufeng.site/#Publications,,Technical Paper / Everything Interactive and Dynamic
+SIGGRAPH ASIA 2022,Wait,PopStage: The Generation of Stage Cross-Editing Video based on Spatio-Temporal Matching,https://doi.org/10.1145/3550454.3555467,,Technical Paper / Image Generation
+SIGGRAPH ASIA 2022,Wait,Position-Based Surface Tension Flow,https://lwruan.com/pubs/pbd-st,https://lwruan.com/pubs/pbd-st,Technical Paper / Fluid Simulation
+SIGGRAPH ASIA 2022,Wait,Procedural Modeling of Crystal Clusters,https://doi.org/10.1145/3550082.3564165,,Poster / Geometry and Modeling
+SIGGRAPH ASIA 2022,Wait,Prometheus: A mobile telepresence system connecting the 1st person and 3rd person perspectives continuously,https://doi.org/10.1145/3550082.3564187,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,Pupillary oscillation induced by pseudo-isochromatic stimuli for objective color vision test,https://doi.org/10.1145/3550082.3564161,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,Rapid Face Asset Acquisition with Recurrent Feature Alignment,https://vgl.ict.usc.edu/Research/ReFA/,https://vgl.ict.usc.edu/Research/ReFA/,Technical Paper / Faces and Avatars
+SIGGRAPH ASIA 2022,Wait,Real-Time Facial Animation Generation on Face Mask,https://doi.org/10.1145/3550082.3564178,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,Realistic Rendering Tool for Pseudo-Structural Coloring with Multi-Color Extrusion of FFF 3D Printing,https://doi.org/10.1145/3550082.3564179,,Poster / Display and Print Technologies
+SIGGRAPH ASIA 2022,Wait,Recursive Rendering of 2D Images for Accurate Pose Estimation in a 3D Mesh Map,https://doi.org/10.1145/3550082.3564201,,Poster / Computer Vision and Image Understanding
+SIGGRAPH ASIA 2022,Wait,Reference Based Sketch Extraction via Attention Mechanism,https://doi.org/10.1145/3550454.3555504,,Technical Paper / Stylization and Colorization
+SIGGRAPH ASIA 2022,Wait,Representation of FRP material damage in 3DCG,https://doi.org/10.1145/3550082.3564166,,Poster / Material Simulation
+SIGGRAPH ASIA 2022,Wait,Ribbon Font Neural Style Transfer for OpenType-SVG Font,https://doi.org/10.1145/3550082.3564163,,Poster / Machine Learning for Computer Graphics
+SIGGRAPH ASIA 2022,Wait,Robust Vectorized Surface Reconstruction with 2D-3D Joint Optimization,https://doi.org/10.1145/3550082.3564202,,Poster / Geometry and Modeling
+SIGGRAPH ASIA 2022,Wait,Robust and Efficient Structure-from-Motion Method for Ambiguous Large-Scale Indoor Scene,https://doi.org/10.1145/3550082.3564199,,Poster / Geometry and Modeling
+SIGGRAPH ASIA 2022,Wait,Scene Synthesis from Human Motion,https://tml.stanford.edu/publications/2022/scene-synthesis-human-motion,https://tml.stanford.edu/publications/2022/scene-synthesis-human-motion,Technical Paper / Shape Generation
+SIGGRAPH ASIA 2022,Wait,Simulation of Hand Anatomy Using Medical Imaging,http://viterbi-web.usc.edu/~jbarbic/handSystem/,http://viterbi-web.usc.edu/~jbarbic/handSystem/,Technical Paper / Simulation of Everything
+SIGGRAPH ASIA 2022,Wait,SkinMixer: Blending 3D Animated Models,http://vcg.isti.cnr.it/Publications/2022/NPCST22/,http://vcg.isti.cnr.it/Publications/2022/NPCST22/,Technical Paper / Geometric Operations
+SIGGRAPH ASIA 2022,Wait,Sprite-from-Sprite: Cartoon Animation Decomposition with Self-supervised Sprite Estimation,https://lllyasviel.github.io/GitPageToonDecompose/,https://lllyasviel.github.io/GitPageToonDecompose/,Technical Paper / Image Generation
+SIGGRAPH ASIA 2022,,Sustainable VFX - A Pipeline and Rendering Challenge?,,,Poster / Rendering Techniques
+SIGGRAPH ASIA 2022,Wait,Temporal and Spatial Distortion for VR Rhythmic Skill Training,https://doi.org/10.1145/3550082.3564160,,"Poster / Virtual Reality, Augmented Reality, and Mixed Reality"
+SIGGRAPH ASIA 2022,Wait,TexSR: Image Super-resolution for High-Quality Texture Mapping,https://doi.org/10.1145/3550082.3564204,,Poster / Image and Video Processing Applications
+SIGGRAPH ASIA 2022,Wait,The Continuity of Locomotion: Rethinking Conventions for Locomotion and Its Visualization in Shared Virtual Reality Spaces,https://doi.org/10.1145/3550454.3555522,,Technical Paper / Perception in VR and AR
+SIGGRAPH ASIA 2022,Wait,Time-Dependent Machine Learning for Volumetric Simulation,https://doi.org/10.1145/3550082.3564214,,Poster / Machine Learning for Computer Graphics
+SIGGRAPH ASIA 2022,Wait,Transcendental Avatar: Experiencing Bioresponsive Avatar of the Self for Improved Cognition,https://doi.org/10.1145/3550082.3564210,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,Transformer Inertial Poser: Real-time Human Motion Reconstruction from Sparse IMUs with Simultaneous Terrain Generation,https://tml.stanford.edu/publications/2022/transformer-inertial-poser-real-time-human-motion-reconstruction-sparse-imus,https://tml.stanford.edu/publications/2022/transformer-inertial-poser-real-time-human-motion-reconstruction-sparse-imus,Technical Paper / Character Animation
+SIGGRAPH ASIA 2022,Wait,Using Rhythm Game to train Rhythmic Motion in Sports,https://doi.org/10.1145/3550082.3564173,,Poster / Human-Computer Interaction
+SIGGRAPH ASIA 2022,Wait,Video-driven Neural Physically-based Facial Asset for Production,https://sites.google.com/view/npfa/,https://sites.google.com/view/npfa/,"Technical Paper / Face, Speech, and Gesture"
+SIGGRAPH ASIA 2022,Wait,VideoReTalking: Audio-based Lip Synchronization for Talking Head Video Editing In the Wild,https://vinthony.github.io/video-retalking/,https://vinthony.github.io/video-retalking/,Technical Paper / Image Editing and Manipulation
+SIGGRAPH ASIA 2022,Wait,Visual Simulation of Tire Smoke,https://doi.org/10.1145/3550082.3564167,,Poster / Material Simulation
+SIGGRAPH ASIA 2023,Wait,Learning based 2D Irregular Shape Packing,https://asia.siggraph.org/2023/?post_type=page&p=14494&id=papers_378&sess=sess157,,Technical Paper / Put Things Together
+SIGGRAPH ASIA 2024,Wait,360-degree Human Video Generation with 4D Diffusion Transformer,https://asia.siggraph.org/2024/presentation/?id=papers_938&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,A Cubic Barrier with Elasticity-Inclusive Dynamic Stiffness,https://github.com/st-tech/ppf-contact-solver,https://github.com/st-tech/ppf-contact-solver,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,A Flexible Mold for Facade Panel Fabrication,https://asia.siggraph.org/2024/presentation/?id=papers_356&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,A Mesh-based Simulation Framework using Automatic Code Generation,https://asia.siggraph.org/2024/presentation/?id=papers_1044&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,A Simple Approach to Differentiable Rendering of SDFs,https://zichenwang01.github.io/relaxed_boundary/,https://zichenwang01.github.io/relaxed_boundary/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,A class of new tuned primal subdivision schemes with high-quality limit surface in extraordinary regions,https://asia.siggraph.org/2024/presentation/?id=papers_1047&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Alignable Lamella Gridshells,http://vcg.isti.cnr.it/publication/2024/P24-Alignable/,http://vcg.isti.cnr.it/publication/2024/P24-Alignable/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,All you need is rotation: Construction of developable strips,https://dspace.mit.edu/handle/1721.1/157852,https://dspace.mit.edu/handle/1721.1/157852,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,An Impulse Ghost Fluid Method for Simulating Two-Phase Flows,https://yuchen-sun-cg.github.io/projects/igfm/,https://yuchen-sun-cg.github.io/projects/igfm/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Appearance Modeling of Iridescent Feathers with Diverse Nanostructures,https://blaire9989.github.io/assets/2_FeatherLab/project.html,https://github.com/blaire9989/FeatherLab/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,BlobGEN-3D: Compositional 3D-Consistent Freeview Image Generation with 3D Blobs,https://research.nvidia.com/labs/lpr/publication/blob3dgen2024/,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Body Gesture Generation for Multimodal Conversational Agents,https://sites.google.com/view/bodygesture4multimodal,https://sites.google.com/view/bodygesture4multimodal,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,CBIL: Collective Behavior Imitation Learning for Fish from Real Videos,https://frank-zy-dou.github.io/projects/CBIL/index.html,https://frank-zy-dou.github.io/projects/CBIL/index.html,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,COMFI: A Calibrated Observer Metameric Failure Index for Color Critical Tasks,https://asia.siggraph.org/2024/presentation/?id=papers_1237&sess=sess223,https://github.com/robwanat/COMFI/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,CPoser: An Optimization-after-Parsing Approach for Text-to-Pose Generation Using Large Language Models.,https://asia.siggraph.org/2024/presentation/?id=papers_508&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,C^0 Generalized Coons Patches for High-order Cage-based Deformation,https://asia.siggraph.org/2024/presentation/?id=papers_901&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Cafca: High-quality Novel View Synthesis of Expressive Faces from Casual Few-shot Captures,https://syntec-research.github.io/Cafca/,https://syntec-research.github.io/Cafca/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Camera Settings as Tokens: Modeling Photography on Latent Diffusion Models,https://camera-settings-as-tokens.github.io/,https://github.com/aiiu-lab/Camera-Settings-as-Tokens,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Compositional Neural Textures,https://phtu-cs.github.io/cnt-siga24/,https://phtu-cs.github.io/cnt-siga24/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Controlled Spectral Uplifting for Indirect-Light-Metamerism,https://graphics.tudelft.nl/Publications-new/2024/RE24/,https://github.com/markvanderuit/metameric_dev,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,DARTS: Diffusion Approximated Residual Time Sampling for Time-of-flight Rendering in Homogeneous Scattering Media,https://arxiv.org/abs/2402.03106,https://arxiv.org/abs/2402.03106,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,DIScene: Object Decoupling and Interaction Modeling for Complex Scene Generation,https://asia.siggraph.org/2024/presentation/?id=papers_306&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Decoupling Contact for Fine-Grained Motion Style Transfer,http://www.cad.zju.edu.cn/home/jin/SigA20241/Decoupling_Contact.htm,http://www.cad.zju.edu.cn/home/jin/SigA20241/Decoupling_Contact.htm,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Designing triangle meshes with controlled roughness,https://repository.kaust.edu.sa/items/0b8c9c82-17a3-4b39-9eb3-4b2863a938ac,https://repository.kaust.edu.sa/items/0b8c9c82-17a3-4b39-9eb3-4b2863a938ac,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,DiffUHaul: A Training-Free Method for Object Dragging in Images,https://omriavrahami.com/diffuhaul/,https://omriavrahami.com/diffuhaul/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Direct Manipulation of Procedural Implicit Surfaces,https://eliemichel.github.io/SdfManipulation/,https://eliemichel.github.io/SdfManipulation/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,DirectL: Efficient Radiance Fields Rendering for 3D Light Field Displays,https://direct-l.github.io/,https://direct-l.github.io/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,DreamUDF: Generating Unsigned Distance Fields from A Single Image,http://geometrylearning.com/DreamUDF/,http://geometrylearning.com/DreamUDF/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Dynamic Neural Radiosity with Multi-grid Decomposition,https://woaixuexisr.github.io/papers/dynamic-neural-radiosity/,https://github.com/woAIxuexiSR/dynamic-neural-radiosity,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Enhancing the Aesthetics of 3D Shapes via Reference-based Editing,https://minchanchen.github.io/projects/enhancing_aesthetics.html,https://minchanchen.github.io/projects/enhancing_aesthetics.html,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Fabrig: A Cloth-Simulated Transferable 3D Face Parameterization,https://asia.siggraph.org/2024/presentation/?id=papers_1197&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,FaceMap: Distortion-Driven Perceptual Facial Saliency Maps,https://github.com/facebookresearch/FaceMap?tab=readme-ov-file,https://github.com/facebookresearch/FaceMap?tab=readme-ov-file,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Fast and Globally Consistent Normal Orientation based on the Winding Number Normal Consistency,https://jsnln.github.io/wnnc/index.html,https://github.com/jsnln/wnnc,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,FaçAID: A Transformer Model for Neuro-Symbolic Facade Reconstruction,https://asia.siggraph.org/2024/presentation/?id=papers_817&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,FürElise: Capturing and Physically Synthesizing Hand Motion of Piano Performance,https://asia.siggraph.org/2024/presentation/?id=papers_1250&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,GFFE: G-buffer Free Frame Extrapolation for Low-latency Real-time Rendering,https://poiw.github.io/,https://poiw.github.io/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,GS^3: Efficient Relighting with Triple Gaussian Splatting,https://asia.siggraph.org/2024/presentation/?id=papers_238&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,GaussianHeads: End-to-End Learning of Drivable Gaussian Head Avatars from Coarse-to-fine Representations,https://vcai.mpi-inf.mpg.de/projects/GaussianHeads/,https://vcai.mpi-inf.mpg.de/projects/GaussianHeads/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Geometry-Aware Retargeting for Two-Skinned Characters Interaction,https://vml.kaist.ac.kr/main/international/individual/231,https://vml.kaist.ac.kr/main/international/individual/231,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,InstanceTex: Instance-level Controllable Texture Synthesis for 3D Scenes via Diffusion Priors,https://vcc.tech/research/2024/InstanceTex,https://vcc.tech/research/2024/InstanceTex,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Inverse Painting: Reconstructing The Painting Process,https://inversepainting.github.io/?utm_source=substack&utm_medium=email,https://inversepainting.github.io/?utm_source=substack&utm_medium=email,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,L3DG: Latent 3D Gaussian Diffusion,https://barbararoessle.github.io/l3dg/,https://barbararoessle.github.io/l3dg/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,LLM-enhanced Scene Graph Learning for Household Rearrangement,https://davit666.github.io/AEG-rearrangement/,https://davit666.github.io/AEG-rearrangement/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Learn to Create Simple LEGO Micro Buildings,https://asia.siggraph.org/2024/presentation/?id=papers_104&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,LetsGo: Large-Scale Garage Modeling and Rendering via LiDAR-Assisted Gaussian Primitives,https://zhaofuq.github.io/LetsGo/,https://github.com/zhaofuq/LOD-3DGS,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Local Gaussian Density Mixtures for Unstructured Lumigraph Rendering,https://xchaowu.github.io/papers/lgdm/index.html,https://github.com/XchaoWu/Local-Gaussian-Density-Mixtures-for-Unstructured-Lumigraph-Rendering,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Lumiere: A Space-Time Diffusion Model for Video Generation,https://lumiere-video.github.io/,https://lumiere-video.github.io/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,MARS: Multi-sample Allocation through Russian roulette and Splitting,https://woshicado.eu/publications/2024/mars-multi-sample-allocation-through-russian-roulette-and-splitting/,https://github.com/Woshicado/mars,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,MV2MV: Multi-View Image Translation via View-Consistent Diffusion Models,https://asia.siggraph.org/2024/presentation/?id=papers_920&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,MVImgNet2.0: A Larger-scale Dataset of Multi-view Images,https://asia.siggraph.org/2024/presentation/?id=papers_905&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,MagicClay: Sculpting Meshes With Generative Neural Fields,https://amirbarda.github.io/MagicClay.github.io/,https://amirbarda.github.io/MagicClay.github.io/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Markov-Chain Monte Carlo Sampling of Visibility Boundaries for Differentiable Rendering,https://shuangz.com/projects/psdr-lmc-sa24/,https://shuangz.com/projects/psdr-lmc-sa24/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Measuring Human Motion Under Clothing,https://asia.siggraph.org/2024/presentation/?id=papers_1244&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Medial Skeletal Diagram: A Generalized Medial Axis Approach for 3D Shape Representation,https://gmh14.github.io/medial-skeletal-diagram/,https://github.com/bohanwang/MSD,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,MiNNIE: a Mixed Multigrid Method for Real-time Simulation of Nonlinear Near-Incompressible Elastics,https://lwruan.com/pubs/minnie,https://github.com/LwRuan/MiNNIE,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Millimetric Human Surface Capture in Minutes,https://projects-morpheo.gitlabpages.inria.fr/millimetrichumans/,https://gitlab.inria.fr/projects-morpheo/millimetrichumans,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Motion-Driven Neural Optimizer for Prophylactic Braces Made by Distributed Microstructures,https://cs-people.bu.edu/xjhan/bioDesign.html,https://cs-people.bu.edu/xjhan/bioDesign.html,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,NPGA: Neural Parametric Gaussian Avatars,https://simongiebenhain.github.io/NPGA/,https://simongiebenhain.github.io/NPGA/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,NU-NeRF: Neural Reconstruction of Nested Transparent Objects with Uncontrolled Capture Environment,http://geometrylearning.com/NU-NeRF/,https://github.com/78ij/NU-NeRF,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Neural Garment Dynamic Super-Resolution,https://mengzephyr.com/Neural-Garment-Dynamic-Super-Reslution/,https://github.com/MengZephyr/Neural-Garment-Dynamic-Super-resolution,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Neural Global Illumination via Superposed Deformable Feature Fields,https://asia.siggraph.org/2024/presentation/?id=papers_1007&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Neural Kernel Regression for Consistent Monte Carlo Denoising,https://asia.siggraph.org/2024/presentation/?id=papers_634&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Neural Light Spheres for Implicit Image Stitching and View Synthesis,https://light.princeton.edu/publication/neuls/,https://light.princeton.edu/publication/neuls/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Optimized shock-protecting microstructures,https://cims.nyu.edu/~zh1476/research/shock.html,https://github.com/Huangzizhou/ShockProtection,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,PALP: Prompt Aligned Personalization of Text-to-Image Models,https://prompt-aligned.github.io/,https://prompt-aligned.github.io/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,PC-Planner: Physics-Constrained Self-Supervised Learning for Robust Neural Motion Planning with Shape-Aware Distance Function,https://zju3dv.github.io/pc-planner/,https://zju3dv.github.io/pc-planner/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Perspective-Aligned AR Mirror with Under-Display Camera,https://jianwang-cmu.github.io/,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Polynomial Cauchy Coordinates for Curved Cages,http://home.ustc.edu.cn/~linzhehui626/PolyCauchy/,http://home.ustc.edu.cn/~linzhehui626/PolyCauchy/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Procedural Material Generation with Reinforcement Learning,https://cdfg.mit.edu/publications/proc-mat-rl,https://cdfg.mit.edu/publications/proc-mat-rl,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Quad mesh mechanisms,https://repository.kaust.edu.sa/items/b0da777f-0ade-43af-822c-634f22e7ed2e,https://repository.kaust.edu.sa/items/b0da777f-0ade-43af-822c-634f22e7ed2e,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Real-time Large-scale Deformation of Gaussian Splatting,https://users.cs.cf.ac.uk/Yukun.Lai/,https://github.com/IGLICT/GaussianMesh,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Reconstruct translucent thin objects from photos,https://asia.siggraph.org/2024/presentation/?id=papers_220&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Reflection-Aware Neural Radiance Fields,https://asia.siggraph.org/2024/presentation/?id=papers_162&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,RoMo: A Robust Solver for Full-body Unlabeled Optical Motion Capture,http://www.cad.zju.edu.cn/home/jin/SigA20243/RoMo.htm,https://github.com/robustmocap/RoMo,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,SD-𝜋XL: Generating Low-Resolution Quantized Imagery via Score Distillation,https://igl.ethz.ch/projects/sd-pixl/,https://igl.ethz.ch/projects/sd-pixl/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,SGEdit: Bridging LLM with Text2Image Generative Model for Scene Graph-based Image Editing,https://bestzzhang.github.io/SGEdit/,https://github.com/bestzzhang/SGEdit-code,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,SKEL-Betweener: a Neural Motion Rig for Interactive Motion,https://asia.siggraph.org/2024/presentation/?id=papers_590&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,SPARK: Self-supervised Personalized Real-time Monocular Face Capture,https://kelianb.github.io/SPARK/,https://kelianb.github.io/SPARK/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Sharpening and Sparsifying with Surface Hessians,https://d-r-o-w-e.github.io/sssh/index.html,https://github.com/d-r-o-w-e/sssh,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Skeleton-Driven Inbetweening of Bitmap Character Drawings,http://www-labs.iro.umontreal.ca/~bmpix/inbetweening/,https://github.com/kbrodt/inbetweening,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Spatiotemporal Bilateral Gradient Filtering for Inverse Rendering,https://cseweb.ucsd.edu//~ravir/,https://cseweb.ucsd.edu//~ravir/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Stochastic Normal Orientation for Point Clouds,https://ustc-gcl-f.github.io/projects/SNO/SNO.html,https://github.com/mtm114/SNO,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,TALK-Act: Enhance Textural-Awareness for 2D Speaking Avatar Reenactment with Diffusion Model,https://guanjz20.github.io/projects/TALK-Act/,https://guanjz20.github.io/projects/TALK-Act/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,Tencers: Tension-Constrained Elastic Rods,https://infoscience.epfl.ch/entities/publication/d78a8e72-c425-4d3a-bb28-9800226dbe4d,https://infoscience.epfl.ch/entities/publication/d78a8e72-c425-4d3a-bb28-9800226dbe4d,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,"The Lips, the Teeth, the tip of the Tongue: LTT Tracking",https://asia.siggraph.org/2024/presentation/?id=papers_1121&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,ThermOuch: A Wearable Thermo-Haptic Device for Inducing Pain Sensation in Virtual Reality through Thermal Grill Illusion,https://meilab-hk.github.io/projectpages/thermouch.html,https://meilab-hk.github.io/projectpages/thermouch.html,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,UFO Instruction Graphs Are Machine Knittable,https://textiles-lab.github.io/publications/2024-instruction-graphs/,https://textiles-lab.github.io/publications/2024-instruction-graphs/,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,V^3: Viewing Volumetric Videos on Mobiles via Streamable 2D Dynamic Gaussians,https://asia.siggraph.org/2024/presentation/?id=papers_539&sess=sess223,,Technical Paper / Technical Papers Fast-Forward and Awards
+SIGGRAPH ASIA 2024,Wait,gDist: Efficient Distance Computation between 3D Meshes on GPU,https://min-tang.github.io/home/gDist/,https://github.com/yingtix/DistanceQuery,Technical Paper / Technical Papers Fast-Forward and Awards

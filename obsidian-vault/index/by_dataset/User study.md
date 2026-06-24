@@ -1,0 +1,83 @@
+---
+title: "Dataset: User study"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: User study
+
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Brushstroke_Engine_Learning_a_Latent_Style_Space_of_Interactive_Drawing_Tools.md|Neural Brushstroke Engine: Learning a Latent Style Space of Interactive Drawing Tools (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Neural_Brushstroke_Engine_Learning_a_Latent_Style_Space_of_Interactive_Drawing_Tools.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Neural Brushstroke Engine
+	- datasets: Styles1, User study
+- [[obsidian-vault/analysis/arxiv_2023/LAMP_Learn_A_Motion_Pattern_for_Few_Shot_Based_Video_Generation.md|LAMP: Learn A Motion Pattern for Few-Shot-Based Video Generation (arxiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/LAMP_Learn_A_Motion_Pattern_for_Few_Shot_Based_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LAMP
+	- datasets: Custom evaluation set, User study
+- [[obsidian-vault/analysis/CVPR_2024/MotionEditor_Editing_Video_Motion_via_Content_Aware_Diffusion.md|MotionEditor: Editing Video Motion via Content-Aware Diffusion (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/MotionEditor_Editing_Video_Motion_via_Content_Aware_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionEditor
+	- datasets: User study
+- [[obsidian-vault/analysis/ECCV_2024/Generating_Human_Interaction_Motions_in_Scenes_with_Text_Control.md|Generating Human Interaction Motions in Scenes with Text Control (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/Generating_Human_Interaction_Motions_in_Scenes_with_Text_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: TeSMo
+	- datasets: SAMP sitting test set, User study, Loco-3D-FRONT test set
+- [[obsidian-vault/analysis/3DV_2025/3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability.md|3D Whole body Grasp Synthesis with Directional Controllability (3DV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/3DV_2025/3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CWGrasp
+	- datasets: GRAB / ReplicaGrasp, ReplicaGrasp, User study
+- [[obsidian-vault/analysis/arxiv_2025/Free_Form_Motion_Control_A_Synthetic_Video_Generation_Dataset_with_Controllable_Camera_and_Object_Motions.md|Free-Form Motion Control: A Synthetic Video Generation Dataset with Controllable Camera and Object Motions (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Free_Form_Motion_Control_A_Synthetic_Video_Generation_Dataset_with_Controllable_Camera_and_Object_Motions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Free-Form Motion Control (FMC)
+	- datasets: SynFMC test set, User study
+- [[obsidian-vault/analysis/CVPR_2025/AnyMoLe_Any_Character_Motion_In_Betweening_Leveraging_Video_Diffusion_Models.md|AnyMoLe Any Character Motion In Betweening Leveraging Video Diffusion Models (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/AnyMoLe_Any_Character_Motion_In_Betweening_Leveraging_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnyMoLe
+	- datasets: Humanoid character test set, Non-humanoid character test set, User study
+- [[obsidian-vault/analysis/ICLR_2025/CameraCtrl_Enabling_Camera_Control_for_Text_to_Video_Generation.md|CameraCtrl: Enabling Camera Control for Text-to-Video Generation (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/CameraCtrl_Enabling_Camera_Control_for_Text_to_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: CameraCtrl
+	- datasets: RealEstate10K test set, User study
+- [[obsidian-vault/analysis/SIGGRAPH_2025/VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Control.md|VideoAnydoor: High-fidelity Video Object Insertion with Precise Motion Control (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoAnydoor
+	- datasets: Custom benchmark, User study
+- [[obsidian-vault/analysis/arxiv_2026/FlowAct-R1_Towards_Interactive_Humanoid_Video_Generation.md|FlowAct-R1: Towards Interactive Humanoid Video Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/FlowAct-R1:_Towards_Interactive_Humanoid_Video_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FlowAct-R1
+	- datasets: User study, Real-time performance
+- [[obsidian-vault/analysis/CVPR_2026/Breaking_Semantic_Boundaries_Distribution_Guided_Semantic_Exploration_for_Creative_Generation.md|Breaking Semantic Boundaries: Distribution-Guided Semantic Exploration for Creative Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Breaking_Semantic_Boundaries_Distribution_Guided_Semantic_Exploration_for_Creative_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DisTok
+	- datasets: CangJie TP2O text pairs, Distribution-Conditional Generation, User study
+- [[obsidian-vault/analysis/ICLR_2026/FieryGS_In_the_Wild_Fire_Synthesis_with_Physics_Integrated_Gaussian_Splatting.md|FieryGS: In-the-Wild Fire Synthesis with Physics-Integrated Gaussian Splatting (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FieryGS_In_the_Wild_Fire_Synthesis_with_Physics_Integrated_Gaussian_Splatting_d7901a6ed2cd.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: FieryGS
+	- datasets: User study

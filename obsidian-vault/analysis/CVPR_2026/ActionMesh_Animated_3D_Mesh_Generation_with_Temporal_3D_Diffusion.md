@@ -1,0 +1,336 @@
+---
+title: "ActionMesh: Animated 3D Mesh Generation with Temporal 3D Diffusion"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/ActionMesh_Animated_3D_Mesh_Generation_with_Temporal_3D_Diffusion.pdf
+aliases:
+- ActionMesh
+tags:
+- CVPR_2026
+- topic/vision_multimodal_applications
+- topic/vision_multimodal_applications/3d_rendering_reconstruction
+- topic/generative_models_diffusion
+core_operator: 在预训练的3D扩散模型中引入时间轴，通过膨胀自注意力和旋转位置嵌入实现跨帧同步（时间3D扩散），并设计时间3D自编码器将独立3D形状序列转换为基于参考网格的变形场，从而获得拓扑一致的动画。
+primary_logic: 受早期视频生成模型启发，将3D扩散改造为时序3D扩散：先产生时间同步但独立的形状潜在，再通过自编码器转化为一致拓扑的动画，分离几何生成与动画构建。
+claims:
+- ActionMesh在ActionBench基准上所有几何与运动指标（CD-3D, CD-4D, CD-M）均显著优于现有最佳基线，且推理速度快约10倍（2分钟 vs 15-45分钟）。
+- 消融实验显示，移除时间3D自编码器无法生成动画网格；移除掩码生成或旋转位置嵌入导致时序一致性大幅下降，验证了时间轴设计的关键性。
+- 在真实世界视频和复杂多物体场景中，模型仍能保持高几何保真度和强运动表达，证明方法的实用鲁棒性。
+- ActionBench 上 CD-3D↓ = 0.053
+---
+
+# ActionMesh: Animated 3D Mesh Generation with Temporal 3D Diffusion
+
+> [!tip] 核心洞察
+> 受早期视频生成模型启发，将3D扩散改造为时序3D扩散：先产生时间同步但独立的形状潜在，再通过自编码器转化为一致拓扑的动画，分离几何生成与动画构建。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | ActionMesh：基于时序3D扩散的动画三维网格生成 |
+| 英文题名 | ActionMesh: Animated 3D Mesh Generation with Temporal 3D Diffusion |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2601.16148) · [Project](https://remysabathier.github.io/actionmesh/) |
+| Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
+| Method | ActionMesh |
+| Dataset | ActionBench |
+
+> [!tip] 效果简介
+> - ActionBench 上，CD-3D↓ 0.053 vs 0.056 (TripoSG) (-0.003 (相对提升5.4%))；CD-4D↓ 0.081 vs 0.126 (LIM) (-0.045 (相对提升35.7%))；CD-M↓ 0.148 vs 0.243 (LIM) (-0.095 (相对提升39.1%))。
+
+## 概述
+
+从视频或文本等通用输入生成可直接使用的动画三维网格，是计算机图形学与三维视觉中长期存在的难题。现有方法大多依赖耗时的逐场景优化（通常需30–45分钟），且输出网格拓扑不一致，难以直接用于纹理映射、运动迁移等下游任务。**ActionMesh** 提出了一种前馈式生成模型，将动画网格生成分解为两个阶段：首先在预训练三维扩散模型中引入时间轴，通过膨胀自注意力与旋转位置嵌入实现跨帧同步，生成时间一致但拓扑独立的形状序列；随后通过一个时间三维自编码器，将所有帧的几何表达转化为基于同一参考网格的顶点变形场，从而获得拓扑一致的动画网格。
+
+该方法的核心洞察来自早期视频生成模型的启发——将三维扩散改造为**时序三维扩散**，分离几何生成与动画构建。在统一的 **ActionBench** 基准上，ActionMesh 在所有几何与运动指标（CD-3D、CD-4D、CD-M）上均显著超越现有最佳基线，同时推理速度提升约一个数量级（约2分钟 vs. 15–45分钟）。此外，模型支持多种输入模态（视频、文本、图像+文本、三维网格+文本），并展现出对真实世界视频和多物体场景的良好鲁棒性。消融实验进一步验证了时序扩散、掩码生成策略以及时间三维自编码器等关键设计对最终性能的决定性贡献。
+
+## 背景与动机
+
+### 问题背景：从静态3D到“运动中”的3D网格
+
+近年来，图像到3D生成技术取得了长足进步，能够在数秒内从单张图片重建出高质量的静态三维网格。然而，现实世界的应用场景——游戏开发、影视制作、AR/VR体验——需要的不仅是静态资产，更是能够自然运动、且拓扑一致的三维动画网格。一个会跳舞的章鱼、一只扇动翅膀的萤火虫，这些“运动中”的3D内容才是产业落地的真正需求。
+
+将静态3D生成能力扩展到时间维度面临双重挑战：**几何保真度**要求每一帧的网格形状准确，**时序一致性**要求跨帧的顶点对应关系稳定，而两者往往相互制约。
+
+### 现有方法的缺口
+
+当前主流的视频到4D生成方法大致分为两类，但各自存在明显瓶颈：
+
+**优化式方法**（如 **LIM**、**DreamMesh4D (DM4D)**、**V2M4**）通过迭代优化为每帧独立生成3D表示，再辅以后处理提取网格。这类方法通常需要30-45分钟的推理时间，且输出的网格序列拓扑不一致——每一帧的顶点数量和连接关系都不同，无法直接进行纹理映射、运动编辑等下游操作。更关键的是，逐帧独立优化缺乏跨帧信息交互，容易产生几何漂移和细节闪烁（见Figure 3）。
+
+**前馈式方法**（如 **ShapeGen4D (SG4D)**）虽然推理速度有所提升，但通常限于特定输入模态，且在几何精度和运动质量上仍落后于优化式方法。另一类工作如 **AnimateAnyMesh** 专注于文本驱动的网格动画，但依赖已有的高质量网格资产，无法从视频直接生成完整的动画3D内容。
+
+一个根本性的瓶颈在于：现有方法将3D生成和动画构建耦合在一起处理，导致要么牺牲拓扑一致性换取几何保真度，要么为了时序稳定而接受粗糙的几何细节。
+
+### 核心洞察：分离几何生成与动画构建
+
+本文的动机源于一个关键观察：**早期的视频生成模型**（如Video Diffusion Models）通过在预训练图像扩散模型中引入时间轴，成功地将2D图像生成扩展为视频生成。这一思路暗示，类似地，在预训练的3D扩散模型中引入时间轴，或许能够实现时间同步的3D形状序列生成。
+
+但仅有时间同步的独立形状还不够——它们仍然拓扑不一致。因此，本文进一步将问题分解为两个子任务：**先生成时间同步但独立的3D形状潜在序列，再将其转化为基于同一参考网格的顶点变形场**。这种“几何生成-动画构建”的分离设计，使得模型既能利用强大的预训练3D先验保证几何质量，又能通过变形场天然地保证拓扑一致性。
+
+### 本文的出发点
+
+基于上述分析，ActionMesh的设计目标明确为：
+1. **快速前馈推理**：摆脱耗时的逐帧优化，实现分钟级的动画网格生成；
+2. **拓扑一致性输出**：整个动画序列共享同一网格拓扑，便于纹理映射、运动编辑等实际应用；
+3. **多模态输入支持**：统一处理视频、图像+文本、3D网格+文本等多种输入形式，通过掩码生成机制灵活注入已知形状先验。
+
+这一设计使得ActionMesh在推理速度上比现有最佳方法快约10倍（2分钟 vs 15-45分钟），同时在几何精度（CD-3D）和运动保真度（CD-M）上均达到最优水平（见Table 1）。
+
+## 核心创新
+
+ActionMesh 的核心创新在于将传统3D扩散模型改造为**时序3D扩散**，并通过两阶段设计解耦几何生成与动画构建，从而在推理速度（约2分钟 vs 15-45分钟）和拓扑一致性上取得突破。其关键“changed slots”如下：
+
+### 1. 时间轴引入：从逐帧独立到跨帧同步
+
+现有方法（如逐帧图像到3D重建）对视频的每一帧独立处理，导致生成的网格序列存在全局朝向不一致和几何细节不匹配（Figure 3）。ActionMesh 在预训练的3D扩散模型（TripoSG）中**引入时间轴**，实现跨帧信息交互：
+
+- **膨胀自注意力（Inflated Self-Attention）**：将形状为 $N \times T \times D$ 的潜在张量重塑为 $1 \times NT \times D$，应用标准自注意力后再重塑回原形状，使所有帧的潜在在去噪过程中相互感知。
+
+  $$\operatorname{infattn}(\mathbf{X}) = \operatorname{reshape}^{-1}(\operatorname{selfattn}(\operatorname{reshape}(\mathbf{X})))$$
+
+- **旋转位置嵌入（Rotary Positional Embedding）**：在膨胀自注意力层中注入相对帧位置信息，为模型提供显式的时间位置编码。消融实验（Table 3）显示，移除旋转位置嵌入后 CD-3D 从 0.053 退化至 0.054，CD-4D 从 0.081 退化至 0.084，证实了时间位置编码对时序一致性的必要性。
+
+这一设计受早期视频生成模型启发，以最小改动将3D扩散扩展为时序3D扩散，产生时间同步但彼此独立的形状潜在序列。
+
+### 2. 拓扑一致性输出：时间3D自编码器
+
+独立逐帧重建产生的网格序列拓扑不一致（顶点数、面连接性各异），无法直接用于纹理映射、动画编辑等下游应用。ActionMesh 设计了**时间3D自编码器（Temporal 3D Autoencoder）**，将阶段I输出的独立潜在序列转化为**基于同一参考网格的顶点变形场**，确保整个动画序列拓扑一致。
+
+具体而言，自编码器解码器通过自注意力处理整个潜在序列，再以交叉注意力输出参考网格顶点在每帧的位移 $\delta_k$，使得 $(\mathbf{V} + \delta_k, \mathbf{F})$ 逼近目标表面。消融实验（Table 2）表明，移除阶段II后模型无法生成动画网格，CD-M 度量完全失效，而 CD-3D 和 CD-4D 保持不变——证明阶段II在**不损害重建质量的前提下实现了拓扑一致性**。
+
+### 3. 掩码生成机制：解锁多模态输入
+
+ActionMesh 在时序3D扩散中引入**掩码生成（Masked Generation）**策略：允许将已知3D网格的潜在作为无噪声源潜在注入去噪过程，从部分已知形状生成完整动画。这一机制将多种任务统一为“视频到4D”核心问题，使模型支持：
+
+- **视频输入**：从单目视频直接生成动画网格
+- **3D网格+文本动画描述**：为静态网格赋予文本指定的动作
+- **图像+文本动画描述**：从单张图像生成动画网格
+- **运动迁移**：将源视频的运动迁移到目标网格（Figure 4）
+
+消融实验（Table 3）显示，去除掩码生成机制后 CD-3D 从 0.053 恶化至 0.062，CD-4D 从 0.081 恶化至 0.116，表明利用强图像到3D先验的掩码策略对生成质量至关重要，同时失去了多项应用能力。
+
+### 创新点总结
+
+| 设计维度 | 基线方法 | ActionMesh | 证据锚点 |
+|---------|---------|-----------|---------|
+| 时间建模 | 纯3D扩散，每帧独立 | 膨胀自注意力+旋转位置嵌入的时序3D扩散 | Section 3.2, Table 3 |
+| 输出拓扑 | 序列中网格拓扑不一致 | 时间3D自编码器输出统一参考网格的顶点变形场 | Section 3.3, Table 2 |
+| 条件生成 | 仅依赖视频帧 | 掩码生成允许注入已知网格潜在，支持多模态输入 | Section 3.2, Section 3.4, Table 3 |
+
+三个创新相互协同：时间轴保证跨帧几何一致性，自编码器将独立形状转化为拓扑一致的动画，掩码生成则大幅扩展了输入模态的灵活性。三者共同支撑了 ActionMesh 在 ActionBench 上全面超越现有最佳基线（CD-4D 相对提升 35.7%，推理速度快约 10 倍）的核心性能优势。
+
+## 整体框架
+
+ActionMesh 是一个前馈式生成模型，核心目标是**从单一视频生成拓扑一致的动画三维网格**（video-to-4D）。其设计哲学受早期视频生成模型启发：将三维扩散改造为**时序三维扩散**，并将“几何生成”与“动画构建”显式解耦为两个阶段。
+
+### 两阶段流水线
+
+整个框架由两个核心模块串联构成，如 Figure 2 所示：
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/002_Figure_2.jpg]]
+*Figure 2: Overview. Given an input video, our model generates an animated 3D mesh in two stages. (Stage I) After computing a reference mesh latent*
+
+**阶段 I：时序三维扩散（Temporal 3D Diffusion）**
+该阶段负责从输入视频中生成**时间同步但拓扑独立的网格潜在序列**。具体流程为：
+1. 使用现成的图像到三维模型（基于 **TripoSG** 的预训练扩散骨干）从选定参考帧生成参考网格及其潜在表示 $\mathbf{z}_1^*$。
+2. 将 $\mathbf{z}_1^*$ 与视频条件一同输入时序三维扩散模型。该模型通过在预训练三维扩散中引入**膨胀自注意力**（inflated self-attention）和**旋转位置嵌入**（rotary positional embedding）实现跨帧信息交互，输出 $N$ 帧独立的三维形状潜在序列。
+3. 支持**掩码生成**（masked generation）：可将已知网格潜在作为无噪声源注入，实现从部分已知形状生成完整动画，从而解锁运动迁移等应用。
+
+**阶段 II：时序三维自编码器（Temporal 3D Autoencoder）**
+该阶段将阶段 I 输出的独立网格潜在序列转化为**拓扑一致的动画网格**：
+1. 以参考网格为锚点，将每帧的独立形状潜在编码为查询点特征。
+2. 解码器通过自注意力处理整个潜在序列，再经交叉注意力输出参考网格顶点的**逐帧变形场** $\delta_k$。
+3. 最终动画网格序列共享同一参考拓扑 $(\mathbf{V} + \delta_k, \mathbf{F})$，天然保证拓扑一致性，便于纹理映射等下游应用。
+
+### 输入输出灵活性
+
+通过将多种生成任务统一到 video-to-4D 框架，ActionMesh 支持丰富的输入模态：
+- **视频 → 动画网格**：核心任务。
+- **文本提示 → 动画网格**：利用预训练视频生成模型将文本转为视频，再输入本框架。
+- **图像 + 动画文本 → 动画网格**：以图像为参考帧，文本描述驱动运动。
+- **三维网格 + 动画文本 → 动画网格**：以已有网格为参考拓扑，实现文本驱动的网格动画（运动迁移的变体）。
+
+### 关键设计决策
+
+| 设计维度 | 基线做法 | ActionMesh 方案 | 依据 |
+|---------|---------|----------------|------|
+| 时间建模 | 逐帧独立处理，无时间轴 | 膨胀自注意力 + 旋转位置嵌入实现跨帧同步 | Section 3.2, Table 3 |
+| 拓扑一致性 | 每帧网格拓扑独立 | 阶段 II 输出参考网格顶点变形场 | Section 3.3, Table 2 |
+| 条件注入 | 仅依赖视频帧 | 掩码生成允许注入已知网格潜在 | Section 3.2, Table 3 |
+
+消融实验验证了各模块的必要性：移除阶段 II 将完全丧失动画网格生成能力（CD-M 失效）；移除旋转位置嵌入或掩码生成机制均导致时序一致性指标显著退化（Table 2, Table 3）。
+
+## 核心模块与公式推导
+
+ActionMesh 的核心架构由两个级联模块构成：**时序3D扩散（Stage I）** 和 **时序3D自编码器（Stage II）**，两者共同将视频输入转化为拓扑一致的动画网格。其设计动机源于一个关键观察：对视频逐帧运行图像到3D模型会产生全局朝向不一致或几何细节矛盾的网格序列（Figure 3），因此必须引入跨帧同步机制。
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/003_Figure_3.jpg]]
+*Figure 3: Image-to-3D results on video frames. Running an image-to-3D model on each frame produces meshes exhibiting inconsistent global orientation (left) or inconsistent geometric details (right), even when using identical Gaussian noise in the denoiser*
+
+### Stage I：时序3D扩散
+
+该阶段的目标是从视频帧和参考网格潜在 $\mathbf{z}_1^*$（由现成的图像到3D模型从选定帧提取）出发，生成时间同步但拓扑独立的3D网格潜在序列。其核心创新在于对预训练3D扩散模型（TripoSG）的骨干网络进行最小化改造，引入时间轴。
+
+**膨胀自注意力（Inflated Self-Attention）** 是实现跨帧信息交互的关键算子。标准自注意力仅在单帧内部的token间运算，而膨胀自注意力将整个序列的token张量沿时间维度展开后统一处理：
+
+$$
+\operatorname{infattn}(\mathbf{X}) = \operatorname{reshape}^{-1}(\operatorname{selfattn}(\operatorname{reshape}(\mathbf{X})))
+$$
+
+其中 $\mathbf{X} \in \mathbb{R}^{N \times T \times D}$ 是包含 $N$ 个token、$T$ 帧、维度 $D$ 的潜在表示。该操作先将张量重塑为 $\mathbb{R}^{1 \times NT \times D}$，使所有帧的token在同一序列中参与自注意力计算，从而允许不同帧之间的信息自由流动，然后再重塑回原始形状。这一设计直接借鉴了早期视频生成模型将2D卷积膨胀为3D卷积的思路，但以更轻量的方式作用于Transformer架构。
+
+**旋转位置嵌入（Rotary Positional Embedding, RoPE）** 被注入到膨胀注意力层中，为每个token提供其所属帧的相对位置编码。与可学习的绝对位置编码不同，RoPE通过旋转变换编码相对位置关系，天然适合建模时序依赖，使模型能够区分不同帧的token并学习有意义的运动模式。消融实验（Table 3）证实，移除RoPE后CD-4D从0.069恶化至0.084，验证了显式时间位置编码对稳定时序生成的必要性。
+
+**掩码生成（Masked Generation）** 是Stage I的另一关键设计。在推理时，参考帧对应的潜在 $\mathbf{z}_1^*$ 被作为已知的无噪声源潜在注入扩散过程，而其余帧的潜在则从噪声中逐步去噪生成。这种机制使得模型可以充分利用强图像到3D先验，从部分已知形状出发生成完整的动画序列，同时解锁了多种应用模式（如3D网格+文本动画、运动迁移）。消融实验（Table 3）表明，去除掩码生成后CD-3D和CD-4D分别恶化至0.062和0.116，且多项应用能力丧失。
+
+### Stage II：时序3D自编码器
+
+Stage I输出的是一系列时间同步但拓扑独立的网格潜在，无法直接用于需要一致拓扑的下游任务（如纹理映射）。Stage II的时序3D自编码器将这些独立潜在转化为基于同一参考网格的顶点变形场，从而输出拓扑一致的动画网格。
+
+具体而言，给定参考网格 $\mathcal{M}_{\text{ref}} = (\mathbf{V}, \mathbf{F})$ 和Stage I产生的潜在序列，自编码器的解码器通过自注意力层处理所有帧的token序列，然后对查询3D点通过交叉注意力输出该点从源时间步 $t_i$ 到目标时间步 $t_j$ 的位移向量。最终，每一帧的网格表示为 $(\mathbf{V} + \boldsymbol{\delta}_k, \mathbf{F})$，其中 $\boldsymbol{\delta}_k$ 是第 $k$ 帧的顶点变形场。由于所有帧共享相同的面连接性 $\mathbf{F}$，整个动画序列天然具有一致拓扑。
+
+解码器在预测变形时还引入了查询点的表面法向信息，帮助区分空间位置相近但拓扑归属不同的点。消融实验（Table 4）显示，去除法向后CD-M从0.137升高至0.148，验证了法向对精确运动建模的贡献。此外，将源/目标时间步作为额外特征直接拼接到查询点（而非通过自注意力处理）会导致CD-M退化至0.151，表明将时间步作为token注入自注意力是更有效的设计选择。
+
+### 训练与推理流程
+
+整个两阶段管线在合成数据上联合训练。推理时，首先从输入视频中选定一帧（默认为第一帧），通过现成的图像到3D模型生成参考网格及其潜在 $\mathbf{z}_1^*$；随后Stage I以 $\mathbf{z}_1^*$ 和视频帧为条件，通过掩码扩散生成时间同步的独立潜在序列；最后Stage II将这些潜在解码为参考网格的顶点变形场，输出拓扑一致的动画网格。整个推理过程约需2分钟，相比优化类基线（15-45分钟）实现了约10倍的加速。
+
+## 实验与分析
+
+### 4.1 实验设置与评估基准
+
+为系统评估动画3D网格生成的质量，论文构建了**ActionBench**基准，包含128个来自Objaverse的动画场景，所有方法在统一视角与标准化预处理下进行评估。评估指标体系由三个互补的Chamfer距离变体构成：
+
+- **CD-3D**（逐帧ICP对齐后平均CD）：衡量单帧重建精度；
+- **CD-4D**（以首帧变换进行全局对齐后平均CD）：衡量序列级一致性重建；
+- **CD-M**（首帧最近邻对应传播至全序列的CD）：衡量运动保真度，即顶点随时间移动的准确性。
+
+对比基线涵盖四类方法：(1) 逐帧图像到3D重建基线 **TRELLIS** 与 **TripoSG**；(2) 视频到4D优化方法 **LIM**、**DreamMesh4D (DM4D)** 与 **V2M4**；(3) 前馈式视频到4D生成方法 **ShapeGen4D (SG4D)**；(4) 文本驱动网格动画方法 **AnimateAnyMesh**。所有基线使用官方实现或在相同数据集上重新训练（LIM），推理时间均在单张NVIDIA H100 GPU上测量，确保公平性。
+
+### 4.2 主实验结果
+
+Table 1报告了ActionBench上的定量对比。ActionMesh在所有几何与运动指标上均显著优于现有最佳基线：
+
+- **几何保真度**：CD-3D达到0.053，优于TripoSG的0.056（相对提升5.4%）；CD-4D为0.081，相比LIM的0.126提升35.7%，表明时序3D扩散有效解决了逐帧重建的全局不一致问题（如Figure 3所示的方向漂移与细节抖动）。
+- **运动质量**：CD-M为0.148，较LIM的0.243提升39.1%，验证了时间3D自编码器通过固定拓扑变形场实现精确运动对应的能力。
+- **推理效率**：ActionMesh仅需约2分钟完成推理，而LIM与SG4D需15分钟，DM4D与V2M4则需30–45分钟，加速约10倍，体现了前馈式设计相较优化范式的根本性效率优势。
+
+Figure 5的定性对比进一步印证：LIM与DM4D产生粗糙几何且缺乏细节，V2M4与SG4D虽能恢复较清晰细节但存在伪影和部分漂移，而ActionMesh在保持高几何保真度的同时展现出强时序一致性。
+
+### 4.3 消融实验
+
+#### 4.3.1 核心组件消融
+
+Table 2报告了在32个ActionBench场景上的组件消融结果：
+
+- **移除阶段II（时间3D自编码器）**：模型退化为仅输出独立网格序列，CD-M度量失效（无法评估拓扑一致性），但CD-3D与CD-4D保持不变（0.053/0.069），证明阶段II专门负责拓扑一致性构建，不损害重建质量。
+- **同时移除阶段I和II（独立逐帧重建）**：CD-4D从0.069恶化至0.187，表明时间3D扩散是保证跨帧时序一致性的核心机制。
+- **替换骨干模型**：将TripoSG替换为Craftsman后，CD-3D升至0.066，CD-4D升至0.096，说明更强的图像到3D先验对最终动画质量有直接影响。
+
+#### 4.3.2 时间3D扩散消融
+
+Table 3针对时间3D扩散模块进行精细消融：
+
+- **移除旋转位置嵌入**：CD-3D从0.053退化至0.054，CD-4D从0.069退化至0.084，证明显式相对帧位置编码对稳定时序生成的必要性。
+- **移除掩码生成机制**（不注入已知网格潜在）：CD-3D和CD-4D分别大幅恶化至0.062和0.116，同时丧失多项应用能力（如3D+text动画、运动迁移），说明利用强图像到3D先验的掩码策略是模型性能与应用灵活性的关键支撑。
+
+#### 4.3.3 时间3D自编码器消融
+
+Table 4对时间3D自编码器进行消融：
+
+- **移除查询点表面法向信息**：CD-M从0.137升高至0.148，验证法向有助于区分空间邻近但拓扑远离的点，对精确位移预测具有实质贡献。
+- **将源/目标时间步作为额外特征而非通过自注意力处理**：CD-M退化至0.151，表明将时间步作为令牌注入自注意力机制更有效，能更好地建模时序依赖。
+
+#### 4.3.4 帧数与自回归策略消融
+
+Table 5显示，将训练帧数从8增至16可带来持续性能提升（CD-3D 0.054→0.053，CD-4D 0.071→0.069），但增至24帧时收益饱和。Table 6评估自回归上下文窗口：将窗口从4扩至8可改善长序列生成质量，但进一步扩大收益递减，表明适度的时序感受野即可有效抑制误差累积。
+
+#### 4.3.5 参考帧选择消融
+
+Table 7表明，默认选择首帧作为参考帧可获得最优性能；选择中间帧或末帧会导致CD-3D与CD-4D轻微退化，因为首帧通常包含最完整的物体可见表面，为后续变形提供最可靠的拓扑基础。
+
+### 4.4 真实场景泛化与鲁棒性
+
+Figure 6展示了在DAVIS真实视频上的定性结果。即便面对复杂运动、多物体场景与遮挡等挑战，ActionMesh仍能生成精确的动画3D网格，证明方法在合成数据训练后具备一定的真实世界泛化能力。Figure 4的运动迁移结果进一步表明，即使源视频与目标网格的物体类别不一致，模型仍能准确迁移运动模式，体现了变形场表示的灵活性。
+
+### 4.5 失败模式与局限性
+
+Figure 7系统展示了三类典型失败案例：
+
+1. **拓扑变化**：当视频中出现物体部件的出现或消失（如物体断裂、融合），固定的参考拓扑无法自适应修改，导致动画失真。
+2. **参考帧遮挡**：若参考帧存在大面积遮挡区域，模型缺乏足够的几何先验进行补全，产生不完整表面。
+3. **运动遮挡**：运动过程中部分区域被持续遮挡时，对应顶点的位移预测缺乏观测约束，重建质量下降。
+
+这些失败模式揭示了当前方法的核心局限：对固定拓扑的强依赖与对遮挡的敏感性。开放问题包括：如何实现拓扑感知的潜在更新以自然处理部件生成/融合/分离；如何利用多帧信息融合改进遮挡区域补全；以及如何进一步缩短推理时间并提升长序列自回归生成的稳定性。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/004_Table_1.jpg]]
+*Table 1: Quantitative results on ActionBench. We report results from prior works, namely LIM [33], DreamMesh4D [19] V2M4 [4], ShapeGen4D[53], TripoSG [18] and TRELLIS [48]. We outperform all baselines across metrics while running significantly faster*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/009_Table_2.jpg]]
+*Table 2: Ablation study. We evaluate some key components on 32 animated scenes from ActionBench, namely our stage I, both stages I and II, and the pretrained model we started from by using Craftsman [17] instead of TripoSG [18]*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/011_Table_3.jpg]]
+*Table 3: Ablation study - Temporal 3D denoiser*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/012_Table_4.jpg]]
+*Table 4: Ablation study - Temporal 3D autoencoder*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/005_Figure_4.jpg]]
+*Figure 4: Motion transfer results. Our model is able to accurately transfer the motion from a source video to target meshes, even if the objects are inconsistent*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/007_Figure_6.jpg]]
+*Figure 6: Qualitative results on real videos from DAVIS [29]. Even in these challenging scenarios, our model produces accurate animated 3D meshes, thus demonstrating its ability to handle complex motions, multiple objects and occlusions. See supplemental for more results*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/008_Figure_7.jpg]]
+*Figure 7: Limitations. Typical failure cases arise for videos with topological changes (left) and regions that are occluded either on the reference frame (middle) or during the motion (right)*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/010_Figure_8.jpg]]
+*Figure 8: Comparison to AnimateAnyMesh [47]. Panda “doing martial art”, Firefly “flapping its wings”, Armadillo “casually walking”. The Armadillo mesh is sourced from the Stanford Computer Graphics Laboratory*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/015_Table_5.jpg]]
+*Table 5: Ablation study - Number of frames. We train the temporal 3D diffusion model and the temporal 3D autoencoder with various number of frames N and compare reconstructions on 16 keyframes*
+
+![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/016_Table_6.jpg]]
+*Table 6: Ablation study - Autoregressive context window. We evaluate our model trained with N = 16 keyframes on sequences of 31 timesteps for different context window cw*
+
+## 方法谱系与知识库定位
+
+### 与前人工作的关系
+
+ActionMesh 的定位处于**视频/图像到4D生成**与**前馈式网格动画**的交汇点。与现有方法相比，其核心差异体现在三个维度：生成范式、输出拓扑和推理效率。
+
+**视频到4D优化方法**构成了主要对比基线。**LIM**（隐式场插值）、**DreamMesh4D (DM4D)**（网格-高斯混合）、**V2M4**（多阶段管线）均依赖耗时的逐场景优化过程，单次生成需15–45分钟，且输出拓扑不一致或几何粗糙。ActionMesh 以两阶段前馈设计将推理压缩至约2分钟，同时输出拓扑一致的动画网格，在 ActionBench 上 CD-4D（0.081 vs. LIM 0.126）和 CD-M（0.148 vs. LIM 0.243）均实现显著领先（Table 1）。定性上，LIM 与 DM4D 倾向于产生粗糙几何，V2M4 与同期前馈方法 **ShapeGen4D (SG4D)** 虽能恢复更清晰细节，但存在伪影和局部漂移（Figure 5）。
+
+**逐帧图像到3D重建基线**（**TRELLIS**、**TripoSG**）揭示了独立帧处理的内在缺陷：即使注入相同高斯噪声，逐帧重建仍产生全局朝向不一致或几何细节不匹配的网格序列（Figure 3）。ActionMesh 通过时间3D扩散中的膨胀自注意力与旋转位置嵌入，强制跨帧潜在同步，从根本上解决了这一时序断裂问题。TripoSG 本身作为 ActionMesh 的预训练骨干，其 3DShape2VecSet 潜在扩散框架被完整继承，但被扩展了时间轴——这是一种典型的**从3D到4D的最小侵入式改造**策略。
+
+**前馈式网格动画方法**中，**AnimateAnyMesh** 支持文本驱动动画，但 ActionMesh 在运动保真度和几何一致性上表现更优（Figure 8），且额外支持视频、图像+文本、3D网格+文本等多种输入模态。
+
+### 适用边界与关键假设
+
+ActionMesh 的适用性建立在以下核心假设之上：
+
+1. **固定拓扑假设**：时间3D自编码器输出的是参考网格顶点的变形场，因此整个动画序列共享同一拓扑。这为纹理映射、渲染管线集成提供了便利，但也意味着**视频中出现拓扑变化（如物体部分出现或消失）时模型必然失效**（Figure 7左）。这是当前设计的一个硬性边界，而非可调参数的问题。
+
+2. **参考帧信息完整性假设**：参考网格由现成图像到3D模型从单帧生成，若该帧存在遮挡区域，缺失的表面信息将传播至整个序列（Figure 7中）。类似地，运动过程中被遮挡的区域也无法被准确重建（Figure 7右）。
+
+3. **合成数据训练假设**：当前模型仅在合成数据上训练，对真实世界视频的泛化虽有初步验证（Figure 6, DAVIS 数据集），但面对复杂光照、运动模糊、非刚性变形等真实场景的鲁棒性仍需进一步验证。
+
+### 局限与开放问题
+
+论文明确指出的三类典型失败案例（Figure 7）揭示了方法的结构性局限：
+
+- **拓扑变化不可处理**：固定参考拓扑无法自适应修改连通性，因此无法处理网格部件的生成、融合或分离。这引出一个开放问题：**能否实现拓扑感知的潜在更新机制**，使得动画过程中可以自然地增删网格部件而无需后处理编辑？
+
+- **遮挡区域的几何补全不足**：当参考帧缺失关键表面信息时，模型缺乏有效的多帧信息融合机制来补全几何。一个自然的改进方向是**自适应选择参考帧**或**融合多帧可见信息**，而非依赖单一帧。
+
+- **长期动画的自回归误差累积**：消融实验（Table 6）显示，模型以自回归方式生成超出训练帧数的序列时存在误差累积。尽管上下文窗口机制缓解了这一问题，但**如何进一步提升长期动画的稳定性**仍是开放挑战。
+
+更广泛的开放问题还包括：推理时间能否进一步压缩至秒级？能否将时间3D扩散扩展至处理动态纹理或材质？以及如何构建更大规模、更多样化的4D训练数据以提升真实场景泛化能力？
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/ActionMesh_Animated_3D_Mesh_Generation_with_Temporal_3D_Diffusion.pdf]]

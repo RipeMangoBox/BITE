@@ -1,0 +1,357 @@
+---
+title: Building spatial world models from sparse transitional episodic memories
+type: paper
+paper_level: A
+venue: ICLR
+year: 2026
+pdf_ref: paperPDFs/ICLR_2026/Building_spatial_world_models_from_sparse_transitional_episodic_memories_1e9241541b44.pdf
+project_link: null
+code_link: null
+aliases:
+- EESWM
+- BSWMFSTEM
+tags:
+- ICLR_2026
+- topic/other_unclear
+- topic/other_unclear/general
+core_operator: 使用无序的、最小生成树形式的情景记忆库作为输入，并通过随机掩码起始状态、动作或结束状态的元学习任务，迫使模型在推理时动态推断空间结构，而非记忆特定环境。
+primary_logic: 通过元学习预测缺失的转移元素，ESWM 学习到一种通用的空间推理策略，能将分散的情景记忆整合为一致的内部认知地图，且该地图的几何结构与真实环境拓扑对齐，从而支持零样本探索、导航和快速适应。
+claims:
+- ESWM-T 在 Open Arena 和 Random Wall 中显著优于基于序列的 TEM-T 基线，证明了从情景记忆直接推断结构的优势。
+- ESWM 的潜在空间经 ISOMAP 可视化显示出与物理环境一致的几何结构，包括障碍物导致的断裂区域，且在所有预测任务和部分观察下均稳定出现。
+- ESWM 仅凭最小记忆库即可实现 96.8% 的导航成功率和 99.2% 的路径最优性，通过简单编辑记忆库可在环境变化后维持 93% 的成功率，远超 EPN 和固定权重基线。
+- 引入捷径记忆能显著改变 ESWM 的预测分布，且预测熵随整合路径长度增加而上升，证明模型真正在整合而非简单查找。
+---
+
+# Building spatial world models from sparse transitional episodic memories
+
+> [!tip] 核心洞察
+> 通过元学习预测缺失的转移元素，ESWM 学习到一种通用的空间推理策略，能将分散的情景记忆整合为一致的内部认知地图，且该地图的几何结构与真实环境拓扑对齐，从而支持零样本探索、导航和快速适应。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | 从稀疏片段式情景记忆中构建空间世界模型 |
+| 英文题名 | Building spatial world models from sparse transitional episodic memories |
+| 会议/期刊 | ICLR 2026 |
+| Links | [paper](https://openreview.net/forum?id=w3w7WVG4ks) · [arXiv](https://arxiv.org/abs/2412.03572) |
+| Topic | #topic/other_unclear #topic/other_unclear/general |
+| Method | ESWM (Episodic Spatial World Model) |
+| Dataset | Open Arena, Random Wall, Random Wall Navigation, Random Wall Adaptation |
+
+> [!tip] 效果简介
+> - Open Arena (hex grid, 19 locations, 6-bit states) 上，预测准确率 (大致范围，无精确表格) ESWM-T 远高于其余模型 vs TEM-T 次之，ESWM-LSTM/MAMBA 接近随机 (显著)。
+> - Random Wall (hex grid, 36 locations, integer states) 上，Predict Source (Seen / Unseen / Unsolvable) 0.905 / 0.875 / 0.827 (ESWM-T-4L) vs TEM-T 失败 (无法泛化到不同墙体结构) (ESWM-T 显著优于 TEM-T)。
+> - Random Wall Navigation 上，成功率 / 路径最优性 96.8% / 99.2% vs EPN: 78.8% / 78.2% (相对下降18和21个百分点) (+18% / +21%)。
+
+## 概述
+
+**问题瓶颈**：传统世界模型通常依赖连续的序列数据，将环境结构知识隐式编码于循环网络或注意力权重中。这种范式在以下场景中面临根本性困难：(1) 观察完整环境需极长的时间步；(2) 环境结构随时间变化；(3) 记忆以片段化、非连续的方式收集。其本质瓶颈在于，这类模型难以从**离散、无序的情景记忆中快速构建空间地图**，且在环境拓扑发生变化时缺乏灵活适应的能力。
+
+**核心思想**：本文提出 **ESWM**（Episodic Spatial World Model），将世界模型重新定义为一种**基于情景记忆库的元学习问题**。模型接收一个由独立一步转移 $(s_s, a, s_e)$ 构成的无序记忆库 $M$，以及一个随机掩码了起始状态、动作或结束状态的查询转移 $q$，目标是预测完整的转移 $q^* = f(M, q)$。通过在不同环境结构上反复执行这一元学习任务，模型被迫学习一种**通用的空间推理策略**，而非记忆任何特定环境——因为每个训练 trial 中状态与位置的映射都被随机化。
+
+**关键机制**：ESWM 采用无位置编码的 Transformer 编码器，通过注意力机制直接并行聚合所有记忆 token，动态推断转移之间的空间关系。这一设计与经典的内容可寻址记忆模型精神相通，使模型能够在推理时整合分散的情景记忆为一致的内部认知地图。
+
+**方法定位**：ESWM 在方法谱系上区别于两类基线：(1) **TEM-T**（Whittington et al., ICLR 2022），一种基于连续序列的世界模型，将结构知识嵌入循环或注意力权重中；(2) **EPN**（Ritter et al., NeurIPS 2020），一种基于情景记忆的导航智能体，使用强化学习训练。ESWM 的核心差异在于：记忆库采用最小生成树式的无序集合而非完整遍历轨迹，训练任务同时预测三种掩码元素而非仅预测终点状态，且环境适应仅需编辑记忆库而无须任何参数更新。
+
+**主要结果**：
+- **预测性能**：ESWM-T 在 Open Arena 和 Random Wall 环境中显著优于 TEM-T 等基线；在 Random Wall 的 Predict Source 任务上，ESWM-T-4L 在可见/不可见/不可解三类查询上分别达到 90.5%/87.5%/82.7% 的准确率（Table 2）。
+- **空间地图涌现**：ESWM 的潜在空间经 ISOMAP 可视化后展现出与物理环境几何一致的拓扑结构，包括障碍物导致的断裂区域，且该地图在所有预测任务和部分观察条件下稳定存在（Fig. 3, Fig. 12）。
+- **导航与适应**：仅凭最小生成树记忆库（19–36 条转移），ESWM 实现 96.8% 的导航成功率和 99.2% 的路径最优性；通过简单编辑记忆库，可在环境结构变化后维持 93% 的成功率，远超固定权重基线（56%）和 EPN（72%）（Fig. 5b, Fig. 5c）。
+- **规模扩展**：ESWM 成功扩展至 MiniGrid（9×9 自我中心网格）和 ProcThor（3D 真实感环境、连续动作空间），验证了方法的通用性（Fig. 6）。
+
+**局限与展望**：当环境中存在重复状态且无历史轨迹作为上下文时，单步转移预测无法消歧；潜空间启发式 $h_{\mathrm{latent}}$ 可能高估真实测地距离，A* 规划不保证最优性；高维感官输入下的表征质量与可扩展性仍需进一步验证。
+
+## 背景与动机
+
+### 问题背景：世界模型在空间推理中的瓶颈
+
+构建对物理环境的空间理解是智能体实现灵活规划、探索与适应的核心能力。世界模型（world models）作为学习环境动态的内部表征的关键工具，近年来在基于模型的强化学习和规划中扮演着日益重要的角色。然而，传统世界模型存在一个根本性局限：**它们依赖连续序列数据，并将环境的结构性知识内化于网络权重之中**。这种设计带来了三个相互关联的挑战（Fig. 1a）：
+
+1. **长序列依赖**：完整观测一个环境往往需要大量时间步，由此产生的长序列在训练和推理中计算代价高昂，且容易遭遇梯度消失或遗忘问题。
+2. **结构变化敏感**：当环境结构发生改变（如墙体移动、障碍物增减），网络权重需要重新训练或微调才能适应，缺乏即时灵活性。
+3. **跨环境泛化困难**：权重中编码的知识高度特化于训练环境，难以直接迁移到结构不同的新环境中。
+
+这些挑战在空间导航领域尤为突出——智能体需要在仅有少量局部观测的情况下，推断全局空间关系，并在环境变化时快速调整行为。
+
+### 现有方法的缺口
+
+当前应对上述挑战的方法主要沿两条路径展开，但各自存在显著不足：
+
+**路径一：基于序列的世界模型。** 以 **TEM**（Temporal Episodic Memory model，Whittington et al., ICLR 2022）为代表，这类模型将环境知识嵌入循环网络（如 LSTM）或 Transformer 的注意力权重中，通过沿完整遍历轨迹逐步更新隐藏状态来学习转移规律。其根本问题在于，**结构知识被“编译”进网络参数**，导致：
+- 面对新环境结构时，必须重新经历完整的序列学习过程；
+- 无法从零散、无序的情景记忆中直接推断空间拓扑；
+- 当环境结构改变时，模型缺乏“即插即用”的适应能力。
+
+**路径二：基于情景记忆的强化学习智能体。** 以 **EPN**（Episodic Planning Network，Ritter et al., NeurIPS 2020）为代表，这类方法将情景记忆作为显式存储，通过强化学习训练智能体利用记忆进行导航。然而，EPN 的记忆使用方式本质上仍是**内容寻址的查找**，而非结构性的推理整合，其性能受限于记忆库容量和探索效率，且在新环境中的泛化能力有限。
+
+### 核心动机：从片段记忆到空间理解
+
+上述缺口指向一个更深层的科学问题：**能否让模型从稀疏、无序的片段式情景记忆中，动态推断出环境的空间结构，而非将结构知识固化在权重中？**
+
+这一动机源于认知科学中的“认知地图”（cognitive map）概念——生物体能够将离散的经验片段整合为连贯的空间表征，从而支持灵活的导航和推理。本文的核心假设是：通过元学习（meta-learning）范式，模型可以习得一种**通用的空间推理策略**，该策略在推理时根据给定的情景记忆集合动态构建内部空间地图，而非在训练时记忆特定环境。
+
+具体而言，本文提出 **ESWM（Episodic Spatial World Model）**，其设计动机直接回应了上述瓶颈：
+- **输入形式**：以无序的、最小生成树形式的情景转移集合（memory bank）替代连续序列，使模型摆脱对遍历顺序的依赖；
+- **训练目标**：通过随机掩码起始状态、动作或结束状态的元学习任务，迫使模型在推理时主动整合记忆以填补缺失信息，而非被动记忆；
+- **适应机制**：环境变化时仅需编辑记忆库中的少量转移，无需任何参数更新，实现即时适应。
+
+这一设计使得 ESWM 有望在零样本探索、导航和快速适应等关键能力上取得突破，同时其内部表征是否真正形成与物理空间对齐的认知地图，也是本文重点验证的核心假设。
+
+## 核心创新
+
+### 从连续序列到无序片段：记忆表征的范式转换
+
+传统世界模型（如 TEM-T，Whittington et al., ICLR 2022）将环境结构知识编码于循环网络的权重或隐藏状态中，依赖连续的、顺序连接的完整遍历轨迹作为输入。这一设计导致两个根本性瓶颈：其一，在环境结构发生变化时，模型必须重新训练或微调网络参数才能适应；其二，长序列的逐步更新机制使得模型难以从稀疏、离散的片段记忆中进行灵活推理。
+
+ESWM 对此进行了彻底重构。其记忆库不再是一个有序的轨迹序列，而是一个**无序的、最小生成树式的情景转移集合**——每个转移以独立的三元组 $(s_s, a, s_e)$ 形式存储，彼此之间没有预设的时间或空间顺序。这一设计将环境知识从“网络权重中的隐式编码”解放为“可显式编辑的外部记忆”，使得添加、删除或修改少量转移即可实现环境适应，无需任何参数更新（Section 4.6, Section 5）。
+
+### 从单任务预测到多任务掩码元学习
+
+TEM-T 的训练目标仅为预测轨迹末端转移的终点状态，模型习得的是沿序列逐步前向传播的推理策略。ESWM 则将训练任务重构为**随机掩码的三向预测**：在每个 trial 中，查询转移的起始状态 $s_s$、动作 $a$ 或终点状态 $s_e$ 以等概率被随机掩码，模型必须同时预测三者。此外，ESWM 引入“我不知道”类别来处理不可解查询（如查询状态与记忆库完全无关的场景），迫使模型学会判断查询的可解性而非盲目猜测（Section 3.1, Section 3.2）。
+
+这一多任务掩码策略构成了 ESWM 的核心因果杠杆：模型无法依赖任何固定的推理方向（如“总是从起始状态向前推演”），而必须在推理时动态推断空间关系——有时需要从终点状态回溯起始状态，有时需要从两端推断中间动作。配合跨环境的随机化状态-位置映射（每次 trial 重新分配状态与网格位置的对应关系），模型被强制学习一种**通用的空间推理策略**，而非记忆特定环境的拓扑。
+
+### 从序列化整合到并行注意力聚合
+
+TEM-T 的记忆整合机制本质上是序列化的：LSTM 沿轨迹逐步更新隐藏状态，每步仅能访问当前及历史信息。ESWM-T 则采用**无位置编码的 Transformer 编码器**，将所有记忆 token 与查询 token 拼接后，通过自注意力机制进行全局并行聚合（Section 3.2, Fig.1c）。这一架构选择并非偶然——消融实验表明，LSTM 和 Mamba 变体在 Open Arena 上严重过拟合，在 Random Wall 上性能显著落后于 Transformer 版本（Fig.2, Fig.8），证实注意力机制中的内容寻址特性（类似于经典的内容可寻址记忆模型）是实现跨环境泛化的关键。
+
+### 环境适应的零样本能力
+
+上述三个 changed slots 共同催生了 ESWM 最具区分度的能力：**零样本环境适应**。当环境结构发生变化（如新增障碍物），基于序列的模型需要重新训练网络权重；而 ESWM 仅需从记忆库中删除与变化相关的过期转移，并插入少量新探索获得的转移，即可立即恢复导航能力。在 Random Wall 实验中，ESWM 通过简单编辑记忆库在环境变化后维持 93% 的导航成功率，远超固定权重基线（56%）和 EPN（72%）（Fig.5c）。这一能力源于 ESWM 将环境知识外化于可编辑的记忆库，而非固化于网络参数的设计哲学。
+
+## 整体框架
+
+ESWM (Episodic Spatial World Model) 的核心思想是将世界模型从“记忆网络权重”转变为“记忆情景转移”。其整体 pipeline 围绕一个中心函数 $q^{*} = f(M, q)$ 展开：给定一个情景记忆库 $M$ 和一个部分掩码的查询转移 $q$，模型 $f$ 输出完整的预测转移 $q^{*}$（Equation 1）。这一框架将环境结构知识从模型参数中剥离，存储于可显式编辑的记忆库中，使模型在推理时动态推断空间关系，而非从连续序列中隐式学习。
+
+### 模块关系与数据流
+
+整个系统由五个核心模块串联构成，数据流从环境生成到最终预测形成闭环：
+
+1.  **环境与记忆库生成**：每个训练 trial 随机生成一个网格环境 $e = (G, g, W, \psi, A)$，其中状态-位置映射 $\psi$ 被随机化，以防止模型记忆特定环境（Section 3.1）。记忆库 $M$ 由该环境下的最小生成树形式的不相交一步转移集合构成，每条记忆为三元组 $(s_s, a, s_e)$，分别表示起始状态、执行动作和结束状态。
+
+2.  **特征投影与 Token 嵌入**：每个记忆三元组的三个元素分别通过独立的线性投影映射到高维空间，然后取均值形成单一 token。查询转移 $q$ 以同样方式嵌入，但其被掩码的部分用可学习的掩码向量替代（Section 3.2）。
+
+3.  **序列模型（Transformer/LSTM/Mamba）**：记忆库的所有 token 与查询 token 拼接后送入序列模型。ESWM 默认采用无位置编码的 Encoder-only Transformer（ESWM-T），通过自注意力机制并行聚合所有记忆 token，动态推断转移间的空间关系。消融实验中还考察了 LSTM 和 Mamba 架构（Section 3.2, Fig. 1c）。
+
+4.  **多任务预测头**：序列模型最后一个 token 的输出分别通过三个独立的线性解码器，预测起始状态、动作和结束状态。模型同时优化三部分预测的交叉熵损失，并引入“我不知道”类别以处理不可解查询（Section 3.2）。
+
+5.  **元训练循环**：每个 trial 中随机采样环境、记忆库和查询，并以等概率随机掩码起始状态、动作或结束状态。模型在大量不同环境结构上元训练，学习通用的空间推理策略，而非拟合单一环境（Section 3.1, Section 3.2）。
+
+### 输入输出规范
+
+- **输入**：一个无序的情景记忆库 $M$（包含多条 $(s_s, a, s_e)$ 转移）和一个部分掩码的查询转移 $q$。
+- **输出**：完整的预测转移 $q^{*}$，包含起始状态、动作和结束状态的预测分布。
+- **关键设计选择**：记忆库采用最小生成树形式，确保覆盖环境所有可达状态的同时保持稀疏性；无位置编码的 Transformer 迫使模型仅通过内容寻址来整合记忆，这是空间地图涌现的关键（Section 4.1）。
+
+该框架的核心优势在于：推理时无需任何参数更新，仅通过编辑记忆库（添加、删除或修改少量转移）即可适应环境结构变化，这为后续的零样本导航、探索和快速适应奠定了基础（Section 4.5-4.6）。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/001_Figure_1.jpg]]
+*Figure 1: Episodic Spatial World Model. a) Three common scenarios that hinder the ability of typical world models to generalize effectively. (top) Observation of the full environment may take many time steps leading to long sequences; (middle) Environment structure may change across trials; (bottom) Information about a particular environment may be collected across separate exposures to the environment and not within a single one. b) Memory bank and query selection in a square grid environment. c) Architecture of ESWM and training procedure. Model input consists of a bank of transitional memories (corresponding to the black arrows in (b)) and a single query (q arrow in (b)), with either start-state,...*
+
+## 核心模块与公式推导
+
+ESWM 的核心功能由单一公式定义：
+
+$$q^{*} = f(M, q)$$
+
+其中 $M$ 为**记忆库**（memory bank），$q$ 为部分掩码的**查询转移**（query transition），$f$ 为待学习的空间世界模型，输出完整的转移 $q^{*}$。每个情景记忆和查询转移均由三元组 $(s_s, a, s_e)$ 表示——起始状态 $s_s$、执行动作 $a$ 和结束状态 $s_e$，构成环境中的一步转移。
+
+以下按流水线顺序拆解关键模块。
+
+---
+
+### 环境与记忆库生成
+
+每个训练 trial 中，算法随机生成一个环境 $e = (G, g, W, \psi, A)$，其中 $G$ 为网格图，$g$ 为可观察子图过滤函数，$W$ 为障碍物集合，$\psi$ 为状态-位置映射，$A$ 为动作映射。关键在于**状态-位置映射在每个 trial 中完全随机化**：同一物理位置在不同 trial 中被分配不同的状态标识，迫使模型无法记忆特定环境的结构，必须学会从记忆库中动态推断空间关系。
+
+记忆库 $M$ 由一组最小生成树形式的**不相交一步转移**构成，确保记忆库覆盖环境中所有可达位置且不含冗余循环。每个转移 $(s_s, a, s_e)$ 独立存储，彼此之间无顺序依赖——这与传统世界模型依赖连续序列轨迹形成根本差异。
+
+---
+
+### 特征投影与 Token 嵌入
+
+每个记忆转移的三元组 $(s_s, a, s_e)$ 通过各自独立的线性投影映射到高维嵌入空间，随后取均值形成单一 token：
+
+$$\text{token}_i = \text{mean}\left( \text{proj}_s(s_s), \text{proj}_a(a), \text{proj}_e(s_e) \right)$$
+
+查询转移 $q$ 以相同方式嵌入，但被掩码的元素位置替换为可学习的掩码嵌入向量。所有记忆 token 与查询 token 拼接后送入序列模型，**不附加任何位置编码**——这一设计选择是空间结构从内容而非顺序中涌现的前提。
+
+---
+
+### 序列模型：无位置编码的 Transformer
+
+ESWM 的核心架构为**无位置编码的编码器专用 Transformer**（ESWM-T）。与标准 Transformer 不同，移除位置编码后，注意力机制完全基于 token 内容计算相关性，使得模型能够以置换不变的方式并行聚合所有记忆 token，动态推断转移之间的空间关系。
+
+消融实验证实了这一设计的关键性：替换为 LSTM 或 Mamba 后，模型在 Open Arena 上严重过拟合，在 Random Wall 上性能显著落后（Fig.2）。这表明**内容寻址的注意力机制**——而非序列化处理——是学习通用空间推理策略的基础。
+
+---
+
+### 多任务预测头
+
+序列模型的最终 token 输出分别通过三个线性解码器，预测完整转移的起始状态 $\hat{s}_s$、动作 $\hat{a}$ 和结束状态 $\hat{s}_e$。训练采用交叉熵损失联合优化三部分预测，掩码策略为**随机均匀掩码三元素之一**。
+
+特别地，模型输出空间包含一个**“我不知道”**（I don't know）类别，用于处理不可解查询——当记忆库中缺乏足够信息推断被掩码元素时，模型被训练输出该类别，而非盲目猜测。这一机制在 Random Wall 的不可解查询子集中得到验证（Table 2，Unsolvable 列准确率 0.827）。
+
+---
+
+### 元训练循环
+
+每个 trial 的采样流程为：随机生成环境 → 生成最小记忆库 → 随机采样查询转移 → 随机掩码查询元素 → 前向传播 → 联合损失反向传播。训练覆盖海量环境结构变化（约 $1.14 \times 10^9$ 步），使模型在元层面学会“如何从任意记忆库推断缺失转移”，而非记忆任何特定环境。
+
+这一元学习范式是 ESWM 零样本泛化能力的根源：推理时面对全新环境结构和记忆库，模型无需任何参数更新即可直接预测。
+
+## 实验与分析
+
+### 核心预测能力评估
+
+ESWM 的核心评估围绕其从稀疏情景记忆中预测缺失转移元素的能力展开。实验在两个具有代表性的网格世界环境中进行：**Open Arena**（六边形网格，19 个位置，6-bit 状态）和 **Random Wall**（六边形网格，36 个位置，整数状态，墙体结构随机变化）。
+
+在 Open Arena 中，基于 Transformer 的 ESWM-T 在预测准确率上远超所有基线模型，而基于 LSTM 和 Mamba 的变体（ESWM-LSTM、ESWM-MAMBA）则严重过拟合，性能接近随机水平（Fig. 2a）。这一对比直接揭示了架构选择的关键性：注意力机制对于从无序记忆中推断空间关系至关重要，而循环或状态空间模型倾向于记忆特定序列模式而非学习通用推理策略。
+
+Random Wall 环境对泛化能力提出了更严峻的挑战——墙体结构在每次试验中随机变化，迫使模型从零开始推断空间拓扑。ESWM-T-4L 在此环境中表现优异，起始状态预测准确率达到 0.905（已见查询）/ 0.875（未见查询）/ 0.827（不可解查询）（Table 2）。相比之下，TEM-T 基线完全失败，无法泛化到不同墙体结构（Fig. 2b）。这一差异的核心在于输入形式：TEM-T 依赖完整序列轨迹，将结构知识编码在循环权重中；而 ESWM 直接从最小生成树式的无序记忆库中动态推断关系，天然适应结构变化。
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/009_Table_2.jpg]]
+*Table 2: ESWM-T-4L performance in Random Wall . Accuracies for source, action, and end prediction*
+
+### 空间地图的涌现
+
+ESWM 最引人注目的特性是其潜在空间自发形成了与物理环境拓扑对齐的认知地图。通过对 ESWM-T-2L 的中间层激活进行 ISOMAP 降维可视化，研究者发现：
+
+- **无障碍环境**中，潜在表征形成平滑的二维流形，相邻位置的激活在投影空间中保持邻近关系（Fig. 3a）。
+- **有障碍环境**中，流形在墙体对应位置出现断裂，准确反映了物理空间的连通性约束（Fig. 3b）。
+- **不连通区域**中，潜在空间分裂为相互分离的簇，与真实拓扑结构一致（Fig. 3c）。
+
+更关键的是，这种空间地图并非仅在特定预测任务下偶然出现。实验表明，无论模型执行的是起始状态预测、动作预测还是终点状态预测，甚至当查询仅提供部分观察时，空间地图始终稳定存在（Fig. 12）。此外，随着网络深度增加，潜在表征变得更加连续和结构化（Fig. 14），暗示更深层的 Transformer 能够更好地整合分散的记忆信息。
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/018_Figure_12.jpg]]
+*Figure 12: ESWM’s latent spatial map persists for all prediction tasks and partial observations. a) ESWM’s latent spatial map for*
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/020_Figure_14.jpg]]
+*Figure 14: Representation becomes more continuous with depth. Left to right are 30-neighbours ISOMAP projections from layer 1, 6, 9, and 14 of Transformer-14L (2000 activations). The model was trained without random masking of subregions. Representation in the latent space becomes progressively more continuous*
+
+### 记忆整合的直接证据
+
+为验证 ESWM 是否真正在“整合”记忆而非简单查找，研究者设计了精巧的探测实验：
+
+- **整合路径长度效应**：预测熵随解决查询所需的最短整合路径长度增加而单调上升（Fig. 4a）。这表明模型在推理时需要串联多个记忆片段，路径越长，不确定性越高。
+- **捷径记忆干预**：当引入能缩短整合路径的捷径记忆时，ESWM 的预测分布发生显著改变（独立双样本 t 检验，n=5000，p<0.001；Fig. 4b）。这排除了模型仅依赖最近邻查找的可能性。
+- **记忆库密度影响**：在非最小记忆库（增加冗余转移）上训练可进一步提升性能，并使模型对超出分布的密集记忆库具有鲁棒性（Fig. 9, Fig. 4c）。
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/014_Figure_9.jpg]]
+*Figure 9: Training with non-minimal memory banks*
+
+### 消融实验
+
+**架构选择**（Fig. 2, Fig. 8）：Transformer 架构中的注意力机制是 ESWM 成功的核心。LSTM 和 Mamba 变体在 Open Arena 上过拟合，在 Random Wall 上性能显著落后。这表明并行、无位置编码的自注意力机制天然适合从无序记忆集合中动态推断关系。
+
+**注意力头数**（Table 1）：在 6 层 Transformer 上对注意力头数进行消融，发现 8 头配置在起始状态和终点状态预测上均达到最优精度。超过 8 头后性能急剧下降，可能源于过参数化导致的优化困难。
+
+**网络深度**（Fig. 2, Fig. 14）：模型深度与预测性能呈单调正相关。更深层的 Transformer 不仅预测更准确，其潜在空间的 ISOMAP 投影也显得更加连续，暗示深度有助于更充分地整合记忆信息。
+
+**噪声鲁棒性**（Section 4.3）：在记忆库中注入矛盾状态观察或错误转移结果时，ESWM 的预测准确率仅分别下降约 1% 和 10%，显示出对噪声的较强容忍度。
+
+### 导航与适应性应用
+
+基于 ESWM 的预测能力，研究者构建了可直接用于导航的规划智能体。该智能体利用 ESWM 推断任意转移的终点状态，通过自举式多步想象进行前瞻搜索，并使用 A* 算法规划路径。
+
+在 Random Wall 环境中，ESWM 导航智能体仅凭最小生成树记忆库即达到 **96.8% 的导航成功率**和 **99.2% 的路径最优性**，分别比基于强化学习的 EPN 基线高出 18 和 21 个百分点（Fig. 5b）。值得注意的是，EPN 的记忆库容量为 200 条转移（ESWM 的 10 倍以上），且前 2/3 回合用于探索填充记忆，性能仅在后 1/3 回合测量；而 ESWM 直接使用预存的最小记忆库，无需任何探索预热。
+
+在探索效率方面，ESWM 智能体访问的独特状态数比 EPN 多 16.8%，达到拥有完整障碍物知识的预言机智能体性能的 96.48%（Fig. 5a）。
+
+**环境适应性**是 ESWM 的另一关键优势。当环境结构发生变化（如添加新墙体）后，ESWM 仅需简单编辑记忆库（删除过时转移、通过探索补充新转移），无需任何参数更新，即可维持 **93% 的导航成功率**（Fig. 5c）。相比之下，未适应的固定权重基线成功率降至 56%，EPN 为 72%。这一结果直接验证了 ESWM 将环境知识存储在记忆库而非网络权重中的核心设计优势。
+
+### 大规模环境扩展
+
+为验证方法的可扩展性，ESWM 被应用于两个更大规模的环境：
+
+- **MiniGrid**（9×9 自我中心视角，程序生成环境）：ESWM-T-12L 在起始状态、动作和终点状态预测上均表现出强预测性能（Fig. 6a）。
+- **ProcThor**（3D 逼真环境，连续动作空间）：ESWM 成功学习了动作预测和状态预测任务，其潜在空间同样涌现出与物理环境对齐的空间地图（Fig. 6b）。该实验需 4 块 A100 GPU 训练 19 天，验证了方法在复杂感官输入下的可行性，但高训练成本也构成了实用化部署的瓶颈。
+
+### 失败模式与局限
+
+1. **重复状态消歧**：当环境中存在外观相同的重复状态且无历史轨迹作为上下文时，单步转移预测无法消歧。解决方案是预置包含上下文信息的轨迹片段（Fig. 7）。
+2. **连通性依赖**：记忆库必须构成连接图才能覆盖环境全貌，无法处理完全孤立的子区域（尽管可通过主动探索填充）。
+3. **启发式非可允性**：基于潜在空间测地距离的启发式函数 $h_{\mathrm{latent}}$ 可能高估真实距离，导致 A* 规划不保证最优性，需依赖经验性半径选择（Fig. 16）。
+4. **实时部署未验证**：尽管在 ProcThor 等逼真环境中展示了可行性，方法尚未在真实机器人平台上部署验证。
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/023_Figure_16.jpg]]
+*Figure 16: The latent space of ESWM can be harnessed as a heuristic for more efficient planning. All the results are on Random Wall environment with 37 locations. a) (Left) Average number of nodes expanded for different heuristics over 1000 paths. (Middle) Success rates of greedy navigation using different heuristics over 2400 paths. (Right) Success rates for greedy navigation on paths requiring detours around obstacles over 800 paths. b) (Left) Correlation between geodesic distances on*
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/013_Figure_7.jpg]]
+*Figure 7: ESWM’s evaluation accuracy in grid environments with duplicated states. A trajectory is prepended to the query transition to serve as context for disambiguating two locations with the same state. The context trajectory begins at a random state and ends at*
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/002_Figure_2.jpg]]
+*Figure 2: Evaluation accuracy in a) Open Arena and b) Random Wall. In both schematics, blue arrows are transitions in the memory bank and the q-labeled arrows are examples of query transitions*
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/007_Figure_6.jpg]]
+*Figure 6: ESWM in scaled-up environments a) (Top-Left) Examples of procedurally-generated MiniGrid environments. (Top-Right) Accuracies for*
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/008_Table_1.jpg]]
+*Table 1: ESWM-T number of heads ablation*
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/003_Figure_3.jpg]]
+*Figure 3: Spatial map emerges in ESWM’s latent space. a), b) ISOMAP projections of ESWM-T-2L’s activations for action prediction. Different columns are the same projection from different viewing angles. a) Spatial map in the absence of obstacles and b) in the presence of obstacles (a straight wall). c), d) ISOMAP projections of ESWM-T-14L’s activations. c) From left to right: A sample room with two disconnected regions whose shapes match boundaries’ shape; ESWM’s latent space when a memory bank observing either the top or bottom region is given as input; ESWM’s latent space when a memory bank observing both regions is given as input. d) From left to right: A sample room containing two disconnected re...*
+
+![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/025_Figure_17.jpg]]
+*Figure 17: Comparison of end-state prediction accuracy between EMWM Coda-Forno et al. (2022a) and Transformer-2L ESWM in RandomWall. EMWM predicts using a weighted average over the top-K matches (K=5), but we found K=1 performs best, likely due to the sparsity of our memory banks (i.e, transitions are unique, so averaging more than one transition offers no benefit). To adapt the author’s implementation to our task, we embed each token (transitional memory tokens or the end-state masked query) by averaging the embedding of each item*
+
+## 方法谱系与知识库定位
+
+### 核心范式定位：从序列世界模型到情景记忆世界模型
+
+ESWM 在认知科学与机器学习交叉地带提出了一个根本性的范式转换：将世界模型的知识载体从**网络权重**迁移至**可编辑的情景记忆库**。这一转换直接回应了传统世界模型的两大瓶颈——对连续序列数据的依赖，以及环境结构变化时的刚性。
+
+传统世界模型，如 **TEM**（Temporal Episodic Memory model, Whittington et al., ICLR 2022），将环境结构知识嵌入循环网络的隐藏状态或注意力权重中。其核心假设是：智能体通过沿时间序列逐步整合观测来构建内部表征。这一范式在稳定环境中有效，但面临三个典型失败场景（Fig. 1a）：长序列导致梯度消失、环境结构突变使已学权重失效、片段式记忆无法形成连通图。ESWM 的突破在于将输入从“顺序连接的完整遍历轨迹”改为“无序、最小生成树式的情景转移集合”，使模型不再依赖序列顺序来推断结构，而是通过注意力机制并行聚合所有记忆 token，动态推断空间关系。
+
+这一转换的深层意义在于：**世界模型不再是环境的压缩编码，而是一套可泛化的空间推理策略**。元学习框架通过随机掩码起始状态、动作或终点状态，迫使模型学习“如何从碎片中重建整体”的通用能力，而非记忆特定环境的地图。
+
+### 与情景记忆导航方法的对比
+
+**EPN**（Episodic Planning Network, Ritter et al., NeurIPS 2020）是情景记忆导航的代表性工作，其核心机制是通过强化学习训练一个策略网络，在记忆库中检索相似经验并据此决策。ESWM 与 EPN 的关键差异体现在三个层面：
+
+| 维度 | EPN (Ritter et al., NeurIPS 2020) | ESWM (本文) |
+|------|------|------|
+| 记忆使用方式 | 基于内容寻址的检索匹配 | 基于注意力机制的并行整合推理 |
+| 训练范式 | 强化学习（奖励驱动） | 元学习（预测驱动） |
+| 记忆库需求 | 200 条转移（10 倍于 ESWM） | 最小生成树记忆库（约 18-36 条） |
+| 环境适应 | 需重新探索填充记忆库 | 仅编辑少量记忆，无需参数更新 |
+
+在 Random Wall 导航任务中，ESWM 以 96.8% 的成功率和 99.2% 的路径最优性显著优于 EPN（78.8% / 78.2%），且在环境结构变化后仅通过记忆编辑即可维持 93% 成功率，而 EPN 降至 72%。这证明**推理优于检索**——当任务需要整合多条非直接相连的记忆来推断远距离转移时，注意力机制的并行聚合能力远超内容匹配的局部检索。
+
+此外，**EMWM**（Episodic Memory World Model）作为手工设计的记忆查找基线，基于精确的内容匹配进行预测，在需要多步推理的场景中完全失效（Fig. 17），进一步验证了学习性整合机制的必要性。
+
+### 架构选择的深层含义：注意力即推理
+
+ESWM 对三种序列架构（Transformer、LSTM、Mamba）的系统对比揭示了关键洞见：**注意力机制是实现情景记忆推理的必要条件**。LSTM 和 Mamba 在 Open Arena 上严重过拟合，在 Random Wall 上与 Transformer 存在显著差距（Fig. 2, Fig. 8）。这一结果并非偶然——LSTM 的顺序处理特性使其倾向于记忆转移序列而非学习空间关系，而 Transformer 的无位置编码自注意力机制天然适合对无序记忆集合进行全局关系建模。
+
+消融实验进一步证实：注意力头数增加至 8 头时预测精度最优，超过 8 头后性能急剧下降（Table 1）；模型深度与性能呈单调正相关，更深层的潜在空间在 ISOMAP 投影中更加连续（Fig. 14）。这表明**多头注意力在并行整合多条记忆时实现了“软性图搜索”**——每个头可能关注不同的转移链，最终通过聚合形成对空间结构的全局推断。
+
+### 适用边界与局限
+
+ESWM 的能力边界由以下约束定义：
+
+**1. 连通性约束**：记忆库必须构成覆盖环境的连通图。当环境存在完全孤立的子区域且无桥接转移时，模型无法推断区域间的空间关系。这一约束源于方法的根本假设——所有推理必须基于记忆库中存在的转移链进行整合。
+
+**2. 状态歧义问题**：当环境中存在重复状态且无历史轨迹作为上下文时，单步转移预测无法消歧。例如，两个视觉上相同的走廊交叉口需要额外的轨迹上下文来区分（Fig. 7）。这揭示了情景记忆的一个深层局限：**单步转移的马尔可夫性质在感知混叠环境中不足以唯一确定空间位置**。
+
+**3. 启发式可允性缺失**：从潜在空间最近邻图计算得到的启发式函数 $h_{\text{latent}}$ 可能高估真实测地距离，为非可允启发式，因此 A* 规划不保证最优性。实际使用中需依赖经验性半径选择来平衡效率与可允性（Fig. 16）。
+
+**4. 高维感官输入的扩展成本**：ProcThor 实验（3D 真实感环境、连续动作空间）虽验证了方法在大规模场景中的可行性，但训练成本高昂（4 块 A100 训练 19 天），且未在真实机器人上部署验证。从网格世界的抽象状态到高维视觉输入的表征学习，仍存在显著的工程鸿沟。
+
+### 开放问题与未来方向
+
+**1. 空间地图的涌现条件**：ESWM 的潜在空间经 ISOMAP 投影后展现出与物理环境一致的几何结构（Fig. 3, Fig. 12），包括障碍物导致的断裂区域，且在所有预测任务和部分观察下均稳定出现。这一现象提出了一个根本性问题：**空间认知地图能否在未明确训练导航任务、仅基于有限情景记忆的通用预测模型中自然涌现？** 这触及认知科学中“认知地图”的本质——它是否是空间推理的必然副产品，而非导航特化的功能模块。
+
+**2. 自适应启发式半径**：当前 $h_{\text{latent}}$ 依赖固定半径的最近邻图构建，如何在规划过程中动态调整半径以实现效率与可允性的最优平衡，是一个兼具理论与实践价值的问题。可能的路径包括基于预测熵的不确定性估计来动态缩放搜索范围。
+
+**3. 真实感知场景的扩展**：在更复杂的高维感官输入（如激光雷达点云、多相机 RGB-D 流）下，ESWM 的表征质量与可扩展性尚未验证。关键挑战在于：如何将原始感知信号映射到适合情景记忆检索与整合的表示空间，同时保持空间结构的可解释性。
+
+**4. 终身学习与记忆巩固**：当前 ESWM 的记忆编辑依赖人工检测环境变化并手动增删转移。如何实现自动化的变化检测、记忆冲突解决与记忆巩固（如将频繁使用的转移链压缩为“捷径记忆”），是通向终身学习智能体的关键一步。
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/Building_spatial_world_models_from_sparse_transitional_episodic_memories_1e9241541b44.pdf]]

@@ -1,0 +1,113 @@
+{
+  "created": "2026-05-24T15:08:21.900832+00:00",
+  "script": "scripts/modebug_build_hml_original100_inputs.py",
+  "selection_seed": "modebug_hml_original100_20260524_bucket_quota_hash_v1",
+  "selection_policy": "bucket_quota_hash_v1 over HumanML3D full-motion caption rows only",
+  "data_root": "linkedCodebases/datasets/HumanML3D/HumanML3D",
+  "target_counts": {
+    "train": 80,
+    "test": 20
+  },
+  "bucket_quotas": {
+    "train": {
+      "simple_locomotion": 8,
+      "direction_turn": 8,
+      "stop_go": 8,
+      "sit_squat_posture": 8,
+      "jump_kick": 8,
+      "upper_body_gesture": 8,
+      "object_interaction": 8,
+      "count_duration_speed": 8,
+      "multi_action_composition": 8,
+      "dance_exercise": 8
+    },
+    "test": {
+      "simple_locomotion": 2,
+      "direction_turn": 2,
+      "stop_go": 2,
+      "sit_squat_posture": 2,
+      "jump_kick": 2,
+      "upper_body_gesture": 2,
+      "object_interaction": 2,
+      "count_duration_speed": 2,
+      "multi_action_composition": 2,
+      "dance_exercise": 2
+    }
+  },
+  "candidate_counts": {
+    "train": 67132,
+    "test": 12534
+  },
+  "selected_counts": {
+    "train": 80,
+    "test": 20
+  },
+  "selected_primary_bucket_counts": {
+    "simple_locomotion": 10,
+    "direction_turn": 10,
+    "stop_go": 10,
+    "sit_squat_posture": 10,
+    "jump_kick": 10,
+    "upper_body_gesture": 10,
+    "object_interaction": 10,
+    "count_duration_speed": 10,
+    "multi_action_composition": 10,
+    "dance_exercise": 10
+  },
+  "picked_by_bucket": {
+    "train": {
+      "simple_locomotion": 8,
+      "direction_turn": 8,
+      "stop_go": 8,
+      "sit_squat_posture": 8,
+      "jump_kick": 8,
+      "upper_body_gesture": 8,
+      "object_interaction": 8,
+      "count_duration_speed": 8,
+      "multi_action_composition": 8,
+      "dance_exercise": 8
+    },
+    "test": {
+      "simple_locomotion": 2,
+      "direction_turn": 2,
+      "stop_go": 2,
+      "sit_squat_posture": 2,
+      "jump_kick": 2,
+      "upper_body_gesture": 2,
+      "object_interaction": 2,
+      "count_duration_speed": 2,
+      "multi_action_composition": 2,
+      "dance_exercise": 2
+    }
+  },
+  "filters": {
+    "caption_time_tags": "f_tag == 0.0 and to_tag == 0.0",
+    "caption_word_count": "4 <= words <= 45",
+    "required_assets": [
+      "texts/{id}.txt",
+      "new_joints/{id}.npy",
+      "new_joint_vecs/{id}.npy"
+    ],
+    "unique_motion_id": true,
+    "text_rewrite": false,
+    "event_decomposition": "not generated"
+  },
+  "outputs": {
+    "sample_manifest": "paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/inputs/hml_original100_sample_manifest.tsv",
+    "prompts_with_ids": "paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/inputs/hml_original100_prompts_with_ids.tsv",
+    "prompts_txt": "paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/inputs/hml_original100_prompts.txt"
+  },
+  "output_sha256": {
+    "sample_manifest": "64eec924fc37e0da57c7fcbae8fd34a971739b46e97487466f01008c258a63fe",
+    "prompts_with_ids": "7c2f3f8fb49c0b16aa67a8c9da3dbeb059d149e52a2e1959900039e287aa87ed",
+    "prompts_txt": "45a8868bf1d7887653cfff87905e6f22954eec5712bf239dbc5921323ed5b6be"
+  },
+  "role": "diagnostic",
+  "used_for": "failure_bank_construction;baseline_artifact_observation;failure_family_selection;trace_hypothesis_prep",
+  "limitations": [
+    "Original100 is not a benchmark, final test set, or dataset contribution.",
+    "Train-source rows do not establish held-out generalization.",
+    "Test-source rows are sanity checks unless an independent held-out evaluator is predefined.",
+    "Decomposed text is intentionally not generated in this step."
+  ]
+}

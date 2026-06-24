@@ -1,0 +1,331 @@
+---
+title: "Instilling an Active Mind in Avatars via Cognitive Simulation"
+type: paper
+paper_level: A
+venue: ICLR
+year: 2026
+pdf_ref: paperPDFs/ICLR_2026/Instilling_an_Active_Mind_in_Avatars_via_Cognitive_Simulation.pdf
+openreview_forum_id: 80JylHgQn1
+aliases:
+- DSCSFP
+- IAMACS
+tags:
+- ICLR_2026
+- topic/benchmarks_datasets_evaluation
+- topic/benchmarks_datasets_evaluation/benchmark_eval
+core_operator: "引入多模态大语言模型（MLLM）进行显式认知规划（双阶段分析器+规划器），产生高层次语义动作指导；同时采用伪最后一帧策略（pseudo‑last‑frame）解除静态参考图像对动态运动的强约束，实现兼顾身份一致性与运动表现力的生成。"
+primary_logic: "受双过程理论（系统1/系统2）启发，首次将化身生成建模为“审慎规划→反应式合成”的双系统协同过程：利用MLLM模拟系统2的语义推理以生成语境一致的动作规划，再通过对称多模态DiT（MMDiT）架构与专门训练策略有效融合高层语义与低层视听信号，解决模态冲突。"
+claims:
+- "引入推理模块使主观偏好评分提升29%（GSB +0.29），并显著降低运动不自然感（MU 0.58→0.37）。"
+- "手势关键点方差（HKV）随着推理模块的移除而持续下降，表明运动表现力与语义规划强相关。"
+- "所提条件化方案在主观指标上全面优于先进基线OmniHuman‑1（LSI 0.21→0.03, MU 0.39→0.25, GSB ‑0.23→+0.23）。"
+- "CyberHost test set (full‑body animation) 上 HKV (Hand Keypoint Variance) = 72.113"
+---
+
+# Instilling an Active Mind in Avatars via Cognitive Simulation
+
+> [!tip] 核心洞察
+> 受双过程理论（系统1/系统2）启发，首次将化身生成建模为“审慎规划→反应式合成”的双系统协同过程：利用MLLM模拟系统2的语义推理以生成语境一致的动作规划，再通过对称多模态DiT（MMDiT）架构与专门训练策略有效融合高层语义与低层视听信号，解决模态冲突。
+
+| 字段 | 内容 |
+| ------ | ------ |
+| 中文题名 | 基于认知模拟的虚拟化身主动思维赋予方法 |
+| 英文题名 | Instilling an Active Mind in Avatars via Cognitive Simulation |
+| 会议/期刊 | ICLR 2026 (Oral) |
+| Links | [paper](https://openreview.net/forum?id=80JylHgQn1); [Project](https://omnihuman-lab.github.io/v1_5/) |
+| Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
+| Method | Dual-System Cognitive Simulation Framework (Proposed) |
+| Dataset | CyberHost test set (full‑body animation), Multi‑person interaction benchmark, Subjective evaluation vs. commercial baselines |
+
+> [!tip] 效果简介
+> - CyberHost test set (full‑body animation) 上，HKV (Hand Keypoint Variance) 为 72.113，对比 47.561 (OmniHuman‑1)，变化 +24.552。
+> - Multi‑person interaction benchmark 上，GSB (Good/Same/Bad user preference score) 为 +0.26，对比 -0.26 (Ours w/o Reasoning)，变化 +0.52。
+> - Subjective evaluation vs. commercial baselines 上，Top‑1 user preference 为 33%，对比 22% (OmniHuman‑1)，变化 +11%。
+
+## 概述
+
+**问题瓶颈**：现有视频化身模型本质上仅捕捉音频‑运动间的低层相关性，缺乏对情感、意图等高层次语义的理解与规划能力，导致生成的行为在语境合理性、逻辑连贯性和表达丰富性上存在显著不足。
+
+**核心思路**：受认知心理学双过程理论（系统1/系统2）启发，本文提出**双系统认知模拟框架**，首次将化身生成建模为“审慎规划→反应式合成”的协同过程。其中，系统2由多模态大语言模型（MLLM）代理实现，通过对多模态输入的显式推理生成结构化的高层语义动作计划；系统1则采用对称多模态DiT（MMDiT）架构，将高层语义指导与低层视听信号进行统一融合，并辅以伪最后一帧策略和模态预热训练解决模态冲突与身份‑运动权衡。
+
+**方法定位**：该方法在方法谱系上属于**认知驱动型音频‑视觉生成**，区别于传统端到端反应式映射（如SadTalker、Hallo、EchoMimic、OmniHuman-1等），其核心创新在于引入显式语义推理层作为运动规划器，并将身份保持机制从静态参考注意力重构为时序目标约束。
+
+**主要结果**：
+- 引入推理模块使主观偏好评分提升29%（GSB +0.29），运动不自然感从0.58降至0.37。
+- 手势关键点方差（HKV）随推理模块移除而持续下降（168.9→122.4），证实运动表现力与语义规划强相关。
+- 所提条件化方案在主观指标上全面优于OmniHuman-1（LSI 0.21→0.03，MU 0.39→0.25，GSB -0.23→+0.23）。
+- 在用户偏好研究中，本方法以33%的Top-1选择率领先OmniHuman-1（22%）及其他基线。
+
+**局限性**：合成层面存在快速运动下的手部伪影和大角度转头时的身份退化；推理层面MLLM代理偶尔产生过度夸张的动作，且推理过程引入约20‑30秒额外延迟。
+
+## 背景与动机
+
+### 问题背景
+
+数字人化身（Avatar）生成旨在根据音频输入驱动静态肖像或全身图像产生自然的说话动作，在虚拟主播、影视制作、在线教育等领域具有广泛应用。近年来，基于扩散模型（Diffusion Models）和变换器（Transformer）架构的视频生成方法取得了显著进展，使得化身动画在视觉质量、唇音同步精度等方面达到了较高水平。
+
+然而，现有方法存在一个根本性瓶颈：**它们仅捕捉低层音频‑运动相关性，缺乏对情感、意图等高层次语义的理解与规划能力**。传统方法（如 SadTalker、Hallo、EchoMimic、Loopy 等）本质上模拟了一种“反应式”行为模式——直接建立音频特征到面部关键点或像素的映射，类似于认知心理学双过程理论中的“系统1”（System 1）：快速、自动、无需深度思考。这种机制虽然能较好地完成唇音同步等局部任务，但在面对复杂语境时，生成的动作往往表现出语义脱节、逻辑不连贯和表达单一等问题——例如，无论说话内容是愤怒抗议还是温和安慰，手势和表情可能趋同，缺乏语境感知的差异化表达。
+
+### 现有方法缺口
+
+当前主流化身生成方法在以下三个维度上存在显著不足：
+
+**1. 语义理解缺失。** 现有模型仅依赖低层音频特征（如梅尔频谱、Whisper 编码特征）驱动运动生成，未能显式建模说话内容的情感色彩、意图结构和叙事逻辑。这导致生成的动作缺乏高层次语境一致性——例如，在表达疑问、强调或讽刺时，手势和表情无法做出相应调整。
+
+**2. 参考图像条件困境。** 为保持身份一致性，现有方法通常将参考图像作为直接条件注入模型（如通过参考注意力机制）。然而，这种策略存在内在矛盾：若采样与目标片段高度相关的参考帧，模型倾向于直接复制静态图像，导致运动幅度极小；若采样不相关帧，则身份一致性难以保证。这一困境在长序列生成中尤为突出，表现为“重置效应”——模型在每帧都试图回归参考图像的静态姿态。
+
+**3. 多模态融合冲突。** 当试图将文本语义、音频信号和视觉信息同时注入生成模型时，不同模态之间存在干扰。传统的交叉注意力（cross‑attention）融合方式将音频/文本作为外部条件注入视频分支，这种非对称设计限制了模态间的充分交互，容易导致唇音同步与运动表现力之间的权衡困境。
+
+### 核心洞察与动机
+
+受认知心理学**双过程理论**（Dual‑Process Theory）启发，本文提出将化身生成建模为“审慎规划→反应式合成”的双系统协同过程：
+
+- **系统2（审慎规划）**：利用多模态大语言模型（MLLM）对输入的多模态信息（参考图像、音频、文本提示）进行显式认知推理，生成结构化的高层次动作计划——类似于人类在说话前的“思考”过程，决定表达的情感基调、手势风格和节奏变化。
+- **系统1（反应式合成）**：在高层语义计划的指导下，通过专门的对称多模态扩散变换器（MMDiT）将语义指导与低层视听信号融合，执行快速、流畅的运动合成——类似于人类的“执行”过程。
+
+这一双系统设计的关键优势在于：通过显式解耦“规划”与“合成”，使得模型既能保持语境感知的语义一致性（系统2的贡献），又能继承扩散模型在视觉质量和唇音同步方面的优势（系统1的贡献）。同时，针对参考图像条件困境和多模态融合冲突，本文提出了**伪最后一帧策略**（Pseudo Last Frame）和**对称音频分支设计**作为配套解决方案，从架构层面解除静态约束并实现模态间的平等交互。
+
+## 核心创新
+
+本文的核心贡献在于首次将认知科学中的**双过程理论**（系统1/系统2）引入化身生成任务，将传统“音频→运动”的单一反应式映射重构为**“审慎规划→反应式合成”的双系统协同框架**。这一范式转变从根本上改变了模型对语义语境的理解和响应方式，其关键创新体现在以下四个紧密耦合的“changed slots”上。
+
+### 1. 高层次语义控制：从反应式映射到审慎规划
+
+现有方法（如 SadTalker、Hallo、OmniHuman‑1 等）仅依赖低层音频特征直接驱动运动（系统1），这导致生成的行为在语境合理性上存在根本性缺陷——模型无法理解说话内容的情感、意图与逻辑结构，只能产生重复、与语义脱节的动作。
+
+本文的核心突破在于引入**基于多模态大语言模型（MLLM）的双阶段认知推理模块**（系统2），显式生成高层次语义动作计划。该模块由两个协同工作的MLLM代理构成：
+- **分析器**（Analyzer）：接收参考图像、音频及文本提示，通过分步引导性提问推断说话内容、情感状态和意图，输出结构化JSON对象。
+- **规划器**（Planner）：基于分析器的JSON输出，生成以分镜（shot）为单位的详细动作计划，确保跨时间段的角色行为一致性。
+
+这一推理模块产生的“reasoning text”作为高层语义条件注入合成管线，使模型首次具备了语境感知的行为规划能力。消融实验提供了决定性证据：**移除整个推理模块后，手势关键点方差（HKV）从168.912骤降至122.376**（Table 1），同时主观运动不自然感（MU）从0.37上升至0.58，整体偏好评分（GSB）从+0.29反转为‑0.29（Table 2a）——这直接证实了语义规划是运动表现力的核心驱动力。
+
+### 2. 参考图像条件策略：从静态约束到伪最后一帧
+
+传统方法在训练时采样参考图像作为直接条件以保持身份一致性，但这带来了一个根本性困境（Figure 3）：采样与目标片段高度相关的参考帧会导致模型学会“复制”静态图像，产生僵硬的结果；采样不相关的参考帧则会引发身份漂移和内容突变。
+
+本文提出的**伪最后一帧策略**（Pseudo Last Frame, PLF）彻底解除了这一约束：
+- **训练阶段**：完全丢弃参考图像，改用视频片段的首尾帧作为条件，并以概率0.1随机丢弃，迫使模型学习动态运动而非静态复制。
+- **推理阶段**：将用户参考图像放置在最后一帧位置，并对其RoPE位置编码施加固定时间偏移，使其成为模型生成的“身份目标”而非“复制源”。
+
+这一设计的巧妙之处在于：模型在训练中学会的是“从首帧到末帧的过渡生成”，推理时参考图像被重新定义为“期望达到的末帧”，从而在保持身份一致性的同时释放了大幅度的动态运动能力。消融实验显示，**取消PLF会导致长序列生成中严重的身份漂移及场景内容突变**（Section E）。
+
+### 3. 多模态融合方式：从交叉注意力到对称联合建模
+
+现有方法普遍采用交叉注意力（cross‑attention）将音频/图像特征单向注入视频生成分支，这种非对称设计限制了模态间的深层交互。本文在MMDiT架构中引入了**与视频、文本分支完全对称的专用音频分支**，所有分支的token拼接后通过共享自注意力（self‑attention）进行统一联合建模。
+
+这一设计的优势在于：音频、文本、视频三类模态在每一层Transformer中平等参与注意力计算，使得高层语义（来自推理文本）与低层视听信号（来自音频和参考图像）能够无缝融合。消融实验给出了强有力的对比证据：**将对称融合替换为交叉注意力后，HKV从168.912骤降至116.317**，同时唇音同步指标（Sync‑C）也出现下降（Table 1），表明对称融合对运动表现力和视听对齐均有显著贡献。
+
+### 4. 训练策略：两阶段模态预热（MM‑Warmup）
+
+直接端到端联合训练所有模态分支会面临严重的模态冲突：音频分支需要学习唇音同步等核心能力，而视频/文本分支已具备强大的生成先验，联合训练容易导致灾难性遗忘或次优收敛。
+
+本文提出的**两阶段预热策略**有效解决了这一问题：
+- **阶段1**：联合训练三个分支，迫使音频分支在无预训练先验干扰的情况下习得核心能力（如唇音同步）。
+- **阶段2**：载入原始视频/文本分支权重与阶段1的音频分支权重，再微调整体模型。
+
+这一策略的关键在于：先让音频分支获得“惯性专长”，再与其他分支协同优化，避免了模态间的相互干扰。消融实验证实，**取消MM‑Warmup会导致运动动态减弱和手部生成质量显著下降**（Section E），表明该策略对模型充分释放动态表达能力具有支撑作用。
+
+### 创新协同效应
+
+上述四个创新并非孤立存在，而是形成了紧密的因果链条：**MLLM推理模块**提供语义规划的上层建筑，**对称MMDiT融合**确保高层语义与低层信号的有效整合，**伪最后一帧策略**解除静态约束以释放运动自由度，**MM‑Warmup**则保障了多模态训练的稳定性。这一协同效应在主观评估中得到了充分验证：与当前领先方法OmniHuman‑1相比，本文方法在唇音不一致（LSI 0.21→0.03）、运动不自然感（MU 0.39→0.25）和整体偏好（GSB ‑0.23→+0.23）上均实现了大幅超越（Table 2b）。
+
+## 整体框架
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/002_Figure_2.jpg]]
+*Figure 2: The Dual-System Simulation Framework. Our framework models avatar behavior by integrating a deliberative System 2 for planning with a reactive System 1 for synthesis. Left: Overall Pipeline. An MLLM-based System 2 reasons over multimodal inputs (audio, image, text) to generate a high-level “schedule”. This schedule guides the System 1 MMDiT, which synthesizes the final video by fusing information through dedicated text, audio and video branches. Right: Key Components. (a) The System 2 reasoning pipeline, comprising an MLLM Analyser and Planner. (b, c) Our proposed MM-Branch Warm-up and Pseudo Last Frame strategies, designed to mitigate modal conflicts*
+
+本文提出的双系统认知模拟框架将化身行为生成建模为“审慎规划 → 反应式合成”的双阶段过程，其灵感源自认知心理学中的双过程理论（系统1/系统2）。框架整体由两大核心子系统构成：负责高层语义推理的**MLLM代理推理模块**（系统2），以及负责多模态融合与视频生成的**对称MMDiT合成模块**（系统1）。
+
+**输入输出流**：系统接收三模态输入——角色参考图像、音频片段、可选的文本提示。MLLM代理首先对这些输入进行跨模态语义分析，生成结构化的高层动作计划（reasoning text）；该计划随后作为文本条件注入MMDiT，与音频特征、视频潜变量一同送入对称多模态扩散变换器，最终合成语义一致、动态丰富的化身视频。
+
+**代理推理管线（系统2）**采用双阶段MLLM流水线，具体由两个专用代理串联构成（Figure 2, 右上）：
+
+1. **分析器（Analyzer）**：接收参考图像、图像描述、音频及用户提示，通过分步引导性提问推断角色的说话内容、情感状态和行为意图，并将分析结果整合为结构化JSON对象。
+2. **规划器（Planner）**：基于分析器的JSON输出，结合场景上下文生成以“分镜（shot）”为单位的详细动作计划，确保跨时间段的角色行为一致性与逻辑连贯性。
+
+这一显式推理机制的核心价值在于：它将传统方法中隐式、反应式的音频-运动映射，替换为可解释的高层语义指导，从而赋予化身“主动思考”的能力。
+
+**反应式合成管线（系统1）**以预训练的MMDiT为骨干，针对化身生成任务进行了三项关键改造（Figure 2, 左）：
+
+1. **对称音频分支**：在原有视频分支和文本分支之外，引入架构对称的专用音频分支。三类模态的token在每个Transformer块内通过拼接后送入统一的共享多头自注意力（self-attention）进行联合建模，替代了传统方法中单向的交叉注意力（cross-attention）融合方式。这一设计使音频、文本语义与视觉特征在每一层都能充分交互，有效缓解模态冲突。
+
+2. **伪最后一帧（Pseudo Last Frame, PLF）条件化**：训练阶段完全丢弃参考图像，改为以概率0.1随机丢弃的真值首尾帧作为条件；推理阶段将用户参考图像置于最后一帧位置，并对其RoPE位置编码施加固定时间偏移，使其成为模型需要“抵达”的身份目标，而非静态复制源。这一策略解除了传统参考注意力对动态运动的强约束，在保持身份一致性的同时释放运动表现力。
+
+3. **两阶段模态预热（MM-Warmup）**：阶段1联合训练三个分支，迫使音频分支习得唇音同步等核心能力；阶段2以原始视频/文本分支权重与阶段1的音频分支权重初始化，再对完整模型进行微调。该策略有效避免了多模态联合训练初期的相互干扰与灾难性遗忘。
+
+**数据流与协同机制**：整个框架的数据流可概括为“语义规划先行，多模态合成跟进”。MLLM代理输出的reasoning text通过文本分支注入MMDiT，与音频分支提取的韵律特征、视频分支的时空潜变量在共享自注意力中深度融合。这一设计使系统2的高层语义推理能够直接调控系统1的低层运动生成，实现了从“听到什么就动什么”到“理解语境后再行动”的范式跃迁。
+
+> **需要手动验证的点**：关于MMDiT骨干的具体预训练细节（如基础模型版本、预训练数据规模）在已有分析材料中未明确给出，建议查阅原文Section 3.1获取精确信息。
+
+## 核心模块与公式推导
+
+本文提出的双系统认知模拟框架在方法层面引入了四个关键模块，分别对应高层语义规划与低层视听合成中的瓶颈突破。以下逐一阐述各模块的设计逻辑与技术细节。
+
+### 系统2：基于MLLM的双阶段认知推理
+
+传统音频驱动化身模型仅依赖低层音频‑运动映射（系统1），缺乏对情感、意图等高层次语义的理解。本文引入多模态大语言模型（MLLM）作为系统2，通过显式的认知推理生成结构化的动作计划，为后续合成提供语义指导。
+
+推理管线由两个串行的MLLM代理构成：
+
+- **分析器（Analyzer）**：接收参考图像、图像描述、音频及用户文本提示，通过分步引导性提问推断说话内容、情感状态和意图，输出结构化JSON对象。
+- **规划器（Planner）**：基于分析器的JSON输出，生成以“镜头（shot）”为单位的详细动作计划，确保跨时间段的角色行为一致性。
+
+该管线输出的推理文本（reasoning text）作为高层语义条件，注入后续的合成模块。消融实验表明，移除推理模块使手势关键点方差（HKV）从168.912骤降至122.376，主观运动不自然感（MU）从0.37升至0.58，整体偏好分数（GSB）从+0.29逆转为‑0.29（Table 1, Table 2(a)），证实语义规划对运动表现力的强因果关联。
+
+### 系统1：对称多模态DiT架构
+
+为有效融合高层语义文本与低层视听信号，本文在MMDiT（Multimodal Diffusion Transformer）骨干中引入与视频、文本分支架构对称的专用音频分支。三类模态的token在每个Transformer块内拼接后，通过共享多头自注意力（self‑attention）进行统一联合建模，替代传统方案中音频/图像特征通过交叉注意力注入视频分支的做法。
+
+消融实验中，将对称音频融合替换为交叉注意力后，HKV从168.912骤降至116.317，唇音同步指标Sync‑C也从4.087降至3.263（Table 1），表明共享自注意力机制在保留运动表现力与视听同步方面具有显著优势。
+
+### 伪最后一帧（Pseudo Last Frame）策略
+
+参考图像条件面临两难困境：若采样与目标片段高度相关的参考帧，模型倾向于输出静态结果；若采样不相关帧，则导致身份漂移。本文提出**伪最后一帧（PLF）**策略来解决此问题。
+
+具体而言，训练阶段完全丢弃参考图像，以概率0.1随机丢弃GT首尾帧作为条件；推理阶段将用户参考图像置于最后一帧位置，形成“伪最后一帧”，并对其RoPE位置编码施加固定时间偏移。该设计将参考图像从“身份约束”重新定义为“身份目标”，使模型在保持身份一致性的同时获得大幅动态运动的自由度。
+
+消融实验表明，取消PLF会导致长序列生成中出现严重的身份漂移及场景内容突变（Section E），验证了该策略对身份‑运动平衡的关键作用。
+
+### 两阶段模态预热（MM‑Warmup）
+
+直接端到端联合训练所有模态分支容易引发模态间相互干扰和灾难性遗忘。本文提出两阶段预热策略：
+
+- **阶段1**：联合训练视频、文本、音频三个分支，迫使音频分支习得唇音同步等核心能力。
+- **阶段2**：以原始视频/文本分支权重初始化，载入阶段1的音频分支专长权重，再对整体模型进行微调。
+
+该策略使音频分支在获得惯性专长后与其他模态平稳融合。视觉消融显示，取消MM‑Warmup导致运动动态减弱和手部生成质量显著下降（Section E），表明预热机制对模态协同具有不可替代的作用。
+
+### 公式说明
+
+本文未引入新的数学公式。模型核心基于扩散变换器（DiT）的标准去噪范式，其训练目标为常规的噪声预测损失。各模块的创新集中在架构设计、条件策略与训练流程层面，不涉及公式层面的推导或修改。
+
+## 实验与分析
+
+### 消融实验：推理模块与条件化设计的因果验证
+
+消融实验从客观指标（Table 1）和主观偏好（Table 2）两个维度，系统验证了双系统框架中核心组件的因果贡献。
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/004_Table_1.jpg]]
+*Table 1: Ablation studies on our proposed framework*
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/005_Table_2.jpg]]
+*Table 2: Pairwise subjective ablation study and component comparison. We report Lipsync Inconsistency (LSI), Motion Unnaturalness (MU), Image Distortion (ID), and an overall Good/Same/Bad preference score (GSB). Lower is better for LSI, MU, and ID*
+
+**推理模块的消融揭示了语义规划对运动表现力的决定性作用。** 当完整移除推理模块（System 1 Only）时，手势关键点方差（HKV）从 168.912 骤降至 122.376，表明生成的动作丧失了丰富的动态变化。主观评价同样印证了这一发现：移除推理后，运动不自然感（MU）从 0.37 显著恶化至 0.58，整体偏好分数 GSB 从 +0.29 反转为 ‑0.29（Table 2(a)）。若仅移除多步推理而保留分析器，HKV 降至 157.638，说明分阶段的语义推理链对动作多样性有增量贡献。这些结果共同指向一个因果链条：MLLM 代理产生的高层语义规划是驱动手势表现力的关键控制变量，缺少这一信号，模型退化为仅依赖音频‑运动相关性的反应式映射，生成的动作趋于单调和机械。
+
+**条件化架构的三个创新点各自承担不可替代的角色。** 将对称音频融合替换为交叉注意力（Cross‑Attention）后，HKV 暴跌至 116.317，唇音同步（Sync‑C）也从 4.087 下降至 3.263，证明对称自注意力机制在模态融合效率上显著优于传统交叉注意力方案。取消 MM‑Warmup 两阶段预热策略导致运动动态性减弱和手部生成质量下降，说明该策略有效避免了音频分支与其他分支之间的模态冲突和灾难性遗忘。取消 Pseudo Last Frame（PLF）条件则引发长序列生成中的严重身份漂移和场景内容突变，验证了其在解除静态参考图像约束、平衡身份一致性与运动自由度方面的关键作用。
+
+### 主观偏好研究：与学术基线和商业系统的全面对比
+
+主观评估采用双盲配对比较，40 名参与者从唇音不一致（LSI）、运动不自然感（MU）、图像失真（ID）和整体偏好（GSB）四个维度进行评判。
+
+**与 OmniHuman‑1 的对比凸显了所提条件化方案的优势。** Table 2(b) 显示，在相同推理模块下，本文提出的条件化方案（Proposed）相较于 OmniHuman‑1 的条件化方案，在 LSI（0.03 vs. 0.21）、MU（0.25 vs. 0.39）和 GSB（+0.23 vs. ‑0.23）上均取得大幅领先。这验证了伪最后一帧策略和对称 MMDiT 融合在生成质量上的实质性提升。
+
+**在多人物动画场景下，完整模型展现出显著的行为协调能力。** Table 3 表明，完整模型在多人物交互基准上取得 GSB +0.26，而移除推理的变体仅为 ‑0.26，两者差距达 0.52。同时，完整模型的驱动精度（DA）达到 0.94，运动不自然感（MU）低至 0.12，说明推理模块对多人场景中的对话轮次理解和协调行为生成至关重要。
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/006_Table_3.jpg]]
+*Table 3: Comparison with existing methods on multi-person animation. We report quantitative metrics and pairwise subjective evaluation results, including Driving Accuracy (DA), Lip-sync Inconsistency (LSI), Motion Unnaturalness (MU) and an overall user preference score derived from a Good/Same/Bad (GSB) evaluation*
+
+**最佳选择任务（Top‑1）中，本文方法以 33% 的偏好率领先所有学术基线。** Figure 5（左表）显示，OmniHuman‑1 以 22% 位居第二，MultiTalk 以 18% 位居第三，其余方法均低于 15%。在与商业系统的 GSB 配对比较中，本文方法同样表现出竞争力。
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/010_Figure_5.jpg]]
+*Figure 5: Subjective User Preference Study. We present results from two evaluation settings: (Left) a best-choice selection task comparing our method against academic baselines, and (Right) a GSB pairwise comparison against leading proprietary models*
+
+### 全身动画与肖像动画的定量对比
+
+Table 4 展示了在标准基准上的定量结果。在 CyberHost 全身动画测试集上，本文方法取得最高的 HKV（72.113），远超 OmniHuman‑1 的 47.561，印证了其在生成大幅度、动态运动方面的优势。在 CelebV‑HQ 肖像动画测试集上，本文方法的 FID（31.320）在所有对比方法中最低，Sync‑C（5.053）具有竞争力，ASE（2.663）最高，说明在保持唇音同步的同时，生成质量和解剖结构保真度均达到领先水平。
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/007_Table_4.jpg]]
+*Table 4: Quantitative comparison with audio-conditioned animation baselines. (Left) Portrait animation on the CelebV-HQ test set. (Right) Full-body animation on the CyberHost test set*
+
+### 失败模式与局限性
+
+Figure 13 系统展示了方法的局限性，分为合成层面和推理层面两类。
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/026_Figure_13.jpg]]
+*Figure 13: Limitations of our method. Despite its strong performance, our method exhibits limitations in both synthesis and reasoning. On the synthesis level, the model can struggle with fine details during rapid movements, leading to hand artifacts (row 1) and degraded facial identity during large head turns (row 2). Separately, on the reasoning level, the agent can generate motions that, while plausible, are occasionally over-articulated (e.g., excessive gesturing), lacking the subtlety required for cinematic performance*
+
+**合成层面**，模型在快速运动时容易出现手部细节伪影，在大角度头部转动时面部身份一致性下降，偶尔出现身份漂移。这些失败模式与 DiT 骨干在极端姿态和快速运动下的生成能力边界有关，需要更大规模、更高质量的训练数据来缓解。
+
+**推理层面**，MLLM 代理有时会生成过度夸张的手势动作，缺乏影视级表演所需的细腻与内敛。这表明当前的语义规划粒度尚不足以捕捉人类行为中的微妙变化，未来需要更精细的动作描述语言或更强的推理约束。此外，代理推理过程引入约 20–30 秒的额外延迟，虽然论文认为在非交互场景下可接受，但对于实时应用仍需优化。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/008_Table_5.jpg]]
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/013_Table_7.jpg]]
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/014_Table_8.jpg]]
+*Table 8: Illustrating the Reasoning Process for the Sample in Row 2*
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/016_Table_5.jpg]]
+*Table 5: MLLM-based Evaluation. Pairwise comparison results (GSB Score) with individual scores for Overall Quality, Prompt Following, and Motion-Context Coherence*
+
+![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/017_Table_6.jpg]]
+*Table 6: Subjective Evaluation vs. Wan2.2-S2V. Subjective evaluation against Wan2.2-S2V, including a GSB preference score (Which is better?) and a pairwise comparison of artifacts (Which is less bad?)*
+
+## 方法谱系与知识库定位
+
+### 问题定位：从反应式映射到认知驱动
+
+现有音频驱动化身生成方法——包括 **SadTalker**、**Hallo**、**EchoMimic**、**Loopy**、**Hallo-3**、**OmniHuman-1**、**Skyreel-A1**、**FantasyTalking**、**OmniAvatar**、**MultiTalk**、**InterActHuman** 以及 **Wan2.2-S2V**——均建立在单一“系统1”范式之上：模型仅学习音频信号到面部/身体运动的低层统计映射。这类方法的根本瓶颈在于**缺乏对情感、意图、语境等高层次语义的理解与规划能力**，导致生成的行为在语境合理性、逻辑连贯性和表达丰富性上存在显著不足。具体表现为：同一段音频在不同语境下产生几乎相同的运动模式，无法区分“愤怒地挥手”与“热情地打招呼”之间的语义差异。
+
+本文提出的双系统认知模拟框架（Dual-System Cognitive Simulation Framework）首次将化身生成建模为“审慎规划→反应式合成”的协同过程，其核心洞察受认知心理学中的双过程理论（系统1/系统2）启发：利用多模态大语言模型（MLLM）模拟系统2的语义推理以生成语境一致的动作规划，再通过专门设计的对称多模态扩散变换器（MMDiT）架构与配套训练策略，有效融合高层语义与低层视听信号。
+
+### 关键设计决策与因果机制
+
+**1. 双阶段认知推理（Analyzer + Planner）**
+
+与基线方法仅依赖音频特征不同，本方法引入基于MLLM的双阶段推理管线：
+- **Analyzer**：接收参考图像、音频、文本提示，通过分步引导性提问推断说话内容、情感状态、说话意图，输出结构化JSON对象；
+- **Planner**：基于分析器的JSON输出，生成分镜（shot）形式的详细动作计划，确保跨时间段的角色行为一致性。
+
+该推理模块是运动表现力的关键驱动力。消融实验（Table 1）显示：移除多步推理（Multi-Step Reasoning）导致手势关键点方差（HKV）从168.912降至157.638；完全移除推理模块（System 1 Only）使HKV进一步骤降至122.376，同时主观运动不自然感（MU）从0.37显著上升至0.58，整体偏好评分（GSB）从+0.29反转为-0.29（Table 2a）。这表明**语义规划质量直接决定运动表现力的上限**。
+
+**2. 对称多模态融合（MMDiT + Audio Branch）**
+
+基线方法普遍采用交叉注意力（cross-attention）将音频/图像特征注入视频生成分支，这种非对称设计容易导致模态间信息损失。本文在MMDiT中引入与视频、文本分支**架构对称的专用音频分支**，所有分支的token拼接后通过共享自注意力（self-attention）进行统一联合建模。消融实验（Table 1）证实：将对称音频融合替换为交叉注意力导致HKV从168.912骤降至116.317，并降低了唇音同步指标（Sync-C），说明**对称架构是高层语义与低层视听信号有效融合的结构性前提**。
+
+**3. 伪最后一帧策略（Pseudo Last Frame）**
+
+传统参考图像条件机制存在根本性困境（Figure 3）：采样与目标片段相关的参考图像会导致模型学会产生静态结果，而采样不相关的参考图像则引发身份不一致。本文的解决方案是**训练时完全丢弃参考图像**，仅使用GT首尾帧并以概率0.1随机丢弃；推理时将用户参考图像置于伪最后一帧位置，并对其RoPE位置编码施加固定时间偏移。这一设计将参考图像从“初始约束”转化为“身份目标”，使模型在保持身份一致性的同时获得大幅度动态运动的自由度。消融实验（Section E）表明：取消PLF会导致长序列生成中严重的身份漂移及场景内容突变。
+
+**4. 两阶段模态预热（MM-Warmup）**
+
+直接端到端联合训练所有模态分支容易导致模态间的相互干扰和灾难性遗忘。本文提出的MM-Warmup策略分两阶段进行：阶段1联合训练三个分支以迫使音频分支获得核心能力（如唇音同步）；阶段2载入原始视频/文本分支权重与阶段1的音频分支权重，再微调整体模型。消融实验（Section E）显示：取消该阶段会导致运动动态减弱和手部生成质量显著下降。
+
+### 证据强度与适用边界
+
+**强证据支撑的结论：**
+- 推理模块对运动表现力的因果贡献在客观指标（HKV从122.376到168.912的梯度变化）和主观指标（GSB +0.29 vs -0.29，MU 0.37 vs 0.58）上均得到一致验证；
+- 所提条件化方案在主观指标上全面优于先进基线OmniHuman-1（LSI 0.21→0.03，MU 0.39→0.25，GSB -0.23→+0.23，Table 2b）；
+- 在全身动画场景（CyberHost测试集）中，HKV达到72.113，显著高于OmniHuman-1的47.561（Table 4右栏）；
+- 多人物交互场景中GSB达到+0.26（Table 3），且方法展现出对非人角色和对话轮次理解的泛化能力（Figure 4）。
+
+**需要注意的评估边界：**
+- 除公开的CelebV-HQ和CyberHost基准外，作者构建了两个自定义测试集（单人150例、多人57例），这可能提升本方法在非标准场景下的相对表现；
+- 主观评估采用双盲配对比较（40名参与者），评估维度涵盖唇音不一致（LSI）、运动不自然（MU）、图像失真（ID）和整体偏好（GSB），评估设计较为全面；
+- 与商业系统的比较采用匿名化处理，部分商业系统的具体架构未知，结论仅限于公开可评估的方法。
+
+### 已知局限与失效模式
+
+**合成层面：**
+- 快速运动（如大幅度手势）时可能出现手部细节伪影；
+- 大角度转头时面部身份一致性下降，偶尔出现身份漂移；
+- 训练数据与算力需求较高（15k小时视频，多阶段训练），推理时关闭反射过程以减少开销。
+
+**推理层面：**
+- MLLM代理生成的动作有时过度演绎（过于夸张的手势），缺乏影视表演所需的细腻与内敛；
+- 代理推理过程引入约20-30秒的额外延迟（未优化），对于交互式应用仍有优化空间。
+
+### 开放问题
+
+1. **端到端联合训练**：当前MLLM推理与DiT合成为解耦的两阶段管线，如何实现端到端联合训练使得高层语义推理与低层运动合成更紧密对齐，避免语义与动作脱节？
+2. **推理延迟优化**：在保持高表现力的前提下，如何将Agent推理延迟降低至可支撑在线交互场景的水平？
+3. **反射重规划集成**：当前推理过程为一次性前向规划，能否以低开销方式集成反射重规划（reflection）机制，进一步提升长视频的逻辑连贯性？
+4. **合成伪影消除**：如何通过更大规模、更高质量的数据训练进一步消除快速运动和大角度旋转场景下的合成伪影？
+5. **泛化边界探索**：当前方法在非人物角色和复杂交互场景下的泛化边界尚未被充分探索，是否存在更多未知的失效模式？
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/Instilling_an_Active_Mind_in_Avatars_via_Cognitive_Simulation.pdf]]

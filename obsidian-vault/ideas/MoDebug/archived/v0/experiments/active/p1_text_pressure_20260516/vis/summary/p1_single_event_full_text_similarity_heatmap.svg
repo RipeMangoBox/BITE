@@ -1,0 +1,518 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1106" height="822" viewBox="0 0 1106 822">
+<metadata>{&quot;date&quot;: &quot;2026-05-17&quot;, &quot;experiment_path&quot;: &quot;paperIDEAs/MoDebug/experiments/p1_event_transfer_20260516&quot;, &quot;evaluator&quot;: &quot;clip/ViT-B/32_text_embedding_similarity_collapsed_by_sample_event&quot;, &quot;protocol&quot;: &quot;paperIDEAs/MoDebug/experiments/p1_event_transfer_20260516/protocols/eval_contract.md&quot;, &quot;data_source&quot;: &quot;paperIDEAs/MoDebug/experiments/p1_event_transfer_20260516/eval/text_embedding/p1_full_single_embedding_similarity.tsv&quot;, &quot;condition_pair&quot;: &quot;&quot;, &quot;prompt_pair&quot;: &quot;full/single_event&quot;, &quot;n/evaluable&quot;: &quot;30/30 unique decomposed events&quot;, &quot;coverage&quot;: &quot;10/10 samples；从 60 条模型标签重复行 折叠为 30 个 unique events；模型标签为 mogents,momask。&quot;, &quot;role&quot;: &quot;diagnostic&quot;, &quot;used_for&quot;: &quot;observation&quot;, &quot;limitations&quot;: &quot;仅为 CLIP 文本嵌入相似度；MoMask/MoGenTS 重复文本侧行按 (sample_id, event_id) 折叠；不是生成器传递、运动正确性或最终评估器证据。&quot;}</metadata>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24.0" y="34.0" text-anchor="start" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="700" fill="#263238">P1 单事件在完整文本中的相似度</text>
+<text x="24.0" y="58.0" text-anchor="start" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="400" fill="#54656f">行是 sample，列是事件顺序；颜色表示文本距离，格内标注目标维度、相似度和距离。</text>
+<text x="24.0" y="78.0" text-anchor="start" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="400" fill="#54656f">去重：按 (sample_id, event_id) 折叠 MoMask/MoGenTS 重复文本侧记录；n/evaluable=30/30。</text>
+<text x="326.0" y="104.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">事件顺序 1</text>
+<text x="462.0" y="104.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">事件顺序 2</text>
+<text x="598.0" y="104.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">事件顺序 3</text>
+<text x="734.0" y="104.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">事件顺序 4</text>
+<text x="870.0" y="104.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">事件顺序 5</text>
+<text x="244.0" y="141.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">1 gesture clap</text>
+<text x="244.0" y="161.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=1</text>
+<g><title>sample_id: p1evt_1_gesture_clap
+event_id: p1evt_1_gesture_clap__event_01
+目标维度: upper_body_gesture
+完整文本: a person clapping their hands
+单事件文本: a person clapping their hands.
+余弦相似度: 0.995588
+余弦距离: 0.004412</title>
+<rect x="260.0" y="118.0" width="132" height="58" fill="#e5f2fb" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="136.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">上肢手势</text>
+<text x="326.0" y="154.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.996</text>
+<text x="326.0" y="169.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.004</text>
+</g>
+<rect x="396.0" y="118.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="153.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="532.0" y="118.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="153.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="668.0" y="118.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="153.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="804.0" y="118.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="153.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<text x="244.0" y="203.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">1 locomotion walk</text>
+<text x="244.0" y="223.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=1</text>
+<g><title>sample_id: p1evt_1_locomotion_walk
+event_id: p1evt_1_locomotion_walk__event_01
+目标维度: locomotion_path
+完整文本: a man walking straight.
+单事件文本: a man walking straight.
+余弦相似度: 1.000000
+余弦距离: -0.000000</title>
+<rect x="260.0" y="180.0" width="132" height="58" fill="#ebf5ff" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="198.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">移动路径</text>
+<text x="326.0" y="216.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 1.000</text>
+<text x="326.0" y="231.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 -0.000</text>
+</g>
+<rect x="396.0" y="180.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="215.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="532.0" y="180.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="215.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="668.0" y="180.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="215.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="804.0" y="180.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="215.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<text x="244.0" y="265.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">2 walk turn</text>
+<text x="244.0" y="285.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=2</text>
+<g><title>sample_id: p1evt_2_walk_turn
+event_id: p1evt_2_walk_turn__event_01
+目标维度: locomotion_path
+完整文本: the person is walking forward then turning around.
+单事件文本: the person is walking forward.
+余弦相似度: 0.968901
+余弦距离: 0.031099</title>
+<rect x="260.0" y="242.0" width="132" height="58" fill="#bedde6" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="260.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">移动路径</text>
+<text x="326.0" y="278.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.969</text>
+<text x="326.0" y="293.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.031</text>
+</g>
+<g><title>sample_id: p1evt_2_walk_turn
+event_id: p1evt_2_walk_turn__event_02
+目标维度: direction_change
+完整文本: the person is walking forward then turning around.
+单事件文本: the person is turning around.
+余弦相似度: 0.942717
+余弦距离: 0.057283</title>
+<rect x="396.0" y="242.0" width="132" height="58" fill="#98c8d1" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="260.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">转向</text>
+<text x="462.0" y="278.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.943</text>
+<text x="462.0" y="293.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.057</text>
+</g>
+<rect x="532.0" y="242.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="277.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="668.0" y="242.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="277.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="804.0" y="242.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="277.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<text x="244.0" y="327.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">2 walk stop</text>
+<text x="244.0" y="347.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=2</text>
+<g><title>sample_id: p1evt_2_walk_stop
+event_id: p1evt_2_walk_stop__event_01
+目标维度: locomotion
+完整文本: a person walks, then stops.
+单事件文本: a person walks.
+余弦相似度: 0.959707
+余弦距离: 0.040293</title>
+<rect x="260.0" y="304.0" width="132" height="58" fill="#b1d5df" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="322.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">移动</text>
+<text x="326.0" y="340.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.960</text>
+<text x="326.0" y="355.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.040</text>
+</g>
+<g><title>sample_id: p1evt_2_walk_stop
+event_id: p1evt_2_walk_stop__event_02
+目标维度: stop_go
+完整文本: a person walks, then stops.
+单事件文本: a person stops.
+余弦相似度: 0.947340
+余弦距离: 0.052660</title>
+<rect x="396.0" y="304.0" width="132" height="58" fill="#9fccd5" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="322.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">停走</text>
+<text x="462.0" y="340.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.947</text>
+<text x="462.0" y="355.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.053</text>
+</g>
+<rect x="532.0" y="304.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="339.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="668.0" y="304.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="339.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="804.0" y="304.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="339.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<text x="244.0" y="389.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">3 walk squat return</text>
+<text x="244.0" y="409.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=3</text>
+<g><title>sample_id: p1evt_3_walk_squat_return
+event_id: p1evt_3_walk_squat_return__event_01
+目标维度: direction_path
+完整文本: a person takes a few steps, squats twice, then turns and walks back.
+单事件文本: a person takes a few steps.
+余弦相似度: 0.902485
+余弦距离: 0.097515</title>
+<rect x="260.0" y="366.0" width="132" height="58" fill="#8eb7ad" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="384.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">方向路径</text>
+<text x="326.0" y="402.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.902</text>
+<text x="326.0" y="417.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.098</text>
+</g>
+<g><title>sample_id: p1evt_3_walk_squat_return
+event_id: p1evt_3_walk_squat_return__event_02
+目标维度: count_duration
+完整文本: a person takes a few steps, squats twice, then turns and walks back.
+单事件文本: a person squats twice.
+余弦相似度: 0.906001
+余弦距离: 0.093999</title>
+<rect x="396.0" y="366.0" width="132" height="58" fill="#88b6b1" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="384.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">次数时长</text>
+<text x="462.0" y="402.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.906</text>
+<text x="462.0" y="417.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.094</text>
+</g>
+<g><title>sample_id: p1evt_3_walk_squat_return
+event_id: p1evt_3_walk_squat_return__event_03
+目标维度: order_transition
+完整文本: a person takes a few steps, squats twice, then turns and walks back.
+单事件文本: a person turns and walks back.
+余弦相似度: 0.908451
+余弦距离: 0.091549</title>
+<rect x="532.0" y="366.0" width="132" height="58" fill="#85b6b4" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="384.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">顺序转换</text>
+<text x="598.0" y="402.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.908</text>
+<text x="598.0" y="417.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.092</text>
+</g>
+<rect x="668.0" y="366.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="401.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="804.0" y="366.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="401.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<text x="244.0" y="451.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">3 forward back forward</text>
+<text x="244.0" y="471.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=3</text>
+<g><title>sample_id: p1evt_3_forward_back_forward
+event_id: p1evt_3_forward_back_forward__event_01
+目标维度: count_direction
+完整文本: a person takes three steps forward, then takes one step back, and then continues walking forward.
+单事件文本: a person takes three steps forward.
+余弦相似度: 0.937756
+余弦距离: 0.062244</title>
+<rect x="260.0" y="428.0" width="132" height="58" fill="#91c4cd" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="446.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">次数方向</text>
+<text x="326.0" y="464.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.938</text>
+<text x="326.0" y="479.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.062</text>
+</g>
+<g><title>sample_id: p1evt_3_forward_back_forward
+event_id: p1evt_3_forward_back_forward__event_02
+目标维度: direction_path
+完整文本: a person takes three steps forward, then takes one step back, and then continues walking forward.
+单事件文本: a person takes one step back.
+余弦相似度: 0.921093
+余弦距离: 0.078907</title>
+<rect x="396.0" y="428.0" width="132" height="58" fill="#79b7c0" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="446.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">方向路径</text>
+<text x="462.0" y="464.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.921</text>
+<text x="462.0" y="479.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.079</text>
+</g>
+<g><title>sample_id: p1evt_3_forward_back_forward
+event_id: p1evt_3_forward_back_forward__event_03
+目标维度: order_transition
+完整文本: a person takes three steps forward, then takes one step back, and then continues walking forward.
+单事件文本: a person continues walking forward.
+余弦相似度: 0.943914
+余弦距离: 0.056086</title>
+<rect x="532.0" y="428.0" width="132" height="58" fill="#9ac9d2" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="446.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">顺序转换</text>
+<text x="598.0" y="464.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.944</text>
+<text x="598.0" y="479.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.056</text>
+</g>
+<rect x="668.0" y="428.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="463.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<rect x="804.0" y="428.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="463.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<text x="244.0" y="513.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">4 turn steps sit return</text>
+<text x="244.0" y="533.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=4</text>
+<g><title>sample_id: p1evt_4_turn_steps_sit_return
+event_id: p1evt_4_turn_steps_sit_return__event_01
+目标维度: direction_path
+完整文本: person turns to left, takes three steps forward, sits down, and then walks back to starting place.
+单事件文本: a person turns to the left.
+余弦相似度: 0.889398
+余弦距离: 0.110602</title>
+<rect x="260.0" y="490.0" width="132" height="58" fill="#a3b8a0" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="508.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">方向路径</text>
+<text x="326.0" y="526.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.889</text>
+<text x="326.0" y="541.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.111</text>
+</g>
+<g><title>sample_id: p1evt_4_turn_steps_sit_return
+event_id: p1evt_4_turn_steps_sit_return__event_02
+目标维度: count_duration
+完整文本: person turns to left, takes three steps forward, sits down, and then walks back to starting place.
+单事件文本: a person takes three steps forward.
+余弦相似度: 0.876959
+余弦距离: 0.123041</title>
+<rect x="396.0" y="490.0" width="132" height="58" fill="#b6ba93" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="508.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">次数时长</text>
+<text x="462.0" y="526.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.877</text>
+<text x="462.0" y="541.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.123</text>
+</g>
+<g><title>sample_id: p1evt_4_turn_steps_sit_return
+event_id: p1evt_4_turn_steps_sit_return__event_03
+目标维度: posture
+完整文本: person turns to left, takes three steps forward, sits down, and then walks back to starting place.
+单事件文本: a person sits down.
+余弦相似度: 0.874337
+余弦距离: 0.125663</title>
+<rect x="532.0" y="490.0" width="132" height="58" fill="#baba90" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="508.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">姿态</text>
+<text x="598.0" y="526.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.874</text>
+<text x="598.0" y="541.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.126</text>
+</g>
+<g><title>sample_id: p1evt_4_turn_steps_sit_return
+event_id: p1evt_4_turn_steps_sit_return__event_04
+目标维度: direction_path
+完整文本: person turns to left, takes three steps forward, sits down, and then walks back to starting place.
+单事件文本: a person walks back to the starting place.
+余弦相似度: 0.897451
+余弦距离: 0.102549</title>
+<rect x="668.0" y="490.0" width="132" height="58" fill="#96b7a8" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="508.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">方向路径</text>
+<text x="734.0" y="526.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.897</text>
+<text x="734.0" y="541.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.103</text>
+</g>
+<rect x="804.0" y="490.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="525.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<text x="244.0" y="575.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">4 jump lr return jump</text>
+<text x="244.0" y="595.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=4</text>
+<g><title>sample_id: p1evt_4_jump_lr_return_jump
+event_id: p1evt_4_jump_lr_return_jump__event_01
+目标维度: left_right
+完整文本: person jumps to the right, then jumps to the left, then turns around and walks back to the start before jumping once again.
+单事件文本: a person jumps to the right.
+余弦相似度: 0.926666
+余弦距离: 0.073334</title>
+<rect x="260.0" y="552.0" width="132" height="58" fill="#81bcc5" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="570.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">左右</text>
+<text x="326.0" y="588.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.927</text>
+<text x="326.0" y="603.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.073</text>
+</g>
+<g><title>sample_id: p1evt_4_jump_lr_return_jump
+event_id: p1evt_4_jump_lr_return_jump__event_02
+目标维度: left_right
+完整文本: person jumps to the right, then jumps to the left, then turns around and walks back to the start before jumping once again.
+单事件文本: a person jumps to the left.
+余弦相似度: 0.911433
+余弦距离: 0.088567</title>
+<rect x="396.0" y="552.0" width="132" height="58" fill="#80b6b7" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="570.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">左右</text>
+<text x="462.0" y="588.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.911</text>
+<text x="462.0" y="603.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.089</text>
+</g>
+<g><title>sample_id: p1evt_4_jump_lr_return_jump
+event_id: p1evt_4_jump_lr_return_jump__event_03
+目标维度: direction_path
+完整文本: person jumps to the right, then jumps to the left, then turns around and walks back to the start before jumping once again.
+单事件文本: a person turns around and walks back to the start.
+余弦相似度: 0.917338
+余弦距离: 0.082662</title>
+<rect x="532.0" y="552.0" width="132" height="58" fill="#76b5bd" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="570.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">方向路径</text>
+<text x="598.0" y="588.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.917</text>
+<text x="598.0" y="603.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.083</text>
+</g>
+<g><title>sample_id: p1evt_4_jump_lr_return_jump
+event_id: p1evt_4_jump_lr_return_jump__event_04
+目标维度: count_duration
+完整文本: person jumps to the right, then jumps to the left, then turns around and walks back to the start before jumping once again.
+单事件文本: a person jumps once again.
+余弦相似度: 0.893083
+余弦距离: 0.106917</title>
+<rect x="668.0" y="552.0" width="132" height="58" fill="#9db8a3" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="570.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">次数时长</text>
+<text x="734.0" y="588.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.893</text>
+<text x="734.0" y="603.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.107</text>
+</g>
+<rect x="804.0" y="552.0" width="132" height="58" fill="#f4f5f6" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="587.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="13" font-weight="400" fill="#a0a7ad">--</text>
+<text x="244.0" y="637.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">5 step bow turn bow turn</text>
+<text x="244.0" y="657.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=5</text>
+<g><title>sample_id: p1evt_5_step_bow_turn_bow_turn
+event_id: p1evt_5_step_bow_turn_bow_turn__event_01
+目标维度: direction_path
+完整文本: a man steps forward, bows, then turns to his right, bows again, and then turns once again to his right.
+单事件文本: a man steps forward.
+余弦相似度: 0.927382
+余弦距离: 0.072618</title>
+<rect x="260.0" y="614.0" width="132" height="58" fill="#82bcc5" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="632.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">方向路径</text>
+<text x="326.0" y="650.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.927</text>
+<text x="326.0" y="665.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.073</text>
+</g>
+<g><title>sample_id: p1evt_5_step_bow_turn_bow_turn
+event_id: p1evt_5_step_bow_turn_bow_turn__event_02
+目标维度: body_part
+完整文本: a man steps forward, bows, then turns to his right, bows again, and then turns once again to his right.
+单事件文本: a man bows.
+余弦相似度: 0.877234
+余弦距离: 0.122766</title>
+<rect x="396.0" y="614.0" width="132" height="58" fill="#b6ba93" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="632.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">身体部位</text>
+<text x="462.0" y="650.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.877</text>
+<text x="462.0" y="665.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.123</text>
+</g>
+<g><title>sample_id: p1evt_5_step_bow_turn_bow_turn
+event_id: p1evt_5_step_bow_turn_bow_turn__event_03
+目标维度: direction_path
+完整文本: a man steps forward, bows, then turns to his right, bows again, and then turns once again to his right.
+单事件文本: a man turns to his right.
+余弦相似度: 0.929779
+余弦距离: 0.070221</title>
+<rect x="532.0" y="614.0" width="132" height="58" fill="#86bec7" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="632.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">方向路径</text>
+<text x="598.0" y="650.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.930</text>
+<text x="598.0" y="665.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.070</text>
+</g>
+<g><title>sample_id: p1evt_5_step_bow_turn_bow_turn
+event_id: p1evt_5_step_bow_turn_bow_turn__event_04
+目标维度: count_duration
+完整文本: a man steps forward, bows, then turns to his right, bows again, and then turns once again to his right.
+单事件文本: a man bows again.
+余弦相似度: 0.924061
+余弦距离: 0.075939</title>
+<rect x="668.0" y="614.0" width="132" height="58" fill="#7dbac3" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="632.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">次数时长</text>
+<text x="734.0" y="650.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.924</text>
+<text x="734.0" y="665.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.076</text>
+</g>
+<g><title>sample_id: p1evt_5_step_bow_turn_bow_turn
+event_id: p1evt_5_step_bow_turn_bow_turn__event_05
+目标维度: count_duration
+完整文本: a man steps forward, bows, then turns to his right, bows again, and then turns once again to his right.
+单事件文本: a man turns once again to his right.
+余弦相似度: 0.934582
+余弦距离: 0.065418</title>
+<rect x="804.0" y="614.0" width="132" height="58" fill="#8dc2cb" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="632.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">次数时长</text>
+<text x="870.0" y="650.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.935</text>
+<text x="870.0" y="665.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.065</text>
+</g>
+<text x="244.0" y="699.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">5 stand jog fast stop squat</text>
+<text x="244.0" y="719.0" text-anchor="end" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">事件数=5</text>
+<g><title>sample_id: p1evt_5_stand_jog_fast_stop_squat
+event_id: p1evt_5_stand_jog_fast_stop_squat__event_01
+目标维度: posture
+完整文本: from a squat a person stands up, jogs slowly in place, then faster, stops, backs up and squats again.
+单事件文本: from a squat, a person stands up.
+余弦相似度: 0.891156
+余弦距离: 0.108844</title>
+<rect x="260.0" y="676.0" width="132" height="58" fill="#a0b8a1" stroke="#ffffff" rx="3"/>
+<text x="326.0" y="694.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">姿态</text>
+<text x="326.0" y="712.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.891</text>
+<text x="326.0" y="727.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.109</text>
+</g>
+<g><title>sample_id: p1evt_5_stand_jog_fast_stop_squat
+event_id: p1evt_5_stand_jog_fast_stop_squat__event_02
+目标维度: speed_transition
+完整文本: from a squat a person stands up, jogs slowly in place, then faster, stops, backs up and squats again.
+单事件文本: a person jogs slowly in place.
+余弦相似度: 0.789894
+余弦距离: 0.210106</title>
+<rect x="396.0" y="676.0" width="132" height="58" fill="#d97d54" stroke="#ffffff" rx="3"/>
+<text x="462.0" y="694.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">速度转换</text>
+<text x="462.0" y="712.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.790</text>
+<text x="462.0" y="727.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.210</text>
+</g>
+<g><title>sample_id: p1evt_5_stand_jog_fast_stop_squat
+event_id: p1evt_5_stand_jog_fast_stop_squat__event_03
+目标维度: speed_transition
+完整文本: from a squat a person stands up, jogs slowly in place, then faster, stops, backs up and squats again.
+单事件文本: a person jogs faster in place.
+余弦相似度: 0.824449
+余弦距离: 0.175551</title>
+<rect x="532.0" y="676.0" width="132" height="58" fill="#efad63" stroke="#ffffff" rx="3"/>
+<text x="598.0" y="694.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">速度转换</text>
+<text x="598.0" y="712.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.824</text>
+<text x="598.0" y="727.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.176</text>
+</g>
+<g><title>sample_id: p1evt_5_stand_jog_fast_stop_squat
+event_id: p1evt_5_stand_jog_fast_stop_squat__event_04
+目标维度: stop_go
+完整文本: from a squat a person stands up, jogs slowly in place, then faster, stops, backs up and squats again.
+单事件文本: a person stops.
+余弦相似度: 0.754820
+余弦距离: 0.245180</title>
+<rect x="668.0" y="676.0" width="132" height="58" fill="#c44c45" stroke="#ffffff" rx="3"/>
+<text x="734.0" y="694.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">停走</text>
+<text x="734.0" y="712.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.755</text>
+<text x="734.0" y="727.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.245</text>
+</g>
+<g><title>sample_id: p1evt_5_stand_jog_fast_stop_squat
+event_id: p1evt_5_stand_jog_fast_stop_squat__event_05
+目标维度: posture
+完整文本: from a squat a person stands up, jogs slowly in place, then faster, stops, backs up and squats again.
+单事件文本: a person backs up and squats again.
+余弦相似度: 0.923441
+余弦距离: 0.076559</title>
+<rect x="804.0" y="676.0" width="132" height="58" fill="#7cb9c2" stroke="#ffffff" rx="3"/>
+<text x="870.0" y="694.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="700" fill="#263238">姿态</text>
+<text x="870.0" y="712.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">相似 0.923</text>
+<text x="870.0" y="727.0" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">距离 0.077</text>
+</g>
+<rect x="982.0" y="118.0" width="18" height="4.0" fill="#c44c45" stroke="none"/>
+<rect x="982.0" y="121.0" width="18" height="4.0" fill="#c65046" stroke="none"/>
+<rect x="982.0" y="124.1" width="18" height="4.0" fill="#c85548" stroke="none"/>
+<rect x="982.0" y="127.1" width="18" height="4.0" fill="#ca5949" stroke="none"/>
+<rect x="982.0" y="130.2" width="18" height="4.0" fill="#cc5d4a" stroke="none"/>
+<rect x="982.0" y="133.2" width="18" height="4.0" fill="#cd624c" stroke="none"/>
+<rect x="982.0" y="136.2" width="18" height="4.0" fill="#cf664d" stroke="none"/>
+<rect x="982.0" y="139.3" width="18" height="4.0" fill="#d16a4e" stroke="none"/>
+<rect x="982.0" y="142.3" width="18" height="4.0" fill="#d36f50" stroke="none"/>
+<rect x="982.0" y="145.3" width="18" height="4.0" fill="#d57351" stroke="none"/>
+<rect x="982.0" y="148.4" width="18" height="4.0" fill="#d77752" stroke="none"/>
+<rect x="982.0" y="151.4" width="18" height="4.0" fill="#d97c54" stroke="none"/>
+<rect x="982.0" y="154.5" width="18" height="4.0" fill="#db8055" stroke="none"/>
+<rect x="982.0" y="157.5" width="18" height="4.0" fill="#dd8456" stroke="none"/>
+<rect x="982.0" y="160.5" width="18" height="4.0" fill="#df8958" stroke="none"/>
+<rect x="982.0" y="163.6" width="18" height="4.0" fill="#e08d59" stroke="none"/>
+<rect x="982.0" y="166.6" width="18" height="4.0" fill="#e2915a" stroke="none"/>
+<rect x="982.0" y="169.6" width="18" height="4.0" fill="#e4965c" stroke="none"/>
+<rect x="982.0" y="172.7" width="18" height="4.0" fill="#e69a5d" stroke="none"/>
+<rect x="982.0" y="175.7" width="18" height="4.0" fill="#e89e5e" stroke="none"/>
+<rect x="982.0" y="178.8" width="18" height="4.0" fill="#eaa360" stroke="none"/>
+<rect x="982.0" y="181.8" width="18" height="4.0" fill="#eca761" stroke="none"/>
+<rect x="982.0" y="184.8" width="18" height="4.0" fill="#eeab62" stroke="none"/>
+<rect x="982.0" y="187.9" width="18" height="4.0" fill="#f0b064" stroke="none"/>
+<rect x="982.0" y="190.9" width="18" height="4.0" fill="#f2b465" stroke="none"/>
+<rect x="982.0" y="193.9" width="18" height="4.0" fill="#f3b866" stroke="none"/>
+<rect x="982.0" y="197.0" width="18" height="4.0" fill="#f5bd68" stroke="none"/>
+<rect x="982.0" y="200.0" width="18" height="4.0" fill="#f3be6a" stroke="none"/>
+<rect x="982.0" y="203.1" width="18" height="4.0" fill="#eebd6d" stroke="none"/>
+<rect x="982.0" y="206.1" width="18" height="4.0" fill="#e9bd71" stroke="none"/>
+<rect x="982.0" y="209.1" width="18" height="4.0" fill="#e4bd74" stroke="none"/>
+<rect x="982.0" y="212.2" width="18" height="4.0" fill="#dfbc77" stroke="none"/>
+<rect x="982.0" y="215.2" width="18" height="4.0" fill="#dabc7b" stroke="none"/>
+<rect x="982.0" y="218.3" width="18" height="4.0" fill="#d5bc7e" stroke="none"/>
+<rect x="982.0" y="221.3" width="18" height="4.0" fill="#d0bb81" stroke="none"/>
+<rect x="982.0" y="224.3" width="18" height="4.0" fill="#ccbb84" stroke="none"/>
+<rect x="982.0" y="227.4" width="18" height="4.0" fill="#c7bb88" stroke="none"/>
+<rect x="982.0" y="230.4" width="18" height="4.0" fill="#c2ba8b" stroke="none"/>
+<rect x="982.0" y="233.4" width="18" height="4.0" fill="#bdba8e" stroke="none"/>
+<rect x="982.0" y="236.5" width="18" height="4.0" fill="#b8ba91" stroke="none"/>
+<rect x="982.0" y="239.5" width="18" height="4.0" fill="#b3b995" stroke="none"/>
+<rect x="982.0" y="242.6" width="18" height="4.0" fill="#aeb998" stroke="none"/>
+<rect x="982.0" y="245.6" width="18" height="4.0" fill="#a9b99b" stroke="none"/>
+<rect x="982.0" y="248.6" width="18" height="4.0" fill="#a4b89e" stroke="none"/>
+<rect x="982.0" y="251.7" width="18" height="4.0" fill="#9fb8a2" stroke="none"/>
+<rect x="982.0" y="254.7" width="18" height="4.0" fill="#9bb8a5" stroke="none"/>
+<rect x="982.0" y="257.7" width="18" height="4.0" fill="#96b7a8" stroke="none"/>
+<rect x="982.0" y="260.8" width="18" height="4.0" fill="#91b7ab" stroke="none"/>
+<rect x="982.0" y="263.8" width="18" height="4.0" fill="#8cb7af" stroke="none"/>
+<rect x="982.0" y="266.9" width="18" height="4.0" fill="#87b6b2" stroke="none"/>
+<rect x="982.0" y="269.9" width="18" height="4.0" fill="#82b6b5" stroke="none"/>
+<rect x="982.0" y="272.9" width="18" height="4.0" fill="#7db6b9" stroke="none"/>
+<rect x="982.0" y="276.0" width="18" height="4.0" fill="#78b5bc" stroke="none"/>
+<rect x="982.0" y="279.0" width="18" height="4.0" fill="#76b6bf" stroke="none"/>
+<rect x="982.0" y="282.1" width="18" height="4.0" fill="#7bb8c1" stroke="none"/>
+<rect x="982.0" y="285.1" width="18" height="4.0" fill="#7fbbc4" stroke="none"/>
+<rect x="982.0" y="288.1" width="18" height="4.0" fill="#84bdc6" stroke="none"/>
+<rect x="982.0" y="291.2" width="18" height="4.0" fill="#88c0c9" stroke="none"/>
+<rect x="982.0" y="294.2" width="18" height="4.0" fill="#8dc2cb" stroke="none"/>
+<rect x="982.0" y="297.2" width="18" height="4.0" fill="#91c4ce" stroke="none"/>
+<rect x="982.0" y="300.3" width="18" height="4.0" fill="#96c7d0" stroke="none"/>
+<rect x="982.0" y="303.3" width="18" height="4.0" fill="#9ac9d3" stroke="none"/>
+<rect x="982.0" y="306.4" width="18" height="4.0" fill="#9fccd5" stroke="none"/>
+<rect x="982.0" y="309.4" width="18" height="4.0" fill="#a3ced8" stroke="none"/>
+<rect x="982.0" y="312.4" width="18" height="4.0" fill="#a8d1da" stroke="none"/>
+<rect x="982.0" y="315.5" width="18" height="4.0" fill="#acd3dc" stroke="none"/>
+<rect x="982.0" y="318.5" width="18" height="4.0" fill="#b1d5df" stroke="none"/>
+<rect x="982.0" y="321.5" width="18" height="4.0" fill="#b5d8e1" stroke="none"/>
+<rect x="982.0" y="324.6" width="18" height="4.0" fill="#badae4" stroke="none"/>
+<rect x="982.0" y="327.6" width="18" height="4.0" fill="#bedde6" stroke="none"/>
+<rect x="982.0" y="330.7" width="18" height="4.0" fill="#c3dfe9" stroke="none"/>
+<rect x="982.0" y="333.7" width="18" height="4.0" fill="#c7e2eb" stroke="none"/>
+<rect x="982.0" y="336.7" width="18" height="4.0" fill="#cce4ee" stroke="none"/>
+<rect x="982.0" y="339.8" width="18" height="4.0" fill="#d0e6f0" stroke="none"/>
+<rect x="982.0" y="342.8" width="18" height="4.0" fill="#d5e9f3" stroke="none"/>
+<rect x="982.0" y="345.8" width="18" height="4.0" fill="#d9ebf5" stroke="none"/>
+<rect x="982.0" y="348.9" width="18" height="4.0" fill="#deeef8" stroke="none"/>
+<rect x="982.0" y="351.9" width="18" height="4.0" fill="#e2f0fa" stroke="none"/>
+<rect x="982.0" y="355.0" width="18" height="4.0" fill="#e7f3fd" stroke="none"/>
+<rect x="982.0" y="358.0" width="18" height="4.0" fill="#ebf5ff" stroke="none"/>
+<rect x="982.0" y="118.0" width="18" height="240" fill="none" stroke="#455a64"/>
+<text x="1010.0" y="125.0" text-anchor="start" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">0.245</text>
+<text x="1010.0" y="358.0" text-anchor="start" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">0.000</text>
+<text x="978.0" y="383.0" text-anchor="start" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#263238">文本距离</text>
+<text x="978.0" y="401.0" text-anchor="start" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="11" font-weight="400" fill="#6b747b">越红表示单事件离 full prompt 越远</text>
+<text x="24.0" y="798.0" text-anchor="start" font-family="Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif" font-size="12" font-weight="400" fill="#54656f">说明：该图是文本侧诊断，不作为生成质量或 motion correctness 的最终证据。</text>
+</svg>

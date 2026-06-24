@@ -1,0 +1,31 @@
+{
+  "part_id": "8/13",
+  "section_role": "conclusion and references",
+  "method_evidence": [
+    {
+      "claim": "decoupled architecture synergizes a frozen MLLM for high-level reasoning with a trainable DiT",
+      "section": "Conclusion",
+      "anchor": "our decoupled architecture successfully synergizes a frozen MLLM for high-level reasoning with a trainable DiT, guided by a hybrid conditioning mechanism that separates high-level semantic and low-level signal features.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "constructed AudioEdit, a large-scale dataset of over one million instruction-guided editing pairs",
+      "section": "Conclusion",
+      "anchor": "we also constructed AudioEdit, a large-scale dataset of over one million instructionguided editing pairs.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "single unified model matches or surpasses specialized expert models",
+      "table_or_figure": "Conclusion",
+      "metric": "performance",
+      "value": "matches or surpasses the performance of specialized expert models",
+      "confidence": 0.9
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": []
+}

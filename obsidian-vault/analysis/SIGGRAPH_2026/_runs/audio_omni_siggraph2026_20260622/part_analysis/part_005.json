@@ -1,0 +1,136 @@
+{
+  "part_id": "part_005",
+  "section_role": "Experiments",
+  "method_evidence": [
+    {
+      "claim": "The DiT backbone is a transformer architecture with a depth of 36 blocks, a hidden dimension of 2048, and 32 attention heads.",
+      "section": "5.1",
+      "anchor": "The DiT backbone is a transformer architecture with a depth of 36 blocks, a hidden dimension of 2048, and 32 attention heads.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The entire model has approximately 7.9B total parameters, of which 3.05B (the DiT and conditioners) are trainable.",
+      "section": "5.1",
+      "anchor": "The entire model has approximately 7.9B total parameters, of which 3.05B (the DiT and conditioners) are trainable.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We train the DiT backbone and all learnable conditioning modules for approximately 80k steps on a total batch size of 5120.",
+      "section": "5.1",
+      "anchor": "We train the DiT backbone and all learnable conditioning modules for approximately 80k steps on a total batch size of 5120.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We use the AdamW optimizer with a learning rate of 5e-5, with β1 = 0.9, β2 = 0.999, and a weight decay of 1e-3.",
+      "section": "5.1",
+      "anchor": "We use the AdamW optimizer with a learning rate of 5e-5, with β1 = 0.9, β2 = 0.999, and a weight decay of 1e-3.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "At inference time, we use a numerical ODE solver with 100 steps to generate the audio latent from a random noise sample.",
+      "section": "5.1",
+      "anchor": "At inference time, we use a numerical ODE solver with 100 steps to generate the audio latent from a random noise sample.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Audio-Omni achieves T2A FAD of 1.86, T2M FAD of 1.94, V2A FAD of 1.71, V2M FAD of 1.58, and TTS WER of 1.77.",
+      "table_or_figure": "Table 3",
+      "metric": "T2A_FAD, T2M_FAD, V2A_FAD, V2M_FAD, TTS_WER",
+      "value": "1.86, 1.94, 1.71, 1.58, 1.77",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Audio-Omni achieves AE FAD of 3.27, AE LSD of 2.27, and CLAP of 0.32 on audio editing benchmarks.",
+      "table_or_figure": "Table 4",
+      "metric": "AE_FAD, AE_LSD, CLAP",
+      "value": "3.27, 2.27, 0.32",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Audio-Omni achieves MMSU of 56.83 and MMAU of 63.30 on understanding benchmarks.",
+      "table_or_figure": "Table (unnamed, before Section 5)",
+      "metric": "MMSU, MMAU",
+      "value": "56.83, 63.30",
+      "confidence": 0.95
+    }
+  ],
+  "formula_evidence": [
+    {
+      "name": "Rectified Flow objective",
+      "latex": "Equation 5",
+      "meaning": "The entire model is trained end-to-end using the Rectified Flow objective.",
+      "section": "5.1",
+      "confidence": 0.9
+    }
+  ],
+  "figure_table_roles": [
+    {
+      "label": "Table 3",
+      "role_hint": "Quantitative results on multimodal generation benchmarks.",
+      "caption": "Quantitative results on multimodal generation benchmarks.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table 4",
+      "role_hint": "Quantitative results on audio editing benchmarks.",
+      "caption": "Quantitative results on audio editing benchmarks.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_005",
+    "part_index": 5,
+    "part_count": 13,
+    "chunk_chars": 5841,
+    "latency_seconds": 15.631,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 2595,
+      "completion_tokens_est": 1020,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3615,
+      "total_with_reasoning_tokens_est": 3615,
+      "estimated_cost_usd": 0.002016,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2852,
+      "completion_tokens_api": 1056,
+      "total_tokens_api": 3908,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 2212,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 1056,
+        "prompt_tokens": 2852,
+        "total_tokens": 3908,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 2212
+      },
+      "estimated_cost_usd_api": 0.001883,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 3400,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 1058,
+        "api_usage_present": true
+      }
+    }
+  }
+}

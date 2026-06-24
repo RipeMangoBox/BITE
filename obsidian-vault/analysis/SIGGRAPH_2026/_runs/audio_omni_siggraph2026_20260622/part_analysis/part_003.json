@@ -1,0 +1,124 @@
+{
+  "part_id": "part_003",
+  "section_role": "Dataset Construction and Method Preliminaries",
+  "method_evidence": [
+    {
+      "claim": "Audio-Omni is the first framework to unify understanding, generation, and editing across all general sound, music, and speech domains.",
+      "section": "Introduction",
+      "anchor": "we propose Audio-Omni, the first framework to unify understanding, generation, and editing across all general sound, music, and speech domains.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The generative backbone is built upon Rectified Flow.",
+      "section": "4.1 Preliminary",
+      "anchor": "Our generative backbone is built upon the framework of Rectified Flow [Liu et al. 2022]",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Rectified Flow models a straight-line trajectory between noise and data via an ODE with constant velocity.",
+      "section": "4.1 Preliminary",
+      "anchor": "Rectified Flow simplifies the generation process by modeling a straight-line trajectory between noise and data... via a simple ordinary differential equation (ODE) with a constant velocity field v = x_1 - x_0.",
+      "confidence": 0.98
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "AudioEdit dataset comprises over 1M samples covering add, remove, extract, and style transfer tasks.",
+      "table_or_figure": "Table 1",
+      "metric": "Total Train Samples",
+      "value": "1,100K",
+      "confidence": 0.99
+    },
+    {
+      "claim": "Real data branch retains ~50K pairs after CLAP filtering from ~347K VAD-filtered pairs.",
+      "table_or_figure": "Section 3",
+      "metric": "Retention after CLAP filtering",
+      "value": "~50K pairs (9.2% overall retention)",
+      "confidence": 0.95
+    }
+  ],
+  "formula_evidence": [
+    {
+      "name": "Rectified Flow ODE",
+      "latex": "\\frac { d \\mathbf { x } _ { t } } { d t } = \\mathbf { v }",
+      "meaning": "ODE defining the constant velocity trajectory from noise to data.",
+      "section": "4.1 Preliminary",
+      "confidence": 0.99
+    },
+    {
+      "name": "Linear interpolation solution",
+      "latex": "\\mathbf { x } _ { t } = ( 1 - t ) \\mathbf { x } _ { 0 } + t \\mathbf { x } _ { 1 }",
+      "meaning": "Solution at time t along the linear path between data x_0 and noise x_1.",
+      "section": "4.1 Preliminary",
+      "confidence": 0.99
+    }
+  ],
+  "figure_table_roles": [
+    {
+      "label": "Table 1",
+      "role_hint": "Dataset statistics",
+      "caption": "Statistics of our proposed audio editing dataset AudioEdit.",
+      "confidence": 0.99
+    },
+    {
+      "label": "Figure 2",
+      "role_hint": "Pipeline overview",
+      "caption": "Overview of the hybrid pipeline for constructing our AudioEdit dataset.",
+      "confidence": 0.99
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_003",
+    "part_index": 3,
+    "part_count": 13,
+    "chunk_chars": 7230,
+    "latency_seconds": 8.425,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3011,
+      "completion_tokens_est": 851,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3862,
+      "total_with_reasoning_tokens_est": 3862,
+      "estimated_cost_usd": 0.00205,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2525,
+      "completion_tokens_api": 754,
+      "total_tokens_api": 3279,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1885,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 754,
+        "prompt_tokens": 2525,
+        "total_tokens": 3279,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1885
+      },
+      "estimated_cost_usd_api": 0.001478,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 2837,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 756,
+        "api_usage_present": true
+      }
+    }
+  }
+}

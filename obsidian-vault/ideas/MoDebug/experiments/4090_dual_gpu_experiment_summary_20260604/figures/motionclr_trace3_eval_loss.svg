@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420">
+<rect width="100%" height="100%" fill="white"/>
+<text x="490.0" y="26" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700">MotionCLR Trace3 eval/test reconstruction proxy</text>
+<line x1="70" y1="365" x2="950" y2="365" stroke="#333"/>
+<line x1="70" y1="365" x2="70" y2="55" stroke="#333"/>
+<line x1="70.0" y1="365" x2="70.0" y2="370" stroke="#333"/>
+<text x="70.0" y="387" text-anchor="middle" font-family="Arial" font-size="11">2500</text>
+<line x1="246.0" y1="365" x2="246.0" y2="370" stroke="#333"/>
+<text x="246.0" y="387" text-anchor="middle" font-family="Arial" font-size="11">12000</text>
+<line x1="422.0" y1="365" x2="422.0" y2="370" stroke="#333"/>
+<text x="422.0" y="387" text-anchor="middle" font-family="Arial" font-size="11">21500</text>
+<line x1="598.0" y1="365" x2="598.0" y2="370" stroke="#333"/>
+<text x="598.0" y="387" text-anchor="middle" font-family="Arial" font-size="11">31000</text>
+<line x1="774.0" y1="365" x2="774.0" y2="370" stroke="#333"/>
+<text x="774.0" y="387" text-anchor="middle" font-family="Arial" font-size="11">40500</text>
+<line x1="950.0" y1="365" x2="950.0" y2="370" stroke="#333"/>
+<text x="950.0" y="387" text-anchor="middle" font-family="Arial" font-size="11">50000</text>
+<line x1="65" y1="365.0" x2="70" y2="365.0" stroke="#333"/>
+<text x="62" y="369.0" text-anchor="end" font-family="Arial" font-size="11">0.28</text>
+<line x1="65" y1="303.0" x2="70" y2="303.0" stroke="#333"/>
+<text x="62" y="307.0" text-anchor="end" font-family="Arial" font-size="11">0.324</text>
+<line x1="65" y1="241.0" x2="70" y2="241.0" stroke="#333"/>
+<text x="62" y="245.0" text-anchor="end" font-family="Arial" font-size="11">0.368</text>
+<line x1="65" y1="179.0" x2="70" y2="179.0" stroke="#333"/>
+<text x="62" y="183.0" text-anchor="end" font-family="Arial" font-size="11">0.413</text>
+<line x1="65" y1="117.0" x2="70" y2="117.0" stroke="#333"/>
+<text x="62" y="121.0" text-anchor="end" font-family="Arial" font-size="11">0.457</text>
+<line x1="65" y1="55.0" x2="70" y2="55.0" stroke="#333"/>
+<text x="62" y="59.0" text-anchor="end" font-family="Arial" font-size="11">0.501</text>
+<text x="490.0" y="408" text-anchor="middle" font-family="Arial" font-size="12">step</text>
+<text x="18" y="210.0" text-anchor="middle" font-family="Arial" font-size="12" transform="rotate(-90 18 210.0)">loss_mot_rec</text>
+<polyline points="70.0,77.1 116.3,144.4 162.6,168.9 208.9,209.4 255.3,182.1 301.6,228.9 347.9,255.3 394.2,242.8 440.5,257.3 486.8,234.3 533.2,255.4 579.5,307.3 625.8,275.5 672.1,309.5 718.4,343.6 764.7,281.0 811.1,306.3 857.4,313.9 903.7,314.1 950.0,322.5" fill="none" stroke="#F58518" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="70" y="32" width="12" height="3" fill="#F58518"/>
+<text x="88" y="37" font-family="Arial" font-size="12">disploss</text>
+<polyline points="70.0,76.4 116.3,140.6 162.6,165.8 208.9,216.5 255.3,168.2 301.6,217.9 347.9,252.8 394.2,236.9 440.5,266.6 486.8,222.0 533.2,258.4 579.5,303.6 625.8,271.3 672.1,306.2 718.4,337.9 764.7,283.6 811.1,296.6 857.4,317.1 903.7,301.7 950.0,321.7" fill="none" stroke="#54A24B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="260" y="32" width="12" height="3" fill="#54A24B"/>
+<text x="278" y="37" font-family="Arial" font-size="12">aug_disploss</text>
+</svg>

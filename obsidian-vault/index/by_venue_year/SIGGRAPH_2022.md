@@ -1,0 +1,845 @@
+---
+title: "Venue_Year: SIGGRAPH_2022"
+type: paper-index
+dimension: venue_year
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Venue_Year: SIGGRAPH_2022
+
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Clebsch_Method_for_Free-surface_Vortical_Flow_Simulation.md|A Clebsch Method for Free-surface Vortical Flow Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Clebsch_Method_for_Free_surface_Vortical_Flow_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Free-Surface Clebsch Solver
+	- datasets: Bubble ring evolution, Paddling propulsion with waves, Single hole sink vortex
+- A Compact Representation of Measured BRDFs Using Neural Processes (SIGGRAPH 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- A Comparison of Zoom-in Transition Methods for Multiscale VR (SIGGRAPH 2022 2022)
+- A Fast Text-driven Approach for Generating Artistic Content (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Fast_Unsmoothed_Aggregation_Algebraic_Multigrid_Framework_for_the_Large-scale_Simulation_of_Incompressible_Flow.md|A Fast Unsmoothed Aggregation Algebraic Multigrid Framework for the Large-scale Simulation of Incompressible Flow (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Fast_Unsmoothed_Aggregation_Algebraic_Multigrid_Framework_for_the_Large_scale_Simulation_of_Incompressible_Flow.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: UAAMG（非光滑聚合代数多重网格）结合SIMD-VDB
+	- datasets: Poisson Compact Scene, Viscosity Unit Test, River Fall
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_General_Two-stage_Initialization_for_Sag-free_Deformable_Simulations.md|A General Two-stage Initialization for Sag-free Deformable Simulations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_General_Two_stage_Initialization_for_Sag_free_Deformable_Simulations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Two-Stage Initialization
+	- datasets: Mass-spring tetrahedral mesh, Cloth hat simulation, FEM plant
+- A GPU-accelerated Hydrodynamics Solver for Atmosphere-fire Interactions (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory
+- A GPU-based Multilevel Additive Schwarz Preconditioner for Cloth and Deformable Body Simulation (SIGGRAPH 2022 2022)
+- A Large Scale Benchmark and an Inclusion-based Algorithm for Continuous Collision Detection (SIGGRAPH 2022 2022)
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+- A Large-scale Comparison of Tetrahedral and Hexahedral Elements for Solving Elliptic PDEs With the Finite Element Method (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Motion_Matching-based_Framework_for_Controllable_Gesture_Synthesis_From_Speech.md|A Motion Matching-based Framework for Controllable Gesture Synthesis From Speech (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Motion_Matching_based_Framework_for_Controllable_Gesture_Synthesis_From_Speech.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Motion Matching-based k-NN + cGAN
+	- datasets: User study - control-based synthesis, User study - unconstrained synthesis
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Moving_Eulerian-Lagrangian_Particle_Method_for_Thin_Film_and_Foam_Simulation.md|A Moving Eulerian-Lagrangian Particle Method for Thin Film and Foam Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Moving_Eulerian_Lagrangian_Particle_Method_for_Thin_Film_and_Foam_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Moving Eulerian-Lagrangian Particles (MELP) and multi-MELP
+	- datasets: Equilibrium thickness convergence, Plateau border dihedral angle validation, Partition surface curvature validation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Practical_Model_for_Realistic_Butterfly_Flight_Simulation.md|A Practical Model for Realistic Butterfly Flight Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Practical_Model_for_Realistic_Butterfly_Flight_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于力场的蝴蝶飞行仿真模型 (Force-based Butterfly Flight Simulation Model)
+	- datasets: 消融用户研究, 蝴蝶集群仿真, 蝴蝶集群旅行仿真
+- A Theoretical Analysis of Compactness of the Light Transport Operator (SIGGRAPH 2022 2022)
+- A Unified Newton Barrier Method for Multibody Dynamics (SIGGRAPH 2022 2022)
+- A Well-aligned Dataset for Learning Image Signal Processing on Smartphones From a High-end Camera (SIGGRAPH 2022 2022)
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+- Accommodative Holography: Improving Accommodation Response for Perceptually Realistic Holographic Displays (SIGGRAPH 2022 2022)
+- Accurate Diffuse Lighting From Spherical Gaussian Lights (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Active_Exploration_for_Neural_Global_Illumination_of_Variable_Scenes.md|Active Exploration for Neural Global Illumination of Variable Scenes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Active_Exploration_for_Neural_Global_Illumination_of_Variable_Scenes.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Agent / RL / Planning
+	- methods: Active Exploration (MCMC-guided on-the-fly data generation with self-tuning sample reuse and adaptive resolution)
+	- datasets: Living Room, Spaceship, ArchViz
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Adaptive_Rigidification_of_Elastic_Solids.md|Adaptive Rigidification of Elastic Solids (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Adaptive_Rigidification_of_Elastic_Solids.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adaptive Rigidification of Elastic Solids
+	- datasets: Tire, Blob, Wheel
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Adjoint_Nonlinear_Ray_Tracing.md|Adjoint Nonlinear Ray Tracing (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Adjoint_Nonlinear_Ray_Tracing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adjoint Nonlinear Ray Tracing
+	- datasets: GRIN透镜恢复
+- [[obsidian-vault/analysis/SIGGRAPH_2022/ADOP_Approximate_Differentiable_One-pixel_Point_Rendering.md|ADOP: Approximate Differentiable One-pixel Point Rendering (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/ADOP_Approximate_Differentiable_One_pixel_Point_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: ADOP
+	- datasets: Tanks and Temples
+- Affine Body Dynamics: Fast, Stable, and Intersection-free Simulation of Stiff Materials (SIGGRAPH 2022 2022)
+- Alpha Wrapping With an Offset (SIGGRAPH 2022 2022)
+- Alpha-functions — Piecewise-linear Approximation From Noisy and Hermite Data (SIGGRAPH 2022 2022)
+- An Efficient B-spline Lagrangian/Eulerian Method for Compressible Flow, Shock Waves, and Fracturing Solids (SIGGRAPH 2022 2022)
+	- method groups: Systems / Efficiency / Compression
+- An Inverse Procedural Modeling Pipeline for SVBRDF Maps (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Analytically_Integratable_Zero-restlength_Springs_for_Capturing_Dynamic_Modes_Unrepresented_by_Quasistatic_Neural_Networks.md|Analytically Integratable Zero-restlength Springs for Capturing Dynamic Modes Unrepresented by Quasistatic Neural Networks (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Analytically_Integratable_Zero_restlength_Springs_for_Capturing_Dynamic_Modes_Unrepresented_by_Quasistatic_Neural_Networks.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Quasistatic Neural Network (QNN) augmented with analytically integratable zero-restlength springs
+	- datasets: Jumping jacks dynamic simulation ground truth, Runtime performance, Generalization to unseen motion
+- Animating Portrait Line Drawings From a Single Face Photo and a Speech Signal (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Approximate_Convex_Decomposition_for_3D_Meshes_With_Collision-aware_Concavity_and_Tree_Search.md|Approximate Convex Decomposition for 3D Meshes With Collision-aware Concavity and Tree Search (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Approximate_Convex_Decomposition_for_3D_Meshes_With_Collision_aware_Concavity_and_Tree_Search.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CoACD
+	- datasets: V-HACD dataset, PartNet-Mobility, OpenCabinetDrawer
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Artemis_Articulated_Neural_Pets_With_Appearance_and_Motion_Synthesis.md|Artemis: Articulated Neural Pets With Appearance and Motion Synthesis (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Artemis_Articulated_Neural_Pets_With_Appearance_and_Motion_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Artemis
+- Artist Controlled Fracture Design Using Impurity Maps (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/As-locally-uniform-as-possible_Reshaping_of_Vector_Clip_Art.md|As-locally-uniform-as-possible Reshaping of Vector Clip Art (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/As_locally_uniform_as_possible_Reshaping_of_Vector_Clip_Art.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: As-Locally-Uniform-As-Possible (ALUP) Reshaping
+	- datasets: 用户对比研究
+- [[obsidian-vault/analysis/SIGGRAPH_2022/ASE_Large_Scale_Reusable_Adversarial_Skill_Embeddings_for_Physically_Simulated_Characters.md|ASE: Large-Scale Reusable Adversarial Skill Embeddings for Physically Simulated Characters (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/ASE_Large_Scale_Reusable_Adversarial_Skill_Embeddings_for_Physically_Simulated_Characters.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Safety / Privacy / Robustness
+	- methods: Adversarial Skill Embeddings (ASE)
+	- datasets: Reach, Speed, Steering
+- ASSET: Autoregressive Semantic Scene Editing With Transformers at High Resolutions (SIGGRAPH 2022 2022)
+- Audio-driven Violin Performance Animation With Clear Fingering and Bowing (SIGGRAPH 2022 2022)
+- Auditory Stimuli Degrade Visual Performance in Virtual Reality (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Authentic_Volumetric_Avatars_From_a_Phone_Scan.md|Authentic Volumetric Avatars From a Phone Scan (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Authentic_Volumetric_Avatars_From_a_Phone_Scan.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Deep Lighting Adaptation for DAM
+	- datasets: In-the-wild test set
+- Automatic Alignment and Completion of Point Cloud Environments Using XR Data (SIGGRAPH 2022 2022)
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+- Automatic Generation of a 3D Braid Hair Model From a Single Image (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Automatic_Quantization_for_Physics-based_Simulation.md|Automatic Quantization for Physics-based Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Automatic_Quantization_for_Physics_based_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Automatic Quantization (AutoQuantizer)
+	- datasets: Large-scale Eulerian smoke, Large-scale MLS-MPM fluid
+- [[obsidian-vault/analysis/SIGGRAPH_2022/AvatarCLIP_Zero-shot_Text-driven_Generation_and_Animation_of_3D_Avatars.md|AvatarCLIP: Zero-shot Text-driven Generation and Animation of 3D Avatars (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/AvatarCLIP_Zero_shot_Text_driven_Generation_and_Animation_of_3D_Avatars.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AvatarCLIP
+	- datasets: User Study, Qualitative Comparison with Baselines
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A𝛿_Autodiff_for_Discontinuous_Programs_Applied_to_Shaders.md|A𝛿: Autodiff for Discontinuous Programs — Applied to Shaders (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Autodiff_for_Discontinuous_Programs_Applied_to_Shaders.pdf|PDF]]
+	- topics: Other / Unclear
+- Blending Camera and 77 GHz Radar Sensing for Equitable, Robust Plethysmography (SIGGRAPH 2022 2022)
+	- method groups: Safety / Privacy / Robustness
+- Blow-up Print: Rapidly 3D Printing Inflatable Objects in the Compressed State (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2022/CCP_Configurable_Crowd_Profiles.md|CCP: Configurable Crowd Profiles (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CCP_Configurable_Crowd_Profiles.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: CCP
+- Centimeter-wave Free-space Neural Time-of-flight Imaging (SIGGRAPH 2022 2022)
+- Character Articulation Through Profile Curves (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.md|CLIP2StyleGAN: Unsupervised Extraction of StyleGAN Edit Directions (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: CLIP2StyleGAN
+	- datasets: FFHQ / StyleGAN生成人脸
+- [[obsidian-vault/analysis/SIGGRAPH_2022/CLIPasso_Semantically_Aware_Object_Sketching.md|CLIPasso: Semantically Aware Object Sketching (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CLIPasso_Semantically_Aware_Object_Sketching.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CLIPasso
+	- datasets: User Study, SketchyCOCO
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Closed-loop_Control_of_Direct_Ink_Writing_via_Reinforcement_Learning.md|Closed-loop Control of Direct Ink Writing via Reinforcement Learning (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Closed_loop_Control_of_Direct_Ink_Writing_via_Reinforcement_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: 基于强化学习的直接墨水书写闭环控制器 (RL-Closed-Loop DIW Controller)
+	- datasets: Simulated printing tasks with constant deposition, Simulated printing tasks with dynamic/noisy deposition, Simulated infill printing under noise
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Clustered_Vector_Textures.md|Clustered Vector Textures (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Clustered_Vector_Textures.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Clustered Vector Textures
+	- datasets: 聚类对比基线
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Co-optimization_of_Design_and_Fabrication_Plans_for_Carpentry.md|Co-optimization of Design and Fabrication Plans for Carpentry (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Co_optimization_of_Design_and_Fabrication_Plans_for_Carpentry.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+	- methods: ICEE (Iterative Contraction and Expansion on E-graphs) with Bag-of-Parts (BOP) E-graph
+	- datasets: 多个木质家具模型, 五个代表性模型
+- Compact Poisson Filters for Fast Fluid Simulation (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Comparison_of_Single-image_HDR_Reconstruction_Methods_The_Caveats_of_Quality_Assessment.md|Comparison of Single-image HDR Reconstruction Methods — The Caveats of Quality Assessment (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Comparison_of_Single_image_HDR_Reconstruction_Methods_The_Caveats_of_Quality_Assessment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CRF校正评估协议（CRF Correction-based Evaluation Protocol）
+	- datasets: 新构建的SI-HDR数据集, 主观实验与客观指标相关性, 全验证集方法排名可靠性
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Compatible_Intrinsic_Triangulations.md|Compatible Intrinsic Triangulations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Compatible_Intrinsic_Triangulations.pdf|PDF]]
+	- topics: Other / Unclear
+- [[obsidian-vault/analysis/SIGGRAPH_2022/ComplexGen_CAD_Reconstruction_by_B-rep_Chain_Complex_Generation.md|ComplexGen: CAD Reconstruction by B-rep Chain Complex Generation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/ComplexGen_CAD_Reconstruction_by_B_rep_Chain_Complex_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ComplexGen
+	- datasets: ABC
+- Compression and Interactive Visualization of Terabyte Scale Volumetric RGBA Data With Voxel-scale Details (SIGGRAPH 2022 2022)
+	- method groups: Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computational_Design_of_High-level_Interlocking_Puzzles.md|Computational Design of High-level Interlocking Puzzles (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computational_Design_of_High_level_Interlocking_Puzzles.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
+	- methods: Graph-guided Iterative Puzzle Piece Construction with Kernel Disassembly Graph
+	- datasets: Cube_6x6x6_E1, Cube_5x5x5_E1, 用户研究
+- Computational Design of Knit Templates (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.md|Computational Design of Passive Grippers (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Computational Design of Passive Grippers
+	- datasets: 物体特征覆盖
+- Computational Mirror Cup and Saucer Art (SIGGRAPH 2022 2022)
+- Computational Object-wrapping Rope Nets (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computational_Pattern_Making_From_3D_Garment_Models.md|Computational Pattern Making From 3D Garment Models (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computational_Pattern_Making_From_3D_Garment_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Computational Pattern Making Pipeline
+	- datasets: Tight-fitting dress on scanned body, Example pattern, Shirt model
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computing_Sparse_Integer-constrained_Cones_for_Conformal_Parameterizations.md|Computing Sparse Integer-constrained Cones for Conformal Parameterizations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computing_Sparse_Integer_constrained_Cones_for_Conformal_Parameterizations.pdf|PDF]]
+	- topics: Other / Unclear
+- Constant-cost Spatio-angular Prefiltering of Glinty Appearance Using Tensor Decomposition (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Contact-centric_Deformation_Learning.md|Contact-centric Deformation Learning (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Contact_centric_Deformation_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Contact-Centric Deformation Learning
+	- datasets: Worm, Rubber duck
+- Context-aware Risk Degree Prediction for Smartphone Zombies (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Covector_Fluids.md|Covector Fluids (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Covector_Fluids.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Covector Fluids (CF) / CF+MCM
+	- datasets: Leapfrogging test, Overall simulation workload
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dark_Stereo_Improving_Depth_Perception_Under_Low_Luminance.md|Dark Stereo: Improving Depth Perception Under Low Luminance (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dark_Stereo_Improving_Depth_Perception_Under_Low_Luminance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dark Stereo (Stereo-preserving Contrast Enhancement)
+	- datasets: VR主观偏好实验
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DCT-Net_Domain-calibrated_Translation_for_Portrait_Stylization.md|DCT-Net: Domain-calibrated Translation for Portrait Stylization (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DCT_Net_Domain_calibrated_Translation_for_Portrait_Stylization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DCT-Net
+	- datasets: CelebA
+- Deep Compliant Control (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Deep_Deformable_3D_Caricatures_With_Learned_Shape_Control.md|Deep Deformable 3D Caricatures With Learned Shape Control (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Deep_Deformable_3D_Caricatures_With_Learned_Shape_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Deep Deformable 3D Caricature Model (SIREN MLP Hypernetwork)
+- DeepVideoFaceEditing: Sketch-based Deep Editing of Face Videos (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DEF_Deep_Estimation_of_Sharp_Geometric_Features_in_3D_Shapes.md|DEF: Deep Estimation of Sharp Geometric Features in 3D Shapes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DEF_Deep_Estimation_of_Sharp_Geometric_Features_in_3D_Shapes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DEF (Deep Estimators of Features)
+	- datasets: DEF-Sim local patches, Parametric curve extraction on ABC shapes
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DeltaConv_Anisotropic_Operators_for_Geometric_Deep_Learning_on_Point_Clouds.md|DeltaConv: Anisotropic Operators for Geometric Deep Learning on Point Clouds (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DeltaConv_Anisotropic_Operators_for_Geometric_Deep_Learning_on_Point_Clouds.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: DeltaConv
+	- datasets: ModelNet40, ScanObjectNN, ShapeNet
+- Denoising and Guided Upsampling of Monte Carlo Path Traced Low Resolution Renderings (SIGGRAPH 2022 2022)
+	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.md|Designing Perceptual Puzzles by Differentiating Probabilistic Programs (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 可微分概率编程（Differentiable Probabilistic Programming）
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Detecting_Viewer-perceived_Intended_Vector_Sketch_Connectivity.md|Detecting Viewer-perceived Intended Vector Sketch Connectivity (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Detecting_Viewer_perceived_Intended_Vector_Sketch_Connectivity.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Hybrid Local-Global Intended Junction Detection
+- Determining the Orientation of Low Resolution Images of a De-Bruijn Tracking Pattern With a CNN (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dev2PQ_Planar_Quadrilateral_Strip_Remeshing_of_Developable_Surfaces.md|Dev2PQ: Planar Quadrilateral Strip Remeshing of Developable Surfaces (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dev2PQ_Planar_Quadrilateral_Strip_Remeshing_of_Developable_Surfaces.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dev2PQ
+	- datasets: Clothoid解析可展曲面
+- Developability-driven Piecewise Approximations for Triangular Meshes (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Developability_driven_Piecewise_Approximations_for_Triangular_Meshes.pdf|PDF]]
+- Development of 3D Projection Mapping From a Moving Vehicle to Observe From Inside and Outside of the Vehicle (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Development of Exergame to Resolve Deconditioning in Children With Orthostatic Dysregulation (SIGGRAPH 2022 2022)
+- DiffCloth: Differentiable Cloth Simulation With Dry Frictional Contact (SIGGRAPH 2022 2022)
+- Diffeomorphic Neural Surface Parameterization for 3D and Reflectance Recovery (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Differentiable_Signed_Distance_Function_Rendering.md|Differentiable Signed Distance Function Rendering (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Differentiable_Signed_Distance_Function_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Modified Sphere Tracing with Implicit Reparameterization
+	- datasets: Synthetic scenes: Shadowing, Logo, Bunny
+- DiffPD: Differentiable Projective Dynamics (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DiffusionNet_Discretization_Agnostic_Learning_on_Surfaces.md|DiffusionNet: Discretization Agnostic Learning on Surfaces (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DiffusionNet_Discretization_Agnostic_Learning_on_Surfaces.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: DiffusionNet
+	- datasets: FAUST vertex-labelling correspondence
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Disentangling_Random_and_Cyclic_Effects_in_Time-lapse_Sequences.md|Disentangling Random and Cyclic Effects in Time-lapse Sequences (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Disentangling_Random_and_Cyclic_Effects_in_Time_lapse_Sequences.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: TLGAN (Cyclic Conditioning GAN)
+	- datasets: 自数据集, Mielipidepalsta数据集
+- Do We Measure What We Perceive? Comparison of Perceptual and Computed Differences Between Hand Animations (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Domain_Enhanced_Arbitrary_Image_Style_Transfer_via_Contrastive_Learning.md|Domain Enhanced Arbitrary Image Style Transfer via Contrastive Learning (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Domain_Enhanced_Arbitrary_Image_Style_Transfer_via_Contrastive_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Deep Importance Map Network for Content-Aware Media Retargeting
+	- datasets: Image importance map generation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dr.Jit_A_Just-in-time_Compiler_for_Differentiable_Rendering.md|Dr.Jit: A Just-in-time Compiler for Differentiable Rendering (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dr_Jit_A_Just_in_time_Compiler_for_Differentiable_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Dr.Jit
+	- datasets: 三个场景, 相同场景, 非重参数化 PRB 反向模式
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Drivable_Volumetric_Avatars_Using_Texel-aligned_Features.md|Drivable Volumetric Avatars Using Texel-aligned Features (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Drivable_Volumetric_Avatars_Using_Texel_aligned_Features.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Drivable Volumetric Avatars (DVA)
+	- datasets: ZJU-MoCap S386, ZJU-MoCap S387
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DSG-Net_Learning_Disentangled_Structure_and_Geometry_for_3D_Shape_Generation.md|DSG-Net: Learning Disentangled Structure and Geometry for 3D Shape Generation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DSG_Net_Learning_Disentangled_Structure_and_Geometry_for_3D_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: DSG-Net
+	- datasets: PartNet Chairs, PartNet Lamps
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dual_Octree_Graph_Networks_for_Learning_Adaptive_Volumetric_Shape_Representations.md|Dual Octree Graph Networks for Learning Adaptive Volumetric Shape Representations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dual_Octree_Graph_Networks_for_Learning_Adaptive_Volumetric_Shape_Representations.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Benchmark / Evaluation
+	- methods: Dual Octree Graph Networks
+	- datasets: D-Faust, ShapeNet autoencoder
+- Dual-layer Light Source With Textured Lighting Gel (SIGGRAPH 2022 2022)
+- Dynamic Optimal Space Partitioning for Redirected Walking in Multi-user Environment (SIGGRAPH 2022 2022)
+- Dynamic Vertex Hierarchies for View-dependent Progressive Meshes (SIGGRAPH 2022 2022)
+- DynaPix: Normal Map Pixelization for Dynamic Lighting (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EAMM_One-Shot_Emotional_Talking_Face_via_Audio-based_Emotion-Aware_Motion_Model.md|EAMM: One-Shot Emotional Talking Face via Audio-based Emotion-Aware Motion Model (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EAMM_One_Shot_Emotional_Talking_Face_via_Audio_based_Emotion_Aware_Motion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: EAMM (Emotion-Aware Motion Model)
+	- datasets: LRW, MEAD
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EARS_Efficiency-aware_Russian_Roulette_and_Splitting.md|EARS: Efficiency-aware Russian Roulette and Splitting (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EARS_Efficiency_aware_Russian_Roulette_and_Splitting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: EARS (Efficiency-Aware Russian Roulette and Splitting)
+	- datasets: Pool scene, Kitchen scene, All five test scenes
+- Easy Rearward Visibility by the Control of Eye Direction in Viewing Panoramic Images With HMD (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Ecoclimates_Climate-response_Modeling_of_Vegetation.md|Ecoclimates: Climate-response Modeling of Vegetation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Ecoclimates_Climate_response_Modeling_of_Vegetation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Ecoclimates: Climate-response Modeling of Vegetation
+	- datasets: 不同气候条件下的森林消亡与恢复, 与 Makowski et al. 2019 的微气候比较
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Efficiency-aware_Multiple_Importance_Sampling_for_Bidirectional_Rendering_Algorithms.md|Efficiency-aware Multiple Importance Sampling for Bidirectional Rendering Algorithms (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Efficiency_aware_Multiple_Importance_Sampling_for_Bidirectional_Rendering_Algorithms.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Efficiency-aware Multiple Importance Sampling (Efficiency-aware MIS)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Efficient_Estimation_of_Boundary_Integrals_for_Path-space_Differentiable_Rendering.md|Efficient Estimation of Boundary Integrals for Path-space Differentiable Rendering (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Efficient_Estimation_of_Boundary_Integrals_for_Path_space_Differentiable_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: 我们的方法（基于主样本空间KD树引导的边界路径积分高效估计）
+	- datasets: 多个测试场景上的边界梯度图像比较, 逆渲染优化
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Efficient_Kinetic_Simulation_of_Two-Phase_Flows.md|Efficient Kinetic Simulation of Two-Phase Flows (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Efficient_Kinetic_Simulation_of_Two_Phase_Flows.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Volume-Preserving LBM-MPM Coupling
+	- datasets: Sand drop in beaker
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Egocentric_Scene_Reconstruction_From_an_Omnidirectional_Video.md|Egocentric Scene Reconstruction From an Omnidirectional Video (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Egocentric_Scene_Reconstruction_From_an_Omnidirectional_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Egocentric Scene Reconstruction with Spherical Binoctree
+	- datasets: Synthetic scenes, Memory usage
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Eikonal_Fields_for_Refractive_Novel-view_Synthesis.md|Eikonal Fields for Refractive Novel-view Synthesis (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Eikonal_Fields_for_Refractive_Novel_view_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Eikonal Fields
+	- datasets: Ball scene, Glass scene, Pen scene
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EMBER_Exact_Mesh_Booleans_via_Efficient_and_Robust_Local_Arrangements.md|EMBER: Exact Mesh Booleans via Efficient and Robust Local Arrangements (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EMBER_Exact_Mesh_Booleans_via_Efficient_and_Robust_Local_Arrangements.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+	- methods: EMBER
+	- datasets: Thingi10K
+- Energetically Consistent Inelasticity for Optimization Time Integration (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory
+- Ensemble Metropolis Light Transport (SIGGRAPH 2022 2022)
+- Escherization With Large Deformations Based on As-rigid-as-possible Shape Modeling (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Estimation_of_Yarn-level_Simulation_Models_for_Production_Fabrics.md|Estimation of Yarn-level Simulation Models for Production Fabrics (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Estimation_of_Yarn_level_Simulation_Models_for_Production_Fabrics.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Two-step yarn-level parameter estimation via thin-shell intermediation
+	- datasets: Fabric dataset
+- Evaluating the Quality of a Synthesized Motion With the Fréchet Motion Distance (SIGGRAPH 2022 2022)
+	- method groups: Benchmark / Evaluation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EyeNeRF_A_Hybrid_Representation_for_Photorealistic_Synthesis_Animation_and_Relighting_of_Human_Eyes.md|EyeNeRF: A Hybrid Representation for Photorealistic Synthesis, Animation, and Relighting of Human Eyes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EyeNeRF_A_Hybrid_Representation_for_Photorealistic_Synthesis_Animation_and_Relighting_of_Human_Eyes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: EyeNeRF
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Face_Deblurring_Using_Dual_Camera_Fusion_on_Mobile_Phones.md|Face Deblurring Using Dual Camera Fusion on Mobile Phones (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Face_Deblurring_Using_Dual_Camera_Fusion_on_Mobile_Phones.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Face Deblurring via Dual Camera Fusion
+	- datasets: In-house dataset, Runtime on Google Pixel 6, Desktop GPU latency
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Face_Extrusion_Quad_Meshes.md|Face Extrusion Quad Meshes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Face_Extrusion_Quad_Meshes.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 训练数据原语数量扩充 (Training Data Primitives Enrichment)
+	- datasets: SCAN, Colors, COGS
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Facial_Hair_Tracking_for_High_Fidelity_Performance_Capture.md|Facial Hair Tracking for High Fidelity Performance Capture (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Facial_Hair_Tracking_for_High_Fidelity_Performance_Capture.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dynamic Facial Hair Capture Pipeline
+	- datasets: 面部表演序列
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Fast_Evaluation_of_Smooth_Distance_Constraints_on_Co-dimensional_Geometry.md|Fast Evaluation of Smooth Distance Constraints on Co-dimensional Geometry (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Fast_Evaluation_of_Smooth_Distance_Constraints_on_Co_dimensional_Geometry.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Weighted LogSumExp Smooth Distance with Conservative Barnes-Hut
+	- datasets: Thingi10K 1003 体素网格评估, V形碗刚体质点仿真, Thingi10K GPU基准测试
+- Filament Based Plasma (SIGGRAPH 2022 2022)
+- Fine Wrinkling on Coarsely Meshed Thin Shells (SIGGRAPH 2022 2022)
+- Free-viewpoint Indoor Neural Relighting from Multi-view Stereo (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Free2CAD_Parsing_Freehand_Drawings_Into_CAD_Commands.md|Free2CAD: Parsing Freehand Drawings Into CAD Commands (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Free2CAD_Parsing_Freehand_Drawings_Into_CAD_Commands.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Free2CAD
+- GAN Applied to Wave Function Collapse for Procedural Map Generation (SIGGRAPH 2022 2022)
+	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2022/GANimator_Neural_Motion_Synthesis_From_a_Single_Sequence.md|GANimator: Neural Motion Synthesis From a Single Sequence (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/GANimator_Neural_Motion_Synthesis_From_a_Single_Sequence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: GANimator
+	- datasets: Gangnam style dance
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Generalized_Resampled_Importance_Sampling_Foundations_of_ReSTIR.md|Generalized Resampled Importance Sampling: Foundations of ReSTIR (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Generalized_Resampled_Importance_Sampling_Foundations_of_ReSTIR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Generalized Resampled Importance Sampling (GRIS) and ReSTIR PT
+	- datasets: Carousel, Paris Opera House, Kitchen
+- Generating 3D Human Texture From a Single Image With Sampling and Refinement (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Generating Diverse Indoor Furniture Arrangements (SIGGRAPH 2022 2022)
+- Generation of Traditional Japanese Patterns From Natural Patterns With StyleGAN (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Generative_GaitNet.md|Generative GaitNet (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Generative_GaitNet.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Generative GaitNet
+	- datasets: Leg length discrepancy simulation, Trendelenburg gait simulation, Crouch gait simulation
+- geoTangle: Interactive Design of Geodesic Tangle Patterns on Surfaces (SIGGRAPH 2022 2022)
+- Go Green: General Regularized Green's Functions for Elasticity (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Go_Green_General_Regularized_Green_s_Functions_for_Elasticity.pdf|PDF]]
+- GravityPack: Exploring a Wearable Gravity Display for Immersive Interaction Using Liquid-based System (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Grid-free_Monte_Carlo_for_PDEs_With_Spatially_Varying_Coefficients.md|Grid-free Monte Carlo for PDEs With Spatially Varying Coefficients (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Grid_free_Monte_Carlo_for_PDEs_With_Spatially_Varying_Coefficients.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Volumetric Walk on Spheres (VWoS) / Volumetric Walk on Stars (VWoSt)
+	- datasets: Bilipid Membrane Electrostatics, Mushroom 域, Connector 域
+- Guided Bubbles and Wet Foam for Realistic Whitewater Simulation (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/GWA_A_Large_Geometric-wave_Acoustic_Dataset_for_Audio_Deep_Learning.md|GWA: A Large Geometric-wave Acoustic Dataset for Audio Deep Learning (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/GWA_A_Large_Geometric_wave_Acoustic_Dataset_for_Audio_Deep_Learning.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: GWA（Geometric-Wave Acoustic混合仿真与数据集生成流程）
+	- datasets: AMI corpus, VOICES corpus
+- HDR Lighting Dilation for Dynamic Range Reduction on Virtual Production Stages (SIGGRAPH 2022 2022)
+- Hierarchical Cross-parameterization for the Morphing of Deforming Meshes (SIGGRAPH 2022 2022)
+- High Dynamic Range and Super-resolution From Raw Image Bursts (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- High-low Tech Ombro-Cinéma (SIGGRAPH 2022 2022)
+- HiVideo: Hierarchical Browsing Interface for Educational Videos (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Hogel-free_Holography.md|Hogel-free Holography (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Hogel_free_Holography.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D
+	- methods: Multimodal Neural Acoustic Fields (MNAF)
+	- datasets: SoundSpaces Same Environment, SoundSpaces Novel Environment, Replay
+- Holographic Glasses for Virtual Reality (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Holographic_Glasses_for_Virtual_Reality.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_2022/HRBF-Fusion_Accurate_3D_Reconstruction_From_RGB-D_Data_Using_On-the-fly_Implicits.md|HRBF-Fusion: Accurate 3D Reconstruction From RGB-D Data Using On-the-fly Implicits (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/HRBF_Fusion_Accurate_3D_Reconstruction_From_RGB_D_Data_Using_On_the_fly_Implicits.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: CrossTracker
+	- datasets: KITTI test set, KITTI validation set
+- Hybrid Prediction for Games’ Rollback Netcode (SIGGRAPH 2022 2022)
+- HYFAR: A Textile Soft Actuator for Haptic Clothing Interfaces (SIGGRAPH 2022 2022)
+- Image Features Influence Reaction Time: A Learned Probabilistic Perceptual Model for Saccade Latency (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Image_Features_Influence_Reaction_Time_A_Learned_Probabilistic_Perceptual_Model_for_Saccade_Latency.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- ImLoveNet: Misaligned Image-supported Registration Network for Low-overlap Point Cloud Pairs (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/ImLoveNet_Misaligned_Image_supported_Registration_Network_for_Low_overlap_Point_Cloud_Pairs.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Immersive-Labeler: Immersive Annotation of Large-scale 3D Point Clouds in Virtual Reality (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+- Implicit Neural Representation for Physics-driven Actuated Soft Bodies (SIGGRAPH 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- In Situ Segmentation of Turbulent Flow With Topological Data Analysis (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Inclusive Character Creator: A Showcase of Inclusive Design for 3D Character Creators (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Instant Neural Graphics Primitives With a Multiresolution Hash Encoding (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Instant_Neural_Graphics_Primitives_With_a_Multiresolution_Hash_Encoding.pdf|PDF]]
+- Interactive Augmented Reality Storytelling Guided by Scene Semantics (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Interactive_Augmented_Reality_Storytelling_Guided_by_Scene_Semantics.pdf|PDF]]
+- Interactive Editing of Monocular Depth (SIGGRAPH 2022 2022)
+- Iterative Poisson Surface Reconstruction (iPSR) for Unoriented Points (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Iterative_Poisson_Surface_Reconstruction_iPSR_for_Unoriented_Points.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Joint Neural Phase Retrieval and Compression for Energy- and Computation-efficient Holography on the Edge (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Joint_Neural_Phase_Retrieval_and_Compression_for_Energy_and_Computation_efficient_Holography_on_the_Edge.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression, LLM / Reasoning / Alignment
+- Kuchibashi: 3D-printed Tweezers Bioinspired by the New Caledonian Crow’s Beak (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Learning a Personalized Generative Prior for Face Images (SIGGRAPH 2022 2022)
+	- method groups: Generative / Diffusion / Flow
+- Learning From Documents in the Wild to Improve Document Unwarping (SIGGRAPH 2022 2022)
+- Learning High-DOF Reaching-and-grasping via Dynamic Representation of Gripper-object Interaction (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_High_DOF_Reaching_and_grasping_via_Dynamic_Representation_of_Gripper_object_Interaction.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Learning_Smooth_Neural_Functions_via_Lipschitz_Regularization.md|Learning Smooth Neural Functions via Lipschitz Regularization (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_Smooth_Neural_Functions_via_Lipschitz_Regularization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Lipschitz MLP with learnable per-layer Lipschitz bounds
+	- datasets: MNIST SDF autoencoder, ShapeNet chairs
+- Learning Soccer Juggling Skills With Layer-wise Mixture of Experts (SIGGRAPH 2022 2022)
+- Learning to Brachiate via Simplified Model Imitation (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_to_Brachiate_via_Simplified_Model_Imitation.pdf|PDF]]
+- Learning to Get Up (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_to_Get_Up.pdf|PDF]]
+- Learning to Use Chopsticks in Diverse Gripping Styles (SIGGRAPH 2022 2022)
+- LeviPrint: Contactless Fabrication Using Full Acoustic Manipulation of Elongated Parts (SIGGRAPH 2022 2022)
+- Local Anatomically Constrained Facial Performance Retargeting (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Local_Anatomically_Constrained_Facial_Performance_Retargeting.pdf|PDF]]
+- Local Scale Adaptation for Augmenting Hand Shape Models (SIGGRAPH 2022 2022)
+- Loki: A Unified Multiphysics Simulation Framework for Production (SIGGRAPH 2022 2022)
+- LookOut! Interactive Camera Gimbal Controller for Filming Long Takes (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/LookOut_Interactive_Camera_Gimbal_Controller_for_Filming_Long_Takes.pdf|PDF]]
+- Low-poly Mesh Generation for Building Models (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Low_poly_Mesh_Generation_for_Building_Models.pdf|PDF]]
+- MatBuilder: Mastering Sampling Uniformity Over Projections (SIGGRAPH 2022 2022)
+- MatFormer: A Generative Model for Procedural Materials (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/MatFormer_A_Generative_Model_for_Procedural_Materials.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- MetaPo: A Robotic Meta Portal for Interspace Communication (SIGGRAPH 2022 2022)
+- Mixed Integer Neural Inverse Design (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Mixed_Integer_Neural_Inverse_Design.pdf|PDF]]
+- Modeling 3D Hair by Outlining Hair Cards (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Modeling and Rendering Non-Euclidean Spaces Approximated With Concatenated Polytopes (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- MoRF: Morphable Radiance Fields for Multiview Neural Head Modeling (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/MoRF_Morphable_Radiance_Fields_for_Multiview_Neural_Head_Modeling.pdf|PDF]]
+- Motion Puzzle: Arbitrary Motion Style Transfer by Body Part (SIGGRAPH 2022 2022)
+	- method groups: Representation / Self-Supervised / Transfer
+- Moving Level-of-detail Surfaces (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Moving_Level_of_detail_Surfaces.pdf|PDF]]
+- Möbius Convolutions for Spherical CNNs (SIGGRAPH 2022 2022)
+- Near-gaze Visualisations of Empathic Communication Cues in Mixed Reality Collaboration (SIGGRAPH 2022 2022)
+- NeAT: Neural Adaptive Tomography (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/NeAT_Neural_Adaptive_Tomography.pdf|PDF]]
+- NeROIC: Neural Rendering of Objects From Online Image Collections (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/NeROIC_Neural_Rendering_of_Objects_From_Online_Image_Collections.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Neural 3D Reconstruction in the Wild (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_3D_Reconstruction_in_the_Wild.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Neural Dual Contouring (SIGGRAPH 2022 2022)
+- Neural Jacobian Fields: Learning Intrinsic Mappings of Arbitrary Meshes (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_Jacobian_Fields_Learning_Intrinsic_Mappings_of_Arbitrary_Meshes.pdf|PDF]]
+- Neural Layered BRDFs (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_Layered_BRDFs.pdf|PDF]]
+- Neural Rendering in a Room: Amodal 3D Understanding and Free-viewpoint Rendering for the Closed Scene Composed of Pre-Captured Objects (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_Rendering_in_a_Room_Amodal_3D_Understanding_and_Free_viewpoint_Rendering_for_the_Closed_Scene_Composed_of_Pre_Captured_Objects.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Neural Shadow Mapping (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_Shadow_Mapping.pdf|PDF]]
+- NeuralPassthrough: Learned Real-time View Synthesis for VR (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/NeuralPassthrough_Learned_Real_time_View_Synthesis_for_VR.pdf|PDF]]
+- NeuralSound: Learning-based Modal Sound Synthesis With Acoustic Transfer (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/NeuralSound_Learning_based_Modal_Sound_Synthesis_With_Acoustic_Transfer.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- NeuralTailor: Reconstructing Sewing Pattern Structures From 3D Point Clouds of Garments (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/NeuralTailor_Reconstructing_Sewing_Pattern_Structures_From_3D_Point_Clouds_of_Garments.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- New Types of Smooth Subdivision Algorithms (SIGGRAPH 2022 2022)
+- Newton’s Fractals on Surfaces via Bicomplex Algebra (SIGGRAPH 2022 2022)
+- NIMBLE: A Non-rigid Hand Model With Bones and Muscles (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/NIMBLE_A_Non_rigid_Hand_Model_With_Bones_and_Muscles.pdf|PDF]]
+- Node Graph Optimization Using Differentiable Proxies (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+- Noise-based Enhancement for Foveated Rendering (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Noise_based_Enhancement_for_Foveated_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Non-line-of-sight Transient Rendering (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Novel View Synthesis of Human Interactions From Sparse Multi-view Videos (SIGGRAPH 2022 2022)
+- On the Influence of Dynamic Illumination in the Perception of Translucency (SIGGRAPH 2022 2022)
+- Optical Aberration Correction in Postprocessing Using Imaging Simulation (SIGGRAPH 2022 2022)
+- Optimal Dual Schemes for Adaptive Grid Based Hexmeshing (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Optimal_Dual_Schemes_for_Adaptive_Grid_Based_Hexmeshing.pdf|PDF]]
+- OptiTrap: Optimal Trap Trajectories for Acoustic Levitation Displays (SIGGRAPH 2022 2022)
+- Palette: Image-to-image Diffusion Models (SIGGRAPH 2022 2022)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Parallax Background Texture Generation (SIGGRAPH 2022 2022)
+- PAVEL: Decorative Patterns With Packed Volumetric Elements (SIGGRAPH 2022 2022)
+- PCEDNet: A Lightweight Neural Network for Fast and Interactive Edge Detection in 3D Point Clouds (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Penetration-free Projective Dynamics on the GPU (SIGGRAPH 2022 2022)
+- Perception of Letter Glyph Parameters for InfoTypography (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Perception_of_Letter_Glyph_Parameters_for_InfoTypography.pdf|PDF]]
+- Perceptual Error Optimization for Monte Carlo Rendering (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Perceptual_Error_Optimization_for_Monte_Carlo_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- Perceptual Requirements for Eye-tracked Distortion Correction in VR (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Perceptual_Requirements_for_Eye_tracked_Distortion_Correction_in_VR.pdf|PDF]]
+- Photo-to-shape Material Transfer for Diverse Structures (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Photo_to_shape_Material_Transfer_for_Diverse_Structures.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- Photon-driven Neural Reconstruction for Path Guiding (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Physics Informed Neural Fields for Smoke Reconstruction With Sparse Data (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Physics-based Character Control Using Conditional GAIL (SIGGRAPH 2022 2022)
+- Physics-based Character Controllers Using Conditional VAEs (SIGGRAPH 2022 2022)
+- Physics-based Combustion Simulation (SIGGRAPH 2022 2022)
+- Piecewise-smooth Surface Fitting Onto Unstructured 3D Sketches (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Piecewise_smooth_Surface_Fitting_Onto_Unstructured_3D_Sketches.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Position-free Multiple-bounce Computations for Smith Microfacet BSDFs (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Position_free_Multiple_bounce_Computations_for_Smith_Microfacet_BSDFs.pdf|PDF]]
+- Practical Level-of-detail Aggregation of Fur Appearance (SIGGRAPH 2022 2022)
+- Predicting Loose-fitting Garment Deformations Using Bone-driven Motion Networks (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Predicting_Loose_fitting_Garment_Deformations_Using_Bone_driven_Motion_Networks.pdf|PDF]]
+- Procedural Texturing of Solid Wood With Knots (SIGGRAPH 2022 2022)
+- Procedural Urban Forestry (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Procedural_Urban_Forestry.pdf|PDF]]
+- Programmable Eclairs (SIGGRAPH 2022 2022)
+- ProjecString: Turning an Everyday String Curtain Into an Interactive Projection Display (SIGGRAPH 2022 2022)
+- Pseudo-3D Scene Modeling for Virtual Reality Using Stylized Novel View Synthesis (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- QuickPose: Real-time Multi-view Multi-person Pose Estimation in Crowded Scenes (SIGGRAPH 2022 2022)
+- R2E2: Low-latency Path Tracing of Terabyte-scale Scenes Using Thousands of Cloud CPUs (SIGGRAPH 2022 2022)
+	- method groups: Systems / Efficiency / Compression
+- Random Walks for Adversarial Meshes (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Random_Walks_for_Adversarial_Meshes.pdf|PDF]]
+	- method groups: Safety / Privacy / Robustness
+- Rapid Design of Articulated Objects (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Rapid_Design_of_Articulated_Objects.pdf|PDF]]
+- Real-time Controllable Motion Transition for Characters (SIGGRAPH 2022 2022)
+- Real-time Lens Distortion Algorithm on Embedded GPU Systems (SIGGRAPH 2022 2022)
+- Reconstructing Translucent Objects Using Differentiable Rendering (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Reconstructing_Translucent_Objects_Using_Differentiable_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Recording and Replaying Psychomotor User Actions in VR (SIGGRAPH 2022 2022)
+- Regression-based Monte Carlo Integration (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Regression_based_Monte_Carlo_Integration.pdf|PDF]]
+- ReLU Fields: The Little Non-linearity That Could (SIGGRAPH 2022 2022)
+- Rendering Iridescent Rock Dove Neck Feathers (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Rendering_Iridescent_Rock_Dove_Neck_Feathers.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Rendering Neural Materials on Curved Surfaces (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Rendering_Neural_Materials_on_Curved_Surfaces.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Rendering of Scratched Transparent Materials Using Precomputed SV-BSDFs (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Rendering of Subjective Speckle Formed by Rough Statistical Surfaces (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Rewriting Geometric Rules of a GAN (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Rewriting_Geometric_Rules_of_a_GAN.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Graph / Geometric / Structured Data
+- RHapTor: Rendering Haptic Torques for Virtual Reality (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Robust Computation of Implicit Surface Networks for Piecewise Linear Functions (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Robust_Computation_of_Implicit_Surface_Networks_for_Piecewise_Linear_Functions.pdf|PDF]]
+	- method groups: Safety / Privacy / Robustness
+- Scalable Neural Indoor Scene Rendering (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Scalable_Neural_Indoor_Scene_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Scattering From Elliptical Hair Fibers Based on Microfacet Theory (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory
+- Searching for Fast Demosaicking Algorithms (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Searching_for_Fast_Demosaicking_Algorithms.pdf|PDF]]
+- Seeing Through Obstructions With Diffractive Cloaking (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Seeing_Through_Obstructions_With_Diffractive_Cloaking.pdf|PDF]]
+- Self-conditioned Generative Adversarial Networks for Image Editing (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Self_conditioned_Generative_Adversarial_Networks_for_Image_Editing.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Self-distilled StyleGAN: Towards Generation From Internet Photos (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Self_distilled_StyleGAN_Towards_Generation_From_Internet_Photos.pdf|PDF]]
+- Self-Sampling for Neural Point Cloud Consolidation (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Self-Supervised Post-Correction for Monte Carlo Denoising (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Self_Supervised_Post_Correction_for_Monte_Carlo_Denoising.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+- Semantically Supervised Appearance Decomposition for Virtual Staging From a Single Panorama (SIGGRAPH 2022 2022)
+- ShaderTransformer: Predicting Shader Quality via One-shot Embedding for Fast Simplification (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/ShaderTransformer_Predicting_Shader_Quality_via_One_shot_Embedding_for_Fast_Simplification.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- Shape Dithering for 3D Printing (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Shoot360: Normal View Video Creation From City Panorama Footage (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Simulating Brittle Fracture With Material Points (SIGGRAPH 2022 2022)
+- Simulation and Optimization of Magnetoelastic Thin Shells (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory
+- Single-view View Synthesis in the Wild With Learned Adaptive Multiplane Images (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Single_view_View_Synthesis_in_the_Wild_With_Learned_Adaptive_Multiplane_Images.pdf|PDF]]
+- Skeletonization via Local Separators (SIGGRAPH 2022 2022)
+- Sketch2Pose: Estimating a 3D Character Pose From a Bitmap Sketch (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- SNeRF: Stylized Neural Implicit Representations for 3D Scenes (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- SofGAN: A Portrait Image Generator With Dynamic Styling (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- SPAGHETTI: Editing Implicit Shapes Through Part Aware Generation (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/SPAGHETTI_Editing_Implicit_Shapes_Through_Part_Aware_Generation.pdf|PDF]]
+- Sparse Ellipsometry: Portable Acquisition of Polarimetric SVBRDF and Shape With Unstructured Flash Photography (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Sparse_Ellipsometry_Portable_Acquisition_of_Polarimetric_SVBRDF_and_Shape_With_Unstructured_Flash_Photography.pdf|PDF]]
+- Sparsity-specific Code Optimization Using Expression Trees (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+- Spatial Augmented Reality Assistance System With Accelerometer and Projection Mapping at Cleaning Activities (SIGGRAPH 2022 2022)
+- SPCBPT: Subspace-based Probabilistic Connections for Bidirectional Path Tracing (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/SPCBPT_Subspace_based_Probabilistic_Connections_for_Bidirectional_Path_Tracing.pdf|PDF]]
+- Spelunking the Deep: Guaranteed Queries on General Neural Implicit Surfaces via Range Analysis (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Spelunking_the_Deep_Guaranteed_Queries_on_General_Neural_Implicit_Surfaces_via_Range_Analysis.pdf|PDF]]
+- Sphere: A Novel Approach to 3D and Active Sound Localization (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Stability-aware Simplification of Curve Networks (SIGGRAPH 2022 2022)
+- stelaCSF — A Unified Model of Contrast Sensitivity as the Function of Spatio-temporal Frequency, Eccentricity Luminance, and Area (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/stelaCSF_A_Unified_Model_of_Contrast_Sensitivity_as_the_Function_of_Spatio_temporal_Frequency_Eccentricity_Luminance_and_Area.pdf|PDF]]
+- Stereoscopic Transparent Display Visible With Naked Eye (SIGGRAPH 2022 2022)
+- Stroke Transfer: Example-based Synthesis of Animatable Stroke Styles (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Stroke_Transfer_Example_based_Synthesis_of_Animatable_Stroke_Styles.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- StrokeStyles: Stroke-based Segmentation and Stylization of Fonts (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- StyleFusion: Disentangling Spatial Segments in StyleGAN-generated Images (SIGGRAPH 2022 2022)
+- StyleGAN-NADA: CLIP-guided Domain Adaptation of Image Generators (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/StyleGAN_NADA_CLIP_guided_Domain_Adaptation_of_Image_Generators.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- StyleGAN-XL: Scaling StyleGAN to Large Diverse Datasets (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/StyleGAN_XL_Scaling_StyleGAN_to_Large_Diverse_Datasets.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Subdivision Based Convolutional Networks (SIGGRAPH 2022 2022)
+- SVBRDF Estimation Using a Normal Sorting Technique (SIGGRAPH 2022 2022)
+- Symmetry-driven 3D Reconstruction From Concept Sketches (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Synchronized Hand Difference Visualization for Piano Learning (SIGGRAPH 2022 2022)
+- Synthesis of Frame Field-aligned Multi-laminar Structures (SIGGRAPH 2022 2022)
+- Tailored Reality: Perception-aware Scene Restructuring for Adaptive VR Navigation (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Tailored_Reality_Perception_aware_Scene_Restructuring_for_Adaptive_VR_Navigation.pdf|PDF]]
+- TCB-spline-based Image Vectorization (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Text2Human: Text-driven Controllable Human Image Generation (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Text2Human_Text_driven_Controllable_Human_Image_Generation.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- TextureMe: High-quality Textured Scene Reconstruction in Real Time (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- The Hierarchical Subspace Iteration Method for Laplace-Beltrami Eigenproblems (SIGGRAPH 2022 2022)
+- The Power Particle-in-Cell Method (SIGGRAPH 2022 2022)
+- TightCap: 3D Human Shape Capture With Clothing Tightness Field (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Time-multiplexed Neural Holography: A Flexible Framework for Holographic Near-eye Displays With Fast Heavily Quantized Spatial Light Modulators (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Time_multiplexed_Neural_Holography_A_Flexible_Framework_for_Holographic_Near_eye_Displays_With_Fast_Heavily_Quantized_Spatial_Light_Modulators.pdf|PDF]]
+- TopoCut: Fast and Robust Planar Cutting of Arbitrary Domains (SIGGRAPH 2022 2022)
+	- method groups: Safety / Privacy / Robustness
+- Towards Practical Physical-optics Rendering (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Towards_Practical_Physical_optics_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- True Seams: Modeling Seams in Digital Garments (SIGGRAPH 2022 2022)
+- Typefaces Structural Transformations Regularized Using Differential Evolution for Personalized Visual Accessibility (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Umbrella Meshes: Elastic Mechanisms for Freeform Shape Deployment (SIGGRAPH 2022 2022)
+- Unbiased and Consistent Rendering Using Biased Estimators (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D
+- Unbiased Inverse Volume Rendering With Differential Trackers (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Unbiased_Inverse_Volume_Rendering_With_Differential_Trackers.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Unified Many-worlds Browsing of Arbitrary Physics-based Animations (SIGGRAPH 2022 2022)
+- Unsupervised Kinematic Motion Detection for Part-segmented 3D Shape Collections (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Unsupervised_Kinematic_Motion_Detection_for_Part_segmented_3D_Shape_Collections.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Unsupervised Shape Completion via Deep Prior in the Neural Tangent Kernel Perspective (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Variable_Bitrate_Neural_Fields.md|Variable Bitrate Neural Fields (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Variable_Bitrate_Neural_Fields.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: VQ-AD (Vector-Quantized Auto-Decoder)
+	- datasets: RTMV
+- Variational Quadratic Shape Functions for Polygons and Polyhedra (SIGGRAPH 2022 2022)
+- VEMPIC: Particle-in-polyhedron Fluid Simulation for Intricate Solid Boundaries (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/VEMPIC_Particle_in_polyhedron_Fluid_Simulation_for_Intricate_Solid_Boundaries.pdf|PDF]]
+- Virtual Production in Action: A Creative Implementation of Expanded Cinematography and Narratives (SIGGRAPH 2022 2022)
+- Volume Parametrization Quantization for Hexahedral Meshing (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Volume_Parametrization_Quantization_for_Hexahedral_Meshing.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- VoLux-GAN: A Generative Model for 3D Face Synthesis With HDRI Relighting (SIGGRAPH 2022 2022)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- WallPlan: Synthesizing Floorplans by Learning to Generate Wall Graphs (SIGGRAPH 2022 2022)
+- Which Cross Fields Can Be Quadrangulated? Global Parameterization From Prescribed Holonomy Signatures (SIGGRAPH 2022 2022)
+- ZIGEN: A Windowing System Enabling Multitasking Among 3D and 2D Applications in Immersive Environments (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D

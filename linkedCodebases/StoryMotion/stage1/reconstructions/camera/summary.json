@@ -1,0 +1,195 @@
+{
+  "human_motion": "gt",
+  "manifest": "runs/train/pulpmotion_camera_test_manifest_full_20260610.jsonl",
+  "models": [
+    "vae",
+    "vqvae"
+  ],
+  "output_dir": "runs/vis/stage1/camera",
+  "samples": [
+    {
+      "camera_trajectory": {
+        "vae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vae/2012_EP6Qb7rzBmA_00022_001_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vae/2012_EP6Qb7rzBmA_00022_001_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 5.001944065093994,
+            "rotation_deg_mean": 0.7560430765151978,
+            "translation_l2_max": 0.24108847975730896,
+            "translation_l2_mean": 0.015911048278212547
+          }
+        },
+        "vqvae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vqvae/2012_EP6Qb7rzBmA_00022_001_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vqvae/2012_EP6Qb7rzBmA_00022_001_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 17.721031188964844,
+            "rotation_deg_mean": 12.7982816696167,
+            "translation_l2_max": 0.7483744025230408,
+            "translation_l2_mean": 0.3283206522464752
+          }
+        }
+      },
+      "concat": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/concate/2012_EP6Qb7rzBmA_00022_001_a/camera_trajectory.mp4",
+        "layout": "gt | vae | vqvae"
+      },
+      "gt": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/gt/2012_EP6Qb7rzBmA_00022_001_a/camera_trajectory.mp4"
+      },
+      "index": 0,
+      "intrinsics_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/intrinsics/2012_EP6Qb7rzBmA_00022_001_a.npy",
+      "num_frames": 40,
+      "sample_id": "2012_EP6Qb7rzBmA_00022_001_a",
+      "traj_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/traj/2012_EP6Qb7rzBmA_00022_001_a.txt"
+    },
+    {
+      "camera_trajectory": {
+        "vae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vae/2017_H1TQv3qA7PI_00018_001_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vae/2017_H1TQv3qA7PI_00018_001_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 18.43780517578125,
+            "rotation_deg_mean": 10.261199951171875,
+            "translation_l2_max": 0.2911369502544403,
+            "translation_l2_mean": 0.06904321908950806
+          }
+        },
+        "vqvae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vqvae/2017_H1TQv3qA7PI_00018_001_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vqvae/2017_H1TQv3qA7PI_00018_001_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 34.234561920166016,
+            "rotation_deg_mean": 24.800708770751953,
+            "translation_l2_max": 1.1205871105194092,
+            "translation_l2_mean": 0.8528241515159607
+          }
+        }
+      },
+      "concat": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/concate/2017_H1TQv3qA7PI_00018_001_a/camera_trajectory.mp4",
+        "layout": "gt | vae | vqvae"
+      },
+      "gt": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/gt/2017_H1TQv3qA7PI_00018_001_a/camera_trajectory.mp4"
+      },
+      "index": 1,
+      "intrinsics_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/intrinsics/2017_H1TQv3qA7PI_00018_001_a.npy",
+      "num_frames": 76,
+      "sample_id": "2017_H1TQv3qA7PI_00018_001_a",
+      "traj_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/traj/2017_H1TQv3qA7PI_00018_001_a.txt"
+    },
+    {
+      "camera_trajectory": {
+        "vae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vae/2015_iL1JlXnbnt0_00000_000_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vae/2015_iL1JlXnbnt0_00000_000_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 16.532695770263672,
+            "rotation_deg_mean": 9.785611152648926,
+            "translation_l2_max": 0.281544953584671,
+            "translation_l2_mean": 0.05915489047765732
+          }
+        },
+        "vqvae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vqvae/2015_iL1JlXnbnt0_00000_000_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vqvae/2015_iL1JlXnbnt0_00000_000_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 21.676654815673828,
+            "rotation_deg_mean": 16.3006591796875,
+            "translation_l2_max": 1.998340129852295,
+            "translation_l2_mean": 0.8487693071365356
+          }
+        }
+      },
+      "concat": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/concate/2015_iL1JlXnbnt0_00000_000_a/camera_trajectory.mp4",
+        "layout": "gt | vae | vqvae"
+      },
+      "gt": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/gt/2015_iL1JlXnbnt0_00000_000_a/camera_trajectory.mp4"
+      },
+      "index": 2,
+      "intrinsics_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/intrinsics/2015_iL1JlXnbnt0_00000_000_a.npy",
+      "num_frames": 40,
+      "sample_id": "2015_iL1JlXnbnt0_00000_000_a",
+      "traj_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/traj/2015_iL1JlXnbnt0_00000_000_a.txt"
+    },
+    {
+      "camera_trajectory": {
+        "vae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vae/2016_3l4Uuh_byns_00001_000_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vae/2016_3l4Uuh_byns_00001_000_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 5.083996772766113,
+            "rotation_deg_mean": 1.5496065616607666,
+            "translation_l2_max": 1.8656412363052368,
+            "translation_l2_mean": 0.1021757498383522
+          }
+        },
+        "vqvae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vqvae/2016_3l4Uuh_byns_00001_000_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vqvae/2016_3l4Uuh_byns_00001_000_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 12.240327835083008,
+            "rotation_deg_mean": 8.813234329223633,
+            "translation_l2_max": 2.6848363876342773,
+            "translation_l2_mean": 1.677300214767456
+          }
+        }
+      },
+      "concat": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/concate/2016_3l4Uuh_byns_00001_000_a/camera_trajectory.mp4",
+        "layout": "gt | vae | vqvae"
+      },
+      "gt": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/gt/2016_3l4Uuh_byns_00001_000_a/camera_trajectory.mp4"
+      },
+      "index": 3,
+      "intrinsics_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/intrinsics/2016_3l4Uuh_byns_00001_000_a.npy",
+      "num_frames": 27,
+      "sample_id": "2016_3l4Uuh_byns_00001_000_a",
+      "traj_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/traj/2016_3l4Uuh_byns_00001_000_a.txt"
+    },
+    {
+      "camera_trajectory": {
+        "vae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vae/2012_mjdgDECpWr4_00000_000_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vae/2012_mjdgDECpWr4_00000_000_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 15.562064170837402,
+            "rotation_deg_mean": 10.832865715026855,
+            "translation_l2_max": 0.7742547392845154,
+            "translation_l2_mean": 0.07492847740650177
+          }
+        },
+        "vqvae": {
+          "camera_projection_npz": "runs/vis/stage1/camera/camera_trajectory/vqvae/2012_mjdgDECpWr4_00000_000_a/camera_projection.npz",
+          "camera_trajectory_mp4": "runs/vis/stage1/camera/camera_trajectory/vqvae/2012_mjdgDECpWr4_00000_000_a/camera_trajectory.mp4",
+          "metrics": {
+            "rotation_deg_max": 28.103397369384766,
+            "rotation_deg_mean": 26.579057693481445,
+            "translation_l2_max": 1.3083600997924805,
+            "translation_l2_mean": 0.5522188544273376
+          }
+        }
+      },
+      "concat": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/concate/2012_mjdgDECpWr4_00000_000_a/camera_trajectory.mp4",
+        "layout": "gt | vae | vqvae"
+      },
+      "gt": {
+        "camera_trajectory_mp4": "runs/vis/stage1/camera/gt/2012_mjdgDECpWr4_00000_000_a/camera_trajectory.mp4"
+      },
+      "index": 4,
+      "intrinsics_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/intrinsics/2012_mjdgDECpWr4_00000_000_a.npy",
+      "num_frames": 55,
+      "sample_id": "2012_mjdgDECpWr4_00000_000_a",
+      "traj_path": "/data/public/ripemangobox/Motion/datasets/pulpmotion-data/traj/2012_mjdgDECpWr4_00000_000_a.txt"
+    }
+  ],
+  "views": {
+    "camera_trajectory": "GT human projected through reconstructed camera trajectory",
+    "gt": "GT human projected through GT dataset camera trajectory"
+  }
+}

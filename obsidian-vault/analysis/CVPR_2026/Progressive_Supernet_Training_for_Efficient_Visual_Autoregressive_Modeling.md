@@ -1,0 +1,365 @@
+---
+title: Progressive Supernet Training for Efficient Visual Autoregressive Modeling
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/Progressive_Supernet_Training_for_Efficient_Visual_Autoregressive_Modeling.pdf
+project_link: null
+code_link: "https://github.com/Nola-chen/VARiant"
+aliases:
+- PSTEVAM
+tags:
+- CVPR_2026
+- topic/vision_multimodal_applications
+- topic/vision_multimodal_applications/image_and_video_generation
+core_operator: 利用尺度-深度非对称依赖，在超网中为早期尺度分配完整深度，为后期尺度动态分配浅层子网，通过权重共享和渐进式训练实现计算与质量的灵活权衡。
+primary_logic: 早期尺度对网络深度极为敏感，需要深层网络建立全局语义；后期尺度对深度鲁棒，可用浅层子网细化纹理。等距采样子网与全网络共享权重，并通过动态比率渐进式训练解决优化冲突，打破固定比例训练的帕累托前沿。
+claims:
+- 浅层子网应用于后期尺度（r7–r10）时FID仅从1.95升至5.42，而用于早期尺度（r1–r3）时FID飙升至12.91。
+- 固定比例训练无法同时优化全网络和子网，形成帕累托前沿；渐进式训练的红点突破该前沿，实现双最优。
+- 联合训练将极浅子网（d=2,4）的FID从>130恢复至2.28-2.97，深度子网（d=16）恢复至2.05。
+- 桥接区设计（r1–r6用全深度、r7–r10用子网）在全网跳层时建立梯度桥，将子网FID从9.44提升至2.05。
+---
+
+# Progressive Supernet Training for Efficient Visual Autoregressive Modeling
+
+> [!tip] 核心洞察
+> 早期尺度对网络深度极为敏感，需要深层网络建立全局语义；后期尺度对深度鲁棒，可用浅层子网细化纹理。等距采样子网与全网络共享权重，并通过动态比率渐进式训练解决优化冲突，打破固定比例训练的帕累托前沿。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | 面向高效视觉自回归建模的渐进式超网训练 |
+| 英文题名 | Progressive Supernet Training for Efficient Visual Autoregressive Modeling |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2511.16546) · [Code](https://github.com/Nola-chen/VARiant) |
+| Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
+| Method | VARiant |
+| Dataset | ImageNet 256×256 |
+
+> [!tip] 效果简介
+> - ImageNet 256×256 上，FID (↓) 2.05 vs 1.95 (+0.10)；FID (↓) 2.12 vs 1.95 (+0.17)；FID (↓) 2.97 vs 1.95 (+1.02)。
+> - ImageNet 256×256 (推荐配置) 上，FID (↓) 2.00 vs 1.95 (+0.05)；显存占用 (Memory) 18.4GB vs 28.7GB (-36%)。
+
+## 概述
+
+视觉自回归（Visual Autoregressive, VAR）模型通过下一尺度预测范式实现了高质量图像生成，但其多尺度自回归解码过程中累积的KV缓存导致严重的内存开销，限制了实际部署。本文提出**VARiant**，一种基于渐进式超网训练的高效视觉自回归建模方法，核心洞察在于揭示并利用**尺度-深度非对称依赖**：早期低分辨率尺度对网络深度极为敏感，需要完整深度建立全局语义；后期高分辨率尺度对深度鲁棒，可用浅层子网进行纹理细化。
+
+VARiant通过等距采样子网与全网络共享权重，在单一模型中实现零开销的深度切换。为打破固定比例训练中全网络与子网之间的帕累托前沿——即无法同时优化两者——VARiant采用动态比率三阶段渐进训练策略：初期联合训练建立梯度桥，中期线性过渡至子网聚焦，后期子网精炼。该方法使极浅子网（d=2）的FID从训练前的>130恢复至2.97，深度子网（d=16）恢复至2.05，接近全深度基线**VAR-d30**（Tian et al., NeurIPS 2024）的1.95。
+
+在ImageNet 256×256基准上，VARiant-d16以仅0.10的FID损失换取1.7倍推理加速和44%显存削减；推荐配置（d=16, N=7）达到FID 2.00，内存占用从28.7GB降至18.4GB（-36%）。该方法为视觉自回归模型的效率-质量权衡提供了灵活且可扩展的解决方案。
+
+## 背景与动机
+
+### 视觉自回归建模的兴起与效率瓶颈
+
+视觉自回归建模（Visual Autoregressive Modeling, VAR）由 Tian 等人（NeurIPS 2024）提出，通过将图像生成建模为多尺度令牌图（token map）的逐尺度预测过程，在 ImageNet 256×256 上取得了显著优于扩散模型（如 **DiT-XL/2**）和传统自回归模型（如 **LlamaGen-XXL**）的生成质量。其核心机制是将联合分布分解为条件下一尺度预测的乘积：
+
+$$p ( r _ { 1 } , r _ { 2 } , \ldots , r _ { K } ) = \prod _ { k = 1 } ^ { K } p ( r _ { k } \mid r _ { 1 } , r _ { 2 } , \ldots , r _ { k - 1 } )$$
+
+然而，VAR 的多尺度生成范式带来了一个被严重低估的效率问题：**KV 缓存的累积效应**。在自回归生成过程中，每个尺度的 Transformer 层都需要缓存键值对（Key-Value pairs），随着尺度从粗到细逐步生成，令牌数量呈指数增长，导致 KV 缓存占用量急剧膨胀。以 VAR-d30（30 层全深度网络）为例，在 batch size 64 下，KV 缓存高达 28687MB，总显存占用达 39265MB。这一内存开销严重限制了 VAR 模型在实际部署中的可行性，尤其是对显存受限的边缘设备和批处理推理场景。
+
+### 现有加速方案的局限
+
+针对 VAR 的效率问题，已有方法如 **VAR-CoDe** 尝试通过引入辅助小模型进行多模型协作加速，但这类方案需要额外训练和维护多个独立模型，增加了系统复杂度和部署成本。更重要的是，这些方法未能触及 VAR 效率问题的本质——**网络深度在多尺度生成中的冗余性**。
+
+### 核心发现：尺度-深度的非对称依赖
+
+本文的关键洞察在于揭示了 VAR 生成过程中一个此前未被关注的特性：**不同尺度对网络深度的敏感度存在显著不对称性**。如 Table 1 所示，当浅层子网应用于后期尺度（r7–r10）时，FID 仅从 1.95 轻微上升至 5.42；但若将同样浅层子网应用于早期尺度（r1–r3），FID 则飙升至 12.91。这一现象表明：
+
+- **早期尺度（粗粒度）**：负责建立图像的全局语义和结构布局，对网络深度极为敏感，需要深层网络的表达能力来捕获长程依赖和高层语义。
+- **后期尺度（细粒度）**：主要进行纹理细化和局部细节补充，对深度相对鲁棒，浅层子网即可胜任。
+
+这一发现为差异化深度分配提供了理论依据：无需在所有尺度上使用完整的深层网络，而是可以根据尺度的语义需求进行灵活配置。
+
+### 固定比例训练的帕累托困境
+
+基于上述发现，一个自然的想法是训练一个支持多深度配置的超网（supernet），通过权重共享让全网络和子网协同优化。然而，直接采用固定比例采样训练（即按固定概率交替优化全网络和子网）会陷入严重的**优化冲突**。如 Figure 2(a) 所示，固定比例训练在子网质量与全网络质量之间形成了清晰的帕累托前沿：
+
+- 当子网采样概率 $p=0.1$ 时，全网络达到最优 FID 1.96，但子网 FID 退化至 2.68；
+- 当 $p=1.0$（仅训练子网）时，子网 FID 改善至 2.15，但全网络 FID 升至 2.32。
+
+这种此消彼长的困境源于全网络优化与子网优化对参数更新的需求方向不一致——深层网络的梯度信号与浅层子网的梯度信号存在冲突，固定比例无法同时满足两者的优化目标。
+
+### 本文动机与目标
+
+综上所述，现有 VAR 模型面临的核心矛盾是：**多尺度生成的高质量输出以巨大的 KV 缓存和显存开销为代价，而直接减少网络深度又会因尺度-深度依赖的不对称性导致质量崩溃**。本文的目标是设计一种无需额外模型、不牺牲全网络质量的前提下，实现灵活深度切换和显著效率提升的解决方案。具体而言，需要解决三个关键子问题：
+
+1. 如何构建支持多深度配置的统一超网架构，实现零开销的深度切换？
+2. 如何设计训练策略，突破固定比例训练的帕累托前沿，同时优化全网络和子网？
+3. 如何确定深度分配方案，最大化效率提升的同时最小化质量损失？
+
+## 核心创新
+
+VARiant 的核心创新在于**将视觉自回归（VAR）模型中固有的尺度-深度非对称依赖转化为一种可调的计算-质量杠杆**。与所有尺度均使用完整 30 层 Transformer 的基线 VAR-d30（Tian et al., NeurIPS 2024）不同，VARiant 通过三个紧密耦合的 changed slots 实现了灵活的深度分配与训练优化。
+
+### 1. 多深度超网与等距采样子网
+
+VARiant 构建了一个**多深度超网（Multi-Depth Supernet）**，从原始 30 层网络中通过等距采样提取多个深度递减的子网，且所有子网与全网络共享权重，实现零额外参数的深度切换。对于目标子网深度 $d$，活跃层索引集定义为：
+
+$${\mathcal Z}_{d} = \{ \lfloor \frac{i \cdot (D-1)}{d-1} \rfloor \mid i=0,1,\ldots,d-1 \}$$
+
+该采样策略始终保留首尾层，确保子网在结构上保持完整的输入嵌入和输出投影能力。这为后续的尺度自适应深度分配提供了统一、可复用的网络基座。
+
+### 2. 尺度自适应深度分配：桥接区与灵活区
+
+VARiant 的核心洞察来自一项关键发现：**早期低分辨率尺度对网络深度极为敏感，而后期高分辨率尺度对深度高度鲁棒**。Table 1 的消融实验清晰揭示了这一非对称依赖——将浅层子网应用于早期尺度（$r_1$–$r_3$）时，FID 从 1.95 飙升至 12.91；而应用于后期尺度（$r_7$–$r_{10}$）时，FID 仅轻微升至 5.42。这表明早期尺度需要深层网络建立全局语义结构，而后期尺度仅需浅层子网即可完成纹理细化。
+
+基于此，VARiant 将生成管线划分为两个功能区域：
+
+$$\mathcal{T}_k = \begin{cases} \{0,1,\ldots,D-1\}, & \text{if } k \leq N \text{ (Bridge Zone)}, \\ \mathcal{T}_d, & \text{if } k > N \text{ (Flexible Zone)} \end{cases}$$
+
+- **桥接区（Bridge Zone）**：前 $N$ 个尺度始终使用全深度 $D$ 层，负责建立全局语义基础。
+- **灵活区（Flexible Zone）**：剩余尺度可根据部署需求动态选择子网深度 $\mathcal{T}_d$，实现计算量与质量的灵活权衡。
+
+这一设计的深层机制在于：桥接区为灵活区提供了高质量的中间表示作为条件，形成了“梯度桥”——在训练中，早期尺度的深层网络为后期尺度的浅层子网提供稳定的学习信号，使得极浅子网（如 $d=2$）也能被有效训练。
+
+### 3. 动态比率渐进训练：突破帕累托前沿
+
+直接使用固定比例（如子网:全网络 = 2:8）联合训练全网络和子网会陷入优化冲突：全网络和子网无法同时达到最优，形成帕累托前沿（Figure 2(a)）。例如，当采样比例 $p=0.1$ 时全网络 FID 可达 1.96，但子网降至 2.68；而 $p=1.0$ 时子网 FID 为 2.15，全网络却升至 2.32。
+
+VARiant 的**三阶段渐进训练调度器**通过动态调整采样比率 $\rho$（子网:全网络）打破这一僵局：
+
+- **阶段一：联合训练**（$[0, E_1]$，$\rho = 2:8$）：以 20% 概率采样子网配置，让全网络主导优化，建立稳定的全局语义基础。
+- **阶段二：渐进过渡**（$[E_1, E_2]$）：子网采样概率从 0.2 线性增长至 1.0，遵循调度函数：
+
+$$p(\mathbf{ep}) = 0.2 + 0.8 \cdot \frac{\mathbf{ep} - E_1}{E_2 - E_1}$$
+
+此阶段梯度来源从全网络逐步过渡到子网，通过桥接区的稳定梯度桥实现平滑迁移。
+
+- **阶段三：子网精炼**（$[E_2, \text{end}]$）：完全聚焦子网优化，精炼其生成质量。
+
+渐进训练的核心价值在于**将时间维度引入优化过程**：早期以全网络为主避免子网“拖累”全局结构学习，后期逐步将优化重心转移至子网，最终使全网络和子网同时达到最优（Figure 2(a) 红点），突破了固定比例训练的帕累托前沿。
+
+### 4. 训练自适应的恢复能力
+
+Table 4 的结果进一步验证了渐进训练的有效性：训练前，极浅子网（$d=2, 4$）直接使用预训练 VAR-d30 权重时 FID 超过 130，几乎完全崩溃；经过联合训练自适应后，这些子网被恢复至 FID 2.28–2.97，深度子网（$d=16$）恢复至 2.05。这表明渐进训练不仅协调了全网络与子网的优化，还能“教会”浅层子网利用桥接区提供的丰富条件信息进行有效生成。
+
+## 整体框架
+
+VARiant 将原始 VAR 模型的**固定深度推理**改造为**多深度超网 + 尺度自适应深度分配 + 渐进训练**的统一框架，在保持生成质量的前提下大幅削减计算与内存开销。
+
+### 核心瓶颈与设计动机
+
+VAR 模型通过多尺度自回归分解实现高质量图像生成，但其推理过程需要为所有尺度维护完整的 Transformer 解码器状态。随着生成尺度增加，**KV 缓存累积**成为严重的内存瓶颈——以 VAR-d30（30 层）为例，单次推理的 KV 缓存可达 28.7 GB（batch size 64），严重限制实际部署。
+
+VARiant 的核心洞察在于：**不同生成尺度对网络深度的依赖存在显著非对称性**。早期低分辨率尺度（r₁–r₃）负责建立全局语义结构，对网络深度极度敏感——将浅层子网应用于这些尺度时，FID 从 1.95 飙升至 12.91（Table 1）。而后期高分辨率尺度（r₇–r₁₀）主要进行纹理细化，对深度表现出强鲁棒性——同样使用浅层子网，FID 仅从 1.95 升至 5.42。这一发现揭示了**按尺度分配深度**的巨大潜力。
+
+### 三模块 Pipeline
+
+VARiant 的推理与训练流程由三个紧密协作的模块构成（Figure 1）：
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/001_Figure_1.jpg]]
+*Figure 1: VARiant inference and training framework*
+
+**1. 多深度超网 (Multi-Depth Supernet)**
+
+基于原始 VAR-d30 的 30 层 Transformer 解码器，通过等距采样构建一系列共享权重的子网。给定目标子网深度 $d$，活跃层索引集为：
+
+$${\mathcal Z}_{d} = \{ \lfloor \frac{i \cdot (D-1)}{d-1} \rfloor \mid i=0,1,\ldots,d-1 \}$$
+
+该设计始终保留首尾层，确保子网与全网络在结构上保持兼容。子网深度可从 16 层、8 层直至 2 层灵活选择，且**所有子网与全网络共享同一套参数**，实现零额外存储开销的深度切换。
+
+**2. 桥接区与灵活区 (Bridge Zone & Flexible Zone)**
+
+生成过程被划分为两个功能区域。对于第 $k$ 个生成步骤，活跃层集合定义为：
+
+$$\mathcal{T}_k = \begin{cases} \{0,1,\ldots,D-1\}, & \text{if } k \leq N \text{ (Bridge Zone)}, \\ \mathcal{T}_d, & \text{if } k > N \text{ (Flexible Zone)} \end{cases}$$
+
+- **桥接区**（前 $N$ 个尺度，如 r₁–r₆）：始终使用完整的 30 层网络，为后续尺度建立高质量的全局语义基础，同时为子网训练提供稳定的梯度桥接。
+- **灵活区**（后续尺度，如 r₇–r₁₀）：运行时可根据需要选择任意子网深度 $d$，在质量与效率之间动态权衡。
+
+**3. 渐进训练调度器 (Progressive Training Scheduler)**
+
+直接使用预训练权重初始化子网会导致严重性能崩溃（极浅子网 FID > 130）。VARiant 采用三阶段渐进训练策略解决全网络与子网之间的优化冲突：
+
+- **阶段一（联合训练）**：以 2:8 的比率采样子网与全网络，子网以 20% 概率参与训练，损失函数为：
+
+  $$\mathcal{L} = \sum_{k=1}^{K} \mathrm{CE}\left(p_{\theta}(\boldsymbol{r}_k \mid \boldsymbol{r}_{<k}, \mathcal{T}_k), \boldsymbol{r}_k^{*}\right)$$
+
+- **阶段二（渐进过渡）**：子网采样概率从 0.2 线性增加至 1.0：
+
+  $$p(\mathbf{ep}) = 0.2 + 0.8 \cdot \frac{\mathbf{ep} - E_1}{E_2 - E_1}$$
+
+- **阶段三（子网精炼）**：完全聚焦子网优化，巩固其生成能力。
+
+该调度器使 VARiant 突破了固定比例训练的帕累托前沿——固定比例训练无法同时优化全网络和子网（Figure 2a），而渐进训练的红色星标点实现了双最优。
+
+### 输入输出流
+
+**推理阶段**：输入为初始尺度令牌图 r₁，逐尺度迭代生成。桥接区使用全深度网络处理，灵活区根据配置的子网深度 $d$ 选择性激活 Transformer 层。由于后期尺度使用浅层子网，KV 缓存和计算量显著降低。
+
+**训练阶段**：输入为完整的 10 尺度令牌序列。调度器按当前阶段的采样比率决定每个 batch 中灵活区使用的网络深度，梯度通过共享权重同时优化全网络和子网。训练在 8 块 NVIDIA H100 上使用 AdamW 优化器（lr=1e-6，batch size=1024）进行。
+
+## 核心模块与公式推导
+
+### 3.1 视觉自回归的尺度分解
+
+VAR（Tian et al., NeurIPS 2024）将自回归解码重构为“下一尺度预测”范式，将多尺度令牌图的联合分布分解为条件下一尺度预测的乘积：
+
+$$p ( r _ { 1 } , r _ { 2 } , \ldots , r _ { K } ) = \prod _ { k = 1 } ^ { K } p ( r _ { k } \mid r _ { 1 } , r _ { 2 } , \ldots , r _ { k - 1 } )$$
+
+其中 $r_k$ 表示第 $k$ 个尺度的令牌图，$K$ 为尺度总数。该分解使模型能够从粗到细逐尺度生成，每个尺度依赖所有先前尺度的上下文信息。这一范式在保持自回归生成优势的同时引入了层级并行性，但也导致多尺度生成过程中KV缓存累积，造成严重的内存开销——这正是本文要解决的核心瓶颈。
+
+### 3.2 多深度超网架构
+
+#### 3.2.1 等距采样子网
+
+VARiant的核心设计是构建一个多深度超网（Multi-Depth Supernet），通过等距采样从全深度 $D$（原始VAR-d30的30层）中选择子网深度 $d$ 的活跃层。等距层索引集定义为：
+
+$${\mathcal Z}_{d} = \{ \lfloor \frac{i \cdot (D-1)}{d-1} \rfloor \;|\; i=0,1,\ldots,d-1 \}$$
+
+该公式保证无论子网深度 $d$ 取何值，始终保留首层和末层（$i=0$ 和 $i=d-1$ 分别对应层索引 $0$ 和 $D-1$）。所有子网与全网络共享参数，实现零额外开销的深度切换。
+
+#### 3.2.2 跨尺度深度分配
+
+基于尺度-深度非对称依赖的核心洞察（早期尺度对深度极为敏感，后期尺度对深度鲁棒），VARiant将生成流水线划分为两个区域。第 $k$ 个生成步骤的活跃层集合 $\mathcal{T}_k$ 定义为：
+
+$$\mathcal{T}_k = \begin{cases} \{0,1,\ldots,D-1\}, & \text{if } k \leq N \text{ (Bridge Zone)}, \\ \mathcal{T}_d, & \text{if } k > N \text{ (Flexible Zone)} \end{cases}$$
+
+其中 $N$ 为桥接区（Bridge Zone）的尺度数，此区域内所有尺度均使用全深度 $D$ 层处理，以建立全局语义和稳定梯度流；灵活区（Flexible Zone）的后期尺度可根据需要选择子网深度 $\mathcal{T}_d$，在保持纹理细化能力的同时大幅削减计算和内存开销。
+
+### 3.3 渐进训练策略
+
+#### 3.3.1 固定比例训练的帕累托困境
+
+初步实验发现，以固定采样比例 $\rho$（子网:全网络）联合训练全网络和子网时，存在不可调和的优化冲突：低比例（$\rho$ 小）有利于全网络优化但子网性能退化，高比例（$\rho$ 大）有利于子网但全网络受损，形成帕累托前沿（Figure 2a）。这一困境的根本原因在于两个优化目标的梯度方向在训练后期产生冲突。
+
+#### 3.3.2 三阶段动态调度
+
+为解决上述冲突，VARiant采用动态比率三阶段渐进训练策略。阶段一（联合训练，$[0, E_1]$）以子网采样概率20%进行小比例联合训练，损失函数为：
+
+$$\mathcal{L} = \sum_{k=1}^{K} \mathrm{CE}\left(p_{\theta}(\boldsymbol{r}_k \mid \boldsymbol{r}_{<k}, \mathcal{T}_k), \boldsymbol{r}_k^{*}\right)$$
+
+该阶段在桥接区全深度网络提供的稳定梯度桥（gradient bridge）支持下，同时优化全网络和子网的共享参数。
+
+阶段二（渐进过渡，$[E_1, E_2]$）线性增加子网采样概率，调度函数为：
+
+$$p(\mathbf{ep}) = 0.2 + 0.8 \cdot \frac{\mathbf{ep} - E_1}{E_2 - E_1}$$
+
+其中 $\mathbf{ep}$ 为当前训练轮次。采样概率从0.2平滑过渡至1.0，使优化重心从联合优化逐步转向子网精炼，同时维持梯度桥的稳定传导。
+
+阶段三（子网精炼，$[E_2, E_3]$）仅训练子网配置，完成对子网性能的最终优化。三阶段调度使VARiant突破了固定比例训练的帕累托前沿，同时实现全网络和子网的双最优性能。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/003_Figure_2.jpg]]
+*Figure 2: Fixed-ratio training exhibits (a) Pareto trade-offs, (b) optimization conflicts at extreme ratios, and (c) time-varying optimal ratios, motivating our progressive training strategy*
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/004_Figure_3.jpg]]
+*Figure 3: Progressive training strategy. (a) Dynamic sampling ratio schedule across three training phases. (b) Gradient source analysis showing the transition from joint optimization to subnetfocused refinement through a stable gradient bridge*
+
+## 实验与分析
+
+### 核心瓶颈验证：尺度-深度非对称依赖
+
+VAR模型在多尺度自回归生成中，所有尺度共享同一深层网络，导致KV缓存随分辨率递增而急剧膨胀——这是限制实际部署的真正内存瓶颈。VARiant的设计前提是：不同生成尺度对网络深度的需求存在根本性不对称。Table 1的消融实验直接验证了这一假设。
+
+当浅层子网（d=4）应用于早期低分辨率尺度（r1–r3）时，FID从全深度基线的1.95飙升至12.91，全局语义近乎完全崩溃；应用于中期尺度（r4–r6）时FID为8.5；而仅应用于后期高分辨率尺度（r7–r10）时，FID仅轻微升至5.42。这一鲜明对比揭示了一个因果机制：早期尺度承担建立全局语义结构的关键任务，对网络深度极度敏感；后期尺度主要负责纹理细化，对深度具有较强鲁棒性。这一发现构成了VARiant“桥接区+灵活区”架构设计的经验基础。
+
+### 主实验结果：效率-质量权衡突破
+
+Table 2报告了在ImageNet 256×256上与各类方法的全面对比。以VAR-d30（Tian et al., NeurIPS 2024）为全深度基线（FID 1.95，显存39265MB，推理速度1.0×）：
+
+- **VARiant-d16**：FID 2.05（仅+0.10），显存降至28644MB（-27%），推理加速1.7×，KV缓存从28687MB降至16092MB（-43.9%）。在几乎不损失生成质量的前提下，实现了显著的内存与速度收益。
+- **VARiant-d8**：FID 2.12（+0.17），显存20759MB（-47%），加速2.6×。
+- **VARiant-d2**：FID 2.97（+1.02），显存降至10385MB（-74%），加速3.5×，以适度质量代价换取极致的部署效率。
+
+Table 3进一步按批大小和深度配置拆解了内存消耗。在batch size=64时，VAR-d30的KV缓存占用28687MB，VARiant-d16降至16092MB；当batch size增至256时，VAR-d30直接OOM，而VARiant-d16仍可运行（总计约72000MB）。这直接证明了KV缓存削减是VARiant实现可扩展部署的核心杠杆。
+
+与扩散模型DiT-XL/2和传统自回归模型LlamaGen-XXL相比，VARiant系列在FID与推理效率的联合指标上展现出明显的帕累托优势。与多模型协作加速方法VAR-CoDe相比，VARiant无需额外辅助模型，通过单一超网内的深度切换即可实现灵活权衡。
+
+### 关键消融：训练自适应与桥接区设计
+
+**训练自适应的必要性**。Table 4揭示了直接使用权重复用而无联合训练时的灾难性退化：极浅子网（d=2, 4）的FID超过130，完全不可用。经过VARiant的三阶段渐进训练后，d=2子网恢复至FID 2.97，d=4恢复至2.28，d=16恢复至2.05。这表明，等距采样子网虽然结构上天然适配权重共享，但必须通过精心设计的训练策略来弥合不同深度配置间的优化鸿沟。
+
+**桥接区设计的不可替代性**。Table 5对比了两种深度分配策略：全跳层（所有尺度均使用子网）与仅后期跳层（r1–r6全深度、r7–r10子网）。全跳层策略下，子网FID为9.44，全网络FID为3.12；而桥接区设计将子网FID大幅提升至2.05，全网络FID提升至1.96。其因果机制在于：早期尺度用全深度执行，为后续浅层子网建立了稳定的“梯度桥”——早期层的完整计算为后期子网提供了高质量的中间特征，使子网得以专注于局部纹理细化而非弥补全局语义缺失。
+
+### 渐进训练突破帕累托前沿
+
+固定比例训练（Fixed-Ratio Training）存在根本性的优化冲突（Figure 2(a)）：当子网采样概率p=0.1时，全网络达到最优FID 1.96，但子网退化至2.68；当p=1.0时，子网FID为2.15，但全网络升至2.32。这些点形成了一条不可逾越的帕累托前沿——任何固定比例都无法同时优化全网络和子网。
+
+VARiant的三阶段动态比率渐进训练直接突破了这一前沿。阶段一以2:8比率联合训练，为子网提供初始梯度引导；阶段二线性过渡至10:0，通过梯度桥机制将优化重心平滑迁移至子网；阶段三专注于子网精炼。结果（Figure 2(a)红点）同时实现了全网络最优和子网最优，验证了动态比率调度的核心价值。
+
+### 配置空间分析与推荐设置
+
+子网深度D和早期尺度数N构成二维配置空间（Figure 5(c)）。D控制计算下界与内存占用，N控制深度切换的起始尺度。实验表明：增大N带来边际收益递减——N从6增至10时FID改善幅度逐渐收窄，但内存开销线性增长。推荐配置D=16、N=7达到FID 2.00与36%内存削减的最佳平衡点（Table 8）。
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/010_Figure_5.jpg]]
+*Figure 5: Configuration parameter analysis. (a) Impact of subnet depth D (fixed N=6): quality vs. memory trade-off. (b) Impact of early-scale count N (fixed D=16): diminishing returns with increasing N. (c) Configuration space: colored trajectories for different D values, marker size indicates N. Red star: recommended configuration (D=16, N=7) with FID 2.00 and 36% memory reduction*
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/015_Table_8.jpg]]
+*Table 8: Complete (d, N) configuration space – FID scores on ImageNet 256×256*
+
+Figure 7展示了子网生成质量在渐进训练过程中的演进：阶段一结束时子网输出仍显模糊，阶段二过渡期结构逐渐清晰，阶段三精炼后达到与全网络接近的视觉质量。这从视觉层面印证了渐进训练调度器的有效性。
+
+### 失败模式与局限性
+
+1. **极浅子网的不可恢复退化**：d=2子网即使经联合训练，FID仍为2.97，与全深度基线的1.95存在明显差距。当深度压缩至极端时，网络容量的根本性不足无法完全通过训练策略弥补。
+2. **单子网训练限制**：当前方案仅训练单一子网配置（如d16），若需同时支持多个深度级别（d4/d8/d16），需分别训练或扩展为多子网联合训练，后者可能引入新的优化冲突。
+3. **阶段边界的经验性**：三阶段训练的过渡时机（E1、E2）目前凭经验设定，缺乏自动化确定最优转换点的方法。
+4. **方法泛化性未验证**：尺度自适应深度策略尚未在VAR之外的多尺度生成模型（如基于扩散的级联生成）上测试。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/002_Table_1.jpg]]
+*Table 1: Impact of subnet application on different scales. Applying subnets to early scales causes severe quality degradation, while applying to later scales preserves quality*
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/005_Table_2.jpg]]
+*Table 2: Quantitative assessment of the efficiency-quality trade-off across various methods. Inference efficiency evaluated with batch size 64 on NVIDIA L20 GPU, latency excluding VQVAE’s shared cost*
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/008_Table_3.jpg]]
+*Table 3: Memory consumption breakdown at different batch sizes and depth configurations. All measurements are conducted on NVIDIA L20 GPU with batch sizes ranging from 64 to 256. All values in MB. OOM indicates out-of-memory errors*
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/009_Table_4.jpg]]
+*Table 4: FID comparison (↓) of different subnet depths before and after training. Training-free baselines use pretrained VARd30 weights. Each row represents one training configuration*
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/007_Table_5.jpg]]
+*Table 5: Ablation study on bridge zone design with flexible zone at r7–r10 (d = 16, D = 30)*
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/006_Figure_4.jpg]]
+*Figure 4: Visual quality comparison across different depth configurations. All configurations maintain high visual quality with significant memory reduction and inference speedup*
+
+![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/014_Figure_7.jpg]]
+*Figure 7: Subnet generation quality evolution during progressive training (d = 16). Top row: Cat; Bottom row: Fish. Results demonstrate subnet-only inference across three training phase endpoints*
+
+## 方法谱系与知识库定位
+
+### 与现有工作的关系
+
+**VARiant** 建立在 **VAR**（Tian et al., NeurIPS 2024）的“下一尺度预测”范式之上。VAR 将传统自回归模型的逐 token 解码重构为从粗到细的多尺度生成，通过层级并行实现加速。然而，VAR 的瓶颈在于所有尺度均使用固定的全深度网络（VAR-d30，30层），导致 KV 缓存在多尺度生成中严重累积——这是本工作的核心干预点。
+
+与 **VAR-CoDe** 等多模型协作加速方法不同，VARiant 不引入辅助小模型，而是通过单一超网内的等距采样子网实现深度切换，消除了多模型实例或复杂 token 操作的需求。在效率-质量权衡谱系中，VARiant 填补了 VAR-d30（全深度，FID 1.95）与极端轻量配置之间的空白，同时与 **DiT-XL/2** 扩散模型和 **LlamaGen-XXL** 传统自回归模型形成跨范式对比。
+
+### 核心因果机制
+
+本工作的核心发现是**尺度-深度非对称依赖**：早期低分辨率尺度（r1–r3）对网络深度极为敏感，浅层子网会导致全局语义近乎完全丧失（FID 从 1.95 飙升至 12.91）；后期高分辨率尺度（r7–r10）对深度鲁棒，浅层子网仅使 FID 从 1.95 升至 5.42（Table 1）。这一非对称性构成了方法设计的因果基础。
+
+基于此，VARiant 引入三个因果干预：
+1. **等距采样子网**：从 D=30 层中等距采样 d 层（2≤d≤16），始终保留首尾层，通过权重共享实现零开销深度切换。
+2. **桥接区-灵活区分区**：前 N 个尺度用全深度建立全局语义（桥接区），后续尺度用子网细化纹理（灵活区），在全网跳层时建立梯度桥。
+3. **动态比率渐进训练**：三阶段调度（初期 2:8 子网:全网络采样，中期线性过渡至 10:0，后期子网精炼）解决固定比例训练中全网络与子网的优化冲突，突破帕累托前沿。
+
+### 适用边界与局限
+
+**适用边界**：
+- 该方法专为多尺度自回归生成模型设计，当前验证限于 VAR 框架下的 ImageNet 256×256 类别条件生成。
+- 桥接区设计依赖于早期尺度对深度的敏感性，若目标模型的多尺度特性不同（如尺度间依赖关系更均匀），该策略可能需要重新校准。
+
+**已知局限**：
+1. **单子网训练**：当前仅训练单一子网（如 d16）与全网络，尚未扩展至同时训练多个子网（d4/d8/d16/d30）的单次训练方案。
+2. **阶段边界经验性**：三阶段训练的过渡周期（E₁、E₂）目前凭经验设定，缺乏自动确定最优阶段转换时机的方法。
+3. **框架泛化性未验证**：该方法尚未在除 VAR 外的其他多尺度生成模型（如基于扩散的多尺度架构）上验证其适用性。
+
+### 开放问题
+
+1. **自动化阶段调度**：如何基于训练动态（如梯度冲突度量、损失曲率）自动确定渐进训练的最优阶段转换时机，而非依赖经验设定？
+2. **多子网联合训练**：能否在单次训练中同时优化多个深度子网（d4/d8/d16/d30）而避免优化冲突？这可能需要更复杂的采样策略或梯度解耦机制。
+3. **跨架构迁移**：尺度自适应深度策略在其他多尺度生成模型（如多尺度扩散模型、金字塔式 ViT）中的适用性如何？桥接区的设计原则是否具有普适性？
+4. **动态深度推理**：能否在推理时根据输入复杂度动态选择每尺度的深度，而非固定 N 和 d？这需要开发轻量级的深度决策模块。
+
+> **注意**：以上局限和开放问题均来自原文明确陈述或从实验设计间隙中合理推断。关于跨架构迁移的讨论属于原文未覆盖的推测性延伸，需后续工作验证。
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/Progressive_Supernet_Training_for_Efficient_Visual_Autoregressive_Modeling.pdf]]

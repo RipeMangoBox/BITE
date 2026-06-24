@@ -1,0 +1,103 @@
+---
+title: "Method: Data Curation / Synthesis"
+type: paper-index
+dimension: method
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Method: Data Curation / Synthesis
+
+- [[obsidian-vault/analysis/ICCV_2019/Meta_Sim_Learning_to_Generate_Synthetic_Datasets.md|Meta Sim: Learning to Generate Synthetic Datasets (ICCV 2019 2019)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2019/Meta_Sim_Learning_to_Generate_Synthetic_Datasets.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+	- methods: Meta-Sim
+	- datasets: MNIST Rotated Digits, Aerial2D Semantic Segmentation, KITTI Car Detection
+- [[obsidian-vault/analysis/ECCV_2020/Meta_Sim2_Unsupervised_Learning_of_Scene_Structure_for_Synthetic_Data_Generation.md|Meta-Sim2: Unsupervised Learning of Scene Structure for Synthetic Data Generation (ECCV 2020 2020)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2020/Meta_Sim2_Unsupervised_Learning_of_Scene_Structure_for_Synthetic_Data_Generation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+	- methods: Meta-Sim2
+	- datasets: KITTI 验证集, KITTI 训练集与生成数据之间的分布相似性
+- [[obsidian-vault/analysis/3DV_2021/Mix3D_Out_of_Context_Data_Augmentation_for_3D_Scenes.md|Mix3D: Out-of-Context Data Augmentation for 3D Scenes (3DV 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/3DV_2021/Mix3D_Out_of_Context_Data_Augmentation_for_3D_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+	- methods: Mix3D
+	- datasets: ScanNet, S3DIS, SemanticKITTI
+- [[obsidian-vault/analysis/ICLR_2022/Low_Budget_Active_Learning_via_Wasserstein_Distance_An_Integer_Programming_Approach.md|Low-Budget Active Learning via Wasserstein Distance: An Integer Programming Approach (ICLR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2022/Low_Budget_Active_Learning_via_Wasserstein_Distance_An_Integer_Programming_Approach.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Data Curation / Synthesis
+	- methods: Wasserstein Core-set Selection via Generalized Benders Decomposition (Wass. + EOC + P)
+	- datasets: SVHN, CIFAR-10, Office-31
+- Immersive-Labeler: Immersive Annotation of Large-scale 3D Point Clouds in Virtual Reality (SIGGRAPH 2022 2022)
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+- Learning to Relight Portrait Images via a Virtual Light Stage and Synthetic-to-Real Adaptation (SIGGRAPH ASIA 2022 2022)
+	- method groups: Data Curation / Synthesis
+- [[obsidian-vault/analysis/ICCV_2023/Towards_Viewpoint_Robustness_in_Birds_Eye_View_Segmentation.md|Towards Viewpoint Robustness in Bird's Eye View Segmentation (ICCV 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2023/Towards_Viewpoint_Robustness_in_Bird_s_Eye_View_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+	- methods: 基于新视角合成的视点增强框架 (NVS-based Viewpoint Augmentation Framework)
+	- datasets: NVIDIA DRIVE Sim 目标视点, CARLA synthetic views
+- CLIP-PAE: Projection-Augmentation Embedding to Extract Relevant Features for a Disentangled, Interpretable and Controllable Text-Guided Face Manipulation (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/CLIP_PAE_Projection_Augmentation_Embedding_to_Extract_Relevant_Features_for_a_Disentangled_Interpretable_and_Controllable_Text_Guided_Face_Manipulation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+- Neural Volumetric Reconstruction for Coherent Synthetic Aperture Sonar (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Neural_Volumetric_Reconstruction_for_Coherent_Synthetic_Aperture_Sonar.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+- [[obsidian-vault/analysis/ICLR_2024/Transferring_Labels_to_Solve_Annotation_Mismatches_Across_Object_Detection_Datasets.md|Transferring Labels to Solve Annotation Mismatches Across Object Detection Datasets (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/Transferring_Labels_to_Solve_Annotation_Mismatches_Across_Object_Detection_Datasets.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+	- methods: Label‑Guided Pseudo‑Labeling (LGPL)
+	- datasets: nuScenes → nuImages, Synscapes → Cityscapes, Internal-Dataset → nuImagest
+- [[obsidian-vault/analysis/ICCV_2025/FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annotation_for_Fine_grained_Motion_Generation_and_Editing.md|FineMotion: A Dataset and Benchmark with both Spatial and Temporal Annotation for Fine-grained Motion Generation and Editing (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annotation_for_Fine_grained_Motion_Generation_and_Editing.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Benchmark / Evaluation, Data Curation / Synthesis
+	- methods: FineMotion
+	- datasets: HumanML3D test set
+- DreamMask: Boosting Open-vocabulary Panoptic Segmentation with Synthetic Data (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+- ForceGrip: Reference-Free Curriculum Learning for Realistic Grip Force Control in VR Hand Manipulation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/ForceGrip_Reference-Free_Curriculum_Learning_for_Realistic_Grip_Force_Control_in_VR_Hand_Manipulation.pdf|PDF]]
+	- method groups: Data Curation / Synthesis
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.md|PARC: Physics-based Augmentation with Reinforcement Learning for Character Controllers (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Agent / RL / Planning, Data Curation / Synthesis
+	- methods: PARC
+- To Infinity and Beyond: a GPU-Driven Memory Sharing Pipeline to Generate and Process Infinite Synthetic Data (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression, Data Curation / Synthesis
+- [[obsidian-vault/analysis/ICLR_2026/Active_Learning_for_Decision_Trees_with_Provable_Guarantees.md|Active Learning for Decision Trees with Provable Guarantees (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Active_Learning_for_Decision_Trees_with_Provable_Guarantees.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Data Curation / Synthesis
+	- methods: Algorithm 2（乘性误差主动学习算法）
+- [[obsidian-vault/analysis/ICLR_2026/Automatic_Image_Level_Morphological_Trait_Annotation_for_Organismal_Images.md|Automatic Image-Level Morphological Trait Annotation for Organismal Images (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Automatic_Image_Level_Morphological_Trait_Annotation_for_Organismal_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+	- methods: SAE-guided trait annotation pipeline (MLLM + SAE)
+	- datasets: BIOSCAN-5M, 人类评估, Insects
+- [[obsidian-vault/analysis/ICLR_2026/CauKer_Classification_Time_Series_Foundation_Models_Can_Be_Pretrained_on_Synthetic_Data.md|CauKer: Classification Time Series Foundation Models Can Be Pretrained on Synthetic Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/CauKer_Classification_Time_Series_Foundation_Models_Can_Be_Pretrained_on_Synthetic_Data.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Data Curation / Synthesis
+	- methods: CAUKER
+	- datasets: UCR, WOODS
+- [[obsidian-vault/analysis/ICLR_2026/High_dimensional_Analysis_of_Synthetic_Data_Selection.md|High-dimensional Analysis of Synthetic Data Selection (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/High_dimensional_Analysis_of_Synthetic_Data_Selection.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Data Curation / Synthesis
+	- methods: Covariance Matching
+	- datasets: CIFAR-10
+- [[obsidian-vault/analysis/ICLR_2026/Rethinking_Driving_World_Model_as_Synthetic_Data_Generator_for_Perception_Tasks.md|Rethinking Driving World Model as Synthetic Data Generator for Perception Tasks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Rethinking_Driving_World_Model_as_Synthetic_Data_Generator_for_Perception_Tasks_e3902bf4ec4f.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Data Curation / Synthesis
+	- datasets: nuScenes, DriveObj3D

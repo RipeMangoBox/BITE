@@ -1,0 +1,450 @@
+[
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "004122",
+    "caption": "a man raises his hands over his head, and to the sky. his lips move so as to mouth the words \"ascend.\"",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M011653",
+    "caption": "a person is crouching down and looking around, catiously.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M009577",
+    "caption": "a person touhes their left arms twice with their right hand.",
+    "motion_len": 100,
+    "raw_motion_len": 101
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "013007",
+    "caption": "the man walks in a forward facing zig zag motion.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "003027",
+    "caption": "the person makes a right turn.",
+    "motion_len": 108,
+    "raw_motion_len": 110
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "002522",
+    "caption": "a man steps to the left steps in a small clockwise circle throws left arm then steps in a larger backward clockwise circle",
+    "motion_len": 156,
+    "raw_motion_len": 157
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "002103",
+    "caption": "a man steps forward and does a handstand.",
+    "motion_len": 140,
+    "raw_motion_len": 140
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "013088",
+    "caption": "the person picks up the bottle of shampoo to wash the dog",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "012046",
+    "caption": "a person walks on a beam, loses his balance and fall off to his right.",
+    "motion_len": 88,
+    "raw_motion_len": 91
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M010936",
+    "caption": "a man stands and raises both of his arms overhead and then makes up and downwards movements.",
+    "motion_len": 44,
+    "raw_motion_len": 45
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "006172",
+    "caption": "a person holds their hands together and bows their head a few times.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M010076",
+    "caption": "a person who is standing with his hands by his sides takes four very slow steps forward.",
+    "motion_len": 120,
+    "raw_motion_len": 123
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M000019",
+    "caption": "person jogs around to the right and left",
+    "motion_len": 148,
+    "raw_motion_len": 150
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M014554",
+    "caption": "a person who seems to slap something",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "001179",
+    "caption": "a person raises his right arm and then lowers it.",
+    "motion_len": 52,
+    "raw_motion_len": 53
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "006245",
+    "caption": "a person holds their arms near their face and searches right and left.",
+    "motion_len": 124,
+    "raw_motion_len": 125
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M005851",
+    "caption": "a person, standing, raises his left hand as if to check his watch and then lowers his hand back to his side.",
+    "motion_len": 44,
+    "raw_motion_len": 45
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M011430",
+    "caption": "person stands and raises left leg, then proceeds to kick into the air towards the left. person then pivots their torso tot he left, raising their right leg and kicking to the left. then comes back to stand center",
+    "motion_len": 84,
+    "raw_motion_len": 87
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M003858",
+    "caption": "a person raises both hands and waves them in various ways.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M011471",
+    "caption": "a person sits on the ledge of something then gets off and walks away.",
+    "motion_len": 184,
+    "raw_motion_len": 186
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "000565",
+    "caption": "an off balance intoxicated man gestures at another person to the left. seemingly in an argument.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "005229",
+    "caption": "a person squats to lift something up then struggles to carry and put it down.",
+    "motion_len": 196,
+    "raw_motion_len": 198
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M005197",
+    "caption": "a person lowers their arms to their sides, then stretches them out straight in front of them and parallel to the ground before returning them to their sides.",
+    "motion_len": 128,
+    "raw_motion_len": 129
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M006383",
+    "caption": "subject walks in a full circle, then side steps to turn around and walk around something to avoid running into.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "002897",
+    "caption": "a person jauntily skips forward.",
+    "motion_len": 116,
+    "raw_motion_len": 119
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "010558",
+    "caption": "a person walks in a clockwise direction.",
+    "motion_len": 164,
+    "raw_motion_len": 165
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "010797",
+    "caption": "a person walks forward and side kicks then puts his hand to his face",
+    "motion_len": 124,
+    "raw_motion_len": 125
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M001214",
+    "caption": "a man hops on his left leg five times, makes a small jump, then steps forward into a strong push with both hands. he then returns to the starting position.",
+    "motion_len": 124,
+    "raw_motion_len": 127
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M006658",
+    "caption": "the person walks backwards in a straight line",
+    "motion_len": 100,
+    "raw_motion_len": 101
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M004997",
+    "caption": "a person holds their head with both hands then bats away something with their left hand.",
+    "motion_len": 136,
+    "raw_motion_len": 138
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M003934",
+    "caption": "a person stands, waving back and forth with one arm.",
+    "motion_len": 112,
+    "raw_motion_len": 114
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M000934",
+    "caption": "the person is walking forward.",
+    "motion_len": 112,
+    "raw_motion_len": 113
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M013754",
+    "caption": "a person claps their hands.",
+    "motion_len": 88,
+    "raw_motion_len": 89
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M004146",
+    "caption": "a person walks and turns right to walk back.",
+    "motion_len": 112,
+    "raw_motion_len": 115
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M004991",
+    "caption": "a person flaps their arms like a chicken.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M013371",
+    "caption": "a person swings something with both hands",
+    "motion_len": 152,
+    "raw_motion_len": 153
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "008498",
+    "caption": "the person is shivering and then rubbing their hands together to stay warm.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "000327",
+    "caption": "a person raises their right arm and then bends to touch the floor in fromt of them, they repeat this motion twice.",
+    "motion_len": 152,
+    "raw_motion_len": 152
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M011607",
+    "caption": "a person slowly walks in a clockwise circle",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "009432",
+    "caption": "a figure is laying on the ground then rolls into a sit, then into being on all fours, then to standing",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "003782",
+    "caption": "person walked forward picked up an item and walked to the back and set the item down",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "013426",
+    "caption": "the person is respectfully taking a knee for blm",
+    "motion_len": 152,
+    "raw_motion_len": 152
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M004412",
+    "caption": "a person raises both hands in front of them then throws them down in disapproval.",
+    "motion_len": 84,
+    "raw_motion_len": 86
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "006331",
+    "caption": "a person is stumbling forward.",
+    "motion_len": 88,
+    "raw_motion_len": 90
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "008518",
+    "caption": "person is leaving in a circular motion.",
+    "motion_len": 128,
+    "raw_motion_len": 131
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "005445",
+    "caption": "a person walked in a counter-clockwise circle.",
+    "motion_len": 140,
+    "raw_motion_len": 143
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "012870",
+    "caption": "a person slowly walks forward.",
+    "motion_len": 156,
+    "raw_motion_len": 157
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M004067",
+    "caption": "facing front, a person makes the throwing motion with their left arm.",
+    "motion_len": 52,
+    "raw_motion_len": 52
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M012567",
+    "caption": "a person rests their hands on their knees while squatting.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "002574",
+    "caption": "a person thats walking backwards",
+    "motion_len": 116,
+    "raw_motion_len": 117
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M011812",
+    "caption": "a person walks slightly to the side, then walks back in a slightly exaggerated manner.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "002247",
+    "caption": "a person walking and helping maintain their balance and support,  from holding onto a side rail or wall.",
+    "motion_len": 100,
+    "raw_motion_len": 100
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "005352",
+    "caption": "man walking in a circle to his right (clockwise)",
+    "motion_len": 164,
+    "raw_motion_len": 164
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "001768",
+    "caption": "a man walks from side to side while holding his right forearm with left hand, and then walks back.",
+    "motion_len": 172,
+    "raw_motion_len": 174
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M003784",
+    "caption": "a man walks in counterclockwise direction.",
+    "motion_len": 140,
+    "raw_motion_len": 143
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "010586",
+    "caption": "a person carefully sits down on the ground and crosses their legs.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M009556",
+    "caption": "person walks backwards quickly, then stops.",
+    "motion_len": 96,
+    "raw_motion_len": 99
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "011640",
+    "caption": "a person walks in an s shape pattern.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "011402",
+    "caption": "a person slowly walks in a 3/4 circle.",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M012495",
+    "caption": "a person walks quickly forward, moving at a slight angle to the left",
+    "motion_len": 88,
+    "raw_motion_len": 91
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M010492",
+    "caption": "left hand circular motion medium speed",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M011823",
+    "caption": "person raises left arm as if throwing something light into the air. they then return to center and picks up an item with both hands, brings it up to the left war and then back down and across to the right side of the waist. arms then reset to center and hang by waist, then proceed to pick up an item on the left and turn to the right to put down",
+    "motion_len": 196,
+    "raw_motion_len": 199
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M008484",
+    "caption": "a person stretches their shoulders by moving their bent arms forward and backward.",
+    "motion_len": 64,
+    "raw_motion_len": 66
+  },
+  {
+    "source": "HumanML3D/test",
+    "sample_id": "M011351",
+    "caption": "walks forward, turns around, and walks back.",
+    "motion_len": 80,
+    "raw_motion_len": 83
+  }
+]

@@ -1,0 +1,17 @@
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+Loading model...
+--> Autoaligner loaded from checkpoint
+Rendering 1/2: 2011_-4GsCEopbd4_00008_001_a
+  camera: done (PNG+MP4+Concat)
+  human: done (PNG+MP4+Concat)
+  joint: done (PNG+MP4+Concat)
+Rendering 2/2: 2011_-4GsCEopbd4_00017_000_a
+  camera: done (PNG+MP4+Concat)
+  human: done (PNG+MP4+Concat)
+  joint: done (PNG+MP4+Concat)
+{"ok": true, "out_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0", "samples": 2, "elapsed": 59.92071056365967}

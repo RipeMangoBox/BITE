@@ -1,0 +1,324 @@
+---
+title: "Thinking in Dynamics: How Multimodal Large Language Models Perceive, Track, and Reason Dynamics in Physical 4D World"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/Thinking_in_Dynamics_How_Multimodal_Large_Language_Models_Perceive_Track_and_Reason_Dynamics_in_Physical_4D_World.pdf
+project_link: "https://dyn-bench.github.io/"
+code_link: null
+aliases:
+- STTCMSTMGF
+tags:
+- CVPR_2026
+- topic/other_unclear
+- topic/other_unclear/general
+core_operator: 结构化时空信息集成（包括空间-时间文本认知图ST‑TCM与掩码引导融合Mask‑Guided Fusion）通过显式注入几何、运动及关系先验，使模型能够进行连贯的因果推理。
+primary_logic: 将多模态动态场景抽象为融合空间、时间与运动语义的文本结构（ST‑TCM），并结合掩码引导的视觉聚焦，可显著提升MLLM对4D物理世界中动态事件的感知与推理一致性。
+claims:
+- 掩码引导融合（Mask‑Guided Fusion）在Dyn‑Bench上将平均准确率从53.8提升至57.1，证明结构化视觉先验能有效增强动态推理。
+- ST‑TCM消融实验表明，运动（M）与空间（S）线索组合为Qwen3‑VL‑8B带来最大增益，且单独运动线索即可使UniPixel‑3B达到最优，证实运动与空间语义对时空推理的关键作用。
+- Dyn‑Bench（VQA任务平均） 上 Accuracy (ACC) = 57.1
+- 将多模态动态场景抽象为融合空间、时间与运动语义的文本结构（ST‑TCM），并结合掩码引导的视觉聚焦，可显著提升MLLM对4D物理世界中动态事件的感知与推理一致性。
+---
+
+# Thinking in Dynamics: How Multimodal Large Language Models Perceive, Track, and Reason Dynamics in Physical 4D World
+
+> [!tip] 核心洞察
+> 将多模态动态场景抽象为融合空间、时间与运动语义的文本结构（ST‑TCM），并结合掩码引导的视觉聚焦，可显著提升MLLM对4D物理世界中动态事件的感知与推理一致性。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | 动态思维：多模态大语言模型在4D物理世界中的感知、跟踪与推理 |
+| 英文题名 | Thinking in Dynamics: How Multimodal Large Language Models Perceive, Track, and Reason Dynamics in Physical 4D World |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2603.12746) · [Project](https://dyn-bench.github.io/) |
+| Topic | #topic/other_unclear #topic/other_unclear/general |
+| Method | Spatio-Temporal Textual Cognitive Map (ST-TCM) and Mask-Guided Fusion |
+| Dataset | Dyn‑Bench（VQA任务平均） |
+
+> [!tip] 效果简介
+> - Dyn‑Bench（VQA任务平均） 上，Accuracy (ACC) 57.1 vs 53.8 (+3.3)。
+
+## 概述
+
+多模态大语言模型（MLLM）在静态场景理解上已取得长足进步，但在4D物理世界中的动态感知、跟踪与推理能力仍远未达到人类水平。现有模型对物体运动、场景演化与相机运动缺乏连贯的时空表征，导致动态推理与物体接地相互割裂，难以维持跨帧一致的运动解释。本文提出**Dyn-Bench**——一个系统评估MLLM时空动态推理能力的基准，并引入**时空文本认知图（Spatio-Temporal Textual Cognitive Map, ST‑TCM）**与**掩码引导融合（Mask‑Guided Fusion）**两种结构化集成方法，通过显式注入几何、运动与关系先验，显著提升模型在4D动态场景中的感知与推理一致性。
+
+核心发现如下：
+- **当前MLLM的4D动态理解存在系统性瓶颈**：即使是最强的模型（如GPT‑4o、Qwen3‑VL‑235B），在无结构化时空引导时频繁出现时序推理错误、空间接地错误与关系推理错误（Figure 5），表明显式时空先验对连贯推理不可或缺。
+- **运动与空间语义是提升的关键驱动力**：ST‑TCM消融实验表明，运动（M）与空间（S）线索组合为Qwen3‑VL‑8B带来最大增益，且单独运动线索即可使UniPixel‑3B达到最优性能（Table 5）。
+- **掩码引导融合有效增强动态推理**：在Dyn‑Bench上将平均准确率从53.8提升至57.1（Table 6），尤其对Inter‑Object和Camera‑Object任务的提升最为显著。
+
+方法层面，ST‑TCM通过从RGB‑D与实例分割掩码重建物体3D轨迹，计算位置、速度、加速度等几何属性，并基于空间邻近性与运动连续性建模物体间及相机‑物体关系，最终以规则化模板转化为结构化文本序列。掩码引导融合则将实例掩码作为视觉聚焦信号注入MLLM输入，使模型更精准地关注动态物体区域。这两种方法均以零样本、即插即用的方式工作，无需对MLLM本身进行微调。
+
+在方法谱系中，本工作处于通用MLLM（如GPT‑4o、Qwen3‑VL系列）、空间MLLM（如SpaceR‑7B、SpatialLadder‑3B）与区域级MLLM（如UniPixel‑3B、Sa2VA系列）的交汇点，通过结构化时空信息注入弥补了现有模型在动态推理与物体接地之间的鸿沟。与依赖端到端训练的专用动态理解模型不同，ST‑TCM与Mask‑Guided Fusion提供了一种轻量、可解释的增强路径，但其当前依赖外部掩码和深度估计流水线，尚未实现端到端训练，可能引入级联误差，且规则模板难以捕捉开放域动态语义的细微变化。
+
+## 背景与动机
+
+### 4D物理世界的动态理解：从静态感知到时空推理
+
+多模态大语言模型（MLLM）在图像描述、视觉问答等静态任务上已取得显著进展，然而，现实世界是动态演化的——物体在运动，场景在变化，相机在移动。人类能够自然地感知、跟踪并推理这些动态事件，形成连贯的4D物理世界认知。一个核心问题随之浮现：**当前的MLLM能否以类似人类的连贯方式感知、跟踪和推理物理4D世界？**
+
+现有研究揭示了这一能力的严重不足。当面对包含复杂物体运动、场景演变与相机自运动的视频时，MLLM频繁暴露出三类典型错误（Fig. 5）：**时序推理错误**（混淆事件发生的先后顺序）、**空间接地错误**（将运动属性错误地绑定到无关物体上）以及**关系推理错误**（误解物体间的动态交互关系）。这些错误的根源在于一个深层瓶颈：**现有MLLM缺乏对物体运动、场景变化与相机运动的连贯表示，导致时空推理与动态物体接地相互割裂，难以维持跨帧一致的动态表征，从而产生片段化且不一致的运动解释。**
+
+### 现有基准的局限：缺乏统一的动态评估框架
+
+尽管已有若干工作尝试评估视频理解能力，但如Table 1所总结的，大多数现有基准仅聚焦于场景级建模，未能同时覆盖动态场景理解所需的多个关键维度。具体而言，现有基准存在以下缺口：
+
+- **任务覆盖不完整**：缺乏对“物体间动态关系”、“物体-场景跟踪”与“相机-物体推理”三个层次的同时评估。
+- **数据域多样性不足**：多数基准局限于单一数据域，难以检验模型在真实与合成场景下的泛化能力。
+- **接地与推理分离**：鲜有基准同时衡量模型的时空推理能力与动态物体接地能力，无法揭示两者之间的内在张力。
+
+### 本文动机：构建统一基准并引入结构化时空先验
+
+为系统诊断并弥合上述缺口，本文提出**Dyn-Bench**——一个面向4D物理世界动态推理的统一基准，以及两种互补的结构化集成方法：**时空文本认知图（Spatio-Temporal Textual Cognitive Map, ST-TCM）**与**掩码引导融合（Mask-Guided Fusion）**。
+
+Dyn-Bench覆盖动态场景理解的三个互补层次：① 动态物体间感知（捕获运动物体间的空间关系与交互）；② 动态物体-场景跟踪（追踪物体相对于变化场景的运动）；③ 动态相机-物体推理（建模相机自运动下的物体动态）。通过这一分层设计，Dyn-Bench能够全面揭示MLLM在4D动态理解中的能力边界。
+
+在方法层面，ST-TCM将多模态动态场景抽象为融合空间、时间与运动语义的结构化文本表示，为模型提供显式的几何与关系先验；掩码引导融合则通过注入实例级视觉聚焦信号，增强模型对运动物体的细粒度感知。两者的核心洞察在于：**结构化时空信息集成能够使模型进行连贯的因果推理，从而显著提升对物理4D世界中动态事件的感知与推理一致性。**
+
+## 核心创新
+
+### 瓶颈与动因
+
+现有MLLM在动态视频理解中面临一个根本性瓶颈：**物体运动、场景变化与相机运动三者缺乏连贯的时空表征**。这导致时空推理与动态物体接地相互割裂，模型难以维持跨帧一致的动态理解，最终产生片段化且自相矛盾的运动解释。图5中的自解释分析揭示了这一问题的具体表现——GPT-4o在无结构化时空引导时频繁出现时序推理错误、空间接地错误与关系推理错误，说明单纯依赖语言推理能力无法弥补4D世界建模的缺失。
+
+### 创新机制：双通道结构化时空注入
+
+本文的核心创新在于提出了**双通道结构化时空信息注入机制**，通过两条互补路径将几何、运动与关系先验显式地注入MLLM的推理过程，从而打通感知与推理之间的割裂：
+
+**通道一：时空文本认知图（ST‑TCM）**
+
+ST‑TCM将多模态动态场景抽象为融合空间、时间与运动语义的结构化文本描述。其构建依赖三个级联模块：
+
+- **几何与运动重建（S1）**：从RGB‑D和实例分割掩码重建物体3D轨迹，计算位置 $\mathbf{p}_{t}^{i}$、速度 $\mathbf{v}_{t}^{i}$ 与加速度 $\mathbf{a}_{t}^{i}$。其中3D位置通过相机姿态与深度估计投影获得：
+  $$\mathbf{p}_{t}^{i} = \hat{T}_{t}^{-1} K^{-1} \tilde{\mathbf{u}}_{t}^{i} \hat{D}_{t}(\tilde{\mathbf{u}}_{t}^{i})$$
+  速度与加速度分别通过相邻帧的一阶差分计算：
+  $$\mathbf{v}_{t}^{i} = (\mathbf{p}_{t}^{i} - \mathbf{p}_{t-1}^{i}) / \Delta t$$
+  $$\mathbf{a}_{t}^{i} = (\mathbf{v}_{t}^{i} - \mathbf{v}_{t-1}^{i}) / \Delta t$$
+
+- **动态关系与空间推理（S2）**：基于空间邻近性与运动连续性建模物体间及相机-物体关系，区分接近、远离等动态行为。
+
+- **文本认知映射（S3）**：通过规则化模板将几何、运动与关系属性转化为结构化文本序列，形成可直接作为MLLM辅助输入的时空认知图。
+
+**通道二：掩码引导融合（Mask‑Guided Fusion）**
+
+在视觉输入端，将实例分割掩码与原始视频帧融合，引导模型聚焦于动态物体的精确区域。这一设计使模型在视觉编码阶段即获得物体边界的强先验，减少了从像素到语义的映射歧义。
+
+### Changed Slots 对比
+
+| 变更维度 | Baseline 设定 | 本文方法 |
+|---------|-------------|---------|
+| 视觉输入 | 原始视频帧 | 原始帧 + 掩码引导融合 |
+| 辅助信息 | 无 | ST‑TCM（时序、空间与运动的结构化文本描述） |
+
+### 消融验证的关键发现
+
+Table 5的ST‑TCM消融实验揭示了不同线索的差异化作用：对于Qwen3‑VL‑8B，运动（M）与空间（S）线索组合（M+S）带来最大增益；而UniPixel‑3B仅需运动线索（M）即可达到最优性能。这表明**运动信号是时空推理提升的核心驱动力**，而空间线索的作用因模型架构而异——对于具备较强空间理解能力的模型，空间线索主要起精细化物体-轨迹对齐的作用。
+
+Table 6的掩码引导消融进一步证实：Mask‑Guided Fusion在所有任务类别上均优于RAW VIDEO和MASKED FRAMES ONLY，尤其对Inter‑Object和Camera‑Object任务提升最为显著，将Dyn‑Bench平均准确率从53.8提升至57.1（+3.3个百分点）。这证明结构化视觉先验能有效增强模型对动态关系的推理能力。
+
+### 方法定位与局限
+
+相较于现有空间MLLM（如SpaceR‑7B、VST‑7B‑RL）仅关注静态空间关系，或区域级MLLM（如UniPixel、Sa2VA）仅处理单帧接地，ST‑TCM与掩码引导融合的组合首次将**时序运动语义**与**空间几何先验**协同注入MLLM推理流程。但需注意，当前方法依赖外部掩码和深度估计流水线，未实现端到端训练，可能引入级联误差；ST‑TCM基于规则模板生成，难以捕捉开放域动态语义的细微变化；时空推理与动态接地仍为分开的模块，缺乏深度融合。
+
+## 整体框架
+
+本文提出了一套结构化时空信息集成方案，旨在弥补现有多模态大语言模型（MLLM）在动态视频理解中的核心瓶颈：缺乏对物体运动、场景变化与相机运动的连贯表征，导致时空推理与动态物体接地相互割裂，难以维持跨帧一致的动态解释。该方案由两条互补的路径构成：**时空文本认知图（Spatio‑Temporal Textual Cognitive Map, ST‑TCM）** 与 **掩码引导融合（Mask‑Guided Fusion）**。前者将多模态动态场景抽象为融合空间、时间与运动语义的结构化文本序列，后者则通过显式注入物体掩码先验，强化模型对关键动态区域的视觉聚焦。
+
+### Pipeline 总览
+
+整体框架的输入为一段包含动态物体的 RGB‑D 视频及其对应的实例分割掩码，输出为增强后的 MLLM 推理结果。处理流程可划分为三个核心阶段：
+
+**S1：几何与运动重建**
+基于逐帧 RGB‑D 输入与实例分割掩码，重建每个物体的 3D 轨迹。具体而言，利用估计的深度 $\hat{D}_t$ 与相机姿态 $\hat{T}_t$，将物体质心从像素坐标系投影至世界坐标系：
+$$\mathbf{p}_{t}^{i} = \hat{T}_{t}^{-1} K^{-1} \tilde{\mathbf{u}}_{t}^{i} \hat{D}_{t}(\tilde{\mathbf{u}}_{t}^{i})$$
+在此基础上，通过相邻帧的一阶差分计算物体速度与加速度：
+$$\mathbf{v}_{t}^{i} = (\mathbf{p}_{t}^{i} - \mathbf{p}_{t-1}^{i}) / \Delta t$$
+$$\mathbf{a}_{t}^{i} = (\mathbf{v}_{t}^{i} - \mathbf{v}_{t-1}^{i}) / \Delta t$$
+此阶段为后续推理提供了基础的几何与运动学属性。
+
+**S2：动态关系与空间推理**
+基于空间邻近性与运动连续性，建模物体间以及相机与物体间的动态关系。该模块区分“接近”、“远离”等相对运动行为，将孤立的位置、速度信息转化为关系层面的动态描述，为高层语义理解提供结构化关系先验。
+
+**S3：文本认知映射**
+通过规则化模板，将 S1 和 S2 中提取的几何属性、运动属性与关系属性转化为结构化文本序列，形成时空文本认知图（ST‑TCM）。该认知图作为辅助信息，与原始视频帧一同输入 MLLM，引导模型进行连贯的时空推理。
+
+### 视觉输入增强：掩码引导融合
+
+在视觉输入端，框架引入掩码引导融合（Mask‑Guided Fusion），将实例分割掩码与原始 RGB 帧结合，生成掩码标注的视觉输入。消融实验（Table 6）表明，该融合方式在所有任务类别上均优于仅使用原始视频帧或仅使用掩码帧的配置，尤其在 Inter‑Object 与 Camera‑Object 任务上提升最为显著，使 Dyn‑Bench 上的平均准确率从 53.8 提升至 57.1。
+
+### 模块关系与信息流
+
+ST‑TCM 与 Mask‑Guided Fusion 并非孤立运作，而是协同增强 MLLM 的动态理解能力。Mask‑Guided Fusion 在视觉层面提供精确的物体区域聚焦，ST‑TCM 在语义层面注入时空结构先验。二者共同作用于 MLLM 的推理过程，形成“视觉聚焦 + 语义引导”的双通道增强机制。ST‑TCM 消融实验（Table 5）进一步揭示：运动线索（M）是提升性能的核心驱动力，且不同模型对线索组合的偏好存在差异——Qwen3‑VL‑8B 在运动与空间线索组合（M+S）下获得最大增益，而 UniPixel‑3B 仅需运动线索即可达到最优性能。
+
+### 当前局限
+
+需要指出的是，该框架目前依赖外部掩码和深度估计流水线，尚未实现端到端训练，可能引入级联误差。此外，时空推理与动态接地仍为分开处理的模块，缺乏深度融合，在极端动态场景中的一致性有待提升。ST‑TCM 基于规则模板生成，难以捕捉开放域动态语义的细微变化，这为后续研究留下了改进空间。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/001_Figure.jpg]]
+
+## 核心模块与公式推导
+
+### 结构化时空集成框架
+
+本工作提出一种结构化时空集成方法，旨在解决现有多模态大语言模型（MLLM）在动态视频理解中运动表征与时空推理相互割裂的核心瓶颈。该方法包含两个关键组件：**时空文本认知图（Spatio-Temporal Textual Cognitive Map, ST‑TCM）** 与 **掩码引导融合（Mask‑Guided Fusion）**。前者将多模态动态场景抽象为融合空间、时间与运动语义的结构化文本描述，后者通过显式注入物体掩码实现视觉聚焦，二者协同使模型能够进行连贯的因果推理。
+
+### 几何与运动重建管线
+
+ST‑TCM的构建依赖于一个前置的几何与运动重建管线，该管线从RGB‑D输入和实例分割掩码出发，重建物体的三维运动轨迹并计算运动学属性。其核心计算步骤包括以下三个模块。
+
+**S1：几何与运动重建。** 利用估计的深度与相机姿态，将每帧中物体实例的质心从像素坐标系投影至世界坐标系，得到三维位置：
+
+$$\mathbf{p}_{t}^{i} = \hat{T}_{t}^{-1} K^{-1} \tilde{\mathbf{u}}_{t}^{i} \hat{D}_{t}(\tilde{\mathbf{u}}_{t}^{i})$$
+
+其中，$\tilde{\mathbf{u}}_{t}^{i}$ 为第 $t$ 帧中物体 $i$ 的实例分割质心像素坐标，$\hat{D}_{t}(\cdot)$ 为对应像素的估计深度，$K$ 为相机内参矩阵，$\hat{T}_{t}$ 为估计的相机到世界坐标系的变换矩阵。基于相邻帧的三维位置，通过一阶差分计算物体的瞬时速度与加速度：
+
+$$\mathbf{v}_{t}^{i} = (\mathbf{p}_{t}^{i} - \mathbf{p}_{t-1}^{i}) / \Delta t$$
+
+$$\mathbf{a}_{t}^{i} = (\mathbf{v}_{t}^{i} - \mathbf{v}_{t-1}^{i}) / \Delta t$$
+
+其中 $\Delta t$ 为相邻帧的时间间隔。上述公式为后续的运动语义提取提供了量化基础。
+
+**S2：动态关系与空间推理。** 在获得物体三维轨迹的基础上，该模块基于空间邻近性与运动连续性建模两类动态关系：物体间关系（Inter‑Object）与相机‑物体关系（Camera‑Object）。通过分析物体间的相对距离变化与运动方向一致性，区分接近、远离、交互等动态行为，从而捕捉场景中多物体的协同演化模式。
+
+**S3：文本认知映射。** 将S1与S2中提取的几何属性（位置、速度、加速度）、运动状态与关系结构，通过规则化模板转化为结构化文本序列，形成时空认知图（ST‑TCM）。该文本序列作为辅助信息注入MLLM，为模型提供显式的时空先验。
+
+### 掩码引导融合
+
+掩码引导融合（Mask‑Guided Fusion）是另一个关键组件。与直接输入原始视频帧（RAW VIDEO）或仅输入掩码遮挡帧（MASKED FRAMES ONLY）不同，该方法将原始帧与实例分割掩码进行融合后输入模型，使MLLM能够聚焦于动态物体的空间区域。消融实验证实，该策略在所有任务类别上均优于上述两种基线输入方式，尤其对Inter‑Object和Camera‑Object任务的提升最为显著（Table 6, Fig. 6）。
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/010_Figure_6.jpg]]
+*Figure 6: Mask-Guided Input Comparison*
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/012_Table_6.jpg]]
+*Table 6: Quantitative Comparison of Mask-Guided Inputs*
+
+### 关键公式变量含义汇总
+
+| 符号 | 含义 |
+|------|------|
+| $\mathbf{p}_{t}^{i}$ | 物体 $i$ 在 $t$ 时刻的世界坐标系三维位置 |
+| $\tilde{\mathbf{u}}_{t}^{i}$ | 物体 $i$ 在 $t$ 时刻的实例分割质心像素坐标 |
+| $\hat{D}_{t}(\cdot)$ | $t$ 时刻的估计深度图 |
+| $K$ | 相机内参矩阵 |
+| $\hat{T}_{t}$ | $t$ 时刻估计的相机到世界变换矩阵 |
+| $\mathbf{v}_{t}^{i}$ | 物体 $i$ 在 $t$ 时刻的瞬时速度 |
+| $\mathbf{a}_{t}^{i}$ | 物体 $i$ 在 $t$ 时刻的瞬时加速度 |
+| $\Delta t$ | 相邻帧时间间隔 |
+
+### 局限性说明
+
+需注意，当前几何与运动重建管线依赖外部深度估计与实例分割模型，并非端到端训练，可能引入级联误差。此外，ST‑TCM基于规则模板生成，难以捕捉开放域动态语义的细微变化，这些限制需要在后续工作中加以解决。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/011_Table_5.jpg]]
+*Table 5: Ablation of Spatio-Temporal Textual Cognitive Map. Top three performers in each column are highlighted from Dark (highest) to Light (third highest). T, M, and S denote temporal semantics, motion dynamics, and spatial geometry, respectively*
+
+## 实验与分析
+
+### 核心瓶颈与因果机制
+
+现有MLLM在动态视频理解中的根本瓶颈在于：物体运动、场景变化与相机运动三者缺乏连贯的时空表征，导致时空推理与动态物体接地相互割裂。模型难以维持跨帧一致的对象身份与运动轨迹，从而产生片段化且自相矛盾的运动解释。因果调控的关键在于**结构化时空信息集成**——通过显式注入几何先验（3D位置、速度、加速度）、运动关系（接近/远离等动态行为）以及空间语义，使模型能够进行连贯的因果推理，而非依赖表面语言关联。
+
+核心洞察在于：将多模态动态场景抽象为融合空间、时间与运动语义的文本结构（ST‑TCM），并结合掩码引导的视觉聚焦，可显著提升MLLM对4D物理世界中动态事件的感知与推理一致性。
+
+### 基准对比与定位
+
+Dyn‑Bench相较于现有时空推理基准的独特定位在于其统一的三层次评估框架（Table 1）：动态物体间感知、动态物体-场景跟踪、动态相机-物体推理，同时覆盖更广泛的数据域。这一设计使基准能够系统诊断MLLM在不同粒度的动态理解能力上的缺陷。
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/003_Table_1.jpg]]
+*Table 1: Comparison of Dyn-Bench with existing spatiotemporal benchmarks. Dyn-Bench offers a unified assessment covering three levels of dynamic object grounding and reasoning while spanning more diverse data domains than prior works*
+
+### 主实验结果
+
+**时空推理评估（Table 3）**：在覆盖九类时空任务的Dyn‑Bench上，开源模型中**Qwen3-VL-235B**以平均排名第一取得最优综合表现，在“动作与物体描述”（Act. & Obj. Desc.）子任务上达到65.3%准确率。然而，即使是表现最好的模型，在需要跨帧运动推理与相机-物体关系建模的任务上仍与人类水平存在显著差距。Figure 2的雷达图直观展示了通用MLLM与空间专用MLLM在不同任务维度上的能力分布不均。
+
+**动态物体接地评估（Table 4）**：在区域级MLLM中，**Sa2VA-InternVL2.5-8B**以J&F平均75.6%取得最高接地精度，而**UniPixel-7B**在时空推理维度上表现最优（J&F平均65.2%）。这一对比揭示了一个关键发现：接地精度与时空推理能力并非正相关——擅长分割的模型未必能理解物体的运动逻辑，反之亦然。
+
+### 消融实验与决定性证据
+
+**ST‑TCM线索消融（Table 5）**：对Qwen3-VL-8B而言，运动（M）与空间（S）线索的组合（M+S）带来最大性能增益；而对UniPixel-3B，单独的运动线索（M）即达到最优性能，空间线索主要起细化物体-轨迹对齐的辅助作用。这一差异表明：不同架构对时空先验的利用方式存在根本性差异——Qwen3-VL需要空间几何信息来锚定运动语义，而UniPixel的像素级接地能力使其仅需运动信号即可有效推理。运动线索作为提升动态理解的主要驱动力这一结论在两个模型上均得到验证。
+
+**掩码引导融合消融（Table 6, Figure 6）**：掩码引导融合（Mask‑Guided Fusion）将Dyn‑Bench平均准确率从53.8%提升至57.1%（+3.3个百分点），在所有任务类别上均优于原始视频输入和纯掩码帧输入。增益在物体间（Inter‑Object）和相机-物体（Camera‑Object）任务上最为显著，证明结构化视觉先验能有效引导模型关注运动相关区域，抑制背景噪声对时空推理的干扰。
+
+### 失败模式分析
+
+**自解释诊断（Figure 5）**：对GPT-4o在Dyn‑Bench失败案例上的思维链分析揭示了三种典型错误模式：①**时序推理错误**——模型混淆事件的先后顺序，将结果误判为原因；②**空间接地错误**——模型正确描述了运动类型，但将运动归因到错误的物体上；③**关系推理错误**——模型无法正确推断物体间或物体与相机间的相对运动关系。这些错误表明，即使具备强大的语言推理能力，缺乏显式时空引导的MLLM在4D世界建模上仍存在根本性局限。
+
+### 公平性说明
+
+所有模型在零样本设定下使用默认指令模板评估，确保对比公平。基准构建经过多阶段过滤、几何校验与人工质检，覆盖真实与合成场景，减轻数据分布偏差。但需注意：当前方法依赖外部掩码和深度估计流水线，未实现端到端训练，可能引入级联误差；ST‑TCM基于规则模板生成，难以捕捉开放域动态语义的细微变化——这些限制在解释实验结果时需予以考虑。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/002_Figure_2.jpg]]
+*Figure 2: Model performance on Dyn-Bench. Left / Center radar charts show general and spatial MLLMs accuracy on nine spatiotemporal tasks; Right radar chart shows region-level MLLMs performance on spatio-temporal reasoning and dynamic object grounding*
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/007_Table.jpg]]
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/008_Table_4.jpg]]
+*Table 4: Dynamic object grounding evaluation of Region-level MLLMs on Dyn-Bench. Top three performers in each task category are highlighted from Dark (highest) to Light (third highest)*
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/009_Figure_5.jpg]]
+*Figure 5: Examples of how an MLLM thinks in dynamics as revealed by self-explanations. While the model shows strong linguistic reasoning, its 4D world modeling capability remains limited without explicit spatio-temporal guidance*
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/013_Figure_8.jpg]]
+*Figure 8: Qualitative examples of the nine representative dynamic understanding tasks across the three hierarchical levels of Dyn-Bench*
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/006_Table_2.jpg]]
+*Table 2: Dataset statistics across Dyn-Bench filtering stages*
+
+![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/005_Figure_4.jpg]]
+*Figure 4: Benchmark Statistics. Top: Distribution of tasks across three levels. Bottom: VQA pairs distribution across datasets*
+
+## 方法谱系与知识库定位
+
+### 1. 与基线方法的关系
+
+本工作提出的**时空文本认知图（ST‑TCM）**与**掩码引导融合（Mask‑Guided Fusion）**并非独立的端到端模型，而是作用于现有MLLM之上的结构化信息注入框架。其核心定位是：为通用MLLM提供显式的几何、运动与关系先验，弥补其在动态场景理解中的固有缺陷。
+
+在Dyn‑Bench上评估的基线模型可划分为三个谱系：
+
+- **通用MLLM**：包括闭源模型**GPT‑4o**、**GPT‑5**（OpenAI, 2025）、**Gemini‑2.5 Pro**，以及开源模型**Qwen2.5‑VL**系列（7B/32B/72B）、**Qwen3‑VL**系列（8B/32B/235B）、**InternVL3**系列（14B/38B）、**InternVL3.5**系列（8B/38B）、**LLaVA‑OneVision‑1.5**系列（4B/8B）。这些模型在零样本设定下直接处理原始视频帧，缺乏对物体运动轨迹与空间关系的显式建模。Table 3显示，即使是最强的Qwen3‑VL‑235B，其在动态场景中的推理准确率仍存在显著天花板。
+- **空间MLLM**：包括**SpaceR‑7B**、**VST‑7B‑RL**、**Spatial‑SSRL‑7B**、**SpatialLadder‑3B**。这类模型具备一定的空间理解能力，但主要面向静态或准静态场景，缺乏对时序动态的连贯建模。
+- **区域级MLLM**：包括**UniPixel**系列（3B/7B）、**VideoGLaMM**、**Sa2VA**系列（基于InternVL2.5‑8B、InternVL3‑14B、Qwen2.5‑VL‑7B、Qwen3‑VL‑4B）。这些模型支持像素级或区域级接地，但推理与接地能力往往不均衡——Table 4显示，接地最强的Sa2VA‑InternVL2.5‑8B（J&F平均75.6）在时空推理上并不领先，而推理最强的UniPixel‑7B（J&F平均65.2）在接地精度上有所妥协。
+
+ST‑TCM与Mask‑Guided Fusion的贡献在于：**在不改变MLLM架构的前提下，通过结构化文本与掩码视觉注入，将上述三类模型的动态推理能力统一提升**。Table 6证实，掩码引导融合将平均准确率从53.8提升至57.1（+3.3个百分点），且对Inter‑Object和Camera‑Object任务的增益最为突出。
+
+### 2. 适用边界与局限
+
+本方法的有效性受以下边界条件约束：
+
+**（1）对外部感知流水线的依赖。** ST‑TCM的构建依赖于RGB‑D输入、实例分割掩码与相机姿态估计。这些前置模块并非端到端可微，级联误差（尤其是深度估计噪声与分割不一致）会直接传导至认知图的质量。当场景存在严重遮挡或透明物体时，3D轨迹重建公式
+$$\mathbf{p}_{t}^{i} = \hat{T}_{t}^{-1} K^{-1} \tilde{\mathbf{u}}_{t}^{i} \hat{D}_{t}(\tilde{\mathbf{u}}_{t}^{i})$$
+中的深度估计$\hat{D}_{t}$与实例质心$\tilde{\mathbf{u}}_{t}^{i}$均可能失效，导致后续速度$\mathbf{v}_{t}^{i}$与加速度$\mathbf{a}_{t}^{i}$的计算产生显著偏差。
+
+**（2）规则模板的表达上限。** ST‑TCM通过规则化模板将几何、运动与关系属性转化为结构化文本序列（附录A.2 S3），这决定了其语义粒度受限于预设的属性维度。对于开放域动态语义（如“物体A犹豫地靠近物体B”或“相机带有探索意图地转向”），模板无法捕捉意图、情感或物理常识层面的细微变化。
+
+**（3）推理与接地的分离。** 当前框架中，时空推理（ST‑TCM辅助）与动态接地（掩码引导）仍为两个独立通道，缺乏深度融合。在极端动态场景中（如多物体高速交互同时伴随相机剧烈自运动），推理与接地的一致性可能被打破。
+
+**（4）数据覆盖偏差。** Dyn‑Bench虽覆盖真实与合成场景，但其数据源分布（Figure 4）可能导致模型在特定动态模式上的过拟合。复杂相机自运动及严重遮挡场景的覆盖面有限，是当前基准的已知局限。
+
+### 3. 开放问题
+
+基于上述局限，本工作指向以下待解决的核心问题：
+
+- **统一架构问题**：如何构建联合建模运动动力学、关系结构与高层时序认知的端到端架构？当前ST‑TCM作为外部先验注入的方案虽有效，但其与MLLM内部表征的交互仍是浅层的。将结构化时空表示融入模型训练或微调阶段，可能是实现更深层次融合的关键路径。
+
+- **无监督动态接地**：在无外部掩码与深度标注的情况下，能否实现稳定且通用的动态物体接地与持续跟踪？这要求模型自主学会从RGB视频中推断几何结构与运动场，而非依赖离线的感知流水线。
+
+- **开放域泛化**：如何将ST‑TCM等结构化表示与自监督预训练结合，提升模型对未见过动态场景的泛化能力？当前模板的封闭性限制了其在新领域中的迁移潜力，探索可学习的、软性的结构化表示可能是突破方向。
+
+- **推理-接地协同**：动态推理与物体接地之间的信息双向流动机制尚未建立。理想情况下，推理结果应能反向指导接地精度的提升（如通过预测物体未来位置约束分割），而接地结果应能验证推理的一致性。
+
+---
+
+*注：本节对基线模型的作者、会议及年份信息，因原始论文未提供完整引用元数据，未做补充。如需精确引用，建议查阅Dyn‑Bench论文的参考文献列表进行核实。*
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/Thinking_in_Dynamics_How_Multimodal_Large_Language_Models_Perceive_Track_and_Reason_Dynamics_in_Physical_4D_World.pdf]]

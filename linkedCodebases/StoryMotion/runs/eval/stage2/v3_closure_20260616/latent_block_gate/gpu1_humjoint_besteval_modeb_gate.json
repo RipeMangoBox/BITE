@@ -1,0 +1,193 @@
+{
+  "cache_dir": "runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+  "created_at": "2026-06-17T01:40:12+0800",
+  "deltas_vs_base": {
+    "camera_noise_matched": {
+      "delta": {
+        "max": 4299.7886962890625,
+        "mean": 1.4152163806926108,
+        "median": 0.8291656062356196,
+        "n": 10549,
+        "p90": 1.3079600092722103,
+        "p95": 1.590485208691098,
+        "p99": 2.639052959643308,
+        "std": 42.0375448392194
+      },
+      "relative_delta": {
+        "max": 12229.456811223215,
+        "mean": 1039.417147107249,
+        "median": 688.1795429240118,
+        "n": 10549,
+        "p90": 2344.2437698631625,
+        "p95": 3197.067925799636,
+        "p99": 5038.6920995174105,
+        "std": 1028.0827701050187
+      }
+    },
+    "camera_shuffle": {
+      "delta": {
+        "max": 4295.5963134765625,
+        "mean": 1.5033095057142465,
+        "median": 0.3492495925165713,
+        "n": 10549,
+        "p90": 0.8907292367890481,
+        "p95": 1.2970242104609502,
+        "p99": 3.59365358348936,
+        "std": 50.8062328716486
+      },
+      "relative_delta": {
+        "max": 1547971.829848153,
+        "mean": 749.350236062299,
+        "median": 286.22010673387985,
+        "n": 10549,
+        "p90": 863.6695376189103,
+        "p95": 1291.7056781744013,
+        "p99": 3258.9039397865417,
+        "std": 16588.52278375553
+      }
+    },
+    "camera_zero": {
+      "delta": {
+        "max": 4298.1734619140625,
+        "mean": 0.8407925007941484,
+        "median": 0.23547489807242528,
+        "n": 10549,
+        "p90": 0.6381380795035512,
+        "p95": 0.877525174338371,
+        "p99": 2.113440359756364,
+        "std": 42.030145062116524
+      },
+      "relative_delta": {
+        "max": 1381.1946203916127,
+        "mean": 259.6090994163701,
+        "median": 218.05097507406262,
+        "n": 10549,
+        "p90": 471.7743973262212,
+        "p95": 594.6237645855477,
+        "p99": 829.0213333558428,
+        "std": 161.05625019253677
+      }
+    }
+  },
+  "human_pred_shift_vs_base": {
+    "camera_noise_matched": {
+      "max": 254.12989807128906,
+      "mean": 0.43971309559528343,
+      "median": 0.364084929227829,
+      "n": 10549,
+      "p90": 0.6402988433837891,
+      "p95": 0.7198355197906497,
+      "p99": 1.0580768394470224,
+      "std": 2.599714318927493
+    },
+    "camera_shuffle": {
+      "max": 1238.798583984375,
+      "mean": 0.44452758816877164,
+      "median": 0.13874505460262299,
+      "n": 10549,
+      "p90": 0.365728032588959,
+      "p95": 0.5106142163276672,
+      "p99": 1.235268721580508,
+      "std": 13.529610921655
+    },
+    "camera_zero": {
+      "max": 253.87411499023438,
+      "mean": 0.19118081783876353,
+      "median": 0.09924712032079697,
+      "n": 10549,
+      "p90": 0.277513885498047,
+      "p95": 0.39115357398986833,
+      "p99": 0.8939574003219626,
+      "std": 2.5991445002942237
+    }
+  },
+  "loss_stats": {
+    "base": {
+      "max": 1958.861328125,
+      "mean": 0.32748312592943757,
+      "median": 0.0011980979470536113,
+      "n": 10549,
+      "p90": 0.004586474131792786,
+      "p95": 0.006871304009109736,
+      "p99": 0.01578927136957646,
+      "std": 22.818152462597293
+    },
+    "camera_noise_matched": {
+      "max": 5580.32861328125,
+      "mean": 1.7426995066220483,
+      "median": 0.8307433724403381,
+      "n": 10549,
+      "p90": 1.3104307651519775,
+      "p95": 1.5951225280761725,
+      "p99": 2.688837661743174,
+      "std": 58.49241630578725
+    },
+    "camera_shuffle": {
+      "max": 5576.13623046875,
+      "mean": 1.830792631643684,
+      "median": 0.3512544333934784,
+      "n": 10549,
+      "p90": 0.8964092969894417,
+      "p95": 1.3063289880752582,
+      "p99": 3.6969084358215474,
+      "std": 65.06976306935071
+    },
+    "camera_zero": {
+      "max": 5578.71337890625,
+      "mean": 1.1682756267235859,
+      "median": 0.23688152432441711,
+      "n": 10549,
+      "p90": 0.6433200478553773,
+      "p95": 0.8857688069343568,
+      "p99": 2.1517876529693636,
+      "std": 58.49087169918514
+    }
+  },
+  "mode": "modeb_gate",
+  "run": {
+    "args": {
+      "adam_beta2": "0.999",
+      "batch_size": "512",
+      "cache_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+      "cond_mask_prob": "0.0",
+      "cond_mask_prob_cam": "0.1",
+      "cond_mask_prob_hum": "0.1",
+      "device": "cuda:0",
+      "diffusion_steps": "1000",
+      "dim_mults": "[1, 2, 2]",
+      "early_stop_min_delta": "0.0",
+      "early_stop_patience": "0",
+      "ema_decay": "0.999",
+      "eval_batches": "8",
+      "eval_every": "2000",
+      "eval_samples": "128",
+      "grad_clip": "1.0",
+      "joint_loss_mode": "branch_mean",
+      "log_every": "100",
+      "lr": "0.0001",
+      "lr_gamma": "0.5",
+      "lr_milestone": "200000",
+      "lr_warmup_steps": "500",
+      "mode": "train",
+      "noise_schedule": "cosine",
+      "num_workers": "2",
+      "output_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/p2_long_training_20260615/gpu1_humjoint_heavy_cam1_hum4_joint4_b512",
+      "purge_step": "None",
+      "resume": "None",
+      "seed": "17",
+      "steps": "330000",
+      "task_probs": "[1.0, 4.0, 4.0]",
+      "test_batches": "8",
+      "test_every": "10000",
+      "test_samples": "128",
+      "weight_decay": "0.01",
+      "width": "384",
+      "zero_final": "True"
+    },
+    "checkpoint": "runs/train/stage2/_best_eval_wrappers/gpu1_humjoint_heavy_cam1_hum4_joint4_b512/last.pt",
+    "joint_loss_mode": "branch_mean",
+    "run_dir": "runs/train/stage2/_best_eval_wrappers/gpu1_humjoint_heavy_cam1_hum4_joint4_b512",
+    "step": 282000
+  },
+  "scope": "Latent-level Mode B causal gate. Camera latent is treated as one block; distance/motion sub-slices are not available in this cache."
+}

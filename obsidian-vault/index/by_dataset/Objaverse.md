@@ -1,0 +1,71 @@
+---
+title: "Dataset: Objaverse"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: Objaverse
+
+- [[obsidian-vault/analysis/CVPR_2024/Large_Scale_3D_Generative_Modeling_using_Sparse_Voxel_Hierarchies.md|Large-Scale 3D Generative Modeling using Sparse Voxel Hierarchies (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/Large_Scale_3D_Generative_Modeling_using_Sparse_Voxel_Hierarchies.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: XCube (Hierarchical Voxel Latent Diffusion Model)
+	- datasets: ShapeNet Airplane, ShapeNet Chair, ShapeNet Car
+- [[obsidian-vault/analysis/NEURIPS_2025/Cameras_as_Relative_Positional_Encoding.md|Cameras as Relative Positional Encoding (NEURIPS 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/Cameras_as_Relative_Positional_Encoding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: PRoPE (Projective Positional Encoding)
+	- datasets: RealEstate10K, varying intrinsics per scene), Objaverse
+- [[obsidian-vault/analysis/arxiv_2026/MoCapAnything_V2_End_to_End_Motion_Capture_for_Arbitrary_Skeletons.md|MoCapAnything V2: End-to-End Motion Capture for Arbitrary Skeletons (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/MoCapAnything_V2_End_to_End_Motion_Capture_for_Arbitrary_Skeletons.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MoCapAnything V2
+	- datasets: Truebones Zoo-Seen, Truebones Zoo-Rare, Truebones Zoo-Unseen
+- [[obsidian-vault/analysis/CVPR_2026/FACE_A_Face_based_Autoregressive_Representation_for_High_Fidelity_and_Efficient_Mesh_Generation.md|FACE: A Face-based Autoregressive Representation for High-Fidelity and Efficient Mesh Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FACE_A_Face_based_Autoregressive_Representation_for_High_Fidelity_and_Efficient_Mesh_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: FACE
+	- datasets: Objaverse, Toys4K, Famous
+- [[obsidian-vault/analysis/CVPR_2026/GeodesicNVS_Probability_Density_Geodesic_Flow_Matching_for_Novel_View_Synthesis.md|GeodesicNVS: Probability Density Geodesic Flow Matching for Novel View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GeodesicNVS_Probability_Density_Geodesic_Flow_Matching_for_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: PDG-FM
+	- datasets: Objaverse test, Objaverse
+- [[obsidian-vault/analysis/CVPR_2026/MeshMosaic_Scaling_Artist_Mesh_Generation_via_Local_to_Global_Assembly.md|MeshMosaic: Scaling Artist Mesh Generation via Local-to-Global Assembly (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MeshMosaic_Scaling_Artist_Mesh_Generation_via_Local_to_Global_Assembly.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MeshMosaic
+	- datasets: ShapeNet, Thingi10K, Objaverse
+- [[obsidian-vault/analysis/CVPR_2026/PartDiffuser_Part_wise_3D_Mesh_Generation_via_Discrete_Diffusion.md|PartDiffuser: Part-wise 3D Mesh Generation via Discrete Diffusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PartDiffuser_Part_wise_3D_Mesh_Generation_via_Discrete_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PartDiffuser
+	- datasets: Objaverse
+- [[obsidian-vault/analysis/ICLR_2026/Active_Learning_of_3D_Gaussian_Splatting_with_Consistent_Region_Partition_and_Robust_Pose_Estimation.md|Active Learning of 3D Gaussian Splatting with Consistent Region Partition and Robust Pose Estimation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Active_Learning_of_3D_Gaussian_Splatting_with_Consistent_Region_Partition_and_Robust_Pose_Estimation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Our Active 3DGS Reconstruction with Region Partition and Semantic Variance
+	- datasets: Blender, Objaverse
+- [[obsidian-vault/analysis/ICLR_2026/Exploring_the_Potential_of_Encoder_free_Architectures_in_3D_LMMs.md|Exploring the Potential of Encoder-free Architectures in 3D LMMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Exploring_the_Potential_of_Encoder_free_Architectures_in_3D_LMMs.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: ENEL
+	- datasets: Objaverse
+- [[obsidian-vault/analysis/ICLR_2026/Uncertainty_Matters_in_Dynamic_Gaussian_Splatting_for_Monocular_4D_Reconstruction.md|Uncertainty Matters in Dynamic Gaussian Splatting for Monocular 4D Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Uncertainty_Matters_in_Dynamic_Gaussian_Splatting_for_Monocular_4D_Reconstructio_f0906ec8357c.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: USPLAT4D
+	- datasets: DyCheck, Objaverse

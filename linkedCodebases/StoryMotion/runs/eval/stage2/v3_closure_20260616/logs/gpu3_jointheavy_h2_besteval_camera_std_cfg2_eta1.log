@@ -1,0 +1,29 @@
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/fabric/__init__.py:41: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/torch/nn/modules/transformer.py:515: UserWarning: The PyTorch API of nested tensors is in prototype stage and will change in the near future. We recommend specifying layout=torch.jagged when constructing a nested tensor, as this layout receives active development, has better operator coverage, and works with torch.compile. (Triggered internally at /pytorch/aten/src/ATen/NestedTensorImpl.cpp:178.)
+  output = torch._nested_tensor_from_mask(
+--> Autoaligner loaded from checkpoint
+--> CLaTr loaded from checkpoint
+{"elapsed_sec": 43.953003883361816, "eta_sec": 680.5161179378629, "processed": 640, "target": 10549, "task": "camera"}
+{"elapsed_sec": 80.65152406692505, "eta_sec": 584.0304504502565, "processed": 1280, "target": 10549, "task": "camera"}
+{"elapsed_sec": 116.5614984035492, "eta_sec": 523.858942564701, "processed": 1920, "target": 10549, "task": "camera"}
+{"elapsed_sec": 153.29200387001038, "eta_sec": 478.3788355146534, "processed": 2560, "target": 10549, "task": "camera"}
+{"elapsed_sec": 188.91542291641235, "eta_sec": 433.85607594147325, "processed": 3200, "target": 10549, "task": "camera"}
+{"elapsed_sec": 224.7156195640564, "eta_sec": 392.60861761855585, "processed": 3840, "target": 10549, "task": "camera"}
+{"elapsed_sec": 259.91488456726074, "eta_sec": 352.10344518721104, "processed": 4480, "target": 10549, "task": "camera"}
+{"elapsed_sec": 294.4637260437012, "eta_sec": 312.23507201001047, "processed": 5120, "target": 10549, "task": "camera"}
+{"elapsed_sec": 329.2927620410919, "eta_sec": 273.7817773289565, "processed": 5760, "target": 10549, "task": "camera"}
+{"elapsed_sec": 364.0221633911133, "eta_sec": 235.98874311089514, "processed": 6400, "target": 10549, "task": "camera"}
+{"elapsed_sec": 398.03724336624146, "eta_sec": 198.39668849036096, "processed": 7040, "target": 10549, "task": "camera"}
+{"elapsed_sec": 432.6245210170746, "eta_sec": 161.61455088515456, "processed": 7680, "target": 10549, "task": "camera"}
+{"elapsed_sec": 467.3672618865967, "eta_sec": 125.21173398380095, "processed": 8320, "target": 10549, "task": "camera"}
+{"elapsed_sec": 502.90108609199524, "eta_sec": 89.18636448662728, "processed": 8960, "target": 10549, "task": "camera"}
+{"elapsed_sec": 537.5165085792542, "eta_sec": 53.13574652517835, "processed": 9600, "target": 10549, "task": "camera"}
+{"elapsed_sec": 571.376630783081, "eta_sec": 17.24173622187227, "processed": 10240, "target": 10549, "task": "camera"}
+{"elapsed_sec": 588.2493662834167, "eta_sec": 0.0, "processed": 10549, "target": 10549, "task": "camera"}
+{"elapsed_sec": 588.4387083053589, "keys": 13, "records": "runs/eval/stage2/v3_closure_20260616/full/gpu3_jointheavy_h2_besteval_camera_std_cfg2_eta1.records.jsonl", "samples": 10549, "task": "camera", "wrote": "runs/eval/stage2/v3_closure_20260616/full/gpu3_jointheavy_h2_besteval_camera_std_cfg2_eta1.json"}

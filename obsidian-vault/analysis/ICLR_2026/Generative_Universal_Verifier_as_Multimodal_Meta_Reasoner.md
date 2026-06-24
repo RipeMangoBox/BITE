@@ -1,0 +1,338 @@
+---
+title: "Generative Universal Verifier as Multimodal Meta-Reasoner"
+type: paper
+paper_level: A
+venue: ICLR
+year: 2026
+pdf_ref: paperPDFs/ICLR_2026/Generative_Universal_Verifier_as_Multimodal_Meta_Reasoner.pdf
+openreview_forum_id: DM0Y0oL33T
+aliases:
+- OOT
+- GUVAMMR
+tags:
+- ICLR_2026
+- topic/vision_multimodal_applications
+- topic/vision_multimodal_applications/vision_models_multimodal
+core_operator: "通过基于规则奖励的强化学习，在自动化构建的高质量视觉验证数据上训练生成式通用验证器（OmniVerifier），赋予其显式对齐、关系验证和综合推理的原子能力，从而在测试时通过顺序验证-编辑循环实现精细化自我修正（OmniVerifier-TTS）。"
+primary_logic: "视觉验证可分解为显式对齐、关系验证和综合推理三层递进的原子能力；其中前两者具有强跨任务泛化性，因此仅需有限训练数据即可获得广泛验证能力。进一步将验证器作为“不对齐探测器”嵌入生成循环，能实现顺序测试时缩放，在生成质量和推理效率上均优于并行缩放方法。"
+claims:
+- "OmniVerifier-7B在视觉验证基准ViVerBench上取得8.3%的整体性能提升，超越了GPT-4o。"
+- "仅使用涵盖显式对齐和关系验证的单一数据集进行RL训练，即可实现跨任务的广泛泛化，无需为每个任务单独构建数据集。"
+- "OmniVerifier-TTS顺序测试时缩放在T2I-ReasonBench和GenEval++上分别提升+3.7和+4.3分，且优于Best-of-N并行缩放方法。"
+- "ViVerBench 上 Overall Accuracy = 0.653"
+---
+
+# Generative Universal Verifier as Multimodal Meta-Reasoner
+
+> [!tip] 核心洞察
+> 视觉验证可分解为显式对齐、关系验证和综合推理三层递进的原子能力；其中前两者具有强跨任务泛化性，因此仅需有限训练数据即可获得广泛验证能力。进一步将验证器作为“不对齐探测器”嵌入生成循环，能实现顺序测试时缩放，在生成质量和推理效率上均优于并行缩放方法。
+
+| 字段 | 内容 |
+| ------ | ------ |
+| 中文题名 | 生成式通用验证器：多模态元推理框架 |
+| 英文题名 | Generative Universal Verifier as Multimodal Meta-Reasoner |
+| 会议/期刊 | ICLR 2026 (Oral) |
+| Links | [paper](https://openreview.net/forum?id=DM0Y0oL33T); [Project](https://omniverifier.github.io/) |
+| Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
+| Method | OmniVerifier / OmniVerifier-TTS |
+| Dataset | ViVerBench, T2I-ReasonBench, GenEval++ |
+
+> [!tip] 效果简介
+> - ViVerBench 上，Overall Accuracy 为 0.653，对比 0.570 (Qwen2.5-VL 7B)，变化 +0.083 (+8.3%)。
+> - T2I-ReasonBench 上，Overall Score (Qwen-Image) 为 59.2，对比 55.5 (Vanilla Qwen-Image)，变化 +3.7。
+> - GenEval++ 上，Overall Score (Qwen-Image) 为 0.718，对比 0.682 (QwenVL-TTS)，变化 +0.036 (+4.3)。
+
+## 概述
+
+当前多模态大语言模型（MLLMs）在视觉结果验证上存在三个根本性瓶颈：**细粒度图文对齐能力薄弱**、**世界知识在视觉任务中激活不足**，以及**缺乏可靠的批判性反思机制**，导致模型无法通过自我修正来提升生成与推理质量。这些缺陷在需要深度推理的视觉验证场景中尤为突出——现有最先进的视觉语言模型在迷宫、机器人等综合推理任务上的表现仅略高于随机水平，与人类近乎完美的判断能力之间存在巨大鸿沟。
+
+针对上述问题，本文提出 **OmniVerifier**，一个生成式通用视觉验证框架。其核心洞察在于：视觉验证可被分解为**显式对齐**、**关系验证**和**综合推理**三层递进的原子能力，其中前两者具有强跨任务泛化性，仅需有限训练数据即可获得广泛验证能力。基于此，作者设计了两套自动化数据构造管道，结合基于规则奖励的强化学习（DAPO算法），在 Qwen2.5-VL-7B 骨架上训练出 OmniVerifier-7B。进一步地，将验证器作为“不对齐探测器”嵌入生成循环，提出 **OmniVerifier-TTS** 顺序测试时缩放范式，通过多轮“生成-验证-编辑”循环实现精细化自我修正。
+
+主要实验结果验证了方法的有效性：OmniVerifier-7B 在视觉验证基准 ViVerBench 上取得 **+8.3%** 的整体性能提升，超越 GPT-4o；OmniVerifier-TTS 在 T2I-ReasonBench 和 GenEval++ 上分别提升 **+3.7** 和 **+4.3** 分，且在推理效率上优于并行测试时缩放方法（仅需约 47% 的推理时间）。然而，该方法在域差距大的综合推理任务上泛化能力有限，且多步自我细化中可能受限于骨干模型的编辑鲁棒性，出现风格漂移或错误累积。
+
+## 背景与动机
+
+多模态大语言模型（MLLMs）在图像理解与生成任务上取得了显著进展，但其在**视觉结果验证**（visual-outcome verification）这一关键环节上仍存在系统性缺陷。所谓视觉结果验证，是指模型判断一幅生成或合成的图像是否忠实于给定的文本描述或约束条件——这不仅是评估生成质量的基础，更是实现自我修正（self-correction）的前提。
+
+当前MLLMs在该任务上面临三重瓶颈：
+
+1. **细粒度图文对齐能力薄弱**：模型难以精确判断图像中的对象、属性、数量等元素是否与文本描述严格匹配。
+2. **世界知识在视觉任务中激活不足**：即便模型在纯文本推理中具备相关知识，在视觉场景下却无法有效调用，导致“知识-模态鸿沟”。
+3. **缺乏可靠的批判性反思**：现有模型在视觉推理任务中难以对自身输出进行可信的真伪判断，因而无法通过自我修正来提升生成与推理质量。
+
+这些缺陷在ViVerBench基准上得到了量化验证。ViVerBench涵盖16类任务，横跨显式对齐（如对象存在性、属性匹配）、关系验证（如空间关系、边界框）和综合推理（如迷宫路径验证）三个层次，且真假样本比例为1:1以消除随机猜测偏差。评测结果显示，即便是最强的闭源模型**Gemini 2.5 Pro**（Comanici et al., 2025），其整体得分也仅为0.745，与人类表现存在约0.2的显著差距；在迷宫、FrozenLake等需要反思性推理的任务上，模型表现更接近随机水平（Gemini 2.5 Pro迷宫准确率0.580，人类为0.997）。
+
+现有方法的根本局限在于：**缺乏一个专门为通用视觉验证任务训练的生成式验证器**。大多数工作依赖零样本推理或标准监督微调，既未针对验证的原子能力进行系统建模，也未利用强化学习来优化真伪判断的准确性。这直接限制了MLLMs在测试时通过自我修正实现质量缩放的能力。
+
+本文的核心动机由此确立：**构建一个具备通用视觉验证能力的生成式验证器，并将其嵌入生成循环，实现高效的顺序测试时缩放**。这一思路的关键洞见在于，视觉验证可被分解为显式对齐、关系验证和综合推理三层递进的原子能力，其中前两者具有强跨任务泛化性——这意味着仅需有限且精心构造的训练数据，即可赋予模型广泛的验证能力。
+
+## 核心创新
+
+本工作的核心创新在于将视觉验证重新定义为一种**可训练的元推理能力**，而非模型固有的被动评估属性。围绕这一核心洞察，OmniVerifier框架在数据构造、训练范式和测试时推理三个层面实现了关键突破。
+
+### 创新一：自动化高质量视觉验证数据构造
+
+视觉验证任务长期受困于高质量训练数据的匮乏。传统方法依赖昂贵且难以规模化的人工标注，严重制约了验证器性能的上限。本工作提出了**两套互补的自动化数据构造管道**，从根本上解决了这一瓶颈（Figure 2）：
+
+- **方法1（图像固定-提示修改）**：保持图像不变，通过修改原始生成提示中的关键语义元素（如对象、属性、空间关系），构造出与图像内容不一致的“假”样本，同时保留原始图文对作为“真”样本。
+- **方法2（提示固定-图像修复）**：保持文本提示不变，利用图像修复技术局部修改图像内容，使其与提示产生语义冲突，从而生成“假”样本。
+
+两套管道分别从文本端和图像端引入可控的语义偏差，覆盖了显式对齐和关系验证所需的核心错误模式。图像来源包括合成图像（基于ShareGPT-4o-Image通过Seedream 3.0生成）和自然图像（从LVIS中筛选20k样本，由GPT-5进行质量过滤）。最后，利用Seed1.5-VL进行数据清洗，仅保留Best-of-10准确率不低于0.6的高质量样本，确保训练信号的可靠性。
+
+这一设计的关键价值在于**可扩展性**：无需为每个验证子任务单独设计数据构造流程，即可获得覆盖多种错误模式的大规模训练数据。
+
+### 创新二：基于规则奖励强化学习的生成式验证器训练
+
+传统的视觉验证器训练通常采用监督微调或直接依赖零样本推理，缺乏对验证决策正确性的显式优化信号。本工作将验证器训练形式化为**基于规则奖励的强化学习问题**，直接在Qwen2.5-VL-7B（Bai et al., 2025）上进行训练，得到OmniVerifier-7B。
+
+具体而言，采用DAPO算法，训练目标将两类奖励以9:1的比例混合：
+- **规则奖励**：直接评估模型对图文对真伪判断的正确性，即预测标签与真实标签的一致性。
+- **格式奖励**：确保模型输出符合预设的结构化格式，便于后续解析与使用。
+
+这一训练范式的核心优势在于：模型不再仅仅模仿训练数据的表面模式，而是在“判断正确即获得奖励”的明确信号引导下，学会对视觉内容进行真正的批判性审视。消融实验证实，该训练方式显著减少了模型幻觉——在VL-RewardBench上，OmniVerifier-7B的幻觉评分大幅提升+24.3分。
+
+### 创新三：顺序测试时缩放范式（OmniVerifier-TTS）
+
+现有测试时缩放方法主要采用并行策略（如Best-of-N），即独立生成多个候选结果后选择最优者。这类方法存在两个根本局限：一是各候选之间缺乏信息交互，无法进行渐进式改进；二是计算资源随候选数量线性增长，效率低下。
+
+本工作提出**OmniVerifier-TTS**，一种顺序测试时缩放范式。其核心机制是将OmniVerifier作为“不对齐探测器”嵌入统一多模态模型的生成循环中，执行多轮“生成-验证-编辑”迭代：
+
+1. 统一多模态模型根据输入提示生成初始图像。
+2. OmniVerifier对生成图像进行验证，输出真伪判断及解释。
+3. 若判断为假，OmniVerifier同时生成具体的编辑提示，指引模型对图像进行精细化修改。
+4. 重复上述过程，直至验证通过或达到最大迭代步数。
+
+这一设计将验证器的批判性反馈直接转化为生成改进的驱动力，实现了**从“选择最优”到“逐步优化”的范式转变**。实验表明，顺序TTS在所有基准上均优于并行TTS，且推理时间仅为后者的约47%，在生成质量和计算效率上实现了双重超越。
+
+## 整体框架
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/002_Figure_1.jpg]]
+*Figure 1: ViVerBench Overview. ViVerBench has a 1:1 ratio of true to false answers; here, we show only the false ones to better highlight data difficulty*
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/004_Figure_2.jpg]]
+*Figure 2: Automated pipeline for visual verifier data construction*
+
+**OmniVerifier** 与 **OmniVerifier-TTS** 共同构成一个“训练通用验证器—嵌入生成循环实现自我修正”的两阶段元推理框架。其核心思想是：将视觉结果验证分解为**显式对齐、关系验证、综合推理**三层递进的原子能力，通过强化学习训练一个生成式通用验证器，再将其作为“不对齐探测器”嵌入统一多模态模型的生成循环中，实现顺序测试时缩放。
+
+### 训练阶段：从自动化数据到通用验证器
+
+框架的训练侧由两个关键模块串联而成：
+
+**1. 自动化验证数据构造管道**
+
+为突破人工标注的扩展性瓶颈，框架设计了两套互补的自动化管道（Figure 2）：
+
+- **方法1（Image-Fixed, Prompt-Modified）**：固定图像，通过修改提示词构造正负样本对。合成图像使用 ShareGPT-4o-Image 的提示词由 Seedream 3.0 生成；自然图像则从 LVIS 中采样 20k 样本，经 GPT-5 过滤。
+- **方法2（Prompt-Fixed, Image-Inpainting）**：固定提示词，通过图像修复技术生成扰动图像，构造视觉层面的负样本。
+
+生成的数据经 Seed1.5-VL 清洗，仅保留 Best-of-10 准确率不低于 0.6 的高质量样本。
+
+**2. RL训练模块**
+
+以 **Qwen2.5-VL-7B**（Bai et al., 2025）为骨架，使用 **DAPO** 算法进行强化学习训练。训练目标混合了规则奖励（评估真/假预测的正确性）与格式奖励，比例为 9:1。最终产出 **OmniVerifier-7B**——首个面向通用视觉验证的生成式验证器。
+
+### 推理阶段：顺序测试时缩放
+
+**OmniVerifier-TTS** 将训练好的验证器嵌入统一多模态模型的生成循环，形成“生成—验证—编辑”的迭代管线（Figure 5）：
+
+1. **初始生成**：统一多模态模型根据输入提示生成初始图像。
+2. **验证诊断**：OmniVerifier 分析当前图像，输出二元判断（真/假）及解释。若判断为假，额外输出一个**编辑提示**，精确描述当前图像与目标之间的不对齐之处。
+3. **精细编辑**：统一多模态模型基于编辑提示对图像进行局部修正，得到细化结果。
+4. **循环迭代**：重复步骤 2-3，直至验证通过或达到最大细化步数（实验中统一设为 10 步）。
+
+### 关键设计决策
+
+- **数据策略的泛化洞察**：消融实验揭示，仅需一个覆盖显式对齐与关系验证两类原子能力的数据集，即可实现跨任务的广泛泛化，无需为每个任务单独构建数据。综合推理任务则因域差距较大，仍需任务特定数据。
+- **顺序 vs. 并行缩放**：与 Best-of-N 等并行测试时缩放方法不同，OmniVerifier-TTS 利用验证器提供的生成式批评信号进行多轮精细优化，在推理效率上具有显著优势——达到可比或更优结果所需的推理时间约为并行方法的 47%。
+
+## 核心模块与公式推导
+
+### 自动化验证数据构造管道
+
+高质量视觉验证训练数据的规模化获取是训练通用验证器的前提瓶颈。OmniVerifier 采用两套互补的自动化管道（见 Figure 2），分别从“图像固定-提示修改”与“提示固定-图像修复”两个方向生成成对的真/假样本：
+
+- **方法1（Image-Fixed, Prompt-Modified）**：以复杂合成图像（由 Seedream 3.0 生成，提示来自 ShareGPT-4o-Image）或自然图像（从 LVIS 中筛选 20k 样本，经 GPT-5 过滤）为固定锚点，通过修改其对应的文本描述来构造不匹配的“假”样本。该管道主要覆盖对象存在性、属性对齐等显式对齐任务。
+- **方法2（Prompt-Fixed, Image-Inpainting）**：固定文本提示，对图像进行局部修复（如移除、替换或位移关键对象），从而生成违背提示的“假”图像。该管道天然适配空间关系、边界框等关系验证任务。
+
+为保证数据质量，所有生成样本均经过 **Seed1.5-VL** 进行清洗：对每个样本进行 10 次独立验证，仅保留 Best-of-10 准确率不低于 0.6 的样本。这一过滤机制有效剔除了边界模糊或歧义过高的噪声数据，为后续强化学习提供了可靠的监督信号。
+
+### 基于规则奖励的强化学习训练
+
+OmniVerifier 以 **Qwen2.5-VL 7B**（Bai et al., 2025）为骨架，采用 **DAPO** 算法直接进行强化学习训练，而非传统的监督微调范式。训练目标由两类奖励按 9:1 比例混合构成：
+
+1. **规则奖励（Rule-based Reward）**：仅评估模型对真/假标签预测的正确性，不考察解释文本的准确性。其核心指标为规则准确率：
+
+$$\mathrm{Acc}_{\mathrm{rule\text{-}based}} = \frac{1}{N} \sum_{i=1}^{N} \mathbf{1}(\hat{y}_i = y_i)$$
+
+其中 $\hat{y}_i$ 为模型预测的真伪标签，$y_i$ 为真实标签。
+
+2. **格式奖励（Format Reward）**：约束模型输出符合预定义的结构化格式（如先给出真/假判断，再附解释），以确保后续测试时缩放中可被稳定解析。
+
+此外，论文在附录中还定义了更严格的 **模型准确率（Model-based Accuracy）**，用于裁判模型对验证器解释质量的二次评估：
+
+$$\mathrm{Acc}_{\mathrm{model\text{-}based}} = \frac{1}{N} \left[ \sum_{i: y_i = \mathrm{true}} \mathbf{1}(\hat{y}_i = y_i) + \sum_{i: y_i = \mathrm{false}} \mathbf{1}(\hat{y}_i = y_i) \cdot \mathbf{1}(\mathcal{F}(e_i, \hat{e}_i)) \right]$$
+
+其中 $e_i$ 为标注解释，$\hat{e}_i$ 为模型生成的解释，$\mathcal{F}$ 为裁判模型（如 GPT-4o）对两者一致性的判定函数。该指标的核心设计意图是防止模型通过“盲目猜假”来获取高规则准确率——当预测为假时，必须提供与标注解释一致的推理依据，否则该样本不计为正确。
+
+### 顺序测试时缩放模块（OmniVerifier-TTS）
+
+OmniVerifier-TTS 将训练好的通用验证器嵌入统一多模态模型（UMM）的生成循环中，形成“生成-验证-编辑”的顺序测试时缩放范式（见 Figure 5）。其核心流程为：
+
+1. **初始生成**：UMM 根据输入提示生成初始图像。
+2. **不对齐检测**：OmniVerifier 分析当前图像与提示的一致性，输出二元判断（true/false）及解释。若判断为 false，则额外生成一条**编辑提示（edit prompt）**，精确定位图像中的不对齐之处。
+3. **精细化编辑**：UMM 依据编辑提示对图像进行细粒度修改，得到优化后的图像。
+4. **迭代循环**：重复步骤 2-3，直至验证器判定为 true 或达到预设的最大细化步数（统一设为 10 步）。
+
+与并行测试时缩放（Best-of-N，即独立生成 N 个候选并选取最优）相比，顺序 TTS 的核心优势在于充分利用了验证器生成的批判性反馈，实现了多轮、细粒度的定向优化。实验表明，顺序 TTS 在所有基准上均优于并行 TTS，且推理耗时仅约为后者的 47%。
+
+## 实验与分析
+
+### 主实验结果
+
+#### 视觉验证基准 ViVerBench
+
+OmniVerifier-7B 在 ViVerBench 上取得了 65.3% 的整体准确率，相比其训练骨架 Qwen2.5-VL-7B（57.0%）提升了 8.3 个百分点，并超越了 GPT-4o（Hurst et al., 2024）。这一结果验证了基于规则奖励的强化学习训练能够赋予 MLLM 可靠的视觉验证能力。ViVerBench 包含 16 个任务类别，涵盖显式对齐、关系验证和综合推理三个层次，真假答案比例为 1:1，有效避免了随机猜测偏差。Table 1 的规则评测显示，当前最强闭源模型 Gemini 2.5 Pro（Comanici et al., 2025）在该基准上达到 74.5%，但人类表现接近完美（如迷宫任务人类准确率 99.7%，Gemini 2.5 Pro 仅 58.0%），揭示了现有模型在反思性推理任务中的根本性差距。
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/003_Table_1.jpg]]
+*Table 1: Rule-based evaluation of advanced VLMs on ViVerBench*
+
+#### 生成质量提升
+
+OmniVerifier-TTS 将 OmniVerifier 作为“不对齐探测器”嵌入生成循环，在统一多模态模型的图像生成任务上实现了稳定的测试时缩放收益。如 Table 2 所示，在 T2I-ReasonBench 上，OmniVerifier-TTS 将 Qwen-Image（Wu et al., 2025a）的整体得分从 55.5 提升至 59.2（+3.7），将 GPT-Image-1 从 76.8 提升至 79.3（+2.5）。在 GenEval++ 上，OmniVerifier-TTS 将 Qwen-Image 的整体得分从 0.682 提升至 0.718（+4.3），优于基于 QwenVL 的测试时缩放方法。这些提升源自顺序验证-编辑循环能够针对具体的不对齐信号进行精细化修正，而非简单地从多个候选中选择最佳结果。
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/009_Table_2.jpg]]
+*Table 2: Evaluation of OmniVerifier-TTS on reasoning and compositional generation benchmarks*
+
+#### 顺序 vs. 并行测试时缩放
+
+Table 3 对比了顺序 TTS（OmniVerifier-TTS）与并行 TTS（Best-of-N）的性能。在所有三个基准（T2I-ReasonBench、GenEval++）上，顺序 TTS 一致优于并行 TTS，同时推理时间仅约为后者的 47%。这一效率优势源于顺序策略充分利用了 OmniVerifier 生成的批判性反馈，通过多轮细粒度优化逐步逼近目标，而并行策略仅能进行一次性筛选，无法实现迭代改进。
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/011_Table_3.jpg]]
+*Table 3: Evaluation of Parallel and Sequential Test-Time Scaling in UMMs*
+
+### 消融实验
+
+#### 原子能力的泛化性
+
+Figure 3 展示了在 ViVerBench 上仅使用单一任务数据训练时的跨任务泛化趋势，验证了视觉验证三层原子能力的层次结构（Figure 4）：
+
+- **仅训练对象验证数据**：在显式对齐任务（属性、图表、LaTeX）和关系任务（空间关系、边界框）上均取得显著提升，证明显式对齐能力具有广泛的可迁移性。
+- **仅训练空间验证数据**：在关系任务上带来更大提升，同时泛化到显式对齐任务，表明关系验证能力同样具有跨任务泛化性。
+- **仅训练迷宫验证数据**：几乎无泛化效果，因为迷宫任务与常规视觉验证之间存在显著的域差距，综合推理需要任务特定数据。
+
+这一发现直接支撑了核心洞察：显式对齐和关系验证两层原子能力具有强跨任务泛化性，因此仅需一个涵盖这两类底层视觉模式的单一数据集即可实现广泛的验证能力，无需为每个任务单独构建训练数据。
+
+#### 幻觉减少
+
+Table 4 展示了在 VL-RewardBench 上的评估结果。OmniVerifier-7B 的幻觉评分从基线的 45.79 大幅提升至 70.09（+24.3），证明 RL 训练显著抑制了模型在视觉验证中的幻觉倾向。这一改进对于验证器在测试时缩放中的可靠性至关重要——若验证器自身产生幻觉，其反馈将引导生成走向错误方向。
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/026_Table_4.jpg]]
+*Table 4: Evaluation Results on VLRewardBench*
+
+#### 骨干模型与验证器组合
+
+Table 6 对比了不同骨干模型、验证器和 TTS 策略的组合效果。结果显示，OmniVerifier-TTS 的性能受骨干统一多模态模型编辑能力的制约。当使用 Gemini 2.5 Pro 作为验证器时（Table 7），顺序 TTS 的性能上限进一步提升，表明更强的验证器能够提供更精准的不对齐信号，从而释放更大的生成改进空间。
+
+### 失败模式
+
+Figure 9 展示了 OmniVerifier-TTS 的典型失败案例：由于骨干模型的编辑能力有限，多轮自我细化过程中可能出现图像风格漂移或错误累积。例如，GPT-Image-1 在多轮编辑后出现了图像黄化问题，说明当前统一多模态模型在保持风格一致性和精确局部编辑方面仍存在不足。这一局限性表明，顺序测试时缩放的收益上限部分取决于生成模型自身的编辑鲁棒性。
+
+### 关键图表结论
+
+- **Table 1**：ViVerBench 揭示了从开源模型到闭源 SOTA 模型在视觉验证上的梯度差距，综合推理任务（迷宫、FrozenLake、机器人）是人类与模型差距最大的领域。
+- **Table 2**：OmniVerifier-TTS 在推理生成和组合生成两个维度上均实现稳定提升，且对开源和闭源骨干模型均有效。
+- **Table 3**：顺序 TTS 在性能和效率上双重优于并行 TTS，验证了“验证-编辑”循环的累积优化优势。
+- **Table 4**：RL 训练带来的幻觉抑制是 OmniVerifier 可靠性的关键来源。
+- **Table 5**：OmniVerifier 在主流感知和图像推理基准上保持了与基线相当的性能，表明 RL 训练未损害模型的通用视觉理解能力。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/001_Figure.jpg]]
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/030_Figure.jpg]]
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/031_Figure.jpg]]
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/032_Figure.jpg]]
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/033_Figure.jpg]]
+
+![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_DM0Y0oL33T/figures/034_Figure.jpg]]
+
+## 方法谱系与知识库定位
+
+### 1. 问题定位：视觉验证的三大瓶颈
+
+OmniVerifier 的出发点是对现有多模态大模型（MLLMs）在视觉结果验证上的系统性诊断。论文识别出三个根本性缺陷：
+
+- **细粒度图文对齐能力弱**：现有 MLLMs 在判断图像是否精确匹配文本描述时，容易忽略细节偏差（如属性错误、空间关系错位）。
+- **世界知识激活不足**：模型在视觉任务中难以有效调用其内部存储的世界知识，导致常识性验证失败。
+- **批判性反思缺失**：在视觉推理任务中，模型缺乏可靠的自我评估机制，无法通过自我修正来提升生成与推理质量。
+
+这三个瓶颈共同构成了“知识-模态鸿沟”（Knowledge-Modality Gap），即模型在纯文本场景下可用的知识，在视觉验证场景下无法被有效激活。
+
+### 2. 与基线方法的关系
+
+#### 2.1 验证器训练范式
+
+现有视觉验证器主要依赖标准的监督微调（SFT）或零样本推理。OmniVerifier 的差异化在于：
+
+- **训练范式**：采用基于 **DAPO** 的强化学习，直接在 **Qwen2.5-VL 7B**（Bai et al., 2025）上进行训练。奖励函数由规则奖励（判断真伪正确性）与格式奖励以 9:1 比例混合构成，公式为：
+
+  $$\mathrm{Acc}_{\mathrm{rule-based}} = \frac{1}{N} \sum_{i=1}^{N} \mathbf{1}(\hat{y}_i = y_i)$$
+
+  对于预测为假的样本，进一步引入基于裁判模型的验证（model-based accuracy），防止模型随机猜测为假：
+
+  $$\mathrm{Acc}_{\mathrm{model-based}} = \frac{1}{N} \left[ \sum_{i: y_i = \mathrm{true}} \mathbf{1}(\hat{y}_i = y_i) + \sum_{i: y_i = \mathrm{false}} \mathbf{1}(\hat{y}_i = y_i) \cdot \mathbf{1}(\mathcal{F}(e_i, \hat{e}_i)) \right]$$
+
+- **数据构造**：区别于依赖人工标注的基线，OmniVerifier 使用两套自动化管道可扩展地生成高质量成对数据——方法1（图像固定-修改提示）和方法2（提示固定-图像修复），并结合 **Seed1.5-VL** 进行数据清洗（保留 Best-of-10 准确率 ≥ 0.6 的样本）。
+
+#### 2.2 测试时缩放策略
+
+测试时缩放（Test-Time Scaling, TTS）方面，现有方法以并行缩放为主，如 Best-of-N（生成 N 个候选，选择最优）。OmniVerifier 提出**顺序 TTS**（OmniVerifier-TTS）：
+
+- **机制差异**：并行 TTS 独立生成多个候选并一次性选择；顺序 TTS 利用验证器作为“不对齐探测器”，进行多轮验证-编辑循环，每轮的编辑提示由上一轮的错误诊断生成，实现精细化迭代优化。
+- **效率优势**：实验表明，顺序 TTS 在所有基准上均优于并行 TTS，且所用推理时间约为后者的 **47%**。原因在于顺序 TTS 能充分利用验证器生成的批判性反馈进行多轮细粒度优化，而非简单地从固定候选池中挑选。
+
+#### 2.3 与强基线模型的性能对比
+
+在 ViVerBench 上，**OmniVerifier-7B** 取得了 **8.3%** 的整体性能提升，超越 **GPT-4o**（Hurst et al., 2024）。与 SOTA 验证模型 **Gemini 2.5 Pro**（Comanici et al., 2025）相比，OmniVerifier-7B 在显式对齐和关系验证任务上表现竞争力，但在迷宫等综合推理任务上仍有差距（Gemini 2.5 Pro 的 ViVerBench 总分为 0.745）。
+
+在生成任务上，OmniVerifier-TTS 在 **Qwen-Image**（Wu et al., 2025a）和 **GPT-Image-1** 两个统一多模态生成模型上均取得一致提升：T2I-ReasonBench 上分别 +3.7 和 +2.5 分，GenEval++ 上 Qwen-Image 从 QwenVL-TTS 的 0.682 提升至 0.718（+4.3 分）。
+
+### 3. 原子能力层次与泛化边界
+
+论文的核心洞察是将视觉验证分解为三层递进的原子能力：
+
+1. **显式对齐**（Explicit Alignment）：判断图像元素是否与文本描述精确匹配（如属性、图表、LaTeX 渲染）。
+2. **关系验证**（Relational Verification）：验证图像中元素间的空间关系、计数、边界框等。
+3. **综合推理**（Integrative Reasoning）：需要多步逻辑推理的复杂验证（如迷宫路径、FrozenLake 决策）。
+
+**关键泛化规律**：
+
+- 显式对齐和关系验证之间存在**强跨任务泛化性**——仅使用涵盖这两类原子能力的单一数据集进行 RL 训练，即可实现跨任务的广泛泛化，无需为每个任务单独构建数据集。
+- 综合推理任务（如迷宫验证）**几乎无跨域泛化性**——仅训练迷宫数据对其他任务无显著提升，反之亦然。这意味着综合推理能力需要任务特定的领域数据。
+
+### 4. 适用边界与局限
+
+**适用场景**：
+
+- 需要细粒度图文对齐验证的任务（属性检查、图表验证、LaTeX 渲染验证）。
+- 涉及空间关系、计数、边界框等关系推理的验证场景。
+- 统一多模态模型的图像生成后编辑与迭代优化。
+
+**已知局限**：
+
+1. **综合推理泛化不足**：对于迷宫、FrozenLake、机器人等域差距大的综合推理任务，OmniVerifier 的泛化能力有限，仍需任务特定数据。当前 ViVerBench 上最佳模型 Gemini 2.5 Pro 在迷宫任务上也仅得 0.580（人类为 0.997）。
+2. **骨干模型编辑能力制约**：OmniVerifier-TTS 的性能受限于底层统一多模态模型的编辑鲁棒性。在多步自我细化中可能出现图像风格漂移或错误累积——例如 GPT-Image-1 在迭代编辑中出现图像黄化问题。
+3. **验证器本身的幻觉**：尽管 RL 训练显著减少了幻觉（VL-RewardBench 上幻觉评分 +24.3），验证器仍可能产生错误判断，导致编辑方向偏差。
+
+### 5. 开放问题
+
+1. **综合推理的域差距弥合**：如何使通用验证器在无需任务特定数据的情况下，实现对迷宫、具身推理等综合推理任务的鲁棒泛化？当前证据表明单纯的数据驱动方法不足以跨越这一鸿沟。
+2. **编辑鲁棒性与风格一致性**：如何提升骨干模型在自我细化过程中的编辑保真度，减轻多轮生成中的误差累积和风格漂移？这需要从生成模型架构层面进行改进。
+3. **自我进化的推理范式**：视觉验证器能否在更广泛的世界建模和具身推理场景中，通过持续验证与修正形成闭环的自我进化推理范式？Figure 10 展示了向迷宫和机器人任务的初步扩展，但尚未形成完整的自我进化机制。
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/Generative_Universal_Verifier_as_Multimodal_Meta_Reasoner.pdf]]

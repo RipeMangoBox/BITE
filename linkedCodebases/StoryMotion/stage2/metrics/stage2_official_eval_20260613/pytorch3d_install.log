@@ -1,0 +1,71 @@
+START Sat Jun 13 16:04:03 CST 2026
+Collecting fvcore
+  Using cached fvcore-0.1.5.post20221221.tar.gz (50 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting iopath
+  Using cached iopath-0.1.10-py3-none-any.whl
+Requirement already satisfied: numpy in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from fvcore) (1.26.4)
+Collecting yacs>=0.1.6 (from fvcore)
+  Using cached yacs-0.1.8-py3-none-any.whl.metadata (639 bytes)
+Requirement already satisfied: pyyaml>=5.1 in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from fvcore) (6.0.3)
+Requirement already satisfied: tqdm in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from fvcore) (4.68.2)
+Collecting termcolor>=1.1 (from fvcore)
+  Using cached termcolor-3.3.0-py3-none-any.whl.metadata (6.5 kB)
+Requirement already satisfied: Pillow in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from fvcore) (12.2.0)
+Collecting tabulate (from fvcore)
+  Downloading tabulate-0.10.0-py3-none-any.whl.metadata (40 kB)
+Requirement already satisfied: typing_extensions in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from iopath) (4.15.0)
+Collecting portalocker (from iopath)
+  Using cached portalocker-3.2.0-py3-none-any.whl.metadata (8.7 kB)
+Using cached termcolor-3.3.0-py3-none-any.whl (7.7 kB)
+Using cached yacs-0.1.8-py3-none-any.whl (14 kB)
+Using cached portalocker-3.2.0-py3-none-any.whl (22 kB)
+Downloading tabulate-0.10.0-py3-none-any.whl (39 kB)
+Building wheels for collected packages: fvcore
+  Building wheel for fvcore (pyproject.toml): started
+  Building wheel for fvcore (pyproject.toml): finished with status 'done'
+  Created wheel for fvcore: filename=fvcore-0.1.5.post20221221-py3-none-any.whl size=61443 sha256=54e2216770e39b5b3348a7d10b1073fb2b349bf48ad3dba77c7b8316903d5f6b
+  Stored in directory: /home/ripemangobox/.cache/pip/wheels/01/c0/af/77c1cf53a1be9e42a52b48e5af2169d40ec2e89f7362489dd0
+Successfully built fvcore
+Installing collected packages: yacs, termcolor, tabulate, portalocker, iopath, fvcore
+
+Successfully installed fvcore-0.1.5.post20221221 iopath-0.1.10 portalocker-3.2.0 tabulate-0.10.0 termcolor-3.3.0 yacs-0.1.8
+Collecting git+https://github.com/facebookresearch/pytorch3d.git
+  Cloning https://github.com/facebookresearch/pytorch3d.git to /tmp/pip-req-build-wpa8hg24
+  Running command git clone --filter=blob:none --quiet https://github.com/facebookresearch/pytorch3d.git /tmp/pip-req-build-wpa8hg24
+  Resolved https://github.com/facebookresearch/pytorch3d.git to commit 7f8a8a142fa1383a7895ed01dd7082105f9a81fb
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: iopath in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from pytorch3d==0.7.9) (0.1.10)
+Requirement already satisfied: tqdm in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from iopath->pytorch3d==0.7.9) (4.68.2)
+Requirement already satisfied: typing_extensions in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from iopath->pytorch3d==0.7.9) (4.15.0)
+Requirement already satisfied: portalocker in /home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages (from iopath->pytorch3d==0.7.9) (3.2.0)
+Building wheels for collected packages: pytorch3d
+  Building wheel for pytorch3d (pyproject.toml): started
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): still running...
+  Building wheel for pytorch3d (pyproject.toml): finished with status 'done'
+  Created wheel for pytorch3d: filename=pytorch3d-0.7.9-cp310-cp310-linux_x86_64.whl size=6072125 sha256=9d7a31e6be74111f5880bb539f2546d740259402434c51d5c5eb399bddb81f82
+  Stored in directory: /tmp/pip-ephem-wheel-cache-q31ym0hz/wheels/dd/74/cc/b9266c863f19026f796e59a04e1cd9eb3754474a52ce1b66ce
+Successfully built pytorch3d
+Installing collected packages: pytorch3d
+Successfully installed pytorch3d-0.7.9
+EXIT 0 Sat Jun 13 16:04:03 CST 2026

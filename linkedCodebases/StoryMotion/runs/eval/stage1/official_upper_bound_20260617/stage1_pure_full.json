@@ -1,0 +1,322 @@
+{
+  "config_name": "config_dit_xy",
+  "created_at": "2026-06-17T15:12:58+0800",
+  "data_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/pulpmotion-data",
+  "elapsed_sec": 1471.142665863037,
+  "evaluated_samples": 4053,
+  "first_batch_summary": {
+    "raw_output": {
+      "camera": {
+        "device": "cuda:1",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          4,
+          4
+        ]
+      },
+      "human": {
+        "joints": {
+          "device": "cuda:1",
+          "dtype": "torch.float32",
+          "shape": [
+            64,
+            300,
+            24,
+            3
+          ]
+        },
+        "type": "SMPLXOutput"
+      },
+      "intrinsics": {
+        "device": "cuda:1",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          4
+        ]
+      }
+    },
+    "sample_ids": [
+      "2011_-EuO6OFypLo_00029_000_a",
+      "2011_-WW51YaWO-4_00007_000_a",
+      "2011_0JXwzlRcYWk_00002_000_a",
+      "2011_0_avQPM3L90_00002_000_a",
+      "2011_0c-UIkfsk1U_00031_000_a",
+      "2011_0fbR1RvOCQA_00003_000_a",
+      "2011_0j4aiJowI8I_00015_000_a",
+      "2011_0u5O2--9www_00017_000_a",
+      "2011_0zHmeTeLgMY_00002_000_a",
+      "2011_132WIdxvgdo_00000_000_a",
+      "2011_132WIdxvgdo_00001_000_a",
+      "2011_17gLdc5k_XU_00005_000_a",
+      "2011_1H2xudG3BPI_00034_000_a",
+      "2011_1LatwDo_ZL4_00005_000_a",
+      "2011_1Zro4CfP9wY_00025_000_a",
+      "2011_1nLc8ZZUKCg_00007_000_a",
+      "2011_1nVThHLqda0_00000_000_a",
+      "2011_2-1pev4OEJY_00025_000_a",
+      "2011_2-1pev4OEJY_00044_000_a",
+      "2011_20M_teQf-l8_00020_000_a",
+      "2011_2C6FHPmqETM_00018_000_a",
+      "2011_2C6FHPmqETM_00018_000_b",
+      "2011_2O-CC3IVPVg_00033_000_a",
+      "2011_2X80aLjCncQ_00007_001_a",
+      "2011_2gSf5UMZ8ms_00002_000_a",
+      "2011_2h8rH8zxA64_00000_000_a",
+      "2011_2hs_qcU6410_00005_000_a",
+      "2011_2nC7GyHvy0w_00033_000_a",
+      "2011_2sFAyhjR8_o_00021_000_a",
+      "2011_37KddyjUxnQ_00002_001_a",
+      "2011_38PbAk_SMdo_00012_000_a",
+      "2011_3Im7ZYrXCOY_00042_000_a",
+      "2011_3JO11PBdCAo_00002_001_a",
+      "2011_3obteqT0VJU_00017_000_a",
+      "2011_3rYbV-Q-VFo_00004_002_a",
+      "2011_48jtU38CZS4_00043_000_a",
+      "2011_48jtU38CZS4_00043_001_a",
+      "2011_4YZy2deJstI_00003_000_a",
+      "2011_4ZaIb1kBnX8_00014_000_a",
+      "2011_4_4HFkbbbC4_00035_000_a",
+      "2011_4snGt8OzUV0_00001_000_a",
+      "2011_5B5VRYzzz0M_00027_000_a",
+      "2011_5paBdZiLhqQ_00007_000_a",
+      "2011_6-2doIEpFVE_00014_000_a",
+      "2011_6-2doIEpFVE_00014_001_a",
+      "2011_6HJqPZ-KmZs_00010_000_a",
+      "2011_6mBFhNSqBk8_00069_000_a",
+      "2011_6mGJ0lFK8c8_00044_000_b",
+      "2011_6vNGX3c03gM_00037_001_a",
+      "2011_6vNGX3c03gM_00040_000_a",
+      "2011_6vO-XDUiRqU_00029_001_a",
+      "2011_7_OiqaOaeNc_00000_000_a",
+      "2011_7_OiqaOaeNc_00005_000_a",
+      "2011_7_OiqaOaeNc_00018_000_a",
+      "2011_7_OiqaOaeNc_00018_000_b",
+      "2011_7_ip79SGVLo_00001_000_a",
+      "2011_7msu2ugXGW8_00012_000_a",
+      "2011_7vjP2EKf7do_00006_000_a",
+      "2011_7xohWvO9i4c_00001_000_a",
+      "2011_8LM8A67uo_M_00000_000_a",
+      "2011_8WfKSXftr60_00013_001_a",
+      "2011_8bY4qPadkSo_00037_000_a",
+      "2011_8gc-RSAJpH4_00000_000_a",
+      "2011_8gc-RSAJpH4_00000_000_b"
+    ],
+    "x_input": {
+      "camera": {
+        "device": "cuda:1",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          14
+        ]
+      },
+      "human": {
+        "device": "cuda:1",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          199
+        ]
+      },
+      "projection": {
+        "device": "cuda:1",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          18
+        ]
+      }
+    },
+    "x_output": {
+      "camera": {
+        "device": "cuda:1",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          14
+        ]
+      },
+      "human": {
+        "device": "cuda:1",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          199
+        ]
+      }
+    }
+  },
+  "full_split_samples": 4053,
+  "metric_checkpoint_status": {
+    "autoencoder_ckpts": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/autoencoder/aemmardm-xgmj0yjj-325.ckpt"
+    ],
+    "clatr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-text_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_decoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_std.pt"
+    ],
+    "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+    "tmr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_decoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_encoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-text_encoder.pt"
+    ]
+  },
+  "metric_results": {
+    "camera": {
+      "metric_keys": [
+        "test/captions/fscore",
+        "test/captions/precision",
+        "test/captions/recall",
+        "test/clatr/R1",
+        "test/clatr/R2",
+        "test/clatr/R3",
+        "test/clatr/clatr_score",
+        "test/clatr/coverage",
+        "test/clatr/density",
+        "test/clatr/fcd",
+        "test/clatr/mm_distance",
+        "test/clatr/precision",
+        "test/clatr/recall"
+      ],
+      "metrics": {
+        "test/captions/fscore": 0.7761662006378174,
+        "test/captions/precision": 0.8366619348526001,
+        "test/captions/recall": 0.7528232336044312,
+        "test/clatr/R1": 0.13594867289066315,
+        "test/clatr/R2": 0.24993832409381866,
+        "test/clatr/R3": 0.3461633324623108,
+        "test/clatr/clatr_score": 60.53187561035156,
+        "test/clatr/coverage": 0.8467758676663126,
+        "test/clatr/density": 1.127962599140272,
+        "test/clatr/fcd": 17.65767478942871,
+        "test/clatr/mm_distance": 22.46539137976981,
+        "test/clatr/precision": 0.9597789358008472,
+        "test/clatr/recall": 0.7268537217706474
+      }
+    },
+    "human": {
+      "metric_keys": [
+        "test/tmr/R1",
+        "test/tmr/R2",
+        "test/tmr/R3",
+        "test/tmr/coverage",
+        "test/tmr/density",
+        "test/tmr/ftd",
+        "test/tmr/mm_distance",
+        "test/tmr/precision",
+        "test/tmr/recall",
+        "test/tmr/tmr_score"
+      ],
+      "metrics": {
+        "test/tmr/R1": 0.08117444068193436,
+        "test/tmr/R2": 0.14803849160671234,
+        "test/tmr/R3": 0.20133234560489655,
+        "test/tmr/coverage": 0.9242544189215348,
+        "test/tmr/density": 0.603180719169922,
+        "test/tmr/ftd": 109.34369659423828,
+        "test/tmr/mm_distance": 50.17964801463615,
+        "test/tmr/precision": 0.8963766138951592,
+        "test/tmr/recall": 0.9622492946948555,
+        "test/tmr/tmr_score": 15.94174575805664
+      }
+    },
+    "joint": {
+      "metric_keys": [
+        "test/captions/fscore",
+        "test/captions/precision",
+        "test/captions/recall",
+        "test/clatr/R1",
+        "test/clatr/R2",
+        "test/clatr/R3",
+        "test/clatr/clatr_score",
+        "test/clatr/coverage",
+        "test/clatr/density",
+        "test/clatr/fcd",
+        "test/clatr/mm_distance",
+        "test/clatr/precision",
+        "test/clatr/recall",
+        "test/proj/coverage",
+        "test/proj/density",
+        "test/proj/error",
+        "test/proj/g_fpd",
+        "test/proj/outscreen",
+        "test/proj/precision",
+        "test/proj/r_fpd",
+        "test/proj/recall",
+        "test/tmr/R1",
+        "test/tmr/R2",
+        "test/tmr/R3",
+        "test/tmr/coverage",
+        "test/tmr/density",
+        "test/tmr/ftd",
+        "test/tmr/mm_distance",
+        "test/tmr/precision",
+        "test/tmr/recall",
+        "test/tmr/tmr_score"
+      ],
+      "metrics": {
+        "test/captions/fscore": 0.7761662006378174,
+        "test/captions/precision": 0.8366619348526001,
+        "test/captions/recall": 0.7528232336044312,
+        "test/clatr/R1": 0.13594867289066315,
+        "test/clatr/R2": 0.24993832409381866,
+        "test/clatr/R3": 0.3461633324623108,
+        "test/clatr/clatr_score": 60.53187561035156,
+        "test/clatr/coverage": 0.8467758676663126,
+        "test/clatr/density": 1.127962599140272,
+        "test/clatr/fcd": 17.65767478942871,
+        "test/clatr/mm_distance": 22.46539137976981,
+        "test/clatr/precision": 0.9597789358008472,
+        "test/clatr/recall": 0.7268537217706474,
+        "test/proj/coverage": 0.0,
+        "test/proj/density": 0.0,
+        "test/proj/error": 0.0,
+        "test/proj/g_fpd": 0.0,
+        "test/proj/outscreen": 0.03472110629081726,
+        "test/proj/precision": 0.0,
+        "test/proj/r_fpd": 0.13685455918312073,
+        "test/proj/recall": 0.0,
+        "test/tmr/R1": 0.08117444068193436,
+        "test/tmr/R2": 0.14803849160671234,
+        "test/tmr/R3": 0.20133234560489655,
+        "test/tmr/coverage": 0.9242544189215348,
+        "test/tmr/density": 0.603180719169922,
+        "test/tmr/ftd": 109.34369659423828,
+        "test/tmr/mm_distance": 50.17964801463615,
+        "test/tmr/precision": 0.8963766138951592,
+        "test/tmr/recall": 0.9622492946948555,
+        "test/tmr/tmr_score": 15.94174575805664
+      }
+    }
+  },
+  "mode": "pulp_stage1_autoencoder_official_upper_bound",
+  "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+  "pulp_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/PulpMotion",
+  "records_path": "runs/eval/stage1/official_upper_bound_20260617/stage1_pure_full.records.jsonl",
+  "script_hashes": {
+    "eval_stage1_pulp_autoencoder_official.py": "8ca1f89e2bc4520c9acb18db3b5839d572e3695f7b828d2e5891d742806390cb"
+  },
+  "set_name": "pure_",
+  "split": "test",
+  "stage1_autoencoder": {
+    "checkpoint_status": "loaded_by_cfg.model.autoencoder.load_checkpoint",
+    "task": "encode GT feature with official autoencoder, decode, then run official callbacks"
+  }
+}

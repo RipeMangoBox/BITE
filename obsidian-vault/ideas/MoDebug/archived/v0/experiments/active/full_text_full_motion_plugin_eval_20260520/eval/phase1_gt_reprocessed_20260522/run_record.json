@@ -1,0 +1,32 @@
+{
+  "date": "2026-05-22",
+  "artifact_path": "/data/Life Me/ResearchWY Vault/paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/eval/phase1_gt_reprocessed_20260522",
+  "evaluator": "phase1_gt_reprocessed_human_eval_manifest_builder",
+  "protocol": "Reprocess all current P1 human-eval rows with GT availability, source split, text provenance, baseline video paths, and latest human annotations.",
+  "motion_source": "HumanML3D source GT plus MotionGPT/MoLingo/MoMask original/MoGenTS baseline videos",
+  "condition_pair": "full/single_event",
+  "n/evaluable": "samples 18/18; items 90/90; baseline_annotations 28/72",
+  "coverage": "18 P1 rows; each has 1 GT visual reference and 4 baseline visual items.",
+  "role": "diagnostic",
+  "used_for": "human_eval_cleaning;split_analysis;event_embedding_analysis_prep",
+  "limitations": "This is phase1 GT diagnostic bookkeeping. Train/test is HumanML3D source split; single-event texts are manually processed and reuse full source GT motion.",
+  "sample_counts_by_split_bucket": {
+    "phase1_train_gt": 14,
+    "phase1_test_gt": 4
+  },
+  "sample_counts_by_text_origin": {
+    "humanml3d_caption": 6,
+    "manual_event_decomposition": 12
+  },
+  "baseline_annotation_counts_by_status": {
+    "annotated_latest": 28,
+    "missing_latest_annotation": 44
+  },
+  "baseline_nonempty_problem_descriptions": 12,
+  "outputs": {
+    "sample_manifest": "/data/Life Me/ResearchWY Vault/paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/eval/phase1_gt_reprocessed_20260522/phase1_gt_sample_manifest.tsv",
+    "item_manifest": "/data/Life Me/ResearchWY Vault/paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/eval/phase1_gt_reprocessed_20260522/phase1_gt_item_manifest.tsv",
+    "clean_human_annotations": "/data/Life Me/ResearchWY Vault/paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/eval/phase1_gt_reprocessed_20260522/phase1_clean_human_annotations.tsv"
+  },
+  "created_at": "2026-05-22T15:20:02"
+}

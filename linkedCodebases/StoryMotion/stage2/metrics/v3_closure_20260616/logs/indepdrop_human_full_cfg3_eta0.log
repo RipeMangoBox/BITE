@@ -1,0 +1,24 @@
+started_at=2026-06-16T22:42:38+08:00
+name=indepdrop_human_full_cfg3_eta0 gpu=3 task=human rundir=/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/independent_dropout_ft_20260614/gpu0_indepdrop_b512_50000 output=/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v3_closure_20260616/completion_ablation/indepdrop_human_full_cfg3_eta0.json
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_official_bridge_smoke.py:70: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, name):
+/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/fabric/__init__.py:41: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/torch/nn/modules/transformer.py:515: UserWarning: The PyTorch API of nested tensors is in prototype stage and will change in the near future. We recommend specifying layout=torch.jagged when constructing a nested tensor, as this layout receives active development, has better operator coverage, and works with torch.compile. (Triggered internally at /pytorch/aten/src/ATen/NestedTensorImpl.cpp:178.)
+  output = torch._nested_tensor_from_mask(
+--> Autoaligner loaded from checkpoint
+--> TMR loaded from checkpoint
+{"elapsed_sec": 170.44884204864502, "eta_sec": 1234.2893101163208, "processed": 1280, "target": 10549, "task": "human"}
+{"elapsed_sec": 370.93170952796936, "eta_sec": 1157.5677450855262, "processed": 2560, "target": 10549, "task": "human"}
+{"elapsed_sec": 611.3289225101471, "eta_sec": 1068.0744117501501, "processed": 3840, "target": 10549, "task": "human"}
+{"elapsed_sec": 869.8914973735809, "eta_sec": 922.3908084455411, "processed": 5120, "target": 10549, "task": "human"}
+{"elapsed_sec": 1172.6581618785858, "eta_sec": 760.212299005352, "processed": 6400, "target": 10549, "task": "human"}
+{"elapsed_sec": 2702.2356226444244, "eta_sec": 1009.4679689279758, "processed": 7680, "target": 10549, "task": "human"}
+{"elapsed_sec": 2923.4773337841034, "eta_sec": 518.4604334132746, "processed": 8960, "target": 10549, "task": "human"}
+{"elapsed_sec": 3122.1688392162323, "eta_sec": 94.21388391775544, "processed": 10240, "target": 10549, "task": "human"}
+{"elapsed_sec": 3159.6091601848602, "eta_sec": 0.0, "processed": 10549, "target": 10549, "task": "human"}
+{"elapsed_sec": 3159.7607991695404, "keys": 10, "records": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v3_closure_20260616/completion_ablation/indepdrop_human_full_cfg3_eta0.records.jsonl", "samples": 10549, "task": "human", "wrote": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v3_closure_20260616/completion_ablation/indepdrop_human_full_cfg3_eta0.json"}
+finished_at=2026-06-16T23:35:26+08:00

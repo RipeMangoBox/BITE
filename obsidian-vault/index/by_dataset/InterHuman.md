@@ -1,0 +1,113 @@
+---
+title: "Dataset: InterHuman"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: InterHuman
+
+- [[obsidian-vault/analysis/CVPRW_2024/in2IN_Leveraging_individual_Information_to_Generate_Human_INteractions.md|in2IN Leveraging individual Information to Generate Human INteractions (CVPRW 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPRW_2024/in2IN_Leveraging_individual_Information_to_Generate_Human_INteractions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: in2IN + DualMDM
+	- datasets: InterHuman
+- [[obsidian-vault/analysis/ECCV_2024/ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactions.md|ReMoS 3D Motion Conditioned Reaction Synthesis for Two Person Interactions (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: ReMoS
+	- datasets: ReMoCap Lindy Hop, ReMoCap Ninjutsu, InterHuman
+- [[obsidian-vault/analysis/3DV_2025/Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Social_Affordance_Canonicalization_and_Forecasting.md|Interactive Humanoid Online Full Body Motion Reaction Synthesis with Social Affordance Canonicalization and Forecasting (3DV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/3DV_2025/Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Social_Affordance_Canonicalization_and_Forecasting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Social Affordance Canonicalization and Forecasting
+	- datasets: HHI, InterHuman, Chi3D
+- [[obsidian-vault/analysis/arxiv_2025/InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Spatio_Temporal_Mamba.md|InterMamba Efficient Human Human Interaction Generation with Adaptive Spatio Temporal Mamba (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Spatio_Temporal_Mamba.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InterMamba
+	- datasets: InterHuman, InterX, Efficiency
+- [[obsidian-vault/analysis/arxiv_2025/Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Constraints.md|Leader and Follower Interactive Motion Generation under Trajectory Constraints (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Constraints.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Leader-Follower Interactive Motion Generation with Pace Controller and Kinematic Synchronization Adapter
+	- datasets: InterHuman
+- [[obsidian-vault/analysis/CVPR_2025/TIMotion_Temporal_and_Interactive_Framework_for_Efficient_Human_Human_Motion_Generation.md|TIMotion Temporal and Interactive Framework for Efficient Human Human Motion Generation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/TIMotion_Temporal_and_Interactive_Framework_for_Efficient_Human_Human_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TIMotion
+	- datasets: InterHuman, InterX
+- [[obsidian-vault/analysis/ICCV_2025/Towards_Immersive_Human_X_Interaction_A_Real_Time_Framework_for_Physically_Plausible_Motion_Synthesis.md|Towards Immersive Human X Interaction A Real Time Framework for Physically Plausible Motion Synthesis (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/Towards_Immersive_Human_X_Interaction_A_Real_Time_Framework_for_Physically_Plausible_Motion_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Human-X
+	- datasets: Inter-X, InterHuman
+- [[obsidian-vault/analysis/ICLR_2025/InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Modelling.md|INTERMASK 3D HUMAN INTERACTION GENERATION VIA COLLABORATIVE MASKED MODELING (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Modelling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InterMask
+	- datasets: InterHuman, InterX
+- [[obsidian-vault/analysis/ICLR_2025/InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Modelling.md|InterMask 3D Human Interaction Generation via Collaborative Masked Modelling (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Modelling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InterMask
+	- datasets: InterHuman, InterX
+- [[obsidian-vault/analysis/ICLR_2025/Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes.md|Sitcom Crafter A Plot Driven Human Motion Generation System in 3D Scenes (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Sitcom-Crafter
+	- datasets: Replica, InterHuman
+- [[obsidian-vault/analysis/PAMI_2025/MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Generation_and_Editing.md|MotionVerse A Unified Multimodal Framework for Motion Comprehension Generation and Editing (PAMI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/PAMI_2025/MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Generation_and_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionVerse
+	- datasets: InterX, MotionX, InterHuman
+- [[obsidian-vault/analysis/TMLR_2025/MoReact_Generating_Reactive_Motion_from_Textual_Descriptions.md|MoReact Generating Reactive Motion from Textual Descriptions (TMLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/TMLR_2025/MoReact_Generating_Reactive_Motion_from_Textual_Descriptions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MoReact
+	- datasets: InterHuman, CHI3D
+- [[obsidian-vault/analysis/AAAI_2026/InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic_Temporal_Selective_MoE.md|InterMoE Individual Specific 3D Human Interaction Generation via Dynamic Temporal Selective MoE (AAAI 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2026/InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic_Temporal_Selective_MoE.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InterMoE
+	- datasets: InterHuman, InterX
+- [[obsidian-vault/analysis/arxiv_2026/HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Motion_Generation.md|HINT Hierarchical Interaction Modeling for Autoregressive Multi Human Motion Generation (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HINT
+	- datasets: InterHuman, InterX
+- [[obsidian-vault/analysis/CVPR_2026/ARMFlow_AutoRegressive_MeanFlow_for_Online_3D_Human_Reaction_Generation.md|ARMFlow: AutoRegressive MeanFlow for Online 3D Human Reaction Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ARMFlow_AutoRegressive_MeanFlow_for_Online_3D_Human_Reaction_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ARMFlow
+	- datasets: InterHuman, InterX
+- [[obsidian-vault/analysis/CVPR_2026/Unified_Number_Free_Text_to_Motion_Generation_Via_Flow_Matching.md|Unified Number-Free Text-to-Motion Generation Via Flow Matching (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Unified_Number_Free_Text_to_Motion_Generation_Via_Flow_Matching.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Unified Motion Flow (UMF)
+	- datasets: InterHuman, InterHuman-AS
+- [[obsidian-vault/analysis/ICLR_2026/Disentangled_Hierarchical_VAE_for_3D_Human_Human_Interaction_Generation.md|Disentangled Hierarchical VAE for 3D Human-Human Interaction Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Disentangled_Hierarchical_VAE_for_3D_Human_Human_Interaction_Generation_86bc618f301e.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DHVAE (Disentangled Hierarchical Variational Autoencoder)
+	- datasets: InterHuman, InterX

@@ -1,0 +1,101 @@
+---
+title: "Dataset: AMASS"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: AMASS
+
+- [[obsidian-vault/analysis/ECCV_2024/CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motion_Diffusion.md|CoMusion Towards Consistent Stochastic Human Motion Prediction via Motion Diffusion (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motion_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CoMusion
+	- datasets: Human3.6M, AMASS
+- [[obsidian-vault/analysis/ECCV_2024/Large_Motion_Model_for_Unified_Multi_modal_Motion_Generation.md|Large Motion Model for Unified Multi-modal Motion Generation (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/Large_Motion_Model_for_Unified_Multi_modal_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Large Motion Model (LMM)
+	- datasets: HumanML3D, AMASS
+- [[obsidian-vault/analysis/ECCV_2024/Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation.md|Plan Posture and Go Towards Open vocabulary Text to Motion Generation (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PRO-Motion
+	- datasets: ood368, kungfu, AMASS
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MaskedMimic_Unified_Physics_Based_Character_Control_Through_Masked_Motion_Inpainting.md|MaskedMimic: Unified Physics-Based Character Control Through Masked Motion Inpainting (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MaskedMimic_Unified_Physics_Based_Character_Control_Through_Masked_Motion_Inpainting.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: MaskedMimic
+	- datasets: AMASS
+- [[obsidian-vault/analysis/arxiv_2025/DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior.md|DPoser X Diffusion Model as Robust 3D Whole body Human Pose Prior (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DPoser-X
+	- datasets: EHF, AMASS, ReInterHand
+- [[obsidian-vault/analysis/arxiv_2025/ECHO_Ego_Centric_modeling_of_Human_Object_interactions.md|ECHO Ego Centric modeling of Human Object interactions (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/ECHO_Ego_Centric_modeling_of_Human_Object_interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ECHO
+	- datasets: BEHAVE, OMOMO, AMASS
+- [[obsidian-vault/analysis/arxiv_2025/RL_from_Physical_Feedback_Aligning_Large_Motion_Models_with_Humanoid_Control.md|RL from Physical Feedback: Aligning Large Motion Models with Humanoid Control (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/RL_from_Physical_Feedback_Aligning_Large_Motion_Models_with_Humanoid_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- methods: Reinforcement Learning from Physical Feedback (RLPF)
+	- datasets: CMU, AMASS
+- [[obsidian-vault/analysis/NEURIPS_2025/WaveAR_Wavelet-Aware_Continuous_Autoregressive_Diffusion_for_Accurate_Human_Motion_Prediction.md|WaveAR: Wavelet-Aware Continuous Autoregressive Diffusion for Accurate Human Motion Prediction (NeurIPS 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/NeurIPS_2025/2025_WaveAR_Wavelet_Aware_Continuous_Autoregressive_Diffusion_for_Accurate_Human_Motion_Prediction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: WaveAR
+	- datasets: HumanEva-I, Human3.6M, AMASS
+- [[obsidian-vault/analysis/arxiv_2026/PhyGile_Physics_Prefix_Guided_Motion_Generation_for_Agile_General_Humanoid_Motion_Tracking.md|PhyGile: Physics-Prefix Guided Motion Generation for Agile General Humanoid Motion Tracking (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/PhyGile_Physics_Prefix_Guided_Motion_Generation_for_Agile_General_Humanoid_Motion_Tracking.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PhyGile
+	- datasets: HumanML3D, AMASS
+- [[obsidian-vault/analysis/CVPR_2026/Gaussian_Mixture_Latent_Flow_for_Stochastic_3D_Human_Motion_Prediction.md|Gaussian-Mixture Latent Flow for Stochastic 3D Human Motion Prediction (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Gaussian_Mixture_Latent_Flow_for_Stochastic_3D_Human_Motion_Prediction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Gaussian-Mixture Latent Flow
+	- datasets: Human3.6M, AMASS
+- [[obsidian-vault/analysis/CVPR_2026/Geometric_Neural_Distance_Fields_for_Learning_Human_Motion_Priors.md|Geometric Neural Distance Fields for Learning Human Motion Priors (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Geometric_Neural_Distance_Fields_for_Learning_Human_Motion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Neural Riemannian Motion Fields (NRMF)
+	- datasets: AMASS
+- [[obsidian-vault/analysis/CVPR_2026/Humanoid_Generative_Pre_Training_for_Zero_Shot_Motion_Tracking.md|Humanoid Generative Pre-Training for Zero-Shot Motion Tracking (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Humanoid_Generative_Pre_Training_for_Zero_Shot_Motion_Tracking.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Humanoid-GPT
+	- datasets: AMASS, LAFAN1, Motion-Million
+- [[obsidian-vault/analysis/ICLR_2026/BFM_Zero_A_Promptable_Behavioral_Foundation_Model_for_Humanoid_Control_Using_Unsupervised_Reinforcement_Learning.md|BFM-Zero: A Promptable Behavioral Foundation Model for Humanoid Control Using Unsupervised Reinforcement Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/BFM_Zero_A_Promptable_Behavioral_Foundation_Model_for_Humanoid_Control_Using_Unsupervised_Reinforcement_Learning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+	- methods: BFM-Zero
+	- datasets: LAFAN1, AMASS, 真实世界6种运动
+- [[obsidian-vault/analysis/ICLR_2026/KinemaDiff_Towards_Diffusion_for_Coherent_and_Physically_Plausible_Human_Motion_Prediction.md|KinemaDiff: Towards Diffusion for Coherent and Physically Plausible Human Motion Prediction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/KinemaDiff_Towards_Diffusion_for_Coherent_and_Physically_Plausible_Human_Motion_Prediction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: KinemaDiff
+	- datasets: Human3.6M, AMASS
+- [[obsidian-vault/analysis/ICLR_2026/Zero_shot_Human_Pose_Estimation_using_Diffusion_based_Inverse_solvers.md|Zero-shot Human Pose Estimation using Diffusion-based Inverse solvers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Zero_shot_Human_Pose_Estimation_using_Diffusion_based_Inverse_solvers.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: InPose
+	- datasets: AMASS, Arms ×1.4), default shape)

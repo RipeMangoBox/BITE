@@ -1,0 +1,552 @@
+---
+title: "Venue_Year: SIGGRAPH_2023"
+type: paper-index
+dimension: venue_year
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Venue_Year: SIGGRAPH_2023
+
+- [[obsidian-vault/analysis/SIGGRAPH_2023/3D_Gaussian_Splatting_for_Real-time_Radiance_Field_Rendering.md|3D Gaussian Splatting for Real-time Radiance Field Rendering (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/3D_Gaussian_Splatting_for_Real_time_Radiance_Field_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 3D Gaussian Splatting
+	- datasets: Mip-NeRF360
+- [[obsidian-vault/analysis/SIGGRAPH_2023/3DShape2VecSet_A_3D_Shape_Representation_for_Neural_Fields_and_Generative_Diffusion_Models.md|3DShape2VecSet: A 3D Shape Representation for Neural Fields and Generative Diffusion Models (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/3DShape2VecSet_A_3D_Shape_Representation_for_Neural_Fields_and_Generative_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 3DShape2VecSet
+	- datasets: ShapeNet形状自编码, ShapeNet无条件生成
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Contact_Proxy_Splitting_Method_for_Lagrangian_Solid-fluid_Coupling.md|A Contact Proxy Splitting Method for Lagrangian Solid-fluid Coupling (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Contact_Proxy_Splitting_Method_for_Lagrangian_Solid_fluid_Coupling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: F̄-MPM with Particle-Grid Volume-Averaging
+	- datasets: Cook's membrane, Strip footing on incompressible elastoplastic solid, Dam break
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.md|A Convex Optimization Framework for Regularized Geodesic Distances (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: Convex Optimization Framework for Regularized Geodesic Distances
+	- datasets: Single-source distance, Pipe mesh, Dragon mesh
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Fast_Geometric_Multigrid_Method_for_Curved_Surfaces.md|A Fast Geometric Multigrid Method for Curved Surfaces (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Fast_Geometric_Multigrid_Method_for_Curved_Surfaces.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Gravo MG (A Fast Geometric Multigrid Method for Curved Surfaces)
+	- datasets: Poisson 方程, 数据平滑
+- A Full-wave Reference Simulator for Computing Surface Reflectance (SIGGRAPH 2023 2023)
+- A Hybrid Generator Architecture for Controllable Face Synthesis (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Method_for_Animating_Childrens_Drawings_of_the_Human_Figure.md|A Method for Animating Children's Drawings of the Human Figure (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Method_for_Animating_Children_s_Drawings_of_the_Human_Figure.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Animated Drawings
+	- datasets: Amateur Drawings Dataset 验证集
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Practical_Walk-on-Boundary_Method_for_Boundary_Value_Problems.md|A Practical Walk-on-Boundary Method for Boundary Value Problems (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Practical_Walk_on_Boundary_Method_for_Boundary_Value_Problems.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Walk-on-Boundary (WoB)
+	- datasets: 内部 Dirichlet 问题在凸/非凸二维域
+- A Practical Wave Optics Reflection Model for Hair and Fur (SIGGRAPH 2023 2023)
+- A Realistic Surface-based Cloth Rendering Model (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- A Sparse Distributed Gigascale Resolution Material Point Method (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Sparse_Distributed_Gigascale_Resolution_Material_Point_Method.pdf|PDF]]
+- A Sparse Non-parametric BRDF Model (SIGGRAPH 2023 2023)
+- A Temporal Coherent Topology Optimization Approach for Assembly Planning of Bespoke Frame Structures (SIGGRAPH 2023 2023)
+	- method groups: Agent / RL / Planning, Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Acting_as_Inverse_Inverse_Planning.md|Acting as Inverse Inverse Planning (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Acting_as_Inverse_Inverse_Planning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: Inverse Inverse Planning
+	- datasets: Grid-world depiction task: Helping, Grid-world depiction task: Hindering, Grid-world depiction task: Indifference
+- Adaptive Local Basis Functions for Shape Completion (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Adaptive_Local_Basis_Functions_for_Shape_Completion.pdf|PDF]]
+- Algebraic Smooth Occluding Contours (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Algebraic_Smooth_Occluding_Contours.pdf|PDF]]
+- An Elastic Basis for Spectral Shape Correspondence (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/An_Elastic_Basis_for_Spectral_Shape_Correspondence.pdf|PDF]]
+- An Extensible, Data-oriented Architecture for High-performance, Many-world Simulation (SIGGRAPH 2023 2023)
+- Anatomically Detailed Simulation of Human Torso (SIGGRAPH 2023 2023)
+- AniFaceDrawing: Anime Portrait Exploration During Your Sketching (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/AniFaceDrawing_Anime_Portrait_Exploration_During_Your_Sketching.pdf|PDF]]
+	- method groups: Agent / RL / Planning
+- ArrangementNet: Learning Scene Arrangements for Vectorized Indoor Scene Modeling (SIGGRAPH 2023 2023)
+- As-continuous-as-possible Extrusion-based Fabrication of Surface Models (SIGGRAPH 2023 2023)
+- Attend-and-Excite: Attention-based Semantic Guidance for Text-to-image Diffusion Models (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Attend_and_Excite_Attention_based_Semantic_Guidance_for_Text_to_image_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- AvatarMAV: Fast 3D Head Avatar Reconstruction Using Motion-aware Neural Voxels (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- AvatarReX: Real-time Expressive Full-body Avatars (SIGGRAPH 2023 2023)
+- B-rep Matching for Collaborating Across CAD Systems (SIGGRAPH 2023 2023)
+- BakedSDF: Meshing Neural SDFs for Real-time View Synthesis (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/BakedSDF_Meshing_Neural_SDFs_for_Real_time_View_Synthesis.pdf|PDF]]
+- Beyond Chainmail: Computational Modeling of Discrete Interlocking Materials (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Beyond_Chainmail_Computational_Modeling_of_Discrete_Interlocking_Materials.pdf|PDF]]
+- Bidirectional GaitNet: A Bidirectional Prediction Model of Human Gait and Anatomical Conditions (SIGGRAPH 2023 2023)
+- Blended Latent Diffusion (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Blended_Latent_Diffusion.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Bodyformer: Semantics-guided 3D Body Gesture Synthesis With Transformer (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Boundary_Value_Caching_for_Walk_on_Spheres.md|Boundary Value Caching for Walk on Spheres (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Boundary_Value_Caching_for_Walk_on_Spheres.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Boundary Value Caching (BVC)
+	- datasets: 多个视觉/几何计算测试问题, 纯Dirichlet问题, Dirichlet主导的高频边界条件问题
+- Building a Virtual Weakly-compressible Wind Tunnel Testing Facility (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Building_a_Virtual_Weakly_compressible_Wind_Tunnel_Testing_Facility.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_2023/CALM_Conditional_Adversarial_Latent_Models_for_Directable_Virtual_Characters.md|CALM: Conditional Adversarial Latent Models for Directable Virtual Characters (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/CALM_Conditional_Adversarial_Latent_Models_for_Directable_Virtual_Characters.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
+	- methods: Conditional Adversarial Latent Models (CALM)
+	- datasets: Pre-training: Encoder quality, Pre-training: Motion diversity, Pre-training: Controllability
+- CLIP-PAE: Projection-Augmentation Embedding to Extract Relevant Features for a Disentangled, Interpretable and Controllable Text-Guided Face Manipulation (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/CLIP_PAE_Projection_Augmentation_Embedding_to_Extract_Relevant_Features_for_a_Disentangled_Interpretable_and_Controllable_Text_Guided_Face_Manipulation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
+- ClipFace: Text-guided Editing of Textured 3D Morphable Models (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- COFS COntrolable Furniture Layout Synthesis (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/COFS_COntrolable_Furniture_Layout_Synthesis.pdf|PDF]]
+- ColorfulCurves: Palette-aware Lightness Control and Color Editing via Sparse Optimization (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- Complex Wrinkle Field Evolution (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Complex_Wrinkle_Field_Evolution.pdf|PDF]]
+- Composite Motion Learning With Task Control (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Composite_Motion_Learning_With_Task_Control.pdf|PDF]]
+- Computational Exploration of Multistable Elastic Knots (SIGGRAPH 2023 2023)
+	- method groups: Agent / RL / Planning
+- Computational Long Exposure Mobile Photography (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Computational_Long_Exposure_Mobile_Photography.pdf|PDF]]
+- Computing the Singularities of Rational Parametric Surfaces Using Moving Planes (SIGGRAPH 2023 2023)
+- Constraint-based Simulation of Passive Suction Cups (SIGGRAPH 2023 2023)
+- Constructing Printable Surfaces With View-dependent Appearance (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Constructing_Printable_Surfaces_With_View_dependent_Appearance.pdf|PDF]]
+- Contact Edit: Artist Tools for Intuitive Modeling of Hand-object Interactions (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Contact_Edit_Artist_Tools_for_Intuitive_Modeling_of_Hand_object_Interactions.pdf|PDF]]
+- ConTesse: Accurate Occluding Contours for Subdivision Surfaces (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ConTesse_Accurate_Occluding_Contours_for_Subdivision_Surfaces.pdf|PDF]]
+- Coupling Conduction, Convection, and Radiative Transfer in a Single Path-space: Application to Infrared Rendering (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- CT2Hair: High-fidelity 3D Hair Modeling Using Computed Tomography (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- DARAM: Dynamic Avatar-human Motion Remapping Technique for Realistic Virtual Stair Ascending Motions (SIGGRAPH 2023 2023)
+- Data-driven Digital Lighting Design for Residential Indoor Spaces (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Data_Free_Learning_of_Reduced_Order_Kinematic.md|Data-Free Learning of Reduced-Order Kinematic (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Data_Free_Learning_of_Reduced_Order_Kinematic.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Data-Free Neural Subspace Fitting (无数据神经子空间拟合)
+	- datasets: Hanging cow rigidity test, Heterogeneous 3D bar & rigid body chain, Elastic deformation scaling
+- Data-free Learning of Reduced-order Kinematics (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Data_free_Learning_of_Reduced_order_Kinematics.pdf|PDF]]
+- DE-NeRF: DEcoupled Neural Radiance Fields for View-consistent Appearance Editing and High-frequency Environmental Relighting (SIGGRAPH 2023 2023)
+- Deep Appearance Prefiltering (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Deep_Appearance_Prefiltering.pdf|PDF]]
+- Deep Real-time Volumetric Rendering Using Multi-feature Fusion (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Deep SVBRDF Estimation From Single Image Under Learned Planar Lighting (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Denoising-aware Adaptive Sampling for Monte Carlo Ray Tracing (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow
+- Dense, Interlocking-free and Scalable Spectral Packing of Generic 3D Objects (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Deployable Strip Structures (SIGGRAPH 2023 2023)
+- Dictionary Fields: Learning a Neural Basis Decomposition (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Dictionary_Fields_Learning_a_Neural_Basis_Decomposition.pdf|PDF]]
+- Differentiable Heightfield Path Tracing With Accelerated Discontinuities (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Differentiable_Heightfield_Path_Tracing_With_Accelerated_Discontinuities.pdf|PDF]]
+- Differentiable Stripe Patterns for Inverse Design of Structured Surfaces (SIGGRAPH 2023 2023)
+- Differential Frequency Heterodyne Time-of-flight Imaging for Instantaneous Depth and Velocity Estimation (SIGGRAPH 2023 2023)
+- Differential Operators on Sketches via Alpha Contours (SIGGRAPH 2023 2023)
+- Diffusion Image Analogies (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- DOC: Differentiable Optimal Control for Retargeting Motions Onto Legged Robots (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/DOC_Differentiable_Optimal_Control_for_Retargeting_Motions_Onto_Legged_Robots.pdf|PDF]]
+- Drag Your GAN: Interactive Point-based Manipulation on the Generative Image Manifold (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Drag_Your_GAN_Interactive_Point_based_Manipulation_on_the_Generative_Image_Manifold.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- DreamFace: Progressive Generation of Animatable 3D Faces Under Text Guidance (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/DreamFace_Progressive_Generation_of_Animatable_3D_Faces_Under_Text_Guidance.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Effect-based Multi-viewer Caching for Cloud-native Rendering (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Efficient Embeddings in Exact Arithmetic (SIGGRAPH 2023 2023)
+	- method groups: Systems / Efficiency / Compression
+- Efficient Video Portrait Reenactment via Grid-based Codebook (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- EgoLocate: Real-time Motion Capture, Localization, and Mapping With Sparse Body-mounted Sensors (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/EgoLocate_Real_time_Motion_Capture_Localization_and_Mapping_With_Sparse_Body_mounted_Sensors.pdf|PDF]]
+- Encoder-based Domain Tuning for Fast Personalization of Text-to-image Models (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Encoder_based_Domain_Tuning_for_Fast_Personalization_of_Text_to_image_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- End-to-end Procedural Material Capture With Proxy-free Mixed-integer Optimization (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- ETER: Elastic Tessellation for Real-time Pixel-accurate Rendering of Large-scale NURBS Models (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Eventfulness for Interactive Video Alignment (SIGGRAPH 2023 2023)
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+- Evolutionary Piecewise Developable Approximations (SIGGRAPH 2023 2023)
+- Example-based Motion Synthesis via Generative Motion Matching (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow
+- Example-based Procedural Modeling Using Graph Grammars (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Example_based_Procedural_Modeling_Using_Graph_Grammars.pdf|PDF]]
+	- method groups: Graph / Geometric / Structured Data
+- Expansion Cones: A Progressive Volumetric Mapping Framework (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Expansion_Cones_A_Progressive_Volumetric_Mapping_Framework.pdf|PDF]]
+- FactorMatte: Redefining Video Matting for Re-composition Tasks (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/FactorMatte_Redefining_Video_Matting_for_Re_composition_Tasks.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- FashionTex: Controllable Virtual Try-on With Text and Texture (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/FashionTex_Controllable_Virtual_Try_on_With_Text_and_Texture.pdf|PDF]]
+- Fast Complementary Dynamics via Skinning Eigenmodes (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Fast_Complementary_Dynamics_via_Skinning_Eigenmodes.pdf|PDF]]
+- Fast GPU-based Two-way Continuous Collision Handling (SIGGRAPH 2023 2023)
+- Film Grain Rendering and Parameter Estimation (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Flexible_Isosurface_Extraction_for_Gradient_Based_Mesh_Optimization.md|Flexible Isosurface Extraction for Gradient-Based Mesh Optimization (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Flexible_Isosurface_Extraction_for_Gradient_Based_Mesh_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: FlexiCubes
+	- datasets: Mesh Reconstruction
+- Fluid Cohomology (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Fluid_Cohomology.pdf|PDF]]
+- Fluid-solid Coupling in Kinetic Two-phase Flow Simulation (SIGGRAPH 2023 2023)
+- Focal Path Guiding for Light Transport Simulation (SIGGRAPH 2023 2023)
+- Forming Terrains by Glacial Erosion (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Forming_Terrains_by_Glacial_Erosion.pdf|PDF]]
+- Galaxy Maps: Localized Foliations for Bijective Volumetric Mapping (SIGGRAPH 2023 2023)
+- Generalizing Shallow Water Simulations With Dispersive Surface Waves (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Generalizing_Shallow_Water_Simulations_With_Dispersive_Surface_Waves.pdf|PDF]]
+- Generating Activity Snippets by Learning Human-scene Interactions (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Generating_Activity_Snippets_by_Learning_Human_scene_Interactions.pdf|PDF]]
+- Generating Procedural Materials From Text or Image Prompts (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Generative Design of Sheet Metal Structures (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow
+- Geometric Optimisation via Spectral Shifting (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+- GestureDiffuCLIP: Gesture Diffusion Model With CLIP Latents (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow
+- Globally Consistent Normal Orientation for Point Clouds by Regularizing the Winding-number Field (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Globally_Consistent_Normal_Orientation_for_Point_Clouds_by_Regularizing_the_Winding_number_Field.pdf|PDF]]
+- Gloss-aware Color Correction for 3D Printing (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Gloss_aware_Color_Correction_for_3D_Printing.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- GREIL-Crowds: Crowd Simulation With Deep Reinforcement Learning and Examples (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/GREIL_Crowds_Crowd_Simulation_With_Deep_Reinforcement_Learning_and_Examples.pdf|PDF]]
+	- method groups: Agent / RL / Planning
+- Guided Linear Upsampling (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Guided_Linear_Upsampling.pdf|PDF]]
+- HACK: Learning a Parametric Head and Neck Model for High-fidelity Animation (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/HACK_Learning_a_Parametric_Head_and_Neck_Model_for_High_fidelity_Animation.pdf|PDF]]
+- Helix-free Stripes for Knit Graph Design (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Helix_free_Stripes_for_Knit_Graph_Design.pdf|PDF]]
+	- method groups: Graph / Geometric / Structured Data
+- HiGAN+: Handwriting Imitation GAN With Disentangled Representations (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow
+- High-order Incremental Potential Contact for Elastodynamic Simulation on Curved Meshes (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/High_order_Incremental_Potential_Contact_for_Elastodynamic_Simulation_on_Curved_Meshes.pdf|PDF]]
+- How Important Are Detailed Hand Motions for Communication for a Virtual Character Through the Lens of Charades? (SIGGRAPH 2023 2023)
+- HumanRF: High-fidelity Neural Radiance Fields for Humans in Motion (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/HumanRF_High_fidelity_Neural_Radiance_Fields_for_Humans_in_Motion.pdf|PDF]]
+- Image Vectorization and Editing via Linear Gradient Layer Decomposition (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- Improved Water Sound Synthesis Using Coupled Bubbles (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Improved_Water_Sound_Synthesis_Using_Coupled_Bubbles.pdf|PDF]]
+- In the Blink of an Eye: Event-based Emotion Recognition (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/In_the_Blink_of_an_Eye_Event_based_Emotion_Recognition.pdf|PDF]]
+- In-Timestep Remeshing for Contacting Elastodynamics (SIGGRAPH 2023 2023)
+- Inkjet 4D Print: Self-folding Tessellated Origami Objects by Inkjet UV Printing (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Interactive_Hair_Simulation_on_the_GPU_using_ADMM.md|Interactive Hair Simulation on the GPU using ADMM (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Interactive_Hair_Simulation_on_the_GPU_using_ADMM.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning
+	- methods: ADMM-based GPU Hair Simulation for Discrete Elastic Rods with Coulomb Friction
+	- datasets: Hairball 16k, Hairball 128k, Long 47k
+- Inverse Global Illumination Using a Neural Radiometric Prior (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Inverse_Global_Illumination_Using_a_Neural_Radiometric_Prior.pdf|PDF]]
+- Iterative alpha-(de)Blending: A Minimalist Deterministic Diffusion Model (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Iterative_alpha_de_Blending_A_Minimalist_Deterministic_Diffusion_Model.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- Juxtaform: Interactive Visual Summarization for Exploratory Shape Design (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Juxtaform_Interactive_Visual_Summarization_for_Exploratory_Shape_Design.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Kernel-based Frame Interpolation for Spatio-temporally Adaptive Rendering (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Key-locked Rank One Editing for Text-to-image Personalization (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Language-based Photo Color Adjustment for Graphic Designs (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Language_based_Photo_Color_Adjustment_for_Graphic_Designs.pdf|PDF]]
+- Large-scale Terrain (SIGGRAPH 2023 2023)
+- LatentAvatar: Learning Latent Expression Code for Expressive Neural Head Avatar (SIGGRAPH 2023 2023)
+	- method groups: Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Learning_Physically_Simulated_Tennis_Skills_from_Broadcast_Videos.md|Learning Physically Simulated Tennis Skills from Broadcast Videos (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Learning_Physically_Simulated_Tennis_Skills_from_Broadcast_Videos.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Video-to-Player3D / hierarchical physics-based tennis skill control
+- Listen, Denoise, Action! Audio-Driven Motion Synthesis with Diffusion Models (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow
+- Local Deformation for Interactive Shape Editing (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Local_Deformation_for_Interactive_Shape_Editing.pdf|PDF]]
+- Locally Attentional SDF Diffusion for Controllable 3D Shape Generation (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Locally Meshable Frame Fields (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Locally_Meshable_Frame_Fields.pdf|PDF]]
+- Masonry Shell Structures With Discrete Equivalence Classes (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Masonry_Shell_Structures_With_Discrete_Equivalence_Classes.pdf|PDF]]
+- Materialistic: Selecting Similar Materials in Images (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Materialistic_Selecting_Similar_Materials_in_Images.pdf|PDF]]
+- MERF: Memory-Efficient Radiance Fields for Real-time View Synthesis in Unbounded Scenes (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/MERF_Memory_Efficient_Radiance_Fields_for_Real_time_View_Synthesis_in_Unbounded_Scenes.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Mesh Density Adaptation for Template-based Shape Reconstruction (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Mesh_Density_Adaptation_for_Template_based_Shape_Reconstruction.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Meso-facets for Goniochromatic 3D Printing (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- MesoGen: Designing Procedural On-surface Stranded Mesostructures (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/MesoGen_Designing_Procedural_On_surface_Stranded_Mesostructures.pdf|PDF]]
+- Metameric: Spectral Uplifting via Controllable Color Constraints (SIGGRAPH 2023 2023)
+- Micro-Mesh Construction (SIGGRAPH 2023 2023)
+- Microfacet Theory for Non-uniform Heightfields (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- Min-Deviation-Flow in Bi-directed Graphs for T-Mesh Quantization (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Min_Deviation_Flow_in_Bi_directed_Graphs_for_T_Mesh_Quantization.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Modulating Pretrained Diffusion Models for Multimodal Image Synthesis (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Modulating_Pretrained_Diffusion_Models_for_Multimodal_Image_Synthesis.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- MoiréTag: Angular Measurement and Tracking With a Passive Marker (SIGGRAPH 2023 2023)
+- Motion From Shape Change (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Motion_From_Shape_Change.pdf|PDF]]
+- Multi-layer Thick Shells (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Multi_layer_Thick_Shells.pdf|PDF]]
+- NeRF-Texture: Texture Synthesis With Neural Radiance Fields (SIGGRAPH 2023 2023)
+- Nerfstudio: A Modular Framework for Neural Radiance Field Development (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Nerfstudio_A_Modular_Framework_for_Neural_Radiance_Field_Development.pdf|PDF]]
+- NeRO: Neural Geometry and BRDF Reconstruction of Reflective Objects From Multiview Images (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/NeRO_Neural_Geometry_and_BRDF_Reconstruction_of_Reflective_Objects_From_Multiview_Images.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- NeRSemble: Multi-view Radiance Field Reconstruction of Human Heads (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/NeRSemble_Multi_view_Radiance_Field_Reconstruction_of_Human_Heads.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Neural Biplane Representation for BTF Rendering and Acquisition (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Neural_Biplane_Representation_for_BTF_Rendering_and_Acquisition.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Neural Face Rigging for Animating and Retargeting Facial Meshes in the Wild (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Neural_Face_Rigging_for_Animating_and_Retargeting_Facial_Meshes_in_the_Wild.pdf|PDF]]
+- Neural Parametric Mixtures for Path Guiding (SIGGRAPH 2023 2023)
+- Neural Partitioning Pyramids for Denoising Monte Carlo Renderings (SIGGRAPH 2023 2023)
+	- method groups: Generative / Diffusion / Flow
+- Neural Prefiltering for Correlation-aware Levels of Detail (SIGGRAPH 2023 2023)
+- Neural Progressive Meshes (SIGGRAPH 2023 2023)
+- Neural Volumetric Reconstruction for Coherent Synthetic Aperture Sonar (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Neural_Volumetric_Reconstruction_for_Coherent_Synthetic_Aperture_Sonar.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+- NeuSample: Importance Sampling for Neural Materials (SIGGRAPH 2023 2023)
+- NOFA: NeRF-based One-shot Facial Avatar Reconstruction (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/NOFA_NeRF_based_One_shot_Facial_Avatar_Reconstruction.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Nonlinear Compliant Modes for Large-deformation Analysis of Flexible Structures (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Nonlinear_Compliant_Modes_for_Large_deformation_Analysis_of_Flexible_Structures.pdf|PDF]]
+- OctFormer: Octree-based Transformers for 3D Point Clouds (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- OpenMPD: A Low-level Presentation Engine for Multimodal Particle-based Displays (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/OpenMPD_A_Low_level_Presentation_Engine_for_Multimodal_Particle_based_Displays.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Orientable Dense Cyclic Infill for Anisotropic Appearance Fabrication (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Orientable_Dense_Cyclic_Infill_for_Anisotropic_Appearance_Fabrication.pdf|PDF]]
+- P2M: A Fast Solver for Querying Distance From Point to Mesh Surface (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- Parameter-space ReSTIR for Differentiable and Inverse Rendering (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Parameter_space_ReSTIR_for_Differentiable_and_Inverse_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Parsing-conditioned Anime Translation: A New Dataset and Method (SIGGRAPH 2023 2023)
+	- method groups: Benchmark / Evaluation
+- Patternshop: Editing Point Patterns by Image Manipulation (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Patternshop_Editing_Point_Patterns_by_Image_Manipulation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- PCBend: Light Up Your 3D Shapes With Foldable Circuit Boards (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PCBend_Light_Up_Your_3D_Shapes_With_Foldable_Circuit_Boards.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Perceptual Visibility Model for Temporal Contrast Changes in Periphery (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Perceptual_Visibility_Model_for_Temporal_Contrast_Changes_in_Periphery.pdf|PDF]]
+- Perspective-correct VR Passthrough Without Reprojection (SIGGRAPH 2023 2023)
+- PhotoMat: A Material Generator Learned From Single Flash Photos (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PhotoMat_A_Material_Generator_Learned_From_Single_Flash_Photos.pdf|PDF]]
+- PMP: Learning to Physically Interact With Environments Using Part-wise Motion Priors (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PMP_Learning_to_Physically_Interact_With_Environments_Using_Part_wise_Motion_Priors.pdf|PDF]]
+- Polynomial 2D Green Coordinates for Polygonal Cages (SIGGRAPH 2023 2023)
+- PolyStokes: A Polynomial Model Reduction Method for Viscous Fluid Simulation (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PolyStokes_A_Polynomial_Model_Reduction_Method_for_Viscous_Fluid_Simulation.pdf|PDF]]
+- PoseVocab: Learning Joint-structured Pose Embeddings for Human Avatar Modeling (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PoseVocab_Learning_Joint_structured_Pose_Embeddings_for_Human_Avatar_Modeling.pdf|PDF]]
+- Potentially Visible Hidden-volume Rendering for Multi-view Warping (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Potentially_Visible_Hidden_volume_Rendering_for_Multi_view_Warping.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Procedural Metamaterials: A Unified Procedural Graph for Metamaterial Design (SIGGRAPH 2023 2023)
+	- method groups: Graph / Geometric / Structured Data
+- Progressive Null-tracking for Volumetric Rendering (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Pyramid Texture Filtering (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Pyramid_Texture_Filtering.pdf|PDF]]
+- QuestEnvSim: Environment-aware Simulated Motion Tracking From Sparse Sensor Input (SIGGRAPH 2023 2023)
+- Random-access Neural Compression of Material Textures (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Random_access_Neural_Compression_of_Material_Textures.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Real-time Radiance Fields for Single-image Portrait View Synthesis (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Recursive Control Variates for Inverse Rendering (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Relighting Neural Radiance Fields With Shadow and Highlight Hints (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Relighting_Neural_Radiance_Fields_With_Shadow_and_Highlight_Hints.pdf|PDF]]
+- Restricted Delaunay Triangulation for Explicit Surface Reconstruction (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Revisiting Controlled Mixture Sampling for Rendering Applications (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Revisiting_Controlled_Mixture_Sampling_for_Rendering_Applications.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Rhizomorph: The Coordinated Function of Shoots and Roots (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Rhizomorph_The_Coordinated_Function_of_Shoots_and_Roots.pdf|PDF]]
+- Robust Low-poly Meshing for General 3D Models (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Robust_Low_poly_Meshing_for_General_3D_Models.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+- RSMT: Real-time Stylized Motion Transition for Characters (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/RSMT_Real_time_Stylized_Motion_Transition_for_Characters.pdf|PDF]]
+- Sag-free Initialization for Strand-based Hybrid Hair Simulation (SIGGRAPH 2023 2023)
+- ScanBot: Autonomous Reconstruction via Deep Reinforcement Learning (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ScanBot_Autonomous_Reconstruction_via_Deep_Reinforcement_Learning.pdf|PDF]]
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+- Scratch-based Reflection Art via Differentiable Rendering (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Scratch_based_Reflection_Art_via_Differentiable_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Second-order Stencil Descent for Interior-point Hyperelasticity (SIGGRAPH 2023 2023)
+- Seeing Photons in Color (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Seeing_Photons_in_Color.pdf|PDF]]
+- Semantics and Scheduling for Machine Knitting Compilers (SIGGRAPH 2023 2023)
+- Semi-supervised Reference-based Sketch Extraction Using a Contrastive Learning Framework (SIGGRAPH 2023 2023)
+	- method groups: Representation / Self-Supervised / Transfer
+- ShapeCoder: Discovering Abstractions for Visual Programs From Unstructured Primitives (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Shortest Path to Boundary for Self-intersecting Meshes (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Shortest_Path_to_Boundary_for_Self_intersecting_Meshes.pdf|PDF]]
+- Simulation and Retargeting of Complex Multi-character Interactions (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Simulation_and_Retargeting_of_Complex_Multi_character_Interactions.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Simulation_aided_face_strain_extraction_for_ML_animation_systems.md|Simulation-aided face strain extraction for ML animation systems (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Simulation_aided_face_strain_extraction_for_ML_animation_systems.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Simulation-aided muscle strain extraction
+	- datasets: 面部表演捕捉序列 / face-slab tetrahedral simulation examples
+- Single Image Neural Material Relighting (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Single_Image_Neural_Material_Relighting.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Single-shot Implicit Morphable Faces With Consistent Texture Parameterization (SIGGRAPH 2023 2023)
+- Sketch-guided Text-to-image Diffusion Models (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Sketch_guided_Text_to_image_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- SketchFaceNeRF: Sketch-based Facial Generation and Editing in Neural Radiance Fields (SIGGRAPH 2023 2023)
+- Skin-Screen: A Computational Fabrication Framework for Color Tattoos (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Skin_Screen_A_Computational_Fabrication_Framework_for_Color_Tattoos.pdf|PDF]]
+- Somigliana Coordinates: An Elasticity-derived Approach for Cage Deformation (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Somigliana_Coordinates_An_Elasticity_derived_Approach_for_Cage_Deformation.pdf|PDF]]
+- Spectral Coarsening With Hodge Laplacians (SIGGRAPH 2023 2023)
+- Split-Lohmann Multifocal Displays (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Split_Lohmann_Multifocal_Displays.pdf|PDF]]
+- SpongeCake: A Layered Microflake Surface Appearance Model (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/SpongeCake_A_Layered_Microflake_Surface_Appearance_Model.pdf|PDF]]
+- Stealth Shaper: Reflectivity Optimization as Surface Stylization (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- StripMaker: Perception-driven Learned Vector Sketch Consolidation (SIGGRAPH 2023 2023)
+- StyleAvatar: Real-time Photo-realistic Neural Portrait Avatar From a Single Video (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/StyleAvatar_Real_time_Photo_realistic_Neural_Portrait_Avatar_From_a_Single_Video.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Sum-of-squares Collision Detection for Curved Shapes and Paths (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Surface and Edge Detection for Primitive Fitting of Point Clouds (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- Surface Reconstruction From Point Clouds Without Normals by Parametrizing the Gauss Formula (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Surface_Reconstruction_From_Point_Clouds_Without_Normals_by_Parametrizing_the_Gauss_Formula.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Surface Simplification Using Intrinsic Error Metrics (SIGGRAPH 2023 2023)
+- Symmetric Volume Maps: Order-invariant Volumetric Mesh Correspondence With Free Boundary (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Symmetric_Volume_Maps_Order_invariant_Volumetric_Mesh_Correspondence_With_Free_Boundary.pdf|PDF]]
+- Synthesizing Dexterous Nonprehensile Pregrasp for Ungraspable Objects (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Synthesizing_Physical_Character_Scene_Interactions.md|Synthesizing Physical Character-Scene Interactions (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Synthesizing_Physical_Character_Scene_Interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Scene-Conditioned AMP
+	- datasets: Sit, Lie down, Physical perturbations
+- Temporal Set Inversion for Animated Implicits (SIGGRAPH 2023 2023)
+- TextDeformer: Geometry Manipulation Using Text Guidance (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/TextDeformer_Geometry_Manipulation_Using_Text_Guidance.pdf|PDF]]
+- TEXTure: Text-guided Texturing of 3D Shapes (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/TEXTure_Text_guided_Texturing_of_3D_Shapes.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Textured Mesh Quality Assessment: Large-scale Dataset and Deep Learning-based Quality Metric (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Textured_Mesh_Quality_Assessment_Large_scale_Dataset_and_Deep_Learning_based_Quality_Metric.pdf|PDF]]
+	- method groups: Benchmark / Evaluation
+- The Statistics of Eye Movements and Binocular Disparities in VR Gaming Headsets Should Drive Headset Design (SIGGRAPH 2023 2023)
+- The Visual Language of Fabrics (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/The_Visual_Language_of_Fabrics.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Topology Driven Approximation to Rational Surface-surface Intersection via Interval Algebraic Topology Analysis (SIGGRAPH 2023 2023)
+- Toward Optimized VR/AR Ergonomics: Modeling and Predicting User Neck Muscle Contraction (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Toward_Optimized_VR_AR_Ergonomics_Modeling_and_Predicting_User_Neck_Muscle_Contraction.pdf|PDF]]
+- Towards Attention–Aware Foveated Rendering (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Towards_Attention_Aware_Foveated_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Towards Material Digitization With a Dual-scale Optical System (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Towards_Material_Digitization_With_a_Dual_scale_Optical_System.pdf|PDF]]
+- Trim Regions for Online Computation of From-Region Potentially Visible Sets (SIGGRAPH 2023 2023)
+- Ultra-high Resolution SVBRDF Recovery From a Single Image (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- UniTune: Text-driven Image Editing by Fine Tuning a Diffusion Model on a Single Image (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/UniTune_Text_driven_Image_Editing_by_Fine_Tuning_a_Diffusion_Model_on_a_Single_Image.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Unsupervised Learning of Robust Spectral Shape Matching (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Unsupervised_Learning_of_Robust_Spectral_Shape_Matching.pdf|PDF]]
+	- method groups: Safety / Privacy / Robustness
+- UrbanBIS: A Large-scale Benchmark for Fine-grained Urban Building Instance Segmentation (SIGGRAPH 2023 2023)
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+- Variational Quasi-harmonic Maps for Computing Diffeomorphisms (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Variational_Quasi_harmonic_Maps_for_Computing_Diffeomorphisms.pdf|PDF]]
+- Variational Shape Reconstruction via Quadric Error Metrics (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D
+- VideoDoodles: Hand-drawn Animations on Videos With Scene-aware Canvases (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/VideoDoodles_Hand_drawn_Animations_on_Videos_With_Scene_aware_Canvases.pdf|PDF]]
+- ViP-NeRF: Visibility Prior for Sparse Input Neural Radiance Fields (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ViP_NeRF_Visibility_Prior_for_Sparse_Input_Neural_Radiance_Fields.pdf|PDF]]
+- Virtual Mirrors: Non-line-of-sight Imaging Beyond the Third Bounce (SIGGRAPH 2023 2023)
+- Walk on Stars: A Grid-free Monte Carlo Method for PDEs With Neumann Boundary Conditions (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Walk_on_Stars_A_Grid_free_Monte_Carlo_Method_for_PDEs_With_Neumann_Boundary_Conditions.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Walk_on_Stars_Grid_Free_Monte_Carlo_for_Neumann_Boundary_Conditions.md|Walk on Stars: Grid-Free Monte Carlo for Neumann Boundary Conditions (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Walk_on_Stars_Grid_Free_Monte_Carlo_for_Neumann_Boundary_Conditions.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Walk on Stars (WoSt)
+	- datasets: 已知参考函数, 混合边值问题效率对比
+- Winding Numbers on Discrete Surfaces (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Winding_Numbers_on_Discrete_Surfaces.pdf|PDF]]
+- Word-as-image for Semantic Typography (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Word_as_image_for_Semantic_Typography.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Zero-shot Image-to-image Translation (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Zero_shot_Image_to_image_Translation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Étendue Expansion in Holographic Near Eye Displays Through Sparse Eye-box Generation Using Lens Array Eyepiece (SIGGRAPH 2023 2023)
+- ∇-Prox: Differentiable Proximal Algorithm Modeling for Large-scale Optimization (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory

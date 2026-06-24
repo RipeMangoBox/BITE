@@ -1,0 +1,12 @@
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+--> Autoaligner loaded from checkpoint
+{"batch": 0, "elapsed_sec": 3.5871593952178955, "event": "batch_done"}
+{"batch": 1, "elapsed_sec": 3.9882121086120605, "event": "batch_done"}
+{"batch": 2, "elapsed_sec": 4.412722587585449, "event": "batch_done"}
+{"batch": 3, "elapsed_sec": 4.804097890853882, "event": "batch_done"}
+{"elapsed_sec": 4.8042802810668945, "event": "joint_decomposition_written", "out_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2_joint_decomposition_20260612/mixed_standard_last"}

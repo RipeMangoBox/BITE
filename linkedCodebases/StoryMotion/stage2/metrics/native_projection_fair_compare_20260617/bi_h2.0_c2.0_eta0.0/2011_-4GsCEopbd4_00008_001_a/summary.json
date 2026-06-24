@@ -1,0 +1,80 @@
+{
+  "fair_compare_png": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/fair_compare.png",
+  "joint_fair_concat": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/joint_fair_concat.mp4",
+  "motion_stats": {
+    "pulpmotion_wz0_wc11": {
+      "bone_len_cv_mean": 2.196184247665736e-07,
+      "bone_len_relerr_mean": 0.031078668662291222,
+      "foot_contact_rate": 1.0,
+      "foot_contact_rate_absdiff": 0.7794117647058824,
+      "foot_skate_speed_mean": 0.015107431448996067,
+      "gt_foot_contact_rate": 0.22058823529411764,
+      "joint_accel_mean": 0.008649848401546478,
+      "joint_velocity_mean": 0.014425205066800117,
+      "mpjpe_root_aligned": 0.27055713534355164,
+      "root_accel_mean": 0.005417017266154289,
+      "root_path_len": 0.7869599461555481
+    },
+    "pulpmotion_wz2_wc11": {
+      "bone_len_cv_mean": 2.41078137718999e-07,
+      "bone_len_relerr_mean": 0.031078683993296042,
+      "foot_contact_rate": 1.0,
+      "foot_contact_rate_absdiff": 0.7794117647058824,
+      "foot_skate_speed_mean": 0.015169131569564342,
+      "gt_foot_contact_rate": 0.22058823529411764,
+      "joint_accel_mean": 0.009109078906476498,
+      "joint_velocity_mean": 0.010462998412549496,
+      "mpjpe_root_aligned": 0.1575702726840973,
+      "root_accel_mean": 0.00490609323605895,
+      "root_path_len": 0.43537577986717224
+    },
+    "story_human": {
+      "bone_len_cv_mean": 2.2110980976504743e-07,
+      "bone_len_relerr_mean": 0.03107868779719141,
+      "foot_contact_rate": 0.13970588235294118,
+      "foot_contact_rate_absdiff": 0.08088235294117646,
+      "foot_skate_speed_mean": 0.03212980926036835,
+      "gt_foot_contact_rate": 0.22058823529411764,
+      "joint_accel_mean": 0.009988019242882729,
+      "joint_velocity_mean": 0.014402569271624088,
+      "mpjpe_root_aligned": 0.061206281185150146,
+      "root_accel_mean": 0.005975729785859585,
+      "root_path_len": 0.7299677729606628
+    },
+    "story_joint": {
+      "bone_len_cv_mean": 2.2205731454652137e-07,
+      "bone_len_relerr_mean": 0.031078656194737025,
+      "foot_contact_rate": 0.5,
+      "foot_contact_rate_absdiff": 0.27941176470588236,
+      "foot_skate_speed_mean": 0.028359178453683853,
+      "gt_foot_contact_rate": 0.22058823529411764,
+      "joint_accel_mean": 0.012180287390947342,
+      "joint_velocity_mean": 0.018434962257742882,
+      "mpjpe_root_aligned": 0.22738800942897797,
+      "root_accel_mean": 0.006968906614929438,
+      "root_path_len": 0.8954074382781982
+    }
+  },
+  "pulpmotion_native_camera_projection_concat": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/pulpmotion_native_camera_projection_concat.mp4",
+  "render_context": {
+    "center_xy": [
+      0.13754704594612122,
+      -0.047839343547821045
+    ],
+    "ground_z": -0.10518664121627808,
+    "xy_limit": 1.2028668522834778,
+    "z_limit": 1.8443958401679992
+  },
+  "sample_id": "2011_-4GsCEopbd4_00008_001_a",
+  "story_human_vs_joint_concat": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/story_human_vs_joint_concat.mp4",
+  "valid_frames": 69,
+  "videos": {
+    "gt": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/gt_skeleton.mp4",
+    "pulpmotion_wz0_wc11": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/pulpmotion_wz0_wc11_skeleton.mp4",
+    "pulpmotion_wz0_wc11_native_projection": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/pulpmotion_wz0_wc11_native_camera_projection.mp4",
+    "pulpmotion_wz2_wc11": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/pulpmotion_wz2_wc11_skeleton.mp4",
+    "pulpmotion_wz2_wc11_native_projection": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/pulpmotion_wz2_wc11_native_camera_projection.mp4",
+    "story_human": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/story_human_skeleton.mp4",
+    "story_joint": "runs/eval/stage2/native_projection_fair_compare_20260617/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/story_joint_skeleton.mp4"
+  }
+}

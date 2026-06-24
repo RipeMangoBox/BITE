@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="710" height="558" viewBox="0 0 710 558">
+<metadata>{&quot;date&quot;: &quot;2026-05-17&quot;, &quot;experiment_path&quot;: &quot;paperIDEAs/MoDebug/experiments/p1_event_transfer_20260516&quot;, &quot;evaluator&quot;: &quot;p1_text_similarity_heatmap&quot;, &quot;protocol&quot;: &quot;paperIDEAs/MoDebug/experiments/p1_event_transfer_20260516/protocols/eval_contract.md&quot;, &quot;data_source&quot;: &quot;results/compact_tables&quot;, &quot;condition_pair&quot;: &quot;&quot;, &quot;prompt_pair&quot;: &quot;full/single_event&quot;, &quot;n/evaluable&quot;: &quot;见该 SVG 对应的 compact TSV&quot;, &quot;coverage&quot;: &quot;由 compact table 生成的中文诊断可视化。&quot;, &quot;role&quot;: &quot;diagnostic&quot;, &quot;used_for&quot;: &quot;observation&quot;, &quot;limitations&quot;: &quot;仅为可视化，不是最终评估器证据。&quot;}</metadata>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24.0" y="32.0" text-anchor="start" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#222222">P1 文本距离随事件负载上升</text>
+<text x="24.0" y="54.0" text-anchor="start" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#555555">完整文本 vs 单事件文本的 CLIP 余弦距离；每格对应 event_count x event_order。</text>
+<text x="169.0" y="62.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">顺序 1</text>
+<text x="247.0" y="62.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">顺序 2</text>
+<text x="325.0" y="62.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">顺序 3</text>
+<text x="403.0" y="62.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">顺序 4</text>
+<text x="481.0" y="62.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">顺序 5</text>
+<text x="114.0" y="125.0" text-anchor="end" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">事件数 1</text>
+<rect x="130.0" y="82.0" width="74.0" height="74.0" fill="#eff6ff" stroke="#ffffff"/>
+<text x="167.0" y="125.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.002</text>
+<rect x="208.0" y="82.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="245.0" y="125.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<rect x="286.0" y="82.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="323.0" y="125.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<rect x="364.0" y="82.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="401.0" y="125.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<rect x="442.0" y="82.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="479.0" y="125.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<text x="114.0" y="203.0" text-anchor="end" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">事件数 2</text>
+<rect x="130.0" y="160.0" width="74.0" height="74.0" fill="#a9d4e0" stroke="#ffffff"/>
+<text x="167.0" y="203.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.036</text>
+<rect x="208.0" y="160.0" width="74.0" height="74.0" fill="#81c0cf" stroke="#ffffff"/>
+<text x="245.0" y="203.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.055</text>
+<rect x="286.0" y="160.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="323.0" y="203.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<rect x="364.0" y="160.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="401.0" y="203.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<rect x="442.0" y="160.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="479.0" y="203.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<text x="114.0" y="281.0" text-anchor="end" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">事件数 3</text>
+<rect x="130.0" y="238.0" width="74.0" height="74.0" fill="#aeb59d" stroke="#ffffff"/>
+<text x="167.0" y="281.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.080</text>
+<rect x="208.0" y="238.0" width="74.0" height="74.0" fill="#bcb28f" stroke="#ffffff"/>
+<text x="245.0" y="281.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.086</text>
+<rect x="286.0" y="238.0" width="74.0" height="74.0" fill="#a1b7aa" stroke="#ffffff"/>
+<text x="323.0" y="281.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.074</text>
+<rect x="364.0" y="238.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="401.0" y="281.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<rect x="442.0" y="238.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="479.0" y="281.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<text x="114.0" y="359.0" text-anchor="end" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">事件数 4</text>
+<rect x="130.0" y="316.0" width="74.0" height="74.0" fill="#c7b083" stroke="#ffffff"/>
+<text x="167.0" y="359.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.092</text>
+<rect x="208.0" y="316.0" width="74.0" height="74.0" fill="#e5aa66" stroke="#ffffff"/>
+<text x="245.0" y="359.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.106</text>
+<rect x="286.0" y="316.0" width="74.0" height="74.0" fill="#e1ab6a" stroke="#ffffff"/>
+<text x="323.0" y="359.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.104</text>
+<rect x="364.0" y="316.0" width="74.0" height="74.0" fill="#e2ab69" stroke="#ffffff"/>
+<text x="401.0" y="359.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.105</text>
+<rect x="442.0" y="316.0" width="74.0" height="74.0" fill="#f2f2f2" stroke="#ffffff"/>
+<text x="479.0" y="359.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">NA</text>
+<text x="114.0" y="437.0" text-anchor="end" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#222222">事件数 5</text>
+<rect x="130.0" y="394.0" width="74.0" height="74.0" fill="#c5b086" stroke="#ffffff"/>
+<text x="167.0" y="437.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.091</text>
+<rect x="208.0" y="394.0" width="74.0" height="74.0" fill="#be4a40" stroke="#ffffff"/>
+<text x="245.0" y="437.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.166</text>
+<rect x="286.0" y="394.0" width="74.0" height="74.0" fill="#e79555" stroke="#ffffff"/>
+<text x="323.0" y="437.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.123</text>
+<rect x="364.0" y="394.0" width="74.0" height="74.0" fill="#c35443" stroke="#ffffff"/>
+<text x="401.0" y="437.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.161</text>
+<rect x="442.0" y="394.0" width="74.0" height="74.0" fill="#9bb8b0" stroke="#ffffff"/>
+<text x="479.0" y="437.0" text-anchor="middle" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#222222">0.071</text>
+<rect x="558.0" y="309.1" width="18.0" height="3.4" fill="#eff6ff" stroke="none"/>
+<rect x="558.0" y="306.2" width="18.0" height="3.4" fill="#ebf4fd" stroke="none"/>
+<rect x="558.0" y="303.4" width="18.0" height="3.4" fill="#e6f2fb" stroke="none"/>
+<rect x="558.0" y="300.5" width="18.0" height="3.4" fill="#e2f0f9" stroke="none"/>
+<rect x="558.0" y="297.6" width="18.0" height="3.4" fill="#deedf7" stroke="none"/>
+<rect x="558.0" y="294.8" width="18.0" height="3.4" fill="#d9ebf6" stroke="none"/>
+<rect x="558.0" y="291.9" width="18.0" height="3.4" fill="#d5e9f4" stroke="none"/>
+<rect x="558.0" y="289.0" width="18.0" height="3.4" fill="#d1e7f2" stroke="none"/>
+<rect x="558.0" y="286.1" width="18.0" height="3.4" fill="#cce5f0" stroke="none"/>
+<rect x="558.0" y="283.2" width="18.0" height="3.4" fill="#c8e3ee" stroke="none"/>
+<rect x="558.0" y="280.4" width="18.0" height="3.4" fill="#c4e1ec" stroke="none"/>
+<rect x="558.0" y="277.5" width="18.0" height="3.4" fill="#bfdfea" stroke="none"/>
+<rect x="558.0" y="274.6" width="18.0" height="3.4" fill="#bbdce8" stroke="none"/>
+<rect x="558.0" y="271.8" width="18.0" height="3.4" fill="#b7dae6" stroke="none"/>
+<rect x="558.0" y="268.9" width="18.0" height="3.4" fill="#b2d8e4" stroke="none"/>
+<rect x="558.0" y="266.0" width="18.0" height="3.4" fill="#aed6e3" stroke="none"/>
+<rect x="558.0" y="263.1" width="18.0" height="3.4" fill="#aad4e1" stroke="none"/>
+<rect x="558.0" y="260.2" width="18.0" height="3.4" fill="#a5d2df" stroke="none"/>
+<rect x="558.0" y="257.4" width="18.0" height="3.4" fill="#a1d0dd" stroke="none"/>
+<rect x="558.0" y="254.5" width="18.0" height="3.4" fill="#9dcedb" stroke="none"/>
+<rect x="558.0" y="251.6" width="18.0" height="3.4" fill="#98cbd9" stroke="none"/>
+<rect x="558.0" y="248.8" width="18.0" height="3.4" fill="#94c9d7" stroke="none"/>
+<rect x="558.0" y="245.9" width="18.0" height="3.4" fill="#90c7d5" stroke="none"/>
+<rect x="558.0" y="243.0" width="18.0" height="3.4" fill="#8bc5d3" stroke="none"/>
+<rect x="558.0" y="240.1" width="18.0" height="3.4" fill="#87c3d1" stroke="none"/>
+<rect x="558.0" y="237.2" width="18.0" height="3.4" fill="#83c1d0" stroke="none"/>
+<rect x="558.0" y="234.4" width="18.0" height="3.4" fill="#7ebfce" stroke="none"/>
+<rect x="558.0" y="231.5" width="18.0" height="3.4" fill="#80bdca" stroke="none"/>
+<rect x="558.0" y="228.6" width="18.0" height="3.4" fill="#84bdc6" stroke="none"/>
+<rect x="558.0" y="225.8" width="18.0" height="3.4" fill="#89bcc1" stroke="none"/>
+<rect x="558.0" y="222.9" width="18.0" height="3.4" fill="#8dbbbd" stroke="none"/>
+<rect x="558.0" y="220.0" width="18.0" height="3.4" fill="#92bab9" stroke="none"/>
+<rect x="558.0" y="217.1" width="18.0" height="3.4" fill="#96b9b4" stroke="none"/>
+<rect x="558.0" y="214.2" width="18.0" height="3.4" fill="#9ab8b0" stroke="none"/>
+<rect x="558.0" y="211.4" width="18.0" height="3.4" fill="#9fb8ac" stroke="none"/>
+<rect x="558.0" y="208.5" width="18.0" height="3.4" fill="#a3b7a7" stroke="none"/>
+<rect x="558.0" y="205.6" width="18.0" height="3.4" fill="#a8b6a3" stroke="none"/>
+<rect x="558.0" y="202.8" width="18.0" height="3.4" fill="#acb59e" stroke="none"/>
+<rect x="558.0" y="199.9" width="18.0" height="3.4" fill="#b0b49a" stroke="none"/>
+<rect x="558.0" y="197.0" width="18.0" height="3.4" fill="#b5b396" stroke="none"/>
+<rect x="558.0" y="194.1" width="18.0" height="3.4" fill="#b9b391" stroke="none"/>
+<rect x="558.0" y="191.2" width="18.0" height="3.4" fill="#beb28d" stroke="none"/>
+<rect x="558.0" y="188.4" width="18.0" height="3.4" fill="#c2b189" stroke="none"/>
+<rect x="558.0" y="185.5" width="18.0" height="3.4" fill="#c6b084" stroke="none"/>
+<rect x="558.0" y="182.6" width="18.0" height="3.4" fill="#cbaf80" stroke="none"/>
+<rect x="558.0" y="179.8" width="18.0" height="3.4" fill="#cfae7b" stroke="none"/>
+<rect x="558.0" y="176.9" width="18.0" height="3.4" fill="#d4ae77" stroke="none"/>
+<rect x="558.0" y="174.0" width="18.0" height="3.4" fill="#d8ad73" stroke="none"/>
+<rect x="558.0" y="171.1" width="18.0" height="3.4" fill="#dcac6e" stroke="none"/>
+<rect x="558.0" y="168.2" width="18.0" height="3.4" fill="#e1ab6a" stroke="none"/>
+<rect x="558.0" y="165.4" width="18.0" height="3.4" fill="#e5aa66" stroke="none"/>
+<rect x="558.0" y="162.5" width="18.0" height="3.4" fill="#eaa961" stroke="none"/>
+<rect x="558.0" y="159.6" width="18.0" height="3.4" fill="#eea95d" stroke="none"/>
+<rect x="558.0" y="156.8" width="18.0" height="3.4" fill="#f0a75a" stroke="none"/>
+<rect x="558.0" y="153.9" width="18.0" height="3.4" fill="#eea359" stroke="none"/>
+<rect x="558.0" y="151.0" width="18.0" height="3.4" fill="#eca058" stroke="none"/>
+<rect x="558.0" y="148.1" width="18.0" height="3.4" fill="#eb9c57" stroke="none"/>
+<rect x="558.0" y="145.2" width="18.0" height="3.4" fill="#e99956" stroke="none"/>
+<rect x="558.0" y="142.4" width="18.0" height="3.4" fill="#e79555" stroke="none"/>
+<rect x="558.0" y="139.5" width="18.0" height="3.4" fill="#e59154" stroke="none"/>
+<rect x="558.0" y="136.6" width="18.0" height="3.4" fill="#e38e53" stroke="none"/>
+<rect x="558.0" y="133.8" width="18.0" height="3.4" fill="#e18a52" stroke="none"/>
+<rect x="558.0" y="130.9" width="18.0" height="3.4" fill="#df8751" stroke="none"/>
+<rect x="558.0" y="128.0" width="18.0" height="3.4" fill="#dd8350" stroke="none"/>
+<rect x="558.0" y="125.1" width="18.0" height="3.4" fill="#db804f" stroke="none"/>
+<rect x="558.0" y="122.2" width="18.0" height="3.4" fill="#d97c4e" stroke="none"/>
+<rect x="558.0" y="119.4" width="18.0" height="3.4" fill="#d7784d" stroke="none"/>
+<rect x="558.0" y="116.5" width="18.0" height="3.4" fill="#d5754c" stroke="none"/>
+<rect x="558.0" y="113.6" width="18.0" height="3.4" fill="#d3714b" stroke="none"/>
+<rect x="558.0" y="110.8" width="18.0" height="3.4" fill="#d16e4a" stroke="none"/>
+<rect x="558.0" y="107.9" width="18.0" height="3.4" fill="#cf6a49" stroke="none"/>
+<rect x="558.0" y="105.0" width="18.0" height="3.4" fill="#cd6748" stroke="none"/>
+<rect x="558.0" y="102.1" width="18.0" height="3.4" fill="#cc6347" stroke="none"/>
+<rect x="558.0" y="99.2" width="18.0" height="3.4" fill="#ca5f46" stroke="none"/>
+<rect x="558.0" y="96.4" width="18.0" height="3.4" fill="#c85c45" stroke="none"/>
+<rect x="558.0" y="93.5" width="18.0" height="3.4" fill="#c65844" stroke="none"/>
+<rect x="558.0" y="90.6" width="18.0" height="3.4" fill="#c45543" stroke="none"/>
+<rect x="558.0" y="87.8" width="18.0" height="3.4" fill="#c25142" stroke="none"/>
+<rect x="558.0" y="84.9" width="18.0" height="3.4" fill="#c04e41" stroke="none"/>
+<rect x="558.0" y="82.0" width="18.0" height="3.4" fill="#be4a40" stroke="none"/>
+<rect x="558.0" y="82.0" width="18.0" height="230.0" fill="none" stroke="#444444"/>
+<text x="584.0" y="86.0" text-anchor="start" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#222222">0.166</text>
+<text x="584.0" y="312.0" text-anchor="start" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#222222">0.002</text>
+<text x="554.0" y="334.0" text-anchor="start" font-family="Arial, Noto Sans CJK SC, Microsoft YaHei, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#222222">文本距离</text>
+</svg>

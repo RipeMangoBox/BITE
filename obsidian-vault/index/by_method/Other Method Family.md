@@ -1,0 +1,373 @@
+---
+title: "Method: Other Method Family"
+type: paper-index
+dimension: method
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Method: Other Method Family
+
+- [[obsidian-vault/analysis/TOG_2019/NSM_Neural_State_Machine_for_Character_Scene_Interactions.md|Neural State Machine for Character-Scene Interactions (TOG 2019 2019)]]
+	- [[obsidian-vault/paperPDFs/TOG_2019/Neural_State_Machine_for_Character_Scene_Interactions.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: Neural State Machine (NSM)
+	- datasets: Sitting task - final pose precision, Carrying task - final pose precision, Responsiveness - idle to walk transition
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Fast_Unsmoothed_Aggregation_Algebraic_Multigrid_Framework_for_the_Large-scale_Simulation_of_Incompressible_Flow.md|A Fast Unsmoothed Aggregation Algebraic Multigrid Framework for the Large-scale Simulation of Incompressible Flow (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Fast_Unsmoothed_Aggregation_Algebraic_Multigrid_Framework_for_the_Large_scale_Simulation_of_Incompressible_Flow.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: UAAMG（非光滑聚合代数多重网格）结合SIMD-VDB
+	- datasets: Poisson Compact Scene, Viscosity Unit Test, River Fall
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_General_Two-stage_Initialization_for_Sag-free_Deformable_Simulations.md|A General Two-stage Initialization for Sag-free Deformable Simulations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_General_Two_stage_Initialization_for_Sag_free_Deformable_Simulations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Two-Stage Initialization
+	- datasets: Mass-spring tetrahedral mesh, Cloth hat simulation, FEM plant
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Moving_Eulerian-Lagrangian_Particle_Method_for_Thin_Film_and_Foam_Simulation.md|A Moving Eulerian-Lagrangian Particle Method for Thin Film and Foam Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Moving_Eulerian_Lagrangian_Particle_Method_for_Thin_Film_and_Foam_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Moving Eulerian-Lagrangian Particles (MELP) and multi-MELP
+	- datasets: Equilibrium thickness convergence, Plateau border dihedral angle validation, Partition surface curvature validation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Practical_Model_for_Realistic_Butterfly_Flight_Simulation.md|A Practical Model for Realistic Butterfly Flight Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Practical_Model_for_Realistic_Butterfly_Flight_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于力场的蝴蝶飞行仿真模型 (Force-based Butterfly Flight Simulation Model)
+	- datasets: 消融用户研究, 蝴蝶集群仿真, 蝴蝶集群旅行仿真
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Adaptive_Rigidification_of_Elastic_Solids.md|Adaptive Rigidification of Elastic Solids (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Adaptive_Rigidification_of_Elastic_Solids.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adaptive Rigidification of Elastic Solids
+	- datasets: Tire, Blob, Wheel
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Adjoint_Nonlinear_Ray_Tracing.md|Adjoint Nonlinear Ray Tracing (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Adjoint_Nonlinear_Ray_Tracing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adjoint Nonlinear Ray Tracing
+	- datasets: GRIN透镜恢复
+- [[obsidian-vault/analysis/SIGGRAPH_2022/As-locally-uniform-as-possible_Reshaping_of_Vector_Clip_Art.md|As-locally-uniform-as-possible Reshaping of Vector Clip Art (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/As_locally_uniform_as_possible_Reshaping_of_Vector_Clip_Art.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: As-Locally-Uniform-As-Possible (ALUP) Reshaping
+	- datasets: 用户对比研究
+- [[obsidian-vault/analysis/SIGGRAPH_2022/CCP_Configurable_Crowd_Profiles.md|CCP: Configurable Crowd Profiles (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CCP_Configurable_Crowd_Profiles.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: CCP
+- [[obsidian-vault/analysis/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.md|CLIP2StyleGAN: Unsupervised Extraction of StyleGAN Edit Directions (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: CLIP2StyleGAN
+	- datasets: FFHQ / StyleGAN生成人脸
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Clustered_Vector_Textures.md|Clustered Vector Textures (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Clustered_Vector_Textures.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Clustered Vector Textures
+	- datasets: 聚类对比基线
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.md|Computational Design of Passive Grippers (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Computational Design of Passive Grippers
+	- datasets: 物体特征覆盖
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Covector_Fluids.md|Covector Fluids (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Covector_Fluids.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Covector Fluids (CF) / CF+MCM
+	- datasets: Leapfrogging test, Overall simulation workload
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dark_Stereo_Improving_Depth_Perception_Under_Low_Luminance.md|Dark Stereo: Improving Depth Perception Under Low Luminance (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dark_Stereo_Improving_Depth_Perception_Under_Low_Luminance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dark Stereo (Stereo-preserving Contrast Enhancement)
+	- datasets: VR主观偏好实验
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DCT-Net_Domain-calibrated_Translation_for_Portrait_Stylization.md|DCT-Net: Domain-calibrated Translation for Portrait Stylization (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DCT_Net_Domain_calibrated_Translation_for_Portrait_Stylization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DCT-Net
+	- datasets: CelebA
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.md|Designing Perceptual Puzzles by Differentiating Probabilistic Programs (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 可微分概率编程（Differentiable Probabilistic Programming）
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Dev2PQ_Planar_Quadrilateral_Strip_Remeshing_of_Developable_Surfaces.md|Dev2PQ: Planar Quadrilateral Strip Remeshing of Developable Surfaces (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Dev2PQ_Planar_Quadrilateral_Strip_Remeshing_of_Developable_Surfaces.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dev2PQ
+	- datasets: Clothoid解析可展曲面
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Ecoclimates_Climate-response_Modeling_of_Vegetation.md|Ecoclimates: Climate-response Modeling of Vegetation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Ecoclimates_Climate_response_Modeling_of_Vegetation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Ecoclimates: Climate-response Modeling of Vegetation
+	- datasets: 不同气候条件下的森林消亡与恢复, 与 Makowski et al. 2019 的微气候比较
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Face_Extrusion_Quad_Meshes.md|Face Extrusion Quad Meshes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Face_Extrusion_Quad_Meshes.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 训练数据原语数量扩充 (Training Data Primitives Enrichment)
+	- datasets: SCAN, Colors, COGS
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Facial_Hair_Tracking_for_High_Fidelity_Performance_Capture.md|Facial Hair Tracking for High Fidelity Performance Capture (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Facial_Hair_Tracking_for_High_Fidelity_Performance_Capture.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Dynamic Facial Hair Capture Pipeline
+	- datasets: 面部表演序列
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Free2CAD_Parsing_Freehand_Drawings_Into_CAD_Commands.md|Free2CAD: Parsing Freehand Drawings Into CAD Commands (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Free2CAD_Parsing_Freehand_Drawings_Into_CAD_Commands.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Free2CAD
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Generalized_Resampled_Importance_Sampling_Foundations_of_ReSTIR.md|Generalized Resampled Importance Sampling: Foundations of ReSTIR (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Generalized_Resampled_Importance_Sampling_Foundations_of_ReSTIR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Generalized Resampled Importance Sampling (GRIS) and ReSTIR PT
+	- datasets: Carousel, Paris Opera House, Kitchen
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Practical_Walk-on-Boundary_Method_for_Boundary_Value_Problems.md|A Practical Walk-on-Boundary Method for Boundary Value Problems (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Practical_Walk_on_Boundary_Method_for_Boundary_Value_Problems.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Walk-on-Boundary (WoB)
+	- datasets: 内部 Dirichlet 问题在凸/非凸二维域
+- [[obsidian-vault/analysis/AAAI_2024/InstructAvatar_Text_Guided_Emotion_and_Motion_Control_for_Avatar_Generation.md|InstructAvatar: Text-Guided Emotion and Motion Control for Avatar Generation (AAAI 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2024/InstructAvatar_Text_Guided_Emotion_and_Motion_Control_for_Avatar_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: InstructAvatar
+	- datasets: MEAD, TalkingHead 1KH
+- [[obsidian-vault/analysis/arxiv_2024/DSONet_Textual_Decomposition_Then_Sub_Motion_Space_Scattering_for_Open_Vocabulary_Motion_Generation.md|Textual Decomposition Then Sub-Motion-Space Scattering for Open-Vocabulary Motion Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/DSONet_Textual_Decomposition_Then_Sub_Motion_Space_Scattering_for_Open_Vocabulary_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: DSO-Net
+	- datasets: HumanML3D, Idea400, Mixamo
+- [[obsidian-vault/analysis/CVPR_2024/GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis.md|GEARS Local Geometry aware Hand object Interaction Synthesis (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: GEARS
+	- datasets: GRAB, InterCap
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Heat_Method_for_Generalized_Signed_Distance.md|A Heat Method for Generalized Signed Distance (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Heat_Method_for_Generalized_Signed_Distance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Intrinsic Triangulation Framework (内蕴三角剖分框架)
+	- datasets: Thingi10k 数据集上的内蕴 Delaunay 翻转
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Generalized_Ray_Formulation_For_Wave-Optical_Light_Transport.md|A Generalized Ray Formulation For Wave-Optical Light Transport (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Generalized_Ray_Formulation_For_Wave_Optical_Light_Transport.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Generalized Ray Backward Light Transport (sample–solve)
+	- datasets: Snake enclosure, CD scene
+- [[obsidian-vault/analysis/arxiv_2025/Qwen3_VL_Technical_Report.md|Qwen3-VL Technical Report (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Qwen3_VL_Technical_Report.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Qwen3-VL
+	- datasets: MMLU-Pro, HallusionBench, MIA-Bench
+- [[obsidian-vault/analysis/CVPR_2025/EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Object_Interactions_in_the_Wild.md|EasyHOI Unleashing the Power of Large Models for Reconstructing Hand Object Interactions in the Wild (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Object_Interactions_in_the_Wild.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: EasyHOI
+	- datasets: Arctic
+- [[obsidian-vault/analysis/CVPR_2025/SimMotionEdit_Text_Based_Human_Motion_Editing_with_Motion_Similarity_Prediction.md|SimMotionEdit: Text-Based Human Motion Editing with Motion Similarity Prediction (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SimMotionEdit_Text_Based_Human_Motion_Editing_with_Motion_Similarity_Prediction.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: SimMotionEdit
+	- datasets: MotionFix 测试集
+- [[obsidian-vault/analysis/EUROVIS_2025/HyperFLINT_Hypernetwork_based_Flow_Estimation_and_Temporal_Interpolation_for_Scientific_Ensemble_Visualization.md|HyperFLINT: Hypernetwork-based Flow Estimation and Temporal Interpolation for Scientific Ensemble Visualization (EUROVIS 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/EUROVIS_2025/HyperFLINT_Hypernetwork_based_Flow_Estimation_and_Temporal_Interpolation_for_Scientific_Ensemble_Visualization.pdf|PDF]]
+	- topics: Time Series / Dynamical Systems
+	- method groups: Other Method Family
+	- methods: HyperFLINT
+	- datasets: Nyx 5×, Castro 5×
+- [[obsidian-vault/analysis/ICCV_2025/PRIMAL_Physically_Reactive_and_Interactive_Motor_Model_for_Avatar_Learning.md|PRIMAL Physically Reactive and Interactive Motor Model for Avatar Learning (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/PRIMAL_Physically_Reactive_and_Interactive_Motor_Model_for_Avatar_Learning.pdf|PDF]]
+	- topics: Motion Animation, Pose Trajectory Control
+	- method groups: Other Method Family
+	- methods: PRIMAL
+	- datasets: Motion Realism, Reaction to Induced Impulses, Semantic Action Generation
+- [[obsidian-vault/analysis/MM_2025/AC4AU_Regulatory_Focus_Micro_Expression_Analysis.md|AC4AU Regulatory Focus Micro Expression Analysis (MM 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/MM_2025/AC4AU_Regulatory_Focus_Micro_Expression_Analysis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: AC4AU
+	- datasets: CD6ME
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.md|PhysicsFC Learning User Controlled Skills for a Physics Based Football Player Controller (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PhysicsFC
+	- datasets: Dribble Skill, Trap Skill, Move Skill
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.md|PhysicsFC: Learning User-Controlled Skills for a Physics-Based Football Player Controller (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PhysicsFC
+	- datasets: Dribble Skill, Trap Skill, Move Skill
+- [[obsidian-vault/analysis/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.md|ActAvatar: Temporally-Aware Precise Action Control for Talking Avatars (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ActAvatar
+	- datasets: HDTF, Action Bench
+- [[obsidian-vault/analysis/CVPR_2026/AudioAvatar_Personalized_Audio_driven_Whole_body_Talking_Avatars.md|AudioAvatar: Personalized Audio-driven Whole-body Talking Avatars (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/AudioAvatar_Personalized_Audio_driven_Whole_body_Talking_Avatars.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: AudioAvatar
+- [[obsidian-vault/analysis/CVPR_2026/Differentiable_Adaptive_4D_Structured_Illumination_for_Joint_Capture_of_Shape_and_Reflectance.md|Differentiable Adaptive 4D Structured Illumination for Joint Capture of Shape and Reflectance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Differentiable_Adaptive_4D_Structured_Illumination_for_Joint_Capture_of_Shape_and_Reflectance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Differentiable Adaptive 4D Structured Illumination
+	- datasets: 物理物体
+- [[obsidian-vault/analysis/CVPR_2026/DK_DDIL_Adaptive_Knowledge_Retention_for_Dynamic_Domain_Incremental_Learning_in_Medical_Imaging.md|DK-DDIL: Adaptive Knowledge Retention for Dynamic Domain-Incremental Learning in Medical Imaging (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DK_DDIL_Adaptive_Knowledge_Retention_for_Dynamic_Domain_Incremental_Learning_in_Medical_Imaging.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DK-DDIL
+	- datasets: Skin Pathology Diagnosis, Cyst-X, OfficeHome
+- [[obsidian-vault/analysis/CVPR_2026/Evidential_Neural_Radiance_Fields.md|Evidential Neural Radiance Fields (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Evidential_Neural_Radiance_Fields.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Evidential Neural Radiance Fields (Evidential NeRF)
+	- datasets: LF, LLFF, RobustNeRF
+- [[obsidian-vault/analysis/CVPR_2026/FrankenMotion_Part_level_Human_Motion_Generation_and_Composition.md|FrankenMotion: Part-level Human Motion Generation and Composition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FrankenMotion_Part_level_Human_Motion_Generation_and_Composition.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: FrankenMotion
+	- datasets: FrankenStein
+- [[obsidian-vault/analysis/CVPR_2026/GaussianFluent_Gaussian_Simulation_for_Dynamic_Scenes_with_Mixed_Materials.md|GaussianFluent: Gaussian Simulation for Dynamic Scenes with Mixed Materials (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GaussianFluent_Gaussian_Simulation_for_Dynamic_Scenes_with_Mixed_Materials.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: GaussianFluent
+	- datasets: Internal Texture Filling, Dynamic Scene Simulation
+- [[obsidian-vault/analysis/CVPR_2026/Hearing_the_Room_Through_the_Shape_of_the_Drum_Modal_Guided_Sound_Recovery_from_Multi_Point_Surface_Vibrations.md|Hearing the Room Through the Shape of the Drum: Modal-Guided Sound Recovery from Multi-Point Surface Vibrations (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Hearing_the_Room_Through_the_Shape_of_the_Drum_Modal_Guided_Sound_Recovery_from_Multi_Point_Surface_Vibrations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Modal-Guided Sound Recovery
+	- datasets: 多物体测试集
+- [[obsidian-vault/analysis/CVPR_2026/Mapping_Networks.md|Mapping Networks (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mapping_Networks.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Mapping Networks
+	- datasets: MNIST, FashionMNIST, Celeb-DF
+- [[obsidian-vault/analysis/CVPR_2026/MS_2Gait_A_Multi_Scale_Spatio_Temporal_Fusion_Network_for_LiDAR_based_Gait_Recognition.md|MS^2Gait: A Multi-Scale Spatio-Temporal Fusion Network for LiDAR-based Gait Recognition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MS_2Gait_A_Multi_Scale_Spatio_Temporal_Fusion_Network_for_LiDAR_based_Gait_Recognition.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: MS^2Gait
+	- datasets: SUSTech1K, Free-Gait
+- [[obsidian-vault/analysis/CVPR_2026/Node_RF_Learning_Generalized_Continuous_Space_Time_Scene_Dynamics_with_Neural_ODE_based_NeRFs.md|Node-RF: Learning Generalized Continuous Space-Time Scene Dynamics with Neural ODE-based NeRFs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Node_RF_Learning_Generalized_Continuous_Space_Time_Scene_Dynamics_with_Neural_ODE_based_NeRFs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Node-RF
+	- datasets: Bouncing Balls, Pendulum, Oscillating Ball
+- [[obsidian-vault/analysis/CVPR_2026/OMG_Avatar_One_shot_Multi_LOD_Gaussian_Head_Avatar.md|OMG-Avatar: One-shot Multi-LOD Gaussian Head Avatar (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/OMG_Avatar_One_shot_Multi_LOD_Gaussian_Head_Avatar.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OMG-Avatar
+	- datasets: VFHQ, HDTF
+- [[obsidian-vault/analysis/CVPR_2026/PhyGaP_Physically_Grounded_Gaussians_with_Polarization_Cues.md|PhyGaP: Physically-Grounded Gaussians with Polarization Cues (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PhyGaP_Physically_Grounded_Gaussians_with_Polarization_Cues.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PhyGaP
+	- datasets: PANDORA, Mitsuba3, SMVP - Relighting
+- [[obsidian-vault/analysis/CVPR_2026/RF4D_Neural_Radar_Fields_for_Novel_View_Synthesis_in_Outdoor_Dynamic_Scenes.md|RF4D:Neural Radar Fields for Novel View Synthesis in Outdoor Dynamic Scenes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RF4D_Neural_Radar_Fields_for_Novel_View_Synthesis_in_Outdoor_Dynamic_Scenes.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: RF4D
+	- datasets: Oxford RobotCar, Boreas
+- [[obsidian-vault/analysis/CVPR_2026/Scalable_Multi_View_Subspace_Clustering_with_Tensorized_Anchor_Guidance.md|Scalable Multi-View Subspace Clustering with Tensorized Anchor Guidance (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Scalable_Multi_View_Subspace_Clustering_with_Tensorized_Anchor_Guidance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: SMVS-TAG (Scalable Multi-view Subspace Clustering with Tensorized Anchor Guidance)
+	- datasets: Dermatology, Scene15, COIL100
+- [[obsidian-vault/analysis/CVPR_2026/SDTrack_A_Baseline_for_Event_based_Tracking_via_Spiking_Neural_Networks.md|SDTrack: A Baseline for Event-based Tracking via Spiking Neural Networks (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SDTrack_A_Baseline_for_Event_based_Tracking_via_Spiking_Neural_Networks.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: SDTrack Pipeline
+	- datasets: FE108
+- [[obsidian-vault/analysis/CVPR_2026/Towards_Real_World_Document_Parsing_via_Realistic_Scene_Synthesis_and_Document_Aware_Training.md|Towards Real-World Document Parsing via Realistic Scene Synthesis and Document-Aware Training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Towards_Real_World_Document_Parsing_via_Realistic_Scene_Synthesis_and_Document_Aware_Training.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Realistic Scene Synthesis + Document-Aware Training (DocHumming model)
+	- datasets: OmniDocBench, XFUND, Wild-OmniDocBench
+- [[obsidian-vault/analysis/ICLR_2026/A_Two_Phase_Deep_Learning_Framework_for_Adaptive_Time_Stepping_in_High_Speed_Flow_Modeling.md|A Two-Phase Deep Learning Framework for Adaptive Time-Stepping in High-Speed Flow Modeling (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Two_Phase_Deep_Learning_Framework_for_Adaptive_Time_Stepping_in_High_Speed_Flow_Modeling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ShockCast
+	- datasets: Circular Blast, Coal Dust Explosion
+- [[obsidian-vault/analysis/ICLR_2026/Activation_Steering_with_a_Feedback_Controller.md|Activation Steering with a Feedback Controller (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Activation_Steering_with_a_Feedback_Controller.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Proportional-Integral-Derivative (PID) Steering
+	- datasets: Jailbreak Attack, Toxicity Mitigation
+- [[obsidian-vault/analysis/ICLR_2026/Building_spatial_world_models_from_sparse_transitional_episodic_memories.md|Building spatial world models from sparse transitional episodic memories (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Building_spatial_world_models_from_sparse_transitional_episodic_memories_1e9241541b44.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ESWM (Episodic Spatial World Model)
+	- datasets: Open Arena, Random Wall, Random Wall Navigation
+- [[obsidian-vault/analysis/ICLR_2026/Dynamic_Novel_View_Synthesis_in_High_Dynamic_Range.md|Dynamic Novel View Synthesis in High Dynamic Range (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Dynamic_Novel_View_Synthesis_in_High_Dynamic_Range_c7124ba0dcb7.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: HDR-4DGS
+	- datasets: HDR-4D-Syn, HDR-4D-Real
+- [[obsidian-vault/analysis/ICLR_2026/OccDriver_Future_Occupancy_Guided_Dual_branch_Trajectory_Planner_in_Autonomous_Driving.md|OccDriver: Future Occupancy Guided Dual-branch Trajectory Planner in Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/OccDriver_Future_Occupancy_Guided_Dual_branch_Trajectory_Planner_in_Autonomous_D_fbeed04774ba.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OccDriver
+	- datasets: nuPlan Val14, nuPlan Test14-Hard
+- [[obsidian-vault/analysis/ICLR_2026/ORCaS_Unsupervised_Depth_Completion_via_Occluded_Region_Completion_as_Supervision.md|ORCaS: Unsupervised Depth Completion via Occluded Region Completion as Supervision (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ORCaS_Unsupervised_Depth_Completion_via_Occluded_Region_Completion_as_Supervision.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ORCaS (Occluded Region Completion as Supervision)
+	- datasets: VOID1500, NYUv2, KITTI DC
+- [[obsidian-vault/analysis/ICLR_2026/ResWorld_Temporal_Residual_World_Model_for_End_to_End_Autonomous_Driving.md|ResWorld: Temporal Residual World Model for End-to-End Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ResWorld_Temporal_Residual_World_Model_for_End_to_End_Autonomous_Driving_0aa5048f38c3.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ResWorld
+	- datasets: nuScenes, NAVSIM
+- [[obsidian-vault/analysis/ICLR_2026/TSLM_Tree_Structured_Language_Modeling_for_Divergent_Thinking.md|TSLM: Tree-Structured Language Modeling for Divergent Thinking (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/TSLM_Tree_Structured_Language_Modeling_for_Divergent_Thinking.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: TSLM (Tree-Structured Language Modeling)
+	- datasets: Game of 24, Gridworld, ProntoQA

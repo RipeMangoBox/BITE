@@ -1,0 +1,1076 @@
+---
+title: "Method: Optimization / Theory"
+type: paper-index
+dimension: method
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Method: Optimization / Theory
+
+- [[obsidian-vault/analysis/CVPR_2019/Devil_is_in_the_Edges_Learning_Semantic_Boundaries_from_Noisy_Annotations.md|Devil is in the Edges: Learning Semantic Boundaries from Noisy Annotations (CVPR 2019 2019)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2019/Devil_is_in_the_Edges_Learning_Semantic_Boundaries_from_Noisy_Annotations.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: STEAL (Semantically Thinned Edge Alignment Learning)
+	- datasets: SBD re-annotated test set, SBD original test set, Cityscapes val
+- [[obsidian-vault/analysis/CVPR_2021/See_through_Gradients_Image_Batch_Recovery_via_GradInversion.md|See through Gradients: Image Batch Recovery via GradInversion (CVPR 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2021/See_through_Gradients_Image_Batch_Recovery_via_GradInversion.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Vision / Multimodal / 3D
+	- methods: GradInversion
+	- datasets: ImageNet1K batch label restoration, ImageNet1K ResNet-50 gradient inversion, Ablation: effect of fidelity regularization
+- [[obsidian-vault/analysis/ICCV_2021/Active_Learning_for_Deep_Object_Detection_via_Probabilistic_Modeling.md|Active Learning for Deep Object Detection via Probabilistic Modeling (ICCV 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2021/Active_Learning_for_Deep_Object_Detection_via_Probabilistic_Modeling.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Vision / Multimodal / 3D
+	- methods: AL-MDN (Active Learning via Mixture Density Networks)
+	- datasets: PASCAL VOC07, PASCAL VOC07+12, MS-COCO
+- [[obsidian-vault/analysis/ICML_2021/Image_Level_or_Object_Level_A_Tale_of_Two_Resampling_Strategies_for_Long_Tailed_Detection.md|Image-Level or Object-Level? A Tale of Two Resampling Strategies for Long-Tailed Detection (ICML 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/ICML_2021/Image_Level_or_Object_Level_A_Tale_of_Two_Resampling_Strategies_for_Long_Tailed_Detection.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: RIO
+	- datasets: LVIS v1.0 detection, LVIS v1.0 segmentation
+- [[obsidian-vault/analysis/CVPR_2022/Extracting_Triangular_3D_Models_Materials_and_Lighting_From_Images.md|Extracting Triangular 3D Models, Materials, and Lighting From Images (CVPR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2022/Extracting_Triangular_3D_Models_Materials_and_Lighting_From_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: DMTet-based joint optimization with differentiable split sum lighting
+	- datasets: NeRFactor synthetic dataset, NeRF realistic synthetic dataset, NeRFactor variant of NeRF synthetic
+- [[obsidian-vault/analysis/CVPR_2022/Not_All_Labels_Are_Equal_Rationalizing_The_Labeling_Costs_for_Training_Object_Detection.md|Not All Labels Are Equal: Rationalizing The Labeling Costs for Training Object Detection (CVPR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2022/Not_All_Labels_Are_Equal_Rationalizing_The_Labeling_Costs_for_Training_Object_Detection.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Vision / Multimodal / 3D
+	- methods: Unified Active Learning with Robustness and Pseudo-labeling
+	- datasets: PASCAL VOC07+12, MS-COCO
+- [[obsidian-vault/analysis/ICLR_2022/Low_Budget_Active_Learning_via_Wasserstein_Distance_An_Integer_Programming_Approach.md|Low-Budget Active Learning via Wasserstein Distance: An Integer Programming Approach (ICLR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2022/Low_Budget_Active_Learning_via_Wasserstein_Distance_An_Integer_Programming_Approach.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Data Curation / Synthesis
+	- methods: Wasserstein Core-set Selection via Generalized Benders Decomposition (Wass. + EOC + P)
+	- datasets: SVHN, CIFAR-10, Office-31
+- [[obsidian-vault/analysis/NEURIPS_2022/Structural_Pruning_via_Latency_Saliency_Knapsack.md|Structural Pruning via Latency-Saliency Knapsack (NEURIPS 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2022/Structural_Pruning_via_Latency_Saliency_Knapsack.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: Hardware-Aware Latency Pruning (HALP)
+	- datasets: ImageNet, PASCAL VOC
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Clebsch_Method_for_Free-surface_Vortical_Flow_Simulation.md|A Clebsch Method for Free-surface Vortical Flow Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Clebsch_Method_for_Free_surface_Vortical_Flow_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Free-Surface Clebsch Solver
+	- datasets: Bubble ring evolution, Paddling propulsion with waves, Single hole sink vortex
+- A GPU-accelerated Hydrodynamics Solver for Atmosphere-fire Interactions (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Co-optimization_of_Design_and_Fabrication_Plans_for_Carpentry.md|Co-optimization of Design and Fabrication Plans for Carpentry (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Co_optimization_of_Design_and_Fabrication_Plans_for_Carpentry.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+	- methods: ICEE (Iterative Contraction and Expansion on E-graphs) with Bag-of-Parts (BOP) E-graph
+	- datasets: 多个木质家具模型, 五个代表性模型
+- Energetically Consistent Inelasticity for Optimization Time Integration (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory
+- Node Graph Optimization Using Differentiable Proxies (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+- Perceptual Error Optimization for Monte Carlo Rendering (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Perceptual_Error_Optimization_for_Monte_Carlo_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- Scattering From Elliptical Hair Fibers Based on Microfacet Theory (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory
+- Simulation and Optimization of Magnetoelastic Thin Shells (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory
+- Sparsity-specific Code Optimization Using Expression Trees (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+- A Neural Galerkin Solver for Accurate Surface Reconstruction (SIGGRAPH ASIA 2022 2022)
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- Computer Generated Hologram Optimization for Lens Aberration (SIGGRAPH ASIA 2022 2022)
+	- method groups: Optimization / Theory
+- ElastoMonolith: A Monolithic Optimization-based Liquid Solver for Contact-Aware Elastic-Solid Coupling (SIGGRAPH ASIA 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/ElastoMonolith_A_Monolithic_Optimization_based_Liquid_Solver_for_Contact_Aware_Elastic_Solid_Coupling.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Fluidic Topology Optimization with an Anisotropic Mixture Model (SIGGRAPH ASIA 2022 2022)
+	- method groups: Optimization / Theory
+- Robust Vectorized Surface Reconstruction with 2D-3D Joint Optimization (SIGGRAPH ASIA 2022 2022)
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.md|A Convex Optimization Framework for Regularized Geodesic Distances (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: Convex Optimization Framework for Regularized Geodesic Distances
+	- datasets: Single-source distance, Pipe mesh, Dragon mesh
+- A Temporal Coherent Topology Optimization Approach for Assembly Planning of Bespoke Frame Structures (SIGGRAPH 2023 2023)
+	- method groups: Agent / RL / Planning, Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Boundary_Value_Caching_for_Walk_on_Spheres.md|Boundary Value Caching for Walk on Spheres (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Boundary_Value_Caching_for_Walk_on_Spheres.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Boundary Value Caching (BVC)
+	- datasets: 多个视觉/几何计算测试问题, 纯Dirichlet问题, Dirichlet主导的高频边界条件问题
+- ColorfulCurves: Palette-aware Lightness Control and Color Editing via Sparse Optimization (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- End-to-end Procedural Material Capture With Proxy-free Mixed-integer Optimization (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Flexible_Isosurface_Extraction_for_Gradient_Based_Mesh_Optimization.md|Flexible Isosurface Extraction for Gradient-Based Mesh Optimization (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Flexible_Isosurface_Extraction_for_Gradient_Based_Mesh_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: FlexiCubes
+	- datasets: Mesh Reconstruction
+- Geometric Optimisation via Spectral Shifting (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+- Image Vectorization and Editing via Linear Gradient Layer Decomposition (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- Microfacet Theory for Non-uniform Heightfields (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- P2M: A Fast Solver for Querying Distance From Point to Mesh Surface (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Simulation_aided_face_strain_extraction_for_ML_animation_systems.md|Simulation-aided face strain extraction for ML animation systems (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Simulation_aided_face_strain_extraction_for_ML_animation_systems.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Simulation-aided muscle strain extraction
+	- datasets: 面部表演捕捉序列 / face-slab tetrahedral simulation examples
+- Stealth Shaper: Reflectivity Optimization as Surface Stylization (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Walk_on_Stars_Grid_Free_Monte_Carlo_for_Neumann_Boundary_Conditions.md|Walk on Stars: Grid-Free Monte Carlo for Neumann Boundary Conditions (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Walk_on_Stars_Grid_Free_Monte_Carlo_for_Neumann_Boundary_Conditions.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Walk on Stars (WoSt)
+	- datasets: 已知参考函数, 混合边值问题效率对比
+- ∇-Prox: Differentiable Proximal Algorithm Modeling for Large-scale Optimization (SIGGRAPH 2023 2023)
+	- method groups: Optimization / Theory
+- A Locality-based Neural Solver for Optical Motion Capture (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Locality_based_Neural_Solver_for_Optical_Motion_Capture.pdf|PDF]]
+	- method groups: Optimization / Theory
+- A Parametric Kinetic Solver for Simulating Boundary-Dominated Turbulent Flow Phenomena (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Parametric_Kinetic_Solver_for_Simulating_Boundary_Dominated_Turbulent_Flow_Phenomena.pdf|PDF]]
+	- method groups: Optimization / Theory
+- GARM-LS: A Gradient-Augmented Reference-Map Method for Level-Set Fluid Simulation (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GARM_LS_A_Gradient_Augmented_Reference_Map_Method_for_Level_Set_Fluid_Simulation.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Joint Sampling and Optimisation for Inverse Rendering (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Joint_Sampling_and_Optimisation_for_Inverse_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- Learning Gradient Fields for Scalable and Generalizable Irregular Packing (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_Gradient_Fields_for_Scalable_and_Generalizable_Irregular_Packing.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Metric Optimization in Penner Coordinates (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Metric_Optimization_in_Penner_Coordinates.pdf|PDF]]
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+- Neural Cache for Monte Carlo Partial Differential Equation Solver (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Cache_for_Monte_Carlo_Partial_Differential_Equation_Solver.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Neural Gradient Learning and Optimization for Oriented Point Normal Estimation (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Gradient_Learning_and_Optimization_for_Oriented_Point_Normal_Estimation.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Perceptual error optimization for Monte Carlo animation rendering (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Perceptual_error_optimization_for_Monte_Carlo_animation_rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- Power Plastics: A Hybrid Lagrangian/Eulerian Solver for Mesoscale Inelastic Flows (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Power_Plastics_A_Hybrid_Lagrangian_Eulerian_Solver_for_Mesoscale_Inelastic_Flows.pdf|PDF]]
+	- method groups: Optimization / Theory
+- SeamlessNeRF: Stitching Part NeRFs with Gradient Propagation (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SeamlessNeRF_Stitching_Part_NeRFs_with_Gradient_Propagation.pdf|PDF]]
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Subspace_Mixed_Finite_Elements_for_Real_Time_Heterogeneous_Elastodynamics.md|Subspace Mixed Finite Elements for Real-Time Heterogeneous Elastodynamics (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Subspace_Mixed_Finite_Elements_for_Real_Time_Heterogeneous_Elastodynamics.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Subspace Mixed Finite Element Method (MFEM)
+	- datasets: Mammoth, Crab, Sword
+- ToRoS: A Topology Optimization Approach for Designing Robotic Skins (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ToRoS_A_Topology_Optimization_Approach_for_Designing_Robotic_Skins.pdf|PDF]]
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/ECCV_2024/Improving_Hyperparameter_Optimization_with_Checkpointed_Model_Weights.md|Improving Hyperparameter Optimization with Checkpointed Model Weights (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/Improving_Hyperparameter_Optimization_with_Checkpointed_Model_Weights.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Forecasting Model Search (FMS)
+	- datasets: Simple CNN Hub, PTMHub SVHN, PTMHub CIFAR-10
+- [[obsidian-vault/analysis/SGP_GRADUATE_SCHOOL_2024/Monte_Carlo_Geometry_Processing.md|Monte Carlo Geometry Processing (SGP GRADUATE SCHOOL 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SGP_GRADUATE_SCHOOL_2024/Monte_Carlo_Geometry_Processing.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Walk on Spheres (WoS) 及其扩展 (Walk on Stars, Boundary Value Caching, Delta Tracking)
+	- datasets: 复杂几何热传导问题, 高频边界条件 screened Poisson 方程
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Differential_Monte_Carlo_Solver_for_the_Poisson_Equation.md|A Differential Monte Carlo Solver for the Poisson Equation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Differential_Monte_Carlo_Solver_for_the_Poisson_Equation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Differentiable Walk-on-Spheres (可微WoS)
+	- datasets: Wrench, Teapot, Globe
+- An Induce-on-Boundary Magnetostatic Solver for Grid-based Ferrofluids (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2024/CNS-Edit_3D_Shape_Editing_via_Coupled_Neural_Shape_Optimization.md|CNS-Edit: 3D Shape Editing via Coupled Neural Shape Optimization (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CNS_Edit_3D_Shape_Editing_via_Coupled_Neural_Shape_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: CNS-Edit
+	- datasets: ShapeNet Chair, ShapeNet Airplane
+- Differentiable solver for time-dependent deformation problems with contact (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- From Microfacets to Participating Media: A Unified Theory of Light Transport With Stochastic Geometry (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- GIPC: Fast and stable Gauss-Newton optimization of IPC barrier energy (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- HAISOR: Human-Aware Indoor Scene Optimization via Deep Reinforcement Learning (SIGGRAPH 2024 2024)
+	- method groups: Agent / RL / Planning, Optimization / Theory
+- PEA-PODs: Perceptual Evaluation of Algorithms for Power Optimization in XR Displays (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/PEA_PODs_Perceptual_Evaluation_of_Algorithms_for_Power_Optimization_in_XR_Displays.pdf|PDF]]
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+- Preconditioned Nonlinear Conjugate Gradient Method for Real-time Interior-point Hyperelasticity (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- Spin-It Faster: Quadrics Solve All Topology Optimization Problems That Depend Only on Mass Moments (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Spin_It_Faster_Quadrics_Solve_All_Topology_Optimization_Problems_That_Depend_Only_on_Mass_Moments.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Theory of Human Tetrachromatic Color Experience and Printing (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Theory_of_Human_Tetrachromatic_Color_Experience_and_Printing.pdf|PDF]]
+	- method groups: Optimization / Theory
+- View-Independent Adjoint Light Tracing for Lighting Design Optimization (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Walkin_Robin_Walk_on_Stars_with_Robin_Boundary_Conditions.md|Walkin' Robin: Walk on Stars with Robin Boundary Conditions (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Walkin_Robin_Walk_on_Stars_with_Robin_Boundary_Conditions.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Walkin' Robin (WoSt with Robin boundary conditions)
+	- datasets: 多种几何, 常函数解问题
+- X-SLAM: Scalable Dense SLAM for Task-aware Optimization Using CSFD (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- Accelerate Neural Subspace-Based Reduced-Order Solver of Deformable Simulation by Lipschitz Optimization (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Accelerate_Neural_Subspace_Based_Reduced_Order_Solver_of_Deformable_Simulation_by_Lipschitz_Optimization.pdf|PDF]]
+	- method groups: Optimization / Theory
+- CPoser: An Optimization-after-Parsing Approach for Text-to-Pose Generation Using Large Language Models. (SIGGRAPH ASIA 2024 2024)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Differential_Walk_on_Spheres.md|Differential Walk on Spheres (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Differential_Walk_on_Spheres.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+- End-to-end Optimization of Fluidic Lenses (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/End_to_end_Optimization_of_Fluidic_Lenses.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Filtering-Based Reconstruction for Gradient-Domain Rendering (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Filtering_Based_Reconstruction_for_Gradient_Domain_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- From Sim-to-Real: Toward General Event-based Low-light Frame Interpolation with Per-scene Optimization (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/From_Sim_to_Real_Toward_General_Event_based_Low_light_Frame_Interpolation_with_Per_scene_Optimization.pdf|PDF]]
+	- method groups: Optimization / Theory
+- RoMo: A Robust Solver for Full-body Unlabeled Optical Motion Capture (SIGGRAPH ASIA 2024 2024)
+	- method groups: Optimization / Theory, Safety / Privacy / Robustness
+- Spatiotemporal Bilateral Gradient Filtering for Inverse Rendering (SIGGRAPH ASIA 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- [[obsidian-vault/analysis/TOG_2024/Trading_Spaces_Adaptive_Subspace_Time_Integration_for_Contacting_Elastodynamics.md|Trading Spaces: Adaptive Subspace Time Integration for Contacting Elastodynamics (TOG 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/TOG_2024/Trading_Spaces_Adaptive_Subspace_Time_Integration_for_Contacting_Elastodynamics.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Adaptive Subspace Time Integration
+	- datasets: Multiple scenes, Linear solver comparison, Rubber hand on spikes
+- [[obsidian-vault/analysis/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.md|ZTRS: Zero-Imitation End-to-end Autonomous Driving with Trajectory Scoring (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: ZTRS (Zero-Imitation Trajectory Scoring with Exhaustive Policy Optimization)
+	- datasets: Navhard, Navtest, HUGSIM
+- [[obsidian-vault/analysis/CVPR_2025/SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition_with_Oriented_Deformation.md|SODA4MER Dynamic Stereotype Theory Induced Micro expression Recognition with Oriented Deformation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition_with_Oriented_Deformation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: SODA4MER
+	- datasets: SMIC-HS, CASME II, SAMM
+- [[obsidian-vault/analysis/ICCV_2025/MaskControl_Spatio_Temporal_Control_for_Masked_Motion_Synthesis.md|MaskControl: Spatio-Temporal Control for Masked Motion Synthesis (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/MaskControl_Spatio_Temporal_Control_for_Masked_Motion_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: MaskControl
+	- datasets: HumanML3D, HSI-1, HSI-2
+- A Divide-and-Conquer Approach for Global Orientation of Non-Watertight Scene-Level Point Clouds with 0-1 Integer Optimization (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Divide-and-Conquer_Approach_for_Global_Orientation_of_Non-Watertight_Scene-Level_Point_Clouds_with_0-1_Integer_Optimization.pdf|PDF]]
+	- method groups: Optimization / Theory
+- C-Tubes: Design and Optimization of Tubular Structures Composed of Developable Strips (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- DAMO: A Deep Solver for Arbitrary Marker Configuration in Optical Motion Capture (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Designing Balancing Toys Through Mass and Shape Optimization (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- DualMS: Implicit Dual-Channel Minimal Surface Optimization for Heat Exchanger Design (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- EDGE: Epsilon-Difference Gradient Evolution for Buffer-Free Flow Maps (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- End-to-end Surface Optimization for Light Control (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Gaussian Fluids: A Grid-Free Fluid Solver based on Gaussian Spatial Representation (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+- Interactive Optimization of Scaffolded Procedural Patterns (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- James-Stein Gradient Combiner for Inverse Monte Carlo Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- MGPBD: A Multigrid Accelerated Global XPBD Solver (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MGPBD_A_Multigrid_Accelerated_Global_XPBD_Solver.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Neural Co-Optimization of Structural Topology, Manufacturable Layers, and Path Orientations for Fiber-Reinforced Composites (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Solving_partial_differential_equations_in_participating_media.md|Solving partial differential equations in participating media (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Solving_partial_differential_equations_in_participating_media.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Volumetric walk on spheres (VWoS) and volumetric walk on stars (VWoSt)
+	- datasets: Mushroom domain, Connector domain, Bilipid membrane electrostatics
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Stochastic_Barnes_Hut_Approximation_for_Fast_Summation_on_the_GPU.md|Stochastic Barnes-Hut Approximation for Fast Summation on the GPU (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Stochastic_Barnes_Hut_Approximation_for_Fast_Summation_on_the_GPU.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Stochastic Barnes-Hut Approximation
+	- datasets: Power station Coulomb potential, Coulomb potential, grid 1003
+- Stochastic Preconditioning for Neural Field Optimization (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- TetWeave: Isosurface Extraction using On-The-Fly Delaunay Tetrahedral Grids for Gradient-Based Mesh Optimization (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Transformer IMU Calibrator: Dynamic On-body IMU Calibration for Inertial Motion Capture (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Unbiased_Differential_Visibility_Using_Fixed_Step_Walk_on_Spherical_Caps_And_Closest_Silhouettes.md|Unbiased Differential Visibility Using Fixed-Step Walk-on-Spherical-Caps And Closest Silhouettes (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Unbiased_Differential_Visibility_Using_Fixed_Step_Walk_on_Spherical_Caps_And_Closest_Silhouettes.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Fixed-Step Walk-on-Spherical-Caps (WoSC) for Warped-Area Reparameterization
+	- datasets: Voronoi-bunny shadows gradient, Center box gradient, Mirror shadows gradient
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Harmonic_caching_for_walk_on_spheres.md|Harmonic caching for walk on spheres (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Harmonic_caching_for_walk_on_spheres.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Harmonic Caching (HC)
+	- datasets: Poisson方程, 收敛性分析
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Robust_Derivative_Estimation_with_Walk_on_Stars.md|Robust Derivative Estimation with Walk on Stars (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Robust_Derivative_Estimation_with_Walk_on_Stars.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Safety / Privacy / Robustness
+	- methods: Robust Derivative Estimation with Walk on Stars
+	- datasets: 解析纯 Neumann 问题, 混合 Dirichlet-Neumann 问题, 纯 Neumann 问题解重建
+- [[obsidian-vault/analysis/SIGGRAPH_COURSE_2025/State_of_the_Art_in_Grid_Free_Monte_Carlo_Methods_for_Partial_Differential_Equations.md|State of the Art in Grid-Free Monte Carlo Methods for Partial Differential Equations (SIGGRAPH COURSE 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025_COURSE/State_of_the_Art_in_Grid_Free_Monte_Carlo_Methods_for_Partial_Differential_Equations.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Grid-Free Monte Carlo Methods based on Walk on Spheres (WoS) and its extensions
+	- datasets: 具有丰富表面细节和复杂内部结构的真实几何体上的 Poisson 方程
+- [[obsidian-vault/analysis/WACV_2025/Advancing_Weight_and_Channel_Sparsification_with_Enhanced_Saliency.md|Advancing Weight and Channel Sparsification with Enhanced Saliency (WACV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/WACV_2025/Advancing_Weight_and_Channel_Sparsification_with_Enhanced_Saliency.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Agent / RL / Planning
+	- methods: IEE (Iterative Exploitation and Exploration)
+	- datasets: ImageNet1K structured ResNet50, ImageNet1K unstructured ResNet50 90% ERK, ImageNet1K N:M sparsity ResNet50 2
+- [[obsidian-vault/analysis/CVPR_2026/Attack_for_Defense_Adversarial_Agents_for_Point_Prompt_Optimization_Empowering_Segment_Anything_Model.md|Attack for Defense: Adversarial Agents for Point Prompt Optimization Empowering Segment Anything Model (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Attack_for_Defense_Adversarial_Agents_for_Point_Prompt_Optimization_Empowering_Segment_Anything_Model.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: Point Prompt Defender (PPD)
+	- datasets: PASCAL VOC, ISIC, Kvasir
+- [[obsidian-vault/analysis/CVPR_2026/Breaking_the_Scalability_Limit_of_Multi_Projector_Calibration_with_Embedded_Cameras.md|Breaking the Scalability Limit of Multi-Projector Calibration with Embedded Cameras (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Breaking_the_Scalability_Limit_of_Multi_Projector_Calibration_with_Embedded_Cameras.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Multi-Projector Calibration with Embedded Cameras (proposed)
+	- datasets: Outdoor ambient light
+- [[obsidian-vault/analysis/CVPR_2026/FreeForm_Reduced_Order_Deformable_Simulation_from_Particle_Based_Skinning_Eigenmodes.md|FreeForm: Reduced-Order Deformable Simulation from Particle-Based Skinning Eigenmodes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FreeForm_Reduced_Order_Deformable_Simulation_from_Particle_Based_Skinning_Eigenmodes.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: FreeForm
+	- datasets: 标准悬臂梁弯曲, 标准悬臂梁扭转, Thingi10K (Fix Side, Simready (Fix Side
+- [[obsidian-vault/analysis/CVPR_2026/Fresco_Frequency_Spatial_Consistent_Optimization_for_Fine_Grained_Head_Avatar_Modeling.md|Fresco: Frequency-Spatial Consistent Optimization for Fine-Grained Head Avatar Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Fresco_Frequency_Spatial_Consistent_Optimization_for_Fine_Grained_Head_Avatar_Modeling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Fresco
+	- datasets: NeRSemble
+- [[obsidian-vault/analysis/CVPR_2026/Generalizable_Radio_Frequency_Radiance_Fields_for_Spatial_Spectrum_Synthesis.md|Generalizable Radio-Frequency Radiance Fields for Spatial Spectrum Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Generalizable_Radio_Frequency_Radiance_Fields_for_Spatial_Spectrum_Synthesis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: GRaF
+	- datasets: Synthetic indoor RF spatial-spectrum scenes
+- [[obsidian-vault/analysis/CVPR_2026/Gradient_Knows_Best_Mixed_Precision_Quantization_via_Gradient_Guided_Bit_Allocation_for_Super_Resolution.md|Gradient Knows Best: Mixed-Precision Quantization via Gradient-Guided Bit Allocation for Super-Resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Gradient_Knows_Best_Mixed_Precision_Quantization_via_Gradient_Guided_Bit_Allocation_for_Super_Resolution.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: Gradient-Guided Mixed-Precision Quantization with Dynamic Activation Range Normalization (GBA+DAN)
+	- datasets: Urban100, Set5, Test2K
+- [[obsidian-vault/analysis/CVPR_2026/Linear_Fundamental_Matrix_Estimation_from_7_or_5_Points.md|Linear Fundamental Matrix Estimation from 7 or 5 Points (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Linear_Fundamental_Matrix_Estimation_from_7_or_5_Points.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: V-Umlaut线性基础矩阵求解器 (7-point V-Umlaut linear F-matrix solver)
+	- datasets: PhotoTourism, Aachen Day-Night v1.1
+- [[obsidian-vault/analysis/CVPR_2026/No_Calibration_No_Depth_No_Problem_Cross_Sensor_View_Synthesis_with_3D_Consistency.md|No Calibration, No Depth, No Problem: Cross-Sensor View Synthesis with 3D Consistency (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/No_Calibration_No_Depth_No_Problem_Cross_Sensor_View_Synthesis_with_3D_Consistency.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Match‑Densify‑Consolidate (CADF + Self‑matching + RGB‑X 3DGS)
+	- datasets: METU-VisTIR-Cloudy, RGB-NIR-Stereo, RGBT-Scenes
+- [[obsidian-vault/analysis/CVPR_2026/QuadSync_Quadrifocal_Tensor_Synchronization_via_Tucker_Decomposition.md|QuadSync: Quadrifocal Tensor Synchronization via Tucker Decomposition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/QuadSync_Quadrifocal_Tensor_Synchronization_via_Tucker_Decomposition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: QuadSync (IRLS-ADMM) and Joint Optimization (QuadSync, TrifocalSync, Essential matrices)
+	- datasets: ETH3D - courtyard, EPFL - FountainP11, EPFL - CastleP19
+- [[obsidian-vault/analysis/CVPR_2026/TaskForce_Cooperative_Multi_agent_Reinforcement_Learning_for_Multi_task_Optimization.md|TaskForce: Cooperative Multi-agent Reinforcement Learning for Multi-task Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TaskForce_Cooperative_Multi_agent_Reinforcement_Learning_for_Multi_task_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: TaskForce
+	- datasets: NYU-v2, Cityscapes
+- [[obsidian-vault/analysis/CVPR_2026/TESO_Online_Tracking_of_Essential_Matrix_by_Stochastic_Optimization.md|TESO: Online Tracking of Essential Matrix by Stochastic Optimization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/TESO_Online_Tracking_of_Essential_Matrix_by_Stochastic_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: TESO
+	- datasets: CARLA-Drift, KITTI, MAN TruckScenes
+- [[obsidian-vault/analysis/ICLR_2026/boldsymbolpartialinfty_Grid_A_Neural_Differential_Equation_Solver_with_Differentiable_Feature_Grids.md|$\\boldsymbol{\\partial^\\infty}$-Grid: A Neural Differential Equation Solver with Differentiable Feature Grids (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/boldsymbolpartialinfty_Grid_A_Neural_Differential_Equation_Solver_with_Differentiable_Feature_Grids.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: ∂∞-Grid
+	- datasets: 泊松方程图像重建
+- [[obsidian-vault/analysis/ICLR_2026/mathbfLi_2_A_Framework_on_Dynamics_of_Feature_Emergence_and_Delayed_Generalization.md|$\\mathbf{Li_2}$: A Framework on Dynamics of Feature Emergence and Delayed Generalization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/mathbfLi_2_A_Framework_on_Dynamics_of_Feature_Emergence_and_Delayed_Generalization.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Li2 框架
+	- datasets: 模加法任务, 多层网络模加法任务
+- [[obsidian-vault/analysis/ICLR_2026/muLO_Compute_Efficient_Meta_Generalization_of_Learned_Optimizers.md|$\\mu$LO: Compute-Efficient Meta-Generalization of Learned Optimizers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/muLO_Compute_Efficient_Meta_Generalization_of_Learned_Optimizers.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: µLO（µ-参数化学习型优化器）
+	- datasets: MLP IN32, MLP IN32 W=8192, MLP C10 W=8192
+- [[obsidian-vault/analysis/ICLR_2026/Noisier_Noise_Contrastive_Estimation_is_Almost_Maximum_Likelihood.md|``Noisier'’ Noise Contrastive Estimation is (Almost) Maximum Likelihood (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Noisier_Noise_Contrastive_Estimation_is_Almost_Maximum_Likelihood.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: Noisier Noise Contrastive Estimation (N²CE)
+	- datasets: SVHN, CelebA, CIFAR-10
+- [[obsidian-vault/analysis/ICLR_2026/A_Block_Coordinate_Descent_Method_for_Nonsmooth_Composite_Optimization_under_Orthogonality_Constraints.md|A Block Coordinate Descent Method for Nonsmooth Composite Optimization under Orthogonality Constraints (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Block_Coordinate_Descent_Method_for_Nonsmooth_Composite_Optimization_under_Orthogonality_Constraints.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: OBCD
+	- datasets: L0-regularized SPCA, λ=100), L1-regularized SPCA
+- [[obsidian-vault/analysis/ICLR_2026/A_Convergence_Analysis_of_Adaptive_Optimizers_under_Floating_point_Quantization.md|A Convergence Analysis of Adaptive Optimizers under Floating-point Quantization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Convergence_Analysis_of_Adaptive_Optimizers_under_Floating_point_Quantization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: 量化自适应优化器分析框架（Quantized Adam & Quantized Muon）
+	- datasets: Rosenbrock函数, CIFAR-10
+- [[obsidian-vault/analysis/ICLR_2026/A_Derandomization_Framework_for_Structure_Discovery_Applications_in_Neural_Networks_and_Beyond.md|A Derandomization Framework for Structure Discovery: Applications in Neural Networks and Beyond (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Derandomization_Framework_for_Structure_Discovery_Applications_in_Neural_Networks_and_Beyond.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 去随机化框架（Derandomization Framework）
+	- datasets: 单层NN玩具示例, 两层NN教师-学生设定, MAXCUT
+- [[obsidian-vault/analysis/ICLR_2026/A_Faster_Parameter_Free_Regret_Matching_Algorithm.md|A Faster Parameter-Free Regret Matching Algorithm (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Faster_Parameter_Free_Regret_Matching_Algorithm.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Monotone Increasing Smooth Predictive Regret Matching+ (MI-SPRM+)
+	- datasets: 随机生成两人零和 NFG, 标准 EFG 基准, HUNL Subgames
+- [[obsidian-vault/analysis/ICLR_2026/A_Hidden_Semantic_Bottleneck_in_Conditional_Embeddings_of_Diffusion_Transformers.md|A Hidden Semantic Bottleneck in Conditional Embeddings of Diffusion Transformers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Hidden_Semantic_Bottleneck_in_Conditional_Embeddings_of_Diffusion_Transformers.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Generative / Diffusion / Flow
+	- methods: 条件嵌入剪枝（Conditional Embedding Pruning）
+	- datasets: ImageNet-1K
+- [[obsidian-vault/analysis/ICLR_2026/A_Hierarchical_Circuit_Symbolic_Discovery_Framework_for_Efficient_Logic_Optimization.md|A Hierarchical Circuit Symbolic Discovery Framework for Efficient Logic Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Hierarchical_Circuit_Symbolic_Discovery_Framework_for_Efficient_Logic_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Hierarchical Circuit Symbolic Discovery Framework (HIS)
+	- datasets: EPFL, EPFL + IWLS
+- [[obsidian-vault/analysis/ICLR_2026/A_Memory_Efficient_Hierarchical_Algorithm_for_Large_scale_Optimal_Transport_Problems.md|A Memory-Efficient Hierarchical Algorithm for Large-scale Optimal Transport Problems (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Memory_Efficient_Hierarchical_Algorithm_for_Large_scale_Optimal_Transport_Problems.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: HALO (Hierarchical Algorithm for Large-scale Optimal Transport)
+	- datasets: DOTmark, ModelNet10
+- [[obsidian-vault/analysis/ICLR_2026/A_Near_Optimal_Best_of_Both_Worlds_Algorithm_for_Federated_Bandits.md|A Near-Optimal Best-of-Both-Worlds Algorithm for Federated Bandits (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Near_Optimal_Best_of_Both_Worlds_Algorithm_for_Federated_Bandits.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: FEDFTRL
+	- datasets: 合成数据集, MovieLens数据集
+- [[obsidian-vault/analysis/ICLR_2026/A_New_Approach_to_Controlling_Linear_Dynamical_Systems.md|A New Approach to Controlling Linear Dynamical Systems (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_New_Approach_to_Controlling_Linear_Dynamical_Systems.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: Online Spectral Control (OSC)
+	- datasets: 线性动力系统, 非线性动力系统
+- [[obsidian-vault/analysis/ICLR_2026/A_New_Initialization_to_Control_Gradients_in_Sinusoidal_Neural_Networks.md|A New Initialization to Control Gradients in Sinusoidal Neural Networks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_New_Initialization_to_Control_Gradients_in_Sinusoidal_Neural_Networks.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: SIREN Proposed (σ_a=0 initialization)
+	- datasets: 图像拟合
+- [[obsidian-vault/analysis/ICLR_2026/A_Physics_Inspired_Optimizer_Velocity_Regularized_Adam.md|A Physics-Inspired Optimizer: Velocity Regularized Adam (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Physics_Inspired_Optimizer_Velocity_Regularized_Adam.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: VRAdam
+	- datasets: WikiText-2, CIFAR-10, GridWorld
+- [[obsidian-vault/analysis/ICLR_2026/A_Problem_Oriented_Perspective_and_Anchor_Verification_for_Code_Optimization.md|A Problem-Oriented Perspective and Anchor Verification for Code Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Problem_Oriented_Perspective_and_Anchor_Verification_for_Code_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: 问题导向视角与锚点验证框架
+	- datasets: PIE/PCO测试集, PCO测试集
+- [[obsidian-vault/analysis/ICLR_2026/A_Recovery_Guarantee_for_Sparse_Neural_Networks.md|A Recovery Guarantee for Sparse Neural Networks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Recovery_Guarantee_for_Sparse_Neural_Networks.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Iterative Hard Thresholding (IHT) for Sparse MLP Recovery
+	- datasets: Planted sparse scalar-output MLP, Planted sparse vector-output MLP
+- [[obsidian-vault/analysis/ICLR_2026/A_Representer_Theorem_for_Hawkes_Processes_via_Penalized_Least_Squares_Minimization.md|A Representer Theorem for Hawkes Processes via Penalized Least Squares Minimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Representer_Theorem_for_Hawkes_Processes_via_Penalized_Least_Squares_Minimization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Ours
+	- datasets: Mutually-exciting scenario
+- [[obsidian-vault/analysis/ICLR_2026/A_Scalable_Constant_Factor_Approximation_Algorithm_for_W_p_Optimal_Transport.md|A Scalable Constant-Factor Approximation Algorithm for $W_p$ Optimal Transport (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Scalable_Constant_Factor_Approximation_Algorithm_for_W_p_Optimal_Transport.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 基于多级聚类有向 spanner 的 $W_p$ 最优传输近似算法
+	- datasets: 合成正态分布数据, MNIST 数据集, 均匀分布数据
+- [[obsidian-vault/analysis/ICLR_2026/A_Scalable_Distributed_Framework_for_Multimodal_GigaVoxel_Image_Registration.md|A Scalable Distributed Framework for Multimodal GigaVoxel Image Registration (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Scalable_Distributed_Framework_for_Multimodal_GigaVoxel_Image_Registration.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: FFDP (Flash Fused Distributed Primitives)
+	- datasets: Faux-OASIS
+- [[obsidian-vault/analysis/ICLR_2026/A_Sharp_KL_Convergence_Analysis_for_Diffusion_Models_under_Minimal_Assumptions.md|A Sharp KL Convergence Analysis for Diffusion Models under Minimal Assumptions (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Sharp_KL_Convergence_Analysis_for_Diffusion_Models_under_Minimal_Assumptions.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Generative / Diffusion / Flow
+	- methods: ODE-step + noise-step 生成算法（Algorithm 1）
+	- datasets: 理论分析
+- [[obsidian-vault/analysis/ICLR_2026/A_Statistical_Learning_Perspective_on_Semi_dual_Adversarial_Neural_Optimal_Transport_Solvers.md|A Statistical Learning Perspective on Semi-dual Adversarial Neural Optimal Transport Solvers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Statistical_Learning_Perspective_on_Semi_dual_Adversarial_Neural_Optimal_Transport_Solvers.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Minimax Quadratic OT Solver (半对偶对抗神经最优传输求解器)
+	- datasets: 合成高斯分布
+- [[obsidian-vault/analysis/ICLR_2026/A_Statistical_Theory_of_Overfitting_for_Imbalanced_Classification.md|A Statistical Theory of Overfitting for Imbalanced Classification (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Statistical_Theory_of_Overfitting_for_Imbalanced_Classification.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 边际重平衡SVM（Margin-Rebalanced SVM）
+	- datasets: IFNB单细胞RNA-seq
+- [[obsidian-vault/analysis/ICLR_2026/A_Step_to_Decouple_Optimization_in_3DGS.md|A Step to Decouple Optimization in 3DGS (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Step_to_Decouple_Optimization_in_3DGS.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: AdamW-GS
+	- datasets: MipNerf360
+- [[obsidian-vault/analysis/ICLR_2026/A_Study_on_PAVE_Specification_for_Learnware.md|A Study on PAVE Specification for Learnware (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Study_on_PAVE_Specification_for_Learnware.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: Parameter Vector (PAVE) Specification
+	- datasets: NLP Datasets, Computer Vision Datasets, Medical LLM Benchmarks
+- [[obsidian-vault/analysis/ICLR_2026/A_Tale_of_Two_Geometries_Adaptive_Optimizers_and_Non_Euclidean_Descent.md|A Tale of Two Geometries: Adaptive Optimizers and Non-Euclidean Descent (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Tale_of_Two_Geometries_Adaptive_Optimizers_and_Non_Euclidean_Descent.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 统一自适应优化器框架（Well-Structured Preconditioner Set, Algorithm 1）
+- [[obsidian-vault/analysis/ICLR_2026/A_Theoretical_Analysis_of_Mambas_Training_Dynamics_Filtering_Relevant_Features_for_Generalization_in_State_Space_Models.md|A Theoretical Analysis of Mamba’s Training Dynamics: Filtering Relevant Features for Generalization in State Space Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Theoretical_Analysis_of_Mambas_Training_Dynamics_Filtering_Relevant_Features_for_Generalization_in_State_Space_Models.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Simplified Mamba block with input-dependent gating and two-layer MLP
+	- datasets: Synthetic majority-voting data, Synthetic locality-structured data
+- [[obsidian-vault/analysis/ICLR_2026/A_Unifying_View_of_Coverage_in_Linear_Off_policy_Evaluation.md|A Unifying View of Coverage in Linear Off-policy Evaluation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Unifying_View_of_Coverage_in_Linear_Off_policy_Evaluation.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: 基于特征动态覆盖率的LSTDQ分析
+- [[obsidian-vault/analysis/ICLR_2026/ACE_Attribution_Controlled_Knowledge_Editing_for_Multi_hop_Factual_Recall.md|ACE: Attribution-Controlled Knowledge Editing for Multi-hop Factual Recall (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ACE_Attribution_Controlled_Knowledge_Editing_for_Multi_hop_Factual_Recall.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: ACE (Attribution-Controlled Knowledge Editing)
+	- datasets: MQuAKE-3K
+- [[obsidian-vault/analysis/ICLR_2026/Achieving_Approximate_Symmetry_Is_Exponentially_Easier_than_Exact_Symmetry.md|Achieving Approximate Symmetry Is Exponentially Easier than Exact Symmetry (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Achieving_Approximate_Symmetry_Is_Exponentially_Easier_than_Exact_Symmetry.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Random Subset Group Averaging（随机子集群平均）
+	- datasets: 合成不变回归任务(d=20, G={±1}^d
+- [[obsidian-vault/analysis/ICLR_2026/ACPBench_Hard_Unrestrained_Reasoning_about_Action_Change_and_Planning.md|ACPBench Hard: Unrestrained Reasoning about Action, Change, and Planning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ACPBench_Hard_Unrestrained_Reasoning_about_Action_Change_and_Planning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: ACPBench Hard 基准测试
+	- datasets: ACPBench Hard
+- [[obsidian-vault/analysis/ICLR_2026/Action_Chunking_and_Data_Augmentation_Yield_Exponential_Improvements_in_Behavior_Cloning_for_Continuous_Spaces.md|Action Chunking and Data Augmentation Yield Exponential Improvements in Behavior Cloning for Continuous Spaces (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Action_Chunking_and_Data_Augmentation_Yield_Exponential_Improvements_in_Behavior_Cloning_for_Continuous_Spaces.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: 动作分块与探索性噪声注入（Action-Chunking & Noise-Injected Data Collection）
+	- datasets: Synthetic EISS dynamics, HalfCheetah-v5, Humanoid-v5
+- [[obsidian-vault/analysis/ICLR_2026/Activation_Function_Design_Sustains_Plasticity_in_Continual_Learning.md|Activation Function Design Sustains Plasticity in Continual Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Activation_Function_Design_Sustains_Plasticity_in_Continual_Learning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: Smooth-Leaky 与 Randomized Smooth-Leaky（及其扩展 Bo-PReLU、R-SeLU）
+	- datasets: Permuted MNIST, Scaling Shock Stress Test
+- [[obsidian-vault/analysis/ICLR_2026/Active_Learning_for_Decision_Trees_with_Provable_Guarantees.md|Active Learning for Decision Trees with Provable Guarantees (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Active_Learning_for_Decision_Trees_with_Provable_Guarantees.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Data Curation / Synthesis
+	- methods: Algorithm 2（乘性误差主动学习算法）
+- [[obsidian-vault/analysis/ICLR_2026/AdaCache_Adaptive_Caching_and_Context_Augmentation_for_Efficient_LLM_Serving.md|AdaCache: Adaptive Caching and Context Augmentation for Efficient LLM Serving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AdaCache_Adaptive_Caching_and_Context_Augmentation_for_Efficient_LLM_Serving.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: AdaCache
+	- datasets: MMLU, MMLU-Pro, SuperGPQA
+- [[obsidian-vault/analysis/ICLR_2026/Adapt_Data_to_Model_Adaptive_Transformation_Optimization_for_Domain_shared_Time_Series_Foundation_Models.md|Adapt Data to Model: Adaptive Transformation Optimization for Domain-shared Time Series Foundation Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adapt_Data_to_Model_Adaptive_Transformation_Optimization_for_Domain_shared_Time_Series_Foundation_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: TATO (Time-series Adaptive Transformation Optimization)
+	- datasets: ETTh1, ETTm2, Exchange
+- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Acquisition_Selection_for_Bayesian_Optimization_with_Large_Language_Models.md|Adaptive Acquisition Selection for Bayesian Optimization with Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Acquisition_Selection_for_Bayesian_Optimization_with_Large_Language_Models.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: LMABO (Language Model-Assisted Adaptive Bayesian Optimization)
+- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Collaboration_with_Humans_Metacognitive_Policy_Optimization_for_Multi_Agent_LLMs_with_Continual_Learning.md|Adaptive Collaboration with Humans: Metacognitive Policy Optimization for Multi-Agent LLMs with Continual Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Collaboration_with_Humans_Metacognitive_Policy_Optimization_for_Multi_Agent_LLMs_with_Continual_Learning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: Human-In-the-Loop Multi-Agent Collaboration (HILA) with Dual-Loop Policy Optimization (DLPO)
+	- datasets: GSM8K, AMC, AIME
+- [[obsidian-vault/analysis/ICLR_2026/AdaRank_Adaptive_Rank_Pruning_for_Enhanced_Model_Merging.md|AdaRank: Adaptive Rank Pruning for Enhanced Model Merging (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AdaRank_Adaptive_Rank_Pruning_for_Enhanced_Model_Merging.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: AdaRank (Adaptive Rank Pruning)
+- [[obsidian-vault/analysis/ICLR_2026/Almost_Bayesian_Dynamics_of_SGD_Through_Singular_Learning_Theory.md|Almost Bayesian: Dynamics of SGD Through Singular Learning Theory (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Almost_Bayesian_Dynamics_of_SGD_Through_Singular_Learning_Theory.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 基于分数 Fokker-Planck 方程的 SGD 多孔介质扩散模型
+	- datasets: TinyStories, TinyLlama, ResNet
+- [[obsidian-vault/analysis/ICLR_2026/An_Information_Theoretic_Parameter_Free_Bayesian_Framework_for_Probing_Labeled_Dependency_Trees_from_Attention_Score.md|An Information-Theoretic Parameter-Free Bayesian Framework for Probing Labeled Dependency Trees from Attention Score (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/An_Information_Theoretic_Parameter_Free_Bayesian_Framework_for_Probing_Labeled_Dependency_Trees_from_Attention_Score.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Generative / Diffusion / Flow
+	- methods: IPBP (Information-theoretic Parameter-free Bayesian Probing)
+	- datasets: UD 2.9 English, Head-Selection Intrinsic Evaluation
+- [[obsidian-vault/analysis/ICLR_2026/Architecture_Agnostic_Test_Time_Adaptation_via_Backprop_Free_Embedding_Alignment.md|Architecture-Agnostic Test-Time Adaptation via Backprop-Free Embedding Alignment (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Architecture_Agnostic_Test_Time_Adaptation_via_Backprop_Free_Embedding_Alignment.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: Progressive Embedding Alignment (PEA)
+	- datasets: ImageNet-C, CIFAR100-C, CIFAR10-C
+- [[obsidian-vault/analysis/ICLR_2026/Asynchronous_Policy_Gradient_Aggregation_for_Efficient_Distributed_Reinforcement_Learning.md|Asynchronous Policy Gradient Aggregation for Efficient Distributed Reinforcement Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Asynchronous_Policy_Gradient_Aggregation_for_Efficient_Distributed_Reinforcement_Learning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: Rennala NIGT and Malenia NIGT
+	- datasets: Humanoid-v4, Reacher-v4, Walker2d-v4
+- [[obsidian-vault/analysis/ICLR_2026/AutoQD_Automatic_Discovery_of_Diverse_Behaviors_with_Quality_Diversity_Optimization.md|AutoQD: Automatic Discovery of Diverse Behaviors with Quality-Diversity Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AutoQD_Automatic_Discovery_of_Diverse_Behaviors_with_Quality_Diversity_Optimization.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: AutoQD
+	- datasets: Ant, Swimmer, BipedalWalker
+- [[obsidian-vault/analysis/ICLR_2026/Avoid_Catastrophic_Forgetting_with_Rank_1_Fisher_from_Diffusion_Models.md|Avoid Catastrophic Forgetting with Rank-1 Fisher from Diffusion Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Avoid_Catastrophic_Forgetting_with_Rank_1_Fisher_from_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Rank-1 EWC with Generative Distillation
+	- datasets: MNIST, FashionMNIST
+- [[obsidian-vault/analysis/ICLR_2026/Binomial_Gradient_Based_Meta_Learning_for_Enhanced_Meta_Gradient_Estimation.md|Binomial Gradient-Based Meta-Learning for Enhanced Meta-Gradient Estimation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Binomial_Gradient_Based_Meta_Learning_for_Enhanced_Meta_Gradient_Estimation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: BinomMAML (BinomGBML applied to MAML)
+	- datasets: Synthetic sinusoid regression, miniImageNet 5-way 1-shot, miniImageNet 5-way 5-shot
+- [[obsidian-vault/analysis/ICLR_2026/Block_Recurrent_Dynamics_in_Vision_Transformers.md|Block Recurrent Dynamics in Vision Transformers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Block_Recurrent_Dynamics_in_Vision_Transformers.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Vision / Multimodal / 3D
+	- methods: Raptor (Recurrent Approximations to Phase‑structured TransfORmers)
+	- datasets: ImageNet-1k, ADE20k, NYUv2
+- [[obsidian-vault/analysis/ICLR_2026/Breaking_Gradient_Temporal_Collinearity_for_Robust_Spiking_Neural_Networks.md|Breaking Gradient Temporal Collinearity for Robust Spiking Neural Networks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Breaking_Gradient_Temporal_Collinearity_for_Robust_Spiking_Neural_Networks.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Structured Temporal Orthogonal Decorrelation (STOD)
+	- datasets: CIFAR-10, CIFAR-100, ImageNet
+- [[obsidian-vault/analysis/ICLR_2026/Characterization_and_Learning_of_Causal_Graphs_with_Latent_Confounders_and_Post_treatment_Selection_from_Interventional_Data.md|Characterization and Learning of Causal Graphs with Latent Confounders and Post-treatment Selection from Interventional Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Characterization_and_Learning_of_Causal_Graphs_with_Latent_Confounders_and_Post_treatment_Selection_from_Interventional_Data.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: F-FCI
+	- datasets: Synthetic graphs with latent confounders and post-treatment selection, Synthetic graphs with latent confounders and post-treatment selection (soft intervention, Synthetic graphs with latent confounders and post-treatment selection
+- [[obsidian-vault/analysis/ICLR_2026/CLUE_Conflict_guided_Localization_for_LLM_Unlearning_Framework.md|CLUE: Conflict-guided Localization for LLM Unlearning Framework (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/CLUE_Conflict_guided_Localization_for_LLM_Unlearning_Framework.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: CLUE
+	- datasets: WMDP Cyber / Winogrande, WMDP Cyber / SST-2, WMDP Cyber / RTE
+- [[obsidian-vault/analysis/ICLR_2026/Constraint_Matters_Multi_Modal_Representation_for_Reducing_Mixed_Integer_Linear_programming.md|Constraint Matters: Multi-Modal Representation for Reducing Mixed-Integer Linear programming (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Constraint_Matters_Multi_Modal_Representation_for_Reducing_Mixed_Integer_Linear_programming.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Vision / Multimodal / 3D
+	- methods: Constraint-based Model Reduction with Multi-Modal Representation (Ours)
+	- datasets: CA, MVC, Large-scale CA
+- [[obsidian-vault/analysis/ICLR_2026/Discount_Model_Search_for_Quality_Diversity_Optimization_in_High_Dimensional_Measure_Spaces.md|Discount Model Search for Quality Diversity Optimization in High-Dimensional Measure Spaces (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Discount_Model_Search_for_Quality_Diversity_Optimization_in_High_Dimensional_Measure_Spaces.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Discount Model Search (DMS)
+- [[obsidian-vault/analysis/ICLR_2026/Distributional_Equivalence_in_Linear_Non_Gaussian_Latent_Variable_Cyclic_Causal_Models_Characterization_and_Learning.md|Distributional Equivalence in Linear Non-Gaussian Latent-Variable Cyclic Causal Models: Characterization and Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Distributional_Equivalence_in_Linear_Non_Gaussian_Latent_Variable_Cyclic_Causal_Models_Characterization_and_Learning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: glvLiNG
+	- datasets: Erdős-Rényi随机图, l=1, avgdeg=1
+- [[obsidian-vault/analysis/ICLR_2026/DriveVLA_W0_World_Models_Amplify_Data_Scaling_Law_in_Autonomous_Driving.md|DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DriveVLA_W0_World_Models_Amplify_Data_Scaling_Law_in_Autonomous_Driving_1311ad3bd77a.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: DriveVLA-W0
+	- datasets: NAVSIM v1, NAVSIM v2, In-house 70M frames
+- [[obsidian-vault/analysis/ICLR_2026/DTO_KD_Dynamic_Trade_off_Optimization_for_Effective_Knowledge_Distillation.md|DTO-KD: Dynamic Trade-off Optimization for Effective Knowledge Distillation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DTO_KD_Dynamic_Trade_off_Optimization_for_Effective_Knowledge_Distillation.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: DTO-KD
+	- datasets: ImageNet-1K, COCO
+- [[obsidian-vault/analysis/ICLR_2026/Efficient_Resource_Constrained_Training_of_Transformers_via_Subspace_Optimization.md|Efficient Resource-Constrained Training of Transformers via Subspace Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Efficient_Resource_Constrained_Training_of_Transformers_via_Subspace_Optimization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: WASI (Weight-Activation Subspace Iteration)
+	- datasets: ViT on CIFAR-10, SwinT on multiple datasets, TinyLlama on BoolQ
+- [[obsidian-vault/analysis/ICLR_2026/FALCON_Few_step_Accurate_Likelihoods_for_Continuous_Flows.md|FALCON: Few-step Accurate Likelihoods for Continuous Flows (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FALCON_Few_step_Accurate_Likelihoods_for_Continuous_Flows.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: FALCON (Few-step Accurate Likelihoods for Continuous Flows)
+	- datasets: Tri-alanine, Alanine tetrapeptide, Hexa-alanine
+- [[obsidian-vault/analysis/ICLR_2026/Fast_Escape_Slow_Convergence_Learning_Dynamics_of_Phase_Retrieval_under_Power_Law_Data.md|Fast Escape, Slow Convergence: Learning Dynamics of Phase Retrieval under Power-Law Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Fast_Escape_Slow_Convergence_Learning_Dynamics_of_Phase_Retrieval_under_Power_Law_Data.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: Three-phase Gradient Flow Analysis for Anisotropic Phase Retrieval
+	- datasets: Synthetic Phase Retrieval under Power-Law Covariance, Synthetic Data
+- [[obsidian-vault/analysis/ICLR_2026/Fast_training_of_accurate_physics_informed_neural_networks_without_gradient_descent.md|Fast training of accurate physics-informed neural networks without gradient descent (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Fast_training_of_accurate_physics_informed_neural_networks_without_gradient_descent.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Frozen-PINN
+	- datasets: 线性对流方程, 波动方程
+- [[obsidian-vault/analysis/ICLR_2026/FedDAG_Clustered_Federated_Learning_via_Global_Data_and_Gradient_Integration_for_Heterogeneous_Environments.md|FedDAG: Clustered Federated Learning via Global Data and Gradient Integration for Heterogeneous Environments (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FedDAG_Clustered_Federated_Learning_via_Global_Data_and_Gradient_Integration_for_Heterogeneous_Environments.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: FedDAG
+	- datasets: CIFAR-10, FMNIST
+- [[obsidian-vault/analysis/ICLR_2026/FlexHiNM_GP_Flexible_Hierarchical_Pruning_via_Region_Allocation_and_Channel_Permutation.md|FlexHiNM-GP: Flexible Hierarchical Pruning via Region Allocation and Channel Permutation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FlexHiNM_GP_Flexible_Hierarchical_Pruning_via_Region_Allocation_and_Channel_Permutation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: FlexHiNM‑GP
+	- datasets: QQP, SST-2, SQuAD v1.1
+- [[obsidian-vault/analysis/ICLR_2026/From_Markov_to_Laplace_How_Mamba_In_Context_Learns_Markov_Chains.md|From Markov to Laplace: How Mamba In-Context Learns Markov Chains (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/From_Markov_to_Laplace_How_Mamba_In_Context_Learns_Markov_Chains.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: MambaZero
+	- datasets: Random first-order Markov chains, WikiText-103, PG-19
+- [[obsidian-vault/analysis/ICLR_2026/Gelato_Graph_Edit_Distance_via_Autoregressive_Neural_Combinatorial_Optimization.md|Gelato: Graph Edit Distance via Autoregressive Neural Combinatorial Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Gelato_Graph_Edit_Distance_via_Autoregressive_Neural_Combinatorial_Optimization.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: GELATO
+	- datasets: AIDS, LINUX
+- [[obsidian-vault/analysis/ICLR_2026/Global_Resolution_Optimal_Multi_Draft_Speculative_Sampling_via_Convex_Optimization.md|Global Resolution: Optimal Multi-Draft Speculative Sampling via Convex Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Global_Resolution_Optimal_Multi_Draft_Speculative_Sampling_via_Convex_Optimization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Global Resolution
+	- datasets: Llama-3 70B/8B, Gemma-2 27B/2B
+- [[obsidian-vault/analysis/ICLR_2026/HATSolver_Learning_Gröbner_Bases_with_Hierarchical_Attention_Transformers.md|HATSolver: Learning Gröbner Bases with Hierarchical Attention Transformers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/HATSolver_Learning_Gröbner_Bases_with_Hierarchical_Attention_Transformers.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: HATSolver（Hierarchical Attention Transformer for Gröbner bases）
+	- datasets: density 90%, F7, density 30%
+- [[obsidian-vault/analysis/ICLR_2026/HeuriGym_An_Agentic_Benchmark_for_LLM_Crafted_Heuristics_in_Combinatorial_Optimization.md|HeuriGym: An Agentic Benchmark for LLM-Crafted Heuristics in Combinatorial Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/HeuriGym_An_Agentic_Benchmark_for_LLM_Crafted_Heuristics_in_Combinatorial_Optimization.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: HeuriGym
+	- datasets: HeuriGym, 对比进化框架
+- [[obsidian-vault/analysis/ICLR_2026/High_dimensional_limit_theorems_for_SGD_Momentum_and_Adaptive_Step_sizes.md|High-dimensional limit theorems for SGD: Momentum and Adaptive Step-sizes (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/High_dimensional_limit_theorems_for_SGD_Momentum_and_Adaptive_Step_sizes.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: SGD with momentum (SGD-M) 及带有梯度单位范数预条件的 SGD（SGD-U）的高维标度极限框架
+	- datasets: Spiked Tensor / Matrix PCA, Single Index Model=x^7+4x^4 with noise), Matrix PCA
+- [[obsidian-vault/analysis/ICLR_2026/How_Do_Transformers_Learn_to_Associate_Tokens_Gradient_Leading_Terms_Bring_Mechanistic_Interpretability.md|How Do Transformers Learn to Associate Tokens: Gradient Leading Terms Bring Mechanistic Interpretability (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/How_Do_Transformers_Learn_to_Associate_Tokens_Gradient_Leading_Terms_Bring_Mechanistic_Interpretability.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 梯度主导项表征理论（Gradient Leading Term Characterization）
+	- datasets: TinyStories, OpenWebText
+- [[obsidian-vault/analysis/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.md|In-the-Flow Agentic System Optimization for Effective Planning and Tool Use (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: AGENTFLOW (with Flow-GRPO)
+	- datasets: Bamboogle, HotpotQA, Musique
+- [[obsidian-vault/analysis/ICLR_2026/Learning_to_Segment_for_Vehicle_Routing_Problems.md|Learning to Segment for Vehicle Routing Problems (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Learning_to_Segment_for_Vehicle_Routing_Problems.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Learning to Segment (L2Seg) with First-Segment-Then-Aggregate (FSTA)
+	- datasets: CVRP2k, CVRP5k, VRPTW5k
+- [[obsidian-vault/analysis/ICLR_2026/LLMs_Get_Lost_In_Multi_Turn_Conversation.md|LLMs Get Lost In Multi-Turn Conversation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/LLMs_Get_Lost_In_Multi_Turn_Conversation.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: Sharded Simulation Framework
+	- datasets: 自定义六项任务集, 同上, 翻译任务
+- [[obsidian-vault/analysis/ICLR_2026/LogART_Pushing_the_Limit_of_Efficient_Logarithmic_Post_Training_Quantization.md|LogART: Pushing the Limit of Efficient Logarithmic Post-Training Quantization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/LogART_Pushing_the_Limit_of_Efficient_Logarithmic_Post_Training_Quantization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: LogART (Logarithmic Adaptive Rounding Techniques)
+	- datasets: WikiText-2, ImageNet
+- [[obsidian-vault/analysis/ICLR_2026/Long_Context_Attention_Benchmark_From_Kernel_Efficiency_to_Distributed_Context_Parallelism.md|Long-Context Attention Benchmark: From Kernel Efficiency to Distributed Context Parallelism (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Long_Context_Attention_Benchmark_From_Kernel_Efficiency_to_Distributed_Context_Parallelism.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: LongCA-bench
+	- datasets: Sparse Kernel Efficiency, Dense Kernel Efficiency, Context Parallelism
+- [[obsidian-vault/analysis/ICLR_2026/MaskCO_Masked_Generation_Drives_Effective_Representation_Learning_and_Exploiting_for_Combinatorial_Optimization.md|MaskCO: Masked Generation Drives Effective Representation Learning and Exploiting for Combinatorial Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MaskCO_Masked_Generation_Drives_Effective_Representation_Learning_and_Exploiting_for_Combinatorial_Optimization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: MaskCO
+	- datasets: TSP-100, TSP-1000, CVRP-1000
+- [[obsidian-vault/analysis/ICLR_2026/Multiplayer_Nash_Preference_Optimization.md|Multiplayer Nash Preference Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Multiplayer_Nash_Preference_Optimization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: MNPO (Multiplayer Nash Preference Optimization)
+	- datasets: Arena-Hard, AlpacaEval 2.0
+- [[obsidian-vault/analysis/ICLR_2026/Muon_Outperforms_Adam_in_Tail_End_Associative_Memory_Learning.md|Muon Outperforms Adam in Tail-End Associative Memory Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Muon_Outperforms_Adam_in_Tail_End_Associative_Memory_Learning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/ICLR_2026/Non_Convex_Federated_Optimization_under_Cost_Aware_Client_Selection.md|Non-Convex Federated Optimization under Cost-Aware Client Selection (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Non_Convex_Federated_Optimization_under_Cost_Aware_Client_Selection.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: I-CGM-RG-SAGA (Inexact Composite Gradient Method with Recursive Gradient SAGA estimator)
+	- datasets: EMNIST, CIFAR10, LIBSVM logistic regression with nonconvex regularizer
+- [[obsidian-vault/analysis/ICLR_2026/Obscure_but_Effective_Classical_Chinese_Jailbreak_Prompt_Optimization_via_Bio_Inspired_Search.md|Obscure but Effective: Classical Chinese Jailbreak Prompt Optimization via Bio-Inspired Search (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Obscure_but_Effective_Classical_Chinese_Jailbreak_Prompt_Optimization_via_Bio_Inspired_Search.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: CC-BOS
+	- datasets: AdvBench
+- [[obsidian-vault/analysis/ICLR_2026/On_the_Convergence_of_Two_Layer_Kolmogorov_Arnold_Networks_with_First_Layer_Training.md|On the Convergence of Two-Layer Kolmogorov-Arnold Networks with First-Layer Training (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/On_the_Convergence_of_Two_Layer_Kolmogorov_Arnold_Networks_with_First_Layer_Training.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 第一层训练的两层 Kolmogorov‑Arnold 网络（First‑Layer Training for Two‑Layer KANs）
+	- datasets: 合成数据, 理论比较
+- [[obsidian-vault/analysis/ICLR_2026/On_the_Wasserstein_Geodesic_Principal_Component_Analysis_of_probability_measures.md|On the Wasserstein Geodesic Principal Component Analysis of probability measures (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/On_the_Wasserstein_Geodesic_Principal_Component_Analysis_of_probability_measures.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/ICLR_2026/Optimal_Sparsity_of_Mixture_of_Experts_Language_Models_for_Reasoning_Tasks.md|Optimal Sparsity of Mixture-of-Experts Language Models for Reasoning Tasks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Optimal_Sparsity_of_Mixture_of_Experts_Language_Models_for_Reasoning_Tasks.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: 基于活跃FLOPs与每参数令牌数（TPP）的MoE最优稀疏度选择原则
+- [[obsidian-vault/analysis/ICLR_2026/Overcoming_Joint_Intractability_with_Lossless_Hierarchical_Speculative_Decoding.md|Overcoming Joint Intractability with Lossless Hierarchical Speculative Decoding (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Overcoming_Joint_Intractability_with_Lossless_Hierarchical_Speculative_Decoding.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: Hierarchical Speculative Decoding (HSD)
+	- datasets: GSM8K, HumanEval
+- [[obsidian-vault/analysis/ICLR_2026/Overparametrization_bends_the_landscape_BBP_transitions_at_initialization_in_simple_Neural_Networks.md|Overparametrization bends the landscape: BBP transitions at initialization in simple Neural Networks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Overparametrization_bends_the_landscape_BBP_transitions_at_initialization_in_simple_Neural_Networks.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Field-theoretic BBP transition analysis of the Hessian at initialization
+	- datasets: Teacher-student setup with p*=1, varying a and p, Teacher-student with p=p*=1
+- [[obsidian-vault/analysis/ICLR_2026/Pinet_Optimizing_hard_constrained_neural_networks_with_orthogonal_projection_layers.md|Pinet: Optimizing hard-constrained neural networks with orthogonal projection layers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Pinet_Optimizing_hard_constrained_neural_networks_with_orthogonal_projection_layers.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Πnet
+	- datasets: small non-convex, small convex
+- [[obsidian-vault/analysis/ICLR_2026/Premise_Selection_for_a_Lean_Hammer.md|Premise Selection for a Lean Hammer (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Premise_Selection_for_a_Lean_Hammer.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: LEANPREMISE
+	- datasets: Mathlib-test
+- [[obsidian-vault/analysis/ICLR_2026/Probabilistic_Kernel_Function_for_Fast_Angle_Testing.md|Probabilistic Kernel Function for Fast Angle Testing (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Probabilistic_Kernel_Function_for_Fast_Angle_Testing.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Probabilistic Kernel Functions (K_S^1 and K_S^2) and their implementations KS1 / KS2
+- [[obsidian-vault/analysis/ICLR_2026/Quantitative_Bounds_for_Length_Generalization_in_Transformers.md|Quantitative Bounds for Length Generalization in Transformers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Quantitative_Bounds_for_Length_Generalization_in_Transformers.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 长度泛化定量界限
+	- datasets: SimpleTask, ModPTask, In-context k-gram
+- [[obsidian-vault/analysis/ICLR_2026/RAIN_Merging_A_Gradient_Free_Method_to_Enhance_Instruction_Following_in_Large_Reasoning_Models_with_Preserved_Thinking_Format.md|RAIN-Merging: A Gradient-Free Method to Enhance Instruction Following in Large Reasoning Models with Preserved Thinking Format (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/RAIN_Merging_A_Gradient_Free_Method_to_Enhance_Instruction_Following_in_Large_Reasoning_Models_with_Preserved_Thinking_Format.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: RAIN-Merging
+	- datasets: IFEval, Math, Instruction Following Average
+- [[obsidian-vault/analysis/ICLR_2026/RealPDEBench_A_Benchmark_for_Complex_Physical_Systems_with_Real_World_Data.md|RealPDEBench: A Benchmark for Complex Physical Systems with Real-World Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/RealPDEBench_A_Benchmark_for_Complex_Physical_Systems_with_Real_World_Data.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Benchmark / Evaluation
+	- methods: RealPDEBench Benchmark
+	- datasets: Cylinder, Controlled Cylinder, Combustion
+- [[obsidian-vault/analysis/ICLR_2026/Reasoning_with_Sampling_Your_Base_Model_is_Smarter_Than_You_Think.md|Reasoning with Sampling: Your Base Model is Smarter Than You Think (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Reasoning_with_Sampling_Your_Base_Model_is_Smarter_Than_You_Think.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: Power Sampling (Algorithm 1)
+	- datasets: MATH500, HumanEval, GPQA
+- [[obsidian-vault/analysis/ICLR_2026/Reevaluating_Policy_Gradient_Methods_for_Imperfect_Information_Games.md|Reevaluating Policy Gradient Methods for Imperfect-Information Games (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Reevaluating_Policy_Gradient_Methods_for_Imperfect_Information_Games.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: 通用策略梯度方法（PPO、PPG、MMD）配以适当调优
+	- datasets: LD2D5F, DH3, ADH3
+- [[obsidian-vault/analysis/ICLR_2026/RefineStat_Efficient_Exploration_for_Probabilistic_Program_Synthesis.md|RefineStat: Efficient Exploration for Probabilistic Program Synthesis (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/RefineStat_Efficient_Exploration_for_Probabilistic_Program_Synthesis.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Agent / RL / Planning
+	- methods: REFINESTAT
+	- datasets: All 5 datasets, Surgical, Peregrine
+- [[obsidian-vault/analysis/ICLR_2026/Riemannian_Federated_Learning_via_Averaging_Gradient_Streams.md|Riemannian Federated Learning via Averaging Gradient Streams (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Riemannian_Federated_Learning_via_Averaging_Gradient_Streams.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Agent / RL / Planning
+	- methods: RFedAGS
+	- datasets: PCA, HSP, FMC
+- [[obsidian-vault/analysis/ICLR_2026/Saddle_to_Saddle_Dynamics_Explains_A_Simplicity_Bias_Across_Neural_Network_Architectures.md|Saddle-to-Saddle Dynamics Explains A Simplicity Bias Across Neural Network Architectures (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Saddle_to_Saddle_Dynamics_Explains_A_Simplicity_Bias_Across_Neural_Network_Architectures.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Saddle-to-Saddle Dynamics Framework
+	- datasets: 多种两层架构, MNIST 二分类
+- [[obsidian-vault/analysis/ICLR_2026/Semi_Supervised_Preference_Optimization_with_Limited_Feedback.md|Semi-Supervised Preference Optimization with Limited Feedback (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Semi_Supervised_Preference_Optimization_with_Limited_Feedback.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: Semi-Supervised Preference Optimization (SSPO)
+	- datasets: UltraFeedback
+- [[obsidian-vault/analysis/ICLR_2026/Smooth_Calibration_Error_Uniform_Convergence_and_Functional_Gradient_Analysis.md|Smooth Calibration Error: Uniform Convergence and Functional Gradient Analysis (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Smooth_Calibration_Error_Uniform_Convergence_and_Functional_Gradient_Analysis.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: 平滑校准误差的一致收敛与函数梯度分析框架
+	- datasets: Toy dataset) / UCI Breast Cancer, Difficult separability toy data)
+- [[obsidian-vault/analysis/ICLR_2026/Stronger_MAS_Multi_Agent_Reinforcement_Learning_for_Collaborative_LLMs.md|Stronger-MAS: Multi-Agent Reinforcement Learning for Collaborative LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Stronger_MAS_Multi_Agent_Reinforcement_Learning_for_Collaborative_LLMs.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: AT-GRPO (Agent- and Turn-wise Grouped Relative Policy Optimization)
+	- datasets: Sudoku - Qwen3-1.7B, Sokoban - Qwen3-8B, Plan-Path - Qwen3-1.7B
+- [[obsidian-vault/analysis/ICLR_2026/Study_of_Training_Dynamics_for_Memory_Constrained_Fine_Tuning.md|Study of Training Dynamics for Memory-Constrained Fine-Tuning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Study_of_Training_Dynamics_for_Memory_Constrained_Fine_Tuning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Representation / Self-Supervised / Transfer
+	- methods: TraDy
+	- datasets: MobileNetV2-w0.35, MobileNetV2 on Food, 所有架构与数据集
+- [[obsidian-vault/analysis/ICLR_2026/Taming_Hierarchical_Image_Coding_Optimization_A_Spectral_Regularization_Perspective.md|Taming Hierarchical Image Coding Optimization: A Spectral Regularization Perspective (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Taming_Hierarchical_Image_Coding_Optimization_A_Spectral_Regularization_Perspective.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: DHIC-Regu (Explicit Spectral Regularization for Hierarchical Coding)
+	- datasets: Kodak, CLIC Pro, Tecnick
+- [[obsidian-vault/analysis/ICLR_2026/Taming_Momentum_Rethinking_Optimizer_States_Through_Low_Rank_Approximation.md|Taming Momentum: Rethinking Optimizer States Through Low-Rank Approximation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Taming_Momentum_Rethinking_Optimizer_States_Through_Low_Rank_Approximation.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: LoRA-Pre
+	- datasets: C4 validation
+- [[obsidian-vault/analysis/ICLR_2026/Task_free_Adaptive_Meta_Black_box_Optimization.md|Task-free Adaptive Meta Black-box Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Task_free_Adaptive_Meta_Black_box_Optimization.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+	- methods: ABOM (Adaptive meta Black-box Optimization Model)
+	- datasets: BBOB f6, BBOB f8, UAV 路径规划
+- [[obsidian-vault/analysis/ICLR_2026/TEST_TIME_SCALING_IN_DIFFUSION_LLMS_VIA_HIDDEN_SEMI_AUTOREGRESSIVE_EXPERTS.md|TEST-TIME SCALING IN DIFFUSION LLMS VIA HIDDEN SEMI-AUTOREGRESSIVE EXPERTS (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/TEST_TIME_SCALING_IN_DIFFUSION_LLMS_VIA_HIDDEN_SEMI_AUTOREGRESSIVE_EXPERTS.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Generative / Diffusion / Flow
+	- methods: HEX (Hidden semi-autoregressive EXperts)
+	- datasets: GSM8K, MATH, ARC-C
+- [[obsidian-vault/analysis/ICLR_2026/To_Infinity_and_Beyond_Tool_Use_Unlocks_Length_Generalization_in_State_Space_Models.md|To Infinity and Beyond: Tool-Use Unlocks Length Generalization in State Space Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/To_Infinity_and_Beyond_Tool_Use_Unlocks_Length_Generalization_in_State_Space_Models.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
+	- methods: 交互式工具增强的SSM代理（Tool-Augmented SSM with Interactive Memory Tool）
+	- datasets: 多位数加法, 多位数乘法, 逻辑图推理
+- [[obsidian-vault/analysis/ICLR_2026/Token_Importance_Guided_Direct_Preference_Optimization.md|Token-Importance Guided Direct Preference Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Token_Importance_Guided_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: TI-DPO
+	- datasets: MMLU, GSM8K, GPQA
+- [[obsidian-vault/analysis/ICLR_2026/ToolTree_Efficient_LLM_Tool_Planning_via_Dual_Feedback_Monte_Carlo_Tree_Search_and_Bidirectional_Pruning.md|ToolTree: Efficient LLM Tool Planning via Dual-Feedback Monte Carlo Tree Search and Bidirectional Pruning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ToolTree_Efficient_LLM_Tool_Planning_via_Dual_Feedback_Monte_Carlo_Tree_Search_and_Bidirectional_Pruning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: ToolTree
+	- datasets: GTA, m&m
+- [[obsidian-vault/analysis/ICLR_2026/Training_Free_Determination_of_Network_Width_via_Neural_Tangent_Kernel.md|Training-Free Determination of Network Width via Neural Tangent Kernel (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Training_Free_Determination_of_Network_Width_via_Neural_Tangent_Kernel.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: 基于NTK最小特征值的训练无关cardinal width选择
+	- datasets: DNN on Diabetes / California Housing, CNN / ResNet on CIFAR-10 / MNIST, DNN on MNIST / XOR
+- [[obsidian-vault/analysis/ICLR_2026/TROLL_Trust_Regions_Improve_Reinforcement_Learning_for_Large_Language_Models.md|TROLL: Trust Regions Improve Reinforcement Learning for Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/TROLL_Trust_Regions_Improve_Reinforcement_Learning_for_Large_Language_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: TROLL (Trust Region Optimization for Large Language models)
+	- datasets: DAPO-Train, DAPO-Eval, MATH-Eval
+- [[obsidian-vault/analysis/ICLR_2026/TTSDS2_Resources_and_Benchmark_for_Evaluating_Human_Quality_Text_to_Speech_Systems.md|TTSDS2: Resources and Benchmark for Evaluating Human-Quality Text to Speech Systems (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/TTSDS2_Resources_and_Benchmark_for_Evaluating_Human_Quality_Text_to_Speech_Systems.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: TTSDS2
+	- datasets: CLEAN, WILD, KIDS
+- [[obsidian-vault/analysis/ICLR_2026/Understanding_vs_Generation_Navigating_Optimization_Dilemma_in_Multimodal_Models.md|Understanding vs. Generation: Navigating Optimization Dilemma in Multimodal Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Understanding_vs_Generation_Navigating_Optimization_Dilemma_in_Multimodal_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Reason-Reflect-Refine (R3)
+	- datasets: GenEval++, Image-Text Alignment, Compositional VQA
+- [[obsidian-vault/analysis/ICLR_2026/Uni_DPO_A_Unified_Paradigm_for_Dynamic_Preference_Optimization_of_LLMs.md|Uni-DPO: A Unified Paradigm for Dynamic Preference Optimization of LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Uni_DPO_A_Unified_Paradigm_for_Dynamic_Preference_Optimization_of_LLMs.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: Uni-DPO
+	- datasets: AlpacaEval 2.0, Arena-Hard, Math Reasoning

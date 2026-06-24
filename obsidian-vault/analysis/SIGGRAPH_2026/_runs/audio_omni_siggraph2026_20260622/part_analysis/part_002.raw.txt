@@ -1,0 +1,25 @@
+{
+  "part_id": "2/13",
+  "section_role": "Introduction contributions and start of Related Work",
+  "method_evidence": [
+    {
+      "claim": "Audio-Omni is the first framework to unify understanding, generation, and editing across all general sound, music, and speech domains.",
+      "section": "2 Related Work",
+      "anchor": "we propose Audio-Omni, the first framework to unify understanding, generation, and editing across all general sound, music, and speech domains.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Audio-Omni outperforms prior unified models and achieves competitive or superior results compared to specialized expert models.",
+      "table_or_figure": "N/A",
+      "metric": "N/A",
+      "value": "outperforms prior unified models and achieves competitive or superior results",
+      "confidence": 0.8
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": []
+}

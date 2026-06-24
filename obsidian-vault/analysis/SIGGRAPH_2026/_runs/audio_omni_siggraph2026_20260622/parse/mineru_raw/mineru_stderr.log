@@ -1,0 +1,89 @@
+2026-06-22 15:42:08.108 | INFO     | mineru.cli.client:run_orchestrated_cli:877 - Started local mineru-api at http://127.0.0.1:46621
+2026-06-22 15:42:10.726 | INFO     | __main__:create_app:262 - Request concurrency limited to 3
+INFO:     Started server process [1781925]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:46621 (Press CTRL+C to quit)
+2026-06-22 15:42:11.120 | INFO     | mineru.cli.client:run_planned_task:773 - Submitting batch 1/1 | 1 document, 12 pages in this batch | 12 pages total | task#1 [Audio_Omni_Extending_Multi_modal_Understanding_to_Versatile_Audio_Generation_and_Editing]
+2026-06-22 15:42:15.201 | INFO     | mineru.backend.pipeline.pipeline_analyze:doc_analyze_streaming:183 - Pipeline processing-window multi-file run. doc_count=1, total_pages=12, window_size=64, total_batches=1
+2026-06-22 15:42:18.960 | INFO     | mineru.backend.pipeline.pipeline_analyze:doc_analyze_streaming:235 - Pipeline processing window batch 1/1: 12/12 pages, batch_pages=12, doc_slices=doc0:1-12
+2026-06-22 15:42:19.048 | INFO     | mineru.backend.pipeline.pipeline_analyze:batch_image_analyze:328 - GPU Memory: 24 GB, Batch Ratio: 8. 
+2026-06-22 15:42:19.048 | INFO     | mineru.backend.pipeline.model_init:__init__:207 - DocAnalysis init, this may take some times......
+2026-06-22 15:42:24.425 | INFO     | mineru.backend.pipeline.model_init:__init__:260 - DocAnalysis init done!
+2026-06-22 15:42:24.426 | INFO     | mineru.backend.pipeline.pipeline_analyze:custom_model_init:83 - model init cost: 5.377127170562744
+
+Layout Predict:   0%|          | 0/12 [00:00<?, ?it/s]
+Layout Predict:  67%|██████▋   | 8/12 [00:00<00:00,  8.74it/s]
+Layout Predict: 100%|██████████| 12/12 [00:01<00:00, 10.59it/s]
+Layout Predict: 100%|██████████| 12/12 [00:01<00:00, 10.16it/s]
+
+MFR Predict:   0%|          | 0/35 [00:00<?, ?it/s]
+MFR Predict:  91%|█████████▏| 32/35 [00:01<00:00, 30.11it/s]
+MFR Predict: 100%|██████████| 35/35 [00:02<00:00, 14.04it/s]
+
+Table-ocr det:   0%|          | 0/13 [00:00<?, ?it/s]
+Table-ocr det:  23%|██▎       | 3/13 [00:00<00:00, 25.11it/s]
+Table-ocr det:  54%|█████▍    | 7/13 [00:00<00:00, 30.46it/s]
+Table-ocr det:  85%|████████▍ | 11/13 [00:00<00:00, 28.04it/s]
+Table-ocr det: 100%|██████████| 13/13 [00:00<00:00, 25.78it/s]
+
+Table-ocr rec ch:   0%|          | 0/571 [00:00<?, ?it/s]
+Table-ocr rec ch:   7%|▋         | 42/571 [00:00<00:01, 406.02it/s]
+Table-ocr rec ch:  16%|█▌        | 90/571 [00:00<00:01, 438.21it/s]
+Table-ocr rec ch:  24%|██▍       | 138/571 [00:00<00:00, 443.27it/s]
+Table-ocr rec ch:  33%|███▎      | 186/571 [00:00<00:00, 452.22it/s]
+Table-ocr rec ch:  41%|████      | 234/571 [00:00<00:00, 455.64it/s]
+Table-ocr rec ch:  49%|████▉     | 282/571 [00:00<00:00, 453.83it/s]
+Table-ocr rec ch:  58%|█████▊    | 330/571 [00:00<00:00, 457.32it/s]
+Table-ocr rec ch:  67%|██████▋   | 384/571 [00:00<00:00, 479.38it/s]
+Table-ocr rec ch:  77%|███████▋  | 438/571 [00:00<00:00, 495.57it/s]
+Table-ocr rec ch:  86%|████████▌ | 492/571 [00:01<00:00, 499.31it/s]
+Table-ocr rec ch:  96%|█████████▌| 546/571 [00:01<00:00, 431.17it/s]
+Table-ocr rec ch: 100%|██████████| 571/571 [00:01<00:00, 438.00it/s]
+
+Table-wireless Predict:   0%|          | 0/13 [00:00<?, ?it/s]
+Table-wireless Predict:  31%|███       | 4/13 [00:00<00:00,  9.90it/s]
+Table-wireless Predict:  62%|██████▏   | 8/13 [00:00<00:00, 11.65it/s]
+Table-wireless Predict:  92%|█████████▏| 12/13 [00:01<00:00, 10.50it/s]
+Table-wireless Predict: 100%|██████████| 13/13 [00:01<00:00,  9.37it/s]
+
+Table-wired Predict:   0%|          | 0/7 [00:00<?, ?it/s]
+Table-wired Predict:  14%|█▍        | 1/7 [00:00<00:01,  3.25it/s]
+Table-wired Predict:  29%|██▊       | 2/7 [00:00<00:01,  3.42it/s]
+Table-wired Predict:  57%|█████▋    | 4/7 [00:00<00:00,  5.66it/s]
+Table-wired Predict:  71%|███████▏  | 5/7 [00:01<00:00,  4.17it/s]
+Table-wired Predict:  86%|████████▌ | 6/7 [00:01<00:00,  3.23it/s]
+Table-wired Predict: 100%|██████████| 7/7 [00:02<00:00,  2.59it/s]
+Table-wired Predict: 100%|██████████| 7/7 [00:02<00:00,  3.16it/s]
+
+OCR-det ch:   0%|          | 0/35 [00:00<?, ?it/s]
+OCR-det ch:  11%|█▏        | 4/35 [00:00<00:00, 33.48it/s]
+OCR-det ch:  23%|██▎       | 8/35 [00:00<00:01, 21.01it/s]
+OCR-det ch:  34%|███▍      | 12/35 [00:00<00:00, 26.61it/s]
+OCR-det ch:  46%|████▌     | 16/35 [00:01<00:02,  9.21it/s]
+OCR-det ch:  54%|█████▍    | 19/35 [00:01<00:01, 10.22it/s]
+OCR-det ch:  63%|██████▎   | 22/35 [00:01<00:01, 12.60it/s]
+OCR-det ch:  71%|███████▏  | 25/35 [00:01<00:00, 14.38it/s]
+OCR-det ch:  80%|████████  | 28/35 [00:01<00:00, 15.69it/s]
+OCR-det ch:  94%|█████████▍| 33/35 [00:02<00:00, 21.51it/s]
+OCR-det ch: 100%|██████████| 35/35 [00:02<00:00, 16.75it/s]
+
+Seal Predict: 0it [00:00, ?it/s]
+Seal Predict: 0it [00:00, ?it/s]
+
+Processing pages:   0%|          | 0/12 [00:00<?, ?it/s]
+Processing pages:  17%|█▋        | 2/12 [00:00<00:00, 10.17it/s]
+Processing pages:  33%|███▎      | 4/12 [00:00<00:00,  8.99it/s]
+Processing pages:  42%|████▏     | 5/12 [00:00<00:00,  8.74it/s]
+Processing pages:  50%|█████     | 6/12 [00:00<00:00,  8.61it/s]
+Processing pages:  58%|█████▊    | 7/12 [00:00<00:00,  8.87it/s]
+Processing pages:  75%|███████▌  | 9/12 [00:01<00:00,  8.07it/s]
+Processing pages:  83%|████████▎ | 10/12 [00:01<00:00,  5.62it/s]
+Processing pages:  92%|█████████▏| 11/12 [00:01<00:00,  6.26it/s]
+Processing pages: 100%|██████████| 12/12 [00:01<00:00,  6.65it/s]
+2026-06-22 15:42:40.742 | INFO     | mineru.cli.client:run_planned_task:809 - Completed batch 1/1 | Processed 12/12 pages | 1 of 1 batch finished | task#1 [Audio_Omni_Extending_Multi_modal_Understanding_to_Versatile_Audio_Generation_and_Editing]
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1781925]
+[W622 15:42:51.988178072 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())

@@ -1,0 +1,789 @@
+{
+  "verified_analysis": {
+    "paper_metadata": {
+      "title": "Cubic Discrete Diffusion: Discrete Visual Generation on High-Dimensional Representation Tokens",
+      "title_zh": "Cubic离散扩散：面向高维表示令牌的离散视觉生成",
+      "venue": "CVPR 2026",
+      "year": 2026,
+      "project_link": null,
+      "code_link": "https://github.com/YuqingWang1029/CubiD"
+    },
+    "source_links": [
+      {
+        "label": "Code",
+        "url": "https://github.com/YuqingWang1029/CubiD",
+        "anchor": "Code is available at: https://github.com/YuqingWang1029/CubiD",
+        "confidence": 1.0
+      }
+    ],
+    "analysis_truth": {
+      "real_bottleneck": "现有离散生成方法受限于低维潜在令牌（8‑32 维），牺牲了理解和生成所需的语义丰富性；而高维表示（768‑1024 维）的离散化面临维度灾难，其 h×w×d 张量产生指数级庞大的令牌空间，自回归建模需要 O(hwd) 步不可行，标准离散扩散又无法捕获维度内与空间跨位置的复杂依赖。",
+      "causal_knob": "在 h×w×d 张量上执行元素级（per‑element）细粒度掩码与并行预测，打破空间位置和维度的刚性边界，使模型能够从部分观测中捕获多轴依赖关系，并将生成步数固定为 T (<< hwd)，实现与特征维度解耦的高效生成。",
+      "core_insight": "将高维表示令牌视为统一的三维立方体，通过细粒度掩码扩散将不可行的顺序生成转化为固定的并行细化过程，既保留了语义完整性，又使高维离散生成在计算上可行。",
+      "decisive_evidence": [
+        {
+          "claim": "元素级掩码 (gFID=5.33) 远优于按维度掩码 (gFID=120.03) 和按空间掩码 (gFID=22.22)，证明细粒度跨轴建模的必要性。",
+          "anchor": "Table 4b: Per‑element (Ours) gFID↓ 5.33; Per‑dim gFID↓ 120.03; Per‑spatial gFID↓ 22.22.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "可学习掩码令牌 (gFID=5.33) 比随机掩码令牌 (gFID=56.38) 显著更优，验证了掩码表示的适应性设计。",
+          "anchor": "Table 4c: Learned gFID↓ 5.33; Random gFID↓ 56.38.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "逐维量化（DQ）在多模态理解基准上保持连续特征的性能（GQA 63.1 vs 63.2），而向量量化（VQ）显著下降（GQA 54.9），证明 DQ 是保留语义的关键离散化手段。",
+          "anchor": "Table 3: SigLIP2‑DQ GQA 63.1, TextVQA 59.8; SigLIP2‑VQ GQA 54.9, TextVQA 54.1.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "模型规模从 946M 扩展至 3.7B 时生成质量持续提升（gFID 从 5.25 降至 4.68），表明方法具有良好的可伸缩性。",
+          "anchor": "Table 4e: CubiD‑L (946M) gFID 5.25; CubiD‑XL (1.4B) gFID 4.91; CubiD‑XXL (3.7B) gFID 4.68.",
+          "confidence": 0.95
+        }
+      ]
+    },
+    "method": {
+      "proposed_method_name": "Cubic Discrete Diffusion (CubiD)",
+      "baseline_methods": [
+        {
+          "name": "MaskGIT",
+          "role": "经典离散扩散基线，按空间位置掩码",
+          "citation": "Chang et al., CVPR 2022"
+        },
+        {
+          "name": "VAR",
+          "role": "自回归生成基线，下一尺度预测",
+          "citation": "Tian et al., arXiv 2024"
+        },
+        {
+          "name": "VFM-Tok",
+          "role": "高维令牌生成基线，但需重组压缩",
+          "citation": null
+        }
+      ],
+      "changed_slots": [
+        {
+          "slot_name": "离散化策略",
+          "baseline_value": "向量量化 (VQ) 联合量化整个向量",
+          "proposed_value": "逐维量化 (DQ) 独立处理每一维度",
+          "evidence_anchor": "Table 3: DQ maintains continuous‑level performance while VQ shows significant degradation.",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "掩码粒度",
+          "baseline_value": "空间位置级掩码 (如 MaskGIT) 或维度级掩码",
+          "proposed_value": "元素级掩码：独立掩码 h×w×d 张量中任意元素",
+          "evidence_anchor": "Table 4b: Per‑element masking achieves gFID 5.33 vs. Per‑dim 120.03 and Per‑spatial 22.22.",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "掩码令牌表示",
+          "baseline_value": "固定值或随机噪声",
+          "proposed_value": "可学习的 [MASK] 嵌入",
+          "evidence_anchor": "Table 4c: Learned mask token achieves gFID 5.33 vs. Random 56.38.",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "生成步数复杂度",
+          "baseline_value": "自回归 O(N) 或标准扩散无法捕获维度内依赖",
+          "proposed_value": "固定 T 步（cosine schedule），与特征维度 d 无关",
+          "evidence_anchor": "Introduction / Figure 1(b): generation requires O(T) iterations—typically hundreds of steps—regardless of the tensor dimensionality d.",
+          "confidence": 0.9
+        },
+        {
+          "slot_name": "掩码比率分布",
+          "baseline_value": "可能为固定比率或均匀分布",
+          "proposed_value": "截断高斯分布 TruncNorm(μ=1.0, σ=0.10, [0,1])",
+          "evidence_anchor": "Equation 2 / Table 4a: σ=0.10 gives best gFID 5.33.",
+          "confidence": 0.9
+        }
+      ],
+      "pipeline_modules": [
+        {
+          "name": "Representation Encoder (frozen pretrained)",
+          "role": "从输入图像提取高维连续特征图 (e.g., DINOv2‑B 16×16×768)",
+          "evidence_anchor": "Section 3.1: pretrained encoder E (e.g., DINOv2, SigLIP2) produces feature map z ∈ R^{h×w×d}"
+        },
+        {
+          "name": "Dimension-wise Quantization",
+          "role": "将连续特征逐维量化为 L 级离散令牌，保持语义质量",
+          "evidence_anchor": "Equation 1 / Table 3"
+        },
+        {
+          "name": "3D Masking Sampler",
+          "role": "从截断高斯分布采样掩码比率，并在 h×w×d 张量上随机选取位置掩码",
+          "evidence_anchor": "Equation 2 / Section 3.2"
+        },
+        {
+          "name": "Bidirectional Transformer (with MLP head)",
+          "role": "以 h×w 序列为输入，双向注意力建模，通过 MLP 头同时预测每个位置的所有 d 维令牌类别",
+          "evidence_anchor": "Section 3.2 Model Architecture / Figure 3(b)"
+        },
+        {
+          "name": "Iterative Unmasking Inference",
+          "role": "从全掩码张量开始，按 cosine schedule 逐步预测并随机解掩码令牌，实现 coarse‑to‑fine 生成",
+          "evidence_anchor": "Figure 4 / Section 3.2 Inference"
+        }
+      ]
+    },
+    "experiments": {
+      "main_results": [
+        {
+          "benchmark": "ImageNet 256×256 class‑conditional generation",
+          "metric": "gFID (with classifier‑free guidance)",
+          "proposed": "1.88 (CubiD‑XXL)",
+          "baseline": "1.95 (VFM‑Tok‑XXL)",
+          "delta": "-0.07",
+          "anchor": "Table 5 / Discussion: CubiD‑XXL achieves 1.88 gFID with cfg, while VFM‑Tok‑XXL reports 1.95 gFID.",
+          "confidence": 0.9
+        },
+        {
+          "benchmark": "ImageNet 256×256 class‑conditional generation",
+          "metric": "gFID (without guidance)",
+          "proposed": "2.02 (CubiD‑XXL)",
+          "baseline": "2.04 (CubiD‑XL / VFM‑Tok‑3B)",
+          "delta": "-0.02",
+          "anchor": "Table 5: CubiD‑XXL gFID 2.02 without guidance; in text CubiD‑XL 2.04, VFM‑Tok‑3B 2.04 gFID.",
+          "confidence": 0.85
+        }
+      ],
+      "ablations": [
+        {
+          "claim": "掩码比率标准差 σ=0.10 实现最优 gFID=5.33，过高或过低均导致性能下降。",
+          "anchor": "Table 4a: σ=0.10 → gFID 5.33; σ=0.01 → 5.47; σ=0.25 → 5.75.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "元素级掩码（per‑element）显著优于按维度掩码（per‑dim）和按空间掩码（per‑spatial），表明同时建模空间与维度依赖的重要性。",
+          "anchor": "Table 4b: Per‑element gFID 5.33 vs. Per‑dim 120.03 vs. Per‑spatial 22.22.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "可学习掩码令牌优于固定零值或随机值，提供最佳的上下文表示。",
+          "anchor": "Table 4c: Learned gFID 5.33, Fixed gFID 5.52, Random gFID 56.38.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "推理步数在 T=512 时性能趋于饱和，继续增加步数增益极小。",
+          "anchor": "Table 4d: T=512 → gFID 5.25; T=1024 → gFID 5.24.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "模型从 946M 扩展到 3.7B 参数带来持续质量提升（gFID 5.25 → 4.68），显示良好的规模扩展行为。",
+          "anchor": "Table 4e: CubiD‑L (946M) 5.25, CubiD‑XL (1.4B) 4.91, CubiD‑XXL (3.7B) 4.68.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "DINOv2‑B 和 SigLIP2‑B 编码器均可训练出高质量生成模型（gFID 5.25 vs 5.87），表明方法对编码器选择具有通用性。",
+          "anchor": "Table 4f: DINOv2 5.25, SigLIP2 5.87.",
+          "confidence": 0.95
+        }
+      ],
+      "fairness_notes": []
+    },
+    "formulas": [
+      {
+        "name": "Dimension‑wise Quantization",
+        "latex": "q_{x,y,i} = \\mathrm{Quantize}(z_{x,y,i}; L)",
+        "meaning": "将连续特征 z 的第 i 维度在空间 (x,y) 处独立量化为 L 个离散等级之一。",
+        "anchor": "Section 3.1, Equation 1"
+      },
+      {
+        "name": "Mask Ratio Sampling",
+        "latex": "r \\sim \\mathrm{TruncNorm}(\\mu = 1.0, \\sigma, [0, 1.0])",
+        "meaning": "从均值为 1.0、标准差 σ 的截断高斯分布中采样掩码比率 r，偏向大掩码率以强制学习强上下文推理。",
+        "anchor": "Section 3.2, Equation 2"
+      },
+      {
+        "name": "Cross‑entropy Loss",
+        "latex": "\\mathcal{L} = -\\mathbb{E}_{\\mathbf{q}, \\mathbf{M}} \\left[ \\sum_{i \\in \\mathbf{M}} \\log p(q_i | \\mathbf{q}_{\\bar{\\mathbf{M}}}) \\right]",
+        "meaning": "训练模型从可见令牌 q_{\\overline{M}} 预测被掩码的位置 i 的真实离散类别，使用交叉熵损失。",
+        "anchor": "Section 3.2, Equation 3"
+      }
+    ],
+    "figures_tables": [
+      {
+        "label": "Figure 1",
+        "role": "Comparison of discrete visual generation approaches (low‑dim vs high‑dim).",
+        "caption": "Figure 1.Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor—any dimension at any position can be masked and predicted independently-enabling effcient generation in T< h ×w ×d iterations while capturing both spatial and dimensional correlations."
+      },
+      {
+        "label": "Figure 2",
+        "role": "Generated samples from CubiD on ImageNet 256×256 using DINOv2‑B tokens.",
+        "caption": "Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories."
+      },
+      {
+        "label": "Figure 3",
+        "role": "Overview of Cubic Discrete Diffusion: discretization and training pipeline.",
+        "caption": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes."
+      },
+      {
+        "label": "Figure 4",
+        "role": "Inference process of CubiD: progressive unmasking from fully masked to complete image.",
+        "caption": "Figure4.InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details."
+      },
+      {
+        "label": "Figure 5",
+        "role": "Qualitative comparison of masking strategies (per‑dim, per‑spatial, per‑element).",
+        "caption": "Figure 5.Qualitative comparison of different masking strategies.Top row:Per-dim masking completely fails,producing severe texture-like artifacts.Middle row:Per-spatial masking generates images with significant local inconsistencies and blurry details.Bottom row: Our per-element masking produces clear, coherent images with fine details.The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes."
+      },
+      {
+        "label": "Table 1",
+        "role": "Model sizes and architecture configurations of CubiD.",
+        "caption": "Table 1.Model sizes and architecture configurations of CubiD."
+      },
+      {
+        "label": "Table 2",
+        "role": "Effect of quantization levels on reconstruction quality.",
+        "caption": "Table 2. Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2)."
+      },
+      {
+        "label": "Table 3",
+        "role": "Multimodal understanding performance: dimension‑wise quantization preserves semantic quality while vector quantization degrades.",
+        "caption": "Table 3.Understanding performance onLLaVA benchmarks with different quantization methods.Evaluation using SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation."
+      },
+      {
+        "label": "Table 4a",
+        "role": "Ablation on mask ratio distribution (σ).",
+        "caption": "Effect of standard deviation σ in sampling mask ratios."
+      },
+      {
+        "label": "Table 4b",
+        "role": "Ablation on masking granularity (per‑dim, per‑spatial, per‑element).",
+        "caption": "Per‑dim: mask all spatial positions per dimension. Per‑spatial: mask all dimensions per position. Per‑element: mask independently across all axes."
+      },
+      {
+        "label": "Table 4c",
+        "role": "Ablation on mask token value (fixed, random, learned).",
+        "caption": "(c)Mask value.Fixed,random, or learned mask token."
+      },
+      {
+        "label": "Table 4d",
+        "role": "Ablation on inference steps T.",
+        "caption": "(d) Inference steps.Effect of inference steps T."
+      },
+      {
+        "label": "Table 4e",
+        "role": "Model scaling from 946M to 3.7B parameters.",
+        "caption": "Scaling of CubiD model sizes on generation quality."
+      },
+      {
+        "label": "Table 4f",
+        "role": "Effect of different representation encoders (DINOv2 vs SigLIP2).",
+        "caption": "(f) Representation encoder. DI‑NOv2 vs. SigLIP2."
+      },
+      {
+        "label": "Table 5",
+        "role": "Main results on ImageNet 256×256 class‑conditional generation, comparing CubiD with existing discrete generation methods.",
+        "caption": "Table 5.Discrete generationmethodsonImageNet[8256x256.LatentDimdenotes theoriginaldimensionalityofthelatentspace (featureseforevectorquantizationforlow-dimensionalmethods,beforeandafterdimension-wiseuantizationforCubiD).Resultsith superscript\"redenoterejectionsampling.CubiDisthefirstandonlydiscretemethodtodirectlygeneratewithnativehigh-dimensional representation tokens (768d),while allother methods use compressed or low-dimensional tokens (mostly below 32)."
+      }
+    ],
+    "limitations": [
+      "当前实验仅限于 256×256 分辨率的 class‑conditional 生成，未探索更高分辨率或文本到图像应用。",
+      "生成质量高度依赖预训练编码器的表示能力，不同编码器（如 DINOv2 vs SigLIP2）会导致性能差异。",
+      "逐维量化虽保留了连续特征性能，但量化位数有限（L=8 或 16），可能在某些极端场景下引入微小信息损失。",
+      "推理虽与维度无关，但仍需数百步迭代，实时应用尚有一定挑战。"
+    ],
+    "open_questions": [
+      "能否将 CubiD 的细粒度掩码策略与连续扩散模型结合，以进一步提升高维令牌的生成保真度？",
+      "该方法能否直接扩展到文本到图像或视频生成任务，并保持相同的效率？",
+      "未来统一多模态架构中，能否让同一组高维离散令牌同时服务于视觉理解和生成任务，并实现端到端训练？",
+      "在高分辨率（>512²）场景下，元素级掩码的计算开销是否可控，是否需要分层或稀疏的掩码策略？"
+    ],
+    "_meta": {
+      "part_count": 9,
+      "latency_seconds": 164.653,
+      "created_at": "2026-06-22T07:21:40.252837+00:00",
+      "usage": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "enabled",
+        "reasoning_effort": "max",
+        "prompt_tokens_est": 38572,
+        "completion_tokens_est": 4720,
+        "reasoning_tokens_est": 5901,
+        "total_tokens_est": 43292,
+        "total_with_reasoning_tokens_est": 49193,
+        "estimated_cost_usd": 0.020885,
+        "cost_basis": "discounted_estimate_from_local_text_lengths",
+        "prompt_tokens_api": 34687,
+        "completion_tokens_api": 11043,
+        "total_tokens_api": 45730,
+        "reasoning_tokens_api": 6206,
+        "prompt_cache_hit_tokens": 1536,
+        "prompt_cache_miss_tokens": 33151,
+        "cached_tokens_api": 1536,
+        "api_usage_raw": {
+          "completion_tokens": 11043,
+          "prompt_tokens": 34687,
+          "total_tokens": 45730,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": null,
+            "audio_tokens": null,
+            "reasoning_tokens": 6206,
+            "rejected_prediction_tokens": null
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1536
+          },
+          "prompt_cache_hit_tokens": 1536,
+          "prompt_cache_miss_tokens": 33151
+        },
+        "estimated_cost_usd_api": 0.024034,
+        "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+        "stream_diagnostics": {
+          "content_chars": 14493,
+          "reasoning_chars": 15554,
+          "finish_reason": "stop",
+          "finish_reasons": [
+            "stop",
+            "stop"
+          ],
+          "stream_chunk_count": 11044,
+          "api_usage_present": true
+        }
+      }
+    }
+  },
+  "focused_part_analyses": [
+    {
+      "part_id": "part_001",
+      "section_role": "Abstract and Introduction",
+      "method_evidence": [
+        {
+          "claim": "CubiD performs fine-grained masking throughout the high-dimensional discrete representation—any dimension at any position can be masked and predicted from partial observations.",
+          "section": "Abstract",
+          "anchor": "CubiD performs fine-grained masking throughout the high-dimensional discrete representation—any dimension at any position can be masked and predicted from partial observations.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "We propose Cubic Discrete Diffusion (CubiD), a masked diffusion method for high-dimensional discrete generation.",
+          "section": "1. Introduction",
+          "anchor": "We propose Cubic Discrete Diffusion (CubiD), a masked diffusion method [1,3,26] for high-dimensional discrete generation.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "CubiD achieves state-of-the-art discrete generation on ImageNet-256.",
+          "table_or_figure": "Abstract",
+          "metric": "state-of-the-art",
+          "value": "state-of-the-art",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Dimension-wise quantized features achieve nearly identical performance to continuous features on multimodal understanding tasks.",
+          "table_or_figure": "Table 3",
+          "metric": "performance",
+          "value": "nearly identical",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Figure 1",
+          "role_hint": "Comparison of discrete visual generation approaches",
+          "caption": "Comparison of discrete visual generation approaches. (a) Low-dimensional token generation... (b) High-dimensional token generation... Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tenso...",
+          "confidence": 0.95
+        },
+        {
+          "label": "Figure 2",
+          "role_hint": "Generated samples from CubiD",
+          "caption": "Generated samples from CubiD. Class-conditional generation results on ImageNet 256×256 using high-dimensional representation tokens from DINOv2-B encoder, demonstrating fine details and textures across diverse categorie...",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_002",
+      "section_role": "abstract, contributions, related work, method overview",
+      "method_evidence": [
+        {
+          "claim": "CubiD performs masked prediction across both spatial and dimensional axes simultaneously.",
+          "section": "3. Method",
+          "anchor": "We propose Cubic Discrete Diffusion (CubiD), which performs masked prediction across both spatial and dimensional axes simultaneously.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "CubiD treats the h × w × d tensor as a unified space with fine-grained masking.",
+          "section": "Contributions",
+          "anchor": "treating the h × w × d tensor as a unified space with fine-grained masking",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "CubiD achieves 1.88 FID on ImageNet 256x256 with 768-dimensional discrete tokens.",
+          "table_or_figure": "N/A",
+          "metric": "FID",
+          "value": "1.88",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Method scales from 900M to 3.7B parameters.",
+          "table_or_figure": "N/A",
+          "metric": "Parameters",
+          "value": "900M to 3.7B",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Figure 3",
+          "role_hint": "Overview of Cubic Discrete Diffusion",
+          "caption": "Figure 3. Overview of Cubic Discrete Diffusion. (a) High-dimensional Token Discretization... (b) Training via Dimension-wise Mask Modeling...",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_003",
+      "section_role": "Method",
+      "method_evidence": [
+        {
+          "claim": "CubiD performs fine-grained masking at the dimension level—treating the h×w×d tensor as a unified modeling space where any subset of dimensions can be masked and predicted from the remaining visible context.",
+          "section": "3.2",
+          "anchor": "CubiD performs fine-grained masking at the dimension level—treating the $h \\times w \\times d$ tensor as a unified modeling space where any subset of dimensions can be masked and predicted from the remaining visible cont...",
+          "confidence": 0.95
+        },
+        {
+          "claim": "During training, we apply a binary mask M ∈ {0,1}^{h×w×d} where each element is independently and randomly masked.",
+          "section": "3.2",
+          "anchor": "during training,we apply a binary mask $\\mathbf { M } \\in \\{ 0 , 1 \\} ^ { h \\times w \\times d }$ where each element is independently and randomly masked.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Through experiments on understanding tasks, we verify that this discretization preserves the semantic quality of the original representations.",
+          "table_or_figure": "Table 3",
+          "metric": "semantic quality",
+          "value": "preserves",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [
+        {
+          "name": "Dimension-wise Quantization",
+          "latex": "q_{x,y,i} = \\mathrm{Quantize}(z_{x,y,i}; L)",
+          "meaning": "Quantizes each continuous value into L discrete levels independently per dimension.",
+          "section": "3.1",
+          "confidence": 0.95
+        },
+        {
+          "name": "Masking Ratio Sampling",
+          "latex": "r \\sim \\mathrm{TruncNorm}(\\mu = 1.0, \\sigma, [0, 1.0])",
+          "meaning": "Samples a masking ratio from a truncated Gaussian distribution biased toward aggressive masking.",
+          "section": "3.2",
+          "confidence": 0.95
+        }
+      ],
+      "figure_table_roles": [
+        {
+          "label": "Figure 3",
+          "role_hint": "Overview of Cubic Discrete Diffusion",
+          "caption": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscreteto...",
+          "confidence": 0.9
+        },
+        {
+          "label": "Figure 4",
+          "role_hint": "Inference process of CubiD",
+          "caption": "Figure4.InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reac...",
+          "confidence": 0.9
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_004",
+      "section_role": "method details and experiments",
+      "method_evidence": [
+        {
+          "claim": "CubiD generates images through iterative refinement starting from a fully masked tensor.",
+          "section": "Model Architecture",
+          "anchor": "CubiD generates images through iterative refinement starting from a fully masked tensor.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "The number of tokens to unmask follows a cosine schedule.",
+          "section": "Model Architecture",
+          "anchor": "the number of tokens to unmask follows a cosine schedule.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Effect of quantization levels on reconstruction quality.",
+          "table_or_figure": "Table 2",
+          "metric": "rFID",
+          "value": "DINOv2 L=8: 0.57, SigLIP2 L=16: 0.69",
+          "confidence": 0.95
+        },
+        {
+          "claim": "DQ maintains continuous-level performance while VQ shows significant degradation.",
+          "table_or_figure": "Table 3",
+          "metric": "GQA",
+          "value": "SigLIP2-DQ: 63.1, SigLIP2-VQ: 54.9",
+          "confidence": 0.95
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Table 1",
+          "role_hint": "model sizes and architecture configurations",
+          "caption": "Model sizes and architecture configurations of CubiD.",
+          "confidence": 0.95
+        },
+        {
+          "label": "Table 2",
+          "role_hint": "ablation on quantization levels",
+          "caption": "Effect of quantization levels on reconstruction quality.",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_005",
+      "section_role": "Experiments: Discretization studies and ablation",
+      "method_evidence": [
+        {
+          "claim": "Dimension-wise quantization preserves continuous-level performance while VQ shows significant degradation.",
+          "section": "4.2",
+          "anchor": "SigLIP2-DQ achieves nearly identical performance to continuous features (63.1 vs 63.2 on GQA,59.8 vs 59.6 on TextVQA),while SigLIP2-VQ shows significant degradation across all metrics.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Masking strategy: per-element masking is used.",
+          "section": "Table 4(b)",
+          "anchor": "Per-element (Ours) gFID↓ 5.33",
+          "confidence": 0.9
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "SigLIP2-DQ matches continuous SigLIP2 on multimodal benchmarks.",
+          "table_or_figure": "Table 3",
+          "metric": "GQA",
+          "value": "63.1 vs 63.2",
+          "confidence": 0.95
+        },
+        {
+          "claim": "SigLIP2-DQ matches continuous SigLIP2 on TextVQA.",
+          "table_or_figure": "Table 3",
+          "metric": "TextVQA",
+          "value": "59.8 vs 59.6",
+          "confidence": 0.95
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Table 3",
+          "role_hint": "Multimodal understanding comparison: continuous vs VQ vs DQ",
+          "caption": "SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation.",
+          "confidence": 0.95
+        },
+        {
+          "label": "Table 4",
+          "role_hint": "Ablation studies on CubiD design choices",
+          "caption": "Table 4.Ablation studies on CubiD design choices.Gray rows indicate best results.",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_006",
+      "section_role": "Ablation studies and analysis of CubiD",
+      "method_evidence": [
+        {
+          "claim": "Masking ratio r is sampled from a truncated Gaussian distribution with μ=1.0 and varying σ.",
+          "section": "4.3",
+          "anchor": "We sample the masking ratio r from a truncated Gaussian distribution (Eq.2) with μ = 1.O and varying standard deviation o.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Per-element masking independently masks individual elements across the h×w×d tensor.",
+          "section": "4.3",
+          "anchor": "Perelement masking,our approach that independently masks individual elements across the tensor.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Optimal masking ratio standard deviation σ=0.10 achieves gFID=5.33.",
+          "table_or_figure": "Table 4a",
+          "metric": "gFID",
+          "value": "5.33",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Per-element masking achieves gFID=5.33, outperforming per-dim (120.03) and per-spatial (22.22).",
+          "table_or_figure": "Table 4b",
+          "metric": "gFID",
+          "value": "5.33",
+          "confidence": 0.95
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Table 4a",
+          "role_hint": "Mask ratio distribution ablation",
+          "caption": "Effect of standard deviation σ in truncated Gaussian masking ratio distribution.",
+          "confidence": 0.9
+        },
+        {
+          "label": "Table 4b",
+          "role_hint": "Masking strategy ablation",
+          "caption": "Comparison of per-dim, per-spatial, and per-element masking strategies.",
+          "confidence": 0.9
+        }
+      ],
+      "open_questions": []
+    }
+  ],
+  "focused_figures_tables": [
+    {
+      "item_id": "item_001",
+      "label": "Figure 1",
+      "type": "figure",
+      "caption": "Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)Hig...",
+      "visual_summary": "Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T<h ×w iterations.(b)Hig...",
+      "visual_type": "figure",
+      "placement_hint": "",
+      "is_sample_only": false,
+      "cluster_size": 2,
+      "full_region_source": "pdf_crop",
+      "is_full_region": true
+    },
+    {
+      "item_id": "item_002",
+      "label": "Figure",
+      "type": "figure",
+      "caption": "Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories",
+      "visual_summary": "Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories",
+      "visual_type": "figure",
+      "placement_hint": "",
+      "is_sample_only": false,
+      "cluster_size": 1,
+      "full_region_source": "",
+      "is_full_region": false
+    },
+    {
+      "item_id": "item_003",
+      "label": "Figure",
+      "type": "figure",
+      "caption": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModel...",
+      "visual_summary": "Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModel...",
+      "visual_type": "figure",
+      "placement_hint": "",
+      "is_sample_only": false,
+      "cluster_size": 1,
+      "full_region_source": "",
+      "is_full_region": false
+    },
+    {
+      "item_id": "item_004",
+      "label": "Figure 4",
+      "type": "figure",
+      "caption": "InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelp...",
+      "visual_summary": "InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelp...",
+      "visual_type": "figure",
+      "placement_hint": "",
+      "is_sample_only": false,
+      "cluster_size": 1,
+      "full_region_source": "",
+      "is_full_region": false
+    },
+    {
+      "item_id": "item_005",
+      "label": "Table 1",
+      "type": "table",
+      "caption": "Model sizes and architecture configurations of CubiD",
+      "visual_summary": "Model sizes and architecture configurations of CubiD",
+      "visual_type": "table",
+      "placement_hint": "实验与分析",
+      "is_sample_only": false,
+      "cluster_size": 1,
+      "full_region_source": "",
+      "is_full_region": false
+    },
+    {
+      "item_id": "item_006",
+      "label": "Table 4",
+      "type": "table",
+      "caption": "Ablation studies on CubiD design choices.Gray rows indicate best results",
+      "visual_summary": "Ablation studies on CubiD design choices.Gray rows indicate best results",
+      "visual_type": "table",
+      "placement_hint": "实验与分析",
+      "is_sample_only": false,
+      "cluster_size": 1,
+      "full_region_source": "",
+      "is_full_region": false
+    },
+    {
+      "item_id": "item_007",
+      "label": "Table",
+      "type": "table",
+      "caption": "",
+      "visual_summary": "",
+      "visual_type": "table",
+      "placement_hint": "实验与分析",
+      "is_sample_only": false,
+      "cluster_size": 1,
+      "full_region_source": "",
+      "is_full_region": false
+    },
+    {
+      "item_id": "item_008",
+      "label": "Table 2",
+      "type": "table",
+      "caption": "Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2)",
+      "visual_summary": "Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2)",
+      "visual_type": "table",
+      "placement_hint": "实验与分析",
+      "is_sample_only": false,
+      "cluster_size": 2,
+      "full_region_source": "pdf_crop",
+      "is_full_region": true
+    },
+    {
+      "item_id": "item_009",
+      "label": "Table",
+      "type": "table",
+      "caption": "(d) Inference steps.Effect of inference steps T. (f) Representation encoder. DI-NOv2 vs. SigLIP2",
+      "visual_summary": "(d) Inference steps.Effect of inference steps T. (f) Representation encoder. DI-NOv2 vs. SigLIP2",
+      "visual_type": "table",
+      "placement_hint": "实验与分析",
+      "is_sample_only": false,
+      "cluster_size": 2,
+      "full_region_source": "pdf_crop",
+      "is_full_region": true
+    },
+    {
+      "item_id": "item_010",
+      "label": "Table",
+      "type": "table",
+      "caption": "(c)Mask value.Fixed,random, or learned mask token",
+      "visual_summary": "(c)Mask value.Fixed,random, or learned mask token",
+      "visual_type": "table",
+      "placement_hint": "实验与分析",
+      "is_sample_only": false,
+      "cluster_size": 2,
+      "full_region_source": "pdf_crop",
+      "is_full_region": true
+    }
+  ],
+  "context_note": "Part and figure/table context is filtered for this section; use verified_analysis for global facts.",
+  "section_title": "核心模块与公式推导",
+  "section_goal": "只写关键模块、关键公式、公式变量含义，禁止猜公式。"
+}

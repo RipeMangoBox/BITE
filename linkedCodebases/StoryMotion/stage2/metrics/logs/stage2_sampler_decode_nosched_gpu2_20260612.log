@@ -1,0 +1,12 @@
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+--> Autoaligner loaded from checkpoint
+{"batch": 0, "elapsed_sec": 2.6127240657806396, "event": "batch_done", "run": "mixed_nosched_last", "samples_done": 16}
+{"batch": 1, "elapsed_sec": 3.612713575363159, "event": "batch_done", "run": "mixed_nosched_last", "samples_done": 32}
+{"batch": 2, "elapsed_sec": 4.545920133590698, "event": "batch_done", "run": "mixed_nosched_last", "samples_done": 48}
+{"batch": 3, "elapsed_sec": 5.440526008605957, "event": "batch_done", "run": "mixed_nosched_last", "samples_done": 64}
+{"elapsed_sec": 5.440735578536987, "event": "sampler_decode_smoke_written", "out_dir": "runs/eval/stage2_sampler_decode_smoke_20260612/mixed_nosched_last", "run": "mixed_nosched_last", "sample_steps": 50, "samples": 64}

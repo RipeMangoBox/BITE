@@ -1,0 +1,16 @@
+{
+  "date": "2026-05-25T04:12:17",
+  "protocol": "paperIDEAs/MoDebug/experiments/active/full_text_full_motion_plugin_eval_20260520/protocols/phase1_phase2_eval_data_split_contract.md",
+  "condition_pair": "original_full_text_only",
+  "role": "diagnostic",
+  "used_for": "observation",
+  "limitations": "Original100 baseline generation artifact only; not a final evaluator; unified rendering and human review are downstream.",
+  "artifact_path": "/data/public/ripemangobox/Motion/EventT2M-codes/artifacts/remote4090/modebug_hml_original100_four_baseline_20260524/results/molingo/molingo_263_original100_20260524",
+  "evaluator": "molingo_custom_prompt_original100_runner",
+  "motion_source": "MoLingo pretrained_model_263 on remote4090 GPU0 via event-t2m env",
+  "n/evaluable": "100/100",
+  "coverage": "100 HumanML3D native full-motion captions; target length from clipped GT frames.",
+  "joints_npy_count": 100,
+  "features_npy_count": 100,
+  "static_png_count": 100
+}

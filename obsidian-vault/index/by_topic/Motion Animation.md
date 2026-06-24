@@ -1,0 +1,469 @@
+---
+title: "Topic: Motion Animation"
+type: paper-index
+dimension: topic
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Topic: Motion Animation
+
+- [[obsidian-vault/analysis/TOG_2019/NSM_Neural_State_Machine_for_Character_Scene_Interactions.md|Neural State Machine for Character-Scene Interactions (TOG 2019 2019)]]
+	- [[obsidian-vault/paperPDFs/TOG_2019/Neural_State_Machine_for_Character_Scene_Interactions.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: Neural State Machine (NSM)
+	- datasets: Sitting task - final pose precision, Carrying task - final pose precision, Responsiveness - idle to walk transition
+- [[obsidian-vault/analysis/NEURIPS_2022/HUMANISE_Language-conditioned_Human_Motion_Generation_in_3D_Scenes.md|HUMANISE: Language-conditioned Human Motion Generation in 3D Scenes (NeurIPS 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2022/HUMANISE:_Language-conditioned_Human_Motion_Generation_in_3D_Scenes.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Scene-and-language conditioned cVAE generative model with self-attention fusion and auxiliary losses
+	- datasets: HUMANISE
+- [[obsidian-vault/analysis/CVPR_2023/MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space.md|MLD: Executing your Commands via Motion Diffusion in Latent Space (CVPR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2023/MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Motion Latent-based Diffusion (MLD)
+	- datasets: HumanML3D, KIT
+- [[obsidian-vault/analysis/CVPR_2023/T2M_GPT_Generating_Human_Motion_from_Textual_Descriptions_with_Discrete_Representations.md|T2M-GPT: Generating Human Motion from Textual Descriptions with Discrete Representations (CVPR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2023/T2M_GPT_Generating_Human_Motion_from_Textual_Descriptions_with_Discrete_Representations.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow
+	- methods: T2M-GPT
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/ICLR_2023/MDM_Human_Motion_Diffusion_Model.md|MDM: Human Motion Diffusion Model (ICLR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2023/MDM_Human_Motion_Diffusion_Model.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow
+	- methods: Motion Diffusion Model (MDM)
+	- datasets: HumanML3D, KIT, HumanAct12
+- [[obsidian-vault/analysis/ICLR_2023/On_The_Effectiveness_of_Out_of_Distribution_Data_in_Self_Supervised_Long_Tail_Learning.md|On The Effectiveness of Out-of-Distribution Data in Self-Supervised Long-Tail Learning (ICLR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2023/On_The_Effectiveness_of_Out_of_Distribution_Data_in_Self_Supervised_Long_Tail_Learning.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: COLT (Contrastive with Out-of-distribution data for Long-Tail learning)
+	- datasets: CIFAR-10-LT, CIFAR-100-LT, ImageNet-100-LT
+- [[obsidian-vault/analysis/NEURIPS_2023/MotionGPT_Human_Motion_as_a_Foreign_Language.md|MotionGPT: Human Motion as a Foreign Language (NEURIPS 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2023/MotionGPT_Human_Motion_as_a_Foreign_Language.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MotionGPT
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/TPAMI_2023/MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model.md|MotionDiffuse: Text-Driven Human Motion Generation with Diffusion Model (TPAMI 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/TPAMI_2023/MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow
+	- methods: MotionDiffuse
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/AAAI_2024/InstructAvatar_Text_Guided_Emotion_and_Motion_Control_for_Avatar_Generation.md|InstructAvatar: Text-Guided Emotion and Motion Control for Avatar Generation (AAAI 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2024/InstructAvatar_Text_Guided_Emotion_and_Motion_Control_for_Avatar_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: InstructAvatar
+	- datasets: MEAD, TalkingHead 1KH
+- [[obsidian-vault/analysis/AAAI_2024/Robustness_Guided_Image_Synthesis_for_Data_Free_Quantization.md|Robustness-Guided Image Synthesis for Data-Free Quantization (AAAI 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2024/Robustness_Guided_Image_Synthesis_for_Data_Free_Quantization.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Robustness-Guided Image Synthesis (RIS)
+	- datasets: CIFAR-100, CIFAR-10/100, ImageNet
+- [[obsidian-vault/analysis/ACM_MM_2024/SATO_Stable_Text-to-Motion_Framework.md|SATO: Stable Text-to-Motion Framework (ACM MM 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ACM_MM_2024/SATO_Stable_Text_to_Motion_Framework.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SATO (Stable Text-to-Motion Framework)
+	- datasets: HumanML3D, KIT-ML, Human evaluation
+- [[obsidian-vault/analysis/arxiv_2024/DSONet_Textual_Decomposition_Then_Sub_Motion_Space_Scattering_for_Open_Vocabulary_Motion_Generation.md|Textual Decomposition Then Sub-Motion-Space Scattering for Open-Vocabulary Motion Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/DSONet_Textual_Decomposition_Then_Sub_Motion_Space_Scattering_for_Open_Vocabulary_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: DSO-Net
+	- datasets: HumanML3D, Idea400, Mixamo
+- [[obsidian-vault/analysis/CVPR_2024/DanceCamera3D_3D_Camera_Movement_Synthesis_with_Music_and_Dance.md|DanceCamera3D: 3D Camera Movement Synthesis with Music and Dance (CVPR 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/DanceCamera3D_3D_Camera_Movement_Synthesis_with_Music_and_Dance.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FIDk ↓
+- [[obsidian-vault/analysis/CVPR_2024/Tri-Modal_Motion_Retrieval_by_Learning_a_Joint_Embedding_Space.md|Tri-Modal Motion Retrieval by Learning a Joint Embedding Space (CVPR 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/Tri-Modal_Motion_Retrieval_by_Learning_a_Joint_Embedding_Space.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: LAVIMO (LAnguage-VIdeo-MOtion alignment)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2024/MMM_Generative_Masked_Motion_Model.md|HGM Hierarchical Generative Masked Motion Modeling with Hard Token Mining (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/MMM_Generative_Masked_Motion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Motion Animation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MMM (Generative Masked Motion Model)
+	- datasets: HumanML3D, KIT-ML, Motion In-betweening
+- [[obsidian-vault/analysis/CVPR_2024/MMM_Generative_Masked_Motion_Model.md|MMM: Generative Masked Motion Model (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/MMM_Generative_Masked_Motion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Motion Animation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MMM (Generative Masked Motion Model)
+	- datasets: HumanML3D, KIT-ML, Motion In-betweening
+- [[obsidian-vault/analysis/CVPR_2024/MoMask_Generative_Masked_Modeling_of_3D_Human_Motions.md|MoMask: Generative Masked Modeling of 3D Human Motions (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/MoMask_Generative_Masked_Modeling_of_3D_Human_Motions.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MoMask
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2024/NoiseCLR_A_Contrastive_Learning_Approach_for_Unsupervised_Discovery_of_Interpretable_Directions_in_Diffusion_Models.md|NoiseCLR: A Contrastive Learning Approach for Unsupervised Discovery of Interpretable Directions in Diffusion Models (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/NoiseCLR_A_Contrastive_Learning_Approach_for_Unsupervised_Discovery_of_Interpretable_Directions_in_Diffusion_Models.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: NoiseCLR
+	- datasets: Race Edit, Mustache Edit, Age Edit
+- [[obsidian-vault/analysis/ECCV_2024/Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation.md|Motion Mamba: Efficient and Long Sequence Motion Generation (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Systems / Efficiency / Compression
+	- methods: Motion Mamba
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/ICLR_2024/PriorMDM_Human_Motion_Diffusion_as_a_Generative_Prior.md|PriorMDM: Human Motion Diffusion as a Generative Prior (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/PriorMDM:_Human_Motion_Diffusion_as_a_Generative_Prior.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PriorMDM Composition Methods (DoubleTake, ComMDM, DiffusionBlending)
+	- datasets: BABEL, HumanML3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MotionFix_Text_Driven_3D_Human_Motion_Editing.md|MotionFix: Text-Driven 3D Human Motion Editing (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MotionFix_Text_Driven_3D_Human_Motion_Editing.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: TMED (Text-Driven Motion Editing Diffusion Model)
+	- datasets: MotionFix 测试集, 数据规模消融
+- [[obsidian-vault/analysis/TPAMI_2024/GTA-Human_Playing_for_3D_Human_Recovery.md|GTA-Human: Playing for 3D Human Recovery (TPAMI 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/TPAMI_2024/GTA-Human:_Playing_for_3D_Human_Recovery.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: GTA-Human Dataset with Blended Training and Finetuning
+- [[obsidian-vault/analysis/AAAI_2025/ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models.md|ReMoGPT: Part-Level Retrieval-Augmented Motion Language Models (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: LLM / Reasoning / Alignment
+	- methods: ReMoGPT
+	- datasets: HumanML3D, Motion-X
+- [[obsidian-vault/analysis/arxiv_2025/CoMPAS3D_A_Dataset_and_Benchmark_for_Interactive_Motion.md|CoMPAS3D: A Dataset and Benchmark for Interactive Motion (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/CoMPAS3D:_A_Dataset_and_Benchmark_for_Interactive_Motion.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: CoMPAS3D（数据集与三层评估框架）
+	- datasets: CoMPAS3D Move Classification, CoMPAS3D Proficiency Estimation, CoMPAS3D Follower Generation - 运动学指标
+- [[obsidian-vault/analysis/arxiv_2025/FlexMotion_Lightweight_Physics-Aware_and_Controllable_Human_Motion_Generation.md|FlexMotion: Lightweight, Physics-Aware, and Controllable Human Motion Generation (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/FlexMotion:_Lightweight,_Physics-Aware,_and_Controllable_Human_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FlexMotion
+	- datasets: HumanML3D, Computational Efficiency
+- [[obsidian-vault/analysis/arxiv_2025/MEgoHand_Multimodal_Egocentric_Hand-Object_Interaction_Motion_Generation.md|MEgoHand: Multimodal Egocentric Hand-Object Interaction Motion Generation (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/MEgoHand:_Multimodal_Egocentric_Hand-Object_Interaction_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MEgoHand
+	- datasets: In-domain, Cross-domain ARCTIC, Cross-domain HOLO
+- [[obsidian-vault/analysis/arxiv_2025/Motion_Anything_Any_to_Motion_Generation.md|Motion Anything: Any to Motion Generation (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Motion_Anything_Any_to_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Motion Anything
+	- datasets: HumanML3D, KIT-ML, AIST++
+- [[obsidian-vault/analysis/arxiv_2025/MotionDuet_Dual-Conditioned_3D_Human_Motion_Generation_with_Video-Regularized_Text_Learning.md|MotionDuet: Dual-Conditioned 3D Human Motion Generation with Video-Regularized Text Learning (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/MotionDuet:_Dual-Conditioned_3D_Human_Motion_Generation_with_Video-Regularized_Text_Learning.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionDuet
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2025/SMAP_Self-supervised_Motion_Adaptation_for_Physically_Plausible_Humanoid_Whole-body_Control.md|SMAP: Self-supervised Motion Adaptation for Physically Plausible Humanoid Whole-body Control (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/SMAP_Self_supervised_Motion_Adaptation_for_Physically_Plausible_Humanoid_Whole_body_Control.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SMAP
+	- datasets: CMU MoCap
+- [[obsidian-vault/analysis/arxiv_2025/Towards_Synthesized_and_Editable_Motion_In-Betweening_Through_Part-Wise_Phase_Representation.md|Towards Synthesized and Editable Motion In-Betweening Through Part-Wise Phase Representation (arXiv 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Towards_Synthesized_and_Editable_Motion_In_Betweening_Through_Part_Wise_Phase_Representation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Part-Wise Phase Representation Framework (BP Phase Autoencoder + BPMoE + Motion Sampler)
+- [[obsidian-vault/analysis/arxiv_2025/CASIM_Composite_Aware_Semantic_Injection_for_Text_to_Motion_Generation.md|CASIM: Composite Aware Semantic Injection for Text to Motion Generation (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/CASIM:_Composite_Aware_Semantic_Injection_for_Text_to_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CASIM (Composite Aware Semantic Injection Mechanism)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2026/MAMMA_Markerless_Accurate_Multi_person_Motion_Acquisition.md|MAMMA Markerless and Automatic Multi Person Motion Action Capture (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MAMMA_Markerless_Accurate_Multi_person_Motion_Acquisition.pdf|PDF]]
+	- topics: Pose Trajectory Control, Motion Animation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MAMMA
+	- datasets: RICH, MOYO, Harmony4D
+- [[obsidian-vault/analysis/arxiv_2025/OmniMoGen.md|OmniMoGen: Unifying Human Motion Generation via Learning from Interleaved Text-Motion Instructions (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/OmniMoGen.pdf|PDF]]
+	- topics: Motion Animation, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Agent / RL / Planning
+	- methods: OmniMoGen
+	- datasets: HumanML3D, MotionFix, AnyContext
+- [[obsidian-vault/analysis/arxiv_2025/OmniMotion_Multimodal_Motion_Generation_with_Continuous_Masked_Autoregression.md|OmniMotion: Multimodal Motion Generation with Continuous Masked Autoregression (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/OmniMotion:_Multimodal_Motion_Generation_with_Continuous_Masked_Autoregression.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OmniMotion
+	- datasets: HumanML3D subset of Motion-X, BEAT2, FineDance
+- [[obsidian-vault/analysis/arxiv_2025/Think_Before_You_Move_Latent_Motion_Reasoning_for_Text-to-Motion_Generation.md|Think Before You Move: Latent Motion Reasoning for Text-to-Motion Generation (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Think_Before_You_Move:_Latent_Motion_Reasoning_for_Text-to-Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Latent Motion Reasoning (LMR)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2025/AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Reward.md|AToM: Aligning Text-to-Motion Model at Event-Level with GPT-4Vision Reward (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Reward.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Agent / RL / Planning
+	- methods: AToM
+	- datasets: Temporal, Human evaluation
+- [[obsidian-vault/analysis/CVPR_2025/HumanDreamer_Generating_Controllable_Human_Motion_Videos_via_Decoupled_Generation.md|HumanDreamer: Generating Controllable Human Motion Videos via Decoupled Generation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/HumanDreamer_Generating_Controllable_Human_Motion_Videos_via_Decoupled_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Vision / Multimodal / 3D
+	- methods: HumanDreamer
+	- datasets: MotionVid subset, Pose-to-Video
+- [[obsidian-vault/analysis/CVPR_2025/MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation.md|MARDM: Rethinking Diffusion for Text-Driven Human Motion Generation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow
+	- methods: MARDM
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/CVPR_2025/MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation_across_Multiple_Granularities.md|MG-MotionLLM: A Unified Framework for Motion Comprehension and Generation across Multiple Granularities (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation_across_Multiple_Granularities.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: MG-MotionLLM
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/CVPR_2025/SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation_and_Editing.md|SALAD: Skeleton-aware Latent Diffusion for Text-driven Motion Generation and Editing (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation_and_Editing.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: SALAD
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/CVPR_2025/SimMotionEdit_Text_Based_Human_Motion_Editing_with_Motion_Similarity_Prediction.md|SimMotionEdit: Text-Based Human Motion Editing with Motion Similarity Prediction (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/SimMotionEdit_Text_Based_Human_Motion_Editing_with_Motion_Similarity_Prediction.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: SimMotionEdit
+	- datasets: MotionFix 测试集
+- [[obsidian-vault/analysis/CVPR_2025/TokenMotion_Decoupled_Motion_Control_via_Token_Disentanglement_for_Human_centric_Video_Generation.md|TokenMotion: Decoupled Motion Control via Token Disentanglement for Human-centric Video Generation (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/TokenMotion_Decoupled_Motion_Control_via_Token_Disentanglement_for_Human_centric_Video_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: TokenMotion
+	- datasets: HumanVid + RealEstate10K
+- [[obsidian-vault/analysis/ICCV_2025/Morph_A_Motion-free_Physics_Optimization_Framework_for_Human_Motion_Generation.md|Morph: A Motion-free Physics Optimization Framework for Human Motion Generation (ICCV 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/Morph_A_Motion_free_Physics_Optimization_Framework_for_Human_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Morph
+	- datasets: HumanML3D, AIST++
+- [[obsidian-vault/analysis/ICCV_2025/FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annotation_for_Fine_grained_Motion_Generation_and_Editing.md|FineMotion: A Dataset and Benchmark with both Spatial and Temporal Annotation for Fine-grained Motion Generation and Editing (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annotation_for_Fine_grained_Motion_Generation_and_Editing.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Benchmark / Evaluation, Data Curation / Synthesis
+	- methods: FineMotion
+	- datasets: HumanML3D test set
+- [[obsidian-vault/analysis/ICCV_2025/MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Condition_Motion_Paradigm.md|MotionLab: Unified Human Motion Generation and Editing via the Motion-Condition-Motion Paradigm (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Condition_Motion_Paradigm.pdf|PDF]]
+	- topics: Motion Animation, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MotionLab
+	- datasets: HumanML3D, MotionFix
+- [[obsidian-vault/analysis/ICCV_2025/MotionStreamer_Streaming_Motion_Generation_via_Diffusion_based_Autoregressive_Model_in_Causal_Latent_Space.md|MotionStreamer: Streaming Motion Generation via Diffusion-based Autoregressive Model in Causal Latent Space (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/MotionStreamer_Streaming_Motion_Generation_via_Diffusion_based_Autoregressive_Model_in_Causal_Latent_Space.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: MotionStreamer
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/ICCV_2025/PRIMAL_Physically_Reactive_and_Interactive_Motor_Model_for_Avatar_Learning.md|PRIMAL Physically Reactive and Interactive Motor Model for Avatar Learning (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/PRIMAL_Physically_Reactive_and_Interactive_Motor_Model_for_Avatar_Learning.pdf|PDF]]
+	- topics: Motion Animation, Pose Trajectory Control
+	- method groups: Other Method Family
+	- methods: PRIMAL
+	- datasets: Motion Realism, Reaction to Induced Impulses, Semantic Action Generation
+- [[obsidian-vault/analysis/ICCV_2025/You_Think_You_ACT_The_New_Task_of_Arbitrary_Text_to_Motion_Generation.md|You Think, You ACT: The New Task of Arbitrary Text to Motion Generation (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/You_Think_You_ACT_The_New_Task_of_Arbitrary_Text_to_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Think and Act framework for Arbitrary Text (TAAT)
+	- datasets: HUMANML3D++ Scene Text to Motion, HUMANML3D++ Action Texts to Motion
+- [[obsidian-vault/analysis/ICLR_2025/DART_A_Diffusion_Based_Autoregressive_Motion_Model_for_Real_Time_Text_Driven_Motion_Control.md|DART: A Diffusion-Based Autoregressive Motion Model for Real-Time Text-Driven Motion Control (ICLR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/DART_A_Diffusion_Based_Autoregressive_Motion_Model_for_Real_Time_Text_Driven_Motion_Control.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow
+	- methods: DART (DartControl)
+	- datasets: Text-conditioned temporal motion composition, Text-conditioned goal-reaching
+- [[obsidian-vault/analysis/NEURIPS_2025/MOSPA_Human_Motion_Generation_Driven_by_Spatial_Audio.md|MOSPA: Human Motion Generation Driven by Spatial Audio (NEURIPS 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/MOSPA_Human_Motion_Generation_Driven_by_Spatial_Audio.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MOSPA
+	- datasets: SAM
+- [[obsidian-vault/analysis/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.md|AnyTop Character Animation Diffusion with Any Topology (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnyTop
+	- datasets: Truebones Zoo - Quadrupeds subset, Truebones Zoo - Bipeds subset, Truebones Zoo - Flying subset
+- [[obsidian-vault/analysis/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.md|AnyTop: Character Animation Diffusion with Any Topology (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnyTop
+	- datasets: Truebones Zoo - Quadrupeds subset, Truebones Zoo - Bipeds subset, Truebones Zoo - Flying subset
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MAMM_Motion_Control_via_Metric_Aligning_Motion_Matching.md|MAMM: Motion Control via Metric-Aligning Motion Matching (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MAMM.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Benchmark / Evaluation
+	- methods: Metric-Aligning Motion Matching (MAMM)
+	- datasets: Mixamo/Adobe动画资产, 手绘曲线、合成波形、音频、运动等控制序列
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MAMM_Motion_Control_via_Metric_Aligning_Motion_Matching.md|Motion Control via Metric-Aligning Motion Matching (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MAMM.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Benchmark / Evaluation
+	- methods: Metric-Aligning Motion Matching (MAMM)
+	- datasets: Mixamo/Adobe动画资产, 手绘曲线、合成波形、音频、运动等控制序列
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.md|PARC: Physics-based Augmentation with Reinforcement Learning for Character Controllers (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Agent / RL / Planning, Data Curation / Synthesis
+	- methods: PARC
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/CamCloneMaster_Enabling_Reference_based_Camera_Control_for_Video_Generation.md|CamCloneMaster: Enabling Reference-based Camera Control for Video Generation (SIGGRAPH ASIA 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/CamCloneMaster_Enabling_Reference_based_Camera_Control_for_Video_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: CamCloneMaster
+	- datasets: RealEstate10K
+- [[obsidian-vault/analysis/AAAI_2026/ReAlign_Text_to_Motion_Generation_via_Step_Aware_Reward_Guided_Alignment.md|ReAlign: Text-to-Motion Generation via Step-Aware Reward-Guided Alignment (AAAI 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/ReAlign_Text_to_Motion_Generation_via_Step_Aware_Reward_Guided_Alignment.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: LLM / Reasoning / Alignment, Agent / RL / Planning
+	- methods: ReAlign (Reward-guided sampling Alignment)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2026/AnyMo_Scaling_Any-Modality_Conditional_Motion_Generation_with_Masked_Modeling.md|AnyMo: Scaling Any-Modality Conditional Motion Generation with Masked Modeling (arXiv 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/AnyMo_Scaling_Any_Modality_Conditional_Motion_Generation_with_Masked_Modeling.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: AnyMo
+	- datasets: OmniHuMo-Text test set, OmniHuMo-Speech test set, OmniHuMo-Music test set
+- [[obsidian-vault/analysis/arxiv_2026/Coordinating_Multiple_Conditions_for_Trajectory-Controlled_Human_Motion_Generation.md|Coordinating Multiple Conditions for Trajectory-Controlled Human Motion Generation (arXiv 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Coordinating_Multiple_Conditions_for_Trajectory-Controlled_Human_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CMC (Coordinating Multiple Conditions)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.md|MotionVLA: Vision-Language-Action Model for Humanoid Motion (arXiv 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MotionVLA
+	- datasets: MBench, HumanML3D
+- [[obsidian-vault/analysis/arxiv_2026/AnyAct_Towards_Human_Reenactment_of_Character_Motion_From_Video.md|AnyAct: Towards Human Reenactment of Character Motion From Video (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/AnyAct_Towards_Human_Reenactment_of_Character_Motion_From_Video.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: AnyAct
+	- datasets: AnyAct benchmark
+- [[obsidian-vault/analysis/arxiv_2026/FlowAct-R1_Towards_Interactive_Humanoid_Video_Generation.md|FlowAct-R1: Towards Interactive Humanoid Video Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/FlowAct-R1:_Towards_Interactive_Humanoid_Video_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FlowAct-R1
+	- datasets: User study, Real-time performance
+- [[obsidian-vault/analysis/arxiv_2026/Motion-Adapter_A_Diffusion_Model_Adapter_for_Text-to-Motion_Generation_of_Compound_Actions.md|Motion-Adapter: A Diffusion Model Adapter for Text-to-Motion Generation of Compound Actions (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Motion-Adapter:_A_Diffusion_Model_Adapter_for_Text-to-Motion_Generation_of_Compound_Actions.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Motion-Adapter
+	- datasets: 用户研究, 复合动作数据集
+- [[obsidian-vault/analysis/arxiv_2026/Reconstruction-Anchored_Diffusion_Model_for_Text-to-Motion_Generation.md|Reconstruction-Anchored Diffusion Model for Text-to-Motion Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Reconstruction-Anchored_Diffusion_Model_for_Text-to-Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Reconstruction-Anchored Diffusion Model (RAM)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2026/ActionPlan_Future_Aware_Streaming_Motion_Synthesis_via_Frame_Level_Action_Planning.md|ActionPlan: Future-Aware Streaming Motion Synthesis via Frame-Level Action Planning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ActionPlan_Future_Aware_Streaming_Motion_Synthesis_via_Frame_Level_Action_Planning.pdf|PDF]]
+	- topics: Motion Animation, Generative Models / Diffusion, Diffusion Model
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Frame-level action plan, two-stage hierarchical diffusion, heterogeneous timesteps
+	- datasets: HumanML3D-272, BABEL frame-level annotations
+- [[obsidian-vault/analysis/CVPR_2026/CMDM_HP.md|CMDM-HP: Causal Motion Diffusion Models for Autoregressive Motion Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CMDM_HP.pdf|PDF]]
+	- topics: Motion Animation, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Causal Motion Diffusion Models (CMDM)
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/CVPR_2026/Envisioning_the_Future_One_Step_at_a_Time.md|Envisioning the Future, One Step at a Time (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Envisioning_the_Future_One_Step_at_a_Time.pdf|PDF]]
+	- topics: Time Series / Dynamical Systems, Motion Animation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Myriad
+	- datasets: OWM, PhysicsIQ, Physion
+- [[obsidian-vault/analysis/CVPR_2026/FrankenMotion_Part_level_Human_Motion_Generation_and_Composition.md|FrankenMotion: Part-level Human Motion Generation and Composition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FrankenMotion_Part_level_Human_Motion_Generation_and_Composition.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: FrankenMotion
+	- datasets: FrankenStein
+- [[obsidian-vault/analysis/CVPR_2026/LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Inference.md|LaMoGen: Language-to-Motion Generation Through LLM-Guided Symbolic Inference (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Inference.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
+	- methods: LaMoGen
+	- datasets: Laban Benchmark, HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2026/MAMMA_Markerless_Accurate_Multi_person_Motion_Acquisition.md|MAMMA: Markerless Accurate Multi-person Motion Acquisition (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MAMMA_Markerless_Accurate_Multi_person_Motion_Acquisition.pdf|PDF]]
+	- topics: Pose Trajectory Control, Motion Animation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MAMMA
+	- datasets: RICH, MOYO, Harmony4D
+- [[obsidian-vault/analysis/CVPR_2026/Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_Open_Vocabulary_Motion_Generation.md|Open the Motion Door: Atomic Motion Decomposition and Recomposition for Open-Vocabulary Motion Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Motion Animation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Atomic Motion Decomposition and Recomposition
+	- datasets: HumanML3D, IDEA400, Mixamo
+- [[obsidian-vault/analysis/CVPR_2026/ProjFlow_Projection_Sampling_with_Flow_Matching_for_Zero_Shot_Exact_Spatial_Motion_Control.md|ProjFlow: Projection Sampling with Flow Matching for Zero-Shot Exact Spatial Motion Control (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ProjFlow_Projection_Sampling_with_Flow_Matching_for_Zero_Shot_Exact_Spatial_Motion_Control.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ProjFlow
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/ICLR_2026/COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High_Quality_Text_to_Motion_Generation.md|COME: Advancing Representation Learning and Generative Modeling for High-Quality Text-to-Motion Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High_Quality_Text_to_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: COME (Continuous Motion Diffusion)
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/ICLR_2026/Motion_R1_Enhancing_Motion_Generation_via_Decomposed_CoT_and_Reinforcement_Learning_Binding.md|Motion-R1: Enhancing Motion Generation via Decomposed CoT and Reinforcement Learning Binding (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Motion_R1_Enhancing_Motion_Generation_via_Decomposed_CoT_and_Reinforcement_Learning_Binding.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: Motion-R1
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/TMM_2026/Multi-Modal_Motion_Retrieval_by_Learning_a_Fine-Grained_Joint_Embedding_Space.md|Multi-Modal Motion Retrieval by Learning a Fine-Grained Joint Embedding Space (TMM 2026)]]
+	- [[obsidian-vault/paperPDFs/TMM_2026/Multi-Modal_Motion_Retrieval_by_Learning_a_Fine-Grained_Joint_Embedding_Space.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Multi-Modal Fine-Grained Joint Embedding Framework
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/TPAMI_2026/DrawMotion_Generating_3D_Human_Motions_by_Freehand_Drawing.md|DrawMotion: Generating 3D Human Motions by Freehand Drawing (TPAMI 2026)]]
+	- [[obsidian-vault/paperPDFs/TPAMI_2026/DrawMotion_Generating_3D_Human_Motions_by_Freehand_Drawing.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DrawMotion
+	- datasets: HumanML3D test set, KIT-ML test set, User Study
+- [[obsidian-vault/analysis/WACV_2026/SegMo_Segment-aligned_Text_to_3D_Human_Motion_Generation.md|SegMo: Segment-aligned Text to 3D Human Motion Generation (WACV 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/WACV_2026/SegMo:_Segment-aligned_Text_to_3D_Human_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SegMo
+	- datasets: HumanML3D, KIT-ML

@@ -1,0 +1,162 @@
+[
+  {
+    "step": 2500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 4.220882892608643,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.4853801419958472
+  },
+  {
+    "step": 5000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.733103036880493,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.43731896253302693
+  },
+  {
+    "step": 7500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.771573781967163,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.4197887913323939
+  },
+  {
+    "step": 10000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7591915130615234,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.3908449145965278
+  },
+  {
+    "step": 12500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7609975337982178,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.41034332755953074
+  },
+  {
+    "step": 15000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7419745922088623,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.37688472447916865
+  },
+  {
+    "step": 17500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.8912785053253174,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.35807329788804054
+  },
+  {
+    "step": 20000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7964677810668945,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.3669971558265388
+  },
+  {
+    "step": 22500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7760887145996094,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.3566129747778177
+  },
+  {
+    "step": 25000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7733941078186035,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.37303591007366776
+  },
+  {
+    "step": 27500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.780683755874634,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.35795728769153357
+  },
+  {
+    "step": 30000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 4.006983280181885,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.32088647969067097
+  },
+  {
+    "step": 32500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7869958877563477,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.3435884127393365
+  },
+  {
+    "step": 35000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7791945934295654,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.31933772284537554
+  },
+  {
+    "step": 37500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.767774820327759,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.29493606742471457
+  },
+  {
+    "step": 40000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7598183155059814,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.33970597805455327
+  },
+  {
+    "step": 42500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.852870464324951,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.3215856743045151
+  },
+  {
+    "step": 45000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7592720985412598,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.3162027127109468
+  },
+  {
+    "step": 47500,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.7395904064178467,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.31602156395092607
+  },
+  {
+    "step": 50000,
+    "split": "eval",
+    "batches": 32,
+    "elapsed_sec": 3.773332357406616,
+    "metric_scope": "unaugmented_denoising_reconstruction_proxy",
+    "loss_mot_rec": 0.3100358354859054
+  }
+]

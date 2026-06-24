@@ -1,0 +1,3119 @@
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en"> 
+
+<head>
+    <style>html { scroll-padding-top: 70px; /* height of sticky header plus extra */ }</style>
+    
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/static/virtual/js/virtual.js"></script>
+    <meta name="google-site-verification" content="0jwPnVXIAk4FvFdT37dwMmd-kjHF86e5DKwvqlStUW0">
+
+
+    
+    <link rel="stylesheet" href="/static/core/css/core.css" type="text/css">
+    <link rel="stylesheet" href="/static/virtual/css/virtual.css" type="text/css">
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/static/core/css/custom.css" type="text/css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['\\[', '\\]']],
+            processEscapes: true,
+          },
+          options: {
+            ignoreHtmlClass: 'no-mathjax',
+          }
+        };
+    </script>
+
+    <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+            nonce="ZJbFpqBn1Ubcm7Y8xFphwA==" >
+    </script>
+
+    <!--This script keeps local links inside the web app rather than opening them
+in Safari, and has nothing to do with editing or Aloha.-->
+
+<script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+    (function (document, navigator, standalone) {
+
+        if ((standalone in navigator) && navigator[standalone]) {
+            var curnode, location = document.location, stop = /^(a|html)$/i;
+            document.addEventListener('click', function (e) {
+                curnode = e.target;
+                while (!(stop).test(curnode.nodeName)) {
+                    curnode = curnode.parentNode;
+                }
+
+                if (
+                    'href' in curnode && // is a link
+                    (chref = curnode.href).replace(location.href, '').indexOf('#') && // is not an anchor
+                    (!(/^[a-z\+\.\-]+:/i).test(chref) ||                       // either does not have a proper scheme (relative links)
+                        chref.indexOf(location.protocol + '//' + location.host) === 0) // or is in the same protocol and domain
+                ) {
+                    e.preventDefault();
+                    location.href = curnode.href;
+                }
+            }, false);
+        }
+    })(document, window.navigator, 'standalone');
+</script>
+
+
+<style>
+
+    @media screen and (min-width: 767px) {
+        .blurb {
+            min-height: 260px;
+        }
+    }
+</style>
+    
+
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"
+        integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
+</script>
+
+<script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+    if (typeof jQuery === 'undefined') {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = "/static/core/js/jquery-3.6.1.min.js";
+        document.head.appendChild(script);
+    }
+</script>
+
+    
+    <script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+        var $ = jQuery;
+    </script>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+    <script src="/static/core/js/ajax-csrf-snippet.js"></script>
+    
+    <link rel="stylesheet" href="/static/fontawesomefree/css/all.min.css">
+    <script src="/static/fontawesomefree/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+
+
+    <style nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+        body {
+            font-family: Exo;}
+    </style>
+
+
+
+
+
+
+
+
+        
+
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic">
+    <link href="https://fonts.googleapis.com/css2?family=Exo:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/virtual/css/virtual.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.bundle.min.js" integrity="sha512-lEb9Vp/rkl9g2E/LdHIMFTqz21+LA79f84gqP75fbimHqVTu6483JG1AwJlWLLQ8ezTehty78fObKupq3HSHPQ==" crossorigin="anonymous"></script>
+    <script src="/static/core/js/moment/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="/static/core/js/ajax-csrf-snippet.js" ></script>
+    <script src="/static/virtual/js/virtual.js"></script>
+    
+
+    
+
+    
+    <title>ICML Poster Annotations Mitigate Post-Training Mode Collapse</title>
+    <script src='https://slideslive.com/embed_presentation.js'></script>
+    
+    <link rel="canonical" href="https://ICML.cc/virtual/2026/poster/63468">
+    
+        <script type="application/ld+json">
+      {
+ "@context": "https://schema.org/",
+ "@type": "CreativeWork",
+ "name": "Annotations Mitigate Post-Training Mode Collapse",
+ "creditText": "ICML 2026",
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Jacob Mitchell Springer"
+  },
+  {
+   "@type": "Person",
+   "name": "Madhu Advani"
+  },
+  {
+   "@type": "Person",
+   "name": "Lukas Aichberger"
+  },
+  {
+   "@type": "Person",
+   "name": "Arwen Bradley"
+  },
+  {
+   "@type": "Person",
+   "name": "Eran Malach"
+  },
+  {
+   "@type": "Person",
+   "name": "Omid Saremi"
+  },
+  {
+   "@type": "Person",
+   "name": "Sinead Williamson"
+  },
+  {
+   "@type": "Person",
+   "name": "Preetum Nakkiran"
+  },
+  {
+   "@type": "Person",
+   "name": "Etai Littwin"
+  },
+  {
+   "@type": "Person",
+   "name": "Aditi Raghunathan"
+  }
+ ],
+ "datePublished": "2026-05-05",
+ "dateModified": "2026-06-04"
+}
+    </script>
+    
+    
+
+    <style nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+        /* ========================================
+           CSS Variables - Design System
+           ======================================== */
+        :root {
+            --primary-blue: #1976d2;
+            --zoom-blue: #2d8cff;
+            --project-purple: #6c5ce7;
+            --success-green: #28a745;
+            --warning-red: #dc3545;
+            --text-primary: #212121;
+            --text-secondary: #555;
+            --text-muted: #777;
+            --bg-light: #f8f9fa;
+            --bg-page: #f6f6f6;
+            --border-light: #e0e0e0;
+            --border-lighter: #f0f0f0;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        /* ========================================
+           Base Page Styling
+           ======================================== */
+        body {
+            background: var(--bg-page);
+        }
+
+        .detail-page-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 40px 24px;
+        }
+
+        /* ========================================
+           Hero Card - Main Event Info
+           ======================================== */
+        .hero-card {
+            display: block;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border-left: 5px solid #6c757d;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .hero-card::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Event Type Colors - matches eventlistwithbios card accents */
+        .hero-card.invited-talk { border-left-color: #0d9488; }
+        /* Keynote talk: indigo accent + subtle gradient. Declared so that an event
+           with both `invited-talk` and `keynote-talk` classes (the keynote case —
+           type="Invited Talk", event_type="Keynote Talk") gets the keynote color. */
+        .hero-card.keynote-talk {
+            border-left-color: #4338ca;
+            background: linear-gradient(to right, #eef2ff 0%, #ffffff 12%, #ffffff 100%);
+        }
+        .hero-card.poster, .hero-card.poster-session { border-left-color: #c580fa; }
+        .hero-card.award {
+            border-left-color: gold;
+            background: linear-gradient(to right, #fffef0 0%, #ffffff 12%, #ffffff 100%);
+        }
+        .hero-card.tutorial { border-left-color: rgb(113, 180, 194); }
+        .hero-card.workshop { border-left-color: #52ad0d; }
+        .hero-card.demonstration { border-left-color: rgb(194, 190, 240); }
+        .hero-card.symposium { border-left-color: #5fadef; }
+        .hero-card.oral, .hero-card.oral-session { border-left-color: #fdbb02; }
+        .hero-card.social { border-left-color: #c1f197; }
+        .hero-card.competition { border-left-color: #c1f197; }
+        .hero-card.spotlight { border-left-color: #fdbb02; }
+        .hero-card.mentorship { border-left-color: rgb(141, 140, 138); }
+        .hero-card.town-hall { border-left-color: rgb(155, 232, 181); }
+        .hero-card.affinity-workshop,
+        .hero-card.affinity-event { border-left-color: rgb(53, 147, 144); }
+        .hero-card.affinity-poster-session { border-left-color: rgb(154, 203, 119); }
+        .hero-card.expo-workshop { border-left-color: rgb(250, 151, 72); }
+        .hero-card.expo-talk-panel { border-left-color: rgb(200, 221, 231); }
+        .hero-card.expo-demonstration { border-left-color: rgb(252, 175, 245); }
+        .hero-card.panel { border-left-color: #0510ea; }
+        .hero-card.creative-ai-session { border-left-color: #ff6b9d; }
+        .hero-card.education-track-session { border-left-color: #4ecdc4; }
+        .hero-card.break, .hero-card.registration-desk { border-left-color: #d7d6d3; }
+        .hero-card.remarks { border-left-color: #6a6d6f; }
+
+        .hero-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .bookmark-container {
+            flex-shrink: 0;
+        }
+
+        .hero-card .bookmark-right,
+        .hero-card .bookmark-cell,
+        .bookmark-container .bookmark-right,
+        .bookmark-container .bookmark-cell,
+        .bookmark-container > span {
+            float: none !important;
+            position: static !important;
+            left: auto !important;
+        }
+
+        /* Hide any bookmark text - but NOT the bookmark toggle itself */
+        .bookmark-container .bookmark-text {
+            display: none !important;
+        }
+
+        /* ========================================
+           Event Type Badge
+           ======================================== */
+        .event-type-badge {
+            display: inline-flex;
+            align-items: center;
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            padding: 5px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--border-light);
+        }
+
+        /* ========================================
+           Title
+           ======================================== */
+        .event-title {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 16px 0;
+            line-height: 1.25;
+        }
+
+        /* ========================================
+           Organizers/Speakers
+           ======================================== */
+        .event-organizers {
+            color: var(--text-secondary);
+            font-size: 1.05em;
+            line-height: 1.6;
+            margin-bottom: 4px;
+            overflow: hidden;
+            clear: both;
+        }
+
+        .event-organizers a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .event-organizers a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========================================
+           Meta Pills Row
+           ======================================== */
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+        }
+
+        .meta-pill i {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .hero-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .session-info {
+            color: var(--text-muted);
+            font-size: 0.8em;
+            margin-bottom: 16px;
+        }
+
+        /* ========================================
+           Action Buttons
+           ======================================== */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+            margin-bottom: 12px;
+            font-size: 0;
+        }
+
+        .action-buttons > * {
+            font-size: 0.95rem;
+        }
+
+        .action-btn {
+            display: inline-flex !important;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem !important;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+        }
+
+        .action-btn.project {
+            background: var(--bg-light) !important;
+            color: var(--text-secondary) !important;
+            border: 1px solid var(--border-light) !important;
+        }
+
+        .action-btn.project:hover {
+            background: #e9ecef !important;
+            color: var(--text-primary) !important;
+        }
+
+        .action-btn.metadata {
+            background: #f0f7ff !important;
+            color: #1976d2 !important;
+            border: 1px solid #c8e1f3 !important;
+        }
+
+        .action-btn.metadata:hover {
+            background: #e3f0fc !important;
+        }
+
+        .action-buttons .nowrap,
+        .action-buttons span.nowrap {
+            display: inline-flex !important;
+            white-space: nowrap;
+            font-size: 0;
+        }
+
+        .action-buttons .nowrap a,
+        .action-buttons a[href*="openreview"],
+        .action-buttons a[href*="pdf"] {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85em;
+            font-weight: 500;
+            text-decoration: none;
+            background: #e8f4fc;
+            color: #1976d2 !important;
+            border: 1px solid #c8e1f3;
+            transition: all 0.2s ease;
+        }
+
+        .action-buttons .nowrap a:hover,
+        .action-buttons a[href*="openreview"]:hover,
+        .action-buttons a[href*="pdf"]:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+            background: #d6ebf8;
+            text-decoration: none;
+        }
+
+        .action-buttons a[href*="openreview"] {
+            background: #fdf2f2;
+            color: #b31b1b !important;
+            border: 1px solid #f5d6d6;
+        }
+
+        .action-buttons a[href*="openreview"]:hover {
+            background: #fae8e8;
+        }
+
+        .action-buttons .nowrap a {
+            font-size: 0.95rem;
+        }
+
+        /* Zoom Button Group */
+        .zoom-btn-group {
+            position: relative;
+            display: inline-flex;
+        }
+
+        .action-btn.zoom {
+            background: #e8f4ff;
+            color: #2d8cff;
+            border: 1px solid #c5e0ff;
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+        }
+
+        .action-btn.zoom:hover {
+            background: #d6ebff;
+            color: #1a7ae8;
+        }
+
+        .action-btn.zoom.no-dropdown {
+            border-radius: var(--radius-sm);
+        }
+
+        .zoom-dropdown-btn {
+            background: #e8f4ff;
+            color: #2d8cff;
+            border: 1px solid #c5e0ff;
+            border-left: none;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .zoom-dropdown-btn:hover {
+            background: #d6ebff;
+        }
+
+        .zoom-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 500px;
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            border: 1px solid var(--border-light);
+            z-index: 1000;
+            display: none;
+        }
+
+        .zoom-dropdown.show {
+            display: block;
+        }
+
+        .zoom-dropdown-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 600;
+            font-size: 0.9em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .zoom-dropdown-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .zoom-dropdown-body {
+            padding: 14px 16px;
+        }
+
+        .zoom-info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .zoom-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .zoom-info-label {
+            font-size: 0.75em;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .zoom-info-value {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+            background: var(--bg-light);
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-size: 0.8em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .copy-btn.copied {
+            background: var(--success-green);
+            color: white;
+            border-color: var(--success-green);
+        }
+
+        .zoom-host-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .zoom-host-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--warning-red);
+            font-weight: 600;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+
+        .zoom-host-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .zoom-public-warning {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff3cd;
+            color: #856404;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75em;
+            font-weight: 500;
+        }
+
+        .zoom-public-warning i {
+            color: #e0a800;
+            font-size: 0.9em;
+        }
+
+        /* ========================================
+           Abstract Section
+           ======================================== */
+        .abstract-section {
+            clear: both !important;
+            display: block !important;
+            overflow: hidden !important;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-lighter);
+            position: relative;
+            width: 100%;
+        }
+
+        .abstract-header {
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .abstract-header i {
+            color: var(--primary-blue);
+            font-size: 0.9em;
+        }
+
+        .abstract-content {
+            display: block !important;
+            overflow: hidden !important;
+            position: relative;
+            width: 100%;
+        }
+
+        .abstract-text {
+            display: block !important;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.8;
+            overflow: hidden !important;
+            word-wrap: break-word;
+            position: relative;
+            width: 100%;
+            text-align: left;
+        }
+
+        .abstract-text.collapsed {
+            max-height: 200px !important;
+        }
+
+        .abstract-text.expanded {
+            max-height: none !important;
+        }
+
+        .abstract-text-inner {
+            display: block !important;
+            position: relative !important;
+            width: 100% !important;
+        }
+
+        .show-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 0.9em;
+            font-weight: 600;
+            padding: 10px 0;
+            cursor: pointer;
+        }
+
+        .show-more-btn:hover {
+            color: #1565c0;
+        }
+
+        .show-more-btn i {
+            transition: transform 0.2s;
+        }
+
+        .show-more-btn.expanded i {
+            transform: rotate(180deg);
+        }
+
+        /* Keywords */
+        .keywords-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .keywords-label {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .keyword-pill {
+            display: inline-block;
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            text-decoration: none;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+
+        .keyword-pill:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        /* Awards */
+        .awards-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #fff7e6 0%, #fffbe6 100%);
+            border-radius: var(--radius-md);
+            border: 1px solid #ffd54f;
+        }
+
+        .award-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .award-item img {
+            max-height: 40px;
+            width: auto;
+        }
+
+        .award-name {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #b8860b;
+        }
+
+        /* Related Events */
+        .related-events {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .related-event-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 0.9em;
+        }
+
+        .related-event-item:not(:last-child) {
+            border-bottom: 1px solid var(--border-lighter);
+        }
+
+        .related-type-badge {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            background: var(--primary-blue);
+        }
+
+        .related-event-item a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .related-event-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========================================
+           Content Sections
+           ======================================== */
+        .content-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+            font-size: 0.9em;
+        }
+
+        /* Speaker bios — modern card layout, full bio (no clamping). Replaces
+           the old <table border="1"> rendering of the show_bios block. */
+        .speaker-bios-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-top: 8px;
+        }
+
+        .speaker-bio-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .speaker-bio-pic {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        .speaker-bio-info {
+            flex: 1;
+            min-width: 0;
+            text-align: left;
+        }
+
+        .speaker-bio-name {
+            font-size: 1.15em;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+        }
+
+        .speaker-bio-name a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .speaker-bio-name a:hover {
+            text-decoration: underline;
+        }
+
+        .speaker-bio-text {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.65;
+            text-align: left;
+        }
+
+        @media (max-width: 600px) {
+            .speaker-bio-row {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            .speaker-bio-pic {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        .timezone-link {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timezone-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .timezone-link a:hover {
+            text-decoration: underline;
+        }
+
+        .am-pm-timeframe-badge {
+            display: inline-block;
+            background: #e8f4ff;
+            color: #1565c0;
+            padding: 1px 7px;
+            border-radius: 3px;
+            font-weight: 700;
+            border: 1px solid #c5e0ff;
+            letter-spacing: 0.3px;
+        }
+
+        /* Video Section */
+        .video-embed {
+            margin-top: 16px;
+        }
+
+        .access-message {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-bottom: 12px;
+        }
+
+        /* Chat Section - Override nested container */
+        .chat-section .container {
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .chat-section .pp-card {
+            margin: 0 !important;
+            box-shadow: none;
+        }
+
+        .chat-section .m-3 {
+            margin: 0 !important;
+        }
+
+        /* Schedule Table Styles */
+        .content-section table.table {
+            width: 100%;
+            margin: 0;
+            border: none;
+        }
+
+        .content-section table.table,
+        .content-section table.table tbody,
+        .content-section table.table tr,
+        .content-section table.table td {
+            display: block;
+            border: none;
+            padding: 0;
+        }
+
+        .schedule-row {
+            border-bottom: 1px solid var(--border-lighter);
+        }
+
+        .schedule-row:last-child {
+            border-bottom: none;
+        }
+
+        .content-section table.table td.schedule-cell {
+            padding: 8px 0;
+        }
+
+        .schedule-main {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            min-height: 24px;
+        }
+
+        .schedule-time {
+            flex-shrink: 0;
+            width: 70px;
+            font-size: 0.8em;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .schedule-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .schedule-title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .schedule-event-name {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .schedule-event-name a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .schedule-event-name a:hover {
+            color: var(--primary-blue);
+        }
+
+        .schedule-authors {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .schedule-authors a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .schedule-authors a:hover {
+            color: var(--primary-blue);
+        }
+
+        .schedule-authors details {
+            display: inline;
+        }
+
+        .schedule-authors details summary {
+            cursor: pointer;
+            color: var(--primary-blue);
+            display: inline;
+            list-style: none;
+        }
+
+        .schedule-authors details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .schedule-meta {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .schedule-event-type {
+            display: inline-block;
+            background: var(--bg-light);
+            color: var(--text-muted);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: 1px solid var(--border-light);
+            text-decoration: none;
+        }
+
+        .schedule-event-type:hover {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .schedule-bookmark {
+            font-size: 0.85em;
+        }
+
+        .schedule-extras {
+            margin: 4px 0 0 82px;
+        }
+
+        .schedule-video-btn {
+            display: inline-block;
+            font-size: 0.75em;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .schedule-video-btn:hover {
+            color: var(--primary-blue);
+        }
+
+        .schedule-video-btn i {
+            margin-right: 3px;
+        }
+
+        .schedule-abstract {
+            background: var(--bg-light);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            margin: 6px 0 0 82px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .schedule-abstract .poster-location {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin: 0 0 6px 0;
+        }
+
+        .schedule-abstract .poster-location i {
+            margin-right: 4px;
+        }
+
+        .schedule-abstract-link {
+            margin-top: 6px;
+        }
+
+        .schedule-abstract-link a {
+            color: var(--primary-blue);
+            font-size: 0.9em;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content-section {
+                padding: 20px;
+            }
+
+            .schedule-main {
+                flex-wrap: wrap;
+            }
+
+            .schedule-time {
+                width: auto;
+            }
+
+            .schedule-info {
+                width: 100%;
+                order: 3;
+                margin-top: 2px;
+            }
+
+            .schedule-extras,
+            .schedule-abstract {
+                margin-left: 0;
+            }
+        }
+    </style>
+
+    <title>ICML 2026</title>
+</head>
+
+<body>
+<!-- <h1><a href="#" onclick="alert('CSP Test');">CSP Test</a></h1> -->
+
+
+
+
+<div class="noprint">
+    
+        
+            <!--Navbar start-->
+<header>
+    <a href="#child-menu" class="off-screen">Skip to yearly menu bar</a>
+    <a href="#main" class="off-screen">Skip to main content</a>
+    <div id="id_navbar" class="navbar navbar-expand-sm navbar-dark" aria-label="Main Navigation"
+         style="background-color:#212529">
+        <h2 class="off-screen">Main Navigation</h2>
+        <div class="container-fluid">
+            <div><a class="navbar-brand" href="/" aria-label="Home">
+
+                <img src="/static/core/img/icml-navbar-logo.svg" alt="conference_logo" height="40"></a></div>
+
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarToggler1"
+                    aria-expanded="false" aria-label="Toggle main navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarToggler1">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    
+    <li class="dropdown-item dropdown pe-3">
+        <a class="nav-link dropdown-toggle  p-1" 
+           href="#"
+           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            ICML
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark">
+            
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/FAQ">
+                    <span >
+                        Help/FAQ
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/Help/Contact">
+                    <span >
+                        Contact ICML
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/Profile/create">
+                    <span >
+                        Create Profile
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/yearly-document/CodeOfConduct">
+                    <span >
+                        Code of Conduct
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/public/PrivacyPolicy">
+                    <span >
+                        Privacy Policy
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/Conferences/2026/Press">
+                    <span >
+                        Press
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/public/JournalToConference">
+                    <span >
+                        Journal To Conference Track
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/careers">
+                    <span >
+                        Careers
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/Downloads">
+                    <span >
+                        Downloads
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/public/Inclusion">
+                    <span >
+                        Inclusion
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/Conferences/FutureMeetings">
+                    <span >
+                        Future Meetings
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+        </ul>
+    </li>
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/MyStuff">
+                    <span >
+                        My Stuff
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+                    
+                </ul>
+
+                
+                <form class="d-flex mx-2" aria-label="Search" role="search" action="/search">
+                    <div class="input-group" role="search" style="outline-color:green;">
+                        <input type="text" class="form-control" placeholder="Search" name="q"
+                               value=""
+                               aria-label="Search" aria-describedby="btnGroupAddon"
+                                id="navbar-search">
+                        <div class="input-group-text btn-primary" id="btnGroupAddon">
+                            <button style="border: none; background-color: transparent; padding: 0;" type="submit" aria-label="execute search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+
+                
+                    <a href="/accounts/login?nextp=/Conferences/2026/Pricing " class="navbar-brand"><span
+                            class="fa-solid fa-right-to-bracket"></span> Login</a>
+                
+
+            </div>
+        </div>
+    </div>
+</header>
+<!--Navbar end-->
+        
+    
+</div><!--noprint div-->
+
+<!--This holds the whole page including the navbar-->
+<main id="main">
+    
+        
+            <div class="container-fluid">
+                
+<!--Navbar start-->
+
+
+
+
+<div class="container-fluid">
+
+    <div class="dropdown" id="child-menu">
+        <nav class="align-middle navbar navbar-expand-lg draft-diagonal-watermark rounded-bottom"
+             style="min-height: 57px; background-image: url(/static/virtual/img/navbackground.png); background-repeat: repeat-x;">
+            <div class="container-fluid">
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarToggler1530"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarToggler1530">
+                    <ul class="navbar-nav me-auto mb-lg-0">
+                        
+
+
+    <li class="dropdown-item dropdown pe-3">
+        <a class="nav-link dropdown-toggle border-3  btn btn-primary text-white p-1" style= "background-color: #070bff; font-size: 1.2 em;"
+           href="#"
+           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Select Year: (2026)
+        </a>
+        <ul class="dropdown-menu">
+            
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2026">2026
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2025">2025
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2024">2024
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2023">2023
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2022">2022
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2021/index.html">2021
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2020/">2020
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2019/">2019
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2018">2018
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2017">2017
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2016">2016
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2015">2015
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2014">2014
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2013">2013
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2012">2012
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2011">2011
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2010">2010
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2009">2009
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2008">2008
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2008">2007
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2007">2006
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2005">2005
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2005">2004
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/2002">2002
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="/Conferences/1996">1996
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item " >
+                <a class="dropdown-item p-1"
+                   href="http://www.machinelearning.org/archive.html">IMLS Archives
+                </a>
+                
+            </li>
+        
+
+    
+
+
+
+        </ul>
+    </li>
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/index.html">
+                    <span >
+                        Getting Started
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/calendar">
+                    <span >
+                        Schedule
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/events/tutorial">
+                    <span >
+                        Tutorials
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+    <li class="dropdown-item dropdown pe-3">
+        <a class="nav-link dropdown-toggle  p-1" 
+           href="#"
+           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Main Conference
+        </a>
+        <ul class="dropdown-menu">
+            
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/eventlistwithbios/invited%20talk">
+                    <span >
+                        Invited Talks
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/test-of-time-award">
+                    <span >
+                        Test of Time Award
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/papers.html">
+                    <span >
+                        Papers
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/events/oral">
+                    <span >
+                        Orals
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/awards_detail">
+                    <span >
+                        Awards
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/events/2026SpotlightPosters">
+                    <span >
+                        Spotlight Posters
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/events/2026-position-papers">
+                    <span >
+                        Position Paper Posters
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/events/2026-journal-track">
+                    <span >
+                        Journal Track Posters
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+        </ul>
+    </li>
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/events/workshop">
+                    <span >
+                        Workshops
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+    <li class="dropdown-item dropdown pe-3">
+        <a class="nav-link dropdown-toggle  p-1" 
+           href="#"
+           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Community
+        </a>
+        <ul class="dropdown-menu">
+            
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/community?show=socials">
+                    <span >
+                        Socials
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+        </ul>
+    </li>
+    
+
+
+
+    <li class="dropdown-item dropdown pe-3">
+        <a class="nav-link dropdown-toggle  p-1" 
+           href="#"
+           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Exhibitors
+        </a>
+        <ul class="dropdown-menu">
+            
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/events/expo">
+                    <span >
+                        Expo
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/sponsor_list">
+                    <span >
+                        Exhibitors
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+        </ul>
+    </li>
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/organizers">
+                    <span >
+                        Organizers
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/search">
+                    <span >
+                        <i class="fas fa-search"></i>
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+    <li class="dropdown-item dropdown pe-3">
+        <a class="nav-link dropdown-toggle  p-1" 
+           href="#"
+           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Help
+        </a>
+        <ul class="dropdown-menu">
+            
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="">
+                    <span >
+                        RocketChat Help
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="">
+                    <span >
+                        RocketChat Desktop Client
+                    </span>
+                </a>
+                
+                    <hr class="dropdown-divider" aria-hidden="true">
+                
+            </li>
+
+        
+
+    
+
+
+
+    
+        
+            <li class="dropdown-item  pe-2" >
+                <a class="nav-link p-1"  href="/virtual/2026/faq">
+                    <span >
+                        FAQ
+                    </span>
+                </a>
+                
+            </li>
+
+        
+
+    
+
+
+
+        </ul>
+    </li>
+    
+
+
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <!--Navbar end-->
+
+            </div>
+            <br><br>
+        
+    
+    
+<div class="container-fluid">
+
+    
+
+    
+
+            
+
+        <div class="detail-page-wrapper">
+
+            <!-- ========================================
+                 HERO CARD
+                 ======================================== -->
+            <div class="hero-card poster" id="bookmark-here">
+
+                <!-- Header Row: Badge and Bookmark -->
+                <div class="hero-header-row">
+                    <div class="meta-row">
+                        
+                            <span class="event-type-badge">Poster</span>
+                        
+                        
+                            
+                                <span class="meta-pill">
+                                    <i class="far fa-calendar-alt"></i>
+                                    Thu, Jul 9, 2026 &bull; 2:30 PM &ndash; 4:15 PM KST
+                                </span>
+                                
+                            
+                        
+                        
+                            <span class="meta-pill">
+                                <i class="fas fa-map-marker-alt"></i>
+                                HALL A
+                            </span>
+                        
+                    </div>
+                    <div class="hero-header-right">
+                        <!-- Live Status Pill (populated by JS) -->
+                        <span class="meta-pill status-pill" id="liveStatus" style="display: none;">
+                            <i class="fas fa-circle"></i>
+                            <span id="liveStatusText"></span>
+                        </span>
+                        <div class="bookmark-container">
+                            
+                                
+
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <h1 class="event-title">Annotations Mitigate Post-Training Mode Collapse</h1>
+
+
+                <!-- Organizers/Authors -->
+                <div class="event-organizers">
+                    Jacob Mitchell Springer ⋅ Madhu Advani ⋅ Lukas Aichberger ⋅ Arwen Bradley ⋅ Eran Malach ⋅ Omid Saremi ⋅ Sinead Williamson ⋅ Preetum Nakkiran ⋅ Etai Littwin ⋅ Aditi Raghunathan
+                </div>
+                <!-- Schedule HTML (inline) -->
+                
+
+                <!-- Session Info -->
+                
+
+                <!-- Keywords -->
+                
+
+                <!-- Awards -->
+                
+
+                <!-- Related Events -->
+                
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    
+
+                    
+
+                    <!-- Event Media Links (OpenReview, etc.) styled as buttons -->
+                    
+
+                    
+
+                    <!-- Event Metadata for Authors Button -->
+                    
+                </div>
+
+                <!-- Abstract Section -->
+                
+                    <div class="abstract-section">
+                        <h3 class="abstract-header">
+                            <i class="fas fa-file-alt"></i> Abstract
+                        </h3>
+                        <div class="abstract-content">
+                            <div class="abstract-text collapsed" id="abstractText">
+                                <div class="abstract-text-inner">
+                                    
+                                        <p>Post-training (via supervised fine-tuning) improves instruction-following, but often induces semantic mode collapse by biasing models toward low-entropy fine-tuning data at the expense of the high-entropy pre-training distribution. Crucially, we find this trade-off worsens with scale. To close this semantic diversity gap, we propose annotation-anchored training, a principled method that enables models to adopt the preference-following behaviors of post-training without sacrificing the inherent diversity of pre-training. Our approach is simple: we pre-train on documents paired with semantic annotations, inducing a rich annotation distribution that reflects the full breadth of pre-training data, and we preserve this distribution during post-training. This lets us sample diverse annotations at inference time and use them as anchors to guide generation, effectively transferring pre-training's semantic richness into post-trained models. We find that models trained with annotation-anchored training can attain 6× less diversity collapse than models trained with SFT, and improve with scale.</p>
+
+                                    
+                                </div>
+                            </div>
+                            <button class="show-more-btn" id="showMoreBtn">
+                                <span id="showMoreText">Show more</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                
+
+                <!-- Lay Summary Section -->
+                
+
+                <!-- Speaker Bios — lives inside the hero-card so the speaker
+                     reads as part of the talk, sitting directly below the abstract. -->
+                
+
+            </div>
+
+            
+            
+
+            <!-- ========================================
+                 VIDEO SECTION
+                 ======================================== -->
+            
+                
+                    <div class="content-section">
+                        <p class="access-message">Log in and register to view live content</p>
+                    </div>
+                
+            
+
+            <!-- ========================================
+                 SCHEDULE TABLE
+                 ======================================== -->
+            
+
+            <!-- (Speaker bios moved into the hero-card above, directly below the abstract.) -->
+
+            <!-- ========================================
+                 BOTTOM SECTION MEDIA
+                 ======================================== -->
+            
+            
+
+        </div>
+
+    <script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+        // Toggle abstract show more/less
+        function toggleAbstract() {
+            var abstractText = document.getElementById('abstractText');
+            var btn = document.getElementById('showMoreBtn');
+            var btnText = document.getElementById('showMoreText');
+
+            if (!abstractText || !btn) return;
+
+            if (abstractText.classList.contains('collapsed')) {
+                abstractText.classList.remove('collapsed');
+                abstractText.classList.add('expanded');
+                abstractText.style.maxHeight = abstractText.scrollHeight + 'px';
+                btnText.textContent = 'Show less';
+                btn.classList.add('expanded');
+            } else {
+                abstractText.classList.remove('expanded');
+                abstractText.classList.add('collapsed');
+                abstractText.style.maxHeight = '200px';
+                btnText.textContent = 'Show more';
+                btn.classList.remove('expanded');
+            }
+        }
+
+        // Toggle lay summary show more/less
+        function toggleLaySummary() {
+            var laySummaryText = document.getElementById('laySummaryText');
+            var btn = document.getElementById('showMoreLaySummaryBtn');
+            var btnText = document.getElementById('showMoreLaySummaryText');
+
+            if (!laySummaryText || !btn) return;
+
+            if (laySummaryText.classList.contains('collapsed')) {
+                laySummaryText.classList.remove('collapsed');
+                laySummaryText.classList.add('expanded');
+                laySummaryText.style.maxHeight = laySummaryText.scrollHeight + 'px';
+                btnText.textContent = 'Show less';
+                btn.classList.add('expanded');
+            } else {
+                laySummaryText.classList.remove('expanded');
+                laySummaryText.classList.add('collapsed');
+                laySummaryText.style.maxHeight = '200px';
+                btnText.textContent = 'Show more';
+                btn.classList.remove('expanded');
+            }
+        }
+
+        // Toggle zoom dropdown
+        function toggleZoomDropdown(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var dropdown = document.getElementById('zoomDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(function() {
+                var originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            var dropdown = document.getElementById('zoomDropdown');
+            if (dropdown && !e.target.closest('.zoom-btn-group')) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if abstract needs show more button
+            var abstractText = document.getElementById('abstractText');
+            var btn = document.getElementById('showMoreBtn');
+
+            if (abstractText && btn) {
+                // Temporarily remove collapsed to measure full height
+                abstractText.classList.remove('collapsed');
+                abstractText.classList.add('expanded');
+                var fullHeight = abstractText.scrollHeight;
+                abstractText.classList.remove('expanded');
+                abstractText.classList.add('collapsed');
+
+                // If content fits within collapsed height, hide the button
+                if (fullHeight <= 200) {
+                    btn.style.display = 'none';
+                    abstractText.classList.remove('collapsed');
+                    abstractText.classList.add('expanded');
+                }
+            }
+
+            // Check if lay summary needs show more button
+            var laySummaryText = document.getElementById('laySummaryText');
+            var laySummaryBtn = document.getElementById('showMoreLaySummaryBtn');
+
+            if (laySummaryText && laySummaryBtn) {
+                laySummaryText.classList.remove('collapsed');
+                laySummaryText.classList.add('expanded');
+                var layFullHeight = laySummaryText.scrollHeight;
+                laySummaryText.classList.remove('expanded');
+                laySummaryText.classList.add('collapsed');
+
+                if (layFullHeight <= 200) {
+                    laySummaryBtn.style.display = 'none';
+                    laySummaryText.classList.remove('collapsed');
+                    laySummaryText.classList.add('expanded');
+                }
+            }
+
+            // CSP-compliant event listeners
+            var showMoreBtn = document.getElementById('showMoreBtn');
+            if (showMoreBtn) {
+                showMoreBtn.addEventListener('click', toggleAbstract);
+            }
+
+            var showMoreLaySummaryBtn = document.getElementById('showMoreLaySummaryBtn');
+            if (showMoreLaySummaryBtn) {
+                showMoreLaySummaryBtn.addEventListener('click', toggleLaySummary);
+            }
+
+            var zoomDropdownBtn = document.querySelector('.zoom-dropdown-btn');
+            if (zoomDropdownBtn) {
+                zoomDropdownBtn.addEventListener('click', function(e) {
+                    toggleZoomDropdown(e);
+                });
+            }
+
+            document.querySelectorAll('.copy-btn[data-copy-text]').forEach(function(copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    copyToClipboard(this.getAttribute('data-copy-text'), this);
+                });
+            });
+        });
+    </script>
+
+
+    
+        </div>
+    
+
+</main>
+<!--END BLOCK CONTENT-->
+
+
+<!--Footer for the edit button-->
+
+
+<script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+
+    $(function () {
+        if ($(".editable").length == 0) {
+            $("#editFooter").hide();
+        }
+
+        // Event bindings for edit buttons
+        $('.startEditBtn').on('click', function() {
+            start_edit();
+        });
+        
+        $('.stopEditBtn').on('click', function() {
+            stop_edit();
+        });
+        $('#id_accepted_terms_and_conditions').on('change', function() {
+            this.form.submit();
+        });
+        $('.accepted_terms_and_conditions').on('change', function() {
+            this.form.submit();
+        });
+        $('.workshopstatus').on('change', function() {
+            changeStatus(this);
+        });
+        $('.action-select').on('change', function() {
+            actionChanged(this);
+        });
+        $('.extra').on('change', function() {
+            extraChanged(this);
+        });
+        $('.filter_workshop').on('change', function() {
+            this.form.submit();
+        });
+        $('.volunteer-status, .recommendation-letter-status').on('change', function() {
+            setStatus(this);
+        });
+        $('.status-form-show').on('change', function() {
+            this.form.submit();
+        });
+        $('.download-form-download').on('change', function() {
+            this.form.submit();
+        });
+        $('.presentation-type-form-presentation-type').on('change', function() {
+            this.form.submit();
+        });
+        $('.export-form-resource').on('change', function() {
+            showFieldsForResource(this.value);
+        });
+        $('.import-form-resource').on('change', function() {
+            showFieldsForResource(this.value);
+        });
+        $('.vol-email-form-to, .vol-email-form-template').on('change', function() {
+            this.form.submit();
+        });
+        $('.organizer-alert').on('click', function() {
+            getUserCreateForm(this.href);
+        });
+    })
+</script>
+
+<script src="/static/core/js/fastclick.min.js" ></script>
+
+<!--We don't know if there are editable tags on the page until after the django template engine has rendered the page. So,
+test in javascript for "editable" tags and if present, load the ckeditor engine dynamically. -->
+
+<script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+    if (document.getElementsByClassName('editable').length > 0) {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = "/static/core/ckeditor/4.18/ckeditor.js";    // use this for linked script
+      script.onload = function () {
+        console.log("ckeditor loaded");
+        // Initial setup when each editor is ready
+        CKEDITOR.on("instanceReady", function (e) {
+          updateToggleDocName(e.editor);
+        });
+
+        // React to any editor entering/leaving read-only
+        CKEDITOR.on("readOnly", function (e) {
+          updateToggleDocName(e.editor);
+        });
+      };
+        document.body.appendChild(script);
+    }
+
+    function updateToggleDocName(editor) {
+      var id = editor && editor.name;
+      if (!id || id.indexOf("id_") !== 0) return;
+
+      var doc_name_element = document.getElementById("document_name_" + id.slice(3));
+      console.log(doc_name_element);
+      if (!doc_name_element) return;
+
+      doc_name_element.style.display = editor.readOnly ? "none" : "block";
+    }
+
+</script>
+
+
+<script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+    function fetchContent() {
+        $(".editable").each(function (index) {
+            var myself = this;
+            var docvID = this.getAttribute('id').replace("id_", "");
+            var blurbtext = this.getAttribute("blurbtext");
+            $.ajax({
+                url: "/Admin/RetrieveDocumentVersion",
+                type: "POST",
+                data: {
+                    docvID: docvID,
+                    blurbtext: blurbtext,
+                    csrfmiddlewaretoken: csrftoken,
+                },
+                success: function (data, textStatus, jqXHR) {
+                    myself.setAttribute("contenteditable", "true");
+                    myself.innerHTML = data;
+                    CKEDITOR.inline(myself.id);
+                },
+            });
+        })
+    }
+
+    $("#nopageedit").hide();
+
+    function start_edit() {
+
+        $(".editable").addClass("warning-ring");
+
+        //At the beginning of an edit, we need to replace the content of the
+        //editable div with it's databased content in order to preserve the
+        //template tags. We want the tag, not the rendered tag.
+
+        /* You must remove any countdown.js timers on the page before replacing the page with it's
+        document version otherwise, Javascript will throw an exception.  */
+
+
+        $("[class$='-countdown']").parent().remove();
+        fetchContent();
+        $(".editable").attr("onblur", "ckeditorsave(this)");
+        window.status.bold();
+        window.status = "Click outside the editable area to save. Changes are LIVE!! Refresh page to discard changes.";
+        $("#editpage").hide();
+        $("#noeditpage").show();
+    }
+
+
+    function stop_edit() {
+        ckeditorsave();
+        $("#noeditpage").hide();
+        $("#editpage").show();
+        window.location.reload();
+    }
+
+    function ckeditorsave(event) {
+        for (var name in CKEDITOR.instances) {
+            if (CKEDITOR.instances[name].checkDirty()) {
+                editor = CKEDITOR.instances[name];
+                saveEditable(editor);
+            }
+        }
+    }
+
+    function saveEditable(editor) {
+        var content = editor.getData();
+        var contentId = editor.name;
+        var pageId = window.location.pathname;
+        var originalContent = "N/A";
+        var documentversion = editor.container.getAttribute("id").replace("id_", "");
+        var blurbtext = editor.container.getAttribute("blurbtext");
+        if (contentId.match(/-aloha$/gi)) {
+            contentId = contentId.replace(/-aloha/gi, '');
+        }  /*I'm not sure what this does but it seems like it would matter*/
+        var request = jQuery.ajax({
+            url: "/Admin/SaveDocument",
+            type: "POST",
+            async: false,
+            data: {
+                content: content,
+                originalContent: originalContent,
+                contentId: contentId,
+                pageId: pageId,
+                documentversion: documentversion,
+                blurbtext: blurbtext,
+                csrfmiddlewaretoken: csrftoken
+            },
+            success: function (data) {
+                if (data['message']) {
+                    alert(data['message']);
+                }
+            },
+            error: function (xqXHR, textStatus) {
+                window.status = textStatus;
+                debugger;
+            }
+
+        });
+
+    };
+
+
+</script>
+
+<script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+    jQuery(document).ajaxSend(function (event, xhr, settings) {
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function sameOrigin(url) {
+            // url could be relative or scheme relative or absolute
+            var host = document.location.host; // host + port
+            var protocol = document.location.protocol;
+            var sr_origin = '//' + host;
+            var origin = protocol + sr_origin;
+            // Allow absolute or scheme relative URLs to same origin
+            return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+                (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+                // or any other URL that isn't scheme relative or absolute i.e relative.
+                !(/^(\/\/|http:|https:).*/.test(url));
+        }
+
+        function safeMethod(method) {
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    });
+</script>
+
+
+
+
+
+<div id="successful-page-load" class='hidden'>Successful Page Load</div>
+
+
+
+
+
+    
+        <link href="/static/conf_gdpr/css/conf_gdpr.css" rel="stylesheet">
+        <div id="cookie-bar" style="z-index: 8">
+            <table class="gdpr-statement">
+                <col>
+                <col style="width:120px">
+                <tr>
+                    <td style="padding:5px">
+                        ICML uses cookies for essential functions only. We do not sell your personal
+                        information.
+                        <a href="/public/PrivacyPolicy">Our Privacy Policy &raquo;&nbsp;</a>
+                    </td>
+                    <td>
+                        <button float-end class="btn btn-light btn-sm btn btn-outline-dark" id="accept_cookies_button" >Accept</button>
+                           
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <script nonce="ZJbFpqBn1Ubcm7Y8xFphwA==">
+            function accept_cookies() {
+
+                $.ajax({
+                    method: "POST",
+                    url: "/conf_gdpr/accept",
+                    data: {
+                        csrfmiddlewaretoken: csrftoken,
+                    },
+                }).done(function (data) {
+                    console.log(data);
+                    $("#cookie-bar").fadeOut();
+                }).fail(function (jqXHR, textStatus) {
+                    alert(textStatus);
+                });
+            }
+            $("#accept_cookies_button").on("click", () => {
+                accept_cookies();
+            });
+        </script>
+
+    
+
+
+
+
+
+
+
+<br>
+<div class="noprint">
+    <footer id="bootstrap-footer" class="text-center text-lg-start bg-light text-muted noprint">
+
+        <div class="text-center p-1 border-top border-dark">
+        </div>
+        <!-- Section: Links  -->
+        <section class="pt-1">
+            <div class="container text-center text-md-start mt-3">
+                <!-- Grid row -->
+                <div class="row mt-3">
+                    <!-- Grid column -->
+                    <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mb-3">
+                        <!-- Content -->
+                        <h6 class="text-uppercase fw-bold mb-4">
+                            <img src="/static/core/img/ICML-logo.svg" alt="ICML logo" height='30'>
+                        </h6>
+                        <p>
+                            The ICML Logo above may be used on presentations. Right-click and choose
+                            download. It is a vector graphic and may be used at any scale.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Grid column -->
+                    <div class="col-md-5 col-lg-4 col-xl-3 mx-auto mb-4" style="max-width: 300px;">
+                        <!-- Links -->
+                        <h6 class="text-uppercase fw-bold mb-4 text-center">
+                            Useful links
+                        </h6>
+                        <div></div>
+                    </div>
+                    <!-- Grid column -->
+
+                    <!-- Grid column -->
+                    <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+                        <!-- Links -->
+                        <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
+                        
+                            <p>
+                                <i class="fas fa-home me-3"></i> 1269 Law Street, San Diego CA 92109
+                            </p>
+                        
+                        <p>
+                            <i class="fas fa-envelope me-3"></i> <a href="/Help/Contact">Email</a>
+                        </p>
+                        
+                        
+
+
+                    </div>
+                    <!-- Grid column -->
+                </div>
+                <!-- Grid row -->
+            </div>
+        </section>
+        <!-- Section: Links  -->
+
+        <!-- Copyright -->
+        <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+            <div></div>
+        </div>
+        <!-- Copyright -->
+    </footer>
+</div>
+<!-- Footer -->
+
+
+<!-- Footer -->
+
+</body>
+</html>

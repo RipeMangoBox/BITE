@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="600" viewBox="0 0 1100 600" role="img" aria-label="sample-level success / failure delta 对比">
+<!-- diagnostic observation: sample-level internal trace tensors only; no final evaluator -->
+<style>
+text{font-family:'Noto Sans CJK SC','Microsoft YaHei','PingFang SC','DejaVu Sans',sans-serif;fill:#26312f}
+.title{font-size:24px;font-weight:700}.subtitle{font-size:13px;fill:#53615d}.small{font-size:12px;fill:#53615d}.label{font-size:13px}
+.axis{stroke:#60706b;stroke-width:1}.grid{stroke:#d8dfdb;stroke-width:1}.card{fill:#fffdf8;stroke:#d8dfdb;stroke-width:1}
+</style>
+<rect x="0" y="0" width="1100" height="600" fill="#fbfaf5"/>
+<text class="title" x="95" y="48">sample-level success / failure delta 对比</text>
+<text class="subtitle" x="95" y="74">每个 baseline 各 1 个 success control 与 1 个 failure probe；metric=relative_l2。</text>
+<line class="axis" x1="95" y1="470" x2="1050" y2="470"/>
+<line class="axis" x1="95" y1="118" x2="95" y2="470"/>
+<line class="grid" x1="95" y1="470.0" x2="1050" y2="470.0"/>
+<text class="small" x="85" y="474.0" text-anchor="end">0.00</text>
+<line class="grid" x1="95" y1="382.0" x2="1050" y2="382.0"/>
+<text class="small" x="85" y="386.0" text-anchor="end">0.50</text>
+<line class="grid" x1="95" y1="294.0" x2="1050" y2="294.0"/>
+<text class="small" x="85" y="298.0" text-anchor="end">1.00</text>
+<line class="grid" x1="95" y1="206.0" x2="1050" y2="206.0"/>
+<text class="small" x="85" y="210.0" text-anchor="end">1.50</text>
+<line class="grid" x1="95" y1="118.0" x2="1050" y2="118.0"/>
+<text class="small" x="85" y="122.0" text-anchor="end">2.00</text>
+<rect x="149.4" y="330.2" width="58" height="139.8" rx="6" fill="#37766f"/>
+<text class="small" x="178.4" y="322.2" text-anchor="middle">0.794</text>
+<rect x="221.4" y="423.5" width="58" height="46.5" rx="6" fill="#b4574d"/>
+<text class="small" x="250.4" y="415.5" text-anchor="middle">0.264</text>
+<text class="label" x="214.4" y="500" text-anchor="middle" font-weight="700">MotionGPT</text>
+<text class="small" x="214.4" y="522" text-anchor="middle">success: row 2</text>
+<text class="small" x="214.4" y="542" text-anchor="middle">failure: missing_subaction</text>
+<rect x="388.1" y="296.1" width="58" height="173.9" rx="6" fill="#37766f"/>
+<text class="small" x="417.1" y="288.1" text-anchor="middle">0.988</text>
+<rect x="460.1" y="248.2" width="58" height="221.8" rx="6" fill="#b4574d"/>
+<text class="small" x="489.1" y="240.2" text-anchor="middle">1.260</text>
+<text class="label" x="453.1" y="500" text-anchor="middle" font-weight="700">MoLingo</text>
+<text class="small" x="453.1" y="522" text-anchor="middle">success: row 2</text>
+<text class="small" x="453.1" y="542" text-anchor="middle">failure: trajectory_error</text>
+<rect x="626.9" y="279.2" width="58" height="190.8" rx="6" fill="#37766f"/>
+<text class="small" x="655.9" y="271.2" text-anchor="middle">1.084</text>
+<rect x="698.9" y="263.8" width="58" height="206.2" rx="6" fill="#b4574d"/>
+<text class="small" x="727.9" y="255.8" text-anchor="middle">1.172</text>
+<text class="label" x="691.9" y="500" text-anchor="middle" font-weight="700">MoMask original</text>
+<text class="small" x="691.9" y="522" text-anchor="middle">success: row 2</text>
+<text class="small" x="691.9" y="542" text-anchor="middle">failure: artifact_sliding_or_drift</text>
+<rect x="865.6" y="320.7" width="58" height="149.3" rx="6" fill="#37766f"/>
+<text class="small" x="894.6" y="312.7" text-anchor="middle">0.849</text>
+<rect x="937.6" y="226.5" width="58" height="243.5" rx="6" fill="#b4574d"/>
+<text class="small" x="966.6" y="218.5" text-anchor="middle">1.383</text>
+<text class="label" x="930.6" y="500" text-anchor="middle" font-weight="700">MoGenTS</text>
+<text class="small" x="930.6" y="522" text-anchor="middle">success: row 2</text>
+<text class="small" x="930.6" y="542" text-anchor="middle">failure: trajectory_error</text>
+<rect x="95" y="552" width="16" height="16" rx="3" fill="#37766f"/>
+<text class="small" x="119" y="565">success control</text>
+<rect x="245" y="552" width="16" height="16" rx="3" fill="#b4574d"/>
+<text class="small" x="269" y="565">failure probe</text>
+<text class="small" x="415" y="565">text/null only: 不能证明语义特异性或因果敏感性。</text>
+</svg>

@@ -1,0 +1,7 @@
+<!-- part 13/13 chars 72040-73558 -->
+
+r><td>MMAudio [Cheng et al.2025]</td><td>1.97</td><td>14.95</td><td>6.18</td><td>2.04</td></tr><tr><td>VATT[Liu et al. 2024b]</td><td>1.40</td><td>10.02</td><td>11.71</td><td>2.55</td></tr><tr><td>AudioX [Tian et al. 2025a]</td><td>2.57</td><td>12.16</td><td>8.83</td><td>1.13</td></tr><tr><td> Audio-Omni</td><td>1.98</td><td>10.35</td><td>8.33</td><td>1.71</td></tr><tr><td colspan="5">Video-to-Music (V2M)</td></tr><tr><td>VidMuse [Tian et al. 2025c]</td><td>0.73</td><td>1.32</td><td>22.95</td><td>2.46</td></tr><tr><td>AudioX[Tian et al.2025a]</td><td>0.69</td><td>1.34</td><td>23.96</td><td>2.12</td></tr><tr><td>MuMuLLaMA [Liu et al. 2024a]</td><td>1.00</td><td>1.25</td><td>52.25</td><td>5.10</td></tr><tr><td>Audio-Omni</td><td>0.64</td><td>1.36</td><td>17.46</td><td>1.51</td></tr></table>
+
+## 2 Ethics Statement
+
+While Audio-Omni demonstrates powerful capabilities in audio understanding, generation, and editing, we acknowledge potential ethical risks associated with generative audio technologies. Tasks such as voice conversion and speech synthesis could be misused for creating deepfakes, impersonation, or spreading misinformation. To mitigate these risks, we will require users to accept responsible-use terms before accessing the model, explicitly prohibiting malicious applications. We encourage the community to develop robust audio watermarking and detection methods, and believe that with proper safeguards, Audio-Omni can serve as a valuable tool for creative expression and scientific research.

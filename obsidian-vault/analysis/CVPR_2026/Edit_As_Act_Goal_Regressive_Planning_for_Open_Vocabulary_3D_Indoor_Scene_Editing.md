@@ -1,0 +1,323 @@
+---
+title: "Edit-As-Act: Goal-Regressive Planning for Open-Vocabulary 3D Indoor Scene Editing"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/Edit_As_Act_Goal_Regressive_Planning_for_Open_Vocabulary_3D_Indoor_Scene_Editing.pdf
+project_link: "https://seongraenoh.github.io/edit-as-act/"
+code_link: null
+aliases:
+- EAA
+- Edit-As-Act
+tags:
+- CVPR_2026
+- topic/vision_multimodal_applications
+- topic/vision_multimodal_applications/3d_rendering_reconstruction
+core_operator: 采用PDDL风格的符号动作语言EditLang和规划器‑验证器循环，将编辑建模为从目标状态出发的逆向回归规划问题，每一步动作都经过目标导向性、单调性和物理可行性验证，从而只修改必要对象并维持场景整体稳定。
+primary_logic: 场景编辑不应被视为一次性生成，而应理解为最小化动作序列以实现目标世界状态的过程；通过符号化目标谓词和源感知回归，将语言指令转化为可执行、可验证的编辑计划，从而在保持局部性的同时实现高度一致的编辑结果。
+claims:
+- Edit-As-Act在E2A-Bench的63个任务上全面超越所有基线，平均指令保真度(IF)达69.1，语义一致性(SC)达86.6，物理合理性(PP)达91.7，分别比最强基线高+11.5、+26.1和+1.4。
+- 去除验证器导致SC从86.6降至75.1、PP从91.7降至86.0，表明显式验证对维持编辑稳定性和物理约束至关重要。
+- 用户研究表明参与者对Edit-As-Act的编辑结果评分显著高于基线，三项指标平均分5.49–5.92 (7分制)。
+- E2A-Bench (63 tasks, 9 scenes) 上 Instruction Fidelity (IF) = 69.1
+---
+
+# Edit-As-Act: Goal-Regressive Planning for Open-Vocabulary 3D Indoor Scene Editing
+
+> [!tip] 核心洞察
+> 场景编辑不应被视为一次性生成，而应理解为最小化动作序列以实现目标世界状态的过程；通过符号化目标谓词和源感知回归，将语言指令转化为可执行、可验证的编辑计划，从而在保持局部性的同时实现高度一致的编辑结果。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | Edit-As-Act：基于目标回归规划的开放词汇3D室内场景编辑 |
+| 英文题名 | Edit-As-Act: Goal-Regressive Planning for Open-Vocabulary 3D Indoor Scene Editing |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2603.17583) · [Project](https://seongraenoh.github.io/edit-as-act/) |
+| Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
+| Method | Edit-As-Act |
+| Dataset | E2A-Bench |
+
+> [!tip] 效果简介
+> - E2A-Bench (63 tasks, 9 scenes) 上，Instruction Fidelity (IF) 69.1 vs 57.6 (AnyHome) (+11.5)；Semantic Consistency (SC) 86.6 vs 60.5 (AnyHome) (+26.1)；Physical Plausibility (PP) 91.7 vs 90.3 (ArtiScene-E) (+1.4)。
+> - E2A-Bench (reasoning baselines) 上，IF 69.1 vs 49.6 (GPT-5 direct) (+19.5)；SC 86.6 vs 78.3 (SceneWeaver) (+8.3)；PP 91.7 vs 82.1 (SceneWeaver) (+9.6)。
+
+## 概述
+
+3D 室内场景编辑旨在根据自由形式的自然语言指令修改现有场景，同时保持未指定区域的完整性和物理合理性。现有方法将编辑视为生成任务——直接预测布局坐标、执行全局约束优化，或通过图像驱动编辑后提升至 3D——这些范式缺乏对目标状态的显式推理，导致三大系统性问题：**全局漂移**（修改非目标区域）、**布局一致性破坏**（无法维持场景原有的空间语义）和**物理不合理放置**（忽略支撑、碰撞等几何约束）。如 Table 1 所示，直接生成方法（LayoutGPT-E）和约束优化方法（AnyHome）在指令保真度与语义一致性上存在结构性缺陷，而图像驱动方法（ArtiScene-E）虽能保持一定物理合理性，却难以精确控制多步指令的执行。
+
+Edit-As-Act 的核心洞察在于：**场景编辑不应被视为一次性生成，而应理解为最小化动作序列以实现目标世界状态的过程**。为此，该方法引入 PDDL 风格的符号动作语言 **EditLang**，将编辑建模为从目标状态出发的**逆向目标回归规划问题**。给定源场景与自由形式指令，LLM 首先提取符号化目标谓词，随后规划器‑验证器循环迭代选择动作，每一步动作都经过目标导向性、单调性和物理可行性验证，确保仅修改必要对象并维持场景整体稳定。源感知回归算子 $\operatorname{Regress}^{*}(G, a; s_{0})$ 仅传播未在源场景中满足的前提条件，避免冗余规划。
+
+在 E2A-Bench 的 63 个编辑任务上，Edit-As-Act 全面超越所有基线：平均指令保真度（IF）达 69.1（+11.5 vs 最强基线）、语义一致性（SC）达 86.6（+26.1）、物理合理性（PP）达 91.7（+1.4）。消融实验证实，验证器的移除导致 SC 下降 11.5，源感知回归的移除导致 IF 下降 10.9，表明显式验证与场景感知是方法有效性的关键支柱。用户研究进一步确认，参与者对 Edit-As-Act 编辑结果的评分显著高于基线（三项指标 5.49–5.92，7 分制）。
+
+## 背景与动机
+
+### 3D 室内场景编辑的现状与瓶颈
+
+3D 室内场景编辑旨在根据自然语言指令对既有场景进行语义化和几何化的修改。这一任务在室内设计、增强现实和具身 AI 等领域具有广泛应用前景，但其核心挑战在于同时满足三个关键需求：**指令保真度**（Instruction Fidelity, IF）——编辑必须精确反映用户指令；**语义一致性**（Semantic Consistency, SC）——编辑不应破坏场景中未涉及部分的语义结构；**物理合理性**（Physical Plausibility, PP）——编辑结果需满足支撑关系、无穿透、不悬空等物理约束。
+
+当前主流方法可归为三类范式（Table 1），但均存在系统性缺陷：
+
+- **直接布局生成方法**（如 LayoutGPT-E）：将编辑视为从指令到 3D 坐标的端到端预测任务。这类方法缺乏对目标状态的显式推理，倾向于修改非目标区域，导致**全局漂移**——即编辑后整个场景布局发生不必要的变化，破坏语义一致性。
+- **约束优化方法**（如 AnyHome）：通过全局约束优化来调整布局参数。虽然能维持一定的空间合理性，但优化目标难以精确对齐自由形式的语言指令，且一次性优化缺乏对多步编辑的分解能力，指令保真度受限。
+- **图像驱动编辑方法**（如 ArtiScene-E）：先对场景渲染图像进行 2D 编辑，再通过 3D 提升还原场景。这类方法面临 2D-3D 不一致性问题，且难以在 3D 空间中保持精确的几何关系和物理约束。
+
+上述方法的共同症结在于：**将编辑视为生成任务，而非对目标状态的推理过程**。它们缺乏对“编辑后世界应满足什么条件”的显式建模，因而无法在保持局部性的同时实现高度一致的编辑结果。
+
+### 推理基线的局限
+
+近期工作开始探索将大语言模型（LLM）的推理能力引入场景编辑。SceneWeaver 采用迭代动作-反思机制，GPT-5 直接推理等方法尝试让 LLM 参与编辑决策。然而，这些方法仍存在根本性困难：LLM 在**几何模拟**方面表现不可靠——直接生成 3D 坐标或空间关系时容易出现物理不合理的结果；但在**符号规约**方面却表现出色——能够准确理解场景语义并描述应满足的条件。这一不对称性（见 Figure 5）揭示了关键洞察：LLM 的强项在于“规定什么应成立”，而非“计算如何实现”。
+
+### 本文动机：从生成到规划
+
+基于上述分析，本文提出一种范式转换：**将 3D 场景编辑重新定义为从目标状态出发的逆向回归规划问题**。核心思想是：
+
+1. **目标规约而非生成**：将编辑指令转化为一组符号化的目标谓词，描述编辑后场景必须满足的条件，而非直接预测物体坐标。
+2. **逆向规划而非前向生成**：从目标状态出发，通过回归推理寻找最小化动作序列，每一步只修改必要对象，天然保证编辑的局部性。
+3. **显式验证而非隐式约束**：在规划循环中引入语义与几何验证器，对每个候选动作进行目标导向性、单调性和物理可行性检查，确保编辑结果同时满足指令要求和物理约束。
+
+这一思路借鉴了经典规划中的 STRIPS 形式化，但引入了**源感知回归**（source-aware regression）机制——仅传播在当前源场景中未满足的前提条件，避免对已存在的关系进行冗余规划。由此，Edit-As-Act 框架将场景编辑建模为可解释、可验证的符号规划过程，从根本上区别于现有生成式或优化式方法。
+
+## 核心创新
+
+Edit-As-Act 的核心创新在于将开放词汇 3D 场景编辑从“生成”范式重新定义为“目标回归规划”范式。现有方法——无论是直接生成布局坐标的 **LayoutGPT-E**、基于约束优化的 **AnyHome**，还是图像驱动编辑后 3D 提升的 **ArtiScene-E**——均将编辑视为一次性或前向生成过程，缺乏对目标状态的显式推理。这导致三个系统性缺陷：(1) 编辑往往修改非目标区域，产生全局漂移；(2) 多步指令的语义一致性难以保证；(3) 物理合理性依赖隐式约束，不可靠。
+
+Edit-As-Act 通过以下四个关键设计改变了这一格局：
+
+**1. 符号化动作语言 EditLang。** 受 PDDL 启发，EditLang 将编辑操作表示为带显式前提条件的原子动作 $\langle \mathrm{pre}(a_t), \mathrm{add}(a_t), \mathrm{del}(a_t) \rangle$，而非连续坐标预测。这一结构化接口使 LLM 能够理解编辑的因果约束——例如，“旋转椅子”需要椅子“在桌子附近”作为前提。消融实验表明，将 EditLang 替换为通用场景图后，语义一致性从 86.6 骤降至 73.6，且无法表达关系约束（如绕桌旋转椅子），验证了显式前提对物理合理编辑的不可或缺性（Table 4, Figure 3）。
+
+**2. 源感知目标回归。** 不同于前向搜索，Edit-As-Act 从目标状态出发逆向规划，每一步仅传播未满足的条件：
+
+$$G_{t-1} = (G_t \setminus \mathrm{add}(a_t)) \cup (\mathrm{pre}(a_t) \setminus S_0)$$
+
+该算子截断已由动作实现的目标谓词，并仅添加不在源场景中的前提条件，从而避免重新规划场景中已满足的部分。去除源感知回归后，指令保真度下降 10.9（69.1→58.2），语义一致性下降 11.5（86.6→75.1），说明忽略场景已有条件会引入大量冗余子目标（Table 4）。前向规划变体的性能同样显著劣于完整模型（IF 61.2 vs 69.1），证实逆向目标回归提供了更强的归纳偏置。
+
+**3. 规划器‑验证器循环。** 规划器在每一步提议一个满足当前目标的 EditLang 动作，验证器则对其进行目标导向性、单调性、上下文一致性和形式有效性四重检查，拒绝违规动作。这一显式验证机制是维持编辑稳定性的关键：去除验证器后，语义一致性从 86.6 降至 75.1，物理合理性从 91.7 降至 86.0（Table 4）。直接输出坐标的预测方法在所有消融中表现最差（IF 52.8, SC 68.1, PP 85.5），进一步验证纯几何预测不足以实现可靠编辑。
+
+**4. 范式转换的本质。** 上述三个组件共同实现了一个根本性转变：场景编辑不再是“生成新布局”，而是“最小化动作序列以实现目标世界状态”。这种规划视角天然保证了编辑的局部性——只修改必要对象，维持场景整体稳定。在 E2A-Bench 的 63 个任务上，Edit-As-Act 的语义一致性达 86.6，比最强基线 **AnyHome** 高出 26.1 点；物理合理性达 91.7，比 **ArtiScene-E** 高出 1.4 点；指令保真度达 69.1，比 **AnyHome** 高出 11.5 点。用户研究进一步确认，参与者在三项指标上对 Edit-As-Act 的评分（5.49–5.92，7 分制）显著高于所有基线（Figure 4）。
+
+## 整体框架
+
+Edit-As-Act 将开放词汇 3D 室内场景编辑重新定义为**目标回归规划问题**，而非一次性生成或约束优化。其核心流程由三个阶段构成，形成从自然语言指令到可执行编辑动作序列的闭环。
+
+### 阶段一：目标提取
+
+给定源场景 $S_0$ 和自由形式的自然语言指令，**LLM 目标提取器**将二者映射为一组用 EditLang 表达的**符号化目标谓词** $G_T$。EditLang 是一种受 PDDL 启发的动作语言，其谓词覆盖空间关系、几何属性、材质风格等维度。这一映射将模糊的语言意图转化为可被规划器消费的精确逻辑条件。
+
+### 阶段二：规划器‑验证器循环
+
+这是框架的核心推理引擎。规划从完整的目标集 $G_T$ 出发，通过**逆向回归**逐步缩减未满足的目标，直至所有目标都能在源场景 $S_0$ 中找到支撑。
+
+具体而言，在每一规划步 $t$：
+- **规划器**提议一个 EditLang 动作 $a_t = \langle \mathrm{pre}(a_t), \mathrm{add}(a_t), \mathrm{del}(a_t) \rangle$，该动作需至少满足当前目标集 $G_t$ 中的一个谓词。
+- **验证器**对提议动作执行四重检查：目标导向性（动作效果是否真正推进目标）、单调性（动作是否不破坏已满足的目标）、上下文一致性（动作前提是否与场景相容）以及形式有效性。违规动作被拒绝，规划器需重新提议。
+- 动作被接受后，通过**源感知目标回归**更新目标集：
+  $$G_{t-1} = (G_t \setminus \mathrm{add}(a_t)) \cup (\mathrm{pre}(a_t) \setminus S_0)$$
+  即：移除已被该动作实现的目标谓词，并仅添加那些在源场景 $S_0$ 中不成立的前提条件。这一“源感知”机制是关键——它避免了重新规划场景中已满足的条件，从而抑制冗余子目标的生成，保证编辑的局部性。
+
+循环终止于 $G_0 \subseteq S_0$，即所有剩余目标均在源场景中自然成立，此时得到完整的反向动作序列。
+
+### 阶段三：确定性执行
+
+将规划器输出的动作序列按正向顺序应用于 $S_0$。**确定性执行引擎**在每一步重新计算几何谓词，保持符号状态与 3D 几何的严格对齐。动作类型涵盖空间重排（Move）、物体添加（Add）和材质风格化（Stylize），最终生成编辑后的场景 $S_T$。
+
+### 模块间关系与关键设计选择
+
+| 模块 | 输入 | 输出 | 核心作用 |
+|------|------|------|----------|
+| LLM 目标提取器 | 源场景 $S_0$ + 自然语言指令 | EditLang 目标谓词集 $G_T$ | 语言到符号的语义锚定 |
+| 规划器 | 当前目标集 $G_t$，验证器反馈 | 候选动作 $a_t$ | 目标导向的动作提议 |
+| 验证器 | 候选动作 $a_t$，场景上下文 | 接受/拒绝 + 拒绝理由 | 显式约束实施 |
+| 源感知目标回归 | 接受的动作 $a_t$，$G_t$，$S_0$ | 更新后的 $G_{t-1}$ | 避免冗余规划的归纳偏置 |
+| 确定性执行引擎 | 动作序列，$S_0$ | 编辑后场景 $S_T$ | 符号‑几何对齐的最终落地 |
+
+整个 pipeline 的设计哲学是**将编辑理解为最小化动作序列以实现目标世界状态的过程**。与直接预测坐标或全局优化布局的方法不同，Edit-As-Act 通过符号化目标谓词和源感知回归，将语言指令转化为可执行、可验证的编辑计划，从而在保持局部性的同时实现高度一致的编辑结果。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/002_Figure_1.jpg]]
+*Figure 1: Overview of Edit-As-Act. Step 1: an LLM converts a source scene*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/010_Figure_6.jpg]]
+*Figure 6: Overview of the object generation and stylization pipeline. We utilize Hyper3D Gen-2 [19] to synthesize high-fidelity 3D assets. The pipeline operates in two modes: (1) Text-to-3D for generating new objects from scratch, and (2) Point Cloud-Guided Stylization (highlighted in blue dashed boxes) where the input 3D object is converted into a point cloud to condition the generation, ensuring the geometric structure remains preserved while the texture is updated according to the text prompt*
+
+## 核心模块与公式推导
+
+Edit-As-Act 的核心创新在于将场景编辑重新定义为**目标回归规划问题**，而非一次性生成或全局优化。框架由五个关键模块构成，围绕一个中心公式——源感知目标回归算子——协同工作。
+
+### 问题形式化：编辑即规划
+
+传统方法将编辑视为从源场景 $S_0$ 到目标场景 $S_T$ 的直接映射。Edit-As-Act 则将其分解为在符号动作空间中寻找一条从目标状态回归到源状态的动作序列。给定源场景 $S_0$ 和自然语言指令，系统首先提取目标谓词集 $G_T$，然后通过逆向规划逐步回归，直到所有剩余目标都在 $S_0$ 中已满足。
+
+状态转移遵循标准 STRIPS 语义：
+
+$$s' = (s \setminus \operatorname{del}(a)) \cup \operatorname{add}(a)$$
+
+其中 $s$ 为当前符号状态，$a$ 为执行的动作，$\operatorname{del}(a)$ 和 $\operatorname{add}(a)$ 分别为动作的删除效果和增加效果。该公式定义了执行动作后符号状态的精确更新规则——移除不再成立的谓词，添加新成立的谓词。
+
+### 源感知目标回归：核心公式
+
+规划的核心是**源感知目标回归算子**（Source-Aware Goal Regression），其数学定义为：
+
+$$\operatorname{Regress}^{*}(G, a; s_{0}) = (G \setminus \operatorname{add}(a)) \cup (\operatorname{pre}(a) \setminus s_{0})$$
+
+该公式的含义是：当选定动作 $a$ 来实现当前目标集 $G$ 中的某些目标时，新的待满足目标集由两部分组成：
+- **$G \setminus \operatorname{add}(a)$**：从当前目标集中移除已被动作 $a$ 实现的目标谓词；
+- **$\operatorname{pre}(a) \setminus s_{0}$**：添加动作 $a$ 的前提条件中尚未在源场景 $S_0$ 中成立的部分。
+
+这一设计的精妙之处在于**源感知截断**：传统回归会将所有前提条件都加入目标集，导致规划器重新“规划”源场景中已经满足的条件，引入冗余子目标。而源感知回归只传播未满足的前提，确保规划器聚焦于真正需要改变的部分，从机制上抑制了全局漂移。
+
+在规划循环中，该公式具体化为每一步的目标更新规则：
+
+$$G_{t-1} = (G_t \setminus \operatorname{add}(a_t)) \cup (\operatorname{pre}(a_t) \setminus S_0)$$
+
+其中 $G_t$ 为第 $t$ 步的剩余目标集，$a_t$ 为第 $t$ 步选择的动作。规划终止条件是 $G_0 \subseteq S_0$，即所有目标均已回归到源场景中已满足的状态。
+
+### 动作表示：EditLang
+
+EditLang 是一种受 PDDL 启发的符号动作语言，每个动作具有完整的三元组结构：
+
+$$a_t = \langle \mathrm{pre}(a_t), \mathrm{add}(a_t), \mathrm{del}(a_t) \rangle$$
+
+其中 $\mathrm{pre}(a_t)$ 为动作执行前必须满足的前提条件谓词集，$\mathrm{add}(a_t)$ 为动作执行后新成立的谓词集，$\mathrm{del}(a_t)$ 为动作执行后不再成立的谓词集。EditLang 不仅支持几何重排原语（如 Move、Rotate），还支持 Add（添加新物体）和 Stylize（材质风格化）两种非几何编辑原语，使其能够处理开放词汇的语义编辑需求。
+
+### 规划器-验证器循环
+
+规划器（Planner）在每一步接收当前目标集 $G_t$，提议一个满足至少一个目标谓词的 EditLang 动作。验证器（Validator）随后对该动作进行四重检查：
+1. **目标导向性**：动作是否确实实现了 $G_t$ 中的某个目标；
+2. **单调性**：动作是否引入了与已实现目标冲突的副作用；
+3. **上下文一致性**：动作的前提条件是否与场景的几何约束相容；
+4. **形式有效性**：动作结构是否符合 EditLang 语法。
+
+被拒绝的动作会触发规划器根据验证器反馈进行修订。消融实验表明，移除验证器导致语义一致性（SC）从 86.6 骤降至 75.1，物理合理性（PP）从 91.7 降至 86.0，证实显式验证对维持编辑稳定性和物理约束不可或缺。
+
+### 确定性执行引擎
+
+规划完成后，确定性执行引擎按顺序执行动作序列。每步执行后重新计算几何谓词（如碰撞检测、支撑关系），确保符号状态与几何状态保持对齐。这种符号-几何闭环保证了最终编辑结果在物理上的有效性——几何指标显示 Edit-As-Act 的出界率和浮空率在所有方法中最低。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/009_Figure_5.jpg]]
+*Figure 5: LLMs demonstrate strong capabilities in interpreting existing 3D layouts (top) but remain unreliable when directly generating 3D layouts from instructions (bottom). This asymmetry motivates our goal-regressive formulation*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/008_Figure_3.jpg]]
+*Figure 3: Effect of removing EditLang, which provides explicit preconditions that allow the chair to be rotated around the table*
+
+## 实验与分析
+
+### 核心发现：目标回归规划全面超越现有编辑范式
+
+Edit-As-Act在E2A-Bench的63个编辑任务上对所有基线方法实现了显著且一致的领先。Table 2汇总了九个场景类别的定量对比结果：在指令保真度（IF）上，Edit-As-Act平均得分69.1，比最强基线AnyHome（57.6）高出+11.5；在语义一致性（SC）上，平均得分86.6，比AnyHome（60.5）高出+26.1；在物理合理性（PP）上，平均得分91.7，比ArtiScene-E（90.3）高出+1.4。
+
+这一结果揭示了现有范式的结构性缺陷。LayoutGPT-E代表的前向布局生成方法缺乏对目标状态的显式推理，往往修改非目标区域，产生全局漂移。AnyHome代表的约束优化方法虽能维持布局一致性，但在处理多步指令时容易遗漏子目标。ArtiScene-E代表的图像驱动编辑方法通过2D图像编辑再提升至3D，虽在物理合理性上表现尚可（90.3），但语义一致性显著不足（60.5），因为图像编辑缺乏对3D空间关系的显式建模。
+
+Edit-As-Act的核心优势在于将编辑建模为从目标状态出发的逆向回归规划问题。每一步动作都经过目标导向性、单调性和物理可行性验证，从而只修改必要对象并维持场景整体稳定。Table 3进一步显示，与当代推理基线相比，Edit-As-Act在IF上比GPT-5直接推理（49.6）高出+19.5，在SC上比SceneWeaver（78.3）高出+8.3，在PP上比SceneWeaver（82.1）高出+9.6，验证了结构化规划比通用推理更可靠。
+
+### 消融实验：验证器与源感知回归是关键组件
+
+Table 4的消融实验揭示了各组件对系统性能的贡献程度。去除验证器（w/o Validator）导致SC从86.6骤降至75.1（-11.5），PP从91.7降至86.0（-5.7），表明显式语义与几何检查对维持编辑稳定性和物理约束不可或缺。去除源感知回归（w/o Source-Awareness）使IF从69.1降至58.2（-10.9），SC从86.6降至75.1（-11.5），说明忽略场景已有条件会引入冗余子目标，导致规划偏离指令本意。
+
+替换EditLang为通用场景图（w/o EditLang）使SC降至73.6、PP降至88.3，且无法表达关系约束（例如绕桌旋转椅子，见Figure 3），验证了PDDL风格动作语言中显式前提条件对物理合理编辑的关键作用。前向规划变体（Forward Planning）的IF仅为61.2（vs 69.1），证实逆向目标回归提供了更强的归纳偏置——从目标倒推避免了在庞大动作空间中盲目搜索。
+
+最值得注意的是，直接输出坐标的预测方法（Coord. Prediction）在所有消融中表现最差（IF 52.8, SC 68.1, PP 85.5），验证了纯几何预测不足以实现可靠编辑。这一发现直接支持了论文的核心主张：场景编辑不应被视为一次性生成，而应理解为最小化动作序列以实现目标世界状态的过程。
+
+Table 8的附加消融显示，采用较小LLM骨干（GPT-OSS-20b）时SC下降13.1（86.6→73.5），但EditLang的结构化接口仍能部分弥补推理能力的损失。缩小谓词集导致IF从69.1降至52.4，但PP仅从91.7降至88.2，说明丰富谓词对指令保真度至关重要，而物理有效性主要由几何验证保证。
+
+### 按操作类型与几何指标分析
+
+Table 7按编辑操作类型划分的性能分析表明，Edit-As-Act在所有操作类别上均保持领先，包括添加、删除、移动、旋转、替换和风格化。Table 9的几何指标对比进一步验证了物理有效性：Edit-As-Act的出界率和浮空率均为最低，说明显式几何验证器有效防止了碰撞和不稳定放置。
+
+### 用户研究与定性分析
+
+Figure 4的用户研究结果提供了感知层面的证据。十名参与者对Edit-As-Act、ArtiScene和AnyHome的编辑结果进行评分（7分制），Edit-As-Act在指令保真度、语义一致性和物理合理性上分别获得5.49、5.65和5.92分，显著高于ArtiScene（3.11, 2.93, 3.93）和AnyHome（3.46, 4.04, 4.36）。Figure 2的定性对比显示，基线方法常引入非预期的全局变化或遗漏多步指令，而Edit-As-Act生成的编辑精准、局部化且物理有效。
+
+### 失败模式与局限
+
+尽管整体性能优越，Edit-As-Act仍存在若干失败模式。高度模糊的指令（如“把房间弄乱”）会产生不精确的目标谓词，导致编辑效果欠佳。部分编辑几何正确但风格或功能性次优——例如两个豆袋椅面对面摆放虽然满足空间约束，但不符合人类对自然布局的期望（Section 5.8）。严格单调性约束下，偶尔出现子目标无法同时满足的规划死锁，需依赖重试机制缓解。这些失败模式指向了当前符号谓词集在表达功能性推理方面的不足，也为未来的谓词扩展和概率规划融合指明了方向。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/006_Table_4.jpg]]
+*Table 4: Ablation study showing the impact of each component*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/007_Figure_4.jpg]]
+*Figure 4: User study results. Ten participants rated edited scenes produced by Edit-As-Act, ArtiScene, and AnyHome on three criteria. Edit-As-Act obtains the highest perceived instruction fidelity, semantic consistency, and physical plausibility*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/004_Table_3.jpg]]
+*Table 3: Comparison with contemporary reasoning baselines*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/001_Table_1.jpg]]
+*Table 1: Comparison of three essential requirements for different scene editing paradigms. LayoutGPT represents direct 3D layout editing. AnyHome represents constraint-based optimization. ArtiScene represents image-driven editing followed by 3D lifting*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/021_Table_8.jpg]]
+*Table 8: Additional ablation on backbone robustness, predicate complexity, and validator parameter sensitivity*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/003_Table_2.jpg]]
+*Table 2: Quantitative comparison across nine scene categories. Edit-As-Act achieves the strongest and most consistent performance in instruction fidelity (IF), semantic consistency (SC), and physical plausibility (PP), demonstrating robust generalization across diverse spatial configurations*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/005_Figure_2.jpg]]
+*Figure 2: Representative qualitative results. Baseline methods often introduce unintended global changes, fail to satisfy multi-step instructions, or generate incomplete edits. Edit-As-Act produces precise, instruction-aligned modifications that remain physically valid and preserve the overall scene identity*
+
+![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/017_Table_7.jpg]]
+*Table 7: Performance by editing operation type. Edit-As-Act achieves the strongest and most reliable performance across all edit categories, maintaining high instruction fidelity (IF), semantic consistency (SC), and physical plausibility (PP)*
+
+## 方法谱系与知识库定位
+
+### 1. 问题瓶颈：从生成到规划的范式转换
+
+现有3D室内场景编辑方法可归为三类范式：直接布局生成、约束优化和图像驱动编辑。这些方法的共同瓶颈在于将编辑视为**一次性生成任务**，缺乏对目标状态的显式推理，导致三个核心需求无法同时满足（Table 1）：
+
+- **指令保真度**：生成式方法（如 **LayoutGPT-E**）常遗漏多步指令中的部分要求；约束优化方法（如 **AnyHome**）在复杂空间约束下可能牺牲指令完整性；图像驱动方法（如 **ArtiScene-E**）在2D到3D提升过程中丢失细粒度语义。
+- **语义一致性**：前向生成缺乏对源场景的显式锚定，编辑往往修改非目标区域，产生“全局漂移”——例如为添加一个物体而意外移动整个房间布局。
+- **物理合理性**：直接预测坐标或从图像提升3D几何时，缺乏对碰撞、支撑、边界等物理约束的显式验证，导致物体穿模、浮空或出界。
+
+**推理型基线**（如 **SceneWeaver** 的迭代动作‑反思循环）试图通过多步推理缓解上述问题，但仍采用前向编辑策略，缺乏从目标状态出发的结构化规划，在指令保真度（IF 49.6）和物理合理性（PP 82.1）上显著落后于 Edit-As-Act（Table 3）。
+
+Edit-As-Act 的核心洞察在于：**场景编辑不应被视为一次性生成，而应理解为最小化动作序列以实现目标世界状态的过程**。通过将语言指令转化为符号化目标谓词，并采用逆向目标回归规划，该方法在保持局部性的同时实现了高度一致的编辑结果。
+
+### 2. 关键设计差异：Edit-As-Act 的方法论创新
+
+Edit-As-Act 与现有方法在四个关键维度上存在根本性差异：
+
+| 维度 | 现有方法 | Edit-As-Act |
+|------|---------|-------------|
+| **编辑范式** | 直接生成布局坐标 / 全局约束优化 / 图像到3D提升 | 基于目标回归的符号化规划（EditLang + 规划器‑验证器循环） |
+| **动作表示** | 连续坐标预测或布局参数优化 | PDDL风格原子动作 $\langle \mathrm{pre}, \mathrm{add}, \mathrm{del} \rangle$，带明确前提与效果 |
+| **规划方向** | 前向生成 / 一次性优化 | 逆向目标回归，源感知只传播未满足的条件 |
+| **验证机制** | 隐式或无 | 显式语义与几何验证器（目标导向、单调性、上下文一致性、形式有效性） |
+
+**EditLang 动作语言**是该方法的核心知识表示层。它定义了一组带有显式前提条件、增加效果和删除效果的原子动作模式，使LLM能够在结构化符号空间中进行推理，而非直接输出连续坐标。这种设计使得每个编辑步骤的意图和后果都是可解释、可验证的。消融实验表明，将EditLang替换为通用场景图后，语义一致性（SC）从86.6降至73.6，且无法表达关系约束（例如“绕桌旋转椅子”），证实了领域特定符号语言对复杂空间推理的必要性（Table 4, Figure 3）。
+
+**源感知目标回归算子** $\operatorname{Regress}^{*}(G, a; s_{0}) = (G \setminus \operatorname{add}(a)) \cup (\operatorname{pre}(a) \setminus s_{0})$ 是规划效率的关键。与经典STRIPS回归不同，该算子仅将不在源场景 $s_0$ 中成立的前提条件加入目标集，避免对已满足条件的冗余规划。去除源感知机制导致指令保真度（IF）从69.1降至58.2，语义一致性（SC）下降11.5（Table 4），说明忽略场景已有条件会引入大量冗余子目标，使规划偏离原始意图。
+
+**规划器‑验证器循环**实现了“提议‑检查‑修订”的闭环控制。验证器对每个提议动作执行四类检查：目标导向性（动作是否确实满足当前某个目标）、单调性（动作是否不撤销已实现的目标）、上下文一致性（动作前提是否与当前场景状态兼容）、形式有效性（动作是否符合EditLang语法）。去除验证器导致SC下降11.5、PP下降5.7（Table 4），表明显式验证对维持编辑稳定性和物理约束不可或缺。
+
+### 3. 适用边界与局限
+
+Edit-As-Act 的当前设计存在以下适用边界：
+
+**符号知识的覆盖范围**：EditLang的谓词集合和动作模式目前依赖人工设计，覆盖了常见的空间关系（on、near、facing等）和编辑操作（Move、Rotate、Add、Stylize）。当面对新物体类别或交互类型时，需要手动扩展谓词和动作模式。消融实验中缩小谓词集导致IF从69.1骤降至52.4，说明谓词丰富度对指令保真度至关重要（Table 8, Section J.2）。然而物理合理性（PP）仅从91.7降至88.2，表明几何验证器在谓词稀疏时仍能部分维持物理有效性。
+
+**场景复杂度**：实验仅限于单个静态室内场景（E2A-Bench覆盖9种房间类型，63个编辑任务），尚未验证在多房间环境或动态场景（如随时间变化的场景、移动代理）中的有效性。当场景包含跨房间语义依赖（如“将客厅的沙发移到书房”）时，当前单房间谓词表示可能不足以捕获全局约束。
+
+**指令模糊性**：高度模糊的指令（如“把房间弄乱”）会产生不精确的目标谓词，导致编辑效果欠佳。这是因为目标提取器依赖LLM将自然语言映射为EditLang谓词，而模糊指令缺乏明确的语义锚点。此外，部分编辑虽几何正确但功能性次优（例如两个豆袋椅面对面摆放虽然满足空间约束但不自然），暴露出纯符号规划在捕获人类偏好和功能性推理方面的局限。
+
+**规划死锁**：在严格单调性约束下（即动作不能撤销已实现的目标），偶尔会出现子目标无法同时满足的规划死锁。当前通过重试机制缓解，但未从根本上解决约束冲突问题。
+
+### 4. 开放问题与未来方向
+
+基于上述局限，以下开放问题值得进一步探索：
+
+1. **自动化谓词与动作模式学习**：如何以数据驱动方式扩展EditLang的谓词和动作模式，降低对领域专家的依赖？可能的路径包括从大规模3D场景数据中挖掘常见空间关系和编辑模式，或利用LLM的少样本泛化能力自动提议新的谓词模板。
+
+2. **多房间与多层次环境推广**：如何将目标回归规划推广至多房间、多层次环境，并处理跨房间语义依赖？这需要扩展谓词表示以支持层级场景结构，并设计能够推理全局约束的规划算法。
+
+3. **功能性推理的融入**：能否在符号谓词中融入更高级的功能性推理（如椅子应面向工作区、台灯应照亮阅读角），从而在几何正确性之外实现布局的语义合理性？这可能需要引入从人类偏好数据中学习的功能性约束，或与大型多模态模型的功能性常识推理能力结合。
+
+4. **概率化与模糊指令处理**：如何在不破坏解释性和终止保证的前提下，引入概率或学习组件以处理模糊指令？可能的方向包括将目标谓词表示为概率分布而非确定性集合，或允许规划器在多个可行计划中进行软选择。
+
+5. **与生成式方法的深度融合**：Edit-As-Act 目前将符号规划与3D资产生成解耦（通过Hyper3D Gen-2进行文本到3D生成）。是否存在端到端可微分的方式，使规划决策能够直接指导生成过程，从而在保持符号可解释性的同时提升生成质量？
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/Edit_As_Act_Goal_Regressive_Planning_for_Open_Vocabulary_3D_Indoor_Scene_Editing.pdf]]

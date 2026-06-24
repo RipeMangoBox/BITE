@@ -1,0 +1,346 @@
+---
+title: "Denoising as Path Planning: Training-Free Acceleration of Diffusion Models with DPCache"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/Denoising_as_Path_Planning_Training_Free_Acceleration_of_Diffusion_Models_with_DPCache.pdf
+project_link: null
+code_link: "https://github.com/argsss/DPCache"
+aliases:
+- DAPPTFADMD
+tags:
+- CVPR_2026
+- topic/vision_multimodal_applications
+- topic/generative_models_diffusion
+- topic/generative_models_diffusion/diffusion_image_video
+core_operator: 通过将采样加速建模为全局路径规划问题，利用路径感知代价张量（PACT）捕捉跳过时间步的路径依赖误差，并采用动态规划精确选择全局最优的关键时间步序列。这一序列最小化与全步数去噪轨迹的累积偏差，是实现高质量加速的根本原因。
+primary_logic: 将扩散模型采样加速重新定义为全局路径规划问题，构建路径感知代价张量（PACT）以量化跳跃误差的路径依赖性，并通过动态规划高效求解最优稀疏调度。该框架无需训练，仅需极少量校准样本，即可在显著加速的同时保持甚至超越全步数基线的生成质量。
+claims:
+- DPCache在FLUX.1-dev上以3.54×加速实现ImageReward 1.007，超越全步数基线（0.979，+0.028），证明全局调度可超越未加速模型。
+- 在4.87×更高加速比下，DPCache的ImageReward仍达到0.958，比第二优方法高0.031，且PSNR、SSIM显著领先，验证全局调度对轨迹保真度的优势。
+- 消融实验表明，DPCache的3D路径感知代价张量结合累积误差能获得最高ImageReward和PSNR，证明了PACT设计的有效性。
+- FLUX.1-dev on DrawBench 上 ImageReward ↑ = 1.007 (K=13)
+---
+
+# Denoising as Path Planning: Training-Free Acceleration of Diffusion Models with DPCache
+
+> [!tip] 核心洞察
+> 将扩散模型采样加速重新定义为全局路径规划问题，构建路径感知代价张量（PACT）以量化跳跃误差的路径依赖性，并通过动态规划高效求解最优稀疏调度。该框架无需训练，仅需极少量校准样本，即可在显著加速的同时保持甚至超越全步数基线的生成质量。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | 去噪即路径规划：基于DPCache的免训练扩散模型加速 |
+| 英文题名 | Denoising as Path Planning: Training-Free Acceleration of Diffusion Models with DPCache |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2602.22654) · [Code](https://github.com/argsss/DPCache) |
+| Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
+| Method | DPCache |
+| Dataset | FLUX.1-dev on DrawBench, HunyuanVideo on VBench, DiT-XL/2 on ImageNet |
+
+> [!tip] 效果简介
+> - FLUX.1-dev on DrawBench 上，ImageReward ↑ 1.007 (K=13) vs 0.979 (50 steps) (+0.028)；PSNR ↑ / SSIM ↑ / LPIPS ↓ 21.65 / 0.8106 / 0.1804 (K=13) vs 15.32 / 0.6527 / 0.4133 (30% steps, best non-DPCache in fidelity?) Actually the... (+2.43 PSNR over SpeCa (K=13))。
+> - HunyuanVideo on VBench 上，VBench Score (%) ↑ 80.23 (K=9) vs 80.93 (50 steps) (-0.70 (but outperforms other accelerated methods by ≥0.24))。
+> - DiT-XL/2 on ImageNet 上，FID ↓ / sFID ↓ / IS ↑ 3.285 / 5.063 / 215.99 (3.02× speedup) vs 2.226 / 4.275 / 241.10 (50 steps) (best among accelerated methods, e.g., FID improvement over second-best: -1.420)。
+
+## 概述
+
+扩散模型在图像和视频生成中展现出卓越能力，但其迭代去噪过程计算开销巨大。现有免训练加速方法——如基于缓存重用的 **TeaCache**、基于泰勒预测的 **TaylorSeer** 和引入验证器网络的 **SpeCa**——普遍采用固定间隔或局部自适应采样策略，忽略了去噪轨迹的全局结构。固定调度无法识别关键过渡区域，导致轨迹大幅偏离；局部自适应策略则因短视而跳过必要时间步，造成不可逆漂移与误差累积，最终产生模糊、几何扭曲等视觉伪影（图1）。
+
+本文提出 **DPCache**，将扩散模型采样加速重新定义为**全局路径规划问题**。核心洞察在于：跳过时间步所引入的误差并非独立，而是**路径依赖的**——同一跳步在不同前驱步下代价迥异。DPCache 通过构建**路径感知代价张量（PACT）**，以累积 L1 预测误差量化每一步跳跃的路径条件代价，并利用动态规划精确选择使总路径代价最小的全局最优关键时间步序列。该框架无需训练，仅需约 10 张校准样本离线构建 PACT，所得调度可冻结并泛化至任意输入。
+
+**方法定位**：DPCache 属于免训练、基于缓存预测的扩散加速方法，在以下维度实现突破：
+
+- **调度策略**：从固定/局部自适应升级为全局路径规划，最小化累积轨迹偏差。
+- **缓存范围**：仅缓存最后层特征，内存开销仅增加 0.36 GB，远低于缓存所有层的方案。
+- **校准效率**：校准样本极少（~10），且调度一经确定即可泛化，无需逐样本调整。
+
+**主要结果**：在 FLUX.1-dev 文本生成图像任务上，DPCache 以 3.54× 加速实现 ImageReward 1.007，超越全步数基线（0.979，+0.028）；在 4.87× 更高加速比下，ImageReward 仍达 0.958，领先次优方法 0.031。在 HunyuanVideo 视频生成和 DiT-XL/2 类别条件生成任务上，DPCache 同样以显著保真度优势超越现有加速方法，验证了全局路径规划范式的通用性与有效性。
+
+## 背景与动机
+
+扩散模型已成为视觉生成领域的核心架构，但其迭代去噪过程通常需要数十至上百个推理步骤，导致高昂的计算成本与延迟。在交互式应用、视频生成等场景中，这一瓶颈尤为突出。因此，如何在保持生成质量的前提下大幅减少有效计算量，成为扩散模型实用化的关键挑战。
+
+### 现有加速范式及其局限
+
+当前免训练的扩散模型加速方法主要分为两类：**步数约简**与**缓存重用**。
+
+- **步数约简**直接减少去噪步数（如将50步压缩至10步），虽能线性降低计算量，但会因离散化误差增大而导致生成质量急剧退化，表现为模糊、细节丢失和几何失真。
+- **缓存重用**方法（如**TeaCache**、**TaylorSeer**、**SpeCa**）在部分时间步执行完整计算并缓存中间特征，其余步则通过预测或直接复用缓存来跳过计算。这类方法在保持一定质量的同时实现了可观的加速比。
+
+然而，现有缓存方法的**采样调度策略**存在根本性缺陷：
+
+- **固定间隔调度**（如TaylorSeer的N步预测）缺乏对去噪轨迹结构的感知能力，无法识别关键过渡区域，导致轨迹大偏差。
+- **局部自适应调度**（如TeaCache的阈值判断、SpeCa的验证器）虽能动态决定是否跳过当前步，但其贪婪的短视决策容易跳过必要的时间步，造成不可逆漂移和误差累积。
+
+这两种策略均未将加速问题视为**全局优化问题**，忽略了跳跃决策之间的路径依赖性——某一步的跳跃代价不仅取决于当前状态，还依赖于前序关键步的历史信息。这一疏忽是导致现有方法在高加速比下出现模糊、几何扭曲等视觉伪影的根本原因。
+
+### 本文动机：从局部决策到全局路径规划
+
+本文提出一个核心洞察：**扩散模型的采样加速本质上是一个全局路径规划问题**。去噪轨迹上的每一步跳跃都会引入误差，且该误差沿轨迹累积并受前序关键步的强影响。因此，最优的关键步选择序列应当最小化整条轨迹的累积偏差，而非孤立地优化每一步的决策。
+
+基于这一视角，DPCache将加速问题形式化为：在给定的目标步数$K$下，从全步数去噪轨迹中选择一组关键时间步，使得跳跃造成的路径感知累积误差最小。这一全局优化框架无需训练，仅需极少量校准样本，即可在显著加速的同时保持甚至超越全步数基线的生成质量。
+
+## 核心创新
+
+DPCache 的核心创新在于将扩散模型的采样加速从一个**局部、短视的缓存决策问题**重新定义为**全局路径规划问题**。现有基于缓存的方法（如 TeaCache、TaylorSeer、SpeCa）虽然通过特征预测跳过了大量计算，但其调度策略存在根本性缺陷：固定间隔调度无法感知去噪轨迹中的关键过渡区域，导致与全步数轨迹产生大偏差；而局部自适应策略（如基于阈值的贪婪判断或轻量验证器）由于缺乏全局视野，常常跳过必要的时间步，造成不可逆的漂移和误差累积，最终表现为模糊、几何扭曲等视觉伪影（Figure 1）。
+
+DPCache 通过三个紧密耦合的 changed slots 系统性地解决了上述瓶颈：
+
+**1. 采样调度策略：从局部自适应到全局路径规划**
+
+这是最根本的改变。DPCache 不再依赖固定间隔或逐步的局部判断，而是将整个去噪过程建模为一条从纯噪声到干净图像的轨迹，将选择哪些时间步执行完整计算视为在该轨迹上选取一条“最优路径”。其优化目标是最小化所选路径与全步数轨迹之间的累积偏差：
+
+$$\arg \min_{\mathcal{T}} \sum_{m=2}^{K} \mathcal{C}[t_{m-1}, t_m, t_{m+1}]$$
+
+其中 $\mathcal{T} = \{t_1, t_2, ..., t_K\}$ 为选定的关键时间步序列，$\mathcal{C}[i,j,k]$ 是路径感知的段代价（见下文）。该目标函数显式地考虑了跳跃决策的路径依赖性——从步 $j$ 跳到步 $k$ 的代价不仅取决于 $j$ 和 $k$ 本身，还取决于前一个关键步 $i$ 提供的缓存状态。这一设计使得调度选择能够感知误差沿轨迹的传播与累积，从而避开那些会导致后续预测严重失真的跳跃组合。
+
+**2. 代价建模：路径感知代价张量（PACT）**
+
+为实现上述全局优化，DPCache 引入了路径感知代价张量（Path-Aware Cost Tensor, PACT），这是一个三维结构 $\mathcal{C}[i,j,k]$，用于量化在给定前驱关键步 $i$ 的条件下，从步 $j$ 跳到步 $k$ 并跳过中间所有步所带来的累积预测误差：
+
+$$\mathcal{C}[i,j,k] = \sum_{\tau=k}^{j-1} \lVert h_\tau^L - h_{pred,\tau}^L(i,j) \rVert_1$$
+
+其中 $h_\tau^L$ 是全步数去噪在步 $\tau$ 产生的最后层真实特征，$h_{pred,\tau}^L(i,j)$ 是基于步 $i$ 和 $j$ 的缓存特征通过预测器（如泰勒展开）重建的近似特征。PACT 的关键设计在于：**三维结构编码了路径依赖性**（即代价不仅取决于跳跃的起止步 $j$ 和 $k$，还取决于缓存来源 $i$），而**累积求和捕捉了误差沿跳过区间的传播效应**。消融实验证实，同时采用三维代价和累积误差的设计（即完整 PACT）相比仅使用二维代价或仅考虑当前步误差的变体，在 ImageReward 上提升 +0.006，PSNR 提升 +0.78（Table 4），且生成图像的细节保真度明显更优（Figure 10）。
+
+**3. 缓存策略：仅缓存最后层特征**
+
+与 TaylorSeer 和 SpeCa 等缓存所有 Transformer 层中间特征的方法不同，DPCache 仅缓存最后层特征（final-layer features）。这一设计大幅降低了内存开销——相比基线仅增加 +0.36 GB 显存占用，同时仍能为预测器提供足够的信号来重建跳过的中间步特征。PACT 的构建和动态规划求解也仅依赖最后层特征的 L1 误差，使得整个框架在保持全局优化能力的同时具备轻量级的内存特性。
+
+**4. 校准与泛化：离线构建，冻结调度**
+
+DPCache 使用极少量校准样本（约 10 张）运行全步数去噪过程以构建 PACT，随后通过动态规划求解最优关键步序列：
+
+$$D[m,k] = \min_{j>k} D[m-1,j] + \mathcal{C}[P[m-1,j], j, k]$$
+
+该递推在 PACT 上高效搜索，得到目标步数 $K$ 下的全局最优调度。所得调度被冻结，在推理阶段直接应用于任意输入，包括分布外提示词，无需针对不同输入重新调参。消融实验表明，即使仅用 1 个校准样本，DPCache 仍能取得 ImageReward 1.001，几乎无损（Table 5），验证了该方法对校准集大小的高度鲁棒性。
+
+**因果机制总结**：DPCache 之所以能在 3.54× 加速下超越全步数基线（ImageReward +0.028），并在 4.87× 加速下显著领先其他方法（ImageReward +0.031, CLIP Score +0.10），根本原因在于 PACT 精确捕捉了跳跃误差的路径依赖性，而动态规划确保了所选调度在全局范围内最小化累积偏差。这一“全局路径规划”范式从根本上避免了局部自适应方法的短视性错误和固定调度的僵化性，是实现高质量加速的因果枢纽。
+
+## 整体框架
+
+DPCache将扩散模型采样加速重新定义为**全局路径规划问题**，其核心思想是：不依赖固定间隔或局部自适应策略，而是通过离线校准构建路径感知代价张量（Path-Aware Cost Tensor, PACT），再利用动态规划精确选择全局最优的关键时间步序列，使去噪轨迹与全步数基线的累积偏差最小化。整个框架分为**校准阶段**和**推理阶段**两大模块，如图2所示。
+
+### 校准阶段
+
+校准阶段的目标是为后续调度优化提供路径依赖的误差先验。流程如下：
+
+1. **全步数去噪执行**：在少量校准样本（约10张）上运行完整的 $T$ 步去噪过程，收集每一步最后Transformer层的输出特征 $h_\tau^L$。选择仅缓存最后层特征的设计大幅降低了内存开销——相较于全步数基线仅增加约0.36 GB。
+
+2. **PACT构建**：基于收集的特征，计算三维代价张量 $\mathcal{C}[i,j,k]$，其定义为：
+   $$\mathcal{C}[i,j,k] = \sum_{\tau=k}^{j-1} \lVert h_\tau^L - h_{pred,\tau}^L(i,j) \rVert_1$$
+   其中 $i$ 为前一个关键步，从步 $j$ 跳到步 $k$ 时，对跳过区间内所有中间步的预测误差进行累积求和。这一三维结构显式编码了跳跃代价对前驱关键步的路径依赖性——同一跳跃区间在不同前驱条件下会产生不同的误差累积。
+
+3. **最优调度选择**：在PACT上运行动态规划，求解目标关键步数 $K$ 下的最优调度 $\mathcal{T} = \{t_1 > t_2 > \dots > t_K > 0\}$，优化目标为最小化总路径代价：
+   $$\arg \min_{\mathcal{T}} \sum_{m=2}^{K} \mathcal{C}[t_{m-1}, t_m, t_{m+1}]$$
+   其中 $t_{K+1}=0$ 为哨兵端点。动态规划的状态转移方程为：
+   $$D[m,k] = \min_{j>k} D[m-1,j] + \mathcal{C}[P[m-1,j], j, k]$$
+   为保证早期去噪动力学的稳定性，前 $M$ 个时间步被强制纳入所有可行调度。
+
+### 推理阶段
+
+推理阶段直接使用校准阶段产出的冻结调度，无需任何在线优化：
+
+1. **关键步完整计算**：仅在预选的 $K$ 个关键时间步执行完整的去噪模型前向传播，并缓存最后层特征。
+2. **非关键步高效预测**：对于其余时间步，使用预测器（如泰勒展开）基于最近关键步的缓存特征高效重建输出，跳过昂贵的完整计算。
+
+该框架具有三个关键特性：**(a) 免训练**——无需修改模型权重或进行梯度更新；**(b) 调度冻结与泛化**——校准所得的调度可泛化至任意输入，甚至分布外提示；**(c) 预测器无关**——只要在校准和推理阶段使用相同的预测器，框架即可正常工作，不依赖特定预测方法。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/002_Figure_2.jpg]]
+*Figure 2: Overview of DPCache. (a) During the calibration stage, the full T -step denoising process is executed to construct a 3D Path-Aware Cost Tensor (PACT), which quantifies the cumulative error of skipping intermediate timesteps conditioned on the preceding key step. (b) An optimal K-step sampling schedule*
+
+## 核心模块与公式推导
+
+### 3.1 路径规划视角下的采样加速
+
+DPCache将扩散模型采样加速重新定义为**全局路径规划问题**。扩散模型的去噪过程可视为从纯噪声到干净数据的轨迹，现有缓存加速方法（如**TeaCache**、**TaylorSeer**、**SpeCa**）采用固定间隔或局部自适应策略选择关键时间步，忽略了轨迹的全局结构：固定调度无法识别关键过渡区域，导致轨迹大偏差；局部自适应策略因短视跳过必要时间步，造成不可逆漂移和误差累积。
+
+DPCache的核心洞察是：**跳过时间步的误差具有路径依赖性**——从时间步 $j$ 跳到 $k$ 的预测误差，取决于前一个关键步 $i$ 处缓存特征的质量。因此，DPCache通过构建路径感知代价张量（PACT）显式建模这种依赖关系，并利用动态规划精确选择全局最优的关键时间步序列，最小化与全步数去噪轨迹的累积偏差。
+
+### 3.2 预测范式基础
+
+DPCache基于**TaylorSeer**的预测范式构建缓存与预测机制。在关键时间步 $t$，模型执行完整计算并缓存最后层特征 $\mathbf{h}_t^L$ 及其有限差分序列：
+
+$$\mathcal{H} = \{ h_t^l, \Delta h_t^l, ..., \Delta^m h_t^l \}_{l=1}^L$$
+
+对于被跳过的时间步 $t-k$，利用截断泰勒展开预测特征：
+
+$$\mathcal{F}_{pred,m}^l(\pmb{x}_{t-k}) = \pmb{h}_t^l + \sum_{i=1}^m \frac{\Delta^i \pmb{h}_t^l}{i! \cdot \mathcal{N}^i} (-k)^i$$
+
+其中 $\mathcal{N}$ 为归一化因子，$m$ 为预测阶数。DPCache的关键改进在于：仅缓存最后层特征（而非所有层），大幅降低内存开销；同时用全局优化调度替代固定或局部自适应策略。
+
+### 3.3 路径感知代价张量（PACT）
+
+PACT是DPCache的核心数据结构，用于量化跳跃误差的路径依赖性。给定三个时间步 $(i, j, k)$，其中 $i > j > k$，$i$ 为前一个关键步，$j$ 为当前关键步，$k$ 为下一个关键步，PACT的代价条目定义为从 $j$ 跳到 $k$ 的累积L1预测误差：
+
+$$\mathcal{C}[i,j,k] = \sum_{\tau=k}^{j-1} \lVert h_\tau^L - h_{pred,\tau}^L(i,j) \rVert_1$$
+
+**变量含义**：
+- $h_\tau^L$：时间步 $\tau$ 处最后层的真实特征（全步数去噪过程产生）
+- $h_{pred,\tau}^L(i,j)$：基于关键步 $j$ 处缓存特征预测的 $\tau$ 步特征
+- $i$：前一个关键步索引，决定缓存特征的质量，从而影响预测精度
+- $\lVert \cdot \rVert_1$：L1范数，度量预测误差
+
+该公式的关键设计在于：
+1. **三维张量结构**：显式编码 $(i,j,k)$ 三元组的路径依赖关系
+2. **累积误差求和**：对跳过区间 $[k, j-1]$ 内所有中间步的误差求和，捕捉误差累积效应
+
+### 3.4 动态规划最优调度
+
+给定目标关键步数 $K$，最优调度 $\mathcal{T} = \{t_1 > t_2 > \dots > t_K > 0\}$ 通过最小化总路径代价求解：
+
+$$\arg \min_{\mathcal{T}} \sum_{m=2}^{K} \mathcal{C}[t_{m-1}, t_m, t_{m+1}]$$
+
+其中 $t_{K+1} = 0$ 为哨兵端点。为保证早期去噪动力学的稳定性，前 $M$ 个时间步被强制包含在所有可行调度中。
+
+该优化问题通过动态规划高效求解，状态转移方程为：
+
+$$D[m,k] = \min_{j>k} D[m-1,j] + \mathcal{C}[P[m-1,j], j, k]$$
+
+**变量含义**：
+- $D[m,k]$：使用 $m$ 个关键步到达时间步 $k$ 的最小累积代价
+- $P[m-1,j]$：到达状态 $D[m-1,j]$ 的真实前驱关键步索引
+- $\mathcal{C}[P[m-1,j], j, k]$：从前驱经过 $j$ 跳到 $k$ 的路径感知代价
+
+该递推式的核心在于：代价项 $\mathcal{C}$ 依赖于真实前驱 $P[m-1,j]$，而非仅依赖于当前步 $j$，这确保了路径依赖性的精确建模。最终回溯 $P$ 表即可得到全局最优关键步序列。
+
+### 3.5 校准与推理流程
+
+**校准阶段**：使用约10个随机样本运行全步数去噪过程，收集最后层特征，构建PACT。校准离线完成，不增加推理时延。
+
+**推理阶段**：仅在动态规划选出的关键步执行完整计算并缓存特征，其余步使用预测器高效重建特征。DPCache对具体预测方法无偏好，只需校准与推理阶段使用一致的预测器。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/001_Figure_1.jpg]]
+*Figure 1: (a) Fixed schedule is inflexible and unable to identify critical timesteps, resulting in large deviation from the true trajectory. (b) Locally adaptive schedule makes greedy, short-sighted decisions that often skip essential timesteps, leading to irreversible deviation. (c) DPCache identifies a globally optimal sequence of key timesteps through calibration and achieves low cumulative trajectory deviation*
+
+## 实验与分析
+
+### 核心定量结果
+
+DPCache 在文生图、文生视频和类别条件生成三类任务上均展现出显著的加速与质量优势，其核心机制——全局路径规划——是性能突破的根本原因。
+
+**文生图（FLUX.1-dev on DrawBench）**：在 3.54× 加速比（K=13）下，DPCache 取得 ImageReward 1.007，不仅大幅领先所有同类加速方法，更以 +0.028 的优势超越未加速的 50 步全步数基线（ImageReward 0.979）。这表明全局最优调度不仅能逼近、甚至可以**超越**原模型的生成质量。在轨迹保真度指标上，DPCache 的 PSNR 达到 21.65，比次优方法高出 +2.43，SSIM 和 LPIPS 同样显著领先，验证了路径感知代价张量（PACT）对去噪轨迹偏差的有效控制。当加速比提升至 4.87×（K=9）时，DPCache 的 ImageReward 仍保持在 0.958，比第二优方法高 0.031，CLIP Score 领先 0.10，证明全局调度在高加速比下仍能维持较强的语义对齐与视觉质量。
+
+**文生视频（HunyuanVideo on VBench）**：在 4.75× 加速下，DPCache 取得 VBench 综合得分 80.23%，仅比 50 步全步数基线（80.93%）低 0.70 个百分点，但比现有最优加速方法高出至少 0.24 个百分点。值得注意的是，DPCache 仅缓存最后层特征，内存开销仅增加 0.36 GB，而对比方法如 TaylorSeer 和 SpeCa 需缓存所有 Transformer 层的中间特征，内存压力显著更大。
+
+**类别条件生成（DiT-XL/2 on ImageNet）**：在 3.02× 加速比下，DPCache 取得 FID 3.285、sFID 5.063、IS 215.99，其中 FID 比次优方法低 1.420，在所有加速方法中生成质量最优，且与全步数基线（FID 2.226）的差距可控。
+
+### 消融实验：PACT 设计的有效性
+
+PACT 的核心设计包含两个关键维度：**代价张量的维度**（2D vs 3D）和**误差聚合策略**（当前步误差 vs 累积误差）。消融实验（Table 4，FLUX.1-dev，K=13）系统验证了这两项设计的必要性：
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/008_Table_4.jpg]]
+*Table 4: Ablation studies of Path-Aware Cost Tensor on FLUX.1- dev with K = 13*
+
+- **2D 代价 + 当前步误差**：仅考虑单步跳跃的即时误差，忽略路径依赖性，ImageReward 为 1.001，PSNR 为 20.87。
+- **3D 代价 + 当前步误差**：引入前驱关键步条件，捕捉路径依赖性，但仅用当前步误差作为代价，ImageReward 提升至 1.003。
+- **3D 代价 + 累积误差**（DPCache 完整设计）：对跳过区间内所有中间步的 L1 预测误差求和，ImageReward 进一步提升至 1.007，PSNR 提升至 21.65（+0.78），同时 SSIM 和 LPIPS 均达到最优。
+
+这一消融链条清晰揭示了因果机制：**路径依赖性（3D）是建模跳跃代价的必要条件，而累积误差聚合则进一步确保了轨迹的全局保真度**。定性可视化（Figure 10）也印证了这一结论——完整 PACT 设计生成的图像在细节保真度和几何一致性上明显优于简化版本。
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/015_Figure_10.jpg]]
+*Figure 10: Visualization of ablation studies on the dimensionality and cost aggregation strategy of PACT*
+
+### 校准集鲁棒性与泛化性
+
+DPCache 对校准集大小表现出极高的鲁棒性（Table 5）。即使仅使用 **1 个**校准样本构建 PACT，ImageReward 仍能达到 1.001，PSNR 为 21.43，与使用 10 个样本（ImageReward 1.007，PSNR 21.65）相比几乎无损。当校准集增大至 50 个样本时，性能趋于饱和，增益边际递减。这一特性使得 DPCache 的校准成本极低，且所得调度可冻结并泛化至任意输入，甚至分布外提示。
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/009_Table_5.jpg]]
+*Table 5: Ablation study on calibration set size, sampling strategy, and prompt source on FLUX.1-dev with K = 13*
+
+### 预测阶数与加速比的权衡
+
+DPCache 的预测器阶数（O）在轨迹保真度和文本对齐之间存在有趣的权衡（Figure 11）。二阶预测（O=2）在 ImageReward 和 PSNR 上优于一阶预测（O=1），说明更精确的特征外推有助于更紧密地跟随全步数轨迹。然而，一阶预测在 CLIP Score 上略高，暗示**过于严格的轨迹跟随可能以牺牲文本对齐为代价**——这是一个值得注意的失败模式信号。在不同加速比下，DPCache 的性能退化曲线相对平缓，进一步验证了全局调度的稳定性。
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/017_Figure_11.jpg]]
+*Figure 11: Performance of DPCache under varying acceleration ratios and prediction orders*
+
+### 失败模式与局限性
+
+尽管 DPCache 在轨迹保真度上表现优异，其设计哲学也带来了固有局限：
+
+1. **继承原模型错误**：DPCache 以最小化与全步数轨迹的偏差为优化目标，因此会忠实地复制原模型的失败模式。例如，当原模型将 "Text to Image" 错误渲染为 "Omage" 时，DPCache 同样保留此错误。
+2. **微小瑕疵的放大**：当原模型生成结果本身存在轻微伪影时，紧密跟随轨迹可能导致这些缺陷被加剧。论文中展示了花盆伪影被放大的案例。
+3. **多样性潜在损失**：以轨迹保真度为优化目标可能牺牲输出多样性，这是路径规划范式需要关注的固有权衡。
+
+### 公平性说明
+
+所有实验均在单张 NVIDIA H20 GPU 上统一环境进行。对比方法使用原论文推荐或 Table 6 中列出的超参数，确保各方法在各自最佳设置下运行。DPCache 仅需约 10 张校准样本，校准离线完成且不增加推理时延，校准集固定，未针对不同加速比重新调参。速度比基于相同输入分辨率和相同去噪步数基数计算，所有加速方法均未更改模型权重，确保训练无关公平性。
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/011_Table_6.jpg]]
+*Table 6: Hyperparameters used for each method in our experiments*
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/003_Table_1.jpg]]
+*Table 1: Quantitative results of text-to-image generation task for FLUX.1-dev [21] on DrawBench dataset*
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/005_Table_2.jpg]]
+*Table 2: Quantitative results of text-to-video generation task for HunyuanVideo [20] on VBench dataset*
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/007_Table_3.jpg]]
+*Table 3: Quantitative results of class-to-image generation task for DiT-XL/2 [34] on ImageNet dataset*
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/010_Figure_5.jpg]]
+*Figure 5: Visualization of sampling trajectories when applying different acceleration methods to FLUX.1-dev*
+
+![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/012_Figure_6.jpg]]
+*Figure 6: VBench performance of HunyuanVideo across all dimensions with various acceleration methods under different acceleration settings: (left) low speedup, (right) high speedup. Scores are normalized per dimension for improved visual comparison*
+
+## 方法谱系与知识库定位
+
+### 与现有加速方法的关系
+
+扩散模型采样加速领域存在两条主要技术路线：**无缓存方法**（如直接减少步数、蒸馏、ODE求解器优化）与**基于缓存的方法**。DPCache属于后者，其直接对标的方法包括：
+
+- **TaylorSeer**：基于泰勒级数的特征预测加速方法，采用固定间隔调度。DPCache继承了其预测范式（泰勒展开预测中间步特征），但用全局路径规划替代了固定调度，解决了后者因无法识别关键过渡区导致的大轨迹偏差问题。
+- **TeaCache**：基于特征距离阈值的自适应缓存方法，通过局部阈值判断是否重用缓存。其贪心决策易跳过必要时间步，造成不可逆漂移和误差累积。
+- **SpeCa**：引入轻量验证器网络动态决定是否接受预测特征，本质上仍属局部自适应策略，存在类似的短视问题。
+
+DPCache与上述方法的根本差异在于：将采样加速重新定义为**全局路径规划问题**，通过路径感知代价张量（PACT）显式建模跳过时间步的路径依赖性，并采用动态规划精确选择全局最优的关键步序列。这一设计使得DPCache在理论上避免了局部决策的误差累积陷阱。
+
+### 技术贡献的定位
+
+DPCache的核心贡献可归纳为三个层面：
+
+1. **问题建模层面**：首次将扩散采样加速建模为全局路径规划问题，突破了现有方法“固定间隔”或“局部自适应”的范式局限。
+2. **代价函数层面**：提出3D路径感知代价张量（PACT），量化了跳跃误差对前驱关键步的依赖性，这是全局调度可行性的基础。消融实验表明，采用3D代价+累积误差（即论文完整设置）相比2D代价或仅当前步误差，在ImageReward上提升+0.006，PSNR提升+0.78。
+3. **工程效率层面**：仅缓存最后层特征（+0.36 GB内存开销），远低于TaylorSeer和SpeCa缓存所有Transformer层中间特征的高内存方案，在保持高质量加速的同时大幅降低资源压力。
+
+### 适用边界
+
+**适用场景**：
+- 基于Transformer架构的扩散模型（已在FLUX.1-dev、HunyuanVideo、DiT-XL/2上验证）
+- 文生图、文生视频、类别条件生成等任务
+- 中等加速比场景（3×–5×），此时DPCache可保持甚至超越全步数基线的生成质量
+
+**不适用或需谨慎的场景**：
+- 极高加速比（如10×以上）：当前仅使用最后层特征可能不足以准确建模路径代价，需验证是否需要多层特征的路径感知代价建模
+- 对多样性要求极高的应用：DPCache以轨迹保真度为优化目标，可能牺牲输出多样性
+- 原模型存在固有缺陷的场景：DPCache紧密跟随全步数轨迹，会继承甚至放大原模型的语义或结构错误（如原模型将“Text to Image”渲染为“Omage”时，DPCache也会保留此错误）
+
+### 局限与开放问题
+
+**已知局限**（论文已明确）：
+1. **多样性-保真度权衡**：以轨迹保真度为优化目标，可能限制生成多样性。
+2. **错误继承与放大**：紧密跟随全步数轨迹，会保留原模型的语义错误，甚至加剧微小瑕疵（如花盆伪影）。
+3. **调度静态性**：依赖固定校准调度，未实现输入自适应调度，无法根据具体输入内容动态调整关键步选择。
+4. **预测器与规划分离**：预测器独立于路径规划框架，未能联合优化。
+
+**开放问题**：
+1. 如何设计输入自适应调度，使关键步选择能够根据具体输入内容动态调整？
+2. 能否将可学习的预测器与全局路径规划框架端到端协同训练，以在加速同时纠正原模型的失败模式？
+3. 在更高加速比（如10×以上）下，当前仅使用最后层特征是否足够？是否需要多层特征的路径感知代价建模？
+4. 如何将DPCache推广到基于流的加速方法和其他生成模型架构？
+
+### 在知识库中的位置
+
+DPCache处于**免训练扩散模型加速**与**缓存重用**的交叉点，其全局路径规划视角为缓存加速方法引入了新的理论维度。相较于依赖蒸馏或模型修改的加速方法，DPCache的免训练特性使其具有更强的即插即用能力——仅需约10张校准样本离线构建PACT，所得调度可冻结并泛化至任意输入，甚至分布外提示。这一特性使其在实际部署中具有显著优势，也为后续研究（如输入自适应调度、预测器联合优化）提供了清晰的基础框架。
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/Denoising_as_Path_Planning_Training_Free_Acceleration_of_Diffusion_Models_with_DPCache.pdf]]

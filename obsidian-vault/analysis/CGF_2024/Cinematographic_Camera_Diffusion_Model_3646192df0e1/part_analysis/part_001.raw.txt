@@ -1,0 +1,14 @@
+{
+  "part_id": "1/1",
+  "section_role": "supplementary expert feedback",
+  "method_evidence": [],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "open_questions": [
+    "How difficult is the tool to operate for non-professionals?",
+    "Can the tool incorporate set, mise-en-scène, and lighting considerations?",
+    "Does the tool limit creativity by standardizing camera movements?",
+    "How can language control be made more precise for professional requirements?"
+  ]
+}

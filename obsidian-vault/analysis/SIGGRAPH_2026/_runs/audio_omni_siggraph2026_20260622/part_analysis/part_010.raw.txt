@@ -1,0 +1,10 @@
+{
+  "part_id": "10/13",
+  "section_role": "references",
+  "method_evidence": [],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": []
+}

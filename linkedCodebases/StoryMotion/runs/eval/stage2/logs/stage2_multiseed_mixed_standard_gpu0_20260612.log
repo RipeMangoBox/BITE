@@ -1,0 +1,19 @@
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+{"ckpt_name": "last.pt", "elapsed_sec": 5.691370248794556, "eval_loss": 0.34870699102672614, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260620, "test_loss": 0.02801518340068772}
+{"ckpt_name": "last.pt", "elapsed_sec": 5.134030818939209, "eval_loss": 0.3500297279673153, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260621, "test_loss": 0.026906672503173468}
+{"ckpt_name": "last.pt", "elapsed_sec": 5.156826734542847, "eval_loss": 0.3620436753899412, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260622, "test_loss": 0.031290320058057354}
+{"ckpt_name": "last.pt", "elapsed_sec": 5.200007915496826, "eval_loss": 0.3499154307185866, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260623, "test_loss": 0.02712448591773864}
+{"ckpt_name": "last.pt", "elapsed_sec": 5.134552478790283, "eval_loss": 0.3467913264764017, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260624, "test_loss": 0.02784038204117678}
+{"ckpt_name": "last.pt", "event": "aggregate_written", "path": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2_multiseed_mixed_20260612/mixed_standard_ema_sched_last.pt_multiseed.json", "run_alias": "mixed_standard_ema_sched", "test_loss_mean": 0.028235408784166794, "test_loss_std": 0.0017703614008254339}
+{"ckpt_name": "best_eval.pt", "elapsed_sec": 5.263361215591431, "eval_loss": 0.35954685578265827, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260620, "test_loss": 0.028524666792388114}
+{"ckpt_name": "best_eval.pt", "elapsed_sec": 5.261826038360596, "eval_loss": 0.36057477640133584, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260621, "test_loss": 0.027572837825573515}
+{"ckpt_name": "best_eval.pt", "elapsed_sec": 5.244190216064453, "eval_loss": 0.37382081794748956, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260622, "test_loss": 0.03183825454895365}
+{"ckpt_name": "best_eval.pt", "elapsed_sec": 5.2401206493377686, "eval_loss": 0.3610200184399825, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260623, "test_loss": 0.027587942877895937}
+{"ckpt_name": "best_eval.pt", "elapsed_sec": 5.214651346206665, "eval_loss": 0.3574858807745234, "event": "seed_done", "run_alias": "mixed_standard_ema_sched", "seed": 20260624, "test_loss": 0.02834806555316997}
+{"ckpt_name": "best_eval.pt", "event": "aggregate_written", "path": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2_multiseed_mixed_20260612/mixed_standard_ema_sched_best_eval.pt_multiseed.json", "run_alias": "mixed_standard_ema_sched", "test_loss_mean": 0.028774353519596237, "test_loss_std": 0.0017665478045812812}
+{"count": 2, "event": "suite_written", "path": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2_multiseed_mixed_20260612/standard_summary.json"}

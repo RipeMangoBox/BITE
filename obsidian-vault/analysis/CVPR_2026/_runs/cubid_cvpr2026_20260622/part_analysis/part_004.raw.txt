@@ -1,0 +1,75 @@
+{
+  "part_id": "4/9",
+  "section_role": "method details and experiments",
+  "method_evidence": [
+    {
+      "claim": "CubiD generates images through iterative refinement starting from a fully masked tensor.",
+      "section": "Model Architecture",
+      "anchor": "CubiD generates images through iterative refinement starting from a fully masked tensor.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The number of tokens to unmask follows a cosine schedule.",
+      "section": "Model Architecture",
+      "anchor": "the number of tokens to unmask follows a cosine schedule.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Each spatial position, comprising d tokens, is treated as a single token for the transformer model.",
+      "section": "Model Architecture",
+      "anchor": "each spatial position,comprising d tokens,is treated as a single token for the transformer model",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The Transformer processes this sequence through bidirectional attention, with the sequence length remaining fixed at h × w regardless of feature dimensionality.",
+      "section": "Model Architecture",
+      "anchor": "The Transformer processes this sequence through bidirectional attention,with the sequence length remaining fixed at h × w regardless of feature dimensionality.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Each output token from the Transformer is passed through an MLP-based prediction head that produces d × L logits.",
+      "section": "Model Architecture",
+      "anchor": "Each output token from the Transformer is passed through an MLP-based prediction head that produces d × L logits",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Effect of quantization levels on reconstruction quality.",
+      "table_or_figure": "Table 2",
+      "metric": "rFID",
+      "value": "DINOv2 L=8: 0.57, SigLIP2 L=16: 0.69",
+      "confidence": 0.95
+    },
+    {
+      "claim": "DQ maintains continuous-level performance while VQ shows significant degradation.",
+      "table_or_figure": "Table 3",
+      "metric": "GQA",
+      "value": "SigLIP2-DQ: 63.1, SigLIP2-VQ: 54.9",
+      "confidence": 0.95
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table 1",
+      "role_hint": "model sizes and architecture configurations",
+      "caption": "Model sizes and architecture configurations of CubiD.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table 2",
+      "role_hint": "ablation on quantization levels",
+      "caption": "Effect of quantization levels on reconstruction quality.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table 3",
+      "role_hint": "comparison of quantization methods on LLaVA benchmarks",
+      "caption": "Understanding performance on LLaVA benchmarks with different quantization methods.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

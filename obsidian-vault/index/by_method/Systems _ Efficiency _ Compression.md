@@ -1,0 +1,1135 @@
+---
+title: "Method: Systems / Efficiency / Compression"
+type: paper-index
+dimension: method
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Method: Systems / Efficiency / Compression
+
+- [[obsidian-vault/analysis/CVPR_2020/Cost_Volume_Pyramid_Based_Depth_Inference_for_Multi_View_Stereo.md|Cost Volume Pyramid Based Depth Inference for Multi-View Stereo (CVPR 2020 2020)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2020/Cost_Volume_Pyramid_Based_Depth_Inference_for_Multi_View_Stereo.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: CVP-MVSNet（Cost Volume Pyramid based Multi-View Stereo Network）
+	- datasets: DTU, Tanks and Temples
+- [[obsidian-vault/analysis/CVPR_2021/DatasetGAN_Efficient_Labeled_Data_Factory_with_Minimal_Human_Effort.md|DatasetGAN: Efficient Labeled Data Factory with Minimal Human Effort (CVPR 2021 2021)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2021/DatasetGAN_Efficient_Labeled_Data_Factory_with_Minimal_Human_Effort.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: DatasetGAN
+	- datasets: ADE-Car-12, CelebA-Mask-8, Bird-11
+- [[obsidian-vault/analysis/CVPR_2022/A_ViT_Adaptive_Tokens_for_Efficient_Vision_Transformer.md|A-ViT: Adaptive Tokens for Efficient Vision Transformer (CVPR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2022/A_ViT_Adaptive_Tokens_for_Efficient_Vision_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: A-ViT
+	- datasets: ImageNet-1K
+- [[obsidian-vault/analysis/ICML_2022/Understanding_The_Robustness_in_Vision_Transformers.md|Understanding The Robustness in Vision Transformers (ICML 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/ICML_2022/Understanding_The_Robustness_in_Vision_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Fully Attentional Networks (FANs)
+	- datasets: ImageNet-C, ImageNet-1K, Cityscapes-C
+- [[obsidian-vault/analysis/NEURIPS_2022/Structural_Pruning_via_Latency_Saliency_Knapsack.md|Structural Pruning via Latency-Saliency Knapsack (NEURIPS 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2022/Structural_Pruning_via_Latency_Saliency_Knapsack.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: Hardware-Aware Latency Pruning (HALP)
+	- datasets: ImageNet, PASCAL VOC
+- An Efficient B-spline Lagrangian/Eulerian Method for Compressible Flow, Shock Waves, and Fracturing Solids (SIGGRAPH 2022 2022)
+	- method groups: Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Automatic_Quantization_for_Physics-based_Simulation.md|Automatic Quantization for Physics-based Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Automatic_Quantization_for_Physics_based_Simulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Automatic Quantization (AutoQuantizer)
+	- datasets: Large-scale Eulerian smoke, Large-scale MLS-MPM fluid
+- Compression and Interactive Visualization of Terabyte Scale Volumetric RGBA Data With Voxel-scale Details (SIGGRAPH 2022 2022)
+	- method groups: Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EARS_Efficiency-aware_Russian_Roulette_and_Splitting.md|EARS: Efficiency-aware Russian Roulette and Splitting (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EARS_Efficiency_aware_Russian_Roulette_and_Splitting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: EARS (Efficiency-Aware Russian Roulette and Splitting)
+	- datasets: Pool scene, Kitchen scene, All five test scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Efficiency-aware_Multiple_Importance_Sampling_for_Bidirectional_Rendering_Algorithms.md|Efficiency-aware Multiple Importance Sampling for Bidirectional Rendering Algorithms (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Efficiency_aware_Multiple_Importance_Sampling_for_Bidirectional_Rendering_Algorithms.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Efficiency-aware Multiple Importance Sampling (Efficiency-aware MIS)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Efficient_Estimation_of_Boundary_Integrals_for_Path-space_Differentiable_Rendering.md|Efficient Estimation of Boundary Integrals for Path-space Differentiable Rendering (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Efficient_Estimation_of_Boundary_Integrals_for_Path_space_Differentiable_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: 我们的方法（基于主样本空间KD树引导的边界路径积分高效估计）
+	- datasets: 多个测试场景上的边界梯度图像比较, 逆渲染优化
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Efficient_Kinetic_Simulation_of_Two-Phase_Flows.md|Efficient Kinetic Simulation of Two-Phase Flows (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Efficient_Kinetic_Simulation_of_Two_Phase_Flows.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Volume-Preserving LBM-MPM Coupling
+	- datasets: Sand drop in beaker
+- [[obsidian-vault/analysis/SIGGRAPH_2022/EMBER_Exact_Mesh_Booleans_via_Efficient_and_Robust_Local_Arrangements.md|EMBER: Exact Mesh Booleans via Efficient and Robust Local Arrangements (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EMBER_Exact_Mesh_Booleans_via_Efficient_and_Robust_Local_Arrangements.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+	- methods: EMBER
+	- datasets: Thingi10K
+- Image Features Influence Reaction Time: A Learned Probabilistic Perceptual Model for Saccade Latency (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Image_Features_Influence_Reaction_Time_A_Learned_Probabilistic_Perceptual_Model_for_Saccade_Latency.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Joint Neural Phase Retrieval and Compression for Energy- and Computation-efficient Holography on the Edge (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Joint_Neural_Phase_Retrieval_and_Compression_for_Energy_and_Computation_efficient_Holography_on_the_Edge.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression, LLM / Reasoning / Alignment
+- R2E2: Low-latency Path Tracing of Terabyte-scale Scenes Using Thousands of Cloud CPUs (SIGGRAPH 2022 2022)
+	- method groups: Systems / Efficiency / Compression
+- Sparsity-specific Code Optimization Using Expression Trees (SIGGRAPH 2022 2022)
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+- StyleGAN-XL: Scaling StyleGAN to Large Diverse Datasets (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/StyleGAN_XL_Scaling_StyleGAN_to_Large_Diverse_Datasets.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Volume Parametrization Quantization for Hexahedral Meshing (SIGGRAPH 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Volume_Parametrization_Quantization_for_Hexahedral_Meshing.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/3QNet_3D_Point_Cloud_Geometry_Quantization_Compression_Network.md|3QNet: 3D Point Cloud Geometry Quantization Compression Network (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/3QNet_3D_Point_Cloud_Geometry_Quantization_Compression_Network.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: ImAM (Improved Auto-regressive Model)
+	- datasets: ShapeNet
+- Differentiable Point-Based Radiance Fields for Efficient View Synthesis (SIGGRAPH ASIA 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Differentiable_Point_Based_Radiance_Fields_for_Efficient_View_Synthesis.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Efficient Differentiation of Pixel Reconstruction Filters for Path-Space Differentiable Rendering (SIGGRAPH ASIA 2022 2022)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Efficient Drone Exploration in Real Unknown Environments (SIGGRAPH ASIA 2022 2022)
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+- Efficient Light Probes for Real-time Global Illumination (SIGGRAPH ASIA 2022 2022)
+	- method groups: Systems / Efficiency / Compression
+- Efficient Neural Radiance Fields for Interactive Free-viewpoint Video (SIGGRAPH ASIA 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Neural_Radiance_Fields_for_Interactive_Free_viewpoint_Video.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Efficient Neural Style Transfer for Volumetric Simulations (SIGGRAPH ASIA 2022 2022)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Neural_Style_Transfer_for_Volumetric_Simulations.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- Interactive exploration of tension-compression mixed shells (SIGGRAPH ASIA 2022 2022)
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+- MeshTaichi: A Compiler for Efficient Mesh-based Operations (SIGGRAPH ASIA 2022 2022)
+	- method groups: Systems / Efficiency / Compression
+- Neural Bidirectional Texture Function Compression and Rendering (SIGGRAPH ASIA 2022 2022)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Robust and Efficient Structure-from-Motion Method for Ambiguous Large-Scale Indoor Scene (SIGGRAPH ASIA 2022 2022)
+	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/CVPR_2023/VoxFormer_Sparse_Voxel_Transformer_for_Camera_based_3D_Semantic_Scene_Completion.md|VoxFormer: Sparse Voxel Transformer for Camera-based 3D Semantic Scene Completion (CVPR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2023/VoxFormer_Sparse_Voxel_Transformer_for_Camera_based_3D_Semantic_Scene_Completion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: VoxFormer
+	- datasets: SemanticKITTI, SemanticKITTI hidden test set
+- [[obsidian-vault/analysis/NEURIPS_2023/MotionGPT_Human_Motion_as_a_Foreign_Language.md|MotionGPT: Human Motion as a Foreign Language (NEURIPS 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2023/MotionGPT_Human_Motion_as_a_Foreign_Language.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MotionGPT
+	- datasets: HumanML3D
+- Efficient Embeddings in Exact Arithmetic (SIGGRAPH 2023 2023)
+	- method groups: Systems / Efficiency / Compression
+- Efficient Video Portrait Reenactment via Grid-based Codebook (SIGGRAPH 2023 2023)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- MERF: Memory-Efficient Radiance Fields for Real-time View Synthesis in Unbounded Scenes (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/MERF_Memory_Efficient_Radiance_Fields_for_Real_time_View_Synthesis_in_Unbounded_Scenes.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Min-Deviation-Flow in Bi-directed Graphs for T-Mesh Quantization (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Min_Deviation_Flow_in_Bi_directed_Graphs_for_T_Mesh_Quantization.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Random-access Neural Compression of Material Textures (SIGGRAPH 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Random_access_Neural_Compression_of_Material_Textures.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.md|Adaptive Shells for Efficient Neural Radiance Field Rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Adaptive Shells
+	- datasets: Shelly, DTU
+- Efficient Cone Singularity Construction for Conformal Parameterizations (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Cone_Singularity_Construction_for_Conformal_Parameterizations.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Efficient Graphics Representation with Differentiable Indirection (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Graphics_Representation_with_Differentiable_Indirection.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- Efficient Human Motion Reconstruction from Monocular Videos with Physical Consistency Loss (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Human_Motion_Reconstruction_from_Monocular_Videos_with_Physical_Consistency_Loss.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Efficient Hybrid Zoom using Camera Fusion on Mobile Phones (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Hybrid_Zoom_using_Camera_Fusion_on_Mobile_Phones.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Efficient Visualization of Light Pollution for the Night Sky (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Visualization_of_Light_Pollution_for_the_Night_Sky.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- FuseSR: Super Resolution for Real-time Rendering through Efficient Multi-resolution Fusion (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/FuseSR_Super_Resolution_for_Real_time_Rendering_through_Efficient_Multi_resolution_Fusion.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Light-Efficient Holographic Illumination for Continuous-Wave Time-of-Flight Imaging (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Light_Efficient_Holographic_Illumination_for_Continuous_Wave_Time_of_Flight_Imaging.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Neural Point-based Volumetric Avatar: Surface-guided Neural Points for Efficient and Photorealistic Volumetric Head Avatar (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Point_based_Volumetric_Avatar_Surface_guided_Neural_Points_for_Efficient_and_Photorealistic_Volumetric_Head_Avatar.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Shrink & Morph: 3D-printed self-shaping shells actuated by a shape memory effect (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Shrink_Morph_3D_printed_self_shaping_shells_actuated_by_a_shape_memory_effect.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Texture Atlas Compression Based on Repeated Content Removal (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Texture_Atlas_Compression_Based_on_Repeated_Content_Removal.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- VMesh: Hybrid Volume-Mesh Representation for Efficient View Synthesis (SIGGRAPH ASIA 2023 2023)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VMesh_Hybrid_Volume_Mesh_Representation_for_Efficient_View_Synthesis.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/AAAI_2024/Robustness_Guided_Image_Synthesis_for_Data_Free_Quantization.md|Robustness-Guided Image Synthesis for Data-Free Quantization (AAAI 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2024/Robustness_Guided_Image_Synthesis_for_Data_Free_Quantization.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Robustness-Guided Image Synthesis (RIS)
+	- datasets: CIFAR-100, CIFAR-10/100, ImageNet
+- [[obsidian-vault/analysis/arxiv_2024/ElasticTok_Adaptive_Tokenization_for_Image_and_Video.md|ElasticTok: Adaptive Tokenization for Image and Video (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/arXiv_2024/2024_ElasticTok_Adaptive_Tokenization_for_Image_and_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: ElasticTok
+	- datasets: ImageNet, 多模态 VQA
+- [[obsidian-vault/analysis/ECCV_2024/Better_Call_SAL_Towards_Learning_to_Segment_Anything_in_Lidar.md|Better Call SAL: Towards Learning to Segment Anything in Lidar (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/Better_Call_SAL_Towards_Learning_to_Segment_Anything_in_Lidar.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SAL (Segment Anything in Lidar)
+	- datasets: SemanticKITTI
+- [[obsidian-vault/analysis/ECCV_2024/Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation.md|Motion Mamba: Efficient and Long Sequence Motion Generation (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Systems / Efficiency / Compression
+	- methods: Motion Mamba
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/ECCV_2024/NeRF_XL_Scaling_NeRFs_with_Multiple_GPUs.md|NeRF-XL: Scaling NeRFs with Multiple GPUs (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/NeRF_XL_Scaling_NeRFs_with_Multiple_GPUs.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: NeRF-XL
+	- datasets: Garden, Building, University4
+- [[obsidian-vault/analysis/ICLR_2024/Trajeglish_Traffic_Modeling_as_Next_Token_Prediction.md|Trajeglish: Traffic Modeling as Next-Token Prediction (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/Trajeglish_Traffic_Modeling_as_Next_Token_Prediction.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: Trajeglish
+	- datasets: Waymo Open Motion Dataset Sim Agents Test
+- [[obsidian-vault/analysis/NEURIPS_2024/DCVQ_Dimensional_Collapse_in_VQVAEs_Evidence_and_Remedies.md|DCVQ: Dimensional Collapse in VQVAEs: Evidence and Remedies (NeurIPS 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/NeurIPS_2024/2024_DCVQ_Dimensional_Collapse_in_VQVAEs_Evidence_and_Remedies.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: DCVQ (Divide-and-Conquer Vector Quantization)
+	- datasets: CIFAR-10 / CelebA, ImageNet-256
+- A Neural Network Model for Efficient Musculoskeletal-driven Skin Deformation (SIGGRAPH 2024 2024)
+	- method groups: Systems / Efficiency / Compression
+- Alignment Conditions for NURBS-based Design of Mixed Tension-compression Grid Shells (SIGGRAPH 2024 2024)
+	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
+- CharacterGen: Efficient 3D Character Generation From Single Images With Multi-view Pose Canonicalization (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- DiffSound: Differentiable Modal Sound Rendering and Inverse Rendering for Diverse Inference Tasks (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Efficient Debris-flow Simulation for Steep Terrain Erosion (SIGGRAPH 2024 2024)
+	- method groups: Systems / Efficiency / Compression
+- Efficient Position-based Deformable Colon Modeling for Endoscopic Procedures Simulation (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Efficient_Position_based_Deformable_Colon_Modeling_for_Endoscopic_Procedures_Simulation.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- QT-Font: High-efficiency Font Synthesis via Quadtree-based Diffusion Models (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+- SMERF: Streamable Memory Efficient Radiance Fields for Real-time Large-scene Exploration (SIGGRAPH 2024 2024)
+	- method groups: Systems / Efficiency / Compression, Agent / RL / Planning
+- [[obsidian-vault/analysis/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.md|SuperPADL: Scaling Language-Directed Physics-Based Control with Progressive Supervised Distillation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: SuperPADL
+	- datasets: AMASS Motion Quality, Group Controller, Group Controller Training Time
+- [[obsidian-vault/analysis/SIGGRAPH_2024/WalkTheDog_Cross_Morphology_Motion_Alignment_via_Phase_Manifolds.md|WalkTheDog: Cross-Morphology Motion Alignment via Phase Manifolds (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/WalkTheDog_Cross_Morphology_Motion_Alignment_via_Phase_Manifolds.pdf|PDF]]
+	- topics: Motion Alignment, Phase Manifold, Vector Quantization, Character Animation
+	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
+	- methods: VQ-PAE, shared amplitude codebook, phase manifold
+	- datasets: Dog, Human-Locomotion, MOCHA-Clown
+- DirectL: Efficient Radiance Fields Rendering for 3D Light Field Displays (SIGGRAPH ASIA 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Efficient GPU Cloth Simulation with Non-distance Barriers and Subspace Reuse (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Efficient_GPU_Cloth_Simulation_with_Non_distance_Barriers_and_Subspace_Reuse.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Efficient Image-Space Shape Splatting for Monte Carlo Rendering (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Efficient_Image_Space_Shape_Splatting_for_Monte_Carlo_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Efficient Neural Path Guiding with 4D Modeling (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Efficient_Neural_Path_Guiding_with_4D_Modeling.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Exact and Efficient Intersection Resolution for Mesh Arrangements (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Exact_and_Efficient_Intersection_Resolution_for_Mesh_Arrangements.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Gaussian Opacity Fields: Efficient Adaptive Surface Reconstruction in Unbounded Scenes (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Gaussian_Opacity_Fields_Efficient_Adaptive_Surface_Reconstruction_in_Unbounded_Scenes.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- gDist: Efficient Distance Computation between 3D Meshes on GPU (SIGGRAPH ASIA 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- GFFE: G-buffer Free Frame Extrapolation for Low-latency Real-time Rendering (SIGGRAPH ASIA 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- GS^3: Efficient Relighting with Triple Gaussian Splatting (SIGGRAPH ASIA 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+- NeuSmoke: Efficient Smoke Reconstruction and View Synthesis with Neural Transportation Fields (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/NeuSmoke_Efficient_Smoke_Reconstruction_and_View_Synthesis_with_Neural_Transportation_Fields.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- SD-𝜋XL: Generating Low-Resolution Quantized Imagery via Score Distillation (SIGGRAPH ASIA 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+- Stripe Embedding: Efficient Maps with Exact Numeric Computation (SIGGRAPH ASIA 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Stripe_Embedding_Efficient_Maps_with_Exact_Numeric_Computation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/CVPR_2025/MDP_Multidimensional_Vision_Model_Pruning_with_Latency_Constraint.md|MDP: Multidimensional Vision Model Pruning with Latency Constraint (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/MDP_Multidimensional_Vision_Model_Pruning_with_Latency_Constraint.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MDP (Multi-Dimensional Pruning)
+	- datasets: ImageNet, NuScenes
+- [[obsidian-vault/analysis/ICML_2025/Score_Distillation_Sampling_for_Audio_Source_Separation_Synthesis_and_Beyond.md|Score Distillation Sampling for Audio: Source Separation, Synthesis, and Beyond (ICML 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICML_2025/Score_Distillation_Sampling_for_Audio_Source_Separation_Synthesis_and_Beyond.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Audio-SDS
+	- datasets: Impact Synthesis
+- Adaptive Algebraic Reuse of Reordering in Cholesky Factorizations with Dynamic Sparsity Patterns (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Adaptive_Algebraic_Reuse_of_Reordering_in_Cholesky_Factorizations_with_Dynamic_Sparsity_Patterns.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Assessing Learned Models for Phase-only Hologram Compression (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Assessing_Learned_Models_for_Phase-only_Hologram_Compression.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Capsule: Efficient Player Isolation for Datacenters (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Capsule_Efficient_Player_Isolation_for_Datacenters.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Cobra: Efficient Line Art COlorization with BRoAder References (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- ColorSurge: Bringing Vibrancy and Efficiency to Automatic Video Colorization via Dual-Branch Fusion (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Creating Fluid-Interactive Virtual Agents by an Efficient Simulator with Local-domain Control (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Curl Quantization for Automatic Placement of Knit Singularities (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Data-Efficient Discovery of Hyperelastic TPMS Metamaterials with Extreme Energy Dissipation (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Efficient Proxy Raytracer for Optical Systems Using Implicit Neural Representations (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Gaussian Compression for Precomputed Indirect Illumination (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Guided Lens Sampling for Efficient Monte Carlo Circle-of-Confusion Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- MiSo: A DSL for robust and efficient MINIMIZE and SOLVE problems (SIGGRAPH 2025 2025)
+	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+- Patch-Grid: An Efficient and Feature-Preserving Neural Implicit Surface Representation (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- Position-Normal Manifold for Efficient Glint Rendering on High-Resolution Normal Maps (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- SqueezeMe: Mobile-Ready Distillation of Gaussian Full-Body Avatars (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Tiny is not small enough: High quality, low-resource facial animation models through hybrid knowledge distillation (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- To Infinity and Beyond: a GPU-Driven Memory Sharing Pipeline to Generate and Process Infinite Synthetic Data (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression, Data Curation / Synthesis
+- TokenVerse: Versatile Multi-concept Personalization in Token Modulation Space (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Towards Comprehensive Neural Materials: Dynamic Structure-Preserving Synthesis with Accurate Silhouette at Instant Inference Speed (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- UltraMeshRenderer: Efficient Structure and Management of GPU Out-of-core Memory for Real-time Rendering of Gigantic 3D Meshes (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/TPAMI_2025/SMPLest_X_Ultimate_Scaling_for_Expressive_Human_Pose_and_Shape_Estimation.md|SMPLest X Ultimate Scaling for Expressive Human Pose and Shape Estimation (TPAMI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/TPAMI_2025/SMPLest_X_Ultimate_Scaling_for_Expressive_Human_Pose_and_Shape_Estimation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SMPLest-X
+	- datasets: 五大基准测试, SynHand, AGORA test set
+- [[obsidian-vault/analysis/arxiv_2026/KV-Control_Parameter-Efficient_KV_Injection_for_Trajectory-Controlled_Text-to-Motion.md|KV-Control: Parameter-Efficient K/V Injection for Trajectory-Controlled Text-to-Motion (arXiv 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/KV-Control_Parameter-Efficient_KV_Injection_for_Trajectory-Controlled_Text-to-Motion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: KV-Control
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2026/Depth_Completion_as_Parameter_Efficient_Test_Time_Adaptation.md|Depth Completion as Parameter-Efficient Test-Time Adaptation (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Depth_Completion_as_Parameter_Efficient_Test_Time_Adaptation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: CAPA
+	- datasets: ScanNet, Metropolis
+- [[obsidian-vault/analysis/arxiv_2026/MoRe_Motion_aware_Feed_forward_4D_Reconstruction_Transformer.md|MoRe: Motion-aware Feed-forward 4D Reconstruction Transformer (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/MoRe_Motion_aware_Feed_forward_4D_Reconstruction_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MoRe
+	- datasets: Sintel, Bonn, TUM-dynamics
+- [[obsidian-vault/analysis/CVPR_2026/4D_RGPT_Toward_Region_level_4D_Understanding_via_Perceptual_Distillation.md|4D-RGPT: Toward Region-level 4D Understanding via Perceptual Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/4D_RGPT_Toward_Region_level_4D_Understanding_via_Perceptual_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: 4D-RGPT
+	- datasets: STI-Bench, VLM4D-real, VSTI-Bench
+- [[obsidian-vault/analysis/CVPR_2026/Active_Inference_for_Micro_Gesture_Recognition_EFE_Guided_Temporal_Sampling_and_Adaptive_Learning.md|Active Inference for Micro-Gesture Recognition: EFE-Guided Temporal Sampling and Adaptive Learning (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Active_Inference_for_Micro_Gesture_Recognition_EFE_Guided_Temporal_Sampling_and_Adaptive_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: UAAI
+	- datasets: SMG
+- [[obsidian-vault/analysis/CVPR_2026/Attend_Before_Attention_Efficient_and_Scalable_Video_Understanding_via_Autoregressive_Gazing.md|Attend Before Attention: Efficient and Scalable Video Understanding via Autoregressive Gazing (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Attend_Before_Attention_Efficient_and_Scalable_Video_Understanding_via_Autoregressive_Gazing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: AutoGaze
+	- datasets: VideoMME, HLVid, LongVideoBench
+- [[obsidian-vault/analysis/CVPR_2026/Attention_aware_Inference_Optimizations_for_Large_Vision_Language_Models_with_Memory_efficient_Decoding.md|Attention-aware Inference Optimizations for Large Vision-Language Models with Memory-efficient Decoding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Attention_aware_Inference_Optimizations_for_Large_Vision_Language_Models_with_Memory_efficient_Decoding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: AttentionPack
+	- datasets: A-OKVQA, OCR-VQA, MMMU
+- [[obsidian-vault/analysis/CVPR_2026/CoIn_Coverage_and_Informativeness_Guided_Token_Reduction_for_Efficient_Large_Multimodal_Models.md|CoIn: Coverage and Informativeness-Guided Token Reduction for Efficient Large Multimodal Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/CoIn_Coverage_and_Informativeness_Guided_Token_Reduction_for_Efficient_Large_Multimodal_Models.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Systems / Efficiency / Compression, Benchmark / Evaluation
+	- methods: CoIn
+- [[obsidian-vault/analysis/CVPR_2026/Collaborative_Multi_Mode_Pruning_for_Vision_Language_Models.md|Collaborative Multi-Mode Pruning for Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Collaborative_Multi_Mode_Pruning_for_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Collaborative Multi-Mode Pruning (CoMP)
+	- datasets: NLVR2, COCO image-text retrieval
+- [[obsidian-vault/analysis/CVPR_2026/Decompose_Mix_Adapt_A_Unified_Framework_for_Parameter_Efficient_Neural_Network_Recombination_and_Compression.md|Decompose, Mix, Adapt: A Unified Framework for Parameter-Efficient Neural Network Recombination and Compression (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Decompose_Mix_Adapt_A_Unified_Framework_for_Parameter_Efficient_Neural_Network_Recombination_and_Compression.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: CRISP (Coefficient-gated weight Recombination by Interpolated Shared basis Projections)
+	- datasets: VTAB-1K, ViT-B/16 50% compression on 6 fine-grained benchmarks, ViT-B/16 50% compression + PEFT on 6 benchmarks
+- [[obsidian-vault/analysis/CVPR_2026/Deformable_Gaussian_Occupancy_Decoupling_Rigid_and_Nonrigid_Motion_with_Factorized_Distillation.md|Deformable Gaussian Occupancy: Decoupling Rigid and Nonrigid Motion with Factorized Distillation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Deformable_Gaussian_Occupancy_Decoupling_Rigid_and_Nonrigid_Motion_with_Factorized_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: DeGO (Deformable Gaussian Occupancy)
+	- datasets: Occ3D-NuScenes
+- [[obsidian-vault/analysis/CVPR_2026/DUET_VLM_Dual_stage_Unified_Efficient_Token_reduction_for_VLM_Training_and_Inference.md|DUET-VLM: Dual stage Unified Efficient Token reduction for VLM Training and Inference (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DUET_VLM_Dual_stage_Unified_Efficient_Token_reduction_for_VLM_Training_and_Inference.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: DUET-VLM
+	- datasets: LLaVA-1.5-7B, Qwen-2.5-VL-7B, LLaVA-1.5-7B trained
+- [[obsidian-vault/analysis/CVPR_2026/DynamicVGGT_Learning_Dynamic_Point_Maps_for_4D_Scene_Reconstruction_in_Autonomous_Driving.md|DynamicVGGT: Learning Dynamic Point Maps for 4D Scene Reconstruction in Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DynamicVGGT_Learning_Dynamic_Point_Maps_for_4D_Scene_Reconstruction_in_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: DynamicVGGT
+	- datasets: KITTI, Waymo
+- [[obsidian-vault/analysis/CVPR_2026/Efficient_Encoder_Free_Fourier_based_3D_Large_Multimodal_Model.md|Efficient Encoder-Free Fourier-based 3D Large Multimodal Model (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Efficient_Encoder_Free_Fourier_based_3D_Large_Multimodal_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Fase3D
+	- datasets: ScanQA, SQA3D, ScanRefer
+- [[obsidian-vault/analysis/CVPR_2026/Efficient_Unrolled_Networks_for_Large_Scale_3D_Inverse_Problems.md|Efficient Unrolled Networks for Large-Scale 3D Inverse Problems (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Efficient_Unrolled_Networks_for_Large_Scale_3D_Inverse_Problems.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Efficient Unrolled Networks with Domain Partitioning and Normal Operator Approximation
+	- datasets: Walnut-CBCT, Calgary-Campinas MC-MRI
+- [[obsidian-vault/analysis/CVPR_2026/EvoComp_Learning_Visual_Token_Compression_for_Multimodal_Large_Language_Models_via_Semantic_Guided_Evolutionary_Labeling.md|EvoComp: Learning Visual Token Compression for Multimodal Large Language Models via Semantic-Guided Evolutionary Labeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/EvoComp_Learning_Visual_Token_Compression_for_Multimodal_Large_Language_Models_via_Semantic_Guided_Evolutionary_Labeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- datasets: GQA, MMBench, MMBench-CN
+- [[obsidian-vault/analysis/CVPR_2026/FlashMesh_Faster_and_Better_Autoregressive_Mesh_Synthesis_via_Structured_Speculation.md|FlashMesh: Faster and Better Autoregressive Mesh Synthesis via Structured Speculation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FlashMesh_Faster_and_Better_Autoregressive_Mesh_Synthesis_via_Structured_Speculation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: FlashMesh
+	- datasets: ShapeNetV2 / gObjaverse 测试集
+- [[obsidian-vault/analysis/CVPR_2026/FlexAvatar_Flexible_Large_Reconstruction_Model_for_Animatable_Gaussian_Head_Avatars_with_Detailed_Deformation.md|FlexAvatar: Flexible Large Reconstruction Model for Animatable Gaussian Head Avatars with Detailed Deformation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/FlexAvatar_Flexible_Large_Reconstruction_Model_for_Animatable_Gaussian_Head_Avatars_with_Detailed_Deformation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: FlexAvatar
+	- datasets: NeRSemble, FaceCap, Inference Speed
+- [[obsidian-vault/analysis/CVPR_2026/From_Exploration_to_Exploitation_A_Two_Stage_Entropy_RLVR_Approach_for_Noise_Tolerant_MLLM_Training.md|From Exploration to Exploitation: A Two-Stage Entropy RLVR Approach for Noise-Tolerant MLLM Training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/From_Exploration_to_Exploitation_A_Two_Stage_Entropy_RLVR_Approach_for_Noise_Tolerant_MLLM_Training.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: Two-Stage Entropy-Guided GRPO
+	- datasets: ScreenSpot, COCO-derived OVOD
+- [[obsidian-vault/analysis/CVPR_2026/Global_Prior_Meets_Local_Consistency_Dual_Memory_Augmented_Vision_Language_Action_Model_for_Efficient_Robotic_Manipulation.md|Global Prior Meets Local Consistency: Dual-Memory Augmented Vision-Language-Action Model for Efficient Robotic Manipulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Global_Prior_Meets_Local_Consistency_Dual_Memory_Augmented_Vision_Language_Action_Model_for_Efficient_Robotic_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: OptimusVLA
+	- datasets: LIBERO, CALVIN, RoboTwin 2.0 Hard
+- [[obsidian-vault/analysis/CVPR_2026/Gradient_Knows_Best_Mixed_Precision_Quantization_via_Gradient_Guided_Bit_Allocation_for_Super_Resolution.md|Gradient Knows Best: Mixed-Precision Quantization via Gradient-Guided Bit Allocation for Super-Resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Gradient_Knows_Best_Mixed_Precision_Quantization_via_Gradient_Guided_Bit_Allocation_for_Super_Resolution.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: Gradient-Guided Mixed-Precision Quantization with Dynamic Activation Range Normalization (GBA+DAN)
+	- datasets: Urban100, Set5, Test2K
+- [[obsidian-vault/analysis/CVPR_2026/HTTM_Head_wise_Temporal_Token_Merging_for_Faster_VGGT.md|HTTM: Head-wise Temporal Token Merging for Faster VGGT (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/HTTM_Head_wise_Temporal_Token_Merging_for_Faster_VGGT.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: HTTM (Head-wise Temporal Token Merging)
+	- datasets: NRGBD, ScanNet, Global Attention Layers
+- [[obsidian-vault/analysis/CVPR_2026/Hybrid_Token_Compression_for_Vision_Language_Models.md|Hybrid Token Compression for Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Hybrid_Token_Compression_for_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: HTC-VLM
+	- datasets: GQA, VQAv2, MMBench
+- [[obsidian-vault/analysis/CVPR_2026/IAFMNet_Information_Aware_Feature_Modulation_for_Efficient_Super_Resolution.md|IAFMNet: Information-Aware Feature Modulation for Efficient Super-Resolution (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IAFMNet_Information_Aware_Feature_Modulation_for_Efficient_Super_Resolution.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: IAFMNet
+	- datasets: Urban100, Manga109
+- [[obsidian-vault/analysis/CVPR_2026/IF_Prune_Information_Flow_Guided_Token_Pruning_for_Efficient_Vision_Language_Models.md|IF-Prune: Information-Flow Guided Token Pruning for Efficient Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/IF_Prune_Information_Flow_Guided_Token_Pruning_for_Efficient_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: IF-Prune
+	- datasets: InternVL2-26B, InternVL2-8B
+- [[obsidian-vault/analysis/CVPR_2026/LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Inference.md|LaMoGen: Language-to-Motion Generation Through LLM-Guided Symbolic Inference (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Inference.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
+	- methods: LaMoGen
+	- datasets: Laban Benchmark, HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/CVPR_2026/LazyVAR_Accelerating_Visual_Autoregressive_Models_via_Scale_wise_Token_Pruning_and_Parallel_Group_Decoding.md|LazyVAR: Accelerating Visual Autoregressive Models via Scale-wise Token Pruning and Parallel Group Decoding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LazyVAR_Accelerating_Visual_Autoregressive_Models_via_Scale_wise_Token_Pruning_and_Parallel_Group_Decoding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: LazyVAR
+	- datasets: GenEval, MJHQ-30K, HPSv2.1
+- [[obsidian-vault/analysis/CVPR_2026/LLM_Guided_Probabilistic_Fusion_for_Label_Efficient_Document_Layout_Analysis.md|LLM-Guided Probabilistic Fusion for Label-Efficient Document Layout Analysis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/LLM_Guided_Probabilistic_Fusion_for_Label_Efficient_Document_Layout_Analysis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
+	- methods: LLM-Guided Probabilistic Fusion for Label-Efficient Document Layout Analysis
+	- datasets: PubLayNet, DocLayNet
+- [[obsidian-vault/analysis/CVPR_2026/MASQuant_Modality_Aware_Smoothing_Quantization_for_Multimodal_Large_Language_Models.md|MASQuant: Modality-Aware Smoothing Quantization for Multimodal Large Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MASQuant_Modality_Aware_Smoothing_Quantization_for_Multimodal_Large_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MASQuant (Modality-Aware Smoothing Quantization)
+	- datasets: MMMU, LibriSpeech, Qwen2.5-VL-7B Prefill Speed
+- [[obsidian-vault/analysis/CVPR_2026/MedFG_VQA_Low_Frequency_Memory_and_Graph_Attention_for_Lightweight_Medical_VQA.md|MedFG-VQA: Low-Frequency Memory and Graph Attention for Lightweight Medical VQA (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MedFG_VQA_Low_Frequency_Memory_and_Graph_Attention_for_Lightweight_Medical_VQA.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Graph / Geometric / Structured Data, Systems / Efficiency / Compression
+	- methods: MedFG-VQA
+	- datasets: SynMedVQA, SLAKE, PathVQA
+- [[obsidian-vault/analysis/CVPR_2026/MGDHand_Multi_Granularity_Prior_to_Inertial_Distillation_Framework_for_Sequential_3D_Hand_Pose_Estimation_from_Sparse_IMUs.md|MGDHand: Multi-Granularity Prior-to-Inertial Distillation Framework for Sequential 3D Hand Pose Estimation from Sparse IMUs (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MGDHand_Multi_Granularity_Prior_to_Inertial_Distillation_Framework_for_Sequential_3D_Hand_Pose_Estimation_from_Sparse_IMUs.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MGDHand
+	- datasets: VIHand
+- [[obsidian-vault/analysis/CVPR_2026/MORE_STEM_Long_Short_MemOry_REcall_and_Spatio_TEmporal_Consistency_Model_for_Query_Driven_3D4D_Point_Cloud_Segmentation.md|MORE-STEM: Long-Short MemOry REcall and Spatio-TEmporal Consistency Model for Query-Driven 3D/4D Point Cloud Segmentation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MORE_STEM_Long_Short_MemOry_REcall_and_Spatio_TEmporal_Consistency_Model_for_Query_Driven_3D_4D_Point_Cloud_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MORE-STEM
+	- datasets: Instruct3D, InstructKITTI, ScanRefer
+- [[obsidian-vault/analysis/CVPR_2026/Mostly_Text_Smart_Visuals_Asymmetric_Text_Visual_Pruning_for_Large_Vision_Language_Models.md|Mostly Text, Smart Visuals: Asymmetric Text-Visual Pruning for Large Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Mostly_Text_Smart_Visuals_Asymmetric_Text_Visual_Pruning_for_Large_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: ATV-Pruning (Asymmetric Text-Visual Weight Pruning)
+	- datasets: Avg. Retention, MME, OKVQA
+- [[obsidian-vault/analysis/CVPR_2026/MSPT_Efficient_Large_Scale_Physical_Modeling_via_Parallelized_Multi_Scale_Attention.md|MSPT: Efficient Large-Scale Physical Modeling via Parallelized Multi-Scale Attention (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MSPT_Efficient_Large_Scale_Physical_Modeling_via_Parallelized_Multi_Scale_Attention.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Multi-Scale Patch Transformer (MSPT)
+	- datasets: Elasticity, Plasticity, Airfoil
+- [[obsidian-vault/analysis/CVPR_2026/PointWorld_Scaling_3D_World_Models_for_In_The_Wild_Robotic_Manipulation.md|PointWorld: Scaling 3D World Models for In-The-Wild Robotic Manipulation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PointWorld_Scaling_3D_World_Models_for_In_The_Wild_Robotic_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: POINTWORLD
+	- datasets: DROID, BEHAVIOR-1K, Held-out real scenes
+- [[obsidian-vault/analysis/CVPR_2026/PosterOmni_Generalized_Artistic_Poster_Creation_via_Task_Distillation_and_Unified_Reward_Feedback.md|PosterOmni: Generalized Artistic Poster Creation via Task Distillation and Unified Reward Feedback (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PosterOmni_Generalized_Artistic_Poster_Creation_via_Task_Distillation_and_Unified_Reward_Feedback.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: PosterOmni
+	- datasets: PosterOmni-Bench-en
+- [[obsidian-vault/analysis/CVPR_2026/Quant_Experts_Token_aware_Adaptive_Error_Reconstruction_with_Mixture_of_Experts_for_Large_Vision_Language_Models_Quantization.md|Quant Experts: Token-aware Adaptive Error Reconstruction with Mixture of Experts for Large Vision-Language Models Quantization (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Quant_Experts_Token_aware_Adaptive_Error_Reconstruction_with_Mixture_of_Experts_for_Large_Vision_Language_Models_Quantization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Quant Experts (QE)
+	- datasets: Qwen2VL-2B, Qwen2VL-7B
+- [[obsidian-vault/analysis/CVPR_2026/QuietPrune_Query_Guided_Early_Token_Pruning_for_Vision_Language_Models.md|QuietPrune: Query-Guided Early Token Pruning for Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/QuietPrune_Query_Guided_Early_Token_Pruning_for_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: QuietPrune
+	- datasets: InternVL3-1B, Qwen3-VL-4B
+- [[obsidian-vault/analysis/CVPR_2026/RAPID_Reusing_Attention_Sparsity_with_Inter_step_Adaptation_for_Efficient_Video_Diffusion.md|RAPID: Reusing Attention Sparsity with Inter-step Adaptation for Efficient Video Diffusion (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RAPID_Reusing_Attention_Sparsity_with_Inter_step_Adaptation_for_Efficient_Video_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: RAPID
+	- datasets: Wan2.1-14B, HunyuanVideo
+- [[obsidian-vault/analysis/CVPR_2026/Scaling_View_Synthesis_Transformers.md|Scaling View Synthesis Transformers (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Scaling_View_Synthesis_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Scalable View Synthesis Model (SVSM)
+	- datasets: RealEstate10K, DL3DV, RealEstate10K 缩放Pareto
+- [[obsidian-vault/analysis/CVPR_2026/SEATrack_Simple_Efficient_and_Adaptive_Multimodal_Tracker.md|SEATrack: Simple, Efficient, and Adaptive Multimodal Tracker (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SEATrack_Simple_Efficient_and_Adaptive_Multimodal_Tracker.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SEATrack
+	- datasets: LasHeR, DepthTrack, VisEvent
+- [[obsidian-vault/analysis/CVPR_2026/SegMo_Co_Designing_Content_Aware_Sparsity_and_Locally_Cohesive_Segment_Parallelism_for_Efficient_VLM_Inference.md|SegMo: Co-Designing Content-Aware Sparsity and Locally-Cohesive Segment Parallelism for Efficient VLM Inference (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SegMo_Co_Designing_Content_Aware_Sparsity_and_Locally_Cohesive_Segment_Parallelism_for_Efficient_VLM_Inference.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SegMo
+	- datasets: LVBench, LongVideoBench
+- [[obsidian-vault/analysis/CVPR_2026/SpaceDrive_Infusing_Spatial_Awareness_into_VLM_based_Autonomous_Driving.md|SpaceDrive: Infusing Spatial Awareness into VLM-based Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SpaceDrive_Infusing_Spatial_Awareness_into_VLM_based_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SpaceDrive
+	- datasets: nuScenes, Bench2Drive
+- [[obsidian-vault/analysis/CVPR_2026/SparseWorld_TC_Trajectory_Conditioned_Sparse_Occupancy_World_Model.md|SparseWorld-TC: Trajectory-Conditioned Sparse Occupancy World Model (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SparseWorld_TC_Trajectory_Conditioned_Sparse_Occupancy_World_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SparseWorld-TC
+	- datasets: Occ3D-nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/Thinking_with_Drafts_Speculative_Temporal_Reasoning_for_Efficient_Long_Video_Understanding.md|Thinking with Drafts: Speculative Temporal Reasoning for Efficient Long Video Understanding (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Thinking_with_Drafts_Speculative_Temporal_Reasoning_for_Efficient_Long_Video_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SpecTemp
+	- datasets: TempCompass, MVBench, Video-Holmes
+- [[obsidian-vault/analysis/CVPR_2026/Towards_Unified_Human_Perception_and_Machine_Understanding_Token_Flow_Guided_Compression_Framework.md|Towards Unified Human Perception and Machine Understanding: Token Flow Guided Compression Framework (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Towards_Unified_Human_Perception_and_Machine_Understanding_Token_Flow_Guided_Compression_Framework.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Token Flow Guided Compression (TFGC)
+	- datasets: MSCOCO Captioning, VQAv2, RefCOCO
+- [[obsidian-vault/analysis/CVPR_2026/UETrack_A_Unified_and_Efficient_Framework_for_Single_Object_Tracking.md|UETrack: A Unified and Efficient Framework for Single Object Tracking (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UETrack_A_Unified_and_Efficient_Framework_for_Single_Object_Tracking.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: UETrack
+	- datasets: LaSOT, GOT-10k, VOT-RGBD22
+- [[obsidian-vault/analysis/CVPR_2026/Unified_Spatiotemporal_Token_Compression_for_Video_LLMs_at_Ultra_Low_Retention.md|Unified Spatiotemporal Token Compression for Video-LLMs at Ultra-Low Retention (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Unified_Spatiotemporal_Token_Compression_for_Video_LLMs_at_Ultra_Low_Retention.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Unified Spatiotemporal Token Compression (USTC) with Text-Aware Merging
+	- datasets: Multiple, LLaVA-OneVision-7B, LLaVA-Video-7B
+- [[obsidian-vault/analysis/CVPR_2026/UnReflectAnything_RGB_Only_Highlight_Removal_by_Rendering_Synthetic_Specular_Supervision.md|UnReflectAnything: RGB-Only Highlight Removal by Rendering Synthetic Specular Supervision (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UnReflectAnything_RGB_Only_Highlight_Removal_by_Rendering_Synthetic_Specular_Supervision.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: UnReflectAnything
+	- datasets: PSD, SHIQ, SSHR
+- [[obsidian-vault/analysis/CVPR_2026/UTPTrack_Towards_Simple_and_Unified_Token_Pruning_for_Visual_Tracking.md|UTPTrack: Towards Simple and Unified Token Pruning for Visual Tracking (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/UTPTrack_Towards_Simple_and_Unified_Token_Pruning_for_Visual_Tracking.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: UTPTrack
+	- datasets: LaSOT, LaSOT_ext, TrackingNet
+- [[obsidian-vault/analysis/CVPR_2026/VLM_Pruner_Buffering_for_Spatial_Sparsity_in_an_Efficient_VLM_Centrifugal_Token_Pruning_Paradigm.md|VLM-Pruner: Buffering for Spatial Sparsity in an Efficient VLM Centrifugal Token Pruning Paradigm (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VLM_Pruner_Buffering_for_Spatial_Sparsity_in_an_Efficient_VLM_Centrifugal_Token_Pruning_Paradigm.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: VLM-Pruner
+	- datasets: LLaVA-1.5-7B, LLaVA-1.5-13B, LLaVA-Next-7B
+- [[obsidian-vault/analysis/CVPR_2026/VLM_PTQ_Efficient_Post_Training_Quantization_for_Large_Vision_Language_Models.md|VLM-PTQ: Efficient Post-Training Quantization for Large Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VLM_PTQ_Efficient_Post_Training_Quantization_for_Large_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: VLM-PTQ
+	- datasets: Eight VLM Benchmark Avg
+- [[obsidian-vault/analysis/CVPR_2026/ZOO_Prune_Training_Free_Token_Pruning_via_Zeroth_Order_Gradient_Estimation_in_Vision_Language_Models.md|ZOO-Prune: Training-Free Token Pruning via Zeroth-Order Gradient Estimation in Vision-Language Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ZOO_Prune_Training_Free_Token_Pruning_via_Zeroth_Order_Gradient_Estimation_in_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: ZOO-Prune
+	- datasets: LLaVA-1.5-7B, LLaVA-NeXT-7B, Qwen2.5-VL-7B
+- [[obsidian-vault/analysis/ICLR_2026/muLO_Compute_Efficient_Meta_Generalization_of_Learned_Optimizers.md|$\\mu$LO: Compute-Efficient Meta-Generalization of Learned Optimizers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/muLO_Compute_Efficient_Meta_Generalization_of_Learned_Optimizers.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: µLO（µ-参数化学习型优化器）
+	- datasets: MLP IN32, MLP IN32 W=8192, MLP C10 W=8192
+- [[obsidian-vault/analysis/ICLR_2026/pi3_Permutation_Equivariant_Visual_Geometry_Learning.md|$\\pi^3$: Permutation-Equivariant Visual Geometry Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/pi3_Permutation_Equivariant_Visual_Geometry_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: $\pi^3$
+	- datasets: RealEstate10K, Sintel, ETH3D
+- [[obsidian-vault/analysis/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras.md|3DGEER: 3D Gaussian Rendering Made Exact and Efficient for Generic Cameras (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras_ICLR_2026_3dgeer_3d_gaussian_rendering_made_exact_and_efficient_for_generic_cameras.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: 3DGEER
+	- datasets: ScanNet++, MipNeRF360
+- [[obsidian-vault/analysis/ICLR_2026/A_Biologically_Plausible_Dense_Associative_Memory_with_Exponential_Capacity.md|A Biologically Plausible Dense Associative Memory with Exponential Capacity (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Biologically_Plausible_Dense_Associative_Memory_with_Exponential_Capacity.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Threshold-based Dense Associative Memory (TDAM)
+	- datasets: MNIST
+- [[obsidian-vault/analysis/ICLR_2026/A_Convergence_Analysis_of_Adaptive_Optimizers_under_Floating_point_Quantization.md|A Convergence Analysis of Adaptive Optimizers under Floating-point Quantization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Convergence_Analysis_of_Adaptive_Optimizers_under_Floating_point_Quantization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: 量化自适应优化器分析框架（Quantized Adam & Quantized Muon）
+	- datasets: Rosenbrock函数, CIFAR-10
+- [[obsidian-vault/analysis/ICLR_2026/A_Memory_Efficient_Hierarchical_Algorithm_for_Large_scale_Optimal_Transport_Problems.md|A Memory-Efficient Hierarchical Algorithm for Large-scale Optimal Transport Problems (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Memory_Efficient_Hierarchical_Algorithm_for_Large_scale_Optimal_Transport_Problems.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: HALO (Hierarchical Algorithm for Large-scale Optimal Transport)
+	- datasets: DOTmark, ModelNet10
+- [[obsidian-vault/analysis/ICLR_2026/A_Stitch_in_Time_Saves_Nine_Proactive_Self_Refinement_for_Language_Models.md|A Stitch in Time Saves Nine: Proactive Self-Refinement for Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_Stitch_in_Time_Saves_Nine_Proactive_Self_Refinement_for_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: ProActive Self-Refinement (PASR)
+	- datasets: GSM8K, MATH, AIME24
+- [[obsidian-vault/analysis/ICLR_2026/A_universal_compression_theory_for_lottery_ticket_hypothesis_and_neural_scaling_laws.md|A universal compression theory for lottery ticket hypothesis and neural scaling laws (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/A_universal_compression_theory_for_lottery_ticket_hypothesis_and_neural_scaling_laws.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Universal Compression via Moment Matching and Clustering
+	- datasets: teacher-student function fitting, cylindrical harmonic function learning, teacher-student
+- [[obsidian-vault/analysis/ICLR_2026/ABBA_Adapters_Efficient_and_Expressive_Fine_Tuning_of_Foundation_Models.md|ABBA-Adapters: Efficient and Expressive Fine-Tuning of Foundation Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ABBA_Adapters_Efficient_and_Expressive_Fine_Tuning_of_Foundation_Models.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: ABBA-Adapters
+	- datasets: COMMONSENSE170K, COMMONSENSE170K, MATH (Mistral-7B
+- [[obsidian-vault/analysis/ICLR_2026/Accelerating_Inference_for_Multilayer_Neural_Networks_with_Quantum_Computers.md|Accelerating Inference for Multilayer Neural Networks with Quantum Computers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Accelerating_Inference_for_Multilayer_Neural_Networks_with_Quantum_Computers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Quantum-accelerated residual CNN with coherent erf/sigmoid activations, skip connections, and layer normalization
+	- datasets: Exact classical 2D convolution, Exact classical 2D convolution (with QRAM for weights, no input QRAM, Deep network with k nonlinear layers, full QRAM access
+- [[obsidian-vault/analysis/ICLR_2026/Achieving_low_bit_Muon_through_subspace_preservation_and_grid_quantization.md|Achieving low-bit Muon through subspace preservation and grid quantization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Achieving_low_bit_Muon_through_subspace_preservation_and_grid_quantization.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: 4-bit-Muon-GRASP (GRid And Subspace Preserving)
+	- datasets: LLaMA-350M 预训练下游任务平均准确率, LLaMA-1.1B 预训练验证困惑度, Qwen2.5-7B-Math 微调数学推理任务
+- [[obsidian-vault/analysis/ICLR_2026/Action_aware_Dynamic_Pruning_for_Efficient_Vision_Language_Action_Manipulation.md|Action-aware Dynamic Pruning for Efficient Vision-Language-Action Manipulation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Action_aware_Dynamic_Pruning_for_Efficient_Vision_Language_Action_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Systems / Efficiency / Compression, Vision / Multimodal / 3D
+	- methods: Action-aware Dynamic Pruning (ADP)
+	- datasets: LIBERO, 真实世界操作
+- [[obsidian-vault/analysis/ICLR_2026/Actions_Speak_Louder_than_Prompts_A_Large_Scale_Study_of_LLMs_for_Graph_Inference.md|Actions Speak Louder than Prompts: A Large-Scale Study of LLMs for Graph Inference (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Actions_Speak_Louder_than_Prompts_A_Large_Scale_Study_of_LLMs_for_Graph_Inference.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Graph-as-Code
+	- datasets: cora, pubmed, cornell
+- [[obsidian-vault/analysis/ICLR_2026/AdaRank_Adaptive_Rank_Pruning_for_Enhanced_Model_Merging.md|AdaRank: Adaptive Rank Pruning for Enhanced Model Merging (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AdaRank_Adaptive_Rank_Pruning_for_Enhanced_Model_Merging.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: AdaRank (Adaptive Rank Pruning)
+- [[obsidian-vault/analysis/ICLR_2026/AgilePruner_An_Empirical_Study_of_Attention_and_Diversity_for_Adaptive_Visual_Token_Pruning_in_Large_Vision_Language_Models.md|AgilePruner: An Empirical Study of Attention and Diversity for Adaptive Visual Token Pruning in Large Vision-Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AgilePruner_An_Empirical_Study_of_Attention_and_Diversity_for_Adaptive_Visual_Token_Pruning_in_Large_Vision_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: AgilePruner（自适应阈值剪枝方法）
+	- datasets: GQA, SQAIMG, POPE
+- [[obsidian-vault/analysis/ICLR_2026/All_Code_No_Thought_Language_Models_Struggle_to_Reason_in_Ciphered_Language.md|All Code, No Thought: Language Models Struggle to Reason in Ciphered Language (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/All_Code_No_Thought_Language_Models_Struggle_to_Reason_in_Ciphered_Language.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- datasets: MATH 500
+- [[obsidian-vault/analysis/ICLR_2026/Are_LLMs_Really_Not_Knowledgeable_Mining_the_Submerged_Knowledge_in_LLMs_Memory.md|Are LLMs Really Not Knowledgeable? Mining the Submerged Knowledge in LLMs' Memory (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Are_LLMs_Really_Not_Knowledgeable_Mining_the_Submerged_Knowledge_in_LLMs_Memory.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Hits@k
+	- datasets: DBpedia-Head, IMDB-Head
+- [[obsidian-vault/analysis/ICLR_2026/Attention_Is_All_You_Need_for_KV_Cache_in_Diffusion_LLMs.md|Attention Is All You Need for KV Cache in Diffusion LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Attention_Is_All_You_Need_for_KV_Cache_in_Diffusion_LLMs.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Elastic-Cache
+	- datasets: GSM8K
+- [[obsidian-vault/analysis/ICLR_2026/Autoregressive_based_Progressive_Coding_for_Ultra_Low_Bitrate_Image_Compression.md|Autoregressive-based Progressive Coding for Ultra-Low Bitrate Image Compression (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Autoregressive_based_Progressive_Coding_for_Ultra_Low_Bitrate_Image_Compression.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: AutoRegressive-based Progressive Coding (ARPC)
+	- datasets: CLIC2020
+- [[obsidian-vault/analysis/ICLR_2026/AutoTool_Automatic_Scaling_of_Tool_Use_Capabilities_in_RL_via_Decoupled_Entropy_Constraints.md|AutoTool: Automatic Scaling of Tool-Use Capabilities in RL via Decoupled Entropy Constraints (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AutoTool_Automatic_Scaling_of_Tool_Use_Capabilities_in_RL_via_Decoupled_Entropy_Constraints.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: AutoTool
+	- datasets: BFCL, ACEBench
+- [[obsidian-vault/analysis/ICLR_2026/Beyond_Masks_Efficient_Flexible_Diffusion_Language_Models_via_Deletion_Insertion_Processes.md|Beyond Masks: Efficient, Flexible Diffusion Language Models via Deletion-Insertion Processes (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Beyond_Masks_Efficient_Flexible_Diffusion_Language_Models_via_Deletion_Insertion_Processes.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Deletion-Insertion Diffusion language models (DID)
+	- datasets: WikiText, Lambada, OpenWebText
+- [[obsidian-vault/analysis/ICLR_2026/Beyond_Scattered_Acceptance_Fast_and_Coherent_Inference_for_DLMs_via_Longest_Stable_Prefixes.md|Beyond Scattered Acceptance: Fast and Coherent Inference for DLMs via Longest Stable Prefixes (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Beyond_Scattered_Acceptance_Fast_and_Coherent_Inference_for_DLMs_via_Longest_Stable_Prefixes.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Longest Stable Prefix (LSP) Scheduler
+	- datasets: GSM8K, HumanEval
+- [[obsidian-vault/analysis/ICLR_2026/Capacity_Aware_Inference_Mitigating_the_Straggler_Effect_in_Mixture_of_Experts.md|Capacity-Aware Inference: Mitigating the Straggler Effect in Mixture of Experts (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Capacity_Aware_Inference_Mitigating_the_Straggler_Effect_in_Mixture_of_Experts.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Capacity-Aware Inference (含 Capacity-Aware Token Drop 和 Capacity-Aware Expanded Drop)
+	- datasets: MoE single layer speedup, End-to-end inference
+- [[obsidian-vault/analysis/ICLR_2026/CDE_Curiosity_Driven_Exploration_for_Efficient_Reinforcement_Learning_in_Large_Language_Models.md|CDE: Curiosity-Driven Exploration for Efficient Reinforcement Learning in Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/CDE_Curiosity_Driven_Exploration_for_Efficient_Reinforcement_Learning_in_Large_Language_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: CDE (Curiosity-Driven Exploration)
+	- datasets: AIME24, AIME25, Overall Avg
+- [[obsidian-vault/analysis/ICLR_2026/ComGS_Efficient_3D_Object_Scene_Composition_via_Surface_Octahedral_Probes.md|ComGS: Efficient 3D Object-Scene Composition via Surface Octahedral Probes (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ComGS_Efficient_3D_Object_Scene_Composition_via_Surface_Octahedral_Probes_278056e7b7f4.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: ComGS
+	- datasets: SynCom, TensoIR
+- [[obsidian-vault/analysis/ICLR_2026/Compositional_Visual_Planning_via_Inference_Time_Diffusion_Scaling.md|Compositional Visual Planning via Inference-Time Diffusion Scaling (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Compositional_Visual_Planning_via_Inference_Time_Diffusion_Scaling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Compositional Visual Planning via Inference-Time Diffusion Scaling
+	- datasets: Overall Scenes, Overall
+- [[obsidian-vault/analysis/ICLR_2026/Coupling_Experts_and_Routers_in_Mixture_of_Experts_via_an_Auxiliary_Loss.md|Coupling Experts and Routers in Mixture-of-Experts via an Auxiliary Loss (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Coupling_Experts_and_Routers_in_Mixture_of_Experts_via_an_Auxiliary_Loss.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Expert-Router Coupling Loss (ERC Loss)
+	- datasets: MMLU, C-Eval, MMLU-Pro
+- [[obsidian-vault/analysis/ICLR_2026/Cross_Domain_Lossy_Compression_via_Rate_and_Classification_Constrained_Optimal_Transport.md|Cross-Domain Lossy Compression via Rate- and Classification-Constrained Optimal Transport (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Cross_Domain_Lossy_Compression_via_Rate_and_Classification_Constrained_Optimal_Transport.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Rate- and Classification-Constrained Optimal Transport (RCOT)
+	- datasets: KODAK 高斯去噪
+- [[obsidian-vault/analysis/ICLR_2026/Decentralized_Attention_Fails_Centralized_Signals_Rethinking_Transformers_for_Medical_Time_Series.md|Decentralized Attention Fails Centralized Signals: Rethinking Transformers for Medical Time Series (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Decentralized_Attention_Fails_Centralized_Signals_Rethinking_Transformers_for_Medical_Time_Series.pdf|PDF]]
+	- topics: Time Series / Dynamical Systems
+	- method groups: Systems / Efficiency / Compression
+	- methods: TeCh
+	- datasets: ADFTD, APAVA, TDBrain
+- [[obsidian-vault/analysis/ICLR_2026/Difficult_Examples_Hurt_Unsupervised_Contrastive_Learning_A_Theoretical_Perspective.md|Difficult Examples Hurt Unsupervised Contrastive Learning: A Theoretical Perspective (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Difficult_Examples_Hurt_Unsupervised_Contrastive_Learning_A_Theoretical_Perspective.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Difficulty-aware Contrastive Learning Framework (Sample Removal, Margin Tuning, Temperature Scaling, and Combined)
+	- datasets: CIFAR-10, CIFAR-100, STL-10
+- [[obsidian-vault/analysis/ICLR_2026/DTO_KD_Dynamic_Trade_off_Optimization_for_Effective_Knowledge_Distillation.md|DTO-KD: Dynamic Trade-off Optimization for Effective Knowledge Distillation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DTO_KD_Dynamic_Trade_off_Optimization_for_Effective_Knowledge_Distillation.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: DTO-KD
+	- datasets: ImageNet-1K, COCO
+- [[obsidian-vault/analysis/ICLR_2026/Efficient_Reinforcement_Learning_by_Guiding_World_Models_with_Non_Curated_Data.md|Efficient Reinforcement Learning by Guiding World Models with Non-Curated Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Efficient_Reinforcement_Learning_by_Guiding_World_Models_with_Non_Curated_Data.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: NCRL (Non-curated offline data for efficient RL)
+	- datasets: Meta-World, DMControl, Quadruped Walk
+- [[obsidian-vault/analysis/ICLR_2026/Efficient_Resource_Constrained_Training_of_Transformers_via_Subspace_Optimization.md|Efficient Resource-Constrained Training of Transformers via Subspace Optimization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Efficient_Resource_Constrained_Training_of_Transformers_via_Subspace_Optimization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: WASI (Weight-Activation Subspace Iteration)
+	- datasets: ViT on CIFAR-10, SwinT on multiple datasets, TinyLlama on BoolQ
+- [[obsidian-vault/analysis/ICLR_2026/Efficient_LVSM_Faster_Cheaper_and_Better_Large_View_Synthesis_Model_via_Decoupled_Co_Refinement_Attention.md|Efficient-LVSM: Faster, Cheaper, and Better Large View Synthesis Model via Decoupled Co-Refinement Attention (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Efficient_LVSM_Faster_Cheaper_and_Better_Large_View_Synthesis_Model_via_Decouple_f97270a5835a.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Efficient-LVSM
+	- datasets: RealEstate10K, ABO, GSO
+- [[obsidian-vault/analysis/ICLR_2026/Exploratory_Causal_Inference_in_SAEnce.md|Exploratory Causal Inference in SAEnce (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Exploratory_Causal_Inference_in_SAEnce.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Neural Effect Search (NES)
+	- datasets: CelebA semi-synthetic RCT, ISTAnt real-world RCT
+- [[obsidian-vault/analysis/ICLR_2026/FlashDLM_Accelerating_Diffusion_Language_Model_Inference_via_Efficient_KV_Caching_and_Guided_Diffusion.md|FlashDLM: Accelerating Diffusion Language Model Inference via Efficient KV Caching and Guided Diffusion (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FlashDLM_Accelerating_Diffusion_Language_Model_Inference_via_Efficient_KV_Caching_and_Guided_Diffusion.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Systems / Efficiency / Compression, Generative / Diffusion / Flow
+	- methods: FlashDLM (FreeCache + Guided Diffusion)
+	- datasets: GSM8K, MMLU-PRO, PiQA
+- [[obsidian-vault/analysis/ICLR_2026/FlashVID_Efficient_Video_Large_Language_Models_via_Training_free_Tree_based_Spatiotemporal_Token_Merging.md|FlashVID: Efficient Video Large Language Models via Training-free Tree-based Spatiotemporal Token Merging (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FlashVID_Efficient_Video_Large_Language_Models_via_Training_free_Tree_based_Spatiotemporal_Token_Merging.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: FlashVID
+	- datasets: VideoMME / EgoSchema / LongVideoBench / MVBench, Qwen2.5-VL 固定令牌预算
+- [[obsidian-vault/analysis/ICLR_2026/FlashWorld_High_quality_3D_Scene_Generation_within_Seconds.md|FlashWorld: High-quality 3D Scene Generation within Seconds (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/FlashWorld_High_quality_3D_Scene_Generation_within_Seconds.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: FlashWorld
+	- datasets: T3Bench-200, DL3DV-200, WorldScore-200
+- [[obsidian-vault/analysis/ICLR_2026/From_Seeing_to_Experiencing_Scaling_Navigation_Foundation_Models_with_Reinforcement_Learning.md|From Seeing to Experiencing: Scaling Navigation Foundation Models with Reinforcement Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/From_Seeing_to_Experiencing_Scaling_Navigation_Foundation_Models_with_Reinforcement_Learning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: Seeing-to-Experiencing (S2E) learning framework
+	- datasets: NavBench-GS, NavBench-GS-Obstacle, 真实世界轮式机器人
+- [[obsidian-vault/analysis/ICLR_2026/GLASS_Flows_Efficient_Inference_for_Reward_Alignment_of_Flow_and_Diffusion_Models.md|GLASS Flows: Efficient Inference for Reward Alignment of Flow and Diffusion Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/GLASS_Flows_Efficient_Inference_for_Reward_Alignment_of_Flow_and_Diffusion_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: GLASS Flows
+	- datasets: GenEval, SiT
+- [[obsidian-vault/analysis/ICLR_2026/Hyperparameter_Trajectory_Inference_with_Conditional_Lagrangian_Optimal_Transport.md|Hyperparameter Trajectory Inference with Conditional Lagrangian Optimal Transport (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Hyperparameter_Trajectory_Inference_with_Conditional_Lagrangian_Optimal_Transport.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Neural Conditional Lagrangian Optimal Transport (CLOT)
+	- datasets: Semicircles, Cancer therapy, Reacher
+- [[obsidian-vault/analysis/ICLR_2026/Intrinsic_Entropy_of_Context_Length_Scaling_in_LLMs.md|Intrinsic Entropy of Context Length Scaling in LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Intrinsic_Entropy_of_Context_Length_Scaling_in_LLMs.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: 内在熵分析框架（Intrinsic Entropy Framework）
+	- datasets: Position-Weighted Multitask Sparse Parity
+- [[obsidian-vault/analysis/ICLR_2026/JanusVLN_Decoupling_Semantics_and_Spatiality_with_Dual_Implicit_Memory_for_Vision_Language_Navigation.md|JanusVLN: Decoupling Semantics and Spatiality with Dual Implicit Memory for Vision-Language Navigation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/JanusVLN_Decoupling_Semantics_and_Spatiality_with_Dual_Implicit_Memory_for_Vision_Language_Navigation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: JanusVLN
+	- datasets: R2R-CE Val-Unseen, RxR-CE Val-Unseen
+- [[obsidian-vault/analysis/ICLR_2026/Johnson_Lindenstrauss_Lemma_Guided_Network_for_Efficient_3D_Medical_Segmentation.md|Johnson-Lindenstrauss Lemma Guided Network for Efficient 3D Medical Segmentation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Johnson_Lindenstrauss_Lemma_Guided_Network_for_Efficient_3D_Medical_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/ICLR_2026/Locality_aware_Parallel_Decoding_for_Efficient_Autoregressive_Image_Generation.md|Locality-aware Parallel Decoding for Efficient Autoregressive Image Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Locality_aware_Parallel_Decoding_for_Efficient_Autoregressive_Image_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: LPD (Locality-aware Parallel Decoding)
+	- datasets: ImageNet 256×256 class-conditional, ImageNet 512×512 class-conditional, GenEval 1024×1024 text-to-image
+- [[obsidian-vault/analysis/ICLR_2026/LogART_Pushing_the_Limit_of_Efficient_Logarithmic_Post_Training_Quantization.md|LogART: Pushing the Limit of Efficient Logarithmic Post-Training Quantization (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/LogART_Pushing_the_Limit_of_Efficient_Logarithmic_Post_Training_Quantization.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: LogART (Logarithmic Adaptive Rounding Techniques)
+	- datasets: WikiText-2, ImageNet
+- [[obsidian-vault/analysis/ICLR_2026/MEM1_Learning_to_Synergize_Memory_and_Reasoning_for_Efficient_Long_Horizon_Agents.md|MEM1: Learning to Synergize Memory and Reasoning for Efficient Long-Horizon Agents (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MEM1_Learning_to_Synergize_Memory_and_Reasoning_for_Efficient_Long_Horizon_Agents.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: MEM1
+	- datasets: Multi-Objective QA, WebShop
+- [[obsidian-vault/analysis/ICLR_2026/MemoryVLA_Perceptual_Cognitive_Memory_in_Vision_Language_Action_Models_for_Robotic_Manipulation.md|MemoryVLA: Perceptual-Cognitive Memory in Vision-Language-Action Models for Robotic Manipulation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/MemoryVLA_Perceptual_Cognitive_Memory_in_Vision_Language_Action_Models_for_Robotic_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MemoryVLA
+	- datasets: SimplerEnv-Bridge, SimplerEnv-Fractal, LIBERO
+- [[obsidian-vault/analysis/ICLR_2026/Mixture_of_Experts_Can_Surpass_Dense_LLMs_Under_Strictly_Equal_Resource.md|Mixture-of-Experts Can Surpass Dense LLMs Under Strictly Equal Resource (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Mixture_of_Experts_Can_Surpass_Dense_LLMs_Under_Strictly_Equal_Resource.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Systems / Efficiency / Compression
+	- methods: Three-Step Strictly Equal-Resource MoE Framework
+	- datasets: Validation BPC, CMMLU
+- [[obsidian-vault/analysis/ICLR_2026/Muon_Outperforms_Adam_in_Tail_End_Associative_Memory_Learning.md|Muon Outperforms Adam in Tail-End Associative Memory Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Muon_Outperforms_Adam_in_Tail_End_Associative_Memory_Learning.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/ICLR_2026/Object_Centric_World_Models_from_Few_Shot_Annotations_for_Sample_Efficient_Reinforcement_Learning.md|Object-Centric World Models from Few-Shot Annotations for Sample-Efficient Reinforcement Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Object_Centric_World_Models_from_Few_Shot_Annotations_for_Sample_Efficient_Reinforcement_Learning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: OC-STORM
+	- datasets: Atari 100k, Hollow Knight boss: God Tamer, Atari Boxing
+- [[obsidian-vault/analysis/ICLR_2026/On_the_Generalization_Capacities_of_MLLMs_for_Spatial_Intelligence.md|On the Generalization Capacities of MLLMs for Spatial Intelligence (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/On_the_Generalization_Capacities_of_MLLMs_for_Spatial_Intelligence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Camera-Aware MLLM Framework
+	- datasets: ScanNet-val, SPAR-Bench, VSI-Bench
+- [[obsidian-vault/analysis/ICLR_2026/One_Model_for_All_Tasks_Leveraging_Efficient_World_Models_in_Multi_Task_Planning.md|One Model for All Tasks: Leveraging Efficient World Models in Multi-Task Planning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/One_Model_for_All_Tasks_Leveraging_Efficient_World_Models_in_Multi_Task_Planning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: ScaleZero + Dynamic Parameter Scaling (DPS)
+	- datasets: Atari 100k, DMControl, Jericho Zork1
+- [[obsidian-vault/analysis/ICLR_2026/Optimistic_Task_Inference_for_Behavior_Foundation_Models.md|Optimistic Task Inference for Behavior Foundation Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Optimistic_Task_Inference_for_Behavior_Foundation_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: OpTI-BFM
+	- datasets: ExORL DMC
+- [[obsidian-vault/analysis/ICLR_2026/PEAR_Phase_Entropy_Aware_Reward_for_Efficient_Reasoning.md|PEAR: Phase Entropy Aware Reward for Efficient Reasoning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/PEAR_Phase_Entropy_Aware_Reward_for_Efficient_Reasoning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: PEAR (Phase Entropy Aware Reward)
+	- datasets: Average
+- [[obsidian-vault/analysis/ICLR_2026/Pose_Prior_Learner_Unsupervised_Categorical_Prior_Learning_for_Pose_Estimation.md|Pose Prior Learner: Unsupervised Categorical Prior Learning for Pose Estimation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Pose_Prior_Learner_Unsupervised_Categorical_Prior_Learning_for_Pose_Estimation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Pose Prior Learner (PPL)
+	- datasets: Human3.6m, Taichi, CUB-200-2011 Aligned
+- [[obsidian-vault/analysis/ICLR_2026/QeRL_Beyond_Efficiency_Quantization_enhanced_Reinforcement_Learning_for_LLMs.md|QeRL: Beyond Efficiency - Quantization-enhanced Reinforcement Learning for LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/QeRL_Beyond_Efficiency_Quantization_enhanced_Reinforcement_Learning_for_LLMs.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: QeRL
+	- datasets: GSM8K, MATH500, Average over 4 math benchmarks on Qwen2.5-7B
+- [[obsidian-vault/analysis/ICLR_2026/ReasoningBank_Scaling_Agent_Self_Evolving_with_Reasoning_Memory.md|ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ReasoningBank_Scaling_Agent_Self_Evolving_with_Reasoning_Memory.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: REASONINGBANK + MATTS
+	- datasets: WebArena Overall, WebArena Overall with MATTS, SWE-Bench-Verified
+- [[obsidian-vault/analysis/ICLR_2026/REMem_Reasoning_with_Episodic_Memory_in_Language_Agent.md|REMem: Reasoning with Episodic Memory in Language Agent (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/REMem_Reasoning_with_Episodic_Memory_in_Language_Agent.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: REMem
+	- datasets: LoCoMo, REALTALK, Complex-TR
+- [[obsidian-vault/analysis/ICLR_2026/ResT_Reshaping_Token_Level_Policy_Gradients_for_Tool_Use_Large_Language_Models.md|ResT: Reshaping Token-Level Policy Gradients for Tool-Use Large Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ResT_Reshaping_Token_Level_Policy_Gradients_for_Tool_Use_Large_Language_Models.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: ResT
+	- datasets: BFCL Multi-Turn, BFCL Single-Turn
+- [[obsidian-vault/analysis/ICLR_2026/Revela_Dense_Retriever_Learning_via_Language_Modeling.md|Revela: Dense Retriever Learning via Language Modeling (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Revela_Dense_Retriever_Learning_via_Language_Modeling.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Revela
+	- datasets: CoIR, BRIGHT, BEIR
+- [[obsidian-vault/analysis/ICLR_2026/ScaleCUA_Scaling_Open_Source_Computer_Use_Agents_with_Cross_Platform_Data.md|ScaleCUA: Scaling Open-Source Computer Use Agents with Cross-Platform Data (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ScaleCUA_Scaling_Open_Source_Computer_Use_Agents_with_Cross_Platform_Data.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: ScaleCUA
+	- datasets: MMBench-GUI L1-Hard, WebArena-Lite-v2, ScreenSpot-Pro
+- [[obsidian-vault/analysis/ICLR_2026/Scaling_Laws_and_Spectra_of_Shallow_Neural_Networks_in_the_Feature_Learning_Regime.md|Scaling Laws and Spectra of Shallow Neural Networks in the Feature Learning Regime (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Scaling_Laws_and_Spectra_of_Shallow_Neural_Networks_in_the_Feature_Learning_Regime.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: AMP状态演化框架（基于 LASSO 和矩阵压缩感知的神经网络训练分析）
+	- datasets: Power-law synthetic data
+- [[obsidian-vault/analysis/ICLR_2026/Scaling_Laws_Meet_Model_Architecture_Toward_Inference_Efficient_LLMs.md|Scaling Laws Meet Model Architecture: Toward Inference-Efficient LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Scaling_Laws_Meet_Model_Architecture_Toward_Inference_Efficient_LLMs.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Systems / Efficiency / Compression, Generative / Diffusion / Flow
+	- methods: 条件缩放律（Conditional Scaling Law）
+	- datasets: 推理吞吐量
+- [[obsidian-vault/analysis/ICLR_2026/Soft_Masked_Diffusion_Language_Models.md|Soft-Masked Diffusion Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Soft_Masked_Diffusion_Language_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Soft-masking (SM)
+	- datasets: OpenWebText unconstrained generation, HumanEval
+- [[obsidian-vault/analysis/ICLR_2026/Sparse_Imagination_for_Efficient_Visual_World_Model_Planning.md|Sparse Imagination for Efficient Visual World Model Planning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Sparse_Imagination_for_Efficient_Visual_World_Model_Planning.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: Sparse Imagination
+	- datasets: PushT, PointMaze, Meta-World
+- [[obsidian-vault/analysis/ICLR_2026/Sparsity_Forcing_Reinforcing_Token_Sparsity_of_MLLMs.md|Sparsity Forcing: Reinforcing Token Sparsity of MLLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Sparsity_Forcing_Reinforcing_Token_Sparsity_of_MLLMs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression, Agent / RL / Planning
+	- methods: Sparsity Forcing
+	- datasets: MME, VideoMME
+- [[obsidian-vault/analysis/ICLR_2026/T1_Tool_integrated_Verification_for_Test_time_Compute_Scaling_in_Small_Language_Models.md|T1: Tool-integrated Verification for Test-time Compute Scaling in Small Language Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/T1_Tool_integrated_Verification_for_Test_time_Compute_Scaling_in_Small_Language_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: Tool-integrated Verification (T1)
+	- datasets: MATH500, GSM8K
+- [[obsidian-vault/analysis/ICLR_2026/Temporal_superposition_and_feature_geometry_of_RNNs_under_memory_demands.md|Temporal superposition and feature geometry of RNNs under memory demands (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Temporal_superposition_and_feature_geometry_of_RNNs_under_memory_demands.pdf|PDF]]
+	- topics: Time Series / Dynamical Systems
+	- method groups: Systems / Efficiency / Compression
+	- methods: Temporal Superposition Analysis Framework
+- [[obsidian-vault/analysis/ICLR_2026/The_Art_of_Scaling_Reinforcement_Learning_Compute_for_LLMs.md|The Art of Scaling Reinforcement Learning Compute for LLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/The_Art_of_Scaling_Reinforcement_Learning_Compute_for_LLMs.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: SCALERL
+	- datasets: iid validation set, AIME-24, iid validation - batch size scaling
+- [[obsidian-vault/analysis/ICLR_2026/Thinking_Free_Policy_Initialization_Makes_Distilled_Reasoning_Models_More_Effective_and_Efficient_Reasoners.md|Thinking-Free Policy Initialization Makes Distilled Reasoning Models More Effective and Efficient Reasoners (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Thinking_Free_Policy_Initialization_Makes_Distilled_Reasoning_Models_More_Effective_and_Efficient_Reasoners.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: TFPI (Thinking-Free Policy Initialization)
+	- datasets: Overall Average, AIME 25, AIME 24
+- [[obsidian-vault/analysis/ICLR_2026/ThinKV_Thought_Adaptive_KV_Cache_Compression_for_Efficient_Reasoning_Models.md|ThinKV: Thought-Adaptive KV Cache Compression for Efficient Reasoning Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ThinKV_Thought_Adaptive_KV_Cache_Compression_for_Efficient_Reasoning_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Systems / Efficiency / Compression, Generative / Diffusion / Flow
+	- methods: ThinKV
+	- datasets: AIME, LiveCodeBench, A100 throughput
+- [[obsidian-vault/analysis/ICLR_2026/Universal_Inverse_Distillation_for_Matching_Models_with_Real_Data_Supervision_No_GANs.md|Universal Inverse Distillation for Matching Models with Real-Data Supervision (No GANs) (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Universal_Inverse_Distillation_for_Matching_Models_with_Real_Data_Supervision_No_GANs.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: RealUID (Universal Inverse Distillation with Real Data)
+	- datasets: CIFAR-10, CelebA
+- [[obsidian-vault/analysis/ICLR_2026/Webscale_RL_Automated_Data_Pipeline_for_Scaling_RL_Data_to_Pretraining_Levels.md|Webscale-RL: Automated Data Pipeline for Scaling RL Data to Pretraining Levels (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Webscale_RL_Automated_Data_Pipeline_for_Scaling_RL_Data_to_Pretraining_Levels.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression, LLM / Reasoning / Alignment
+	- methods: Webscale-RL
+	- datasets: Average across 7 benchmarks, Gap to Qwen2.5-7B, MMLU-pro
+- [[obsidian-vault/analysis/ICLR_2026/Why_Low_Precision_Transformer_Training_Fails_An_Analysis_on_Flash_Attention.md|Why Low-Precision Transformer Training Fails: An Analysis on Flash Attention (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Why_Low_Precision_Transformer_Training_Fails_An_Analysis_on_Flash_Attention.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Stabilized Flash Attention (检测并调整重复最大值缓解有偏舍入误差)
+	- datasets: GPT-2 Small pretraining on OpenWebText, GPT-2 Medium with AdamW
+- [[obsidian-vault/analysis/ICLR_2026/Wide_In_Narrow_Out_Revokable_Decoding_for_Efficient_and_Effective_DLLMs.md|Wide-In, Narrow-Out: Revokable Decoding for Efficient and Effective DLLMs (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Wide_In_Narrow_Out_Revokable_Decoding_for_Efficient_and_Effective_DLLMs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression, LLM / Reasoning / Alignment
+	- methods: Wide-In, Narrow-Out (WINO)
+	- datasets: GSM8K, ARC-E
+- [[obsidian-vault/analysis/ICLR_2026/WIMFRIS_WIndow_Mamba_Fusion_and_Parameter_Efficient_Tuning_for_Referring_Image_Segmentation.md|WIMFRIS: WIndow Mamba Fusion and Parameter Efficient Tuning for Referring Image Segmentation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/WIMFRIS_WIndow_Mamba_Fusion_and_Parameter_Efficient_Tuning_for_Referring_Image_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: WIMFRIS
+	- datasets: RefCOCO
+- [[obsidian-vault/analysis/ICLR_2026/WinT3R_Window_Based_Streaming_Reconstruction_with_Camera_Token_Pool.md|WinT3R: Window-Based Streaming Reconstruction with Camera Token Pool (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/WinT3R_Window_Based_Streaming_Reconstruction_with_Camera_Token_Pool_5fa1e9c4d8aa.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: WinT3R
+	- datasets: NRGBD, KITTI
+- [[obsidian-vault/analysis/WHITEPAPER_2026/Kimodo_Scaling_Controllable_Human_Motion_Generation.md|Kimodo: Scaling Controllable Human Motion Generation (WHITEPAPER 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/WHITEPAPER_2026/Kimodo_Scaling_Controllable_Human_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Kimodo
+	- datasets: Rigplay Text-Conditioned, Rigplay Constraint-Conditioned

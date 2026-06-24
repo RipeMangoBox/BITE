@@ -1,0 +1,6 @@
+experiment,trace,scope,paper_status,cuda_visible_devices,num_prompts,seeds,num_layers,elapsed_hours,failures,repo
+motionclr_trace1,Trace 1,formal_diagnostic_layer_sweep,not_final_full_evaluator_result,1,64,"0,1,2",18,0.146,0,/data/public/ripemangobox/Motion/MotionCLR
+molingo_trace1,Trace 1,formal_diagnostic_layer_sweep,not_final_full_evaluator_result,1,64,"0,1,2",16,10.986,0,/data/public/ripemangobox/Motion/MoLingo
+motionclr_trace3_baseline,Trace 3,formal_training_candidate,not_final_until_official_evaluator_metrics,0,,0,,5.033,,/data/public/ripemangobox/Motion/MotionCLR
+motionclr_trace3_disploss,Trace 3,formal_training_candidate,not_final_until_official_evaluator_metrics,0,,0,,5.04,,/data/public/ripemangobox/Motion/MotionCLR
+motionclr_trace3_aug_disploss,Trace 3,formal_training_candidate,not_final_until_official_evaluator_metrics,0,,0,,5.162,,/data/public/ripemangobox/Motion/MotionCLR

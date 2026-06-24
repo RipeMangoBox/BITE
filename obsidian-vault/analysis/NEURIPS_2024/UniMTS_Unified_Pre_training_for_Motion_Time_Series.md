@@ -1,0 +1,450 @@
+---
+title: "UniMTS: Unified Pre-training for Motion Time Series"
+type: paper
+paper_level: A
+venue: NEURIPS
+year: 2024
+pdf_ref: paperPDFs/NEURIPS_2024/UniMTS_Unified_Pre_training_for_Motion_Time_Series.pdf
+code_link: https://github.com/xiyuanzh/UniMTS
+aliases:
+- UniMTS
+tags:
+- NEURIPS_2024
+- topic/vision_multimodal_applications
+- topic/vision_multimodal_applications/image_and_video_generation
+core_operator: 通过从运动骨架数据合成覆盖全身关节的加速度和角速度时间序列，并用图神经网络建模关节间时空关联，同时施加旋转不变增强和 LLM 扩增的文本描述，在对比学习框架下对齐运动与语义，使模型习得对设备位置、方向及活动均不敏感的通用表示。
+primary_logic: 将丰富的运动骨架数据转化为多关节传感器模拟信号，并利用图网络与语义对齐，可以打破传统模型对特定数据采集条件的依赖，实现鲁棒的零样本、少样本运动识别。
+claims:
+- UniMTS 在 18 个运动时间序列数据集上零样本性能平均超过最佳基线 340%（F1 提升），且 Wilcoxon 检验 p 值远小于 0.05。
+- 少样本微调（1~10 样本/类）平均 F1 比最强基线 ImageBind 提高 16.3%，显著性 p 值低至 2×10⁻²⁵。
+- 全样本微调后 UniMTS 的 F1 平均为 87.5%，显著优于所有预训练、自监督和传统模型（p=0.018）。
+- 移除旋转增强、文本增强或图编码器均使零样本性能显著下降，证明各组件对泛化至不同方向、活动和位置至关重要。
+---
+
+# UniMTS: Unified Pre-training for Motion Time Series
+
+> [!tip] 核心洞察
+> 将丰富的运动骨架数据转化为多关节传感器模拟信号，并利用图网络与语义对齐，可以打破传统模型对特定数据采集条件的依赖，实现鲁棒的零样本、少样本运动识别。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | UniMTS：统一运动时间序列预训练 |
+| 英文题名 | UniMTS: Unified Pre-training for Motion Time Series |
+| 会议/期刊 | NEURIPS 2024 |
+| Links |  [Code](https://github.com/xiyuanzh/UniMTS)|
+| Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
+| Method | UniMTS |
+| Dataset | 18 个真实运动时间序列数据集（平均） |
+
+> [!tip] 效果简介
+> - 18 个真实运动时间序列数据集（平均） 上，零样本 F1 相对提升 UniMTS vs ImageBind (最佳基线) (+340%)；少样本（1~10 样本/类）平均 F1 相对提升 UniMTS vs ImageBind (最佳基线) (+16.3%)；全样本 F1 87.5 ± 13.4 vs 74.8 ± 16.7 (DeepConvLSTM) (+12.7)。
+
+## 概述
+
+### 问题瓶颈
+
+运动时间序列分类（如基于惯性传感器的活动识别）长期面临一个根本性瓶颈：现有模型通常在同一数据集的封闭设定下训练和测试，难以泛化到**设备佩戴位置不同**、**数据采集方向变化**以及**活动类型差异**等实际场景。当传感器从手腕移至脚踝、设备坐标系旋转或出现训练时未见过的活动时，传统模型的性能会出现大幅下降。这一泛化困境源于真实传感器数据的采集成本高昂、覆盖位置和活动有限，导致模型对特定数据采集条件形成过强的依赖。
+
+### 核心思路
+
+UniMTS 提出了一条根本性的解决路径：**不再依赖真实传感器采集的有限数据，而是从大规模运动骨架数据中合成覆盖全身关节的加速度和角速度时间序列**，并利用图神经网络显式建模关节间的时空关联，同时通过旋转不变增强和 LLM 扩增的文本描述，在对比学习框架下对齐运动与语义。这一设计使模型习得对设备位置、方向及活动均不敏感的通用运动表示，从根本上打破了传统模型对特定采集条件的依赖。
+
+### 方法定位
+
+从方法谱系来看，UniMTS 属于**统一预训练-下游适配**范式，其关键创新体现在以下几个维度：
+
+- **预训练数据来源**：不同于 ImageBind（Girdhar et al., CVPR 2023）、IMU2CLIP（Moon et al., CVPR 2024）等依赖真实传感器数据的多模态模型，UniMTS 从 HumanML3D 等运动骨架数据中通过物理引擎合成全关节运动时间序列，实现了对全身位置的全面覆盖。
+- **运动序列编码器**：区别于 CNN 或 Transformer 等未显式建模关节空间关系的编码器，UniMTS 采用**时空图卷积网络（ST-GCN）**，以骨架关节为节点、骨架结构定义空间边、相邻帧连接时间边，显式捕捉关节间的空间依赖与时序演化。
+- **泛化增强策略**：在每次训练迭代中对每个关节施加随机旋转矩阵以实现**旋转不变性**，同时利用 GPT-3.5 为每条运动描述生成多个释义以**丰富语义空间**，这两项增强分别针对方向泛化和活动泛化。
+- **训练目标**：采用跨模态对比学习，最大化合成运动图嵌入与对应文本嵌入的余弦相似度，使模型在语义空间中组织运动模式。
+- **下游适配**：推理时通过最近关节分配进行图构建，实现零样本分类；微调时冻结文本编码器，仅更新图编码器和线性分类器，保持语义空间稳定。
+
+### 主要结果
+
+UniMTS 在 18 个真实运动时间序列数据集上进行了全面验证，覆盖零样本、少样本和全样本三种设定：
+
+- **零样本**：平均 F1 超过最佳基线 ImageBind **340%**（Wilcoxon 检验 p 值远小于 0.05），首次实现了跨数据集、跨位置、跨方向的鲁棒零样本运动识别。
+- **少样本**（1~10 样本/类）：平均 F1 比最佳基线 ImageBind 提升 **16.3%**，显著性 p 值低至 2×10⁻²⁵。
+- **全样本微调**：平均 F1 达 **87.5%**，显著优于所有预训练、自监督和传统模型（p=0.018），包括 DeepConvLSTM（Ordóñez et al., Sensors 2016）、TS2Vec（Yue et al., AAAI 2022）等。
+- **消融实验**：移除旋转增强、文本增强或图编码器均使零样本性能显著下降，证实各组件对泛化至不同方向、活动和位置至关重要。
+
+此外，UniMTS 的图编码器仅含 **4.94M 参数**，远小于 ImageBind IMU 编码器的 18.69M 参数，在边缘部署场景中具有明显的效率优势。
+
+## 背景与动机
+
+### 问题背景
+
+基于可穿戴惯性传感器（IMU）的人体活动识别（HAR）是普适计算与健康监测的核心任务。现代智能手表、手机、耳机等设备内置的加速度计和陀螺仪持续产生多通道运动时间序列，对这些信号进行准确分类可以实现跌倒检测、运动追踪、康复评估等关键应用。
+
+然而，现实部署面临三个根本性的泛化挑战（Figure 1）：
+1. **设备佩戴位置差异**：同一设备可能佩戴在手腕、脚踝、腰部等不同身体部位，不同用户甚至同一用户在不同时间点的佩戴习惯各不相同。
+2. **传感器方向差异**：设备在佩戴过程中的旋转和偏移导致其局部坐标系与身体坐标系不一致，同一动作在不同方向下产生截然不同的信号模式。
+3. **活动类型差异**：训练数据覆盖的活动类别有限，部署时可能遇到全新或语义相近但模式不同的活动。
+
+### 现有方法及其瓶颈
+
+当前运动时间序列分类方法可归纳为三类，各自在上述泛化挑战上存在明显短板：
+
+**传统监督学习模型**（如 **DeepConvLSTM**、**MA-CNN**、**XGBoost**）在固定数据集上表现良好，但其训练和测试严格限定于同一数据分布——相同的传感器位置、相同的佩戴方向和相同的活动类别。一旦测试条件发生变化（例如从手腕数据迁移到脚踝数据），性能急剧下降。
+
+**自监督预训练模型**（如 **TS2Vec**、**BioBankSSL**）通过重建或对比学习从无标签数据中提取通用表示，在一定程度上缓解了对标注的依赖。然而，这些方法仍然依赖真实传感器采集的数据进行预训练，而真实数据不可避免地带有特定设备位置和方向的偏差，导致习得的表示难以泛化到未见过的传感器配置。
+
+**多模态预训练模型**（如 **ImageBind**、**IMU2CLIP**）尝试将运动信号与图像或文本语义对齐，借助大规模视觉-语言预训练知识增强运动理解。但这些方法仅将运动时间序列视为扁平向量，未显式建模不同身体关节之间的空间结构关系，因此在设备位置泛化上依然受限。基于大语言模型的零样本方法（如 **HARGPT**、**LLaVA**）则直接利用文本推理进行活动识别，缺乏对底层物理运动信号的充分利用。
+
+**核心瓶颈**：现有方法均无法同时应对设备位置、方向和活动类型三个维度的泛化需求。其根本原因在于——真实传感器数据的采集总是绑定于特定身体位置和方向，模型从这样的数据中学习到的特征不可避免地耦合了这些采集条件，难以解耦出对位置、方向均不敏感的通用运动语义。
+
+### 本文动机
+
+本文的核心洞察是：**丰富的运动骨架数据蕴含了全身各关节的完整运动信息，可以转化为多关节传感器模拟信号，从而打破真实数据对特定采集条件的依赖**。具体而言：
+
+- 大规模运动捕捉数据库（如 HumanML3D）提供了覆盖广泛动作类型的人体骨架序列，包含每个关节的三维位置和方向四元数。
+- 通过物理引擎从骨架数据合成加速度和角速度时间序列，可以模拟任意身体关节处的传感器读数，天然覆盖多种设备位置。
+- 结合旋转不变增强和图神经网络建模关节间空间关系，模型可以学会对设备方向和位置不敏感的表示。
+- 利用大语言模型（LLM）丰富文本描述，并通过对比学习对齐运动与语义，实现活动类型的语义级泛化。
+
+基于上述洞察，本文提出 **UniMTS**——首个统一的运动时间序列预训练框架，旨在通过合成数据预训练、图结构编码和跨模态语义对齐，一次性解决设备位置、方向和活动类型三个泛化挑战，实现鲁棒的零样本、少样本和全样本运动识别。
+
+## 核心创新
+
+UniMTS 的核心创新在于通过三个层面的协同设计，从根本上打破了现有运动时间序列分类模型对特定数据采集条件的依赖，实现了对设备佩戴位置、方向及活动类型的统一泛化。
+
+### 1. 从运动骨架到全关节传感器信号的合成范式
+
+现有方法通常依赖真实传感器在单一或少数身体位置采集的数据进行训练，导致模型无法泛化至未见过的佩戴位置。UniMTS 提出了一种**物理引擎驱动的合成范式**（Section 3.1）：基于大规模运动骨架数据（如 HumanML3D），通过数值微分和四元数坐标变换，为全身各关节合成加速度和角速度时间序列。具体而言，对每个关节 $J_i$，利用四元数 $\mathbf{q}_{J_i}(t)$ 将位置的一阶和二阶导数变换到局部坐标系，得到局部速度 $\mathbf{v}_{J_i}(t)$ 和加速度 $\mathbf{a}_{J_i}(t)$（Equation 1-2），同时由四元数导数计算局部角速度 $\boldsymbol{\omega}_{J_i}(t)$（Equation 3），最后添加高斯噪声模拟真实传感器测量（Equation 4）。这一设计使得预训练数据天然覆盖了全身所有关节位置，为位置泛化提供了数据基础。
+
+### 2. 旋转不变增强实现方向泛化
+
+真实应用中，设备佩戴方向可能任意变化，而现有方法缺乏对方向不变性的显式建模。UniMTS 在每次训练迭代中对每个关节独立采样随机旋转矩阵 $\mathbf{R}_{J_i}^\delta \sim \mathrm{Uniform}(\mathrm{SO}(3))$，并将其应用于含噪时间序列（Equation 5-6）。这种**旋转不变增强**迫使模型学习不依赖设备方向的特征表示，是零样本方向泛化的关键使能因素。消融实验证实，移除该增强后零样本性能显著下降（Table 1, w/o rot aug）。
+
+### 3. 图网络编码与语义对齐实现位置和活动泛化
+
+传统 CNN/Transformer 编码器未显式建模关节间的空间关系，难以处理任意位置的传感器输入。UniMTS 采用**时空图卷积网络（ST-GCN）**（Section 3.3.1），以骨架关节为节点，空间边由人体骨架结构 $\mathcal{H}$ 定义，时间边连接相邻帧同一关节（Equation 7）。通过随机掩码部分关节（Equation 8）模拟设备仅覆盖部分位置，图编码器学习从任意关节子集中提取鲁棒特征。同时，UniMTS 利用 GPT-3.5 为每条运动描述生成 $k=3$ 个释义以丰富语义（Section 3.3.2），并在对比学习框架下最大化图嵌入与文本嵌入的相似度（Equation 10-11），使模型习得对活动类型不敏感的语义对齐表示。消融实验表明，替换图编码器为 CNN（w/o graph）或移除文本增强（w/o text aug）均导致性能显著下降（Table 1），验证了这两个组件分别对位置泛化和活动泛化的关键作用。
+
+### 创新总结
+
+| 创新维度 | 基线做法 | UniMTS 方案 | 证据锚点 |
+|---------|---------|------------|---------|
+| **预训练数据** | 真实传感器单一/少数位置数据 | 运动骨架合成的全关节加速度/角速度 | Section 3.1, 3.3.1 |
+| **方向泛化** | 无特殊处理 | 每次迭代随机旋转增强 | Section 3.2, Eq. 5-6 |
+| **位置泛化** | CNN/Transformer 未建模关节关系 | ST-GCN + 随机关节掩码 | Section 3.3.1, Eq. 7-9 |
+| **活动泛化** | 仅使用原始标签名 | LLM 增强文本 + 对比学习语义对齐 | Section 3.3.2-3.3.3, Eq. 10-11 |
+| **下游适配** | 需重新训练或仅微调分类头 | 最近关节分配构建图输入，冻结文本编码器微调 | Section 3.3.3, Eq. 12 |
+
+上述三个创新维度并非孤立存在，而是形成了完整的因果链条：合成数据提供位置覆盖、旋转增强提供方向不变性、图网络与语义对齐提供位置和活动的联合泛化能力。这一设计使得 UniMTS 在 18 个真实数据集上零样本性能平均超过最佳基线 **ImageBind**（Girdhar et al., CVPR 2023）340%（F1 提升），少样本微调平均 F1 超越最佳基线 16.3%，全样本微调 F1 达到 87.5%，显著优于所有预训练、自监督和传统模型（Table 1-3, Figure 4）。
+
+## 整体框架
+
+UniMTS 的整体框架围绕一个核心洞察构建：**将大规模运动骨架数据转化为多关节传感器模拟信号，并利用图网络与语义对齐，可以打破传统模型对特定数据采集条件的依赖**。如图 Figure 2 所示，整个 pipeline 分为预训练与下游适配两大阶段，通过物理引擎合成、旋转不变增强、图编码与跨模态对比学习四个关键模块的协同，实现对设备佩戴位置、方向及活动类型的统一泛化。
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/002_Figure_2.jpg]]
+*Figure 2: UniMTS pre-training framework: The physics engine computes motion time series for each joint based on motion skeleton data and enhances time series through rotation-invariant augmentation. During pre-training, we adopt contrastive learning to align motion time series encoded by graph convolutional neural networks with corresponding text descriptions augmented by an LLM*
+
+### 预训练阶段
+
+预训练阶段的数据流与模块关系如下：
+
+1. **物理引擎合成（Physics Engine）**  
+   输入为运动骨架数据（如 HumanML3D）中每个关节的位置 $\mathbf{p}_{J_i}(t)$ 和方向四元数 $\mathbf{q}_{J_i}(t)$。通过数值微分和四元数旋转变换，计算各关节在局部坐标系下的速度 $\mathbf{v}_{J_i}(t)$、加速度 $\mathbf{a}_{J_i}(t)$ 和角速度 $\boldsymbol{\omega}_{J_i}(t)$（Equation 1-3），并叠加高斯噪声 $\mathbf{n}_{J_i}(t) \sim \mathcal{N}(\mathbf{0}, \sigma)$ 以模拟真实传感器测量（Equation 4）。该模块的输出是覆盖全身关节的含噪加速度和角速度时间序列。
+
+2. **旋转不变增强（Rotation-invariant Augmentation）**  
+   每次训练迭代中，对每个关节独立采样一个随机旋转矩阵 $\mathbf{R}_{J_i}^\delta \sim \mathrm{Uniform}(\mathrm{SO}(3))$（Equation 5），并将其应用于该关节的时间序列 $\hat{\mathbf{x}}_{J_i}^t = \mathbf{R}_{J_i}^\delta \tilde{\mathbf{x}}_{J_i}^t$（Equation 6）。这一操作使模型学会不依赖设备方向，是实现方向泛化的关键机制。
+
+3. **图编码器（Graph Encoder）**  
+   增强后的多关节时间序列被构建为时空图 $\mathcal{G}$（Equation 7）：节点为各关节序列，空间边按人体骨架连接定义，时间边连接相邻帧的同一关节。为模拟真实场景中设备仅覆盖部分位置，对关节进行随机二进制掩码 $\tilde{\mathbf{X}} = \mathbf{X} \odot \mathbf{M}$（Equation 8），将未选中关节的数据置零。随后通过时空图卷积网络（ST-GCN）提取时空特征，经空间图卷积（Equation 9）和时间卷积后输出图级表示 $g_{\phi}(\mathbf{X})$。
+
+4. **文本编码与对比学习（Text Encoder & Contrastive Learning）**  
+   文本侧利用 GPT-3.5 为每条运动描述生成 $k=3$ 个语义释义，与原始标签一同输入 CLIP 预训练的文本编码器 $f_{\theta}$，得到文本嵌入。训练目标为 InfoNCE 对比损失 $\mathcal{L}_{ctr}$（Equation 10），以温度参数 $\gamma$ 调节，最大化配对图嵌入与文本嵌入的余弦相似度（Equation 11），实现运动信号与语义的对齐。
+
+### 下游适配阶段
+
+下游适配分为零样本推理和微调两种模式（Figure 3）：
+
+- **零样本推理**：将真实传感器信号分配至骨架图中最近关节，其余关节置零构建图输入。计算图嵌入与所有候选标签文本嵌入的相似度，输出最高分标签。
+- **微调**：冻结文本编码器 $f_{\theta}$，将真实信号按最近关节分配后输入图编码器 $g_{\phi}$，在其上添加线性分类器 $h_{\psi}$，使用交叉熵损失 $\mathcal{L}_{ce}$（Equation 12）联合优化图编码器和分类器。
+
+整个框架的输入输出流可概括为：**骨架运动数据 → 多关节模拟时间序列 → 旋转增强图表示 → 图嵌入；文本标签 → LLM 增强 → 文本嵌入；两者通过对比损失对齐**。下游任务中，真实传感器信号经最近关节映射后，直接复用预训练图编码器进行推理或微调。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/001_Figure_1.jpg]]
+*Figure 1: Our framework addresses all three generalization challenges (variation in device location, orientation and activity) where existing methods fall short*
+
+## 核心模块与公式推导
+
+UniMTS 的预训练框架由五个核心模块构成，各模块协同实现从运动骨架到通用运动时间序列表示的转化。
+
+### 物理引擎：从骨架到传感器信号
+
+物理引擎负责将运动骨架数据转化为覆盖全身关节的加速度与角速度时间序列。给定骨架中关节 $J_i$ 在时刻 $t$ 的全局位置 $\mathbf{p}_{J_i}(t)$ 和方向四元数 $\mathbf{q}_{J_i}(t)$，通过数值微分与坐标变换合成局部坐标系下的运动信号。
+
+**局部速度**通过位置一阶导数经四元数旋转至局部坐标系得到：
+
+$$
+\mathbf{v}_{J_i}(t) = \mathbf{q}_{J_i}^*(t) \otimes \mathbf{p}_{J_i}'(t) \otimes \mathbf{q}_{J_i}(t)
+$$
+
+**局部加速度**由位置二阶导数经相同变换获得：
+
+$$
+\mathbf{a}_{J_i}(t) = \mathbf{q}_{J_i}^*(t) \otimes \mathbf{p}_{J_i}''(t) \otimes \mathbf{q}_{J_i}(t)
+$$
+
+**局部角速度**利用四元数的一阶导数直接计算：
+
+$$
+\boldsymbol{\omega}_{J_i}(t) = 2 \mathbf{q}_{J_i}^*(t) \otimes \mathbf{q}_{J_i}'(t)
+$$
+
+为模拟真实传感器的测量噪声，对每个关节的合成信号添加零均值高斯噪声：
+
+$$
+\tilde{\mathbf{x}}_{J_i}(t) = \mathbf{x}_{J_i}(t) + \mathbf{n}_{J_i}(t), \quad \mathbf{n}_{J_i}(t) \sim \mathcal{N}(\mathbf{0}, \sigma)
+$$
+
+其中 $\mathbf{x}_{J_i}(t)$ 代表任一通道（加速度或角速度分量），$\sigma$ 控制噪声强度。该模块的关键作用是提供覆盖全身各关节的大规模、多位置训练数据，从根本上打破真实数据采集中设备位置单一的限制。
+
+### 旋转不变增强：消除方向依赖
+
+真实场景中设备佩戴方向任意，模型需对方向变化不敏感。UniMTS 在每次训练迭代中对每个关节独立采样随机旋转矩阵，施加于含噪时间序列。
+
+首先从三维旋转群均匀采样随机旋转矩阵：
+
+$$
+\mathbf{R}_{J_i}^\delta \sim \mathrm{Uniform}(\mathrm{SO}(3))
+$$
+
+然后将旋转矩阵应用于当前关节的含噪信号：
+
+$$
+\hat{\mathbf{x}}_{J_i}^t = \mathbf{R}_{J_i}^\delta \tilde{\mathbf{x}}_{J_i}^t
+$$
+
+该操作使模型在预训练阶段即暴露于任意方向变换，迫使编码器学习方向无关的运动模式。消融实验证实，移除该模块后零样本性能显著下降，验证了其对方向泛化的必要性。
+
+### 图编码器：建模关节时空关联
+
+图编码器基于时空图卷积网络（ST-GCN），将各关节的时间序列组织为骨架图结构，显式建模关节间的空间依赖与时序演化。
+
+**图构建**：定义时空图 $\mathcal{G} = (\mathcal{V}, \mathcal{E}_s, \mathcal{E}_t)$，其中节点集 $\mathcal{V}$ 为各关节增强后的时间序列 $\{\hat{\mathbf{x}}_{J_i}\}_{i=1}^{V}$，空间边 $\mathcal{E}_s$ 由人体骨架连接关系 $\mathcal{H}$ 定义，时间边 $\mathcal{E}_t$ 连接同一关节在相邻帧的表示：
+
+$$
+\mathcal{G} = ( \mathcal{V} = \{ \hat{\mathbf{x}}_{J_i} \}_{i=1}^{V}, \mathcal{E}_s = \{ ( \hat{\mathbf{x}}_{J_i}, \hat{\mathbf{x}}_{J_l} ) \mid (J_i, J_l) \in \mathcal{H} \}, \mathcal{E}_t = \{ ( \hat{\mathbf{x}}_{J_i}^{t-1}, \hat{\mathbf{x}}_{J_i}^{t} ) \}_{i=1, t=2}^{V, T} )
+$$
+
+**关节掩码**：为模拟真实设备仅覆盖部分身体位置，预训练时随机选择关节子集，将其余关节数据置零：
+
+$$
+\tilde{\mathbf{X}} = \mathbf{X} \odot \mathbf{M}
+$$
+
+其中 $\mathbf{M}$ 为二进制掩码矩阵，$\odot$ 表示逐元素乘法。
+
+**空间图卷积**：对掩码后的特征图进行归一化图卷积，聚合邻接关节信息：
+
+$$
+\mathbf{X}_{\mathrm{out}} = \sum_{k}^{K_s} \Phi_k \bigl( \tilde{\mathbf{X}} ( \mathbf{\Lambda}_k^{-\frac{1}{2}} \mathbf{A}_k \mathbf{\Lambda}_k^{-\frac{1}{2}} ) \bigr)
+$$
+
+其中 $\mathbf{A}_k$ 为第 $k$ 种空间划分的邻接矩阵，$\mathbf{\Lambda}_k$ 为度矩阵，$\Phi_k$ 为可学习卷积核。时间维度采用标准时序卷积。最终通过全局池化输出图级嵌入 $g_{\phi}(\mathbf{X})$，作为运动序列的紧凑表示。
+
+消融实验表明，将图编码器替换为 CNN（w/o graph）后性能明显下降，证实显式建模关节空间关系对位置泛化的关键作用。
+
+### 文本编码器与语义增强
+
+文本编码器采用 CLIP 预训练模型，将活动标签或动作描述映射为语义嵌入。为增强语义多样性，利用 GPT-3.5 为每条运动描述生成 $k=3$ 个释义，与原始标签共同编码。消融实验显示，移除文本增强（w/o text aug）导致零样本性能下降，证明语义多样性对活动泛化的贡献。
+
+### 对比学习目标
+
+预训练采用温度参数 $\gamma$ 的 InfoNCE 损失，最大化配对图嵌入与文本嵌入的相似度。相似度采用内积度量：
+
+$$
+\mathrm{sim}( g_{\phi}(\mathbf{X}_i), f_{\theta}(\mathbf{Y}_i) ) = \langle g_{\phi}(\mathbf{X}_i), f_{\theta}(\mathbf{Y}_i) \rangle
+$$
+
+对比损失定义为：
+
+$$
+\mathcal{L}_{ctr} = - \frac{1}{B} \sum_{i=1}^{B} \log \frac{ \exp( \mathrm{sim}( g_{\phi}(\mathbf{X}_i), f_{\theta}(\mathbf{Y}_i) ) )^{\frac{1}{\gamma}} }{ \sum_{k=1}^{B} \exp( \mathrm{sim}( g_{\phi}(\mathbf{X}_i), f_{\theta}(\mathbf{Y}_k) ) )^{\frac{1}{\gamma}} }
+$$
+
+该目标迫使图编码器输出与对应文本语义一致的表示，是实现零样本识别的核心机制。
+
+### 下游适配
+
+**零样本推理**：将真实传感器信号分配至骨架图中最近关节，构造图输入后计算图嵌入与所有候选标签文本嵌入的相似度，输出最高分标签。
+
+**微调阶段**：冻结文本编码器，在图编码器后添加线性分类器 $h_{\psi}$，使用交叉熵损失联合优化：
+
+$$
+\mathcal{L}_{ce} = - \frac{1}{B} \sum_{i=1}^{B} \sum_{j=1}^{D} \mathbf{z}_{ij} \log( \sigma( h_{\psi}( g_{\phi}(\mathbf{X}_i) ) )_j )
+$$
+
+其中 $\mathbf{z}_{ij}$ 为独热编码标签，$D$ 为类别数，$\sigma$ 为 softmax 函数。该设计保留预训练语义知识的同时适配下游分类任务。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/003_Figure_3.jpg]]
+*Figure 3: Inference (left) and fine-tuning (right) phases of UniMTS. We assign real signals to the nearest location in the skeleton graph. During inference, we compute similarity score between the graph embedding and each label candidate, and predict the one with the highest score. During fine-tuning, we freeze the text encoder and update weights of the graph encoder and linear layer*
+
+## 实验与分析
+
+### 核心瓶颈与实验设计逻辑
+
+现有运动时间序列分类模型在训练与测试局限于同一数据集时表现尚可，但一旦面临设备佩戴位置、数据采集方向或活动类型的跨数据集变化，性能即大幅下降。UniMTS 的核心设计目标正是打破这一瓶颈：通过从大规模运动骨架数据合成覆盖全身关节的加速度与角速度时间序列，并利用图神经网络显式建模关节间时空关联，同时施加旋转不变增强与 LLM 扩增的文本描述，在对比学习框架下对齐运动与语义，使模型习得对位置、方向及活动均不敏感的通用表示。
+
+实验围绕三个泛化维度（位置、方向、活动）展开，在 18 个真实运动时间序列数据集上系统评估零样本、少样本和全样本三种设定，并通过消融实验逐一验证各模块的因果贡献。
+
+### 零样本性能：跨数据集泛化的突破
+
+Table 1 展示了 UniMTS 与多个预训练多模态基线及自身消融变体在 18 个数据集上的零样本性能对比。UniMTS 在平均 F1 指标上超过最佳基线 **ImageBind**（Girdhar et al., CVPR 2023）约 340%，Wilcoxon signed-rank 检验的 p 值低至 8×10⁻⁶，具有极强的统计显著性。其他基线如 **IMU2CLIP**（Moon et al., CVPR 2024）、**IMUGPT**（Zhang et al., EMNLP 2023）和 **HARGPT**（Ji et al., UbiComp 2024）等均远低于 UniMTS。
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/004_Table_1.jpg]]
+*Table 1: Zero-Shot performance. We bold the best and underline the second best. UniMTS performs the best compared with both baselines and our model ablations. The last column shows the average performance across 18 datasets with standard deviation*
+
+这一巨大提升的因果机制在于：传统多模态模型（如 ImageBind）虽能对齐 IMU 信号与图像/文本，但其 IMU 编码器未经过对多位置、多方向的系统性预训练，面对未见过的设备配置时表示质量急剧退化。UniMTS 则通过合成数据覆盖了全身 22 个关节的运动信号，并在预训练中通过随机关节掩码（Equation 8）模拟真实场景中仅部分位置有传感器的情况，使图编码器学会从任意关节子集中提取鲁棒的全局运动表示。
+
+### 少样本微调：预训练表示的高效迁移
+
+Figure 4 展示了在每类仅 1、2、3、5、10 个样本的少样本设定下，UniMTS 与各基线的 F1 对比。UniMTS 在所有样本量级上均显著优于最佳基线 ImageBind，平均 F1 提升 16.3%，显著性 p 值低至 2×10⁻²⁵。同时，随机初始化的 UniMTS 结构（Random）性能远低于预训练版本，直接验证了预训练阶段习得的通用表示是少样本泛化的关键来源。
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/005_Figure_4.jpg]]
+*Figure 4: Few-shot fine-tuning results. UniMTS consistently outperforms both baselines and our model ablation. We repeat 3 runs and report both mean and standard deviation*
+
+值得注意的是，UniMTS 在仅 1 样本/类的情况下已展现出较强的分类能力，这得益于其对比学习框架将运动时间序列嵌入与 LLM 增强的文本描述嵌入对齐——即使只有极少标注样本，模型也能通过语义空间中的最近邻匹配完成合理推断。
+
+### 全样本微调：统一框架下的最优性能
+
+Table 2 和 Table 3 分别对比了 UniMTS 与预训练/自监督模型以及传统分类模型在全样本设定下的性能。UniMTS 的平均 F1 达到 87.5%±13.4%，平均 Accuracy 达到 90.6%±10.6%，显著优于所有对比方法（p=0.018）。具体而言：
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/007_Table_2.jpg]]
+*Table 2: Full-Shot performance. We bold the best and underline the second best. UniMTS performs the best compared with both pre-trained, self-supervised and conventional models. The last column shows the average performance across 18 datasets with standard deviation*
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/011_Table_3.jpg]]
+*Table 3: Full-Shot performance on additional baselines before 2021. We bold the best results. The last column shows the average performance across 18 datasets with standard deviation*
+
+- 相比预训练多模态模型 **ImageBind** 和 **IMU2CLIP**，UniMTS 的 F1 分别提升约 9.2% 和更多；
+- 相比自监督时间序列模型 **TS2Vec**（Yue et al., AAAI 2022）和 **BioBankSSL**（Yuan et al., npj Digital Medicine 2024），UniMTS 的优势同样显著；
+- 相比传统模型如 **DeepConvLSTM**（Ordóñez et al., Sensors 2016），F1 从 74.8% 提升至 87.5%，提升幅度达 12.7 个百分点。
+
+这一结果表明，UniMTS 不仅在零样本和少样本场景下具有压倒性优势，即使在拥有充足标注数据的全样本设定下，其统一的图编码器架构和预训练表示仍然超越专门为各数据集设计的传统模型。
+
+### 消融实验：三大模块的因果贡献
+
+Table 1 中的消融行揭示了各核心组件对零样本泛化的必要性：
+
+1. **移除旋转增强（w/o rot aug）**：性能显著下降。该模块在每次训练迭代中对每个关节施加随机旋转矩阵（Equation 5-6），使模型学会不依赖设备方向。移除后，模型在面对与预训练方向分布不同的测试数据时表示退化，直接证明了旋转不变性对方向泛化的因果作用。
+
+2. **移除文本增强（w/o text aug）**：性能进一步下降。预训练中利用 GPT-3.5 为每条运动描述生成 k=3 个释义，丰富了语义空间。移除后，文本嵌入的多样性降低，对比学习目标的对齐信号减弱，模型对未见活动的泛化能力受损。
+
+3. **移除图编码器（w/o graph）**：将 ST-GCN 替换为 CNN 后性能同样下降。图编码器通过显式建模骨架关节间的空间关系（Equation 7, 9），使模型能够从任意位置子集中推断全身运动模式。CNN 缺乏这一归纳偏置，导致位置泛化能力大幅削弱。
+
+三项消融合起来验证了 UniMTS 的设计逻辑：旋转增强应对方向变化，文本增强应对活动变化，图编码器应对位置变化——三者缺一不可。
+
+### 嵌入空间语义对齐的可视化验证
+
+Figure 5 的 T-SNE 可视化展示了 UniMTS 嵌入空间的语义结构。不同活动类别形成的聚类与其语义含义高度一致：静态活动（如“坐着”“站立”）聚集在一起，高强度活动（如“跑步”“跳跃”）彼此靠近。这一观察从几何层面证实了对比学习框架成功将运动时间序列嵌入与文本语义对齐，为零样本推理中通过余弦相似度匹配标签提供了直观解释。
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/006_Figure_5.jpg]]
+*Figure 5: T-SNE visualizations show that signal clusters align with their semantic meanings*
+
+### 对新活动的泛化能力
+
+Figure 7 展示了 UniMTS 在预训练中未见过的活动类别上的零样本性能。相比最佳基线，UniMTS 仍有显著提升。这说明模型并非简单记忆预训练数据中的活动模式，而是通过 LLM 增强的文本描述习得了可迁移的运动语义——即使具体活动名称未在预训练中出现，其文本嵌入仍能为图编码器提供有效的语义锚点。
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/009_Figure_7.jpg]]
+*Figure 7: UniMTS shows significant performance improvement compared with the best baseline when evaluated on new activities not seen*
+
+### 模拟数据与真实数据的模式一致性
+
+Figure 6 和 Figure 9 分别展示了模拟运动时间序列与真实 PAMAP2 数据集在躯干和踝关节位置上的对比。模拟信号在加速度和角速度的模式上与真实传感器记录高度相似，验证了物理引擎合成数据作为预训练语料的合理性。合成过程中加入的高斯噪声（Equation 4）在一定程度上模拟了真实传感器噪声，但论文也承认可能未完全覆盖非高斯噪声、偏移和时延等复杂情况。
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/008_Figure_6.jpg]]
+*Figure 6: Simulated motion time series closely resemble patterns of the real PAMAP2 time series*
+
+![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/012_Figure_9.jpg]]
+*Figure 9: Simulated motion time series show similar patterns as real PAMAP2 time series*
+
+### 失败模式与局限性
+
+尽管 UniMTS 在绝大多数设定下表现优异，仍存在以下已知局限：
+
+1. **物理引擎的模拟偏差**：高斯噪声假设可能无法覆盖真实传感器的非高斯噪声、温度漂移和时延，导致模拟-真实分布间存在残余差距。
+2. **预训练动作覆盖范围**：预训练仅基于 HumanML3D 骨架数据，虽覆盖较全但仍可能缺失某些极端或专业动作类别，对语义差异极大的全新活动零样本泛化仍可能受限。
+3. **动态位置变化的适应性**：推理时需将真实信号分配至最近骨架关节，对于传感器位置在运动过程中动态变化（如滑动、旋转）的场景，当前分配策略的鲁棒性有待进一步验证。
+4. **任务范围验证不足**：目前仅在分类任务上进行了系统评估，尚未在惯性导航、异常检测等其他运动时间序列任务上验证框架的通用性。
+
+### 公平性保障
+
+所有基线均按照原文公开实现或预训练权重进行复现，在相同的数据预处理与采样频率下评估。统计检验统一采用 Wilcoxon signed-rank test 并经过 Holm's α=0.05 校正，所有关键提升的 p 值均显著小于 0.05。超参数（学习率 0.0001，批大小 64，温度参数初始化自 CLIP）在零样本、少样本和全样本设定中保持一致，确保对比的公平性。
+
+## 方法谱系与知识库定位
+
+### 1. 与现有基线的差异化关系
+
+UniMTS 的核心贡献在于通过“合成数据 + 图网络 + 语义对齐”的组合，系统性地解决了运动时间序列识别中设备位置、方向和活动类型三个泛化瓶颈。与现有工作的关系可从以下维度定位：
+
+**（1）预训练多模态模型**
+
+- **ImageBind**（Girdhar et al., CVPR 2023）和 **IMU2CLIP**（Moon et al., CVPR 2024）将 IMU 信号与图像、文本等模态对齐，具备一定的零样本能力，但其训练数据来自真实传感器，受限于单一或少数身体位置，难以泛化到未见位置和方向。UniMTS 在 18 个数据集上的零样本 F1 平均超过 ImageBind 约 340%（Wilcoxon 检验 p 值远小于 0.05），直接证明了合成全关节数据与旋转增强对位置/方向泛化的决定性作用。
+
+**（2）文本到运动 / LLM 零样本方法**
+
+- **IMUGPT**（Zhang et al., EMNLP 2023）和 **HARGPT**（Ji et al., UbiComp 2024）利用 LLM 直接生成运动序列或分类推理，但缺乏对传感器物理特性的显式建模，难以处理跨位置的信号差异。UniMTS 通过物理引擎合成加速度/角速度，并用旋转增强模拟方向变化，弥补了纯文本驱动方法在物理一致性上的不足。
+
+**（3）通用时间序列与自监督模型**
+
+- **GPT4TS**（Zhou et al., NeurIPS 2023）和 **BioBankSSL**（Yuan et al., npj Digital Medicine 2024）在少样本和全样本场景下表现良好，但其预训练目标（如掩码重建或自回归预测）不直接建模人体关节间的空间拓扑关系。UniMTS 的 ST-GCN 编码器显式利用骨架结构定义空间边，消融实验显示，替换为 CNN（w/o graph）后零样本性能显著下降，验证了图结构对位置泛化的必要性。
+
+**（4）传统分类模型**
+
+- **DeepConvLSTM**（Ordóñez et al., Sensors 2016）、**TS2Vec**（Yue et al., AAAI 2022）等在全样本设定下需要针对每个数据集独立训练。UniMTS 全样本微调后 F1 达 87.5%，显著优于 DeepConvLSTM（74.8%）和 TS2Vec 等，且 p=0.018，表明预训练获得的通用表示在充足数据下仍具竞争力。
+
+### 2. 方法适用边界
+
+UniMTS 的强泛化能力建立在以下前提之上，超出这些边界时性能可能下降：
+
+| 适用条件 | 边界说明 |
+|---------|---------|
+| 预训练骨架数据覆盖 | 基于 HumanML3D 骨架数据合成，对极端或高度专业化的动作（如竞技体操特定技巧）可能覆盖不足 |
+| 传感器噪声假设 | 物理引擎使用高斯噪声近似，未建模非高斯噪声、传感器偏移、时延等实际干扰 |
+| 活动语义可描述性 | 依赖文本编码器对活动描述的语义理解，对语义模糊或高度上下文依赖的活动（如“整理桌子” vs “擦拭桌子”）可能区分度受限 |
+| 设备位置分配 | 推理时需将真实信号分配到最近骨架关节，对动态位置变化（如设备在身体表面滑动）的适应性有待验证 |
+| 任务类型 | 目前仅验证了分类任务，尚未在惯性导航、异常检测、回归等任务上评估 |
+
+### 3. 局限与开放问题
+
+**已识别的局限性：**
+
+1. **物理引擎保真度有限**：合成过程使用数值微分和四元数变换，并添加高斯噪声模拟传感器，但真实 IMU 信号还包含偏置漂移、非高斯冲击噪声、采样抖动等，这些因素在预训练中未被建模。
+
+2. **预训练语料多样性**：仅使用 HumanML3D 一个骨架数据集，虽然覆盖较广，但动作类别和人体形态多样性仍受限于该数据集的采集范围和标注质量。
+
+3. **未见活动零样本泛化**：虽然 UniMTS 在新活动上相比基线有显著提升，但语义差异极大的全新活动类别仍可能导致相似度计算失效。
+
+4. **边缘部署的鲁棒性**：推理流程需要最近关节分配步骤，在设备位置动态变化或完全未知的场景下，分配的准确性直接影响识别性能。
+
+**开放研究问题：**
+
+1. **更真实的传感器模拟**：能否引入随机偏移向量、非高斯噪声模型和传感器偏置漂移，以更好地模拟真实传感器在关节附近的信号变化？
+
+2. **任务范围扩展**：UniMTS 的预训练框架能否直接扩展到惯性导航、手势识别、运动质量评估等更广泛的时间序列任务？
+
+3. **预训练数据增强**：如何利用大规模视频姿态估计数据（如从 YouTube 视频中提取的 3D 骨架）进一步增强预训练语料的多样性和规模？
+
+4. **高效边缘推理**：能否结合模型蒸馏、量化和剪枝等技术，在保持泛化能力的同时实现更轻量的边缘端推理？
+
+5. **动态位置适应**：如何在设备位置动态变化或完全未知的情况下，实现无需最近关节分配步骤的鲁棒零样本推理？
+
+### 4. 知识库定位
+
+UniMTS 处于**运动感知预训练**与**跨模态语义对齐**的交汇点，其方法论贡献可归纳为：
+
+- **数据层面**：首次将大规模运动骨架数据通过物理引擎转化为覆盖全身关节的加速度/角速度时间序列，为运动时间序列预训练提供了廉价且多样化的数据来源。
+- **模型层面**：将 ST-GCN 引入运动时间序列编码，通过关节掩码策略模拟部分设备覆盖，结合旋转不变增强，实现对位置和方向的双重鲁棒性。
+- **对齐层面**：利用 CLIP 文本编码器和 LLM 增强的文本描述，在对比学习框架下实现运动信号与语义的跨模态对齐，赋予模型零样本活动识别能力。
+
+这一框架为后续研究提供了可复用的范式：**合成物理一致的运动数据 + 结构化编码器 + 语义对齐**，可作为运动时间序列领域的基础预训练方案，类似于 CLIP 在视觉-语言领域的作用。
+
+## 原文 PDF
+
+![[paperPDFs/NEURIPS_2024/UniMTS_Unified_Pre_training_for_Motion_Time_Series.pdf]]

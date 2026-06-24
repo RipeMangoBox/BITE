@@ -1,0 +1,107 @@
+---
+title: "Dataset: ImageNet 256×256"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: ImageNet 256×256
+
+- [[obsidian-vault/analysis/arxiv_2025/FA-VAE_Frequency-Aware_Variational_Autoencoder.md|FA-VAE: Frequency-Aware Variational Autoencoder (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/arXiv_2025/2025_FA_VAE_Frequency_Aware_Variational_Autoencoder.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: FA-VAE
+	- datasets: ImageNet 256×256
+- [[obsidian-vault/analysis/CVPR_2026/Accelerating_Diffusion_Model_Training_under_Minimal_Budgets_A_Condensation_Based_Perspective.md|Accelerating Diffusion Model Training under Minimal Budgets: A Condensation-Based Perspective (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Accelerating_Diffusion_Model_Training_under_Minimal_Budgets_A_Condensation_Based_Perspective.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: D²C (Diffusion Dataset Condensation)
+	- datasets: ImageNet 256×256, ImageNet 512×512, CIFAR-10
+- [[obsidian-vault/analysis/CVPR_2026/Back_to_Basics_Let_Denoising_Generative_Models_Denoise.md|Back to Basics: Let Denoising Generative Models Denoise (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Back_to_Basics_Let_Denoising_Generative_Models_Denoise.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: JiT (Just image Transformers)
+	- datasets: ImageNet 256×256, ImageNet 512×512
+- [[obsidian-vault/analysis/CVPR_2026/DPAR_Dynamic_Patchification_for_Efficient_Autoregressive_Visual_Generation.md|DPAR: Dynamic Patchification for Efficient Autoregressive Visual Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DPAR_Dynamic_Patchification_for_Efficient_Autoregressive_Visual_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DPAR
+	- datasets: ImageNet 256×256, ImageNet 384×384
+- [[obsidian-vault/analysis/CVPR_2026/Learning_Straight_Flows_Variational_Flow_Matching_for_Efficient_Generation.md|Learning Straight Flows: Variational Flow Matching for Efficient Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Learning_Straight_Flows_Variational_Flow_Matching_for_Efficient_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Straight Variational Flow Matching (S‑VFM)
+	- datasets: CIFAR-10 32×32, ImageNet 256×256
+- [[obsidian-vault/analysis/CVPR_2026/PixelDiT_Pixel_Diffusion_Transformers_for_Image_Generation.md|PixelDiT: Pixel Diffusion Transformers for Image Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/PixelDiT_Pixel_Diffusion_Transformers_for_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: PixelDiT
+	- datasets: ImageNet 256×256, ImageNet 512×512, Text-to-Image 1024×1024
+- [[obsidian-vault/analysis/CVPR_2026/Progressive_Supernet_Training_for_Efficient_Visual_Autoregressive_Modeling.md|Progressive Supernet Training for Efficient Visual Autoregressive Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Progressive_Supernet_Training_for_Efficient_Visual_Autoregressive_Modeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VARiant
+	- datasets: ImageNet 256×256
+- [[obsidian-vault/analysis/CVPR_2026/Reviving_ConvNeXt_for_Efficient_Convolutional_Diffusion_Models.md|Reviving ConvNeXt for Efficient Convolutional Diffusion Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Reviving_ConvNeXt_for_Efficient_Convolutional_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FCDM
+	- datasets: ImageNet 256×256, ImageNet 512×512
+- [[obsidian-vault/analysis/CVPR_2026/Sampling_Aware_Quantization_for_Diffusion_Models.md|Sampling-Aware Quantization for Diffusion Models (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Sampling_Aware_Quantization_for_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Sampling-Aware Quantization (SA-PTQ and SA-QLoRA)
+	- datasets: LSUN-Churches 256×256, LSUN-Bedroom 256×256, ImageNet 256×256
+- [[obsidian-vault/analysis/CVPR_2026/SRA_2_Variational_Autoencoder_Self_Representation_Alignment_for_Efficient_Diffusion_Training.md|SRA 2: Variational Autoencoder Self-Representation Alignment  for Efficient Diffusion Training (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SRA_2_Variational_Autoencoder_Self_Representation_Alignment_for_Efficient_Diffusion_Training.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SRA 2
+	- datasets: ImageNet 256×256, MS-COCO T2I
+- [[obsidian-vault/analysis/ICLR_2026/Adapting_Self_Supervised_Representations_as_a_Latent_Space_for_Efficient_Generation.md|Adapting Self-Supervised Representations as a Latent Space for Efficient Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Adapting_Self_Supervised_Representations_as_a_Latent_Space_for_Efficient_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Representation Tokenizer (RepTok)
+	- datasets: ImageNet 256×256, ImageNet 256×256 类别条件生成, MS-COCO zero-shot
+- [[obsidian-vault/analysis/ICLR_2026/Aligning_Visual_Foundation_Encoders_to_Tokenizers_for_Diffusion_Models.md|Aligning Visual Foundation Encoders to Tokenizers for Diffusion Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Aligning_Visual_Foundation_Encoders_to_Tokenizers_for_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: AlignTok
+	- datasets: ImageNet 256×256, COCO Prompt 6K
+- [[obsidian-vault/analysis/ICLR_2026/BAR_Refactor_the_Basis_of_Autoregressive_Visual_Generation.md|BAR: Refactor the Basis of Autoregressive Visual Generation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/BAR_Refactor_the_Basis_of_Autoregressive_Visual_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Basis Autoregressive (BAR)
+	- datasets: ImageNet 256×256
+- [[obsidian-vault/analysis/ICLR_2026/Dual_Path_Condition_Alignment_for_Diffusion_Transformers.md|Dual-Path Condition Alignment for Diffusion Transformers (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Dual_Path_Condition_Alignment_for_Diffusion_Transformers.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, LLM / Reasoning / Alignment
+	- methods: DUal-Path condition Alignment (DUPA)
+	- datasets: ImageNet 256×256
+- [[obsidian-vault/analysis/ICLR_2026/Latent_Diffusion_Model_without_Variational_Autoencoder.md|Latent Diffusion Model without Variational Autoencoder (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Latent_Diffusion_Model_without_Variational_Autoencoder.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SVG
+	- datasets: ImageNet 256×256
+- [[obsidian-vault/analysis/ICLR_2026/Partition_Generative_Modeling_Masked_Modeling_Without_Masks.md|Partition Generative Modeling: Masked Modeling Without Masks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Partition_Generative_Modeling_Masked_Modeling_Without_Masks.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Partition Generative Model (PGM) / Partition Transformer
+	- datasets: OpenWebText, LM1B, ImageNet 256×256

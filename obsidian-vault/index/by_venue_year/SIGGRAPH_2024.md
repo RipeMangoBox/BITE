@@ -1,0 +1,596 @@
+---
+title: "Venue_Year: SIGGRAPH_2024"
+type: paper-index
+dimension: venue_year
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Venue_Year: SIGGRAPH_2024
+
+- 2D Gaussian Splatting for Geometrically Accurate Radiance Fields (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- 3D Gaussian Blendshapes for Head Avatar Animation (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- 3D Gaussian Splatting With Deferred Reflection (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- 3D-Layers: Bringing Layer-based Color Editing to VR Painting (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/3Doodle_Compact_Abstraction_of_Objects_With_3D_Strokes.md|3Doodle: Compact Abstraction of Objects With 3D Strokes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/3Doodle_Compact_Abstraction_of_Objects_With_3D_Strokes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: 3Doodle
+- [[obsidian-vault/analysis/SIGGRAPH_2024/4D-Rotor_Gaussian_Splatting_Towards_Efficient_Novel_View_Synthesis_for_Dynamic_Scenes.md|4D-Rotor Gaussian Splatting: Towards Efficient Novel View Synthesis for Dynamic Scenes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/4D_Rotor_Gaussian_Splatting_Towards_Efficient_Novel_View_Synthesis_for_Dynamic_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: 4D-Rotor Gaussian Splatting (4DRotorGS)
+	- datasets: Plenoptic Video Dataset, D-NeRF Dataset
+- A Construct-optimize Approach to Sparse View Synthesis Without Camera Pose (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Differential_Monte_Carlo_Solver_for_the_Poisson_Equation.md|A Differential Monte Carlo Solver for the Poisson Equation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Differential_Monte_Carlo_Solver_for_the_Poisson_Equation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Differentiable Walk-on-Spheres (可微WoS)
+	- datasets: Wrench, Teapot, Globe
+- A Dual-Particle Approach for Incompressible SPH Fluids (SIGGRAPH 2024 2024)
+- A Dynamic Duo of Finite Elements and Material Points (SIGGRAPH 2024 2024)
+- A Framework for Solving Parabolic Partial Differential Equations on Discrete Domains (SIGGRAPH 2024 2024)
+- A Free-space Diffraction BSDF (SIGGRAPH 2024 2024)
+- A Fully-correlated Anisotropic Micrograin BSDF Model (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Heat_Method_for_Generalized_Signed_Distance.md|A Heat Method for Generalized Signed Distance (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Heat_Method_for_Generalized_Signed_Distance.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Intrinsic Triangulation Framework (内蕴三角剖分框架)
+	- datasets: Thingi10k 数据集上的内蕴 Delaunay 翻转
+- A Hierarchical 3D Gaussian Representation for Real-time Rendering of Very Large Scenes (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- A Linear Method to Consistently Orient Normals of a 3D Point Cloud (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- A Neural Network Model for Efficient Musculoskeletal-driven Skin Deformation (SIGGRAPH 2024 2024)
+	- method groups: Systems / Efficiency / Compression
+- A Realistic Multi-scale Surface-based Cloth Appearance Model (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Realistic_Multi_scale_Surface_based_Cloth_Appearance_Model.pdf|PDF]]
+- A Unified Differentiable Boolean Operator With Fuzzy Logic (SIGGRAPH 2024 2024)
+- A Vortex Particle-on-mesh Method for Soap Film Simulation (SIGGRAPH 2024 2024)
+- Accelerating Saccadic Response Through Spatial and Temporal Cross-modal Misalignments (SIGGRAPH 2024 2024)
+- Adaptive Grid Generation for Discretizing Implicit Complexes (SIGGRAPH 2024 2024)
+- Alignment Conditions for NURBS-based Design of Mixed Tension-compression Grid Shells (SIGGRAPH 2024 2024)
+	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
+- An Induce-on-Boundary Magnetostatic Solver for Grid-based Ferrofluids (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- Analogist: Out-of-the-box Visual In-context Learning With Image Diffusion Model (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- AONeuS: A Neural Rendering Framework for Acoustic-optical Sensor Fusion (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Aperture-aware Lens Design (SIGGRAPH 2024 2024)
+- Area ReSTIR: Resampling for Real-time Defocus and Antialiasing (SIGGRAPH 2024 2024)
+- Audio Matters Too! Enhancing Markerless Motion Capture With Audio Signals for String Performance Capture (SIGGRAPH 2024 2024)
+- Automatic Digital Garment Initialization From Sewing Patterns (SIGGRAPH 2024 2024)
+- Biharmonic Coordinates and Their Derivatives for Triangular 3D Cages (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Bilateral Guided Radiance Field Processing (SIGGRAPH 2024 2024)
+- Binary Opacity Grids: Capturing Fine Geometric Detail for Mesh-based View Synthesis (SIGGRAPH 2024 2024)
+	- method groups: Graph / Geometric / Structured Data
+- BlockFusion: Expandable 3D Scene Generation Using Latent Tri-plane Extrapolation (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Blue_Noise_for_Diffusion_Models.md|Blue Noise for Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Blue_Noise_for_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Time-varying Noise Diffusion Model (BNDM)
+	- datasets: AFHQ-Cat 64×64, CelebA 64×64, LSUN-Church 64×64
+- BoostMVSNeRFs: Boosting MVS-based NeRFs to Generalizable View Synthesis in Large-scale Scenes (SIGGRAPH 2024 2024)
+- BrepGen: A B-rep Generative Diffusion Model With Structured Latent Geometry (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2024/CAMDM_Taming_Diffusion_Probabilistic_Models_for_Character_Control.md|CAMDM Taming Diffusion Probabilistic Models for Character Control (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CAMDM_Taming_Diffusion_Probabilistic_Models_for_Character_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Conditional Autoregressive Motion Diffusion Model (CAMDM)
+	- datasets: 单风格控制, 实时推理效率
+- Capacitive Touch Sensing on General 3D Surfaces (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- CharacterGen: Efficient 3D Character Generation From Single Images With Multi-view Pose Canonicalization (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- CLAY: A Controllable Large-scale Generative Model for Creating High-quality 3D Assets (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/CNS-Edit_3D_Shape_Editing_via_Coupled_Neural_Shape_Optimization.md|CNS-Edit: 3D Shape Editing via Coupled Neural Shape Optimization (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CNS_Edit_3D_Shape_Editing_via_Coupled_Neural_Shape_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: CNS-Edit
+	- datasets: ShapeNet Chair, ShapeNet Airplane
+- Coin3D: Controllable and Interactive 3D Assets Generation With Proxy-guided Conditioning (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- ColorVideoVDP: A Visual Difference Predictor for Image, Video, and Display Distortions (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Compressed Skinning for Facial Blendshapes (SIGGRAPH 2024 2024)
+- Computational Homogenization for Inverse Design of Surface-based Inflatables (SIGGRAPH 2024 2024)
+- Computational Illusion Knitting (SIGGRAPH 2024 2024)
+- ConceptLab: Creative Concept Generation using VLM-Guided Diffusion Prior Constraints (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Conditional_Mixture_Path_Guiding_for_Differentiable_Rendering.md|Conditional Mixture Path Guiding for Differentiable Rendering (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Conditional_Mixture_Path_Guiding_for_Differentiable_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Bounded Ray Marching with Stratified Bernoulli Impulses
+	- datasets: Dragon, Lion, Cloud
+- Consistent Point Orientation for Manifold Surfaces via Boundary Integration (SIGGRAPH 2024 2024)
+- Contact Detection Between Curved Fibres: High Order Makes a Difference (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- ContourCraft: Learning to Resolve Intersections in Neural Multi-garment Simulations (SIGGRAPH 2024 2024)
+- Controllable Neural Style Transfer for Dynamic Meshes (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- Creating LEGO Figurines From Single Images (SIGGRAPH 2024 2024)
+- Cricket: A Self-powered Chirping Pixel (SIGGRAPH 2024 2024)
+- Cross-image Attention for Zero-shot Appearance Transfer (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Curvature-driven Conformal Deformations (SIGGRAPH 2024 2024)
+- CWF: Consolidating Weak Features in High-quality Mesh Simplification (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Cybersickness_Reduction_via_Gaze-contingent_Image_Deformation.md|Cybersickness Reduction via Gaze-contingent Image Deformation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Cybersickness_Reduction_via_Gaze_contingent_Image_Deformation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Gaze-Contingent Image Deformation
+- Cyclogenesis: Simulating Hurricanes and Tornadoes (SIGGRAPH 2024 2024)
+- DAE-Net: Deforming Auto-Encoder for Fine-grained Shape Co-segmentation (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- DeadWood: Including disturbance and decay in the depiction of digital nature (SIGGRAPH 2024 2024)
+- Deep Fourier-based Arbitrary-scale Super-resolution for Real-time Rendering (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Deep Hybrid Camera Deblurring for Smartphone Cameras (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Deep_Hybrid_Camera_Deblurring_for_Smartphone_Cameras.pdf|PDF]]
+- Deep Sketch Vectorization via Implicit Surface Extraction (SIGGRAPH 2024 2024)
+- DiffCAD: Weakly-supervised Probabilistic CAD Model Retrieval and Alignment From an RGB Image (SIGGRAPH 2024 2024)
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+- Differentiable Geodesic Distance for Intrinsic Minimization on Triangle Meshes (SIGGRAPH 2024 2024)
+- Differentiable solver for time-dependent deformation problems with contact (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- Differentiable Voronoi Diagrams for Simulation of Cell-based Mechanical Systems (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DiffPoseTalk_Speech_Driven_Stylistic_3D_Facial_Animation_and_Head_Pose_Generation_via_Diffusion_Models.md|DiffPoseTalk Speech Driven Stylistic 3D Facial Animation and Head Pose Generation via Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DiffPoseTalk_Speech_Driven_Stylistic_3D_Facial_Animation_and_Head_Pose_Generation_via_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DiffPoseTalk
+	- datasets: TFHP
+- DiffSound: Differentiable Modal Sound Rendering and Inverse Rendering for Diverse Inference Tasks (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Diffusion Illusions: Hiding Images in Plain Sight (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Diffusion_Texture_Painting.md|Diffusion Texture Painting (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Diffusion_Texture_Painting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Diffusion Texture Painting
+	- datasets: Pexels textures
+- DiLightNet: Fine-grained Lighting Control for Diffusion-based Image Generation (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DiLightNet_Fine_grained_Lighting_Control_for_Diffusion_based_Image_Generation.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Direct_a_Video_Customized_Video_Generation_with_User_Directed_Camera_Movement_and_Object_Motion.md|Direct-a-Video: Customized Video Generation with User-Directed Camera Movement and Object Motion (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Direct_a_Video_Customized_Video_Generation_with_User_Directed_Camera_Movement_and_Object_Motion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Direct-a-Video
+	- datasets: Camera Control, Object Control
+- DMHomo: Learning Homography with Diffusion Models (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- Dragon's Path: Synthesizing User-centered Flying Creature Animation Paths for Outdoor Augmented Reality Experiences (SIGGRAPH 2024 2024)
+- DreamFont3D: Personalized Text-to-3D Artistic Font Generation (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- DreamMat: High-quality PBR Material Generation With Geometry- and Light-aware Diffusion Models (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DreamMat_High_quality_PBR_Material_Generation_With_Geometry_and_Light_aware_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- DressCode: Autoregressively Sewing and Generating Garments From Text Guidance (SIGGRAPH 2024 2024)
+- EASI-Tex: Edge-Aware Mesh Texturing from Single Image (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Efficient Debris-flow Simulation for Steep Terrain Erosion (SIGGRAPH 2024 2024)
+	- method groups: Systems / Efficiency / Compression
+- Efficient Position-based Deformable Colon Modeling for Endoscopic Procedures Simulation (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Efficient_Position_based_Deformable_Colon_Modeling_for_Endoscopic_Procedures_Simulation.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Eulerian-Lagrangian Fluid Simulation on Particle Flow Maps (SIGGRAPH 2024 2024)
+- EyeIR: Single Eye Image Inverse Rendering in the Wild (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Fabric Tessellation: Realizing Freeform Surfaces by Smocking (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Fabric_Tessellation_Realizing_Freeform_Surfaces_by_Smocking.pdf|PDF]]
+- Fabricable 3D Wire Art (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Factorized Motion Fields for Fast Sparse Input Dynamic View Synthesis (SIGGRAPH 2024 2024)
+- Filter-Guided Diffusion for Controllable Image Generation (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Flexible Motion In-betweening With Diffusion Models (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Flexible_Motion_In_betweening_with_Diffusion_Models_CondMDI.md|Flexible Motion In-betweening with Diffusion Models (CondMDI) (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CondMDI_Flexible_Motion_In_betweening_with_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CondMDI (Conditional Motion Diffusion In-betweening)
+	- datasets: HumanML3D
+- FlexScale: Modeling and Characterization of Flexible Scaled Sheets (SIGGRAPH 2024 2024)
+- Fluid Control With Laplacian Eigenfunctions (SIGGRAPH 2024 2024)
+- From Microfacets to Participating Media: A Unified Theory of Light Transport With Stochastic Geometry (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2024/fVDB_A_Deep_Learning_Framework_for_Sparse_Large_Scale_and_High_Performance_Spatial_Intelligence.md|fVDB: A Deep-Learning Framework for Sparse, Large-Scale, and High-Performance Spatial Intelligence (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/fVDB_A_Deep_Learning_Framework_for_Sparse_Large_Scale_and_High_Performance_Spatial_Intelligence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: fVDB
+	- datasets: Grid construction, Stanford bunny 3-voxel narrow-band ray marching, Sparse convolution micro-benchmark
+- GaussianPrediction: Dynamic 3D Gaussian Prediction for Motion Extrapolation and Free View Synthesis (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- GEM3D: GEnerative Medial Abstractions for 3D Shape Synthesis (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Generative Escher Meshes (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- GIPC: Fast and stable Gauss-Newton optimization of IPC barrier energy (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- Going With the Flow (SIGGRAPH 2024 2024)
+- GPU-accelerated Rendering of Vector Brush Strokes (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- HAISOR: Human-Aware Indoor Scene Optimization via Deep Reinforcement Learning (SIGGRAPH 2024 2024)
+	- method groups: Agent / RL / Planning, Optimization / Theory
+- Hand-Object Interaction Controller (HOIC): Deep Reinforcement Learning for Reconstructing Interactions With Physics (SIGGRAPH 2024 2024)
+	- method groups: Agent / RL / Planning
+- HeadArtist: Text-conditioned 3D Head Generation With Self Score Distillation (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- High-quality Surface Reconstruction Using Gaussian Surfels (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Holographic Parallax Improves 3D Perceptual Realism (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- HQ3DAvatar: High Quality Implicit 3D Head Avatar (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- I2V-Adapter: A General Image-to-Video Adapter for Diffusion Models (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- Implicit Surface Tension for SPH Fluid Simulation (SIGGRAPH 2024 2024)
+- Implicit Swept Volume SDF: Enabling Continuous Collision-free Trajectory Generation for Arbitrary Shapes (SIGGRAPH 2024 2024)
+- Importance Sampling BRDF Derivatives (SIGGRAPH 2024 2024)
+- In the Quest for Scale-Optimal Mappings (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Interactive_Character_Control_with_Auto_Regressive_Motion_Diffusion_Models.md|Interactive Character Control with Auto-Regressive Motion Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Interactive_Character_Control_with_Auto_Regressive_Motion_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: A-MDM (Auto-Regressive Motion Diffusion Model)
+	- datasets: HumanML3D, LaFAN1
+- Interactive Design of Stylized Walking Gaits for Robotic Characters (SIGGRAPH 2024 2024)
+- Interactive Invigoration: Volumetric Modeling of Trees With Strands (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Interactive_Invigoration_Volumetric_Modeling_of_Trees_With_Strands.pdf|PDF]]
+- Into the Portal: Directable Fractal Self-Similarity (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Into_the_Portal_Directable_Fractal_Self_Similarity.pdf|PDF]]
+- Intrinsic Image Decomposition via Ordinal Shading (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Intrinsic_Image_Decomposition_via_Ordinal_Shading.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- IntrinsicDiffusion: Joint Intrinsic Layers From Latent Diffusion Models (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/IntrinsicDiffusion_Joint_Intrinsic_Layers_From_Latent_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- InvertAvatar: Incremental GAN Inversion for Generalized Head Avatars (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Iterative_Motion_Editing_with_Natural_Language.md|Iterative Motion Editing with Natural Language (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Iterative_Motion_Editing_with_Natural_Language.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: MEO-based Iterative Motion Editing System
+	- datasets: User Study
+- Joint Stroke Tracing and Correspondence for 2D Animation (SIGGRAPH 2024 2024)
+- Kinetic Simulation of Turbulent Multifluid Flows (SIGGRAPH 2024 2024)
+- Lagrangian Covector Fluid With Free Surface (SIGGRAPH 2024 2024)
+- Latent L-systems: Transformer-based Tree Generator (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- LayGA: Layered Gaussian Avatars for Animatable Clothing Transfer (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- Learning a Generalized Physical Face Model From Data (SIGGRAPH 2024 2024)
+- Learning Images Across Scales Using Adversarial Training (SIGGRAPH 2024 2024)
+	- method groups: Safety / Privacy / Robustness
+- Learning Physically Realizable Skills for Online Packing of General 3D Shapes (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- LGTM: Local-to-Global Text-driven Human Motion Diffusion Model (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- Lifting Directional Fields to Minimal Sections (SIGGRAPH 2024 2024)
+- Light Codes for Fast Two-Way Human-Centric Visual Communication (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- LightFormer: Light-oriented Global Neural Rendering in Dynamic Scene (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Lightning-fast Method of Fundamental Solutions (SIGGRAPH 2024 2024)
+- Lite2Relight: 3D-aware Single Image Portrait Relighting (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- LOOSECONTROL: Lifting ControlNet for Generalized Depth Conditioning (SIGGRAPH 2024 2024)
+- MaPa: Text-driven Photorealistic Material Painting for 3D Shapes (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Matting by Generation (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Media2Face_Co_speech_Facial_Animation_Generation_With_Multi_Modality_Guidance.md|Media2Face: Co-speech Facial Animation Generation With Multi-Modality Guidance (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Media2Face_Co_speech_Facial_Animation_Generation_With_Multi_Modality_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Media2Face
+	- datasets: M2F-D
+- MERCI: Mixed curvature-based elements for computing equilibria of thin elastic ribbons (SIGGRAPH 2024 2024)
+- Mesh Neural Cellular Automata (SIGGRAPH 2024 2024)
+- Minkowski Penalties: Robust Differentiable Constraint Enforcement for Vector Graphics (SIGGRAPH 2024 2024)
+	- method groups: Safety / Privacy / Robustness
+- Mob-FGSR: Frame Generation and Super Resolution for Mobile Real-time Rendering (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Mob_FGSR_Frame_Generation_and_Super_Resolution_for_Mobile_Real_time_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Modal Folding: Discovering Smooth Folding Patterns for Sheet Materials Using Strain-space Modes (SIGGRAPH 2024 2024)
+- Modeling Ambient Scene Dynamics for Free-view Synthesis (SIGGRAPH 2024 2024)
+- Modeling Hair Strands With Roving Capsules (SIGGRAPH 2024 2024)
+- Modelling a Feather as a Strongly Anisotropic Elastic Shell (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Modelling_a_Feather_as_a_Strongly_Anisotropic_Elastic_Shell.pdf|PDF]]
+- MonoGaussianAvatar: Monocular Gaussian Point-based Head Avatar (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Explicit_Motion_Modeling.md|Motion-I2V: Consistent and Controllable Image-to-Video Generation with Explicit Motion Modeling (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Explicit_Motion_Modeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Motion-I2V
+	- datasets: UCF-101 / MSR-VTT
+- [[obsidian-vault/analysis/SIGGRAPH_2024/MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation.md|MotionCtrl: A Unified and Flexible Motion Controller for Video Generation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+	- methods: MotionCtrl
+	- datasets: Camera Motion Control, Object Motion Control, Video Quality
+- Multi-material Mesh-based Surface Tracking With Implicit Topology Changes (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Multi_material_Mesh_based_Surface_Tracking_With_Implicit_Topology_Changes.pdf|PDF]]
+- MVD^2: Efficient Multiview 3D Reconstruction for Multiview Diffusion (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- N-BVH: Neural Ray Queries With Bounding Volume Hierarchies (SIGGRAPH 2024 2024)
+- N-Dimensional Gaussians for Fitting of High Dimensional Functions (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/N_Dimensional_Gaussians_for_Fitting_of_High_Dimensional_Functions.pdf|PDF]]
+- Navigation-driven Approximate Convex Decomposition (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Near_realtime_Facial_Animation_by_Deep_3D_Simulation_Super_Resolution.md|Near-realtime Facial Animation by Deep 3D Simulation Super-Resolution (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Near_realtime_Facial_Animation_by_Deep_3D_Simulation_Super_Resolution.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: 3D Simulation Super-Resolution (ours)
+	- datasets: Unseen facial expressions, Simulation speed, Unseen dynamics and external forces
+- NeLT: Object-oriented Neural Light Transfer (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- NeRF as a Non-distant Environment Emitter in Physics-based Inverse Rendering (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Neural Bounding (SIGGRAPH 2024 2024)
+- Neural Control Variates With Automatic Integration (SIGGRAPH 2024 2024)
+- Neural Gaussian Scale-space Fields (SIGGRAPH 2024 2024)
+- Neural Geometry Fields for Meshes (SIGGRAPH 2024 2024)
+- Neural Monte Carlo Fluid Simulation (SIGGRAPH 2024 2024)
+- Neural Slicer for Multi-axis 3D Printing (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Neural_Slicer_for_Multi_axis_3D_Printing.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Neural-assisted Homogenization of Yarn-level Cloth (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Neural_assisted_Homogenization_of_Yarn_level_Cloth.pdf|PDF]]
+- NeuralTO: Neural Reconstruction and View Synthesis of Translucent Objects (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- NeurCADRecon: Neural Representation for Reconstructing CAD Surfaces by Enforcing Zero Gaussian Curvature (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- NICER: A New and Improved Consumed Endurance and Recovery Metric to Quantify Muscle Fatigue of Mid-air Interactions (SIGGRAPH 2024 2024)
+	- method groups: Benchmark / Evaluation
+- Object-level Scene Deocclusion (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Object_level_Scene_Deocclusion.pdf|PDF]]
+- One Noise to Rule Them All: Learning a Unified Model of Spatially-Varying Noise Patterns (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/One_Noise_to_Rule_Them_All_Learning_a_Unified_Model_of_Spatially_Varying_Noise_Patterns.pdf|PDF]]
+- Online Neural Path Guiding with Normalized Anisotropic Spherical Gaussians (SIGGRAPH 2024 2024)
+- Part123: Part-aware 3D Reconstruction From a Single-view Image (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Path-space Differentiable Rendering of Implicit Surfaces (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Path_space_Differentiable_Rendering_of_Implicit_Surfaces.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- PEA-PODs: Perceptual Evaluation of Algorithms for Power Optimization in XR Displays (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/PEA_PODs_Perceptual_Evaluation_of_Algorithms_for_Power_Optimization_in_XR_Displays.pdf|PDF]]
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+- Perceptual Evaluation of Steered Retinal Projection (SIGGRAPH 2024 2024)
+	- method groups: Benchmark / Evaluation
+- Physical Non-inertial Poser (PNP): Modeling Non-inertial Effects in Sparse-inertial Human Motion Capture (SIGGRAPH 2024 2024)
+- Physics-based Scene Layout Generation From Human Motion (SIGGRAPH 2024 2024)
+- Physics-informed Learning of Characteristic Trajectories for Smoke Reconstruction (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/PhysicsPingPong_Strategy_and_Skill_Learning_for_Physics_based_Table_Tennis_Animation.md|PhysicsPingPong Strategy and Skill Learning for Physics based Table Tennis Animation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/PhysicsPingPong_Strategy_and_Skill_Learning_for_Physics_based_Table_Tennis_Animation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PhysicsPingPong
+	- datasets: Table Tennis Skill Evaluation, Ball Control Task, Agent-Agent Competition
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_Representation_and_GANs_Prior.md|Portrait3D Text Guided High Quality 3D Portrait Generation Using Pyramid Representation and GANs Prior (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_Representation_and_GANs_Prior.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Portrait3D
+	- datasets: User Study
+- Position-based Nonlinear Gauss-Seidel for Quasistatic Hyperelasticity (SIGGRAPH 2024 2024)
+- Practical Error Estimation for Denoised Monte Carlo Image Synthesis (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Practical_Error_Estimation_for_Denoised_Monte_Carlo_Image_Synthesis.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Preconditioned Nonlinear Conjugate Gradient Method for Real-time Interior-point Hyperelasticity (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- Primal-dual Non-smooth Friction for Rigid Body Animation (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Primal_dual_Non_smooth_Friction_for_Rigid_Body_Animation.pdf|PDF]]
+- Progressive Dynamics for Cloth and Shell Animation (SIGGRAPH 2024 2024)
+- Promptable Game Models: Text-Guided Game Simulation via Masked Diffusion Models (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- Proxy Asset Generation for Cloth Simulation in Games (SIGGRAPH 2024 2024)
+- Proxy Tracing: Unbiased Reciprocal Estimation for Optimized Sampling in BDPT (SIGGRAPH 2024 2024)
+- QT-Font: High-efficiency Font Synthesis via Quadtree-based Diffusion Models (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+- Quad-optimized Low-discrepancy Sequences (SIGGRAPH 2024 2024)
+- Radar Fields: Frequency-space Neural Scene Representations for FMCW Radar (SIGGRAPH 2024 2024)
+- Ray Tracing Harmonic Functions (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Ray_Tracing_Harmonic_Functions.pdf|PDF]]
+- Reach for the Arcs: Reconstructing Surfaces From SDFs via Tangent Points (SIGGRAPH 2024 2024)
+- Real-time Hair Rendering With Hair Meshes (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Real-Time Neural Appearance Models (SIGGRAPH 2024 2024)
+- Real-time Neural Woven Fabric Rendering (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Real-time Path Guiding Using Bounding Voxel Sampling (SIGGRAPH 2024 2024)
+- Real-time Physically Guided Hair Interpolation (SIGGRAPH 2024 2024)
+- Real-time Wing Deformation Simulations for Flying Insects (SIGGRAPH 2024 2024)
+- RealFill: Reference-driven Generation for Authentic Image Completion (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Recompose Grammars for Procedural Architecture (SIGGRAPH 2024 2024)
+- ReFiNe: Recursive Field Networks for Cross-modal Multi-scene Representation (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- Repulsive Shells (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Repulsive_Shells.pdf|PDF]]
+- RGB↔X: Image Decomposition and Synthesis Using Material- and Lighting-aware Diffusion Models (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/RGB_X_Image_Decomposition_and_Synthesis_Using_Material_and_Lighting_aware_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Rip-NeRF: Anti-aliasing Radiance Fields With Ripmap-encoded Platonic Solids (SIGGRAPH 2024 2024)
+- Robust Containment Queries Over Collections of Rational Parametric Curves via Generalized Winding Numbers (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Robust_Containment_Queries_Over_Collections_of_Rational_Parametric_Curves_via_Generalized_Winding_Numbers.pdf|PDF]]
+	- method groups: Safety / Privacy / Robustness
+- RTG-SLAM: Real-time 3D Reconstruction at Scale Using Gaussian Splatting (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- S3: Speech, Script, and Scene Driven Head and Eye Animation (SIGGRAPH 2024 2024)
+- Saccade-contingent Rendering (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Scale-invariant Monocular Depth Estimation via SSI Depth (SIGGRAPH 2024 2024)
+- Scintilla: Simulating Combustible Vegetation for Wildfires (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Scintilla_Simulating_Combustible_Vegetation_for_Wildfires.pdf|PDF]]
+- Seamless Parametrization in Penner Coordinates (SIGGRAPH 2024 2024)
+- Self-Supervised High Dynamic Range Imaging: What Can Be Learned from a Single 8-bit Video? (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+- Self-supervised Video Defocus Deblurring With Atlas Learning (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Self_supervised_Video_Defocus_Deblurring_With_Atlas_Learning.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+- Semantic Shape Editing With Parametric Implicit Templates (SIGGRAPH 2024 2024)
+- Separate-and-Enhance: Compositional Finetuning for Text-to-image Diffusion Models (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Simplicits_Mesh_Free_Geometry_Agnostic_Elastic_Simulation.md|Simplicits: Mesh-Free, Geometry-Agnostic, Elastic Simulation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Simplicits_Mesh_Free_Geometry_Agnostic_Elastic_Simulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Simplicits
+	- datasets: Mesh monkey, SDF key, Gaussian Splat lego
+- Singular Foliations for Knit Graph Design (SIGGRAPH 2024 2024)
+	- method groups: Graph / Geometric / Structured Data
+- SketchDream: Sketch-based Text-to-3D Generation and Editing (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SketchDream_Sketch_based_Text_to_3D_Generation_and_Editing.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction.md|SMEAR Stylized Motion Exaggeration with ARt direction (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SMEAR
+	- datasets: Motion offsets pre-processing performance, Memory usage per frame, Qualitative comparison: elongated in-betweens vs. swept volumes
+- SMERF: Streamable Memory Efficient Radiance Fields for Real-time Large-scene Exploration (SIGGRAPH 2024 2024)
+	- method groups: Systems / Efficiency / Compression, Agent / RL / Planning
+- Smooth Bijective Projection in a High-order Shell (SIGGRAPH 2024 2024)
+- Soft Pneumatic Actuator Design Using Differentiable Simulation (SIGGRAPH 2024 2024)
+- Solid Knitting (SIGGRAPH 2024 2024)
+- Spatial and Surface Correspondence Field for Interaction Transfer (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- Specular Polynomials (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Specular_Polynomials.pdf|PDF]]
+- Spice-E: Structural Priors in 3D Diffusion Using Cross-Entity Attention (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Spin-It Faster: Quadrics Solve All Topology Optimization Problems That Depend Only on Mass Moments (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Spin_It_Faster_Quadrics_Solve_All_Topology_Optimization_Problems_That_Depend_Only_on_Mass_Moments.pdf|PDF]]
+	- method groups: Optimization / Theory
+- Spin-weighted Spherical Harmonics for Polarized Light Transport (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Spin_weighted_Spherical_Harmonics_for_Polarized_Light_Transport.pdf|PDF]]
+- Split-and-Fit: Learning B-Reps via Structure-aware Voronoi Partitioning (SIGGRAPH 2024 2024)
+- Split-Aperture 2-in-1 Computational Cameras (SIGGRAPH 2024 2024)
+- ST-4DGS: Spatial-Temporally Consistent 4D Gaussian Splatting for Efficient Dynamic Scene Rendering (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Stabler Neo-Hookean Simulation: Absolute Eigenvalue Filtering for Projected Newton (SIGGRAPH 2024 2024)
+- Stochastic Computation of Barycentric Coordinates (SIGGRAPH 2024 2024)
+- StopThePop: Sorted Gaussian Splatting for View-consistent Real-time Rendering (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Strategy and Skill Learning for Physics-based Table Tennis Animation (SIGGRAPH 2024 2024)
+- Streetscapes: Large-scale Consistent Street View Generation Using Autoregressive Video Diffusion (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Stylized Rendering as a Function of Expectation (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Stylized_Rendering_as_a_Function_of_Expectation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Subject-Diffusion: Open Domain Personalized Text-to-image Generation Without Test-time Fine-tuning (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Super-resolution Cloth Animation With Spatial and Temporal Coherence (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.md|SuperPADL: Scaling Language-Directed Physics-Based Control with Progressive Supervised Distillation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
+	- methods: SuperPADL
+	- datasets: AMASS Motion Quality, Group Controller, Group Controller Training Time
+- Surface-filling Curve Flows via Implicit Medial Axes (SIGGRAPH 2024 2024)
+- Taming Diffusion Probabilistic Models for Character Control (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- Target-aware Image Denoising for Inverse Monte Carlo Rendering (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Target_aware_Image_Denoising_for_Inverse_Monte_Carlo_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2024/TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis.md|TEDi Temporally Entangled Diffusion for Long Term Motion Synthesis (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TEDi (Temporally-Entangled Diffusion)
+	- datasets: Perceptual study
+- Tele-Aloha: A Telepresence System With Low-budget and High-authenticity Using Sparse RGB Cameras (SIGGRAPH 2024 2024)
+- Temporal Acoustic Point Holography (SIGGRAPH 2024 2024)
+- Temporally Stable Metropolis Light Transport Denoising Using Recurrent Transformer Blocks (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- TensoSDF: Roughness-aware Tensorial Representation for Robust Geometry and Material Reconstruction (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Terrain Amplification Using Multi Scale Erosion (SIGGRAPH 2024 2024)
+- TexPainter: Generative Mesh Texturing With Multi-view Consistency (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- TexSliders: Diffusion-based Texture Editing in CLIP Space (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/TexSliders_Diffusion_based_Texture_Editing_in_CLIP_Space.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- Text-guided Synthesis of Crowd Animation (SIGGRAPH 2024 2024)
+- Text-to-vector Generation With Neural Path Representation (SIGGRAPH 2024 2024)
+	- method groups: Representation / Self-Supervised / Transfer
+- The Chosen One: Consistent Characters in Text-to-image Diffusion Models (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- The Method of Moving Frames for Surface Global Parametrization (SIGGRAPH 2024 2024)
+- ThemeStation: Generating Theme-aware 3D Assets From Few Exemplars (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/ThemeStation_Generating_Theme_aware_3D_Assets_From_Few_Exemplars.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Theory of Human Tetrachromatic Color Experience and Printing (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Theory_of_Human_Tetrachromatic_Color_Experience_and_Printing.pdf|PDF]]
+	- method groups: Optimization / Theory
+- TIP-Editor: An Accurate 3D Editor Following Both Text-prompts and Image-prompts (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Toonify3D: StyleGAN-based 3D Stylized Face Generator (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Towards Motion Metamers for Foveated Rendering (SIGGRAPH 2024 2024)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Towards_Motion_Metamers_for_Foveated_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Towards Unstructured Unlabeled Optical Mocap: A Video Helps! (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Training-free Consistent Text-to-image Generation (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Transparent Image Layer Diffusion Using Latent Transparency (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Ultra Inertial Poser: Scalable Motion Capture and Tracking From Sparse Inertial Sensors and Ultra-Wideband Ranging (SIGGRAPH 2024 2024)
+- Universal Facial Encoding of Codec Avatars From VR Headsets (SIGGRAPH 2024 2024)
+- Variational Feature Extraction in Scientific Visualization (SIGGRAPH 2024 2024)
+- Velocity-based Monte Carlo Fluids (SIGGRAPH 2024 2024)
+- Versatile Vision Foundation Model for Image and Video Colorization (SIGGRAPH 2024 2024)
+	- method groups: Vision / Multimodal / 3D
+- Vertex Block Descent (SIGGRAPH 2024 2024)
+- View-Independent Adjoint Light Tracing for Lighting Design Optimization (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- VR-GS: A Physical Dynamics-aware Interactive Gaussian Splatting System in Virtual Reality (SIGGRAPH 2024 2024)
+	- method groups: Generative / Diffusion / Flow
+- VRMM: A Volumetric Relightable Morphable Head Model (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Walkin_Robin_Walk_on_Stars_with_Robin_Boundary_Conditions.md|Walkin' Robin: Walk on Stars with Robin Boundary Conditions (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Walkin_Robin_Walk_on_Stars_with_Robin_Boundary_Conditions.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Walkin' Robin (WoSt with Robin boundary conditions)
+	- datasets: 多种几何, 常函数解问题
+- [[obsidian-vault/analysis/SIGGRAPH_2024/WalkTheDog_Cross_Morphology_Motion_Alignment_via_Phase_Manifolds.md|WalkTheDog: Cross-Morphology Motion Alignment via Phase Manifolds (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/WalkTheDog_Cross_Morphology_Motion_Alignment_via_Phase_Manifolds.pdf|PDF]]
+	- topics: Motion Alignment, Phase Manifold, Vector Quantization, Character Animation
+	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
+	- methods: VQ-PAE, shared amplitude codebook, phase manifold
+	- datasets: Dog, Human-Locomotion, MOCHA-Clown
+- Woven Fabric Capture With a Reflection-transmission Photo Pair (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/X_Portrait_Expressive_Portrait_Animation_with_Hierarchical_Motion_Attention.md|X-Portrait: Expressive Portrait Animation with Hierarchical Motion Attention (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/X_Portrait_Expressive_Portrait_Animation_with_Hierarchical_Motion_Attention.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: X-Portrait
+	- datasets: Ablation on Cross-Identity Training, Ablation on Local Control Module, User Study
+- X-SLAM: Scalable Dense SLAM for Task-aware Optimization Using CSFD (SIGGRAPH 2024 2024)
+	- method groups: Optimization / Theory
+- ZeroGrads: Learning Local Surrogates for Non-differentiable Graphics (SIGGRAPH 2024 2024)

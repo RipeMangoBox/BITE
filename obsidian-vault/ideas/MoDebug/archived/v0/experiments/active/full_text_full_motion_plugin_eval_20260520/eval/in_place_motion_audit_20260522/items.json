@@ -1,0 +1,145 @@
+[
+  {
+    "prompt_id": "p1evt_1_locomotion_walk__event_01__single",
+    "baseline": "molingo",
+    "description": "在原地走路",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/molingo/007_p1evt_1_locomotion_walk__event_01__single.mp4",
+    "kind": "flagged",
+    "planar_span": "0.159",
+    "root_x_span": "0.04522223770618439",
+    "root_z_span": "0.15233151614665985",
+    "sheet": "/tmp/modebug_in_place_review/flagged_00_molingo_p1evt_1_locomotion_walk__event_01__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_1_locomotion_walk__full",
+    "baseline": "molingo",
+    "description": "原地踏步",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/molingo/001_p1evt_1_locomotion_walk__full.mp4",
+    "kind": "flagged",
+    "planar_span": "0.065",
+    "root_x_span": "0.038826704025268555",
+    "root_z_span": "0.051930904388427734",
+    "sheet": "/tmp/modebug_in_place_review/flagged_01_molingo_p1evt_1_locomotion_walk__full.jpg"
+  },
+  {
+    "prompt_id": "p1evt_2_walk_stop__event_01__single",
+    "baseline": "momask_original",
+    "description": "在原地走路",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/momask_original/008_p1evt_2_walk_stop__event_01__single.mp4",
+    "kind": "flagged",
+    "planar_span": "0.281",
+    "root_x_span": "0.10685817897319794",
+    "root_z_span": "0.260366290807724",
+    "sheet": "/tmp/modebug_in_place_review/flagged_02_momask_original_p1evt_2_walk_stop__event_01__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_3_forward_back_forward__event_03__single",
+    "baseline": "molingo",
+    "description": "在原地踏步",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/molingo/014_p1evt_3_forward_back_forward__event_03__single.mp4",
+    "kind": "flagged",
+    "planar_span": "0.192",
+    "root_x_span": "0.056247416883707047",
+    "root_z_span": "0.18365421891212463",
+    "sheet": "/tmp/modebug_in_place_review/flagged_03_molingo_p1evt_3_forward_back_forward__event_03__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_3_forward_back_forward__event_03__single",
+    "baseline": "momask_original",
+    "description": "在原地踏步",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/momask_original/014_p1evt_3_forward_back_forward__event_03__single.mp4",
+    "kind": "flagged",
+    "planar_span": "0.457",
+    "root_x_span": "0.14996570348739624",
+    "root_z_span": "0.43123170733451843",
+    "sheet": "/tmp/modebug_in_place_review/flagged_04_momask_original_p1evt_3_forward_back_forward__event_03__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_3_walk_squat_return__event_01__single",
+    "baseline": "momask_original",
+    "description": "在原地踏步",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/momask_original/015_p1evt_3_walk_squat_return__event_01__single.mp4",
+    "kind": "flagged",
+    "planar_span": "0.151",
+    "root_x_span": "0.09621354937553406",
+    "root_z_span": "0.11606384068727493",
+    "sheet": "/tmp/modebug_in_place_review/flagged_05_momask_original_p1evt_3_walk_squat_return__event_01__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_3_walk_squat_return__full",
+    "baseline": "motiongpt",
+    "description": "在原地运动，且反复蹲起",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/motiongpt/005_p1evt_3_walk_squat_return__full.mp4",
+    "kind": "flagged",
+    "planar_span": "0.319",
+    "root_x_span": "0.04495839402079582",
+    "root_z_span": "0.31604835391044617",
+    "sheet": "/tmp/modebug_in_place_review/flagged_06_motiongpt_p1evt_3_walk_squat_return__full.jpg"
+  },
+  {
+    "prompt_id": "p1evt_1_locomotion_walk__event_01__single",
+    "baseline": "motiongpt",
+    "description": "normal comparator",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/motiongpt/007_p1evt_1_locomotion_walk__event_01__single.mp4",
+    "kind": "normal",
+    "planar_span": "3.110",
+    "root_x_span": "0.3702832758426666",
+    "root_z_span": "3.0877296924591064",
+    "sheet": "/tmp/modebug_in_place_review/normal_07_motiongpt_p1evt_1_locomotion_walk__event_01__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_1_locomotion_walk__full",
+    "baseline": "motiongpt",
+    "description": "normal comparator",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/motiongpt/001_p1evt_1_locomotion_walk__full.mp4",
+    "kind": "normal",
+    "planar_span": "3.136",
+    "root_x_span": "0.36685508489608765",
+    "root_z_span": "3.1143884658813477",
+    "sheet": "/tmp/modebug_in_place_review/normal_08_motiongpt_p1evt_1_locomotion_walk__full.jpg"
+  },
+  {
+    "prompt_id": "p1evt_2_walk_stop__event_01__single",
+    "baseline": "motiongpt",
+    "description": "normal comparator",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/motiongpt/008_p1evt_2_walk_stop__event_01__single.mp4",
+    "kind": "normal",
+    "planar_span": "1.498",
+    "root_x_span": "0.4485836327075958",
+    "root_z_span": "1.429044485092163",
+    "sheet": "/tmp/modebug_in_place_review/normal_09_motiongpt_p1evt_2_walk_stop__event_01__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_3_forward_back_forward__event_03__single",
+    "baseline": "motiongpt",
+    "description": "normal comparator",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/motiongpt/014_p1evt_3_forward_back_forward__event_03__single.mp4",
+    "kind": "normal",
+    "planar_span": "3.862",
+    "root_x_span": "0.08862604200839996",
+    "root_z_span": "3.861367702484131",
+    "sheet": "/tmp/modebug_in_place_review/normal_10_motiongpt_p1evt_3_forward_back_forward__event_03__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_3_walk_squat_return__event_01__single",
+    "baseline": "motiongpt",
+    "description": "normal comparator",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/motiongpt/015_p1evt_3_walk_squat_return__event_01__single.mp4",
+    "kind": "normal",
+    "planar_span": "3.604",
+    "root_x_span": "0.3654000461101532",
+    "root_z_span": "3.585336923599243",
+    "sheet": "/tmp/modebug_in_place_review/normal_11_motiongpt_p1evt_3_walk_squat_return__event_01__single.jpg"
+  },
+  {
+    "prompt_id": "p1evt_3_walk_squat_return__full",
+    "baseline": "mogents",
+    "description": "normal comparator",
+    "video_path": "/data/Life Me/ResearchWY Vault/artifacts/remote4090/remote4090/modebug_p1_four_baseline_hml_render_20260522/vis/mogents/005_p1evt_3_walk_squat_return__full.mp4",
+    "kind": "normal",
+    "planar_span": "4.347",
+    "root_x_span": "2.4147818088531494",
+    "root_z_span": "3.614321708679199",
+    "sheet": "/tmp/modebug_in_place_review/normal_12_mogents_p1evt_3_walk_squat_return__full.jpg"
+  }
+]

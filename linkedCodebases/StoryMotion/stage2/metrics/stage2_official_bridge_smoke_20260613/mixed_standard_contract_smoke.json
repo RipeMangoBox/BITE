@@ -1,0 +1,464 @@
+{
+  "cache_dir": "runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+  "contract": {
+    "camera": {
+      "all_keys_ok": true,
+      "all_shapes_ok": true,
+      "batches": 1,
+      "checks": [
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "camera",
+          "padding_mask_shape": [
+            4,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            4,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            4,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            4,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-4GsCEopbd4_00008_001_a",
+            "2011_-4GsCEopbd4_00017_000_a",
+            "2011_-EuO6OFypLo_00002_000_a",
+            "2011_-EuO6OFypLo_00002_000_b"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        }
+      ]
+    },
+    "human": {
+      "all_keys_ok": true,
+      "all_shapes_ok": true,
+      "batches": 1,
+      "checks": [
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "human",
+          "padding_mask_shape": [
+            4,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            4,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            4,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            4,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-4GsCEopbd4_00008_001_a",
+            "2011_-4GsCEopbd4_00017_000_a",
+            "2011_-EuO6OFypLo_00002_000_a",
+            "2011_-EuO6OFypLo_00002_000_b"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        }
+      ]
+    },
+    "joint": {
+      "all_keys_ok": true,
+      "all_shapes_ok": true,
+      "batches": 1,
+      "checks": [
+        {
+          "callback_contract_keys_ok": true,
+          "camera_shape_matches_padding": true,
+          "human_shape_matches_padding": true,
+          "intrinsics_shape_matches_padding": true,
+          "missing_batch_keys": [],
+          "missing_output_keys": [],
+          "mode": "joint",
+          "padding_mask_shape": [
+            4,
+            300
+          ],
+          "raw_input_keys": [
+            "camera",
+            "human",
+            "intrinsics",
+            "projection"
+          ],
+          "raw_output_camera_shape": [
+            4,
+            300,
+            4,
+            4
+          ],
+          "raw_output_human_joints_shape": [
+            4,
+            300,
+            24,
+            3
+          ],
+          "raw_output_intrinsics_shape": [
+            4,
+            300,
+            4
+          ],
+          "raw_output_keys": [
+            "camera",
+            "human",
+            "intrinsics"
+          ],
+          "sample_ids": [
+            "2011_-4GsCEopbd4_00008_001_a",
+            "2011_-4GsCEopbd4_00017_000_a",
+            "2011_-EuO6OFypLo_00002_000_a",
+            "2011_-EuO6OFypLo_00002_000_b"
+          ],
+          "x_output_keys": [
+            "camera",
+            "human"
+          ]
+        }
+      ]
+    }
+  },
+  "created_at": "2026-06-13T14:26:59+0800",
+  "elapsed_sec": 0.688453197479248,
+  "first_output_summary": {
+    "batch": {
+      "camera_intrinsics": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          300,
+          4
+        ]
+      },
+      "camera_segments": {
+        "device": "cuda:0",
+        "dtype": "torch.int64",
+        "shape": [
+          4,
+          300
+        ]
+      },
+      "caption_feat": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          1024
+        ]
+      },
+      "caption_mask": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.bool",
+          "shape": [
+            4,
+            77
+          ]
+        },
+        "human": {
+          "device": "cuda:0",
+          "dtype": "torch.bool",
+          "shape": [
+            4,
+            77
+          ]
+        }
+      },
+      "caption_raw": {
+        "camera": [
+          "The camera moves laterally to the left (trucking left) for the entire shot.",
+          "The camera remains static throughout the entire shot.",
+          "The camera begins with a trucking right-pull-out motion, followed by a continuous trucking right motion.",
+          "The camera starts static and transitions to a boom top position during the shot."
+        ],
+        "human": [
+          "A person leans forward and bends their head towards the table, focusing intently on an object in front of them.",
+          "A person stands still and turns his head slightly to the right.",
+          "A person walks forward, swings their arms, and steps over a staircase.",
+          "A person walks forward, extends their arms outward, and then turns slightly to the right."
+        ]
+      },
+      "clatr_caption": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          77,
+          512
+        ]
+      },
+      "clatr_mask": {
+        "device": "cuda:0",
+        "dtype": "torch.bool",
+        "shape": [
+          4,
+          77
+        ]
+      },
+      "index": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "padding_mask": {
+        "device": "cuda:0",
+        "dtype": "torch.bool",
+        "shape": [
+          4,
+          300
+        ]
+      },
+      "proj_joints": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          300,
+          18
+        ]
+      },
+      "sample_id": [
+        "2011_-4GsCEopbd4_00008_001_a",
+        "2011_-4GsCEopbd4_00017_000_a",
+        "2011_-EuO6OFypLo_00002_000_a",
+        "2011_-EuO6OFypLo_00002_000_b"
+      ],
+      "tmr_caption": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          168,
+          768
+        ]
+      },
+      "tmr_mask": {
+        "device": "cuda:0",
+        "dtype": "torch.bool",
+        "shape": [
+          4,
+          168
+        ]
+      },
+      "x_cond": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          1024
+        ]
+      }
+    },
+    "outputs": {
+      "raw_input": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              4,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            300,
+            4
+          ]
+        },
+        "projection": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            300,
+            9,
+            2
+          ]
+        }
+      },
+      "raw_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              4,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            300,
+            4
+          ]
+        }
+      },
+      "x_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            300,
+            14
+          ]
+        },
+        "human": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            300,
+            199
+          ]
+        }
+      }
+    },
+    "x_input": {
+      "camera": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          300,
+          14
+        ]
+      },
+      "human": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          300,
+          199
+        ]
+      },
+      "projection": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          4,
+          300,
+          18
+        ]
+      }
+    }
+  },
+  "metric_checkpoint_status": {
+    "autoencoder_ckpts": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/autoencoder/aemmardm-xgmj0yjj-325.ckpt"
+    ],
+    "clatr_files": [],
+    "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+    "tmr_files": []
+  },
+  "metric_status": "not_run; this smoke validates callback input contract only, because CLaTr/TMR checkpoint-backed official metric instantiation is a separate step",
+  "mode": "official_bridge_smoke",
+  "run": {
+    "checkpoint": "runs/train/stage2/pulp_official_full_mixed_20260611/gpu0_train_mixed_full_b512_epochmatch_82688_20260611_2110/last.pt",
+    "joint_loss_mode": "element_mean",
+    "run_dir": "runs/train/stage2/pulp_official_full_mixed_20260611/gpu0_train_mixed_full_b512_epochmatch_82688_20260611_2110",
+    "step": 82688
+  },
+  "sample_range": [
+    0,
+    4
+  ],
+  "samples": 4,
+  "timestep": 500
+}

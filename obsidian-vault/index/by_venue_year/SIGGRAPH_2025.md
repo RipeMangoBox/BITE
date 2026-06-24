@@ -1,0 +1,867 @@
+---
+title: "Venue_Year: SIGGRAPH_2025"
+type: paper-index
+dimension: venue_year
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Venue_Year: SIGGRAPH_2025
+
+- 3D Stylization via Large Reconstruction Model (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/3D_Stylization_via_Large_Reconstruction_Model.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- 3D-Fixup: Advancing Photo Editing with 3D Priors (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/3D-Fixup_Advancing_Photo_Editing_with_3D_Priors.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- 3DGH: 3D Head Generation with Composable Hair and Face (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/3DGH_3D_Head_Generation_with_Composable_Hair_and_Face.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- 3DGS2: Near Second-order Converging 3D Gaussian Splatting (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- 4D Gaussian Videos with Motion Layering (SIGGRAPH 2025 2025)
+- 60,000nits Full-color Native RGB Single Junction 3,386PPI Micro-OLED (SIGGRAPH 2025 2025)
+- A Closest Point Method for PDEs on Manifolds with Interior Boundary Conditions for Geometry Processing (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Closest_Point_Method_for_PDEs_on_Manifolds_with_Interior_Boundary_Conditions_for_Geometry_Processing.pdf|PDF]]
+- A Deep Learning-based Virtual Oculoplastic Surgery Simulator (SIGGRAPH 2025 2025)
+- A Divide-and-Conquer Approach for Global Orientation of Non-Watertight Scene-Level Point Clouds with 0-1 Integer Optimization (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Divide-and-Conquer_Approach_for_Global_Orientation_of_Non-Watertight_Scene-Level_Point_Clouds_with_0-1_Integer_Optimization.pdf|PDF]]
+	- method groups: Optimization / Theory
+- A Fast Parallel Median Filtering Algorithm Using Hierarchical Tiling (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Fast_Parallel_Median_Filtering_Algorithm_Using_Hierarchical_Tiling.pdf|PDF]]
+- A Fluorescent Material Model for Non-Spectral Editing & Rendering (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Fluorescent_Material_Model_for_Non-Spectral_Editing__Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- A Fully-statistical Wave Scattering Model for Heterogeneous Surfaces (SIGGRAPH 2025 2025)
+- A Hybrid Near-wall Model for Kinetic Simulation of Turbulent Boundary Layer Flows (SIGGRAPH 2025 2025)
+- A Large-Étendue Direct-View Holographic Display System (SIGGRAPH 2025 2025)
+- A Monte Carlo Rendering Framework for Simulating Optical Heterodyne Detection (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- A Neural Particle Level Set Method for Dynamic Interface Tracking (SIGGRAPH 2025 2025)
+- A Novel Maxwellian Optics Combining Spherical Multi Pinholes and TMD for Enhanced Field of View (SIGGRAPH 2025 2025)
+- A Platform for Interactive AI Character Experiences (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Platform_for_Interactive_AI_Character_Experiences.pdf|PDF]]
+- A Polyhedral Construction of Empty Spheres in Discrete Distance Fields (SIGGRAPH 2025 2025)
+- A Versatile Quaternion-Based Constrained Rigid Body Dynamics (SIGGRAPH 2025 2025)
+- Accelerated Gamut Discovery via Massive Parallelization (SIGGRAPH 2025 2025)
+- Adaptive Algebraic Reuse of Reordering in Cholesky Factorizations with Dynamic Sparsity Patterns (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Adaptive_Algebraic_Reuse_of_Reordering_in_Cholesky_Factorizations_with_Dynamic_Sparsity_Patterns.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- Adaptive Phase-Field-FLIP for Very Large Scale Two-Phase Fluid Simulation (SIGGRAPH 2025 2025)
+- Adding Regional Control for Continuous Remeshing via Attention Flows (SIGGRAPH 2025 2025)
+- Advancing GPU IPC for Stiff Affine-Deformable Simulation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Advancing_GPU_IPC_for_Stiff_Affine-Deformable_Simulation.pdf|PDF]]
+- Aerial 3D Display With Ultra-Wide Viewing Zone Using Polarization Characteristics of LCDs (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Aerial Path Online Planning for Urban Scene Updation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Aerial_Path_Online_Planning_for_Urban_Scene_Updation.pdf|PDF]]
+	- method groups: Agent / RL / Planning
+- AlignTex: Pixel-Precise Texture Generation from Multi-view Artwork (SIGGRAPH 2025 2025)
+- AMOR: Adaptive Character Control through Multi-Objective Reinforcement Learning (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AMOR_Adaptive_Character_Control_through_Multi-Objective_Reinforcement_Learning.pdf|PDF]]
+	- method groups: Agent / RL / Planning
+- An Infinity Mirror Without Apparent Mirroring (SIGGRAPH 2025 2025)
+- Anime Colorization Using Segment Matching With Candidate Colors (SIGGRAPH 2025 2025)
+- ANIME-Rod: Adjustable Nonlinear Isotropic Materials for Elastic Rods (SIGGRAPH 2025 2025)
+- Anymate: A Dataset and Baselines for Learning 3D Object Rigging (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Anymate_A_Dataset_and_Baselines_for_Learning_3D_Object_Rigging.pdf|PDF]]
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.md|AnyTop Character Animation Diffusion with Any Topology (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnyTop
+	- datasets: Truebones Zoo - Quadrupeds subset, Truebones Zoo - Bipeds subset, Truebones Zoo - Flying subset
+- [[obsidian-vault/analysis/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.md|AnyTop: Character Animation Diffusion with Any Topology (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AnyTop
+	- datasets: Truebones Zoo - Quadrupeds subset, Truebones Zoo - Bipeds subset, Truebones Zoo - Flying subset
+- Anywhere Door Experience: Projection Mapping for Enhancing Entertainment and Immersion (SIGGRAPH 2025 2025)
+- Appearance-aware Multi-view SVBRDF Reconstruction via Deep Reinforcement Learning (SIGGRAPH 2025 2025)
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+- Appearance-Preserving Scene Aggregation for Level-of-Detail Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Arenite: A Physics-based Sandstone Simulator (SIGGRAPH 2025 2025)
+- Assessing Learned Models for Phase-only Hologram Compression (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Assessing_Learned_Models_for_Phase-only_Hologram_Compression.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- AssetDropper: Asset Extraction via Diffusion Models with Reward-Driven Optimization (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AssetDropper_Asset_Extraction_via_Diffusion_Models_with_Reward-Driven_Optimization.pdf|PDF]]
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+- Asymptotic analysis and design of linear elastic shell lattice metamaterials (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Asymptotic_analysis_and_design_of_linear_elastic_shell_lattice_metamaterials.pdf|PDF]]
+- Augmented Vertex Block Descent (SIGGRAPH 2025 2025)
+- AutoKeyframe: Autoregressive Keyframe Generation for Human Motion Synthesis and Editing (SIGGRAPH 2025 2025)
+- Automated Task Scheduling for Cloth and Deformable Body Simulations in Heterogeneous Computing Environments (SIGGRAPH 2025 2025)
+- Automatic Interpretation of Ancient Egyptian Texts for Education and Research (SIGGRAPH 2025 2025)
+- BANG: Dividing 3D Assets via Generative Exploded Dynamics (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/BANG_Dividing_3D_Assets_via_Generative_Exploded_Dynamics.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Be Decisive: Noise-Induced Layouts for Multi-Subject Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Be_Decisive_Noise-Induced_Layouts_for_Multi-Subject_Generation.pdf|PDF]]
+- Bernstein Bounds for Caustics (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Bernstein_Bounds_for_Caustics.pdf|PDF]]
+- Beyond Automation: Fostering Agency Between Humans, Algorithms, and Machines in Computational Design for Digital Fabrication (SIGGRAPH 2025 2025)
+- Boolean Operation for CAD Models Using a Hybrid Representation (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- BrepDiff: Single-Stage B-rep Diffusion Model (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow
+- BuildingBlock: A Hybrid Approach for Structured Building Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/BuildingBlock_A_Hybrid_Approach_for_Structured_Building_Generation.pdf|PDF]]
+- C-Tubes: Design and Optimization of Tubular Structures Composed of Developable Strips (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- C5D: Sequential Continuous Convex Collision Detection Using Cone Casting (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- CageNet: A Meta-Framework for Learning on Wild Meshes (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CageNet_A_Meta-Framework_for_Learning_on_Wild_Meshes.pdf|PDF]]
+- Capsule: Efficient Player Isolation for Datacenters (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Capsule_Efficient_Player_Isolation_for_Datacenters.pdf|PDF]]
+	- method groups: Systems / Efficiency / Compression
+- CAST: Component-Aligned 3D Scene Reconstruction from an RGB Image (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CAST_Component-Aligned_3D_Scene_Reconstruction_from_an_RGB_Image.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis.md|Chang et al. Large Scale Multi Character Interaction Synthesis (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Conditional Generative Pipeline for Coordinated Multi-Character Interaction
+	- datasets: InterHuman dancing subset, Adding New Characters, Generating Large Scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2025/CineMaster_A_3D-Aware_and_Controllable_Framework_for_Cinematic_Text-to-Video_Generation.md|CineMaster: A 3D-Aware and Controllable Framework for Cinematic Text-to-Video Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CineMaster_A_3D_Aware_and_Controllable_Framework_for_Cinematic_Text_to_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CineMaster
+	- datasets: Table 1
+- Cirrus: Adaptive Hybrid Particle-Grid Flow Maps on GPU (SIGGRAPH 2025 2025)
+- CK-MPM: A Compact-Kernel Material Point Method (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CK-MPM_A_Compact-Kernel_Material_Point_Method.pdf|PDF]]
+- Claycode: Stylable and Deformable 2D Scannable Codes (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Claycode_Stylable_and_Deformable_2D_Scannable_Codes.pdf|PDF]]
+- Clebsch Gauge Fluid on Particle Flow Maps (SIGGRAPH 2025 2025)
+- Closed-form Generalized Winding Numbers of Rational Parametric Curves for Robust Containment Queries (SIGGRAPH 2025 2025)
+	- method groups: Safety / Privacy / Robustness
+- CLR-Wire: Towards Continuous Latent Representations for 3D Curve Wireframe Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CLR-Wire_Towards_Continuous_Latent_Representations_for_3D_Curve_Wireframe_Generation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- CMD: Controllable Multiview Diffusion for 3D Editing and Progressive Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CMD_Controllable_Multiview_Diffusion_for_3D_Editing_and_Progressive_Generation.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Co-Speech Gesture and Facial Expression Generation for Non-Photorealistic 3D Characters (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Cobra: Efficient Line Art COlorization with BRoAder References (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Collaborative On-Sensor Array Cameras (SIGGRAPH 2025 2025)
+- Color Matching and Biomimicry for Multi-material Dental 3D Printing (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- ColorSurge: Bringing Vibrancy and Efficiency to Automatic Video Colorization via Dual-Branch Fusion (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Compensating Spatiotemporally Inconsistent Observations for Online Dynamic 3D Gaussian Splatting (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Computational Modeling of Gothic Microarchitecture (SIGGRAPH 2025 2025)
+- Confidence Estimation of Few-Shot Patch-Based Learning for Anime-Style Colorization (SIGGRAPH 2025 2025)
+- Conformal First Passage for Epsilon-free Walk-on-Spheres (SIGGRAPH 2025 2025)
+- Controllable Complex Freezing Dynamics Simulation on Thin Films (SIGGRAPH 2025 2025)
+- Controllable Tracking-Based Video Frame Interpolation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Cora: Correspondence-aware image editing using few step diffusion (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Correct your balance heuristic: Optimizing balance-style multiple importance sampling weights (SIGGRAPH 2025 2025)
+- Creating Fluid-Interactive Virtual Agents by an Efficient Simulator with Local-domain Control (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- CueTip: An Interactive and Explainable Physics-aware Pool Assistant (SIGGRAPH 2025 2025)
+- Curl Quantization for Automatic Placement of Knit Singularities (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/SIGGRAPH_2025/DAM-VSR_Disentanglement_of_Appearance_and_Motion_for_Video_Super-Resolution.md|DAM-VSR: Disentanglement of Appearance and Motion for Video Super-Resolution (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/SIGGRAPH_2025/2025_DAM_VSR_Disentanglement_of_Appearance_and_Motion_for_Video_Super_Resolution.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: DAM-VSR
+	- datasets: UDM10, YouHQ40, VideoLQ & AIGC29
+- DAMO: A Deep Solver for Arbitrary Marker Configuration in Optical Motion Capture (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Data-Efficient Discovery of Hyperelastic TPMS Metamaterials with Extreme Energy Dissipation (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- DC-VSR: Spatially and Temporally Consistent Video Super-Resolution with Video Diffusion Prior (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- DeepMill: Neural Accessibility Learning for Subtractive Manufacturing (SIGGRAPH 2025 2025)
+- DeFillet: Detection and Removal of Fillet Regions in Polygonal CAD Models (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Deformable Beta Splatting (SIGGRAPH 2025 2025)
+- Designing 3D Anisotropic Frame Fields with Odeco Tensors (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Designing Balancing Toys Through Mass and Shape Optimization (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Designing Pin-pression Gripper and Learning its Dexterous Grasping with Online In-hand Adjustment (SIGGRAPH 2025 2025)
+- DesignManager: An Agent-Powered Copilot for Designers to Integrate AI Design Tools into Creative Workflows (SIGGRAPH 2025 2025)
+	- method groups: Agent / RL / Planning
+- Differentiable Geometric Acoustic Path Tracing using Time-Resolved Path Replay Backpropagation (SIGGRAPH 2025 2025)
+	- method groups: Graph / Geometric / Structured Data
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Diffuse-CLoC_Guided_Diffusion_for_Physics-based_Character_Look-ahead_Control.md|Diffuse-CLoC: Guided Diffusion for Physics-based Character Look-ahead Control (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Diffuse_CLoC_Guided_Diffusion_for_Physics_based_Character_Look_ahead_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Diffuse-CLoC
+	- datasets: Walk+Perturb, Forest, Jump
+- Diffusing Winding Gradients (DWG): A Parallel and Scalable Method for 3D Reconstruction from Unoriented Point Clouds (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Diffusion_as_Shader_3D-aware_Video_Diffusion_for_Versatile_Video_Generation_Control.md|Diffusion as Shader: 3D-aware Video Diffusion for Versatile Video Generation Control (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Diffusion_as_Shader_3D_aware_Video_Diffusion_for_Versatile_Video_Generation_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Diffusion as Shader (DaS)
+	- datasets: Camera Control, Motion Transfer, Mesh-to-Video Generation
+- Digital Animation of Powder-Snow Avalanches (SIGGRAPH 2025 2025)
+- Digitizing Devotion: Virtual Religious Spaces for Cultural Preservation and Transmission (SIGGRAPH 2025 2025)
+- Discrete Torsion of Connection Forms on Simplicial Meshes (SIGGRAPH 2025 2025)
+- Disentangled Phoneme-Prosody Mapping for Controllable 3D Facial Animation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- DiversePuppetry: An Immersive Multi-User Puppetry System Based on Asymmetric Interaction (SIGGRAPH 2025 2025)
+- Divide-and-Conquer Embedding (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- Don’t Splat your Gaussians: Volumetric Ray-Traced Primitives for Modeling and Rendering Scattering and Emissive Media (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Drag Your Gaussian: Effective Drag-Based Editing  with Score Distillation for 3D Gaussian Splatting (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- DreamCraft: Interactive 3D Scene Creation From Editable Panorama in Virtual Reality (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- DreamMask: Boosting Open-vocabulary Panoptic Segmentation with Synthetic Data (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+- Dress-1-to-3: Single Image to Simulation-Ready 3D Outfit with Diffusion Prior and Differentiable Physics (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- Dual-Band Feature Fusion for Neural Global Illumination with Multi-Frequency Reflections (SIGGRAPH 2025 2025)
+- DualMS: Implicit Dual-Channel Minimal Surface Optimization for Heat Exchanger Design (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2025/DuetGen_Music_Driven_Two_Person_Dance_Generation_via_Hierarchical_Masked_Modeling.md|DuetGen Music Driven Two Person Dance Generation via Hierarchical Masked Modeling (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/DuetGen_Music_Driven_Two_Person_Dance_Generation_via_Hierarchical_Masked_Modeling.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DuetGen
+	- datasets: DD100
+- [[obsidian-vault/analysis/SIGGRAPH_2025/DuetGen_Music_Driven_Two_Person_Dance_Generation_via_Hierarchical_Masked_Modeling.md|DuetGen: Music Driven Two-Person Dance Generation via Hierarchical Masked Modeling (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/DuetGen_Music_Driven_Two_Person_Dance_Generation_via_Hierarchical_Masked_Modeling.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DuetGen
+	- datasets: DD100
+- Dust in Time: Exploring Embodied Experience of Time via an Interactive Installation (SIGGRAPH 2025 2025)
+- Dynamic Concepts Personalization from Single Videos (SIGGRAPH 2025 2025)
+- Dynamic Mesh Processing on the GPU (SIGGRAPH 2025 2025)
+- Dynamic Skinning: Kinematics-Driven Cartoon Effects for Articulated Characters (SIGGRAPH 2025 2025)
+- Echoes of the Coliseum: Towards 3D Live streaming of Sports Events (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- EDGE: Epsilon-Difference Gradient Evolution for Buffer-Free Flow Maps (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- EditDuet: A Multi-Agent System for Video Non-Linear Editing (SIGGRAPH 2025 2025)
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+- Efficient Proxy Raytracer for Optical Systems Using Implicit Neural Representations (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Elastic Locomotion with Mixed Second-order Differentiation (SIGGRAPH 2025 2025)
+- Elevating 3D Models: High-Quality Texture and Geometry Refinement from a Low-Quality Model (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/ELGAR_Expressive_Cello_Performance_Motion_Generation_for_Audio_Rendition.md|ELGAR: Expressive Cello Performance Motion Generation for Audio Rendition (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/ELGAR_Expressive_Cello_Performance_Motion_Generation_for_Audio_Rendition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: ELGAR
+	- datasets: SPD-GEN
+- Emulating Emulsion: A Compact Physically-Based Model for Film Colour (SIGGRAPH 2025 2025)
+- Encoded Marker Clusters for Auto-Labeling in Optical Motion Capture (SIGGRAPH 2025 2025)
+- End-to-end Surface Optimization for Light Control (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Escher Tile Deformation via Closed-Form Solution (SIGGRAPH 2025 2025)
+- EVA: Expressive Virtual Avatars from Multi-view Videos (SIGGRAPH 2025 2025)
+- Evaluating Skin Tone Biases in Virtual Human Rendering (SIGGRAPH 2025 2025)
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+- Evaluating the Effectiveness of Configurable Virtual Reality System for Multi-sensory Spatial Audio Training (SIGGRAPH 2025 2025)
+	- method groups: Benchmark / Evaluation
+- Exploring AI Frame Interpolation Techniques for Watercolour Animation (SIGGRAPH 2025 2025)
+- Exploring Distance Management in Immersive Combat Sports Training With Encountered-Type Haptic Feedback (SIGGRAPH 2025 2025)
+- Exploring Real-Time Water Surface Simulation for Immersive Virtual Reality Using Marker-Based Tracking (SIGGRAPH 2025 2025)
+- FaceExpressions-70k: A Dataset of Perceived Expression Differences (SIGGRAPH 2025 2025)
+	- method groups: Benchmark / Evaluation
+- Facial Appearance Capture at Home with Patch-Level Reflectance Prior (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Facial_Appearance_Capture_at_Home_with_Patch-Level_Reflectance_Prior.pdf|PDF]]
+- Facial Microscopic Structures Synthesis from a Single Unconstrained Image (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Faraday Cage Estimation of Normals for Point Clouds and Ribbon Sketches (SIGGRAPH 2025 2025)
+- FashionComposer: Compositional Fashion Image Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/FashionComposer_Compositional_Fashion_Image_Generation.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Fast But Accurate: A Real-Time Hyperelastic Simulator with Robust Frictional Contact (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Fast_But_Accurate_A_Real-Time_Hyperelastic_Simulator_with_Robust_Frictional_Contact.pdf|PDF]]
+	- method groups: Safety / Privacy / Robustness
+- Fast Determination and Computation of Self-intersections for NURBS Surfaces (SIGGRAPH 2025 2025)
+- Fast Isotropic Median Filtering (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Fast_Isotropic_Median_Filtering.pdf|PDF]]
+- Fast Physics-Based Modeling of Knots and Ties using Templates (SIGGRAPH 2025 2025)
+- Fast Subspace Fluid Simulation with a Temporally-Aware Basis (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Fast_Subspace_Fluid_Simulation_with_a_Temporally-Aware_Basis.pdf|PDF]]
+- Feature-Aligned Parametrization in Penner Coordinates (SIGGRAPH 2025 2025)
+- Feature-Preserving Mesh Repair via Restricted Power Diagram (SIGGRAPH 2025 2025)
+- Feeling Blue or Seeing Red? Investigating the effect of light color, shadow and realism on the perception of emotion of real and virtual humans (SIGGRAPH 2025 2025)
+- Field Smoothness-Controlled Partition for Quadrangulation (SIGGRAPH 2025 2025)
+- FlexiAct: Towards Flexible Action Control in Heterogeneous Scenarios (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/FlexiAct_Towards_Flexible_Action_Control_in_Heterogeneous_Scenarios.pdf|PDF]]
+- Flexible 3D Cage-based Deformation via Green Coordinates on Bézier Patches (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Flexible_3D_Cage-based_Deformation_via_Green_Coordinates_on_Bézier_Patches.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- FLoD: Integrating Flexible Level of Detail into 3D Gaussian Splatting for Customizable Rendering (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/FLoD_Integrating_Flexible_Level_of_Detail_into_3D_Gaussian_Splatting_for_Customizable_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- Fluid Simulation on Compressible Flow Maps (SIGGRAPH 2025 2025)
+- Fluid Simulation on Vortex Particle Flow Maps (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Fluid_Simulation_on_Vortex_Particle_Flow_Maps.pdf|PDF]]
+- Foliager: Procedural Forest Generation From Natural Language Using Scientific Data and AI (SIGGRAPH 2025 2025)
+- ForceGrip: Reference-Free Curriculum Learning for Realistic Grip Force Control in VR Hand Manipulation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/ForceGrip_Reference-Free_Curriculum_Learning_for_Realistic_Grip_Force_Control_in_VR_Hand_Manipulation.pdf|PDF]]
+	- method groups: Data Curation / Synthesis
+- From Style to Identity: AI Pipelines for Visual and Character Coherence in Film (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Full-Color Natural Light Holographic Video Camera (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- G-FED: G-Buffer Guided Frame Extrapolation in Video Diffusion Models (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- GAIA: Generative Animatable Interactive Avatars with Expression-conditioned Gaussians (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow
+- GarmentImage: Raster Encoding of Garment Sewing Patterns with Diverse Topologies (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/GarmentImage_Raster_Encoding_of_Garment_Sewing_Patterns_with_Diverse_Topologies.pdf|PDF]]
+- Gaussian Compression for Precomputed Indirect Illumination (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Gaussian Fluids: A Grid-Free Fluid Solver based on Gaussian Spatial Representation (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
+- Gaussian Wave Splatting for Computer-Generated Holography (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Gaussian_Wave_Splatting_for_Computer-Generated_Holography.pdf|PDF]]
+- GaVS: 3D-Grounded Video Stabilization via Temporally-Consistent Local Reconstruction and Rendering (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/GaVS_3D-Grounded_Video_Stabilization_via_Temporally-Consistent_Local_Reconstruction_and_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Gaze Entropy and Driver Safety: Understanding Cognitive Failure and Situational Response Before Take-over (SIGGRAPH 2025 2025)
+	- method groups: Safety / Privacy / Robustness
+- GBake: Baking 3D Gaussian Splats Into Reflection Probes (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/GBake_Baking_3D_Gaussian_Splats_Into_Reflection_Probes.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- GenAnalysis: Joint Shape Analysis by Learning Man-Made Shape Generators with Deformation Regularizations (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/GenAnalysis_Joint_Shape_Analysis_by_Learning_Man-Made_Shape_Generators_with_Deformation_Regularizations.pdf|PDF]]
+- Generating Past and Future in Digital Painting Processes (SIGGRAPH 2025 2025)
+- Generative detail enhancement for physically based materials (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Generative_detail_enhancement_for_physically_based_materials.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- Generative Neural Materials (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Generative_Neural_Materials.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- Generative Video Matting (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Generative_Video_Matting.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Geometric Contact Potential (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Geometric_Contact_Potential.pdf|PDF]]
+	- method groups: Graph / Geometric / Structured Data
+- GSHeadRelight: Fast Relightability for 3D Gaussian Head Synthesis (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Guided Lens Sampling for Efficient Monte Carlo Circle-of-Confusion Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Guiding-Based Importance Sampling for Walk on Stars (SIGGRAPH 2025 2025)
+- Hand Gesture-Driven Vertical Teleportation: Navigating Complex Height Differences in VR (SIGGRAPH 2025 2025)
+- Hand-Shadow Poser (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Hand-Shadow_Poser.pdf|PDF]]
+- Haunting Horizons: Human–AI Auto-Cartography of Tasmanian Island Experience (SIGGRAPH 2025 2025)
+- HexHex: Highspeed Extraction of Hexahedral Meshes (SIGGRAPH 2025 2025)
+- Hide A Bit: A Training-Free and High-Fidelity Steganography Method for 3D Gaussian Splatting Based on Bit Manipulation and RSA Encryption (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- High-Fidelity Novel View Synthesis via Splatting-Guided Diffusion (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/High-Fidelity_Novel_View_Synthesis_via_Splatting-Guided_Diffusion.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- High-performance CPU Cloth Simulation Using Domain-decomposed Projective Dynamics (SIGGRAPH 2025 2025)
+- Histogram Stratification for Spatio-Temporal Reservoir Sampling (SIGGRAPH 2025 2025)
+- HOIGaze: Gaze Estimation During Hand-Object Interactions in Extended Reality Exploiting Eye-Hand-Head Coordination (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/HOIGaze_Gaze_Estimation_During_Hand-Object_Interactions_in_Extended_Reality_Exploiting_Eye-Hand-Head_Coordination.pdf|PDF]]
+- HoLa: B-Rep Generation using a Holistic Latent Representation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/HoLa_B-Rep_Generation_using_a_Holistic_Latent_Representation.pdf|PDF]]
+	- method groups: Representation / Self-Supervised / Transfer
+- HoloChrome: Polychromatic Illumination for Speckle Reduction in Holographic Near-Eye Displays (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/HoloChrome_Polychromatic_Illumination_for_Speckle_Reduction_in_Holographic_Near-Eye_Displays.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_2025/HumanRAM_Feed-forward_Human_Reconstruction_and_Animation_Model_using_Transformers.md|HumanRAM: Feed-forward Human Reconstruction and Animation Model using Transformers (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/HumanRAM_Feed_forward_Human_Reconstruction_and_Animation_Model_using_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HumanRAM
+	- datasets: THuman2.1, Human4DiT, ActorsHQ
+- Hybrid Tours: A Clip-based System for (SIGGRAPH 2025 2025)
+- Hyper-Dimensional Deformation Simulation (SIGGRAPH 2025 2025)
+- HyperParamBRDF: Fast Parametric Reflectance via Hypernetworks and Physics-Based Simulation (SIGGRAPH 2025 2025)
+- Image-GS: Content-Adaptive Image Representation via 2D Gaussians (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Image-GS_Content-Adaptive_Image_Representation_via_2D_Gaussians.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Image-space Adaptive Sampling for Fast Inverse Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Image-Space Collage and Packing with Differentiable Rendering (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Image-Space_Collage_and_Packing_with_Differentiable_Rendering.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- IMLS-Splatting: Efficient Mesh Reconstruction from Multi-view Images via Point Representation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Improving Global Motion Estimation in Sparse IMU-based Motion Capture with Physics (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Improving_Global_Motion_Estimation_in_Sparse_IMU-based_Motion_Capture_with_Physics.pdf|PDF]]
+- In Search of Empty Spheres: 3D Apollonius Diagrams on GPU (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Instance Segmentation of Scene Sketches Using Natural Image Priors (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- InstanceGen: Image Generation with Instance-level Instructions (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/InstanceGen_Image_Generation_with_Instance-level_Instructions.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Instant Self-Intersection Repair for 3D Meshes (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- InstantRestore: Single-Step Personalized Face Restoration with Shared-Image Attention (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/InstantRestore_Single-Step_Personalized_Face_Restoration_with_Shared-Image_Attention.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Interactive Camerawork Authoring System for Free-Viewpoint Dance Contents (SIGGRAPH 2025 2025)
+- Interactive Object Insertion With Differentiable Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Interactive Optimization of Scaffolded Procedural Patterns (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Interactive Trailers and Posters That Enhance Viewing Intentions Through ‘Breaking the Fourth Wall’ (SIGGRAPH 2025 2025)
+- Intersection-Free Garment Retargeting (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Interspatial_Attention_for_Efficient_4D_Human_Video_Generation.md|Interspatial Attention for Efficient 4D Human Video Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Interspatial_Attention_for_Efficient_4D_Human_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ISA-DiT (Interspatial Attention Diffusion Transformer)
+	- datasets: Human4DiT Dataset, VBench
+- IntrinsicEdit: Precise generative image manipulation in intrinsic space (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/IntrinsicEdit_Precise_generative_image_manipulation_in_intrinsic_space.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Inverse Design of Discrete Interlocking Materials with Desired Mechanical Behavior (SIGGRAPH 2025 2025)
+- Inverse Geometric Locomotion (SIGGRAPH 2025 2025)
+	- method groups: Graph / Geometric / Structured Data
+- IP-Composer: Semantic Composition of Visual Concepts (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/IP-Composer_Semantic_Composition_of_Visual_Concepts.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- IP-Prompter: Training-Free Theme-Specific Image Generation via Dynamic Visual Prompting (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/IP-Prompter_Training-Free_Theme-Specific_Image_Generation_via_Dynamic_Visual_Prompting.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- James-Stein Gradient Combiner for Inverse Monte Carlo Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+- JGS2: Near Second-order Converging Jacobi/Gauss-Seidel for GPU Elastodynamics (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/JGS2_Near_Second-order_Converging_JacobiGauss-Seidel_for_GPU_Elastodynamics.pdf|PDF]]
+- Kernel Predicting Neural Shadow Maps (SIGGRAPH 2025 2025)
+- Kinematic Motion Retargeting for Contact-Rich Anthropomorphic Manipulations (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Kinematic_Motion_Retargeting_for_Contact-Rich_Anthropomorphic_Manipulations.pdf|PDF]]
+- LAM: Large Avatar Model for One-shot Animatable Gaussian Head (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis.md|Large-Scale Multi-Character Interaction Synthesis (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Large-Scale_Multi-Character_Interaction_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Conditional Generative Pipeline for Coordinated Multi-Character Interaction
+	- datasets: InterHuman dancing subset, Adding New Characters, Generating Large Scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2025/LayerFlow_A_Unified_Model_for_Layer-aware_Video_Generation.md|LayerFlow: A Unified Model for Layer-aware Video Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/LayerFlow_A_Unified_Model_for_Layer_aware_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LayerFlow
+	- datasets: VBench, User Study, DAVIS
+- LayerPano3D: Layered 3D Panorama for Hyper-Immersive Scene Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/LayerPano3D_Layered_3D_Panorama_for_Hyper-Immersive_Scene_Generation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Leapfrog Flow Maps for Real-Time Fluid Simulation (SIGGRAPH 2025 2025)
+- Learning to Assemble with Alternative Plans (SIGGRAPH 2025 2025)
+- Learning to Draw Is Learning to See: Analyzing Eye Tracking Patterns for Assisted Observational Drawing (SIGGRAPH 2025 2025)
+- Lifting the Winding Number: Precise Discontinuities in Neural Fields for Physics Simulation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Lifting_the_Winding_Number_Precise_Discontinuities_in_Neural_Fields_for_Physics_Simulation.pdf|PDF]]
+- Light Pipe Holographic Display: Bandwidth-preserved Kaleidoscopic Guiding for AR Glasses (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Light_Pipe_Holographic_Display_Bandwidth-preserved_Kaleidoscopic_Guiding_for_AR_Glasses.pdf|PDF]]
+- LightLab: Controlling Light Sources in Images with Diffusion Models (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/LightLab_Controlling_Light_Sources_in_Images_with_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- Lightning-fast Boundary Element Method (SIGGRAPH 2025 2025)
+- Linear-Time Transport with Rectified Flows (SIGGRAPH 2025 2025)
+- MAGNET: Muscle Activation Generation Networks for Diverse Human Movement (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MAMM_Motion_Control_via_Metric_Aligning_Motion_Matching.md|MAMM: Motion Control via Metric-Aligning Motion Matching (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MAMM.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Benchmark / Evaluation
+	- methods: Metric-Aligning Motion Matching (MAMM)
+	- datasets: Mixamo/Adobe动画资产, 手绘曲线、合成波形、音频、运动等控制序列
+- Manu-Grid: UI for Parameter Estimation of Tilt Angle Extended Generalized Projection Function in Illustrations (SIGGRAPH 2025 2025)
+- MASH: Masked Anchored SpHerical Distances for 3D Shape Representation and Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MASH_Masked_Anchored_SpHerical_Distances_for_3D_Shape_Representation_and_Generation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- MatCLIP: Light- and Shape-Insensitive Assignment of PBR Material Models (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MatCLIP_Light-_and_Shape-Insensitive_Assignment_of_PBR_Material_Models.pdf|PDF]]
+- MaterialPicker: Multi-Modal DiT-Based Material Generation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MaterialPicker_Multi-Modal_DiT-Based_Material_Generation.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_Large_Language_Models.md|MECo Motion example controlled Co speech Gesture Generation Leveraging Large Language Models (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_Large_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MECo
+	- datasets: BEAT2, ZEGGS
+- Meschers: Geometry Processing of Impossible Objects (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Meschers_Geometry_Processing_of_Impossible_Objects.pdf|PDF]]
+- MGPBD: A Multigrid Accelerated Global XPBD Solver (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MGPBD_A_Multigrid_Accelerated_Global_XPBD_Solver.pdf|PDF]]
+	- method groups: Optimization / Theory
+- MIND: Microstructure INverse Design with Generative Hybrid Neural Representation (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MIND_Microstructure_INverse_Design_with_Generative_Hybrid_Neural_Representation.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Minecraft to 3D: A Pipeline for High-Fidelity Reconstruction of Minecraft Worlds (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- MiSo: A DSL for robust and efficient MINIMIZE and SOLVE problems (SIGGRAPH 2025 2025)
+	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Mobius_Text_to_Seamless_Looping_Video_Generation_via_Latent_Shift.md|Mobius: Text to Seamless Looping Video Generation via Latent Shift (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Mobius_Text_to_Seamless_Looping_Video_Generation_via_Latent_Shift.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Mobius
+	- datasets: Custom text prompts, User Study, Longer Video Generation
+- Model See Model Do: Speech-Driven Facial Animation with Style Control (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Model_See_Model_Do_Speech-Driven_Facial_Animation_with_Style_Control.pdf|PDF]]
+- Modeling and Rendering Glow Discharge (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Moment Bounds are Differentiable: Efficiently Approximating Measures in Inverse Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- MonetGPT: Solving Puzzles Enhances MLLMs’ Image Retouching Skills (SIGGRAPH 2025 2025)
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MonetGPT_Solving_Puzzles_Enhances_MLLMs_Image_Retouching_Skills.pdf|PDF]]
+	- method groups: Vision / Multimodal / 3D
+- Monocular Online Reconstruction with Enhanced Detail Preservation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Monte Carlo PDE simulation in participating media (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MAMM_Motion_Control_via_Metric_Aligning_Motion_Matching.md|Motion Control via Metric-Aligning Motion Matching (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MAMM.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Benchmark / Evaluation
+	- methods: Metric-Aligning Motion Matching (MAMM)
+	- datasets: Mixamo/Adobe动画资产, 手绘曲线、合成波形、音频、运动等控制序列
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Motion_Inversion_for_Video_Customization.md|Motion Inversion for Video Customization (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Motion_Inversion_for_Video_Customization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Motion Inversion
+	- datasets: DAVIS, WebVID, 在线视频
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_Large_Language_Models.md|Motion-example-controlled Co-speech Gesture Generation Leveraging Large Language Models (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_Large_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MECo
+	- datasets: BEAT2, ZEGGS
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MotionCanvas_Cinematic_Shot_Design_with_Controllable_Image_to_Video_Generation.md|MotionCanvas: Cinematic Shot Design with Controllable Image-to-Video Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MotionCanvas_Cinematic_Shot_Design_with_Controllable_Image_to_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionCanvas
+	- datasets: RealEstate10K, VIPSeg
+- MoVer: Motion Verification for Motion Graphics Animations (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Multi_Person_Interaction_Generation_from_Two_Person_Motion_Priors.md|Multi Person Interaction Generation from Two Person Motion Priors (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Multi_Person_Interaction_Generation_from_Two_Person_Motion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Graph-driven Interaction Sampling
+	- datasets: InterHuman test set, Close interaction subset, Multi-person interactions
+- Multi-Dimensional Procedural Wave Noise (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Multi_Person_Interaction_Generation_from_Two_Person_Motion_Priors.md|Multi-Person Interaction Generation from Two-Person Motion Priors (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Multi_Person_Interaction_Generation_from_Two_Person_Motion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Graph-driven Interaction Sampling
+	- datasets: InterHuman test set, Close interaction subset, Multi-person interactions
+- Multiple Importance Reweighting for Path Guiding (SIGGRAPH 2025 2025)
+- MyTimeMachine: Personalized Facial Age Transformation (SIGGRAPH 2025 2025)
+- NAM: Neural Adjoint Maps for refinement of shape correspondences (SIGGRAPH 2025 2025)
+- NeST: Neural Stress Tensor Tomography by leveraging 3D Photoelasticity (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Nested Attention: Semantic-aware Attention Values for Concept Personalization (SIGGRAPH 2025 2025)
+- Neural BRDF Importance Sampling by Reparameterization (SIGGRAPH 2025 2025)
+- Neural Co-Optimization of Structural Topology, Manufacturable Layers, and Path Orientations for Fiber-Reinforced Composites (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Neural Importance Sampling of Many Lights (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Neurally_Integrated_Finite_Elements_for_Differentiable_Elasticity_on_Evolving_Domains.md|Neurally Integrated Finite Elements for Differentiable Elasticity on Evolving Domains (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Neurally_Integrated_Finite_Elements_for_Differentiable_Elasticity_on_Evolving_Domains.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Neurally Integrated Mixed FEM
+	- datasets: Dumbbell equilibrium, Dumbbell with large stiffness ratios, Dumbbell buckling
+- NeurCross: A Neural Approach to Computing Cross Fields for Quad Mesh Generation (SIGGRAPH 2025 2025)
+- Noise-Coded Illumination for Forensic and Photometric Video Analysis (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- OctGPT: Octree-based Multiscale Autoregressive Models for 3D Shape Generation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Offset Geometric Contact (SIGGRAPH 2025 2025)
+	- method groups: Graph / Geometric / Structured Data
+- On Planar Shape Interpolation With Logarithmic Metric Blending (SIGGRAPH 2025 2025)
+	- method groups: Benchmark / Evaluation
+- On-the-fly Reconstruction for Large-Scale Novel View Synthesis from Unposed Images (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- One Model to Rig Them All: Diverse Skeleton Rigging with UniRig (SIGGRAPH 2025 2025)
+- Optimal r-Adaptive In-Timestep Remeshing for Elastodynamics (SIGGRAPH 2025 2025)
+- Order Matters: Learning Element Ordering for Graphic Design Generation (SIGGRAPH 2025 2025)
+- PAAP: Performer-Aware Automatic Panning System (SIGGRAPH 2025 2025)
+- Painless Differentiable Rotation Dynamics (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Painting_with_3D_Gaussian_Splat_Brushes.md|Painting with 3D Gaussian Splat Brushes (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Painting_with_3D_Gaussian_Splat_Brushes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: 3D Gaussian Splat Painting
+	- datasets: 自定义3DGS场景
+- PaRas: A Rasterizer for Large-Scale Parametric Surfaces (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.md|PARC: Physics-based Augmentation with Reinforcement Learning for Character Controllers (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Agent / RL / Planning, Data Curation / Synthesis
+	- methods: PARC
+- PartEdit: Fine-Grained Image Editing using Pre-Trained Diffusion Models (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Patch-Grid: An Efficient and Feature-Preserving Neural Implicit Surface Representation (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+- PDT: Point Distribution Transformation with Diffusion Models (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow
+- Photoreal Scene Reconstruction from an Egocentric Device (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Physically Controllable Relighting of Photographs (SIGGRAPH 2025 2025)
+- Physically-Based Compositing of 2D Graphics (SIGGRAPH 2025 2025)
+- Physics-inspired Estimation of Optimal Cloth Mesh Resolution (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.md|PhysicsFC Learning User Controlled Skills for a Physics Based Football Player Controller (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PhysicsFC
+	- datasets: Dribble Skill, Trap Skill, Move Skill
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.md|PhysicsFC: Learning User-Controlled Skills for a Physics-Based Football Player Controller (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PhysicsFC
+	- datasets: Dribble Skill, Trap Skill, Move Skill
+- Piecewise Ruled Approximation for Freeform Mesh Surfaces (SIGGRAPH 2025 2025)
+- PLT: Part-Wise Latent Tokens as Adaptable Motion Priors for Physically Simulated Characters (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- Pocket Time-Lapse (SIGGRAPH 2025 2025)
+- Policy-Space Diffusion for Physics-Based Character Animation (SIGGRAPH 2025 2025)
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+- Polynomial 2D Biharmonic Coordinates for High-order Cages (SIGGRAPH 2025 2025)
+- pOps: Photo-Inspired Diffusion Operators (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow
+- Position-Normal Manifold for Efficient Glint Rendering on High-Resolution Normal Maps (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- Power-Linear Polar Directional Fields (SIGGRAPH 2025 2025)
+- Practical Inverse Rendering of Textured and Translucent Appearance (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Practical Stylized Nonlinear Monte Carlo Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Predicting Accidents in Conditional Autonomous Driving: A Multimodal Approach Integrating Human Misuse, Biometric Indicators, and Spatial Complexity (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Predicting Colors in Unpainted Gaps for Anime-Style Illustration (SIGGRAPH 2025 2025)
+- Predicting Fabric Appearance Through Thread Scattering and Inversion (SIGGRAPH 2025 2025)
+- Preserving Intangible Cultural Heritage of Megalithic Sites Using Immersive Mobile XR (SIGGRAPH 2025 2025)
+- Pretraining Support for Cheerleading Stunts Using Virtual Reality (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- PrimitiveAnything: Human-Crafted 3D Primitive Assembly Generation with Auto-Regressive transformer (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Progressive Dynamics++: A Framework for Stable, Continuous, and Consistent Animation Across Resolution and Time (SIGGRAPH 2025 2025)
+- PS-CAD: Local Geometry Guidance via Prompting and Selection for CAD Reconstruction (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Putting Rigid Bodies to Rest (SIGGRAPH 2025 2025)
+- QRBTF - AI QR Code Generator (SIGGRAPH 2025 2025)
+- Quadric-Based Silhouette Sampling for Differentiable Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Quadtree Tall Cells for Eulerian Liquid Simulation (SIGGRAPH 2025 2025)
+- QUASAR: Quad-based Adaptive Streaming And Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Radiance Surfaces: Optimizing Surface Representations with a 5D Radiance Field Loss (SIGGRAPH 2025 2025)
+- Rags2Riches: Computational Garment Reuse (SIGGRAPH 2025 2025)
+- Real-Time Knit Deformation and Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Real-Time Multispectral Lighting Reproduction (SIGGRAPH 2025 2025)
+- Reassemble by Packing: Path-Valid Spectral Placement for 3D Fragment Assembly (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Reconstructing Graphic Design Posters via Visual Decomposition and Semantic Layer Translation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Rectangular Surface Parameterization (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inversion.md|Reenact Anything: Semantic Video Motion Transfer Using Motion-Textual Inversion (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inversion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: motion-textual inversion
+	- datasets: Something-Something V2 subset
+- RELATE3D: REfocusing Latent Adapter for Targeted local Enhancement and Editing in 3D Generation (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+- Relightable Full-Body Gaussian Codec Avatars (SIGGRAPH 2025 2025)
+- RenderFormer: Transformer-based Neural Rendering of Triangle Meshes with Global Illumination (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Reservoir Splatting for Temporal Path Resampling and Motion Blur (SIGGRAPH 2025 2025)
+- ReStyle3D: Scene-Level Appearance Transfer with Semantic Correspondences (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- Revisiting Tradition and Beyond: A Customized Bilateral Filtering Framework for Point Cloud Denoising (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- RigAnything: Template-Free Autoregressive Rigging for Diverse 3D Assets (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- RNA: Relightable Neural Assets (SIGGRAPH 2025 2025)
+- SAWNA: Space-Aware Text to Image Generation (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- ScaffoldAvatar: High-Fidelity Gaussian Avatars with Patch Expressions (SIGGRAPH 2025 2025)
+- Scalable Volume Rendering of Billion-Cell CFD Simulations Using VFX Pipelines (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- SEE-2-SOUND: Zero-Shot Spatial Environment-to-Spatial Sound (SIGGRAPH 2025 2025)
+- Segment-based Light Transport Simulation (SIGGRAPH 2025 2025)
+- Semantically Consistent Text-to-Motion with Unsupervised Styles (SIGGRAPH 2025 2025)
+- Shape Space Spectra (SIGGRAPH 2025 2025)
+- Simulating the Mechanics of Ant Swarm Aggregations (SIGGRAPH 2025 2025)
+- Single Edge Collapse Quad-Dominant Mesh Reduction (SIGGRAPH 2025 2025)
+- Single View Garment Reconstruction Using Diffusion Mapping Via Pattern Coordinates (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Sketch-based Fluid Video Generation Using Motion-Guided Diffusion Models in Still Landscape Images (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation.md|Sketch2Anim: Towards Transferring Sketch Storyboards into 3D Animation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation.pdf|PDF]]
+	- topics: Sketch To Animation, Motion Diffusion, Pose Trajectory Control, Character Animation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Multi-conditional motion diffusion, trajectory ControlNet, keypose adapter
+	- datasets: HumanML3D
+- Sketch3DVE: Sketch-based 3D-Aware Scene Video Editing (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.md|SkillMimic v2 Learning Robust and Generalizable Interaction Skills from Sparse and Noisy Demonstrations (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Safety / Privacy / Robustness
+	- methods: SkillMimic-V2
+	- datasets: BallPlay-M, ParaHome
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.md|SkillMimic-V2: Learning Robust and Generalizable Interaction Skills from Sparse and Noisy Demonstrations (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Safety / Privacy / Robustness
+	- methods: SkillMimic-V2
+	- datasets: BallPlay-M, ParaHome
+- Skylight: Real-Time Projection Mapping for Surgical Navigation Leveraging Skin-Adhered Fiducials (SIGGRAPH 2025 2025)
+- Smartphone-Based Simple HMD With Multiple Mirrors and Lenticular Lens for Ultra-Wide Field of View (SIGGRAPH 2025 2025)
+- SOAP: Style-Omniscient Animatable Portraits (SIGGRAPH 2025 2025)
+- Sobol' Sequences with Guaranteed-Quality 2D Projections (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Solving_partial_differential_equations_in_participating_media.md|Solving partial differential equations in participating media (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Solving_partial_differential_equations_in_participating_media.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Volumetric walk on spheres (VWoS) and volumetric walk on stars (VWoSt)
+	- datasets: Mushroom domain, Connector domain, Bilipid membrane electrostatics
+- Spatial Adaptivity for Solving PDEs on Manifolds With the Closest Point Method (SIGGRAPH 2025 2025)
+- Spatiotemporally Consistent Indoor Lighting Estimation with Diffusion Priors (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow
+- Sphere Carving: Bounding Volumes for Signed Distance Fields (SIGGRAPH 2025 2025)
+- Spherical Lighting with Spherical Harmonics Hessian (SIGGRAPH 2025 2025)
+- Splat and Replace: 3D Reconstruction with Repetitive Elements (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Splat4D_Diffusion-Enhanced_4D_Gaussian_Splatting_for_Temporally_and_Spatially_Consistent_Content_Creation.md|Splat4D: Diffusion-Enhanced 4D Gaussian Splatting for Temporally and Spatially Consistent Content Creation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Splat4D_Diffusion_Enhanced_4D_Gaussian_Splatting_for_Temporally_and_Spatially_Consistent_Content_Creation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Splat4D
+	- datasets: Consistent4D
+- Spline Deformation Field (SIGGRAPH 2025 2025)
+- SpotLessSplats: Ignoring Distractors in 3D Gaussian Splatting (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- SqueezeMe: Mobile-Ready Distillation of Gaussian Full-Body Avatars (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Stable Cosserat Rods (SIGGRAPH 2025 2025)
+- Stable-Makeup: When Real-World Makeup Transfer Meets Diffusion Model (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- Sticking Information in Plain Sight: Encoding and Detecting Hidden Stickers in the Real World (SIGGRAPH 2025 2025)
+- Stitch-A-Shape: Bottom-up Learning for B-Rep Generation (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Stochastic_Barnes_Hut_Approximation_for_Fast_Summation_on_the_GPU.md|Stochastic Barnes-Hut Approximation for Fast Summation on the GPU (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Stochastic_Barnes_Hut_Approximation_for_Fast_Summation_on_the_GPU.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Stochastic Barnes-Hut Approximation
+	- datasets: Power station Coulomb potential, Coulomb potential, grid 1003
+- Stochastic Preconditioning for Neural Field Optimization (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Streaming-Aware Neural Monte Carlo Rendering Framework with Unified Denoising-Compression and Client Collaboration (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- StreamME: Simplify 3D Gaussian Avatar within Live Stream (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Stressful Tree Modeling: Breaking Branches with Strands (SIGGRAPH 2025 2025)
+- Stroke Imprint: Knitting Reassurance Into Anxious Moments (SIGGRAPH 2025 2025)
+- Stroke Transfer for Participating Media (SIGGRAPH 2025 2025)
+	- method groups: Representation / Self-Supervised / Transfer
+- StructInbet: Integrating Explicit Structural Guidance Into Inbetween Frame Generation (SIGGRAPH 2025 2025)
+- StructRe: Rewriting for Structured Shape Modeling (SIGGRAPH 2025 2025)
+- Style Customization of Text-to-Vector Generation with Image Diffusion Priors (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- SugART: Mixed Reality Sugar Painting for Intangible Cultural Heritage Learning at Home (SIGGRAPH 2025 2025)
+- Super Resolution for Humans (SIGGRAPH 2025 2025)
+- SurfelPlus: A Surfel-Based Global Illumination Solution Optimized for Low-End Graphics Hardware (SIGGRAPH 2025 2025)
+- SwiftSketch: A Diffusion Model for Image-to-Vector Sketch Generation (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- Synchronized tracing of primitive-based implicit volumes (SIGGRAPH 2025 2025)
+- Taking Control: Procedural Diffusion Guidance for Architectural Facade Editing (SIGGRAPH 2025 2025)
+	- method groups: Generative / Diffusion / Flow
+- TeGA: Texture Space Gaussian Avatars for High-Resolution Dynamic Head Modeling (SIGGRAPH 2025 2025)
+- TetWeave: Isosurface Extraction using On-The-Fly Delaunay Tetrahedral Grids for Gradient-Based Mesh Optimization (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Text-based Animatable 3D Avatars with Morphable Model Alignment (SIGGRAPH 2025 2025)
+	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+- Texture Size Reduction Through Symmetric Overlap and Texture Carving (SIGGRAPH 2025 2025)
+- The Gesture Lives On: A VR-Driven Puppet Performance in Immersive Space (SIGGRAPH 2025 2025)
+- The Mokume Dataset and Inverse Modeling of Solid Wood Textures (SIGGRAPH 2025 2025)
+	- method groups: Benchmark / Evaluation
+- Tiny is not small enough: High quality, low-resource facial animation models through hybrid knowledge distillation (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- To Infinity and Beyond: a GPU-Driven Memory Sharing Pipeline to Generate and Process Infinite Synthetic Data (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression, Data Curation / Synthesis
+- TokenVerse: Versatile Multi-concept Personalization in Token Modulation Space (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Topological Offsets (SIGGRAPH 2025 2025)
+- Towards Accelerating Polarization Path tracing of Multi-Bounce Smith Microfacet BSDFs (SIGGRAPH 2025 2025)
+- Towards Comprehensive Neural Materials: Dynamic Structure-Preserving Synthesis with Accurate Silhouette at Instant Inference Speed (SIGGRAPH 2025 2025)
+	- method groups: Systems / Efficiency / Compression
+- Towards Understanding Depth Perception in Foveated Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Train Once, Generate Anywhere: Discretization Agnostic Neural Cellular Automata Using SPH Method (SIGGRAPH 2025 2025)
+- Transformer IMU Calibrator: Dynamic On-body IMU Calibration for Inertial Motion Capture (SIGGRAPH 2025 2025)
+	- method groups: Optimization / Theory
+- Transforming Unstructured Hair Strands into Procedural Hair Grooms (SIGGRAPH 2025 2025)
+- TransparentGS: Fast Inverse Rendering of Transparent Objects with Gaussians (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Two-Stage Sketch-Based Smoke Illustration Generation Using Stream Function (SIGGRAPH 2025 2025)
+- UltraMeshRenderer: Efficient Structure and Management of GPU Out-of-core Memory for Real-time Rendering of Gigantic 3D Meshes (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Unbiased_Differential_Visibility_Using_Fixed_Step_Walk_on_Spherical_Caps_And_Closest_Silhouettes.md|Unbiased Differential Visibility Using Fixed-Step Walk-on-Spherical-Caps And Closest Silhouettes (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Unbiased_Differential_Visibility_Using_Fixed_Step_Walk_on_Spherical_Caps_And_Closest_Silhouettes.pdf|PDF]]
+	- topics: Optimization / Theory / Probabilistic ML
+	- method groups: Optimization / Theory
+	- methods: Fixed-Step Walk-on-Spherical-Caps (WoSC) for Warped-Area Reparameterization
+	- datasets: Voronoi-bunny shadows gradient, Center box gradient, Mirror shadows gradient
+- Uncertainty for SVBRDF Acquisition using Frequency Analysis (SIGGRAPH 2025 2025)
+	- method groups: Safety / Privacy / Robustness
+- Unified Pressure, Surface Tension and Friction for SPH Fluids (SIGGRAPH 2025 2025)
+- Unsupervised Decomposition of 3D Shapes into Expressive and Editable Extruded Profile Primitives (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Variable Shared Template for Consistent Non-rigid ICP (SIGGRAPH 2025 2025)
+- Variational Elastodynamic Simulation (SIGGRAPH 2025 2025)
+- Variational Green and Biharmonic Coordinates for 2D Polynomial Cages (SIGGRAPH 2025 2025)
+- Variational Surface Reconstruction Using Natural Neighbors (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Vector-Valued Monte Carlo Integration Using Ratio Control Variates (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Control.md|VideoAnydoor: High-fidelity Video Object Insertion with Precise Motion Control (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoAnydoor
+	- datasets: Custom benchmark, User study
+- [[obsidian-vault/analysis/SIGGRAPH_2025/VideoPainter_Any-length_Video_Inpainting_and_Editing_with_Plug-and-Play_Context_Control.md|VideoPainter: Any-length Video Inpainting and Editing with Plug-and-Play Context Control (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/VideoPainter_Any_length_Video_Inpainting_and_Editing_with_Plug_and_Play_Context_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: VideoPainter
+	- datasets: VPBench Standard Segmentation, VPBench Long Video Segmentation, Davis Random Mask
+- VirCHEW Reality: On-Face Kinesthetic Feedback for Enhancing Food-Intake Experience in Virtual Reality (SIGGRAPH 2025 2025)
+- Virtualized 3D Gaussians: Flexible Cluster-based Level-of-Detail System for Real-Time Rendering of Composed Scenes (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- ViSA: Physics-based Virtual Stunt Actors for Ballistic Stunts (SIGGRAPH 2025 2025)
+- VR-Doh: Hands-on 3D Modeling in Virtual Reality (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- Weight Illusion Induced by AR Visual Effects on the Arm (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- What is HDR? Perceptual Impact of Luminance and Contrast in Immersive Displays (SIGGRAPH 2025 2025)
+- When Gaussian Meets Surfel: Ultra-fast High-fidelity Radiance Field Rendering (SIGGRAPH 2025 2025)
+	- method groups: Vision / Multimodal / 3D
+- When Mud Toys Meet Digital M(B)uddies: How "Play With Earth" Bridges Traditional Craftsmanship and AI-Assisted Creation (SIGGRAPH 2025 2025)
+- WishGI: Lightweight Static Global Illumination Baking via Spherical Harmonics Fitting (SIGGRAPH 2025 2025)
+- xADA: Controllable and Expressive Audio-Driven Animation (SIGGRAPH 2025 2025)
+- You Can Grow Here: A Therapeutic VR Journey for Anxiety Management (SIGGRAPH 2025 2025)

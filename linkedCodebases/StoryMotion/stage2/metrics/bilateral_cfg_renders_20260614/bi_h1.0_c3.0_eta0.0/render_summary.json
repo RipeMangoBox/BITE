@@ -1,0 +1,70 @@
+{
+  "cfg_camera": 3.0,
+  "cfg_human": 1.0,
+  "cfg_mode": "bilateral",
+  "cfg_scale": 2.0,
+  "elapsed_sec": 59.92071056365967,
+  "eta": 0.0,
+  "samples": [
+    {
+      "modes": {
+        "camera": {
+          "concat": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/camera_concat.mp4",
+          "mp4": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/camera_skeleton.mp4",
+          "png": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/camera_render.png"
+        },
+        "human": {
+          "concat": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/human_concat.mp4",
+          "mp4": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/human_skeleton.mp4",
+          "png": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/human_render.png"
+        },
+        "joint": {
+          "concat": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/joint_concat.mp4",
+          "mp4": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/joint_skeleton.mp4",
+          "png": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/joint_render.png"
+        }
+      },
+      "render_context": {
+        "center_xy": [
+          -0.044366300106048584,
+          -0.2014080286026001
+        ],
+        "ground_z": -0.06441229581832886,
+        "xy_limit": 1.1264766454696655,
+        "z_limit": 1.7272641897201537
+      },
+      "sample_id": "2011_-4GsCEopbd4_00008_001_a",
+      "valid_frames": 69
+    },
+    {
+      "modes": {
+        "camera": {
+          "concat": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/camera_concat.mp4",
+          "mp4": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/camera_skeleton.mp4",
+          "png": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/camera_render.png"
+        },
+        "human": {
+          "concat": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/human_concat.mp4",
+          "mp4": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/human_skeleton.mp4",
+          "png": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/human_render.png"
+        },
+        "joint": {
+          "concat": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/joint_concat.mp4",
+          "mp4": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/joint_skeleton.mp4",
+          "png": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/bilateral_cfg_renders_20260614/bi_h1.0_c3.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/joint_render.png"
+        }
+      },
+      "render_context": {
+        "center_xy": [
+          -0.16845349967479706,
+          0.04327346384525299
+        ],
+        "ground_z": -0.050506770610809326,
+        "xy_limit": 1.1456753611564636,
+        "z_limit": 1.7567022204399108
+      },
+      "sample_id": "2011_-4GsCEopbd4_00017_000_a",
+      "valid_frames": 105
+    }
+  ]
+}

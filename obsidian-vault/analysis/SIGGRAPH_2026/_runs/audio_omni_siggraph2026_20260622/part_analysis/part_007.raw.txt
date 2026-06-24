@@ -1,0 +1,64 @@
+{
+  "part_id": "7/13",
+  "section_role": "Results, Ablation Studies, Conclusion",
+  "method_evidence": [
+    {
+      "claim": "During speech training, we randomly mask either speaker identity or speech content, forcing the model to infer the missing component from context.",
+      "section": "5.3",
+      "anchor": "During speech training, we randomly mask either speaker identity or speech content, forcing the model to infer the missing component from context.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "This optimal strategy involves providing high-level conditions (mm, trans) as flexible Context, while simultaneously concatenating low-level conditions (sync, mel) with the input noise.",
+      "section": "5.4",
+      "anchor": "This optimal strategy involves providing high-level conditions (mm, trans) as flexible Context, while simultaneously concatenating low-level conditions (sync, mel) with the input noise.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Mixed-data approach yields the best overall performance.",
+      "table_or_figure": "Table 5",
+      "metric": "KL↓ / IS↑ / FD↓ / FAD↓ / LSD↓",
+      "value": "1.30 / 5.93 / 20.48 / 2.48 / 1.82",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Optimal conditioning strategy: mm, trans as Context; sync, mel as Cat.",
+      "table_or_figure": "Table 6",
+      "metric": "T2A↓ / V2A↓ / TTS↓ / AE↓",
+      "value": "28.90 / 18.55 / 19.33 / 3.62",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Penultimate layer features are most effective for audio generative tasks.",
+      "table_or_figure": "Table 7",
+      "metric": "T2A IS↑ / FD↓ ; T2M IS↑ / FAD↓",
+      "value": "11.26 / 2.75 ; 3.46 / 3.05",
+      "confidence": 0.98
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table 5",
+      "role_hint": "Ablation study on dataset composition for audio editing training.",
+      "caption": "Table 5. Ablation study on dataset composition for audio editing training.",
+      "confidence": 0.98
+    },
+    {
+      "label": "Table 6",
+      "role_hint": "Ablation study on conditioning injection strategies.",
+      "caption": "Table 6. Ablation study on conditioning injection strategies.",
+      "confidence": 0.98
+    },
+    {
+      "label": "Table 7",
+      "role_hint": "Ablation study on the source of conditional features from the MLLM.",
+      "caption": "Table 7. Ablation study on the source of conditional features from the MLLM.",
+      "confidence": 0.98
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

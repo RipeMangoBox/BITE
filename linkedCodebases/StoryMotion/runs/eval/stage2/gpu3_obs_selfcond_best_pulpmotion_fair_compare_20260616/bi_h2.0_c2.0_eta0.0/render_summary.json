@@ -1,0 +1,170 @@
+{
+  "config": {
+    "cfg_camera": 2.0,
+    "cfg_human": 2.0,
+    "cfg_mode": "bilateral",
+    "cfg_name": "bi_h2.0_c2.0_eta0.0",
+    "cfg_scale": 2.0,
+    "eta": 0.0,
+    "sample_ids": [
+      "2011_-4GsCEopbd4_00008_001_a",
+      "2011_-4GsCEopbd4_00017_000_a"
+    ]
+  },
+  "samples": [
+    {
+      "fair_compare_png": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/fair_compare.png",
+      "joint_fair_concat": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/joint_fair_concat.mp4",
+      "motion_stats": {
+        "pulpmotion_wz0_wc11": {
+          "bone_len_cv_mean": 2.196184247665736e-07,
+          "bone_len_relerr_mean": 0.031078668662291222,
+          "foot_contact_rate": 1.0,
+          "foot_contact_rate_absdiff": 0.7794117647058824,
+          "foot_skate_speed_mean": 0.015107431448996067,
+          "gt_foot_contact_rate": 0.22058823529411764,
+          "joint_accel_mean": 0.008649848401546478,
+          "joint_velocity_mean": 0.014425205066800117,
+          "mpjpe_root_aligned": 0.27055713534355164,
+          "root_accel_mean": 0.005417017266154289,
+          "root_path_len": 0.7869599461555481
+        },
+        "pulpmotion_wz2_wc11": {
+          "bone_len_cv_mean": 2.41078137718999e-07,
+          "bone_len_relerr_mean": 0.031078683993296042,
+          "foot_contact_rate": 1.0,
+          "foot_contact_rate_absdiff": 0.7794117647058824,
+          "foot_skate_speed_mean": 0.015169131569564342,
+          "gt_foot_contact_rate": 0.22058823529411764,
+          "joint_accel_mean": 0.009109078906476498,
+          "joint_velocity_mean": 0.010462998412549496,
+          "mpjpe_root_aligned": 0.1575702726840973,
+          "root_accel_mean": 0.00490609323605895,
+          "root_path_len": 0.43537577986717224
+        },
+        "story_human": {
+          "bone_len_cv_mean": 2.1047003067886073e-07,
+          "bone_len_relerr_mean": 0.031078704291632134,
+          "foot_contact_rate": 0.15441176470588236,
+          "foot_contact_rate_absdiff": 0.06617647058823528,
+          "foot_skate_speed_mean": 0.038365110754966736,
+          "gt_foot_contact_rate": 0.22058823529411764,
+          "joint_accel_mean": 0.009268193505704403,
+          "joint_velocity_mean": 0.012562736868858337,
+          "mpjpe_root_aligned": 0.06032494083046913,
+          "root_accel_mean": 0.005389244295656681,
+          "root_path_len": 0.6195885539054871
+        },
+        "story_joint": {
+          "bone_len_cv_mean": 2.0734055913739427e-07,
+          "bone_len_relerr_mean": 0.031078687982286572,
+          "foot_contact_rate": 0.6617647058823529,
+          "foot_contact_rate_absdiff": 0.4411764705882353,
+          "foot_skate_speed_mean": 0.024864276871085167,
+          "gt_foot_contact_rate": 0.22058823529411764,
+          "joint_accel_mean": 0.011672863736748695,
+          "joint_velocity_mean": 0.01456019189208746,
+          "mpjpe_root_aligned": 0.2475873827934265,
+          "root_accel_mean": 0.0057756900787353516,
+          "root_path_len": 0.4379386901855469
+        }
+      },
+      "render_context": {
+        "center_xy": [
+          0.09954224526882172,
+          -0.0007020235061645508
+        ],
+        "ground_z": -0.10518664121627808,
+        "xy_limit": 1.2028668522834778,
+        "z_limit": 1.8443958401679992
+      },
+      "sample_id": "2011_-4GsCEopbd4_00008_001_a",
+      "story_human_vs_joint_concat": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/story_human_vs_joint_concat.mp4",
+      "valid_frames": 69,
+      "videos": {
+        "gt": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/gt_skeleton.mp4",
+        "pulpmotion_wz0_wc11": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/pulpmotion_wz0_wc11_skeleton.mp4",
+        "pulpmotion_wz2_wc11": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/pulpmotion_wz2_wc11_skeleton.mp4",
+        "story_human": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/story_human_skeleton.mp4",
+        "story_joint": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00008_001_a/story_joint_skeleton.mp4"
+      }
+    },
+    {
+      "fair_compare_png": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/fair_compare.png",
+      "joint_fair_concat": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/joint_fair_concat.mp4",
+      "motion_stats": {
+        "pulpmotion_wz0_wc11": {
+          "bone_len_cv_mean": 2.4511622132325775e-07,
+          "bone_len_relerr_mean": 0.05725317425816878,
+          "foot_contact_rate": 1.0,
+          "foot_contact_rate_absdiff": 0.004807692307692291,
+          "foot_skate_speed_mean": 0.004062536638230085,
+          "gt_foot_contact_rate": 0.9951923076923077,
+          "joint_accel_mean": 0.0033148417714983225,
+          "joint_velocity_mean": 0.0034188919235020876,
+          "mpjpe_root_aligned": 0.14585153758525848,
+          "root_accel_mean": 0.0019249309552833438,
+          "root_path_len": 0.2210230827331543
+        },
+        "pulpmotion_wz2_wc11": {
+          "bone_len_cv_mean": 2.4745400218437305e-07,
+          "bone_len_relerr_mean": 0.05725315828347772,
+          "foot_contact_rate": 1.0,
+          "foot_contact_rate_absdiff": 0.004807692307692291,
+          "foot_skate_speed_mean": 0.009002053178846836,
+          "gt_foot_contact_rate": 0.9951923076923077,
+          "joint_accel_mean": 0.005154132377356291,
+          "joint_velocity_mean": 0.007136174943298101,
+          "mpjpe_root_aligned": 0.11764001846313477,
+          "root_accel_mean": 0.0029748829547315836,
+          "root_path_len": 0.4300025701522827
+        },
+        "story_human": {
+          "bone_len_cv_mean": 2.3122093464538087e-07,
+          "bone_len_relerr_mean": 0.057253178107236125,
+          "foot_contact_rate": 1.0,
+          "foot_contact_rate_absdiff": 0.004807692307692291,
+          "foot_skate_speed_mean": 0.008147272281348705,
+          "gt_foot_contact_rate": 0.9951923076923077,
+          "joint_accel_mean": 0.005514042917639017,
+          "joint_velocity_mean": 0.00824038591235876,
+          "mpjpe_root_aligned": 0.0356440544128418,
+          "root_accel_mean": 0.003427535528317094,
+          "root_path_len": 0.4812663793563843
+        },
+        "story_joint": {
+          "bone_len_cv_mean": 2.6334929705204147e-07,
+          "bone_len_relerr_mean": 0.05725315387357045,
+          "foot_contact_rate": 0.15384615384615385,
+          "foot_contact_rate_absdiff": 0.8413461538461539,
+          "foot_skate_speed_mean": 0.00680758198723197,
+          "gt_foot_contact_rate": 0.9951923076923077,
+          "joint_accel_mean": 0.003012301167473197,
+          "joint_velocity_mean": 0.0055054486729204655,
+          "mpjpe_root_aligned": 0.08985093981027603,
+          "root_accel_mean": 0.0020720043685287237,
+          "root_path_len": 0.4803284704685211
+        }
+      },
+      "render_context": {
+        "center_xy": [
+          -0.16618330776691437,
+          0.04944811016321182
+        ],
+        "ground_z": -0.07309156656265259,
+        "xy_limit": 1.292940616607666,
+        "z_limit": 1.9825089454650877
+      },
+      "sample_id": "2011_-4GsCEopbd4_00017_000_a",
+      "story_human_vs_joint_concat": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/story_human_vs_joint_concat.mp4",
+      "valid_frames": 105,
+      "videos": {
+        "gt": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/gt_skeleton.mp4",
+        "pulpmotion_wz0_wc11": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/pulpmotion_wz0_wc11_skeleton.mp4",
+        "pulpmotion_wz2_wc11": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/pulpmotion_wz2_wc11_skeleton.mp4",
+        "story_human": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/story_human_skeleton.mp4",
+        "story_joint": "runs/eval/stage2/gpu3_obs_selfcond_best_pulpmotion_fair_compare_20260616/bi_h2.0_c2.0_eta0.0/2011_-4GsCEopbd4_00017_000_a/story_joint_skeleton.mp4"
+      }
+    }
+  ]
+}

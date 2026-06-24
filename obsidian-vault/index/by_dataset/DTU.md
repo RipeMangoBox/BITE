@@ -1,0 +1,95 @@
+---
+title: "Dataset: DTU"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: DTU
+
+- [[obsidian-vault/analysis/CVPR_2020/Cost_Volume_Pyramid_Based_Depth_Inference_for_Multi_View_Stereo.md|Cost Volume Pyramid Based Depth Inference for Multi-View Stereo (CVPR 2020 2020)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2020/Cost_Volume_Pyramid_Based_Depth_Inference_for_Multi_View_Stereo.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: CVP-MVSNet（Cost Volume Pyramid based Multi-View Stereo Network）
+	- datasets: DTU, Tanks and Temples
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.md|Adaptive Shells for Efficient Neural Radiance Field Rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Adaptive Shells
+	- datasets: Shelly, DTU
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/3D_Reconstruction_with_Fast_Dipole_Sums.md|3D Reconstruction with Fast Dipole Sums (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/3D_Reconstruction_with_Fast_Dipole_Sums.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Regularized Dipole Sums (Fast Dipole Sums)
+	- datasets: DTU, BlendedMVS
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/3DGSR_Implicit_Surface_Reconstruction_with_3D_Gaussian_Splatting.md|3DGSR: Implicit Surface Reconstruction with 3D Gaussian Splatting (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/3DGSR_Implicit_Surface_Reconstruction_with_3D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 3DGSR
+	- datasets: NeRF-synthetic, DTU
+- [[obsidian-vault/analysis/CVPR_2025/VGGT_Visual_Geometry_Grounded_Transformer.md|VGGT: Visual Geometry Grounded Transformer (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/VGGT_Visual_Geometry_Grounded_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: VGGT (Visual Geometry Grounded Transformer)
+	- datasets: RealEstate10K, CO3Dv2, DTU
+- [[obsidian-vault/analysis/CVPR_2026/GIFSplat_Generative_Prior_Guided_Iterative_Feed_Forward_3D_Gaussian_Splatting_from_Sparse_Views.md|GIFSplat: Generative Prior-Guided Iterative Feed-Forward 3D Gaussian Splatting from Sparse Views (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/GIFSplat_Generative_Prior_Guided_Iterative_Feed_Forward_3D_Gaussian_Splatting_from_Sparse_Views.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GIFSplat / IFSplat
+	- datasets: RealEstate10K, DL3DV, DTU
+- [[obsidian-vault/analysis/CVPR_2026/MeshSplatting_Differentiable_Rendering_with_Opaque_Meshes.md|MeshSplatting: Differentiable Rendering with Opaque Meshes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MeshSplatting_Differentiable_Rendering_with_Opaque_Meshes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MeshSplatting
+	- datasets: Mip-NeRF360, Tanks & Temples, DTU
+- [[obsidian-vault/analysis/CVPR_2026/MuM_Multi_View_Masked_Image_Modeling_for_3D_Vision.md|MuM: Multi-View Masked Image Modeling for 3D Vision (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/MuM_Multi_View_Masked_Image_Modeling_for_3D_Vision.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MuM
+	- datasets: CO3Dv2, Re10K, MegaDepth
+- [[obsidian-vault/analysis/CVPR_2026/VGG_T3_Offline_Feed_Forward_3D_Reconstruction_at_Scale.md|VGG-T3: Offline Feed-Forward 3D Reconstruction at Scale (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/VGG_T3_Offline_Feed_Forward_3D_Reconstruction_at_Scale.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: VGG-T3 (Visual Geometry Grounded Test Time Training)
+	- datasets: DTU, NRGBD-D, KITTI
+- [[obsidian-vault/analysis/ICLR_2026/Aligned_Novel_View_Image_and_Geometry_Synthesis_via_Cross_modal_Attention_Instillation.md|Aligned Novel View Image and Geometry Synthesis via Cross-modal Attention Instillation (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Aligned_Novel_View_Image_and_Geometry_Synthesis_via_Cross_modal_Attention_Instil_f3c511aaa3a8.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MoAI（Cross-modal Attention Instillation）
+	- datasets: DTU, RealEstate10K
+- [[obsidian-vault/analysis/ICLR_2026/D2GS_Depth_and_Density_Guided_Gaussian_Splatting_for_Stable_and_Accurate_Sparse_View_Reconstruction.md|D$^2$GS: Depth-and-Density Guided Gaussian Splatting for Stable and Accurate Sparse-View Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/D_2_GS_Depth_and_Density_Guided_Gaussian_Splatting_for_Stable_and_Accurate_Spars_24092536ec5d.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: D^2GS (Depth-and-Density Guided Gaussian Splatting)
+	- datasets: LLFF, MipNeRF360, DTU
+- [[obsidian-vault/analysis/ICLR_2026/DiffPBR_Point_Based_Rendering_via_Spatial_Aware_Residual_Diffusion.md|DiffPBR: Point-Based Rendering via Spatial-Aware Residual Diffusion (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/DiffPBR_Point_Based_Rendering_via_Spatial_Aware_Residual_Diffusion_9d4873f74381.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DiffPBR
+	- datasets: ScanNet, DTU, THuman2.0
+- [[obsidian-vault/analysis/ICLR_2026/Fracture_GS_Dynamic_Fracture_Simulation_with_Physics_Integrated_Gaussian_Splatting.md|Fracture-GS: Dynamic Fracture Simulation with Physics-Integrated Gaussian Splatting (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Fracture_GS_Dynamic_Fracture_Simulation_with_Physics_Integrated_Gaussian_Splatti_ec080bbb2d3d.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: Fracture-GS
+	- datasets: Ficus, Teapot, Table fracture simulation scenes
+- [[obsidian-vault/analysis/ICLR_2026/Mesh_Splatting_for_End_to_end_Multiview_Surface_Reconstruction.md|Mesh Splatting for End-to-end Multiview Surface Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Mesh_Splatting_for_End_to_end_Multiview_Surface_Reconstruction_023e28fff1e0.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Mesh Splatting
+	- datasets: DTU, BlendedMVS, DTU / NeRF Synthetic

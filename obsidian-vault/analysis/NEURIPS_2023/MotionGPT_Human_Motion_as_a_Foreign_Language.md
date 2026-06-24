@@ -1,0 +1,388 @@
+---
+title: "MotionGPT: Human Motion as a Foreign Language"
+type: paper
+paper_level: A
+venue: NeurIPS
+year: 2023
+pdf_ref: paperPDFs/NEURIPS_2023/MotionGPT_Human_Motion_as_a_Foreign_Language.pdf
+aliases:
+- MotionGPT
+tags:
+- NEURIPS_2023
+- topic/motion_animation
+- topic/motion_animation/human_motion_generation
+core_operator: "通过将3D运动离散化为运动token，并与文本token统一构建词汇表，使得基于预训练语言模型的框架能够以统一的自回归方式同时生成运动序列和自然语言，并通过指令微调实现多任务泛化。"
+primary_logic: "人体运动与人类语言之间存在语义耦合，可视为一种“身体语言”；因此，将运动视作一种外语，融合语言模型的大规模预训练能力，能够实现运动-语言的统一生成与理解。"
+claims:
+- "在统一的框架下，同时对运动和文本进行语言建模，将人体运动视为一种特定的语言。"
+- "MotionGPT在多个运动任务上取得了最先进的性能，包括文本到运动生成、运动描述、运动预测和运动插值。"
+- "我们使用离散向量量化将3D运动转换为运动token，类似于词元生成过程。"
+- "在指令微调阶段，我们定义了15种核心运动任务，并创建了超过一千种不同的指令模板。"
+---
+
+# MotionGPT: Human Motion as a Foreign Language
+
+> [!tip] 核心洞察
+> 人体运动与人类语言之间存在语义耦合，可视为一种“身体语言”；因此，将运动视作一种外语，融合语言模型的大规模预训练能力，能够实现运动-语言的统一生成与理解。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | MotionGPT：将人体运动视为外语 |
+| 英文题名 | MotionGPT: Human Motion as a Foreign Language |
+| 会议/期刊 | NeurIPS 2023 |
+| Links | [paper](https://arxiv.org/abs/2306.14795) · [GitHub](https://github.com/OpenMotionLab/MotionGPT) |
+| Topic | #topic/motion_animation #topic/motion_animation/human_motion_generation |
+| Method | MotionGPT |
+| Dataset | HumanML3D |
+
+> [!tip] 效果简介
+> - HumanML3D 上，Motion-to-Text Bleu@4 为 12.47，对比 7.00 (TM2T)，变化 +5.47。
+> - HumanML3D 上，Motion-to-Text Cider 为 29.2，对比 16.8 (TM2T)，变化 +12.4。
+> - HumanML3D 上，Motion Prediction FID 为 0.905，对比 6.031 (MDM)，变化 -5.126。
+
+## 概述
+
+人体运动生成与理解是计算机视觉中的核心问题。传统方法将人体运动与自然语言视为分离的模态，依赖严格配对的数据，且任务特定的设计无法统一处理文本到运动生成、运动描述、运动预测等多种任务，缺乏对运动-语言深层关联的综合理解。**MotionGPT** 提出了一种范式转换：将人体运动视为一种“外语”，通过将3D运动离散化为运动token，与文本token统一构建词汇表，使得基于预训练语言模型的框架能够以统一的自回归方式同时生成运动序列和自然语言，并通过指令微调实现多任务泛化。
+
+核心结论如下：
+
+- **统一建模**：MotionGPT在单一框架下同时处理运动与文本的语言建模，将人体运动视为一种特定的语言，实现了运动-语言的统一生成与理解。
+- **多任务领先**：在HumanML3D数据集上，MotionGPT在文本到运动生成、运动描述、运动预测和运动插值四个核心任务上均取得最先进性能。运动描述任务上Bleu@4达到12.47（对比TM2T的7.00），Cider达到29.2（对比16.8）；运动预测FID降至0.905（对比MDM的6.031）；运动插值FID降至0.214（对比2.698）。
+- **三阶段训练**：通过运动分词器训练、运动-语言预训练（混合无监督span corruption与有监督翻译）、指令微调三个阶段，模型从运动数据中学习离散表示，再与语言模型融合，最终通过15种核心任务、超千种指令模板实现多任务泛化。
+- **关键瓶颈**：模型性能受限于现有运动数据集的规模（约14.6K序列），更大模型（770M）未能展现明显性能提升，暗示数据量是当前主要瓶颈。
+
+**方法定位**：MotionGPT属于基于离散token的运动-语言统一预训练方法。与**T2M-GPT**（基于VQ-VAE和GPT，使用CLIP文本嵌入作为条件）和**MLD**（基于扩散模型，引入运动潜在空间）等任务特定方法不同，MotionGPT通过统一的文本-运动词汇表和序列到序列的Transformer架构，首次实现了单一模型对多种运动相关任务的统一处理，无需任务特定的模块设计。
+
+## 背景与动机
+
+### 人体运动与自然语言之间的语义鸿沟
+
+人体运动是人类沟通中与自然语言高度耦合的“身体语言”——一个手势、一个步伐往往承载着明确的语义意图。然而，在现有的运动生成与理解研究中，运动与语言长期被视为两个分离的模态。这种分离带来了一个根本性的瓶颈：**现有方法需要严格配对的数据，且任务特定的设计无法统一处理文本到运动生成、运动描述、运动预测等多种任务，缺乏对运动-语言深层关联的综合理解**。
+
+具体而言，当前主流方法可大致分为两类。一类以 **T2M-GPT**（基于 VQ-VAE 和 GPT 的运动生成方法）和 **MLD**（基于扩散模型的运动生成方法）为代表，它们将文本作为条件信号，通过 CLIP 等独立模块提取文本嵌入，再输入运动生成器。这类方法本质上仍是“条件生成”范式，文本与运动之间的交互停留在浅层映射层面。另一类以 **TM2T** 为代表，通过神经翻译网络建立运动和文本之间的双向映射，虽然实现了跨模态转换，但其架构天然地将生成和理解割裂为两个独立过程，无法在统一框架下协同优化。
+
+### 任务碎片化与模型泛化困境
+
+更值得关注的是，现有方法普遍面临**任务碎片化**的困境。如 Table 1 所示，**MDM**、**MotionDiffuse** 等基于扩散模型的方法虽然在文本到运动生成上表现优异，却无法处理运动描述、运动预测等任务；TM2T 支持文本-运动双向转换，但在无条件的随机运动生成或运动补全任务上无能为力。这种“一个模型一个任务”的范式不仅增加了工程部署的复杂性，更从根本上限制了模型对运动-语言深层语义耦合的理解。
+
+### 核心动机：将人体运动视为外语
+
+上述困境的根源在于，现有方法从未将人体运动真正视为一种可与自然语言对等的“语言系统”。本文的核心洞察是：**人体运动与人类语言之间存在语义耦合，可视为一种“身体语言”**。正如不同国家的语言可以通过统一的翻译模型相互转换，人体运动也可以被视为一种“外语”，从而与自然语言在统一的语言建模框架下进行联合学习。
+
+这一视角转换带来了方法论层面的根本变革：如果运动是一种语言，那么它就应当拥有自己的“词汇”（运动 token）和“语法”（运动序列的时序依赖），并且能够与文本 token 共享同一个生成式预训练语言模型。这正是 MotionGPT 的核心动机——**通过将 3D 运动离散化为运动 token，并与文本 token 统一构建词汇表，使得基于预训练语言模型的框架能够以统一的自回归方式同时生成运动序列和自然语言，并通过指令微调实现多任务泛化**。
+
+### 从任务特定到统一生成
+
+Figure 1 直观展示了这一统一范式的愿景：给定不同的指令提示，同一个模型可以完成文本到运动生成（左上）、运动描述生成（左下）、运动补全（右上）乃至运动相关的语言问答（右下）。这种任务统一性不仅是工程上的便利，更意味着模型在预训练阶段真正习得了运动与语言之间的深层语义对齐——这正是现有分离式方法无法企及的能力。
+
+## 核心创新
+
+MotionGPT 的核心创新在于**将人体运动视为一种“外语”**，通过构建统一的文本-运动词汇表，将运动生成与理解问题转化为序列到序列的语言建模问题。这一范式转移带来了四个关键层面的改变：
+
+### 1. 运动表示方式：从连续特征到离散token
+
+现有方法（如 **T2M-GPT**、**MLD**、**MDM**）通常将运动表示为连续的3D关节旋转或位置特征，或将其编码为连续的潜在向量。这种连续表示使得运动与离散的文本token之间存在天然的模态鸿沟，难以进行统一的序列建模。
+
+MotionGPT 采用基于 VQ-VAE 的运动分词器（Motion Tokenizer），将变长的运动序列编码为固定速率的离散运动token：
+
+$$z_i = Q(\hat{z}^i) := \arg\min_{z_k \in Z} \|\hat{z}_i - z_k\|_2$$
+
+具体而言，$M$ 帧运动经过时间下采样率 $l=4$ 编码后得到 $L = M / l$ 个运动token，每个token被量化为可学习码本（大小为 $K=512$）中距离最近的嵌入向量。这一离散化操作使得运动token与文本token在形式上完全对等，为后续的统一语言建模奠定了基础。
+
+### 2. 模态融合策略：从独立条件到统一序列
+
+传统方法通常使用独立的模块分别处理文本和运动——例如 T2M-GPT 使用 CLIP 提取文本嵌入作为运动生成的条件信号，TM2T 通过神经翻译网络建立双向映射。这类设计将文本和运动视为分离的输入/输出，模型内部缺乏对两者深层语义关联的联合建模。
+
+MotionGPT 的关键突破在于**构建统一的文本-运动词汇表**：将原始文本词汇表 $\mathcal{V}_t$ 与运动词汇表 $\mathcal{V}_m$ 合并，使得文本token和运动token可以出现在同一序列中。基于 T5 架构的 Transformer 模型将源序列（可能包含文本和/或运动token）编码后，自回归地预测目标序列的下一个token：
+
+$$\mathcal{L}_{LM} = -\sum_{i=0}^{L_t-1} \log p_\theta(x_t^i \mid x_t^{<i}, x_s)$$
+
+这种设计使得模型能够以完全统一的方式处理“文本→运动”、“运动→文本”、“运动+文本→运动”等多种映射关系，无需任何任务特定的架构修改。
+
+### 3. 训练范式：从单任务监督到三阶段渐进学习
+
+现有方法通常采用任务特定的单阶段监督训练——例如仅针对文本到运动生成进行条件训练，或仅针对运动描述进行双向翻译训练。这种范式导致每个模型只能处理单一任务，无法泛化到未见过的任务类型。
+
+MotionGPT 引入**三阶段训练方案**（见 Figure 3）：
+1. **运动分词器训练**：独立训练 VQ-VAE，学习运动码本和重建能力；
+2. **运动-语言预训练**：混合无监督 span corruption（类似 T5 的预训练目标）和有监督的翻译任务，让语言模型学习文本与运动token之间的语义耦合；
+3. **指令微调**：定义15种核心运动任务（包括生成、描述、预测、插值、随机生成等），创建超过一千种不同的指令模板，使单一模型能够根据提示指令灵活切换任务。
+
+消融实验（Table 9）验证了这一训练方案的必要性：完整的预训练+指令微调使 Base 模型在文本到运动任务上 FID 从 0.365 降至 0.160，同时在运动预测等任务上实现了从无到有的突破。
+
+### 4. 任务泛化能力：从专用模型到统一多任务
+
+这是前三个创新的自然结果。如表1所示，现有方法的功能覆盖高度碎片化：T2M-GPT 只能做文本到运动生成，TM2T 只能做文本-运动双向翻译，MDM 虽能处理多种运动生成任务但无法生成文本描述。MotionGPT 通过不同的提示指令，单一模型即可覆盖所有15种核心运动-语言任务，包括此前方法无法处理的随机运动生成和随机运动描述生成。
+
+值得注意的是，这种统一性并非以牺牲单任务性能为代价：在 HumanML3D 数据集上，MotionGPT 在运动描述任务上 Bleu@4 达到 12.47（对比 TM2T 的 7.00，提升 +5.47），在运动预测任务上 FID 达到 0.905（对比 MDM 的 6.031，降低 5.126），同时在文本到运动生成任务上保持 competitive 水平（R Precision Top1 0.492 vs T2M-GPT 0.491）。
+
+## 整体框架
+
+MotionGPT 的整体设计围绕一个核心洞察展开：人体运动与自然语言之间存在深层的语义耦合，可以被视为一种“身体语言”。基于此，MotionGPT 将人体运动视作一门外语，构建了一个统一的序列到序列生成框架。该框架由两个核心模块串联而成：**运动分词器（Motion Tokenizer）** 和 **运动感知语言模型（Motion-aware Language Model）**，其输入输出流如图2所示。
+
+### 运动分词器：将连续运动转化为离散“词元”
+
+原始人体运动通常以变长的3D关节点旋转或位置序列表示，无法直接输入到基于离散词表的语言模型中。运动分词器（基于VQ-VAE架构）的作用正是填补这一模态鸿沟。它包含一个运动编码器 $E$ 和一个运动解码器 $D$。编码器以时间下采样率 $l=4$ 将 $M$ 帧运动序列压缩为 $L=M/l$ 个潜在向量，随后通过离散矢量量化（Vector Quantization）将每个潜在向量替换为可学习码本中距离最近的嵌入向量：
+
+$$z_i = Q(\hat{z}^i) := \arg\min_{z_k \in Z} \|\hat{z}_i - z_k\|_2$$
+
+这一过程将连续的3D运动转化为离散的运动token序列 $z^{1:L}$，类似于文本分词器将自然语言切分为词元。解码器则负责从离散token序列中重建原始运动，确保信息保真度。码本大小经消融实验确定为 $K=512$（嵌入维度为512），在重建FID（0.067）和MPJPE（55.8mm）上达到最佳平衡（详见Table 8）。
+
+### 运动感知语言模型：统一词汇表下的联合建模
+
+获得离散运动token后，MotionGPT将其与文本token统一纳入同一个词汇表——即合并原始文本词汇表 $V_t$ 与运动词汇表 $V_m$，形成统一的“运动-语言”词表。这一设计使得运动token和文本token在模型眼中成为同一序列的不同片段，从根本上消除了模态隔离。
+
+运动感知语言模型以T5架构为骨干，采用标准的编码器-解码器Transformer结构。如图2所示，源序列（可以是文本、运动token，或二者的组合）被送入Transformer编码器，解码器则以自回归方式逐步预测目标序列的下一个token。训练目标为最大化目标token的条件对数似然：
+
+$$\mathcal{L}_{LM} = -\sum_{i=0}^{L_t-1} \log p_\theta(x_t^i \mid x_t^{<i}, x_s)$$
+
+其中 $x_s$ 为源序列，$x_t^{<i}$ 为已生成的历史目标token。这种统一的序列到序列建模范式，使得同一个模型可以在不同任务间共享参数，仅通过改变源序列和目标序列的模态组合来实现功能切换。
+
+### 三阶段训练流水线
+
+MotionGPT的训练并非一蹴而就，而是遵循三个递进阶段（如图3所示）：
+
+1. **运动分词器训练**：独立训练VQ-VAE，学习离散运动码本，确保运动token具备良好的重建质量。
+2. **运动-语言预训练**：在冻结的运动分词器基础上，使用混合的无监督span corruption（类似T5的预训练目标）和有监督翻译任务（文本→运动、运动→文本）对语言模型进行预训练，建立文本与运动token之间的语义关联。
+3. **指令微调**：定义15种核心运动任务（包括文本到运动生成、运动描述、运动预测、运动插值、随机运动/描述生成等），构造超过一千种不同的指令提示模板，对模型进行多任务指令微调，使其能够根据指令灵活切换任务模式。
+
+### 推理时的输入输出流
+
+在推理阶段，用户通过自然语言指令指定任务类型，模型根据指令模板拼接源序列（如文本描述或部分运动token），编码器处理后，解码器自回归生成目标token序列。若目标为运动，生成的离散token经运动分词器的解码器还原为连续3D运动序列；若目标为文本，则直接由文本分词器解码为自然语言。这一统一流程使得单一模型能够覆盖文本到运动生成、运动描述、运动预测、运动插值、随机运动生成等多种任务，无需任何任务特定的架构修改。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/003_Figure_2.jpg]]
+*Figure 2: Method overview: MotionGPT consists of a motion tokenizer V (Sec. 3.1) and a motionaware language model (Sec. 3.2). Combining Motion Tokens learned by V and Text Tokens by text tokenizer, we then learn motion and language jointly utilizing language model as backbone*
+
+## 核心模块与公式推导
+
+MotionGPT 的架构由两大核心模块构成：**运动分词器（Motion Tokenizer）** 与 **运动感知语言模型（Motion-aware Language Model）**，二者通过统一的离散词汇表实现运动与自然语言的联合建模。
+
+### 运动分词器
+
+运动分词器基于 VQ-VAE 架构，负责将连续的 3D 人体运动序列转换为离散的运动 token 序列。该模块由一个运动编码器 $\mathcal{E}$ 和一个运动解码器 $\mathcal{D}$ 组成。给定一段包含 $M$ 帧的运动序列 $m^{1:M} = \{x^i\}_{i=1}^M$，编码器首先将其压缩为潜在表示，再通过时间下采样率 $l$ 得到 $L = M / l$ 个潜在向量 $\hat{z}^{1:L}$。随后，每个潜在向量通过离散量化操作被替换为可学习码本 $Z$ 中距离最近的嵌入向量：
+
+$$z_i = Q(\hat{z}^i) := \arg\min_{z_k \in Z} \|\hat{z}_i - z_k\|_2$$
+
+其中，$z_i$ 为量化后的离散运动 token，$Z$ 为码本。解码器 $\mathcal{D}$ 则依据这些离散 token 重建原始运动序列：
+
+$$\hat{m}^{1:M} \stackrel{\sim}{=} \mathcal{D}(z^{1:L}) = \mathcal{D}(\mathcal{E}(m^{1:M}))$$
+
+该模块的关键设计在于：将连续的、变长的运动序列转化为固定速率的离散 token 序列（$l=4$），使其在形式上与文本 token 对齐，为后续统一语言建模奠定基础。
+
+### 运动感知语言模型
+
+在获得离散运动 token 后，MotionGPT 构建了一个统一的文本-运动词汇表，将原始文本词汇表 $V_t$ 与运动词汇表 $V_m$ 合并，使运动 token 和文本 token 被视为同一序列中的不同符号。该模块以 T5 架构为骨干，采用编码器-解码器结构进行序列到序列建模。源序列（source tokens）输入 Transformer 编码器，解码器则以自回归方式逐步预测目标序列（target tokens）的概率分布。训练目标为最大化下一个目标 token 的条件对数似然：
+
+$$\mathcal{L}_{LM} = -\sum_{i=0}^{L_t-1} \log p_\theta(x_t^i \mid x_t^{<i}, x_s)$$
+
+其中，$x_s$ 为源序列（可以是文本、运动 token 或二者组合），$x_t^{<i}$ 表示已生成的前 $i$ 个目标 token，$x_t^i$ 为当前待预测的目标 token，$L_t$ 为目标序列长度。通过该统一的语言建模损失，模型能够同时学习运动生成、运动描述、运动预测等多种任务，无需任务特定的架构修改。
+
+### 三阶段训练范式
+
+MotionGPT 的训练分为三个递进阶段：
+
+1. **运动分词器训练**：独立训练 VQ-VAE，学习运动码本，使运动 token 具备良好的重建能力。
+2. **运动-语言预训练**：混合无监督的 span corruption 任务与有监督的文本-运动翻译任务，让语言模型学习运动与文本之间的语义耦合。
+3. **指令微调**：基于 15 种核心运动任务及超过一千种指令模板，对模型进行多任务指令微调，使单一模型能够通过不同的提示指令泛化到各类运动-语言任务。
+
+这种三阶段设计使得 MotionGPT 在不牺牲各任务性能的前提下，实现了运动与语言的统一建模与多任务泛化。
+
+## 实验与分析
+
+### 实验设置
+
+MotionGPT的实验基于两个公开数据集：**HumanML3D**和**KIT**（数据集详细统计见[[../../references/T2M_Common_Datasets|T2M Common Datasets]]）。所有对比方法使用相同的训练/测试划分，评估指标沿用社区标准。
+
+运动分词器采用VQ-VAE架构，码本尺寸经消融确定为 $K \in \mathbb{R}^{512 \times 512}$，编码器时间下采样率 $l=4$，将 $M$ 帧运动压缩为 $L=M/4$ 个离散运动token。所有模型使用AdamW优化器训练，运动分词器学习率 $10^{-4}$，mini-batch大小256。语言模型以T5为基础架构，训练在64块Tesla V100 GPU上进行。
+
+### 主实验结果
+
+**Table 2** 汇总了MotionGPT在HumanML3D数据集上四个核心任务的综合对比：
+
+**文本到运动生成（Text-to-Motion）**：微调后的MotionGPT在FID上达到0.232，R Precision Top1为0.492±.003，多样性（Diversity）9.528，与**T2M-GPT**（FID 0.116, R Top1 0.491）和**MDM**（FID 0.544）等专用方法相比整体竞争力相当（见**Table 3**）。在KIT数据集上同样表现稳定（**Table 7**）。
+
+**运动描述（Motion Captioning）**：MotionGPT在语言质量指标上大幅领先。Bleu@4达到12.47，相比**TM2T**的7.00提升**+5.47**；Cider达到29.2，相比TM2T的16.8提升**+12.4**（**Table 4**）。定性对比（**Figure 6**）显示，MotionGPT生成的描述语法正确性更好，与运动内容的对齐更准确。
+
+**运动预测（Motion Prediction）**：在AMASS子集上，MotionGPT的FID仅为0.905，而**MDM**为6.031，降低**5.126**，差距显著（**Table 5**）。
+
+**运动插值（Motion In-between）**：FID为0.214，MDM为2.698，降低**2.484**。同时，MotionGPT在多样性（DIV）上保持优势（8.972 vs 6.813），说明生成的运动不仅质量高，且在不同条件下保持合理的丰富度。
+
+**关键观察**：**Table 1** 的功能覆盖对比揭示了MotionGPT的核心优势——现有专用方法（T2M-GPT、MDM、TM2T等）通常只能处理1-2种任务，而MotionGPT以单一模型统一覆盖文本到运动、运动描述、运动预测、运动插值、随机运动生成、随机描述生成等全部任务。
+
+### 消融实验
+
+**训练阶段消融**（**Table 9**）：仅做运动-语言预训练而不进行指令微调时，Base模型在文本到运动任务上FID为0.365；加入指令微调后降至0.160。更重要的是，对于运动预测和运动插值等任务，纯预训练模型完全无法处理，指令微调使模型从“无”到“有”获得这些能力。这验证了三阶段训练方案（运动分词器训练→运动-语言预训练→指令微调）的必要性。
+
+**模型规模消融**（**Table 6**）：将模型从Base（220M）扩大到Large（770M）并未带来显著性能提升，甚至在某些任务上略有下降。论文明确指出，这可能是由于当前运动数据集规模有限（约14.6K序列），数据量不足以支撑大模型发挥潜力。**Table 14** 的caption也佐证了这一判断：“当数据量达到百万甚至十亿级别时，大模型可能取得最佳性能”。
+
+**码本尺寸消融**（**Table 8**）：运动分词器在 $K=512$ 时达到最佳重建质量——FID为0.067，MPJPE为55.8mm，优于 $K=256$ 和 $K=1024$ 的设置。**Figure 7** 的码本利用率统计进一步显示，$K=512$ 时各码字的利用频率分布较为均衡。
+
+**生成策略消融**（**Table 12**）：使用beam search（而非随机采样）可将FID从0.232降至0.160，但代价是多样性（MModality）从2.008骤降至0.803。这揭示了生成质量与多样性之间的典型权衡——beam search倾向于生成更“安全”但更单一的结果。
+
+### 定性分析
+
+**Figure 4** 展示了文本驱动运动生成的定性对比，标注了其他方法（MDM、T2M-GPT等）与文本描述的错误对齐（如动作方向错误、动作类型缺失），而MotionGPT的生成结果与文本语义的一致性更优。
+
+**Figure 8** 的用户调研显示，在运动真实感和文本对齐度两个维度上，人类评估者对MotionGPT的偏好均显著高于对比方法。
+
+### 推理效率
+
+**Table 11** 报告了不同模型尺寸的推理速度：所有变体在单块Tesla V100上均能实现实时运动生成（FPS足够支持动画应用），小模型推理速度更快。
+
+### 失败模式与局限
+
+1. **数据规模瓶颈**：当前运动数据集仅约14.6K序列，导致大模型（770M）无法发挥优势，性能甚至不如Base模型。这是限制方法扩展性的核心瓶颈。
+2. **运动类型覆盖有限**：仅处理单人全身运动，未涉及面部表情、手部精细动作、动物运动及多人交互等复杂场景。
+3. **自回归累积误差**：推理过程中自回归生成可能累积误差，影响长序列运动的质量——这一点在论文中被列为开放问题，但未提供定量分析，需手动验证长序列场景下的退化程度。
+4. **码本泛化不足**：固定的VQ-VAE码本可能对训练分布外的运动风格泛化能力有限，论文未对此进行系统评估。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/018_Figure_7.jpg]]
+*Figure 7: The statistics of each "word" in different sizes of motion vocabulary V _ { m } . From left to right, the vocabulary size is K = 2 5 6 , 5 1 2 , 1024. (cf . Tab. 8, K = 512 for the best motion quality.)*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/020_Figure_8.jpg]]
+*Figure 8: User Study. We investigate our motion quality and the alignment with test descriptions. The left part is the user study for text-to-motion. The right part is for motion captioning*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/002_Table_1.jpg]]
+*Table 1: Comparison of recent state-of-the-art methods on diverse motion-relevant tasks. Random Motion and Random Caption represent unconstrained generation of motions and motion descriptions*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/005_Table_2.jpg]]
+*Table 2: Comparison of four motion-related tasks on HumanML3D [11] dataset. The evaluation metrics are computed using the encoder introduced in [11]. The empty columns of previous methods indicate that they can not handle the task. The arrows (→) indicate that closer to Real is desirable. Bold and underline indicate the best and the second best result on text-to-motion task*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/006_Table_3.jpg]]
+*Table 3: Comparison of text-to-motion on HumanML3D [11]. The empty MModality indicates Real motion is deterministic. These methods are sorted by FID. Pre-trained and Fine-tuned indicate uniform motion-language pre-training and specific fine-tuning on this task. (cf. Tab. 2 for notations.)*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/007_Table_4.jpg]]
+*Table 4: Comparison of motion captioning on HumanML3D [11]. The evaluation metrics follow [12], while we use the ground truth texts without pre-processing for linguistic metrics calculation*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/008_Table_5.jpg]]
+*Table 5: Comparison of motion prediction and motion in-between on part of AMASSS [26] dataset using motion data only. FID indicates motion quality and Diversity (DIV) for motion diversity within each condition. ADE and FDE are joints distance between generation and ground truth*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/009_Table_6.jpg]]
+*Table 6: Evaluation of instruction tuning and different model sizes of MotionGPTs in four motion tasks on HumanML3D [11] dataset. (cf. Tab. 2 for metrics details)*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/013_Table_7.jpg]]
+*Table 7: We involve KIT [33]dataset and evaluate the methods on the text-driven motion generation task. Please refer to Tab. 3 for more details on metrics and notations*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/014_Table_8.jpg]]
+*Table 8: Evaluation of our motion tokenizer on the motion part of HumanML3D [11] dataset. We follow MLD [54] to evaluate our VQ-VAE model V: MPJPE and PAMPJPE are measured in millimeter. ACCL indicates acceleration error. We evaluate FID and Diversity the same as Tab. 3. The baselines of VPoser-t [30] and ACTOR [31] are borrowed from MLD. K indicates the codebook size, and K = 512 shows the best performance of motion reconstruction*
+
+![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/015_Table_9.jpg]]
+*Table 9: Evaluation of the training scheme on the base MotionGPT models. We evaluate the results with the proposed evaluation protocols in Sec. G. Please refer to Tab. 2 for metrics and the details*
+
+## 方法谱系与知识库定位
+
+### 1. 方法谱系：从单任务专用模型到统一运动-语言建模
+
+MotionGPT 的核心贡献在于将人体运动视为一种“外语”，从而将运动生成与理解问题转化为统一的序列到序列语言建模问题。这一范式转变使其在方法谱系中占据了独特位置，与之前的单任务专用方法形成鲜明对比。
+
+#### 1.1 运动生成方法的演进
+
+在 MotionGPT 之前，文本到运动生成领域主要由两类方法主导：
+
+- **基于 VQ-VAE + GPT 的方法**：以 **T2M-GPT** 为代表，该方法首先将运动序列量化为离散 token，然后使用 GPT 架构以 CLIP 文本嵌入为条件进行自回归生成。T2M-GPT 在生成质量上取得了显著进展，但其文本条件仅作为外部嵌入注入，文本和运动仍处于分离的表示空间。
+
+- **基于扩散模型的方法**：包括 **MDM**、**MotionDiffuse** 和 **MLD** 等。MDM 将扩散模型直接应用于原始运动数据，能够处理多种运动生成任务（如预测、插值），但缺乏对文本-运动语义对齐的显式建模。MLD 则通过引入运动潜在空间提升了扩散模型的效率。
+
+这些方法的共同局限在于：文本和运动被视为分离的模态，使用独立的编码器处理，仅通过条件注入建立单向联系。这导致每个模型通常只能处理单一任务，无法实现运动与文本之间的双向理解与生成。
+
+#### 1.2 运动-文本跨模态映射的早期尝试
+
+**TM2T** 是少数尝试建立运动与文本双向映射的方法之一。它通过一个神经翻译网络实现运动序列与自然语言描述之间的相互转换，但其架构本质上仍是任务特定的，无法泛化到运动预测、运动插值等其他任务。在运动描述任务上，TM2T 在 HumanML3D 数据集上仅达到 Bleu@4 7.00 和 Cider 16.8，而 MotionGPT 分别提升至 12.47 和 29.2（Table 2），提升幅度分别达 +78% 和 +74%，充分说明了统一语言建模范式的优势。
+
+#### 1.3 MotionGPT 的范式突破
+
+MotionGPT 的方法谱系定位可概括为三个关键转变：
+
+| 维度 | 基线方法（T2M-GPT / MDM / TM2T） | MotionGPT |
+|------|--------------------------------|-----------|
+| **运动表示** | 原始运动特征或连续潜在向量 | 通过 VQ-VAE 生成的离散运动 token 序列 |
+| **模态融合** | 独立模块分别处理文本和运动 | 统一词汇表，文本 token 与运动 token 作为同一序列输入 Transformer |
+| **训练范式** | 任务特定的单阶段监督训练 | 三阶段训练：分词器训练 → 运动-语言预训练 → 指令微调 |
+| **任务泛化** | 每个模型针对单一任务设计 | 单一模型通过不同提示指令处理 15 种核心运动-语言任务 |
+
+其中，**统一词汇表**的构建是关键的架构创新。MotionGPT 将原始文本词汇表 $V_t$ 与运动词汇表 $V_m$ 合并，使得语言模型能够以完全相同的方式处理文本 token 和运动 token。这一定义使得“文本到运动生成”和“运动描述”被统一为同一个序列到序列框架下的不同输入-输出配置，而非两个独立任务。
+
+### 2. 适用边界与能力范围
+
+#### 2.1 已验证的任务覆盖
+
+根据 Table 1 的系统对比，MotionGPT 是目前唯一能够统一处理以下全部六类任务的框架：
+
+- **文本到运动生成**（Text-to-Motion）：给定自然语言描述，生成对应的 3D 人体运动序列
+- **运动描述**（Motion-to-Text / Motion Captioning）：给定运动序列，生成自然语言描述
+- **运动预测**（Motion Prediction）：给定前段运动，预测后续运动
+- **运动插值**（Motion In-between）：给定首尾运动帧，生成中间过渡运动
+- **随机运动生成**（Random Motion）：无条件生成多样化的运动序列
+- **随机运动描述生成**（Random Caption）：无条件生成运动描述文本
+
+此外，通过指令微调阶段定义的 15 种核心运动任务和超过一千种不同的指令模板，MotionGPT 还能处理运动补全、运动问答等更复杂的组合任务。
+
+#### 2.2 适用边界
+
+尽管 MotionGPT 展现了强大的任务统一能力，其适用边界受以下因素约束：
+
+1. **运动类型限制**：目前仅处理单人全身运动，不涉及面部表情、手部精细动作、动物运动及多人交互场景。这是当前运动数据集（HumanML3D 和 KIT，统计见[[../../references/T2M_Common_Datasets|T2M Common Datasets]]）的固有局限。
+
+2. **数据规模瓶颈**：消融实验（Table 6）显示，将模型从 Base（220M）扩展到 Large（770M）并未带来显著的性能提升，甚至在某些任务上略有下降。论文明确指出这可能是当前运动数据规模不足所致，暗示在百万级甚至十亿级数据规模下，更大模型可能展现出更优性能。
+
+3. **离散表示的固有限制**：运动分词器依赖固定的 VQ-VAE 码本（码本大小 $K=512$，嵌入维度 512），该码本在训练集上学习，可能对未见过的运动风格或极端运动类型泛化不足。Table 8 显示 $K=512$ 时重建 FID 为 0.067，MPJPE 为 55.8mm，已是最优配置，但仍存在一定的信息损失。
+
+4. **自回归生成的误差累积**：推理过程中采用自回归方式逐 token 生成运动序列，长序列生成时可能累积误差，影响末端运动的质量和物理合理性。
+
+5. **物理合理性未显式建模**：模型训练目标仅为 token 预测的对数似然最大化，未引入物理约束（如脚部滑动惩罚、关节角度限制），生成的运动可能存在物理不合理之处。
+
+### 3. 消融实验揭示的关键机制
+
+#### 3.1 三阶段训练的必要性
+
+Table 9 的消融实验系统验证了各训练阶段的作用：
+
+- **仅预训练（无指令微调）**：Base 模型在文本到运动任务上 FID 为 0.365，经过指令微调后降至 0.160，提升显著
+- **仅指令微调（无预训练）**：在运动预测和运动插值等任务上完全失效，说明运动-语言预训练阶段建立的语义耦合是任务泛化的基础
+- **完整三阶段训练**：在所有四项核心任务上均达到最优性能
+
+这表明：预训练阶段通过混合无监督 span corruption 和有监督翻译任务，建立了文本与运动 token 之间的语义关联；指令微调则进一步将这种通用知识适配到多样化的下游任务格式。
+
+#### 3.2 运动分词器码本尺寸的选择
+
+Table 8 对码本大小 $K \in \{256, 512, 1024\}$ 的消融研究表明，$K=512$ 在重建质量（FID 0.067）和运动精度（MPJPE 55.8mm）上达到最佳平衡。过小的码本（$K=256$）表达能力不足，过大的码本（$K=1024$）可能导致训练不稳定或码本利用率下降。
+
+#### 3.3 生成策略的质量-多样性权衡
+
+Table 12 揭示了推理超参数的关键影响：
+
+- **采样（无 beam search）**：FID 0.232，运动多样性（MModality）2.008
+- **Beam search（#beams=4）**：FID 降至 0.160，但多样性急剧下降至 0.803
+
+这一经典的质量-多样性权衡表明，实际应用中需根据场景需求选择合适的生成策略：追求运动质量时使用 beam search，追求多样性时使用随机采样。
+
+### 4. 局限性与开放问题
+
+#### 4.1 已明确的局限
+
+1. **运动表征的单一性**：仅支持单人全身运动，无法处理面部、手部、多人交互等更丰富的运动类型
+2. **数据驱动的上限**：模型性能受限于现有运动数据集的规模（约 14.6K 序列），更大模型未能展现预期优势
+3. **固定码本的泛化瓶颈**：VQ-VAE 码本在训练集上学习，对分布外运动类型的泛化能力有限
+4. **物理合理性缺失**：未显式建模物理约束，生成运动可能存在脚部滑动、关节超限等问题
+
+#### 4.2 开放研究问题
+
+1. **运动表征的扩展**：如何将 MotionGPT 的框架扩展到面部表情、手部精细动作、动物运动以及多人交互场景？这可能需要设计更复杂的运动分词器，或引入层次化的运动 token 表示。
+
+2. **数据规模的突破**：能否通过构建更大规模的运动-语言数据集（例如百万级）来释放大型预训练语言模型的潜力？Table 14 的说明暗示，当数据量达到百万甚至十亿级别时，Large 模型可能展现出更优性能。
+
+3. **物理合理性的融入**：如何将物理约束（如脚部滑动惩罚、关节角度限制、动力学合理性）纳入模型训练或后处理？可能的路径包括在损失函数中加入物理正则项，或采用物理模拟器进行后处理优化。
+
+4. **离散表示的改进**：运动分词器能否采用更先进的离散表示方法（如 RQ-VAE、FSQ）以在压缩率和重建质量之间获得更好的平衡？更高效的离散表示可能进一步提升生成运动的质量和多样性。
+
+5. **与大规模预训练模型的深度整合**：当前 MotionGPT 使用 T5 架构从头训练运动-语言模型。未来是否可以直接利用已预训练的 LLM（如 LLaMA 系列）的权重，通过适配器或前缀微调的方式注入运动理解能力，从而更高效地利用语言模型中的世界知识？
+
+6. **运动生成的细粒度控制**：当前文本到运动生成主要依赖自然语言描述，未来是否可以引入更细粒度的控制信号（如关键帧约束、运动风格标签、情感标签），实现更精准的运动编辑与合成？
+
+## 原文 PDF
+
+![[paperPDFs/NEURIPS_2023/MotionGPT_Human_Motion_as_a_Foreign_Language.pdf]]

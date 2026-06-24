@@ -1,0 +1,127 @@
+{
+  "part_id": "part_004",
+  "section_role": "method details and experiments",
+  "method_evidence": [
+    {
+      "claim": "CubiD generates images through iterative refinement starting from a fully masked tensor.",
+      "section": "Model Architecture",
+      "anchor": "CubiD generates images through iterative refinement starting from a fully masked tensor.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The number of tokens to unmask follows a cosine schedule.",
+      "section": "Model Architecture",
+      "anchor": "the number of tokens to unmask follows a cosine schedule.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Each spatial position, comprising d tokens, is treated as a single token for the transformer model.",
+      "section": "Model Architecture",
+      "anchor": "each spatial position,comprising d tokens,is treated as a single token for the transformer model",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The Transformer processes this sequence through bidirectional attention, with the sequence length remaining fixed at h × w regardless of feature dimensionality.",
+      "section": "Model Architecture",
+      "anchor": "The Transformer processes this sequence through bidirectional attention,with the sequence length remaining fixed at h × w regardless of feature dimensionality.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Each output token from the Transformer is passed through an MLP-based prediction head that produces d × L logits.",
+      "section": "Model Architecture",
+      "anchor": "Each output token from the Transformer is passed through an MLP-based prediction head that produces d × L logits",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Effect of quantization levels on reconstruction quality.",
+      "table_or_figure": "Table 2",
+      "metric": "rFID",
+      "value": "DINOv2 L=8: 0.57, SigLIP2 L=16: 0.69",
+      "confidence": 0.95
+    },
+    {
+      "claim": "DQ maintains continuous-level performance while VQ shows significant degradation.",
+      "table_or_figure": "Table 3",
+      "metric": "GQA",
+      "value": "SigLIP2-DQ: 63.1, SigLIP2-VQ: 54.9",
+      "confidence": 0.95
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table 1",
+      "role_hint": "model sizes and architecture configurations",
+      "caption": "Model sizes and architecture configurations of CubiD.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table 2",
+      "role_hint": "ablation on quantization levels",
+      "caption": "Effect of quantization levels on reconstruction quality.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table 3",
+      "role_hint": "comparison of quantization methods on LLaVA benchmarks",
+      "caption": "Understanding performance on LLaVA benchmarks with different quantization methods.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_004",
+    "part_index": 4,
+    "part_count": 9,
+    "chunk_chars": 5030,
+    "latency_seconds": 7.544,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 2353,
+      "completion_tokens_est": 889,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3242,
+      "total_with_reasoning_tokens_est": 3242,
+      "estimated_cost_usd": 0.001797,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2181,
+      "completion_tokens_api": 728,
+      "total_tokens_api": 2909,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1541,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 728,
+        "prompt_tokens": 2181,
+        "total_tokens": 2909,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1541
+      },
+      "estimated_cost_usd_api": 0.001306,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 2964,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 730,
+        "api_usage_present": true
+      }
+    }
+  }
+}

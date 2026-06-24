@@ -1,0 +1,64 @@
+{
+  "placements": [
+    {
+      "item_id": "item_001",
+      "section": "整体框架",
+      "reason": "Figure 1 是框架和能力概览图，展示了整体解耦架构和统一能力，适合作为整体框架的引导图。"
+    },
+    {
+      "item_id": "item_004",
+      "section": "整体框架",
+      "reason": "Figure 3 是详细的模型架构图，展示了混合条件机制和DiT主干，是整体框架部分的核心方法图。"
+    },
+    {
+      "item_id": "item_009",
+      "section": "核心模块与公式推导",
+      "reason": "Figure 4 展示了知识增强生成、上下文生成、零样本语音转换和编辑等涌现能力，直接支撑核心模块中关于MLLM特征传递涌现能力的论述。"
+    },
+    {
+      "item_id": "item_006",
+      "section": "实验与分析",
+      "reason": "Table 3 是生成基准主结果表，包含与统一模型和专家模型的全面对比，是实验部分最核心的结果表。"
+    },
+    {
+      "item_id": "item_007",
+      "section": "实验与分析",
+      "reason": "Table 4 是编辑基准主结果表，展示了编辑能力的定量对比，直接支撑编辑能力评估。"
+    },
+    {
+      "item_id": "item_005",
+      "section": "实验与分析",
+      "reason": "Table 2 是理解基准结果表，展示了MMSU和MMAU上的性能，支撑理解能力评估。"
+    },
+    {
+      "item_id": "item_010",
+      "section": "实验与分析",
+      "reason": "Table 6 是条件注入策略消融实验，验证了混合条件机制的设计选择，是核心消融之一。"
+    },
+    {
+      "item_id": "item_008",
+      "section": "实验与分析",
+      "reason": "Table 5 是数据组合消融实验，验证了混合真实与合成数据的必要性，直接支撑AudioEdit数据集设计。"
+    },
+    {
+      "item_id": "item_011",
+      "section": "实验与分析",
+      "reason": "Table 7 是条件特征源消融实验，验证了MLLM倒数第二层特征的优越性，是核心消融之一。"
+    },
+    {
+      "item_id": "item_013",
+      "section": "实验与分析",
+      "reason": "Table A2 是跨语言零样本生成结果，支撑了跨语言泛化能力的论述，是重要的涌现能力证据。"
+    },
+    {
+      "item_id": "item_012",
+      "section": "实验与分析",
+      "reason": "Table A1 是编码器消融实验，补充验证了MLLM特征相对于CLAP/T5的优势。"
+    },
+    {
+      "item_id": "item_015",
+      "section": "实验与分析",
+      "reason": "Table A6 是人类评估结果，提供了主观质量评估，补充客观指标。"
+    }
+  ]
+}

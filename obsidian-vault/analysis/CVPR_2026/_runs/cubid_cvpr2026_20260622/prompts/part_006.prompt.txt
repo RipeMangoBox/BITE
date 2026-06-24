@@ -1,0 +1,65 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Cubic Discrete Diffusion: Discrete Visual Generation on High-Dimensional Representation Tokens
+Part: 6/9
+Character span: 27480-33984
+
+=== PART CONTENT ===
+](auto/images/rf_full_regions/page_006_Table_00e81ee9c115.jpg)
+(c)Mask value.Fixed,random, or learned mask token.
+
+<table><tr><td>Steps</td><td>gFID↓</td></tr><tr><td>64</td><td>9.14</td></tr><tr><td>256</td><td>5.33</td></tr><tr><td>512</td><td>5.25</td></tr><tr><td>1024</td><td>5.25</td></tr></table>
+
+![](auto/images/rf_full_regions/page_006_Table_1a71602ebb4c.jpg)
+(d) Inference steps.Effect of inference steps T.
+
+<table><tr><td>Params</td><td>gFID↓</td></tr><tr><td>946M</td><td>5.25</td></tr><tr><td>1.4B</td><td>4.91</td></tr><tr><td>3.7B</td><td>4.68</td></tr></table>
+
+(e）Model scaling.Effect of model size.
+
+<table><tr><td>Encoder</td><td>gFID↓</td></tr><tr><td>DINOv2</td><td>5.25</td></tr><tr><td>SigLIP2</td><td>5.87</td></tr></table>
+
+(f) Representation encoder. DI-NOv2 vs. SigLIP2.
+
+## 4.3. Studies of CubiD
+
+Mask Ratio Distribution.Masking is the core operation of our discrete diffusion approach,and the distribution of masking ratios critically affects what patterns the model learns.We sample the masking ratio r from a truncated Gaussian distribution (Eq.2) with μ = 1.O and varying standard deviation o．The parameter o controls the diversity of masking scenarios: small o concentrates sampling around high masking ratios,forcing the model to learn from minimal context,while larger δ provides more uniform coverage across the [O,1] range.Table 4a shows that 9= 0.10 achieves optimal performance (gFID=5.33). Too small values (o = O.O5) degrade generation quality—the model overfits to heavily masked patterns without learning the full distribution.This optimal setting suggests that highdimensional features benefit from aggressive masking during training,likely due to their inherent redundancy.
+
+Masking Strategy.We investigate different masking strategies for the h × w × d representation tensor. Table 4b and Figure 5 compare three approaches:(1) Per-dim masking, where all spatial positions for each dimension are masked together;(2)Per-spatial masking,where all dimensions at each spatial position are masked together；and (3)Perelement masking,our approach that independently masks individual elements across the tensor. The results show obvious performance differences: per-dim masking completely fails (gFID=120.03） with severe texture artifacts, while per-spatial masking produces blurry,locally inconsistent images (gFID=22.22). In contrast,our per-element masking achieves strong performance (gFID=5.33).This is because elements within the same spatial location or dimension exhibit strong dependencies and cannot be treated as independent units for parallel sampling.The 768 dimensions at each spatial position jointly encode semantic information—masking them together (per-spatial) prevents the model from leveraging these within-position correlations. Per-dim masking performs even worse as it requires all spatial positions to be generated in parallel,destroying spatial coherence entirely.Our per-element masking enables the model to observe partial information along both axes during training and generation,utilizing bidirectional attention to capture dependencies across the tensor. This validates the necessity of fine-grained masking for modeling highdimensional discrete tokens,where neither spatial positions nor dimensions can be fully decoupled.
+
+Mask Token Design.We investigate different strategies for the mask token value used during training and inference.Table 4c compares three approaches:(1) Fixed:using a constant value (zero in our experiments),(2) Random:sampling from the discrete codebook at each masking operation,and (3) Learned: treating the mask token as a learnable parameter. The learned mask token achieves the best performance (gFID=5.33),while random sampling performs poorly (gFID=56.38). The failure of random sampling likely stems from the model's inability to distinguish between actual content tokens and randomly sampled mask tokens,as both come from the same codebook distribution. In contrast,a learned mask token can evolve during training to be maximally distinguishable from content tokens,facilitating more effective learning.
+
+Number of Iterations.Table 4d illustrates the effect of inference steps on generation quality. In this experiment with DINOv2,our model needs to generate h × w × d = 16 × 16 × 768 = 196,608 discrete tokens for each image. Despite this massive token count,our method requires only hundreds of iterations to achieve high-quality generation. Performance improves from 64 to 256 steps and saturates around 512 iterations (gFID=5.25).This is remarkably efficient compared to autoregressive methods that would require all 196,608 sequential steps.
+
+![](images/256b80b327cb9f2125c251a19b11d58fdd665d7bfbc6da1d27984bb0afbe3cfe.jpg)  
+Figure 5.Qualitative comparison of different masking strategies.Top row:Per-dim masking completely fails,producing severe texture-like artifacts.Middle row:Per-spatial masking generates images with significant local inconsistencies and blurry details.Bottom row: Our per-element masking produces clear, coherent images with fine details.The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes.
+
+Model Scaling. Table 4e shows results for models ranging from 946M to 3.7B parameters.We observe consistent improvement in generation quality as model size increases, with gFID decreasing from 5.25 for the 946M model to 4.68 for the 3.7B model．This scaling behavior demonstrates that our cubic discrete formulation effectively leverages increased model capacity,exhibiting strong scaling properties similar to other discrete generative models like autoregressive models. The steady improvement across model sizes suggests that our method can benefit from further scaling,making it a promising direction for high-quality representation-based image generation atlarger scales.
+
+Representation Encoder. We evaluate CubiD with different representation encoders to assess generalization.Table 4f compares DINOv2 [30] and SigLIP2 [40] encoders, both producing 16x16x768 feature maps.Both encoders work well with our generation model,achieving gFID scores of 5.25 and 5.87 respectively with limited epochs. DINOv2 achieves slightly better generation quality, likely due to its ImageNet pretraining being better aligned with ImageNet-based evaluation metrics.The consistent performance across both encoders,despite their different training objectives,demonstrates the robustness of our approach.

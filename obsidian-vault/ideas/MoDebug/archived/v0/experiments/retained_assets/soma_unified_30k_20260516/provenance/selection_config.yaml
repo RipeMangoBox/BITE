@@ -1,0 +1,20 @@
+date: 2026-05-16
+experiment_path: paperIDEAs/MoDebug/experiments/soma_unified_30k_20260516
+unit: caption-motion pair
+target_n: 30000
+seed: 20260516
+split:
+  train: 0.8
+  val: 0.1
+  test: 0.1
+filter:
+  mirrors: exclude
+  text: first valid column from content_natural_desc_1..4, technical, short descriptions
+  duration_20fps_est: "40 <= floor(move_duration_frames / 6) < 200"
+  temporal_labels: required
+  soma_uniform_path: required
+leakage_key: take_date|take_name|take_actor|base_filename_without__M
+training_gate: true training requires BVH-to-HumanML3D-263 conversion and MoMask/MoGenTS loader smoke
+role: diagnostic
+used_for: selection
+limitations: metadata-only selection; no final evaluator evidence

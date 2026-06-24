@@ -1,0 +1,64 @@
+{
+  "part_id": "12/13",
+  "section_role": "Appendix / Supplementary Results",
+  "method_evidence": [
+    {
+      "claim": "Using a unified MLLM achieves better performance than specialized single-modality encoders for T2A and V2A.",
+      "section": "1.3",
+      "anchor": "the results consistently demonstrate the superiority of using a unified MLLM, which achieves significantly better performance across all metrics in both tasks.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Audio-Omni achieves competitive or superior human evaluation ratings across all tasks.",
+      "table_or_figure": "Table A6",
+      "metric": "OVL/REL",
+      "value": "T2A: 78.6/83.5; T2M: 82.7/81.6; V2A: 75.3/77.1; V2M: 80.3/81.0; Editing: 79.8/81.5",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Audio-Omni achieves FAD 1.86 on T2A, FAD 1.41 on T2M, FAD 1.71 on V2A, FAD 1.51 on V2M.",
+      "table_or_figure": "Table A5",
+      "metric": "FAD",
+      "value": "T2A: 1.86; T2M: 1.41; V2A: 1.71; V2M: 1.51",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Audio-Omni achieves average FAD 3.27 and LSD 2.27 on audio editing tasks.",
+      "table_or_figure": "Table A3",
+      "metric": "FAD/LSD Avg.",
+      "value": "FAD 3.27, LSD 2.27",
+      "confidence": 0.98
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table A3",
+      "role_hint": "Detailed results on audio editing tasks (Add, Remove, Extract, Style Transfer).",
+      "caption": "Table A3. Detailed results on audio editing tasks. We report FAD/LSD for each task and their average.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table A4",
+      "role_hint": "Training data summary across tasks (hours and datasets).",
+      "caption": "Table A4. Training data summary across tasks.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table A5",
+      "role_hint": "Quantitative results on multimodal generation benchmarks (T2A, T2M, V2A, V2M) with KL, IS, FD, FAD.",
+      "caption": "Table A5. Detailed quantitative results on multimodal generation benchmarks with multiple metrics.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table A6",
+      "role_hint": "Human evaluation results on generation and editing tasks (OVL and REL scores).",
+      "caption": "Table A6. Human evaluation results on generation and editing tasks.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

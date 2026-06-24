@@ -1,0 +1,5 @@
+run_id=modebug_molingo272_eval_diagnostic_20260602-170502_86e21b2_cfg7_g0
+start_time=2026-06-02T17:05:02+08:00
+pid=1428093
+end_time=2026-06-02T17:52:18+08:00
+exit_code=0

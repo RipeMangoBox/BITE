@@ -1,0 +1,159 @@
+---
+title: "Dataset: nuScenes"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: nuScenes
+
+- [[obsidian-vault/analysis/CVPR_2022/Forecasting_from_LiDAR_via_Future_Object_Detection.md|Forecasting from LiDAR via Future Object Detection (CVPR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2022/Forecasting_from_LiDAR_via_Future_Object_Detection.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: FutureDet
+	- datasets: nuScenes
+- [[obsidian-vault/analysis/CVPR_2022/Generating_Useful_Accident_Prone_Driving_Scenarios_via_a_Learned_Traffic_Prior.md|Generating Useful Accident-Prone Driving Scenarios via a Learned Traffic Prior (CVPR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2022/Generating_Useful_Accident_Prone_Driving_Scenarios_via_a_Learned_Traffic_Prior.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: STRIVE（完整管道）
+	- datasets: nuScenes
+- [[obsidian-vault/analysis/CVPR_2022/How_Much_More_Data_Do_I_Need_Estimating_Requirements_for_Downstream_Tasks.md|How Much More Data Do I Need? Estimating Requirements for Downstream Tasks (CVPR 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2022/How_Much_More_Data_Do_I_Need_Estimating_Requirements_for_Downstream_Tasks.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Data Requirement Estimation Framework with Correction Factor and Multi‑round Collection
+	- datasets: CIFAR10, CIFAR100, ImageNet
+- [[obsidian-vault/analysis/CVPR_2023/Trace_and_Pace_Controllable_Pedestrian_Animation_via_Guided_Trajectory_Diffusion.md|Trace and Pace: Controllable Pedestrian Animation via Guided Trajectory Diffusion (CVPR 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2023/Trace_and_Pace_Controllable_Pedestrian_Animation_via_Guided_Trajectory_Diffusion.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+	- methods: TRACE and PACER
+	- datasets: ORCA-Maps, nuScenes, Flat 地形
+- [[obsidian-vault/analysis/CVPR_2024/Improving_Distant_3D_Object_Detection_Using_2D_Box_Supervision.md|Improving Distant 3D Object Detection Using 2D Box Supervision (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/Improving_Distant_3D_Object_Detection_Using_2D_Box_Supervision.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: LR3D
+	- datasets: KITTI, nuScenes
+- [[obsidian-vault/analysis/NEURIPS_2024/DistillNeRF_Perceiving_3D_Scenes_from_Single_Glance_Images_by_Distilling_Neural_Fields_and_Foundation_Model_Features.md|DistillNeRF: Perceiving 3D Scenes from Single-Glance Images by Distilling Neural Fields and Foundation Model Features (NEURIPS 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2024/DistillNeRF_Perceiving_3D_Scenes_from_Single_Glance_Images_by_Distilling_Neural_Fields_and_Foundation_Model_Features.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: DistillNeRF
+	- datasets: nuScenes validation set, nuScenes, Waymo NOTR
+- [[obsidian-vault/analysis/CVPR_2026/A_Self_Conditioned_Representation_Guided_Diffusion_Model_for_Realistic_Text_to_LiDAR_Scene_Generation.md|A Self-Conditioned Representation Guided Diffusion Model for Realistic Text-to-LiDAR Scene Generation (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/A_Self_Conditioned_Representation_Guided_Diffusion_Model_for_Realistic_Text_to_LiDAR_Scene_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: T2LDM
+	- datasets: KITTI-360, nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/DGGT_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_Images.md|DGGT: Feedforward 4D Reconstruction of Dynamic Driving Scenes using Unposed Images (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DGGT_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: DGGT
+	- datasets: Waymo Open Dataset, nuScenes, Argoverse2
+- [[obsidian-vault/analysis/CVPR_2026/DLWM_Dual_Latent_World_Models_enable_Holistic_Gaussian_centric_Pre_training_in_Autonomous_Driving.md|DLWM: Dual Latent World Models enable Holistic Gaussian-centric Pre-training in Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/DLWM_Dual_Latent_World_Models_enable_Holistic_Gaussian_centric_Pre_training_in_Autonomous_Driving.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DLWM (Dual Latent World Models)
+	- datasets: SurroundOcc-nuScenes, nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/Generalizable_Structure_Aware_Keypoint_Correspondence_for_Category_Unified_3D_Single_Object_Tracking.md|Generalizable Structure-Aware Keypoint Correspondence for Category-Unified 3D Single Object Tracking (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Generalizable_Structure_Aware_Keypoint_Correspondence_for_Category_Unified_3D_Single_Object_Tracking.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: UniKPT (Unified Structural KeyPoint Tracker)
+	- datasets: nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/HybridDriveVLA_Vision_Language_Action_Model_with_Visual_CoT_reasoning_and_ToT_Evaluation_for_Autonomous_Driving.md|HybridDriveVLA: Vision-Language-Action Model with Visual CoT reasoning and ToT Evaluation for Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/HybridDriveVLA_Vision_Language_Action_Model_with_Visual_CoT_reasoning_and_ToT_Evaluation_for_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: HybridDriveVLA
+	- datasets: nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/L3DR_3D_aware_LiDAR_Diffusion_and_Rectification.md|L3DR: 3D-aware LiDAR Diffusion and Rectification (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/L3DR_3D_aware_LiDAR_Diffusion_and_Rectification.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: L3DR
+	- datasets: KITTI360, SemanticKITTI, Waymo
+- [[obsidian-vault/analysis/CVPR_2026/Prune2Drive_A_Plug_and_Play_Framework_for_Accelerating_Vision_Language_Models_in_Autonomous_Driving.md|Prune2Drive: A Plug-and-Play Framework for Accelerating Vision-Language Models in Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Prune2Drive_A_Plug_and_Play_Framework_for_Accelerating_Vision_Language_Models_in_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- datasets: DriveLM, DriveLMM-o1, MME
+- [[obsidian-vault/analysis/CVPR_2026/RAYNOVA_Scale_Temporal_Autoregressive_World_Modeling_in_Ray_Space.md|RAYNOVA: Scale-Temporal Autoregressive World Modeling in Ray Space (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RAYNOVA_Scale_Temporal_Autoregressive_World_Modeling_in_Ray_Space.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: RAYNOVA
+	- datasets: nuScenes, nuScenes object condition, nuScenes map condition
+- [[obsidian-vault/analysis/CVPR_2026/RecEdit_Drive_3D_Reconstruction_Guided_Spatiotemporal_Video_Editing_for_Autonomous_Driving_Scenes.md|RecEdit-Drive: 3D Reconstruction-Guided Spatiotemporal Video Editing for Autonomous Driving Scenes (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/RecEdit_Drive_3D_Reconstruction_Guided_Spatiotemporal_Video_Editing_for_Autonomous_Driving_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: RecEdit-Drive
+	- datasets: nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/SpaceDrive_Infusing_Spatial_Awareness_into_VLM_based_Autonomous_Driving.md|SpaceDrive: Infusing Spatial Awareness into VLM-based Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/SpaceDrive_Infusing_Spatial_Awareness_into_VLM_based_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: SpaceDrive
+	- datasets: nuScenes, Bench2Drive
+- [[obsidian-vault/analysis/CVPR_2026/Spectral_Geometric_Neural_Fields_for_Pose_Free_LiDAR_View_Synthesis.md|Spectral-Geometric Neural Fields for Pose-Free LiDAR View Synthesis (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Spectral_Geometric_Neural_Fields_for_Pose_Free_LiDAR_View_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SG-NLF
+	- datasets: KITTI-360, nuScenes
+- [[obsidian-vault/analysis/CVPR_2026/U4D_Uncertainty_Aware_4D_World_Modeling_from_LiDAR_Sequences.md|U4D: Uncertainty-Aware 4D World Modeling from LiDAR Sequences (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/U4D_Uncertainty_Aware_4D_World_Modeling_from_LiDAR_Sequences.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: U4D
+	- datasets: nuScenes, SemanticKITTI, KITTI-360
+- [[obsidian-vault/analysis/CVPR_2026/WAM_Flow_Parallel_Coarse_to_Fine_Motion_Planning_via_Discrete_Flow_Matching_for_Autonomous_Driving.md|WAM-Flow: Parallel Coarse-to-Fine Motion Planning via Discrete Flow Matching for Autonomous Driving (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/WAM_Flow_Parallel_Coarse_to_Fine_Motion_Planning_via_Discrete_Flow_Matching_for_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: WAM-Flow
+	- datasets: NAVSIM-v1, NAVSIM-v2, nuScenes
+- [[obsidian-vault/analysis/ICLR_2026/AutoDrivetext_P3_Unified_Chain_of_PerceptionPredictionPlanning_Thought_via_Reinforcement_Fine_Tuning.md|$AutoDrive\\text{-}P^3$: Unified Chain of Perception–Prediction–Planning Thought via Reinforcement Fine-Tuning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AutoDrivetext_P3_Unified_Chain_of_PerceptionPredictionPlanning_Thought_via_Reinforcement_Fine_Tuning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- methods: AutoDrive-P³
+	- datasets: nuScenes, NAVSIMv1, NAVSIMv2
+- [[obsidian-vault/analysis/ICLR_2026/AutoDrive_R²_Incentivizing_Reasoning_and_Self_Reflection_Capacity_for_VLA_Model_in_Autonomous_Driving.md|AutoDrive-R²: Incentivizing Reasoning and Self-Reflection Capacity for VLA Model in Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/AutoDrive_R²_Incentivizing_Reasoning_and_Self_Reflection_Capacity_for_VLA_Model_in_Autonomous_Driving.pdf|PDF]]
+	- topics: Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning, LLM / Reasoning / Alignment
+	- methods: AutoDrive-R²
+	- datasets: nuScenes, Waymo, NAVSIM
+- [[obsidian-vault/analysis/ICLR_2026/Detecting_Temporal_Misalignment_Attacks_in_Multimodal_Fusion_for_Autonomous_Driving.md|Detecting Temporal Misalignment Attacks in Multimodal Fusion for Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Detecting_Temporal_Misalignment_Attacks_in_Multimodal_Fusion_for_Autonomous_Driving.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: AION
+	- datasets: KITTI, nuScenes
+- [[obsidian-vault/analysis/ICLR_2026/ResWorld_Temporal_Residual_World_Model_for_End_to_End_Autonomous_Driving.md|ResWorld: Temporal Residual World Model for End-to-End Autonomous Driving (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/ResWorld_Temporal_Residual_World_Model_for_End_to_End_Autonomous_Driving_0aa5048f38c3.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ResWorld
+	- datasets: nuScenes, NAVSIM
+- [[obsidian-vault/analysis/ICLR_2026/Rethinking_Driving_World_Model_as_Synthetic_Data_Generator_for_Perception_Tasks.md|Rethinking Driving World Model as Synthetic Data Generator for Perception Tasks (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Rethinking_Driving_World_Model_as_Synthetic_Data_Generator_for_Perception_Tasks_e3902bf4ec4f.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Data Curation / Synthesis
+	- datasets: nuScenes, DriveObj3D
+- [[obsidian-vault/analysis/ICLR_2026/UniSplat_Unified_Spatio_Temporal_Fusion_via_3D_Latent_Scaffolds_for_Dynamic_Driving_Scene_Reconstruction.md|UniSplat: Unified Spatio-Temporal Fusion via 3D Latent Scaffolds for Dynamic Driving Scene Reconstruction (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/UniSplat_Unified_Spatio_Temporal_Fusion_via_3D_Latent_Scaffolds_for_Dynamic_Driving_Scene_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: UniSplat
+	- datasets: nuScenes

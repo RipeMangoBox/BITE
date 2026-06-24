@@ -1,0 +1,301 @@
+---
+title: "Loc$^{2}$: Interpretable Cross-View Localization via Depth-Lifted Local Feature Matching"
+type: paper
+paper_level: A
+venue: ICLR
+year: 2026
+pdf_ref: paperPDFs/ICLR_2026/Loc_2_Interpretable_Cross_View_Localization_via_Depth_Lifted_Local_Feature_Match_da8cf91ad977.pdf
+project_link: null
+code_link: "https://github.com/vita-epfl/Loc2"
+aliases:
+- L2
+- L2ICVLDLLFM
+tags:
+- ICLR_2026
+- topic/representation_self_supervised_transfer
+- topic/representation_self_supervised_transfer/representation_learning
+core_operator: 直接在图像平面上建立地面与空中的局部特征匹配，而不是依赖BEV变换或全局描述子，并引入尺度感知Procrustes对齐来同时恢复姿态和深度尺度。
+primary_logic: 通过弱监督（仅相机姿态）学习图像平面局部特征匹配，利用单目深度先验将地面点提升至BEV空间，再通过可微分的尺度感知Procrustes对齐联合估计相机旋转、平移和深度尺度，无需任何像素级标注，实现了准确且高度可解释的跨视角定位。
+claims:
+- 直接学习地面−空中图像平面局部特征匹配，仅使用3-DoF相机姿态弱监督。
+- 利用单目深度预测将匹配的地面点提升到BEV空间，并支持度量和相对深度。
+- 尺度感知Procrustes对齐可在不同深度尺度下一致恢复姿态。
+- KITTI (同区域 ±180°方向噪声) 上 平均定位误差 (m) = 1.85
+---
+
+# Loc$^{2}$: Interpretable Cross-View Localization via Depth-Lifted Local Feature Matching
+
+> [!tip] 核心洞察
+> 通过弱监督（仅相机姿态）学习图像平面局部特征匹配，利用单目深度先验将地面点提升至BEV空间，再通过可微分的尺度感知Procrustes对齐联合估计相机旋转、平移和深度尺度，无需任何像素级标注，实现了准确且高度可解释的跨视角定位。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | Loc$^{2}$: 基于深度提升的局部特征匹配的可解释跨视角定位 |
+| 英文题名 | Loc$^{2}$: Interpretable Cross-View Localization via Depth-Lifted Local Feature Matching |
+| 会议/期刊 | ICLR 2026 |
+| Links | [paper](https://openreview.net/forum?id=2ciXKn2UlS) · [Code](https://github.com/vita-epfl/Loc2) |
+| Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
+| Method | Loc$^{2}$ |
+| Dataset | KITTI, VIGOR |
+
+> [!tip] 效果简介
+> - KITTI (同区域 ±180°方向噪声) 上，平均定位误差 (m) 1.85 vs 6.88 (CCVPE) (-5.03)。
+> - VIGOR (跨区域 未知方向) 上，平均定位误差 (m) 4.23 vs 10.02 (FG$^{2}$) (-5.79)。
+> - VIGOR (同区域 未知方向) 上，平均方向误差 (°) 9.54 vs 15.02 (FG$^{2}$) (-5.48)。
+
+## 概述
+
+跨视角定位（cross-view localization）旨在通过匹配地面视角图像与空中（卫星/航拍）参考图像，确定地面相机在地理空间中的精确位置与朝向。这一任务面临的核心瓶颈在于**地面与空中视角之间的极端视觉差异**——同一场景在不同视角下呈现截然不同的外观、尺度和几何结构，而像素级标注对应关系的缺失使得传统图像匹配方法难以可靠工作。
+
+针对上述挑战，本文提出 **Loc²**，一种基于深度提升的局部特征匹配的可解释跨视角定位方法。其核心洞察在于：**直接在原始图像平面上建立地面与空中的局部特征对应，利用单目深度先验将匹配的地面点提升至鸟瞰图（BEV）空间，再通过可微分的尺度感知 Procrustes 对齐，联合解析估计相机旋转、平移和深度尺度**——整个过程仅需 3-DoF 相机姿态作为弱监督信号，无需任何像素级标注。
+
+与现有方法相比，Loc² 在三个关键设计槽位上实现了根本性转变：
+
+| 设计维度 | 现有方法 | Loc² |
+|---------|---------|------|
+| **匹配空间** | BEV 平面或地理空间（经纠偏的鸟瞰图） | 原始图像平面（直接在地面与空中图像间进行特征匹配） |
+| **姿态估计方式** | 基于单应性或正交 Procrustes（仅旋转/平移，忽略尺度） | 可微分的尺度感知 Procrustes 对齐，同时估计旋转、平移和深度尺度 |
+| **深度先验** | 假设地面为平面或固定高度，不显式利用深度信息 | 集成 SOTA 单目深度预测器，支持度量深度和相对深度，并为相对深度显式估计尺度因子 |
+
+在方法谱系中，跨视角定位的主流路线可分为三类：（1）**基于全局描述子的方法**，如 **CCVPE**（Xia et al., 2023）和 **SliceMatch**（Lentsch et al., 2023），通过对地面和空中图像提取全局特征进行对比学习匹配，但缺乏细粒度空间对应能力；（2）**基于几何变换的方法**，如 **GGCVT**（Shi et al., 2023）、**HC-Net**（Wang et al., 2024b）和 **DenseFlow**（Song et al., 2024），将地面图像变形至 BEV 后与空中图像对齐，但依赖隐式变换而非显式对应；（3）**基于 BEV 点匹配的方法**，如 **FG²**（Xia & Alahi, 2025），首次尝试在 BEV 空间建立局部对应，但使用正交 Procrustes 忽略了深度尺度。Loc² 在 FG² 的基础上进一步推进：将匹配空间从 BEV 拉回图像平面，利用深度特征的大感受野上下文信息缓解视角差异，并引入尺度感知 Procrustes 对齐恢复被 FG² 忽略的尺度因子。
+
+主要实验结果验证了上述设计的有效性：在 **KITTI** 数据集（同区域 ±180° 方向噪声）上，Loc² 的平均定位误差为 **1.85 m**，较 CCVPE 的 6.88 m 降低 **5.03 m**；在更具挑战性的 **VIGOR** 数据集（跨区域、未知方向）上，平均定位误差为 **4.23 m**，较 FG² 的 10.02 m 降低 **5.79 m**，方向误差为 **9.54°**，较 FG² 的 15.02° 降低 **5.48°**。消融实验进一步表明，尺度感知 Procrustes 对齐相比忽略尺度的正交 Procrustes 能产生更准确且更鲁棒的匹配，而外点剔除（RANSAC）可将平均定位误差额外降低 0.74 m。此外，Loc² 的匹配结果具有高度可解释性——通过将估计的旋转、平移和尺度变换应用于地面布局，可直接在航拍图上可视化对齐质量，从而直观判断定位的可靠性。
+
+> ⚠️ **需要人工验证**：论文未明确标注发表会议/期刊和年份，上述方法谱系中的基线方法引用信息来自分析系统的推断，建议核实具体出处。
+
+## 背景与动机
+
+跨视角地理定位（cross-view geo-localization）旨在通过将地面图像与带有地理坐标的航空或卫星图像进行匹配，确定地面相机的地理位置。这一任务在自动驾驶、增强现实和机器人导航等领域具有重要应用价值。然而，地面图像与空中图像之间存在**极端的视觉差异**：地面图像呈现透视投影下的街景立面，而空中图像则提供近似正交投影的鸟瞰布局。这种视角鸿沟使得传统图像匹配方法难以可靠地建立跨视角对应关系，构成了该任务的核心瓶颈。
+
+现有方法主要沿两条技术路线展开。**基于全局描述子的方法**将跨视角定位视为图像检索问题，通过对比学习提取地面和空中图像的全局特征描述子进行匹配，如 **CCVPE**（Xia et al., 2023）和 **SliceMatch**（Lentsch et al., 2023）。这类方法虽然实现简洁，但丢弃了精细的空间对应信息，定位精度受限。**基于几何变换的方法**尝试将地面图像变形到鸟瞰图（BEV）空间后再与空中图像对齐，如 **GGCVT**（Shi et al., 2023）、**HC-Net**（Wang et al., 2024b）和 **DenseFlow**（Song et al., 2024）。这些方法依赖隐式的特征变换或流场估计，缺乏显式的对应关系监督，且通常假设地面为平面或固定高度，未有效利用深度信息。**FG²**（Xia & Alahi, 2025）首次尝试在BEV空间中通过点匹配建立局部对应，但使用正交Procrustes对齐，忽略了深度尺度的影响。
+
+上述方法面临一个共同的困境：**缺乏像素级的地面−空中标注对应关系**。获取此类标注极其困难且成本高昂，导致现有方法要么退化为粗糙的全局检索，要么依赖强几何假设进行隐式对齐，难以在精度和可解释性之间取得平衡。
+
+针对这一缺口，本文提出 **Loc²**，核心动机是：**直接在原始图像平面上学习地面与空中的局部特征匹配，仅使用3自由度（3-DoF）相机姿态作为弱监督信号**。通过引入单目深度先验将匹配的地面点提升至BEV空间，再借助可微分的尺度感知Procrustes对齐联合估计相机旋转、平移和深度尺度，Loc²在无需任何像素级标注的条件下，实现了准确且高度可解释的跨视角定位。该方法不仅弥合了视角鸿沟，还首次使得定位结果可以通过地面布局在航拍图上的叠加进行直观验证。
+
+## 核心创新
+
+Loc$^{2}$ 的核心创新在于将跨视角定位问题从传统的“全局描述子匹配”或“BEV 空间对齐”范式，重新定义为**原始图像平面上的局部特征匹配 + 深度提升 + 尺度感知 Procrustes 对齐**的端到端流水线。这一设计通过三个关键 changed slots 实现了对现有方法的系统性突破。
+
+### 1. 匹配空间：从 BEV/地理空间回归到图像平面
+
+现有方法普遍在 BEV 平面或地理空间进行匹配：基于全局描述子的方法（如 **CCVPE** (Xia et al., 2023)、**SliceMatch** (Lentsch et al., 2023)）通过对比学习匹配地面与空中图像的全局特征；基于几何变换的方法（如 **GGCVT** (Shi et al., 2023)、**HC-Net** (Wang et al., 2024b)、**DenseFlow** (Song et al., 2024)）则先将地面图像变形为 BEV 表示，再与空中图像对齐。即便是首次尝试建立局部对应的 **FG$^{2}$** (Xia & Alahi, 2025)，其匹配也发生在 BEV 点层面，而非原始图像平面。
+
+Loc$^{2}$ 直接在地面图像 $G$ 与空中图像 $A$ 的原始图像平面上建立局部特征对应。这一设计的关键优势在于：**图像平面保留了最丰富的视觉信息**，避免了 BEV 变换带来的信息损失和几何畸变。具体而言，方法使用冻结的 DINOv2 编码器提取特征图，再通过轻量级投影头进行处理，利用对偶 softmax 归一化（含可学习垃圾桶机制）计算匹配概率矩阵：
+
+$$\hat{M}_{ij}^{*} = \frac{e^{M_{ij}^{*}}}{\sum_{k} e^{M_{ik}^{*}}} \cdot \frac{e^{M_{ij}^{*}}}{\sum_{l} e^{M_{lj}^{*}}}$$
+
+这一匹配过程仅需 3-DoF 相机姿态作为弱监督信号，完全不需要像素级标注对应关系。
+
+### 2. 姿态估计方式：从正交 Procrustes 到尺度感知 Procrustes 对齐
+
+传统基于点对应的姿态估计方法（如 FG$^{2}$ 采用的正交 Procrustes）仅能恢复旋转和平移，**忽略了深度尺度的不确定性**。当使用单目深度预测器获取地面点的 3D 坐标时，预测深度可能带有未知的尺度因子——度量深度和相对深度之间、甚至不同深度模型之间的尺度都不一致。
+
+Loc$^{2}$ 引入可微分的**尺度感知 Procrustes 对齐**（Umeyama, 1991），通过加权 SVD 分解同时估计旋转 $R$、平移 $t$ 和深度尺度 $s$。具体推导表明：无论地面点的深度尺度如何未知，尺度感知 Procrustes 对齐都能一致地恢复相机姿态并显式估计尺度因子：
+
+$$s^{*} = \frac{\mathrm{Tr}(\Sigma)}{\sum_{n=1}^{N} w_{n} \|\tilde{\mathbf{P}}_{n}\|^{2}}, \qquad \mathbf{t} = \bar{\mathbf{Q}} - s^{*} (\mathbf{R} \cdot \bar{\mathbf{P}})$$
+
+消融实验证实了这一设计的决定性作用：**让模型从对应关系中估计尺度，比忽略尺度的正交 Procrustes 产生更准确且更鲁棒的匹配**（Section 4.6）。这一机制使得 Loc$^{2}$ 在推理时能够灵活切换不同的深度预测器而无需重新训练。
+
+### 3. 深度先验：从平面假设到可切换的单目深度集成
+
+此前方法通常假设地面为平面或固定高度，不显式利用深度信息。Loc$^{2}$ 集成了 SOTA 单目深度预测器（如 Unik3D），将匹配的地面点从 2D 图像坐标提升为 BEV 空间中的 3D 坐标。方法同时支持**度量深度和相对深度**——对于相对深度，尺度感知 Procrustes 对齐中显式估计的尺度因子 $s$ 恰好补偿了深度尺度的不确定性。实验表明，使用相对深度预测器（如 BiFuse++、UniFuse）时，定位误差增加不到 0.2 m（Table 2），验证了这一设计的鲁棒性。
+
+### 创新总结
+
+这三个 changed slots 形成了因果闭环：图像平面匹配保留了最丰富的视觉特征 → 单目深度将 2D 对应提升为 3D 坐标 → 尺度感知 Procrustes 对齐在统一的数学框架下同时解决姿态估计和深度尺度恢复。这一设计使得 Loc$^{2}$ 在 KITTI 同区域 ±180° 方向噪声下将平均定位误差从 6.88 m（CCVPE）降至 1.85 m，在 VIGOR 跨区域未知方向下从 10.02 m（FG$^{2}$）降至 4.23 m，同时提供了高度可解释的匹配可视化。
+
+## 整体框架
+
+Loc$^{2}$ 的核心设计是将跨视角定位从 BEV 空间或全局描述子匹配中解放出来，直接在原始图像平面上建立地面与空中之间的局部特征对应，再通过单目深度先验将匹配点提升至 3D 空间，最终以可微分的尺度感知 Procrustes 对齐联合恢复相机姿态和深度尺度。整个流水线由四个紧密耦合的模块组成，如图 Figure 2 所示。
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/002_Figure_2.jpg]]
+*Figure 2: Overview of our proposed method. Our method first matches local features between ground and aerial images. The matched ground points are then lifted to the BEV space using monocular depth priors. By aligning these correspondences using scale-aware Procrustes alignment, we estimate the rotation, translation, and scale between the ground and aerial views*
+
+**输入与输出流**：系统接受一对地面图像 $G$ 和空中图像 $A$ 作为输入。空中图像被假定近似为真数字正射影像（TDOM），其每个像素已具备度量坐标；地面图像则为任意视角的街景或全景图像。输出为相机相对于空中图像坐标系的 3-DoF 姿态——包括旋转（偏航角）$R$、平移（2D 位置）$t$，以及地面点深度的尺度因子 $s$。
+
+**模块一：局部特征匹配（图像平面）**。地面和空中图像分别通过冻结的 DINOv2 特征提取器与轻量投影头，得到特征图 $F_G$ 和 $F_A$。随后计算两幅特征图之间的成对余弦相似度得分 $M = \text{cosine}(F_A, F_G) / \tau$，并在扩展的匹配得分矩阵 $M^*$（包含可学习的垃圾桶行/列）上应用对偶 softmax 归一化，获得匹配概率矩阵 $\hat{M}^*$。丢弃垃圾桶维度后，采样 $N$ 个对应点用于后续姿态估计。这一阶段完全在 2D 图像平面上操作，仅需 3-DoF 相机姿态作为弱监督信号，无需任何像素级标注。
+
+**模块二：坐标关联与深度提升**。匹配的空中点直接赋予其度量坐标 $Q_n$；匹配的地面点则利用离架单目深度预测器生成的深度图 $D = \mathcal{D}(G)$，结合相机光线方向计算其 3D 坐标 $P_n$。该模块的关键灵活性在于同时支持度量深度和相对深度——当使用相对深度时，地面点坐标带有一个未知的全局尺度因子 $s$，这正是后续尺度感知 Procrustes 对齐所要恢复的量。
+
+**模块三：尺度感知 Procrustes 对齐与姿态估计**。给定带权重的点对应集合 $\{ (P_n, Q_n, w_n) \}_{n=1}^{N}$，模块通过加权质心计算、协方差矩阵构建和 SVD 分解，以完全可微分的方式解析求解旋转 $R$、平移 $t$ 和尺度 $s$。与先前方法（如 FG$^{2}$ 所使用的正交 Procrustes）不同，尺度感知 Procrustes 对齐（Umeyama, 1991）能够在地面点尺度未知的情况下，一致地恢复相机姿态并显式估计深度尺度 $s$。消融实验证实，让模型从对应关系中估计尺度，比忽略尺度的正交 Procrustes 产生更准确且更鲁棒的匹配。
+
+**模块四：多目标损失监督**。训练阶段采用 VCE（Virtual Correspondence Error）损失与 InfoNCE 损失的加权组合 $\mathcal{L} = \mathcal{L}_{\mathrm{VCE}} + \beta (\mathcal{L}_{\mathrm{G2S}} + \mathcal{L}_{\mathrm{S2G}}) / 2$。VCE 损失通过在 BEV 空间采样虚拟对应点，计算真值姿态与估计姿态变换后的点集间平均欧氏距离，直接监督姿态估计；InfoNCE 损失则提供对应关系层面的辅助监督。
+
+**推理时的灵活性**：模型可在不重新训练的情况下切换不同的单目深度预测器（度量或相对深度）。当使用相对深度时，尺度感知 Procrustes 自动估计尺度因子，引入的定位误差增量小于 0.2 m。此外，RANSAC 可作为后处理步骤应用于对应点集以剔除离群点，在 VIGOR 数据集上带来 0.74 m 的平均定位误差降低。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/001_Figure_1.jpg]]
+*Figure 1: Loc2: Interpretable cross-view localization via local feature matching. Loc2 establishes accurate correspondences between aerial and ground views, with colors indicating distinct correspondence regions. Using the estimated rotation, translation, and scale, the ground view is warped onto the aerial image, providing a visual interpretation of localization quality*
+
+## 核心模块与公式推导
+
+Loc² 的核心流水线由三个紧密耦合的模块构成：**图像平面局部特征匹配**、**深度提升与坐标关联**、**尺度感知 Procrustes 对齐与姿态估计**。整个流程仅需 3-DoF 相机姿态作为弱监督信号，无需任何像素级标注。
+
+### 3.1 图像平面局部特征匹配
+
+与现有工作在 BEV 平面或地理空间建立匹配不同，Loc² 直接在原始地面图像与空中图像之间学习局部特征对应关系。该模块由冻结的 DINOv2 特征提取器和轻量投影头组成，分别处理地面和空中图像，输出特征图 $F_G$ 和 $F_A$。
+
+匹配分数的计算基于余弦相似度与温度参数 $\tau$：
+
+$$M = \text{cosine}(F_A, F_G) / \tau$$
+
+为处理非匹配区域，在匹配分数矩阵上附加一个可学习的垃圾桶（dustbin）行和列，得到扩展矩阵 $M^*$。随后应用对偶 softmax 归一化：
+
+$$\hat{M}_{ij}^{*} = \frac{e^{M_{ij}^{*}}}{\sum_{k} e^{M_{ik}^{*}}} \cdot \frac{e^{M_{ij}^{*}}}{\sum_{l} e^{M_{lj}^{*}}}$$
+
+该公式对扩展矩阵的行和列分别施加 softmax，得到包含垃圾桶的匹配概率矩阵 $\hat{M}^*$。丢弃垃圾桶行和列后，采样 $N$ 个对应点用于后续姿态估计。消融实验表明，温度 $\tau=0.1$ 与 $\tau=0.05$ 表现相近，更大或更小的值会显著降低精度。
+
+### 3.2 深度提升与坐标关联
+
+匹配完成后，需要为对应点赋予 3D 坐标。对于空中点，直接使用其度量坐标 $\mathbf{Q}_n$。对于地面点，利用现成的单目深度预测器 $D(G)$ 生成深度图，结合相机内参和光线方向将 2D 匹配点提升为 3D 坐标 $\mathbf{P}_n$。
+
+该模块的关键设计在于**支持度量深度和相对深度两种模式**。当使用相对深度时，提升后的地面点坐标带有一个未知的尺度因子 $s$，后续的尺度感知 Procrustes 对齐将显式估计该因子。
+
+### 3.3 尺度感知 Procrustes 对齐与姿态估计
+
+给定 $N$ 对加权对应点 $\{(\mathbf{P}_n, \mathbf{Q}_n, w_n)\}_{n=1}^{N}$，首先计算加权质心：
+
+$$\bar{\mathbf{Q}} = \frac{1}{W} \sum_{n=1}^{N} w_n \mathbf{Q}_n, \quad \bar{\mathbf{P}} = \frac{1}{W} \sum_{n=1}^{N} w_n \mathbf{P}_n, \quad W = \sum_{n=1}^{N} w_n$$
+
+其中 $w_n$ 为匹配概率。中心化后的点集用于构建加权协方差矩阵：
+
+$$\mathbf{C} = \sum_{n=1}^{N} w_n \left( \tilde{\mathbf{P}}_{n} \right) \left( \tilde{\mathbf{Q}}_{n} \right)^{\top}$$
+
+对 $\mathbf{C}$ 进行 SVD 分解 $\mathbf{C} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^{\top}$，可解析计算旋转矩阵 $\mathbf{R}$（对应偏航角）。随后，尺度因子 $s^*$ 和平移向量 $\mathbf{t}$ 由下式给出：
+
+$$s^{*} = \frac{\mathrm{Tr}(\Sigma)}{\sum_{n=1}^{N} w_n \|\tilde{\mathbf{P}}_{n}\|^{2}}, \qquad \mathbf{t} = \bar{\mathbf{Q}} - s^{*} (\mathbf{R} \cdot \bar{\mathbf{P}})$$
+
+这一推导表明，**无论地面点的深度尺度是否已知，尺度感知 Procrustes 对齐都能一致地恢复相机姿态并估计尺度 $s$**。消融实验证实，让模型从对应关系中估计尺度，比忽略尺度的正交 Procrustes 产生更准确且更鲁棒的匹配。
+
+### 3.4 损失函数
+
+模型训练采用 VCE（Virtual Correspondence Error）损失与 InfoNCE 损失的加权组合：
+
+$$\mathcal{L} = \mathcal{L}_{\mathrm{VCE}} + \beta ( \mathcal{L}_{\mathrm{G2S}} + \mathcal{L}_{\mathrm{S2G}} ) / 2$$
+
+其中 VCE 损失监督姿态估计精度，通过虚拟对应点的变换误差计算：
+
+$$\mathcal{L}_{\mathrm{VCE}} = \frac{1}{N_v} \sum \| ( \mathbf{R}_{\mathrm{gt}} \cdot \mathbf{P}_v + \mathbf{t}_{\mathrm{gt}} ) - ( \mathbf{R} \cdot \mathbf{P}_v + \mathbf{t} ) \|_2$$
+
+InfoNCE 损失 $\mathcal{L}_{\mathrm{G2S}}$ 和 $\mathcal{L}_{\mathrm{S2G}}$ 分别从地面到空中和空中到地面两个方向监督匹配质量。需注意，在未知方向场景下，InfoNCE 损失可能引入冲突梯度，影响姿态估计。
+
+## 实验与分析
+
+### 核心实验设置
+
+Loc$^{2}$ 在两个标准跨视角定位基准上进行评估：**KITTI**（同区域，地面图像为透视相机）和 **VIGOR**（同区域与跨区域，地面图像为360°全景）。训练仅使用3-DoF相机姿态作为弱监督信号。模型采用冻结的DINOv2编码器提取特征，仅微调轻量投影头；优化器为AdamW，学习率 $1\times10^{-4}$，VIGOR批次大小为80，KITTI批次大小为224，在单张H100 GPU上训练。推理时，VIGOR数据集应用RANSAC进行外点剔除，KITTI数据集则省略此步骤（未带来精度提升）。使用度量深度时，VIGOR和KITTI分别设置35 m和40 m的最大深度阈值，将超出阈值点的匹配得分置零。
+
+### 主实验结果
+
+**KITTI数据集。** 如表1所示，Loc$^{2}$ 在所有设置下均取得最优定位精度。在同区域±180°方向噪声这一最具挑战性的设置下，平均定位误差仅为 **1.85 m**，相比此前最优方法CCVPE的6.88 m降低了5.03 m（降幅73%）。在跨区域±180°设置下，Loc$^{2}$ 的平均定位误差为11.71 m，同样显著优于所有基线方法。
+
+**VIGOR数据集。** 表2展示了全景图像定位结果。在跨区域未知方向设置下，Loc$^{2}$ 的平均定位误差为 **4.23 m**，相比此前最优的FG$^{2}$（10.02 m）降低了5.79 m；平均方向误差为11.67°，亦为所有方法中最低。在同区域未知方向下，平均方向误差仅 **9.54°**，较FG$^{2}$的15.02°降低5.48°。值得注意的是，当使用不同的相对深度预测器（BiFuse++、UniFuse）替代度量深度时，定位误差增加不足0.2 m，验证了方法对深度先验类型的鲁棒性。
+
+### 消融实验
+
+表3在VIGOR同区域验证集上系统消融了关键设计选择：
+
+- **尺度感知 vs. 正交Procrustes：** 让模型通过尺度感知Procrustes从对应关系中显式估计深度尺度，相比忽略尺度的正交Procrustes，不仅定位精度更高，匹配也更为鲁棒。这验证了联合估计旋转、平移和尺度是方法有效性的核心机制。
+
+- **深度先验的作用：** 移除深度先验（即假设地面为平面）会导致定位精度大幅下降，证明单目深度提升对于建立准确的BEV空间对应关系至关重要。
+
+- **显式选择最高点：** 显式仅选择高度最顶部的点并未提高定位精度，表明模型能自主学习选择信息量丰富的对应点。
+
+- **RANSAC外点剔除：** 在VIGOR上使用RANSAC可将平均定位误差降低 **0.74 m**（Table 7），验证了对应点中存在可被有效检测的外点。
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/013_Table_7.jpg]]
+*Table 7: Ablation on RANSAC. Best in bold*
+
+- **温度参数 $\tau$：** $\tau=0.1$ 与 $\tau=0.05$ 表现相近，更大或更小的值会显著降低精度（Table 11），表明匹配概率的锐度需要仔细调节。
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/017_Table_11.jpg]]
+*Table 11: Different values for the temperature parameter. Best in bold*
+
+- **采样对应点数量：** 增加采样对应点数量可提升精度但趋于饱和，需要在精度与计算开销之间权衡（Table 4）。
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/010_Table_4.jpg]]
+*Table 4: Ablation on the number of sampled correspondences N. Best in bold*
+
+### 定性分析与可解释性
+
+Figure 3展示了VIGOR上的局部特征匹配结果（top 50对应点按匹配得分排序），可见模型成功在语义对应的区域（道路交叉口、建筑物边缘等）建立了准确对应。Figure 5进一步展示了利用估计的旋转、平移和尺度将地面布局叠加到航拍图上的效果：前三个示例中地面结构（道路、建筑轮廓）与航拍图精确对齐，直接反映了高精度定位；最后一个失败案例中，对齐偏差直观揭示了定位错误。值得注意的是，示例(c)中的对齐结果甚至帮助作者发现了真值标注中的位置错误，体现了方法的高度可解释性。
+
+### 跨域泛化
+
+Figure 6展示了在CVACT数据集上的零样本泛化结果。尽管模型仅在VIGOR上训练，其局部特征匹配和布局对齐在CVACT上依然保持良好质量，表明Loc$^{2}$ 学习到的匹配能力具有一定的跨域迁移性。
+
+### 失败模式与局限性
+
+1. **方向估计精度：** 在已知道路方向的场景下，Loc$^{2}$ 的方向估计精度不如利用该先验的方法（如SliceMatch），因为其完全基于局部特征对应解析计算方向，未显式融入道路朝向信息。
+
+2. **空中图像畸变：** 方法假定空中图像近似为真数字正射影像（TDOM），但实际使用的标准DOM可能包含建筑物立面等畸变。尽管深度特征和置信度采样能部分缓解，但在复杂建筑区域仍可能出现对齐错误（Figure 5最后一个示例）。
+
+3. **损失函数冲突：** 在未知方向设置下，InfoNCE损失可能引入与姿态估计目标冲突的梯度，完全移除InfoNCE损失会导致性能下降，如何平衡两者仍需进一步探索。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/003_Table_1.jpg]]
+*Table 1: KITTI test results. Best in bold. The ‘ori.’ column shows orientation noise used in training and testing, uniformly sampled within*
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/004_Table_2.jpg]]
+*Table 2: VIGOR test results. Best in bold. Training uses metric depth from Unik3D (Piccinelli et al., 2025). The row ‘ours’ reports results with metric depth from the same model, while ‘oursxxx’ shows results with different relative depth inputs. Relative depth predictors, BiFuse++ (Wang et al., 2022) and UniFuse (Jiang et al., 2021), are provided by (Wang & Liu, 2024) ‘Ours-Unik3Drel’ denotes the study where metric depth is manually scaled by an arbitrary factor*
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/009_Table_3.jpg]]
+*Table 3: Ablation study on VIGOR same-area validation set with unknown ori. Best in bold*
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/005_Figure_3.jpg]]
+*Figure 3: Local feature matching results on the VIGOR same-area test set under unknown orientation. We visualize the top 50 correspondences, ranked by matching score*
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/006_Figure_4.jpg]]
+*Figure 4: Outlier detection using RANSAC on VIGOR same/cross-area test sets*
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/030_Table_16.jpg]]
+*Table 16: Runtime and memory usage comparison*
+
+![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/008_Figure_6.jpg]]
+*Figure 6: Direct generalization to the CVACT dataset. We visualize the top 50 correspondences, ranked by matching score, and overlay the ground layout on the aerial image after using the predicted rotation, translation, and scale transformations. We use the metric depth prediction from Unik3D*
+
+## 方法谱系与知识库定位
+
+### 跨视角定位的方法谱系
+
+跨视角地面−空中定位任务的核心挑战在于两种视图之间存在极端的视觉外观差异，以及缺乏像素级标注的对应关系。围绕这一瓶颈，已有工作可大致划分为两类范式：基于全局描述子的检索式方法和基于几何变换的对齐式方法。**Loc²** 提出了一种不同于二者的第三条路径——直接在原始图像平面上建立局部特征匹配，并通过深度先验与尺度感知的Procrustes对齐联合估计相机姿态与深度尺度。
+
+**基于全局描述子的方法**将定位视为图像检索问题。**CCVPE**（Xia et al., 2023）通过对比学习将地面和空中图像映射到共享嵌入空间，利用全局描述子进行匹配，但在大范围方向变化下精度显著下降。**SliceMatch**（Lentsch et al., 2023）通过分段搜索策略改进空中图像检索，在已知道路方向先验时表现优异，但该先验在实际应用中往往不可得。这类方法的共同局限在于缺乏对空间布局的显式建模，定位结果难以解释且对方向变化敏感。
+
+**基于几何变换的方法**尝试将地面图像变换到鸟瞰图（BEV）空间后与空中图像对齐。**GGCVT**（Shi et al., 2023）、**HC-Net**（Wang et al., 2024b）和**DenseFlow**（Song et al., 2024）分别通过BEV特征对齐或流场对齐实现跨视角匹配，但它们依赖单应性或正交Procrustes进行姿态估计，忽略了深度尺度因子。**FG²**（Xia & Alahi, 2025）首次尝试在BEV空间中建立局部点对应，但仍使用正交Procrustes，未对尺度进行显式建模。
+
+### 关键设计差异与因果机制
+
+Loc² 的核心创新在于三个相互耦合的设计选择，形成了与前述方法的根本差异：
+
+| 设计维度 | 已有方法 | Loc² | 因果作用 |
+|---------|---------|------|---------|
+| **匹配空间** | BEV平面或地理空间 | 原始图像平面 | 避免BEV变换引入的几何畸变，保留原始纹理信息用于特征匹配 |
+| **姿态估计** | 单应性/正交Procrustes（忽略尺度） | 尺度感知Procrustes对齐 | 同时恢复旋转、平移和深度尺度，消除尺度歧义对匹配的干扰 |
+| **深度先验** | 平面假设或固定高度 | 单目深度预测器（支持度量/相对深度） | 为地面点提供3D坐标，使图像平面匹配能够提升到BEV空间 |
+
+这一设计选择背后的因果逻辑是：当模型能够从对应关系中同时估计尺度时，匹配过程本身会变得更加准确和鲁棒。消融实验证实，使用尺度感知Procrustes替代正交Procrustes后，定位误差显著降低；而显式选择高度最顶部的点并未带来额外收益，说明模型已能自主学习有判别力的对应关系。
+
+### 适用边界与局限性
+
+**1. 方向估计的边界条件。** 本方法完全基于局部特征对应的解析计算来估计方向，未显式融入道路朝向等结构先验。在已知道路方向的场景下（如部分数据集假设车辆沿道路行驶），其方向估计精度不如利用该先验的方法（如SliceMatch）。这表明当道路方向先验可靠时，引入该先验可能进一步提升性能。
+
+**2. 空中图像的几何假设。** 方法假定空中图像近似为真数字正射影像（TDOM），但实际使用的是标准DOM，其中可能包含建筑物立面等非垂直投影导致的畸变。虽然深度特征和置信度加权采样能部分缓解这一问题，但在建筑密集区域仍可能出现对齐错误。Figure 5中展示的失败案例即反映了这一边界条件。
+
+**3. 损失函数的张力。** 在未知方向设置下，InfoNCE损失（用于监督对应关系）与VCE损失（用于监督姿态估计）之间存在潜在冲突：InfoNCE损失可能引入与姿态估计目标不一致的梯度。消融显示，使用相对深度训练时完全移除InfoNCE损失会导致性能下降，说明两者均不可或缺，但其最优平衡策略仍需进一步研究。
+
+**4. 深度模型的依赖性。** 推理时可灵活替换不同的单目深度预测器（度量或相对深度），无需重新训练，且相对深度引入的额外定位误差小于0.2 m（Table 2）。这一特性降低了部署门槛，但深度预测器本身的精度和泛化能力仍构成方法的上限。
+
+### 开放问题
+
+- **方向估计的增强。** 能否通过引入道路结构先验或更强的方向正则化来改进未知方向下的方向估计精度？时序信息或多视角图像是否能为方向估计提供额外约束？
+- **对应点质量的提升。** 当前方法通过RANSAC进行外点剔除，可将平均定位误差降低0.74 m。是否存在更紧耦合的外点剔除机制，能在训练过程中直接提升对应点的内点率？
+- **极端视角下的泛化。** 本方法在KITTI和VIGOR数据集上验证了有效性，并在CVACT上展示了跨域泛化能力（Figure 6），但在更极端的视角变化（如地面图像与卫星图像超大倾角）下的表现尚待检验。
+- **效率与精度的平衡。** Table 16报告了运行时间与显存占用，但未涉及移动端部署。如何在嵌入式设备上平衡单目深度模型的容量与实时性需求，是实际应用落地的关键问题。
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/Loc_2_Interpretable_Cross_View_Localization_via_Depth_Lifted_Local_Feature_Match_da8cf91ad977.pdf]]

@@ -1,0 +1,270 @@
+---
+title: "Venue_Year: arxiv_2024"
+type: paper-index
+dimension: venue_year
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Venue_Year: arxiv_2024
+
+- [[obsidian-vault/analysis/arxiv_2024/A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and_Insights.md|A Comprehensive Survey on Human Video Generation Challenges Methods and Insights (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and_Insights.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Survey
+- [[obsidian-vault/analysis/arxiv_2024/Boximator_Generating_Rich_and_Controllable_Motions_for_Video_Synthesis.md|Boximator: Generating Rich and Controllable Motions for Video Synthesis (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Boximator_Generating_Rich_and_Controllable_Motions_for_Video_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Boximator
+	- datasets: MSR-VTT, ActivityNet, UCF-101
+- [[obsidian-vault/analysis/arxiv_2024/CamCo_Camera_Controllable_3D_Consistent_Image_to_Video_Generation.md|CamCo: Camera-Controllable 3D-Consistent Image-to-Video Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/CamCo_Camera_Controllable_3D_Consistent_Image_to_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CamCo
+	- datasets: RealEstate10K
+- [[obsidian-vault/analysis/arxiv_2024/CamI2V_Camera_Controlled_Image_to_Video_Diffusion_Model.md|CamI2V: Camera-Controlled Image-to-Video Diffusion Model (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/CamI2V_Camera_Controlled_Image_to_Video_Diffusion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CamI2V
+	- datasets: RealEstate10K
+- [[obsidian-vault/analysis/arxiv_2024/ChatCam_Empowering_Camera_Control_through_Conversational_AI.md|ChatCam: Empowering Camera Control through Conversational AI (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/ChatCam_Empowering_Camera_Control_through_Conversational_AI.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: ChatCam
+	- datasets: 多种室内/室外/人像3D场景
+- [[obsidian-vault/analysis/arxiv_2024/CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_for_Pick_and_Place_Actions.md|CHOICE Coordinated Human Object Interaction in Cluttered Environments for Pick and Place Actions (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_for_Pick_and_Place_Actions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CHOICE
+	- datasets: Pick-and-place in cluttered scenes
+- [[obsidian-vault/analysis/arxiv_2024/Cinemo_Consistent_and_Controllable_Image_Animation_with_Motion_Diffusion_Models.md|Cinemo: Consistent and Controllable Image Animation with Motion Diffusion Models (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Cinemo_Consistent_and_Controllable_Image_Animation_with_Motion_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Cinemo
+	- datasets: UCF-101, MSR-VTT
+- [[obsidian-vault/analysis/arxiv_2024/COLLAGE_Collaborative_Human_Agent_Interaction_Generation_using_Hierarchical_Latent_Diffusion_and_Language_Models.md|COLLAGE Collaborative Human Agent Interaction Generation using Hierarchical Latent Diffusion and Language Models (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/COLLAGE_Collaborative_Human_Agent_Interaction_Generation_using_Hierarchical_Latent_Diffusion_and_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: COLLAGE
+	- datasets: CORE-4D
+- [[obsidian-vault/analysis/arxiv_2024/DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_Driven_Dance_Motion_Reconstruction.md|DanceFusion A Spatio Temporal Skeleton Diffusion Transformer for Audio Driven Dance Motion Reconstruction (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_Driven_Dance_Motion_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DanceFusion
+	- datasets: TikTok Dance Dataset
+- [[obsidian-vault/analysis/arxiv_2024/DeblurGS_Gaussian_Splatting_for_Camera_Motion_Blur.md|DeblurGS: Gaussian Splatting for Camera Motion Blur (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/DeblurGS_Gaussian_Splatting_for_Camera_Motion_Blur.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DeblurGS
+	- datasets: Real Motion Blur, Synthetic Extreme Blur
+- [[obsidian-vault/analysis/arxiv_2024/DIP_Diffusion_Implicit_Policy_for_Unpaired_Scene_aware_Motion_Synthesis.md|DIP Diffusion Implicit Policy for Unpaired Scene aware Motion Synthesis (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2025/CLoSD_Closing_the_Loop_between_Simulation_and_Diffusion_for_Multi_Task_Character_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CLoSD
+	- datasets: Custom Task Suite - Striking, Custom Task Suite - Get-up, HumanML3D
+- [[obsidian-vault/analysis/arxiv_2024/DreamVideo_2_Zero_Shot_Subject_Driven_Video_Customization_with_Precise_Motion_Control.md|DreamVideo-2: Zero-Shot Subject-Driven Video Customization with Precise Motion Control (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/DreamVideo_2_Zero_Shot_Subject_Driven_Video_Customization_with_Precise_Motion_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamVideo-2
+	- datasets: DreamVideo-2 Test Set
+- [[obsidian-vault/analysis/arxiv_2024/ElasticTok_Adaptive_Tokenization_for_Image_and_Video.md|ElasticTok: Adaptive Tokenization for Image and Video (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/Uncategorized/arXiv_2024/2024_ElasticTok_Adaptive_Tokenization_for_Image_and_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: ElasticTok
+	- datasets: ImageNet, 多模态 VQA
+- [[obsidian-vault/analysis/arxiv_2024/Generalizable_Motion_Planning_via_Operator_Learning.md|Generalizable Motion Planning via Operator Learning (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Generalizable_Motion_Planning_via_Operator_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Planning Neural Operator (PNO)
+	- datasets: Grid World, MovingAI 2D Synthetic, MovingAI 2D Real-world City
+- [[obsidian-vault/analysis/arxiv_2024/GPT_Connect_Interaction_between_Text_Driven_Human_Motion_Generator_and_3D_Scenes_in_a_Training_free_Manner.md|GPT Connect Interaction between Text Driven Human Motion Generator and 3D Scenes in a Training free Manner (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/GPT_Connect_Interaction_between_Text_Driven_Human_Motion_Generator_and_3D_Scenes_in_a_Training_free_Manner.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: GPT-Connect
+	- datasets: HUMANISE
+- [[obsidian-vault/analysis/arxiv_2024/GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction.md|GraspDiffusion Synthesizing Realistic Whole body Hand Object Interaction (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GraspDiffusion
+	- datasets: Full-body HOI 5K test set, DexYCB subset, Novel objects from DexYCB
+- [[obsidian-vault/analysis/arxiv_2024/It_Takes_Two_Real_time_Co_Speech_Two_persons_Interaction_Generation_via_Reactive_Auto_regressive_Diffusion_Model.md|It Takes Two Real time Co Speech Two person’s Interaction Generation via Reactive Auto regressive Diffusion Model (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/It_Takes_Two_Real_time_Co_Speech_Two_persons_Interaction_Generation_via_Reactive_Auto_regressive_Diffusion_Model.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Reactive Auto-regressive Diffusion Model (反应式自回归扩散模型)
+	- datasets: BEAT, InterACT++
+- [[obsidian-vault/analysis/arxiv_2024/KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation.md|KMM Key Frame Mask Mamba for Extended Motion Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Key Frame Mask Mamba (KMM)
+	- datasets: BABEL, BABEL-D, HumanML3D
+- [[obsidian-vault/analysis/arxiv_2024/Large_Motion_Video_Autoencoding_with_Cross_modal_Video_VAE.md|Large Motion Video Autoencoding with Cross-modal Video VAE (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Large_Motion_Video_Autoencoding_with_Cross_modal_Video_VAE.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Cross-modal Video VAE
+	- datasets: WebVid test set
+- [[obsidian-vault/analysis/arxiv_2024/LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_Environment.md|LaserHuman Language guided Scene aware Human Motion Generation in Free Environment (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_Environment.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Multi-conditional Diffusion Model with Parallel Cross Fusion（多条件扩散模型与并行交叉融合）
+	- datasets: LaserHuman, User Study
+- [[obsidian-vault/analysis/arxiv_2024/Latent_Reframe_Enabling_Camera_Control_for_Video_Diffusion_Model_without_Training.md|Latent-Reframe: Enabling Camera Control for Video Diffusion Model without Training (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Latent_Reframe_Enabling_Camera_Control_for_Video_Diffusion_Model_without_Training.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Latent-Reframe
+- [[obsidian-vault/analysis/arxiv_2024/Learning_Generalizable_Human_Motion_Generator_with_Reinforcement_Learning.md|Learning Generalizable Human Motion Generator with Reinforcement Learning (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Learning_Generalizable_Human_Motion_Generator_with_Reinforcement_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: InstructMotion
+	- datasets: HumanML3D, KIT-ML, Human Evaluation
+- [[obsidian-vault/analysis/arxiv_2024/MBA_SLAM_Motion_Blur_Aware_Dense_Visual_SLAM_with_Radiance_Fields_Representation.md|MBA-SLAM: Motion Blur Aware Dense Visual SLAM with Radiance Fields Representation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MBA_SLAM_Motion_Blur_Aware_Dense_Visual_SLAM_with_Radiance_Fields_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MBA-SLAM
+	- datasets: ArchViz-1, Replica Room0, Replica
+- [[obsidian-vault/analysis/arxiv_2024/MoDiPO_text-to-motion_alignment_via_AI-feedback-driven_Direct_Preference_Optimization.md|MoDiPO: text-to-motion alignment via AI-feedback-driven Direct Preference Optimization (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MoDiPO:_text-to-motion_alignment_via_AI-feedback-driven_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MoDiPO
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2024/MoGenTS_Motion_Generation_based_on_Spatial_Temporal_Joint_Modeling.md|MoGenTS: Motion Generation based on Spatial-Temporal Joint Modeling (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MoGenTS_Motion_Generation_based_on_Spatial_Temporal_Joint_Modeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MoGenTS
+	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2024/Motion_Zero_Zero_Shot_Moving_Object_Control_Framework_for_Diffusion_Based_Video_Generation.md|Motion-Zero: Zero-Shot Moving Object Control Framework for Diffusion-Based Video Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Motion_Zero_Zero_Shot_Moving_Object_Control_Framework_for_Diffusion_Based_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Motion-Zero
+- [[obsidian-vault/analysis/arxiv_2024/MotionFlow_Attention_Driven_Motion_Transfer_in_Video_Diffusion_Models.md|MotionFlow: Attention-Driven Motion Transfer in Video Diffusion Models (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MotionFlow_Attention_Driven_Motion_Transfer_in_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: MotionFlow
+	- datasets: DAVIS, User Study
+- [[obsidian-vault/analysis/arxiv_2024/MotionGPT_2_A_General_Purpose_Motion_Language_Model_for_Motion_Generation_and_Understanding.md|MotionGPT-2: A General-Purpose Motion-Language Model for Motion Generation and Understanding (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MotionGPT_2_A_General_Purpose_Motion_Language_Model_for_Motion_Generation_and_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionGPT-2
+	- datasets: HumanML3D, Motion-X
+- [[obsidian-vault/analysis/arxiv_2024/MotionLLM_Understanding_Human_Behaviors_from_Human_Motions_and_Videos.md|MotionLLM: Understanding Human Behaviors from Human Motions and Videos (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MotionLLM_Understanding_Human_Behaviors_from_Human_Motions_and_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MotionLLM
+	- datasets: MoVid-Bench-Motion, MoVid-Bench-Video, MVBench
+- [[obsidian-vault/analysis/arxiv_2024/MotionRL_Align_Text-to-Motion_Generation_to_Human_Preferences_with_Multi-Reward_Reinforcement_Learning.md|MotionRL: Align Text-to-Motion Generation to Human Preferences with Multi-Reward Reinforcement Learning (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MotionRL:_Align_Text-to-Motion_Generation_to_Human_Preferences_with_Multi-Reward_Reinforcement_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: MotionRL
+	- datasets: HumanML3D测试集
+- [[obsidian-vault/analysis/arxiv_2024/MotionShop_Zero_Shot_Motion_Transfer_in_Video_Diffusion_Models_with_Mixture_of_Score_Guidance.md|MotionShop: Zero-Shot Motion Transfer in Video Diffusion Models with Mixture of Score Guidance (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/MotionShop_Zero_Shot_Motion_Transfer_in_Video_Diffusion_Models_with_Mixture_of_Score_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Mixture of Score Guidance (MSG)
+	- datasets: MotionBench, User Study
+- [[obsidian-vault/analysis/arxiv_2024/Novel_View_Extrapolation_with_Video_Diffusion_Priors.md|Novel View Extrapolation with Video Diffusion Priors (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Novel_View_Extrapolation_with_Video_Diffusion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ViewExtrapolator
+	- datasets: LLFF-Extra
+- [[obsidian-vault/analysis/arxiv_2024/Pay_Attention_and_Move_Better_Harnessing_Attention_for_Interactive_Motion_Generation_and_Training_free_Editing.md|Pay Attention and Move Better: Harnessing Attention for Interactive Motion Generation and Training-free Editing (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Pay_Attention_and_Move_Better_Harnessing_Attention_for_Interactive_Motion_Generation_and_Training_free_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionCLR
+	- datasets: HumanML3D, HVerb / HVerb-wild, Example-based motion generation
+- [[obsidian-vault/analysis/arxiv_2024/PlanAgent_A_Multi_modal_Large_Language_Agent_for_Closed_loop_Vehicle_Motion_Planning.md|PlanAgent: A Multi-modal Large Language Agent for Closed-loop Vehicle Motion Planning (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/PlanAgent_A_Multi_modal_Large_Language_Agent_for_Closed_loop_Vehicle_Motion_Planning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: PlanAgent
+	- datasets: nuPlan Val14, nuPlan Test14-hard, Token Efficiency
+- [[obsidian-vault/analysis/arxiv_2024/ReCapture_Generative_Video_Camera_Controls_for_User_Provided_Videos_using_Masked_Video_Fine_Tuning.md|ReCapture: Generative Video Camera Controls for User-Provided Videos using Masked Video Fine-Tuning (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/ReCapture_Generative_Video_Camera_Controls_for_User_Provided_Videos_using_Masked_Video_Fine_Tuning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ReCapture
+	- datasets: VBench, Kubric-4D
+- [[obsidian-vault/analysis/arxiv_2024/RefFusion_Reference_Adapted_Diffusion_Models_for_3D_Scene_Inpainting.md|RefFusion: Reference Adapted Diffusion Models for 3D Scene Inpainting (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/RefFusion_Reference_Adapted_Diffusion_Models_for_3D_Scene_Inpainting.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: RefFusion
+	- datasets: SPIn-NeRF Dataset, SPIn-NeRF User Study
+- [[obsidian-vault/analysis/arxiv_2024/Structured_3D_Latents_for_Scalable_and_Versatile_3D_Generation.md|Structured 3D Latents for Scalable and Versatile 3D Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Structured_3D_Latents_for_Scalable_and_Versatile_3D_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: TRELLIS (Structured 3D Latents aka SLAT)
+	- datasets: Toys4k reconstruction subset, Toys4k text-to-3D generation, Toys4k image-to-3D generation
+- [[obsidian-vault/analysis/arxiv_2024/DSONet_Textual_Decomposition_Then_Sub_Motion_Space_Scattering_for_Open_Vocabulary_Motion_Generation.md|Textual Decomposition Then Sub-Motion-Space Scattering for Open-Vocabulary Motion Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/DSONet_Textual_Decomposition_Then_Sub_Motion_Space_Scattering_for_Open_Vocabulary_Motion_Generation.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Other Method Family
+	- methods: DSO-Net
+	- datasets: HumanML3D, Idea400, Mixamo
+- [[obsidian-vault/analysis/arxiv_2024/Training_free_Camera_Control_for_Video_Generation.md|Training-free Camera Control for Video Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Training_free_Camera_Control_for_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CamTrol
+	- datasets: RealEstate10k
+- [[obsidian-vault/analysis/arxiv_2024/Two_in_One_Unified_Multi_Person_Interactive_Motion_Generation_by_Latent_Diffusion_Transformer.md|Two in One Unified Multi Person Interactive Motion Generation by Latent Diffusion Transformer (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Two_in_One_Unified_Multi_Person_Interactive_Motion_Generation_by_Latent_Diffusion_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InterLDM (Two-in-One Unified Framework)
+	- datasets: InterHuman test set
+- [[obsidian-vault/analysis/arxiv_2024/Uncertainty_Estimation_for_3D_Object_Detection_via_Evidential_Learning.md|Uncertainty Estimation for 3D Object Detection via Evidential Learning (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Uncertainty_Estimation_for_3D_Object_Detection_via_Evidential_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: Evidential Deep Learning for 3D Object Detection Uncertainty
+	- datasets: nuScenes vs Waymo OOD detection, nuScenes erroneous box detection - FF model, nuScenes missed object detection)
+- [[obsidian-vault/analysis/arxiv_2024/UniEdit_A_Unified_Tuning_Free_Framework_for_Video_Motion_and_Appearance_Editing.md|UniEdit: A Unified Tuning-Free Framework for Video Motion and Appearance Editing (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/UniEdit_A_Unified_Tuning_Free_Framework_for_Video_Motion_and_Appearance_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: UniEdit
+- [[obsidian-vault/analysis/arxiv_2024/VersatileMotion_A_Unified_Framework_for_Motion_Synthesis_and_Comprehension.md|VersatileMotion: A Unified Framework for Motion Synthesis and Comprehension (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/VersatileMotion_A_Unified_Framework_for_Motion_Synthesis_and_Comprehension.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- datasets: str
+- [[obsidian-vault/analysis/arxiv_2024/ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation.md|ZeroHSI Zero Shot 4D Human Scene Interaction by Video Generation (arxiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ZeroHSI
+	- datasets: AnyInteraction

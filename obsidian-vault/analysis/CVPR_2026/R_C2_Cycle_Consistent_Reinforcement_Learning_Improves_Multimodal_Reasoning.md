@@ -1,0 +1,344 @@
+---
+title: "R-C2: Cycle-Consistent Reinforcement Learning Improves Multimodal Reasoning"
+type: paper
+paper_level: A
+venue: CVPR
+year: 2026
+pdf_ref: paperPDFs/CVPR_2026/R_C2_Cycle_Consistent_Reinforcement_Learning_Improves_Multimodal_Reasoning.pdf
+project_link: "https://zirui00.github.io/RC2-Project-Page/"
+code_link: null
+aliases:
+- RCCMCCR
+- R-C2
+tags:
+- CVPR_2026
+- topic/other_unclear
+- topic/other_unclear/general
+core_operator: 使用跨模态循环一致性作为无需标签的奖励信号，强制模型在回答→反向推断查询→切换模态→前向重构答案的过程中自主消除内部冲突，从而提升推理能力和跨模态对齐。
+primary_logic: 多模态模型中的跨模态不一致性并非缺陷，而是一个丰富、天然的自监督信号。通过将其构建成循环一致性目标，可以使模型在没有人工标注的情况下有效提升多模态推理。
+claims:
+- R-C2通过强制执行跨模态循环一致性，利用不一致性本身作为自监督奖励信号。
+- R-C2能够可靠地在没有外部标注答案的情况下引导自身的监督信号，并大幅提高推理准确率和跨模态一致性。
+- 多数投票在多模态场景下会加剧跨模态不一致带来的失败，而R-C2通过答案侧验证解决了这一问题。
+- ScienceQA 上 Text Acc (Qwen2.5-VL-3B) = 76.7
+---
+
+# R-C2: Cycle-Consistent Reinforcement Learning Improves Multimodal Reasoning
+
+> [!tip] 核心洞察
+> 多模态模型中的跨模态不一致性并非缺陷，而是一个丰富、天然的自监督信号。通过将其构建成循环一致性目标，可以使模型在没有人工标注的情况下有效提升多模态推理。
+
+| 字段 | 内容 |
+|------|------|
+| 中文题名 | R-C2：循环一致强化学习提升多模态推理 |
+| 英文题名 | R-C2: Cycle-Consistent Reinforcement Learning Improves Multimodal Reasoning |
+| 会议/期刊 | CVPR 2026 |
+| Links | [paper](https://arxiv.org/abs/2603.25720) · [Project](https://zirui00.github.io/RC2-Project-Page/) |
+| Topic | #topic/other_unclear #topic/other_unclear/general |
+| Method | R-C2 (Cross-Modal Cycle Consistency Reward) |
+| Dataset | ScienceQA, ChartQA, MathVista, VWA |
+
+> [!tip] 效果简介
+> - ScienceQA 上，Text Acc (Qwen2.5-VL-3B) 76.7 vs 68.9 (+7.8)；Vision Acc (Qwen2.5-VL-3B) 83.3 vs 76.0 (+7.3)。
+> - ChartQA 上，Text Acc (Qwen2.5-VL-3B) 77.2 vs 71.1 (+6.1)。
+> - MathVista 上，Text Acc (Qwen2.5-VL-3B) 55.8 vs 49.8 (+6.0)。
+
+## 概述
+
+多模态大语言模型在视觉与文本视角之间存在根本性的模态鸿沟：同一模型面对同一信息的不同表示形式（如网页截图 vs. 其 HTML 源码，或图表图像 vs. 其底层数据表格）时，经常输出相互矛盾的预测。这种跨模态不一致性严重损害了模型在科学问答、图表理解、数学推理等场景中的可靠性。
+
+现有的多数投票自监督方法（如 R0）试图通过采样多个推理路径并取多数结果来提升性能，但在多模态场景下暴露出两类典型失败模式：**稳定冲突**——文本和图像模态各自内部一致但彼此矛盾，投票只能随机选边；**不稳定恢复**——单模态内部分采样给出了正确答案，但多数投票仍被错误答案主导，放大了系统性偏差而非纠正它。换言之，投票机制将跨模态不一致性视为需要掩盖的噪声，而非可利用的信号。
+
+**R-C2** 的核心洞察恰恰相反：跨模态不一致性本身是一个丰富、天然的自监督信号。该方法将这一信号构建为**跨模态循环一致性奖励**，在无需任何外部标注答案的条件下，强制模型自主消除内部冲突，从而同时提升推理准确率和跨模态对齐。具体而言，模型从一个候选答案出发，反向推断可能引出该答案的查询，随后切换模态进行前向推理以重构答案，最终通过四向循环路径（T→T, T→I, I→T, I→I）验证重构答案是否与原始候选一致，产生二元奖励信号。这一过程使模型学会输出在不同模态下都能自洽的答案。
+
+在 Qwen2.5-VL-3B-Instruct 和 Qwen3-VL-8B-Instruct 两个基座模型上，R-C2 在 ScienceQA、ChartQA、MathVista、VWA、A-OKVQA 等多个标准多模态基准上均取得显著提升，最高提升幅度达 **+7.8 个百分点**（ScienceQA 文本准确率），同时跨模态一致性比率也大幅提高。消融实验进一步表明，混合使用四种循环路径、在反向查询生成中同时利用图像和文本模态、以及增加训练样本中跨模态不一致的比例，均能系统性地提升性能。值得注意的是，使用模型自生成的候选答案启动循环，其效果与使用训练集标注答案几乎相当，验证了 R-C2 的**自启动**能力——无需人工标注即可引导有效的监督信号。
+
+## 背景与动机
+
+多模态大语言模型（MLLM）在视觉问答、图表理解、网页导航等任务上取得了显著进展，但其推理可靠性仍受制于一个根本性瓶颈：**跨模态不一致性**。当同一信息以不同模态呈现时——例如同一网页的截图与HTML源码——模型常常给出相互矛盾的预测（Figure 1）。这种模态鸿沟并非偶发的噪声，而是系统性的结构缺陷，直接损害了模型在实际部署中的可信度。
+
+现有的自监督改进方法主要依赖**多数投票**策略，通过对同一问题的多次采样取众数作为伪标签进行自训练。然而，在多模态场景下，投票机制面临两类典型失败模式（Figure 2）：其一为**稳定冲突**，即文本和视觉模态各自内部一致但彼此矛盾，投票结果仅取决于哪一模态恰好占多数，而非推理正确性；其二为**不稳定恢复**，即单模态内部存在正确答案的采样，但多数投票仍将其淹没。这两类失败表明，投票机制不仅无法消解跨模态冲突，反而可能放大系统性偏差，丢弃有价值的正确信号。
+
+上述困境揭示了一个关键洞察：**跨模态不一致性本身并非缺陷，而是一个丰富、天然的自监督信号**。模型在不同模态视角下对同一问题的分歧，恰好暴露了其内部推理链条的薄弱环节。若能设计一种机制，强制模型在回答→反向推断查询→切换模态→前向重构答案的闭环中自主消除内部冲突，则有望在不依赖外部标注的前提下，同时提升推理准确率与跨模态对齐度。
+
+基于这一动机，本文提出 **R-C2（Cross-Modal Cycle Consistency Reward）**，一种以循环一致性为核心的强化学习框架。R-C2将跨模态不一致性转化为无需标签的二元奖励信号，驱动模型在四向循环验证中实现自举式改进。
+
+## 核心创新
+
+### 1. 从“利用共识”到“利用冲突”的范式转变
+
+现有自改进方法（如多数投票）的核心假设是：模型多次采样的统计共识能够逼近正确答案。然而，在多模态场景下，这一假设面临根本性失效。如 Figure 2 所示，多模态投票存在两种典型失败模式：
+
+- **稳定冲突（Consistent Conflict）**：文本模态和图像模态各自内部预测一致，但跨模态答案相互矛盾，投票机制无法判断哪一模态的答案正确。
+- **不稳定恢复（Unstable Recovery）**：单一模态内部的多次采样中包含正确答案，但多数投票反而选择了错误答案，放大了模型的系统性偏差。
+
+R-C2 的核心范式转变在于：**不再试图从噪声采样中提取共识，而是将跨模态不一致性本身转化为自监督训练信号**。这一转变的关键洞察是——多模态模型在面对同一信息的文本视图和图像视图时经常输出相互矛盾的预测，这种“模态鸿沟”并非单纯的缺陷，而是一个丰富、天然且无需人工标注的反馈来源。
+
+### 2. 跨模态循环一致性奖励机制
+
+R-C2 提出了一种全新的奖励信号设计，其核心机制可概括为“答案→反向推断查询→跨模态前向重构→一致性验证”的四步闭环：
+
+1. **候选答案生成**：模型首先对给定问题生成一个候选答案 $a_{orig}$。
+2. **反向查询推断（Backward Inference）**：从候选答案出发，模型反向推断“什么样的查询会导致这个答案”，分别生成文本模态的潜在查询 $\hat{q}_T$ 和图像模态的潜在查询 $\hat{q}_I$（Figure 4 展示了这一步的实际效果）。
+3. **跨模态前向重构（Forward Reconstruction）**：将反向推断出的查询输入模型，但**切换模态**进行前向推理，形成四条完整的循环路径：T→T（文本查询→文本推理）、T→I（文本查询→图像推理）、I→T（图像查询→文本推理）、I→I（图像查询→图像推理），如 Figure 3 所示。
+4. **二元奖励判定**：检查四条路径的重构答案是否与原始候选答案一致，奖励函数为简单的二元形式：
+
+$$r = \begin{cases} 1, & \text{if } \hat{\mathbf{a}} \text{ matches } \mathbf{a}_{\mathrm{orig}}, \\ 0, & \text{otherwise}. \end{cases}$$
+
+这一设计的精妙之处在于：**整个循环过程完全不需要外部标注答案**。奖励信号仅依赖于模型自身能否在跨模态循环中保持答案一致，从而实现了真正的自监督训练。
+
+### 3. 与基线方法的结构性差异
+
+相较于基于多数投票的自改进基线（R0），R-C2 在三个关键维度上实现了根本性改变：
+
+| 维度 | 基线方法（Majority Voting） | R-C2 |
+|------|---------------------------|------|
+| **奖励信号** | 多数投票产生的伪标签 | 跨模态循环一致性二元奖励 |
+| **信号来源** | 单模态或跨模态采样的统计共识 | 答案在跨模态循环中的自洽性 |
+| **训练数据** | 在线采样，无额外数据生成 | 离线预生成完整循环数据集 |
+
+具体而言：
+
+- **奖励信号的可靠性**：投票机制在模型存在系统性偏差时会强化错误（“majority-is-wrong”问题），而循环一致性奖励要求答案必须通过跨模态的双向验证，天然过滤了单模态内部的系统性偏见。
+- **训练数据的组织方式**：R-C2 采用离线策略，在训练开始前预生成完整的合成循环数据集（答案→反向查询→前向重构），避免了在线生成的计算开销和分布漂移问题。
+- **优化目标的粒度**：GRPO 目标函数中的优势函数 $\hat{A}(\hat{\mathbf{a}}_i, \mathbf{a}_i) = \frac{r_i - \mathrm{mean}(\mathbf{r})}{\mathrm{std}(\mathbf{r})}$ 在批次内对循环一致性奖励进行归一化，使得模型能够从相对优势中学习，而非仅仅追求绝对奖励值。
+
+### 4. 创新的本质：以“自洽性”替代“外部监督”
+
+R-C2 的深层创新在于重新定义了多模态推理的监督信号来源。传统方法依赖外部标注（如数据集答案）或统计启发式（如投票共识），而 R-C2 将监督信号内化为模型的**跨模态自洽性**：一个可靠的答案应当能够在不同模态视角下被一致地重构。这一思想与认知科学中的“跨模态不变性”原则相呼应——人类对同一信息的理解在不同感知通道间保持一致，而 R-C2 正是通过强化学习将这一原则注入多模态模型。
+
+消融实验进一步验证了这一创新的有效性：使用模型自生成的候选答案启动循环，其性能与使用训练集标注答案几乎相同（Table 4），证明了 R-C2 具备可靠的自启动（self-bootstrapping）能力，无需依赖任何外部标注即可引导自身的训练信号。
+
+## 整体框架
+
+R-C2 的核心思路是将多模态推理中的**跨模态不一致性**转化为自监督训练信号，而不是试图掩盖或投票消除它。整个框架围绕“答案—反向查询—跨模态前向重构—一致性验证”的闭环展开，形成一个无需外部标注的强化学习奖励机制。
+
+### Pipeline 总览
+
+R-C2 的训练流程由四个紧密耦合的模块组成，数据流从多模态视图准备开始，经过反向查询生成、四向循环验证，最终以 GRPO 强化学习完成参数更新。Figure 3 给出了这一闭环的直观示意：从一个候选答案 $a_{\text{orig}}$ 出发，模型在文本视图 $x_T$ 和图像视图 $x_I$ 上分别反向推断可能的查询，再将每个重构查询在两种模态上分别前向推理，形成 T→T、T→I、I→T、I→I 四条完整的循环路径。只有当重构答案与原始候选答案一致时，模型才获得正向奖励。
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/003_Figure_3.jpg]]
+*Figure 3: Overview of multimodal cycle consistency. Starting from a potential answer candidate*
+
+### 模块 1：多模态数据准备
+
+对于每个训练样本，框架需要一对语义对齐的文本视图和图像视图。当原始数据集只包含图像时（如 ChartQA、ScienceQA 中的图表），R-C2 借助基座模型为图像生成文本描述，从而构造出成对的多模态视图。这一步是后续跨模态循环验证的前提，但其质量依赖于基座模型的生成能力，可能引入级联误差。
+
+### 模块 2：候选答案 → 反向查询生成
+
+给定一个候选答案 $a_{\text{orig}}$，模型在文本视图 $x_T$ 和图像视图 $x_I$ 的条件下，分别反向推断“什么样的查询会导致这个答案”。这一步骤（见 Figure 4 的实例）是 R-C2 区别于多数投票的关键设计：它不是让模型在固定问题上多次采样后投票，而是让模型主动生成与答案语义一致的跨模态查询，从而暴露模态间的潜在冲突。
+
+### 模块 3：前向答案重构与四向循环验证
+
+每个反向生成的查询 $\hat{q}$ 随后被送入模型进行前向推理，但这一次模型被条件化在**另一种模态**上。具体而言：
+
+- 从文本视图生成的反向查询 $\hat{q}_T$，分别在文本和图像上做前向推理，得到 $\hat{a}_{TT}$ 和 $\hat{a}_{TI}$；
+- 从图像视图生成的反向查询 $\hat{q}_I$，同样在文本和图像上前向推理，得到 $\hat{a}_{IT}$ 和 $\hat{a}_{II}$。
+
+这四条路径构成了完整的四向跨模态循环。每条路径的验证结果是二元的：若重构答案与原始候选答案 $a_{\text{orig}}$ 匹配，则该路径奖励为 1，否则为 0。最终奖励 $r$ 是各路径奖励的聚合。这种设计同时检验了**模态内一致性**（T→T、I→I）和**跨模态一致性**（T→I、I→T），消融实验证实，混合使用全部四条路径（Mixed 配置）在准确率和跨模态一致性上均达到最优。
+
+### 模块 4：GRPO 强化学习训练
+
+R-C2 采用 GRPO（Group Relative Policy Optimization）目标函数优化模型参数。对于每个样本，模型在两种模态上各采样 4 个 rollout（温度 1.0，top-p 0.95），计算循环一致性二元奖励后，在批次内对奖励进行均值-标准差归一化得到优势函数：
+
+$$\hat{A}(\hat{\mathbf{a}}_i, \mathbf{a}_i) = \frac{r_i - \mathrm{mean}(\mathbf{r})}{\mathrm{std}(\mathbf{r})}$$
+
+最终的 GRPO 损失为：
+
+$$\mathcal{L}_{\mathrm{GRPO}} = \mathbb{E}\left[\log \pi_{\boldsymbol{\theta}}(\hat{\mathbf{a}}_i | \mathbf{x}_i, \mathbf{q}_i) \cdot \hat{A}(\hat{\mathbf{a}}_i, \mathbf{a}_i)\right]$$
+
+训练采用离线策略：整个循环数据集（包括反向查询和四向重构结果）在训练开始前一次性预生成，而非在线动态构造。这提升了训练效率，但也意味着数据无法随模型分布漂移而自适应更新，可能限制最终性能上限。
+
+### 与多数投票基线的本质区别
+
+多数投票（R0）在单模态下存在“多数即错误”的系统性风险——当模型存在系统性偏差时，多数答案本身就是错误的，投票只会强化这一偏差。在多模态场景下，问题进一步恶化：文本和图像模态的预测经常相互矛盾（见 Figure 2 的两种失败模式），多模态投票要么放大偏差，要么丢失正确的少数信号。R-C2 的循环一致性奖励从根本上绕开了这一困境：它不依赖答案间的相对多数，而是通过跨模态的“自问自答—自验证”闭环，迫使模型在模态切换中消解内部冲突。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/001_Figure_1.jpg]]
+*Figure 1: Gap in Multimodal Reasoning. Multimodal large language models (MLLMs) frequently fail the test of modalinvariance. For example, they produce conflicting answers for the same webpage when presented as a screenshot versus its raw HTML source. We introduce a cycle-consistency framework that directly targets this modality gap, leveraging the inconsistency itself as a signal to jointly improve reasoning and alignment*
+
+## 核心模块与公式推导
+
+### 3.1 问题形式化与GRPO优化框架
+
+R-C2将多模态推理建模为一个强化学习问题。给定一个多模态输入样本，包含文本视图 $\mathbf{x}_T$ 和图像视图 $\mathbf{x}_I$，以及一个问题 $\mathbf{q}$，模型需要生成答案 $\hat{\mathbf{a}}$。优化的核心是GRPO（Group Relative Policy Optimization）目标函数：
+
+$$\mathcal{L}_{\mathrm{GRPO}} = \mathbb{E}\left[\log \pi_{\boldsymbol{\theta}}(\hat{\mathbf{a}}_i | \mathbf{x}_i, \mathbf{q}_i) \cdot \hat{A}(\hat{\mathbf{a}}_i, \mathbf{a}_i)\right]$$
+
+其中 $\pi_{\boldsymbol{\theta}}$ 是当前策略模型，$\hat{A}$ 是优势函数。优势函数通过对批次内奖励进行均值-标准差归一化来计算：
+
+$$\hat{A}(\hat{\mathbf{a}}_i, \mathbf{a}_i) = \frac{r_i - \mathrm{mean}(\mathbf{r})}{\mathrm{std}(\mathbf{r})}$$
+
+**关键区别在于奖励 $r_i$ 的来源**：基线方法（Majority Voting, R0）使用多数投票产生的伪标签作为奖励信号，而R-C2将其替换为跨模态循环一致性二元奖励。
+
+### 3.2 跨模态循环一致性奖励（R-C2）
+
+R-C2的核心创新在于构建了一个无需外部标注的奖励信号，该信号源自模型在多模态视图间的自洽性验证。整个流程包含三个关键模块：
+
+**模块一：候选答案生成。** 对于每个训练样本，模型首先对文本视图和图像视图分别生成多个候选答案。这些候选答案可以来自模型自身的预测（自启动模式），也可以来自训练集标注（有监督模式）——消融实验表明两者性能几乎相同，验证了R-C2的自启动能力。
+
+**模块二：反向查询推断（Answer → Query）。** 给定一个候选答案 $\mathbf{a}_{\mathrm{orig}}$，模型反向推断出可能引出该答案的潜在查询。这一步骤分别在文本模态和图像模态上执行，生成两个反向查询 $\hat{\mathbf{q}}_T$ 和 $\hat{\mathbf{q}}_I$。Figure 4展示了这一步骤的实际效果：模型能够为不同模态生成语义正确且模态特定的查询。
+
+**模块三：前向答案重构与四向循环验证。** 每个反向查询被重新输入模型，但这次条件于另一模态的视图进行前向推理。这形成了四条完整的循环路径：
+- **T→T**：文本反向查询 → 文本视图前向推理
+- **T→I**：文本反向查询 → 图像视图前向推理
+- **I→T**：图像反向查询 → 文本视图前向推理
+- **I→I**：图像反向查询 → 图像视图前向推理
+
+每条路径产生一个重构答案。循环一致性奖励定义为：
+
+$$r = \begin{cases} 1, & \text{if } \hat{\mathbf{a}} \text{ matches } \mathbf{a}_{\mathrm{orig}}, \\ 0, & \text{otherwise}. \end{cases}$$
+
+即只有当重构答案与原始候选答案一致时，才给予正向奖励1，否则为0。这一二元奖励信号密集且无需标签，直接衡量了模型在多模态空间中的推理稳定性。
+
+**模块四：GRPO训练。** 四条路径的奖励汇总后，通过GRPO目标函数反向传播优化模型参数。消融实验（Table 3）表明，混合使用全部四条路径（Mixed配置）在准确率和跨模态一致性上均达到最优，验证了跨模态循环验证的必要性。
+
+### 3.3 离线循环数据生成策略
+
+R-C2采用离线策略预先生成完整的合成循环数据集，而非在训练过程中在线生成。这一设计选择基于效率考量：循环验证涉及多次前向推理（反向查询生成 + 四向前向重构），在线执行将显著拖慢训练。离线预生成允许训练阶段直接读取预计算好的循环数据，大幅提升训练吞吐量。但这一策略的潜在代价是数据无法随模型分布漂移而自适应演化，可能限制训练的最终上限。
+
+### 3.4 与多数投票的本质区别
+
+多数投票方法（R0）在多模态场景下存在系统性缺陷（Figure 2）：
+- **稳定冲突模式**：文本和图像模态各自产生自洽的预测，但彼此矛盾，投票结果取决于哪一模态占据多数，可能系统性偏向错误答案。
+- **不稳定恢复模式**：单一模态内部部分采样给出了正确答案，但多数投票仍被错误答案主导，正确答案信号被淹没。
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/002_Figure_2.jpg]]
+*Figure 2: Failure of multimodal voting. Left: Consistent Conflict — both text and image modalities produce self-consistent predictions (mode-stable) but disagree with each other, and only one modality aligns with the ground truth. Right: Unstable Recovery — within a single modality, some rollouts yield the correct answer, but the majority vote remains wrong, reflecting intra-modal instability. Using multimodal voting can amplify biases or lose correct signals*
+
+R-C2通过答案侧验证规避了这些问题：它不依赖采样间的多数共识，而是强制模型在跨模态循环中自我验证每个候选答案的稳定性。这种设计将模态间的不一致性从缺陷转化为有价值的自监督信号。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/004_Figure_4.jpg]]
+*Figure 4: Examples of the backward-inference (Answer→Query) step. Given a Candidate Answer, the model generates distinct, semantically-grounded queries for both the text and image modalities. This demonstrates the viability of the first step of our cycleconsistency reward, enabling the model to check its answer in the alternate modality*
+
+## 实验与分析
+
+### 主实验结果：推理准确率与跨模态一致性
+
+R-C2 在两个模型规模（Qwen2.5-VL-3B-Instruct 和 Qwen3-VL-8B-Instruct）及六个多模态推理基准上均展现出对基座模型和投票基线的一致提升。Table 1 汇总了各方法的文本视角准确率（Text Acc）和视觉视角准确率（Vision Acc），Table 2 则报告了跨模态一致性比率——即同一问题在文本和视觉模态下给出相同答案的比例。
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/005_Table_1.jpg]]
+*Table 1: Multimodal Reasoning Accuracy. We compare the Base Model, Voting (Text-only), Voting (Image+Text), and our*
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/006_Table_2.jpg]]
+*Table 2: Multimodal Consistency Ratio. We compare both Qwen2.5-VL-3B and Qwen3-VL-8B. Each dataset is evaluated under four supervision settings: Base, +Voting (Text), +Voting (Image+Text), and +R-C2. Values in (green) indicate absolute improvements of*
+
+**基座模型与投票基线的瓶颈。** 多数投票（R0）基线分为两种配置：纯文本投票（Voting Text-only）和图文联合投票（Voting Image+Text）。结果显示，投票方法在多模态场景下不仅未能稳定提升性能，反而在某些基准上加剧了跨模态不一致带来的失败——这正是 Figure 2 所揭示的两种典型失败模式：稳定冲突（文本和视觉各自内部一致但彼此矛盾）与不稳定恢复（单模态内部多数投票仍错误）。R-C2 的出发点正是将这种不一致性转化为自监督信号，而非通过投票掩盖它。
+
+**Qwen2.5-VL-3B 上的表现。** 在 3B 规模的基座模型上，R-C2 在六个基准的文本准确率上平均提升 **+4.8 个百分点**，视觉准确率平均提升 **+2.8 个百分点**。其中 ScienceQA 文本准确率从 68.9 提升至 76.7（+7.8），视觉准确率从 76.0 提升至 83.3（+7.3）；ChartQA 文本准确率从 71.1 提升至 77.2（+6.1）；MathVista 文本准确率从 49.8 提升至 55.8（+6.0）。在跨模态一致性方面，A-OKVQA 的一致性比率从基座模型的 62.7 提升至 75.2（+12.5），ScienceQA 从 66.7 提升至 76.7（+10.0）。
+
+**Qwen3-VL-8B 上的表现。** 在更大规模的 8B 模型上，R-C2 仍保持一致的增益：文本准确率平均提升 **+2.2 个百分点**，视觉准确率平均提升 **+1.1 个百分点**。值得注意的是，MathVista 文本准确率从 62.1 提升至 66.6（+4.5），InfoVQA 从 60.5 提升至 65.4（+4.9），表明方法在更大模型上仍能有效挖掘跨模态不一致中的改进信号，而非仅适用于弱基座模型。
+
+**关键结论。** R-C2 在所有基准和两种模型规模上均优于纯文本投票和图文联合投票基线，且同时提升了准确率与跨模态一致性。这验证了核心假设：跨模态循环一致性奖励比投票伪标签更有效地利用多模态内部冲突，驱动模型自主消除推理矛盾。
+
+### 消融实验
+
+#### 循环路径配置的影响
+
+R-C2 的四向循环包含 T→T、T→I、I→T、I→I 四条路径。Table 3 和 Figure 6 对九种正向-反向路径组合进行了消融，核心发现如下：
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/010_Figure_6.jpg]]
+*Figure 6: Importance of cross modal in cycle consistency path. We show ScienceQA results under*
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/009_Table_3.jpg]]
+*Table 3: Ablation of cycle path configurations in*
+
+- **混合配置（Mixed）最优。** 同时使用全部四条循环路径的配置在 ScienceQA 和 ChartQA 上均取得最高的准确率和跨模态一致性，显著优于仅使用单一模态内循环（如 T→T 或 I→I）或仅使用跨模态循环（如 T→I 或 I→T）的配置。这表明模型需要同时学习模态内自洽和跨模态对齐。
+- **跨模态路径不可或缺。** 仅使用模态内循环（T→T + I→I）的配置在一致性指标上明显弱于包含跨模态路径的配置，验证了跨模态验证是解决模态鸿沟的关键机制。
+- **反向查询的双模态输入。** Figure 6 进一步显示，在反向查询生成阶段同时使用图像和文本模态（而非仅用单一模态）能持续带来更高的准确率和更强的跨模态一致性。这说明从答案反向推断查询时，双模态上下文有助于生成更准确、更具判别力的查询。
+
+#### 跨模态不一致比例的影响
+
+Figure 7 展示了训练样本中跨模态不一致比例对性能的系统性影响。在 ScienceQA 上微调 Qwen2.5-VL-3B-Instruct 时，将不一致样本比例从 0% 逐步增加至 50%，模型的答案准确率和跨模态一致性均呈现单调上升趋势。这一结果直接支持了 R-C2 的核心洞察：跨模态不一致并非缺陷，而是富含结构性信息的训练信号。暴露更多模态冲突样本使 RL 目标能够更有效地引导模型解决跨模态分歧，从而获得更稳定的多模态推理能力。
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/008_Figure_7.jpg]]
+*Figure 7: Effect of cross-modal inconsistency ratio on ScienceQA performance. We fine-tune Qwen2.5-VL-3B-Instruct on ScienceQA with varying fractions of cross-modal inconsistent training samples. As the inconsistency ratio increases from 0% to 50%, both answer accuracy and cross-modal consistency systematically improve. This suggests that exposing the model to more modality conflicts provides a useful structural signal for the RL objective, enabling it to better resolve cross-modal disagreements and yielding more stable multimodal reasoning*
+
+#### 候选答案来源：自启动能力验证
+
+Table 4 比较了两种循环启动方式：使用模型自身预测的答案（Self-generated）与使用训练集标注答案（Training-set answer）。在网页理解任务上，自生成答案的性能与使用标注答案几乎相同，甚至在某些指标上略有超越。这验证了 R-C2 的**自启动（self-bootstrapping）能力**——方法无需外部标注的问答对即可可靠地引导监督信号，大幅降低了对人工标注的依赖。
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/011_Table_4.jpg]]
+*Table 4: Effect of candidate answer source for initiating the cycle. We compare using the model’s own predicted answer (Self-generated) versus using the reference answer from the dataset (Training-set answer). Results show comparable or better performance without requiring annotated QA pairs, highlighting the self-bootstrapping capability of R-C2*
+
+### 失败模式与局限性分析
+
+尽管 R-C2 在多个基准上取得了显著提升，但仍存在若干值得关注的局限：
+
+1. **对成对多模态视图的依赖。** 方法要求每个样本同时具备文本视图和图像视图。对于仅有图像的原始数据集，需借助基座模型生成文本描述来构造文本视图，这一过程可能引入额外的生成误差，进而影响循环一致性奖励的可靠性。
+
+2. **离线循环数据生成的固有限制。** R-C2 采用离线策略预生成完整循环数据集后再进行训练，这虽然保证了训练效率，但也意味着循环数据不会随模型更新而演化。随着模型在 RL 训练中逐步改进，固定的循环数据可能限制最终性能上限，而在线生成策略或许能实现更紧密的数据-模型协同进化。
+
+3. **四向循环的计算开销。** 每条循环路径都需要一次前向推理，四向验证使推理时的计算量显著增加。在低资源或实时性要求高的场景下，这一开销可能构成实际部署的障碍。
+
+4. **模型架构的验证范围有限。** 目前所有实验均在 Qwen 系列模型上进行，尚未在其他多模态架构（如 LLaVA、InternVL 等）上广泛验证方法的泛化性。不同架构的模态融合机制可能影响循环一致性奖励的有效性。
+
+5. **模态扩展的开放性。** 当前方法针对文本-图像双模态设计，如何将循环一致性框架扩展到视频、音频等更多模态仍是开放问题。超过两种模态时，循环路径的组合爆炸和一致性定义都将面临新的挑战。
+
+### 补充图表
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/007_Figure_5.jpg]]
+*Figure 5: Visual comparison among the base model, voting baseline, and*
+
+![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/012_Table.jpg]]
+*Table: A1. Key global hyperparameters used throughout our experiments. Larger batch sizes are adopted when GPU memory permits*
+
+## 方法谱系与知识库定位
+
+### 与基线方法的关系
+
+R-C2 的核心对手是当前多模态自改进中广泛采用的**多数投票（Majority Voting）策略**。投票方法通过对同一问题多次采样的答案取众数，在纯文本推理中已被证明有效，但在多模态场景下暴露出两类根本性失败模式（Figure 2）：
+
+1. **稳定冲突（Consistent Conflict）**：文本和图像模态各自内部一致，但跨模态预测相互矛盾，投票只能选择其一，系统性压制另一模态的正确信号。
+2. **不稳定恢复（Unstable Recovery）**：单一模态内的多次采样中正确答案已经出现，但多数投票仍输出错误答案，放大了模型内部的系统性偏差。
+
+R-C2 的方法论创新在于**将这种跨模态不一致性从缺陷重新定义为自监督信号**。它不依赖外部标注答案，而是通过“候选答案→反向推断查询→跨模态切换→前向重构答案”的完整循环，强制模型自主消除内部冲突。这一设计本质上将**循环一致性（Cycle Consistency）**这一在图像翻译和域适应中成熟的思想，迁移到了多模态大模型的推理对齐问题上，并用强化学习（GRPO）框架进行端到端优化。
+
+与投票基线相比，R-C2 的关键差异体现在三个维度：
+
+| 维度 | 多数投票基线（R0） | R-C2（本方法） |
+|------|-------------------|----------------|
+| 奖励信号 | 多数投票产生的伪标签 | 跨模态循环一致性二元奖励 |
+| 数据生成 | 在线采样或无需额外数据 | 离线预生成完整循环数据集 |
+| 优化目标 | GRPO + 投票伪标签奖励 | GRPO + 四向循环验证二元奖励 |
+
+在基座模型选择上，R-C2 在 **Qwen2.5-VL-3B-Instruct** 和 **Qwen3-VL-8B-Instruct** 两个规模上均进行了验证，覆盖了从 3B 到 8B 的典型多模态模型参数量级。
+
+### 适用边界
+
+**模态成对性要求**：R-C2 依赖成对的多模态视图（文本视图 $x_T$ 与图像视图 $x_I$）来构建循环。对于仅有图像的原始数据集，需要借助基座模型生成文本描述作为替代视图，这一过程可能引入额外的生成误差，影响循环一致性的信号质量。
+
+**离线数据策略的权衡**：R-C2 采用离线策略预先生成完整的循环数据集，在训练效率上优于在线生成方法，但无法像在线方法那样让训练数据随模型分布漂移而动态演化，这可能限制模型在训练后期的进一步优化空间。
+
+**计算开销**：四向循环验证（T→T, T→I, I→T, I→I）在推理阶段引入了额外的前向-反向计算，在低资源部署场景下可能不适用。不过，在训练阶段，这一开销被离线预生成所分摊。
+
+**模型架构依赖**：目前 R-C2 仅在 Qwen 系列多模态模型上进行了验证，尚未在其他主流多模态架构（如 LLaVA 系列、InternVL 系列）上广泛测试，其跨架构泛化性需要进一步验证。
+
+### 局限与开放问题
+
+**已知局限**：
+
+1. **模态数量受限**：当前框架仅处理文本和图像两种模态的循环一致性。对于视频、音频、3D 点云等更多模态的场景，循环路径的组合数量将呈指数增长，如何高效定义和计算多模态循环一致性仍是一个开放挑战。
+
+2. **任务类型约束**：R-C2 在结构化问答基准（ScienceQA、ChartQA、MathVista 等）上表现优异，但在更开放的任务中（如多模态对话、Agent 规划、长文档理解），如何定义有意义的“反向查询”和“循环一致性”仍需探索。
+
+3. **离线数据策略的上限**：预生成的循环数据无法随模型训练过程自适应更新。当模型在 GRPO 训练中逐步改进后，早期生成的低质量循环数据可能成为性能瓶颈。在线循环生成或混合策略可能是潜在的改进方向。
+
+4. **基座模型质量依赖**：循环一致性的信号质量高度依赖基座模型的反向查询生成能力。若基座模型在反向推断步骤中产生语义漂移或无意义查询，循环奖励将退化为噪声。
+
+**开放问题**：
+
+- **扩展到超大规模模型**：R-C2 在 3B 和 8B 模型上已验证有效，该方法是否适用于 100B+ 规模的多模态大模型？大规模预训练本身可能已部分解决跨模态对齐问题，循环一致性奖励能否在大规模场景下继续提供增益？
+
+- **与过程监督的结合**：当前 R-C2 仅对最终答案的重构一致性进行奖励（结果监督）。将循环一致性思想与中间推理步骤的过程监督奖励（如 PRM）相结合，可能进一步提升多模态推理的可信度和可解释性。
+
+- **循环一致性的理论理解**：为什么跨模态不一致样本比例从 0% 增加到 50% 时，模型性能系统性提升（Figure 7）？这一现象暗示不一致性本身携带了结构化的学习信号，但其信息论或优化理论层面的解释尚不充分。
+
+- **自启动能力的边界**：Table 4 表明使用模型自生成候选答案启动循环，其性能与使用训练集标注答案几乎相同。这一自启动能力在模型初始能力较弱时是否仍然成立？若基座模型在特定领域完全不具备推理能力，循环一致性信号是否还能有效引导学习？
+
+## 原文 PDF
+
+![[paperPDFs/CVPR_2026/R_C2_Cycle_Consistent_Reinforcement_Learning_Improves_Multimodal_Reasoning.pdf]]

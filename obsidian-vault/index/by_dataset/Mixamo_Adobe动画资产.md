@@ -1,0 +1,23 @@
+---
+title: "Dataset: Mixamo/Adobe动画资产"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: Mixamo/Adobe动画资产
+
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MAMM_Motion_Control_via_Metric_Aligning_Motion_Matching.md|MAMM: Motion Control via Metric-Aligning Motion Matching (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MAMM.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Benchmark / Evaluation
+	- methods: Metric-Aligning Motion Matching (MAMM)
+	- datasets: Mixamo/Adobe动画资产, 手绘曲线、合成波形、音频、运动等控制序列
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MAMM_Motion_Control_via_Metric_Aligning_Motion_Matching.md|Motion Control via Metric-Aligning Motion Matching (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MAMM.pdf|PDF]]
+	- topics: Motion Animation
+	- method groups: Benchmark / Evaluation
+	- methods: Metric-Aligning Motion Matching (MAMM)
+	- datasets: Mixamo/Adobe动画资产, 手绘曲线、合成波形、音频、运动等控制序列

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="760" viewBox="0 0 1180 760" role="img" aria-label="per-case time-step delta curves">
+<!-- diagnostic observation: sample-level internal trace tensors only; no final evaluator -->
+<style>
+text{font-family:'Noto Sans CJK SC','Microsoft YaHei','PingFang SC','DejaVu Sans',sans-serif;fill:#26312f}
+.title{font-size:24px;font-weight:700}.subtitle{font-size:13px;fill:#53615d}.small{font-size:12px;fill:#53615d}.label{font-size:13px}
+.axis{stroke:#60706b;stroke-width:1}.grid{stroke:#d8dfdb;stroke-width:1}.card{fill:#fffdf8;stroke:#d8dfdb;stroke-width:1}
+</style>
+<rect x="0" y="0" width="1180" height="760" fill="#fbfaf5"/>
+<text class="title" x="70" y="48">per-case time-step delta curves</text>
+<text class="subtitle" x="70" y="74">每个 panel 内 success/failure 对比；x 轴为模型内部时间步，不是视频帧。</text>
+<text class="label" x="70" y="96" font-weight="700">MotionGPT</text>
+<line class="axis" x1="70" y1="355" x2="580" y2="355"/>
+<line class="axis" x1="70" y1="110" x2="70" y2="355"/>
+<line class="grid" x1="70" y1="355.0" x2="580" y2="355.0"/>
+<line class="grid" x1="70" y1="273.3" x2="580" y2="273.3"/>
+<line class="grid" x1="70" y1="191.7" x2="580" y2="191.7"/>
+<line class="grid" x1="70" y1="110.0" x2="580" y2="110.0"/>
+<polyline points="70.0,348.2 172.0,287.7 274.0,290.0 376.0,275.8 478.0,266.5 580.0,251.2" fill="none" stroke="#37766f" stroke-width="2.4"/>
+<polyline points="70.0,353.7 172.0,318.5 274.0,327.2 376.0,331.7 478.0,330.0 580.0,333.6" fill="none" stroke="#b4574d" stroke-width="2.4"/>
+<text class="small" x="78" y="379">success row 2: 0.794</text>
+<text class="small" x="290" y="379">failure row 36: 0.264</text>
+<text class="small" x="78" y="401">failure factor: missing_subaction</text>
+<text class="label" x="630" y="96" font-weight="700">MoLingo</text>
+<line class="axis" x1="630" y1="355" x2="1140" y2="355"/>
+<line class="axis" x1="630" y1="110" x2="630" y2="355"/>
+<line class="grid" x1="630" y1="355.0" x2="1140" y2="355.0"/>
+<line class="grid" x1="630" y1="273.3" x2="1140" y2="273.3"/>
+<line class="grid" x1="630" y1="191.7" x2="1140" y2="191.7"/>
+<line class="grid" x1="630" y1="110.0" x2="1140" y2="110.0"/>
+<polyline points="630.0,351.5 640.6,351.3 651.2,351.2 661.9,351.1 672.5,351.1 683.1,351.0 693.8,351.0 704.4,350.9 715.0,350.9 725.6,350.9 736.2,350.9 746.9,350.9 757.5,350.9 768.1,350.9 778.8,350.9 789.4,350.9 800.0,350.9 810.6,351.0 821.2,351.0 831.9,351.1 842.5,351.1 853.1,351.2 863.8,351.2 874.4,355.0 885.0,355.0 895.6,355.0 906.2,355.0 916.9,355.0 927.5,355.0 938.1,355.0 948.8,355.0 959.4,355.0 970.0,355.0 980.6,355.0 991.2,355.0 1001.9,355.0 1012.5,355.0 1023.1,355.0 1033.8,355.0 1044.4,355.0 1055.0,355.0 1065.6,355.0 1076.2,355.0 1086.9,355.0 1097.5,355.0 1108.1,355.0 1118.8,355.0 1129.4,355.0 1140.0,355.0" fill="none" stroke="#37766f" stroke-width="2.4"/>
+<polyline points="630.0,350.3 640.6,350.2 651.2,350.1 661.9,350.0 672.5,350.0 683.1,349.9 693.8,349.9 704.4,349.9 715.0,349.9 725.6,349.9 736.2,349.8 746.9,349.8 757.5,349.8 768.1,349.8 778.8,349.8 789.4,349.8 800.0,349.8 810.6,349.8 821.2,349.8 831.9,349.8 842.5,349.8 853.1,349.8 863.8,349.8 874.4,349.8 885.0,349.9 895.6,349.9 906.2,349.9 916.9,349.9 927.5,349.9 938.1,349.9 948.8,350.0 959.4,350.0 970.0,350.0 980.6,350.1 991.2,350.1 1001.9,350.2 1012.5,350.2 1023.1,350.3 1033.8,355.0 1044.4,355.0 1055.0,355.0 1065.6,355.0 1076.2,355.0 1086.9,355.0 1097.5,355.0 1108.1,355.0 1118.8,355.0 1129.4,355.0 1140.0,355.0" fill="none" stroke="#b4574d" stroke-width="2.4"/>
+<text class="small" x="638" y="379">success row 2: 0.988</text>
+<text class="small" x="850" y="379">failure row 1: 1.260</text>
+<text class="small" x="638" y="401">failure factor: trajectory_error</text>
+<text class="label" x="70" y="411" font-weight="700">MoMask original</text>
+<line class="axis" x1="70" y1="670" x2="580" y2="670"/>
+<line class="axis" x1="70" y1="425" x2="70" y2="670"/>
+<line class="grid" x1="70" y1="670.0" x2="580" y2="670.0"/>
+<line class="grid" x1="70" y1="588.3" x2="580" y2="588.3"/>
+<line class="grid" x1="70" y1="506.7" x2="580" y2="506.7"/>
+<line class="grid" x1="70" y1="425.0" x2="580" y2="425.0"/>
+<polyline points="70.0,638.0 93.2,635.2 116.4,634.0 139.5,633.5 162.7,632.3 185.9,630.6 209.1,630.4 232.3,630.6 255.5,630.3 278.6,629.8 301.8,629.6 325.0,630.6 348.2,633.2 371.4,635.9 394.5,637.6 417.7,638.5 440.9,639.0 464.1,639.6 487.3,640.0 510.5,639.1 533.6,638.8 556.8,639.4 580.0,637.5" fill="none" stroke="#37766f" stroke-width="2.4"/>
+<polyline points="70.0,637.4 93.2,634.9 116.4,632.0 139.5,629.1 162.7,627.5 185.9,627.0 209.1,627.0 232.3,627.6 255.5,628.5 278.6,629.4 301.8,629.8 325.0,629.9 348.2,630.1 371.4,630.2 394.5,630.1 417.7,630.2 440.9,630.5 464.1,631.1 487.3,632.2 510.5,632.9 533.6,635.0" fill="none" stroke="#b4574d" stroke-width="2.4"/>
+<text class="small" x="78" y="694">success row 2: 1.084</text>
+<text class="small" x="290" y="694">failure row 0: 1.172</text>
+<text class="small" x="78" y="716">failure factor: artifact_sliding_or_drift</text>
+<text class="label" x="630" y="411" font-weight="700">MoGenTS</text>
+<line class="axis" x1="630" y1="670" x2="1140" y2="670"/>
+<line class="axis" x1="630" y1="425" x2="630" y2="670"/>
+<line class="grid" x1="630" y1="670.0" x2="1140" y2="670.0"/>
+<line class="grid" x1="630" y1="588.3" x2="1140" y2="588.3"/>
+<line class="grid" x1="630" y1="506.7" x2="1140" y2="506.7"/>
+<line class="grid" x1="630" y1="425.0" x2="1140" y2="425.0"/>
+<polyline points="630.0,617.2 643.8,622.4 657.6,617.9 671.4,612.5 685.1,605.0 698.9,597.4 712.7,593.1 726.5,590.4 740.3,590.1 754.1,590.8 767.8,591.7 781.6,593.4 795.4,597.4 809.2,605.1 823.0,611.4 836.8,613.3 850.5,613.8 864.3,616.8 878.1,618.7 891.9,616.6 905.7,613.9 919.5,611.4 933.2,610.0" fill="none" stroke="#37766f" stroke-width="2.4"/>
+<polyline points="630.0,599.7 643.8,601.4 657.6,602.9 671.4,614.6 685.1,623.3 698.9,626.6 712.7,626.4 726.5,623.0 740.3,618.8 754.1,617.4 767.8,618.1 781.6,618.4 795.4,618.7 809.2,618.8 823.0,617.3 836.8,614.9 850.5,613.3 864.3,613.1 878.1,612.5 891.9,612.0 905.7,612.8 919.5,614.5 933.2,615.8 947.0,616.5 960.8,616.8 974.6,614.2 988.4,606.3 1002.2,597.0 1015.9,589.5 1029.7,584.9 1043.5,578.2 1057.3,569.1 1071.1,561.0 1084.9,558.2 1098.6,559.6 1112.4,562.1 1126.2,565.4 1140.0,587.0" fill="none" stroke="#b4574d" stroke-width="2.4"/>
+<text class="small" x="638" y="694">success row 2: 0.849</text>
+<text class="small" x="850" y="694">failure row 1: 1.383</text>
+<text class="small" x="638" y="716">failure factor: trajectory_error</text>
+<text class="small" x="70" y="720">曲线只显示内部特征差异；不同模型特征空间不同，跨模型高度不可直接当动作质量比较。</text>
+</svg>

@@ -1,0 +1,367 @@
+{
+  "batch_size": 64,
+  "cache_dir": "runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+  "cache_file": "val.pt",
+  "cache_meta": {
+    "args": {
+      "batch_size": "128",
+      "config_name": "config_dit_xy",
+      "data_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/pulpmotion-data",
+      "device": "cuda:0",
+      "dtype": "float16",
+      "limit_train": "None",
+      "limit_val": "None",
+      "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+      "num_workers": "0",
+      "out_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110",
+      "progress_every": "20",
+      "pulp_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/PulpMotion",
+      "seed": "17",
+      "set_name": "mixed_",
+      "train_split": "train",
+      "val_split": "test"
+    },
+    "camera_slice": [
+      128,
+      192
+    ],
+    "human_slice": [
+      0,
+      128
+    ],
+    "latent_order": "concat([z_hum,z_cam])",
+    "limit": null,
+    "official_latent_order": "concat([z_cam,z_hum])",
+    "pulp_checkpoint": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/autoencoder/aemmardm-xgmj0yjj-325.ckpt",
+    "pulp_model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+    "pulp_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/PulpMotion",
+    "samples": 10549,
+    "set_name": "mixed_",
+    "skipped": 0,
+    "source_split": "test",
+    "split": "val",
+    "valid_latent_rule": "ceil(num_valid_frames / z_scale)",
+    "z_scale": 4
+  },
+  "config_name": "config_dit_xy",
+  "created_at": "2026-06-17T02:12:15+0800",
+  "data_root": "/data/public/ripemangobox/Motion/StoryMotion/linked/pulpmotion-data",
+  "device": "cuda:0",
+  "diffusion_schedule": {
+    "num_train_timesteps": 1000,
+    "source": "loaded from StoryMotion checkpoint run meta via CondMDIDiffusion",
+    "sqrt_alphas_cumprod_sha256": "43c88a868003a5a3b14335c68d82056f957909f9ba62c19aa7c452424ca38a76",
+    "sqrt_one_minus_alphas_cumprod_sha256": "88680c3a8b0e3bc8cc0d5d9e866d7d4b11a60f7386263c65ebd98eeb948af3e0"
+  },
+  "elapsed_sec": 588.4387083053589,
+  "evaluated_samples": 10549,
+  "first_batch_summary": {
+    "cache_z_shape": [
+      64,
+      192,
+      75
+    ],
+    "completion_shape": [
+      64,
+      192,
+      75
+    ],
+    "outputs": {
+      "raw_input": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            64,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              64,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            64,
+            300,
+            4
+          ]
+        },
+        "projection": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            64,
+            300,
+            9,
+            2
+          ]
+        }
+      },
+      "raw_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            64,
+            300,
+            4,
+            4
+          ]
+        },
+        "human": {
+          "joints": {
+            "device": "cuda:0",
+            "dtype": "torch.float32",
+            "shape": [
+              64,
+              300,
+              24,
+              3
+            ]
+          },
+          "type": "SMPLXOutput"
+        },
+        "intrinsics": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            64,
+            300,
+            4
+          ]
+        }
+      },
+      "x_output": {
+        "camera": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            64,
+            300,
+            14
+          ]
+        },
+        "human": {
+          "device": "cuda:0",
+          "dtype": "torch.float32",
+          "shape": [
+            64,
+            300,
+            199
+          ]
+        }
+      }
+    },
+    "sample_ids": [
+      "2011_-4GsCEopbd4_00008_001_a",
+      "2011_-4GsCEopbd4_00017_000_a",
+      "2011_-EuO6OFypLo_00002_000_a",
+      "2011_-EuO6OFypLo_00002_000_b",
+      "2011_-EuO6OFypLo_00020_000_a",
+      "2011_-MG8-wCvzpE_00002_000_a",
+      "2011_-MG8-wCvzpE_00002_001_a",
+      "2011_-RBjiJto4hc_00027_000_a",
+      "2011_-UAElWXbk3I_00000_000_a",
+      "2011_-UAElWXbk3I_00000_001_a",
+      "2011_-WW51YaWO-4_00007_000_a",
+      "2011_-WW51YaWO-4_00007_002_a",
+      "2011_-Y2wqkD2KVM_00040_000_a",
+      "2011_-fJwmmnPHok_00006_000_a",
+      "2011_-fJwmmnPHok_00007_000_a",
+      "2011_-fJwmmnPHok_00007_001_a",
+      "2011_-nkqrSaJf1g_00012_000_b",
+      "2011_-qK58CZslAs_00001_000_a",
+      "2011_-rq6IBVPcBU_00001_000_a",
+      "2011_-tUodP_Wus4_00031_000_a",
+      "2011_-tUodP_Wus4_00031_001_a",
+      "2011_-zIzLRgwdxA_00019_000_a",
+      "2011_-zIzLRgwdxA_00019_001_a",
+      "2011_00pBYZ1yofs_00026_000_a",
+      "2011_00pBYZ1yofs_00026_001_a",
+      "2011_06KH47jZbG0_00062_000_a",
+      "2011_06KH47jZbG0_00062_001_a",
+      "2011_0IxeTLiovq8_00000_000_a",
+      "2011_0IxeTLiovq8_00000_001_a",
+      "2011_0JXwzlRcYWk_00043_000_a",
+      "2011_0LzZVYshI7s_00001_000_a",
+      "2011_0LzZVYshI7s_00001_001_a",
+      "2011_0fTXzdHoip8_00000_000_a",
+      "2011_0fTXzdHoip8_00000_001_a",
+      "2011_0hau_p3N-MI_00003_000_a",
+      "2011_0hau_p3N-MI_00014_000_a",
+      "2011_0j4aiJowI8I_00002_000_a",
+      "2011_0lNb6NAV6jg_00000_000_a",
+      "2011_0lNb6NAV6jg_00004_000_a",
+      "2011_0qvpcfYFHcw_00000_001_a",
+      "2011_0qvpcfYFHcw_00000_001_b",
+      "2011_0qvpcfYFHcw_00000_002_a",
+      "2011_0qvpcfYFHcw_00000_002_b",
+      "2011_0qvpcfYFHcw_00000_002_c",
+      "2011_0qvpcfYFHcw_00000_002_d",
+      "2011_0qvpcfYFHcw_00000_002_e",
+      "2011_0qvpcfYFHcw_00005_000_a",
+      "2011_0sNSVtTcxpo_00034_000_a",
+      "2011_0t6IIdmOIOQ_00001_000_a",
+      "2011_0uSOiu_WUDw_00002_000_a",
+      "2011_0yOwWkbamyM_00031_000_a",
+      "2011_1-G0Fxf9IYU_00017_000_a",
+      "2011_1-HbIkCjDbk_00019_000_a",
+      "2011_117FZnev4Os_00061_000_a",
+      "2011_11nfPZqT5c0_00010_000_a",
+      "2011_12Iosf6btzM_00011_000_a",
+      "2011_12Iosf6btzM_00011_000_b",
+      "2011_12Iosf6btzM_00011_001_a",
+      "2011_12Iosf6btzM_00011_002_a",
+      "2011_1BRteOP9UL8_00007_000_a",
+      "2011_1Ez6dw3ywcc_00005_000_a",
+      "2011_1Ez6dw3ywcc_00030_000_a",
+      "2011_1Ez6dw3ywcc_00036_000_a",
+      "2011_1Ez6dw3ywcc_00038_000_a"
+    ],
+    "x_input": {
+      "camera": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          14
+        ]
+      },
+      "human": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          199
+        ]
+      },
+      "projection": {
+        "device": "cuda:0",
+        "dtype": "torch.float32",
+        "shape": [
+          64,
+          300,
+          18
+        ]
+      }
+    }
+  },
+  "metric_checkpoint_status": {
+    "autoencoder_ckpts": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/autoencoder/aemmardm-xgmj0yjj-325.ckpt"
+    ],
+    "clatr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-text_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_decoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/clatr-traj_encoder.ckpt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/origin_std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/clatr/velocity_std.pt"
+    ],
+    "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+    "tmr_files": [
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/mean.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/std.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_decoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-motion_encoder.pt",
+      "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models/tmr/tmr-text_encoder.pt"
+    ]
+  },
+  "metric_keys": [
+    "test/captions/fscore",
+    "test/captions/precision",
+    "test/captions/recall",
+    "test/clatr/R1",
+    "test/clatr/R2",
+    "test/clatr/R3",
+    "test/clatr/clatr_score",
+    "test/clatr/coverage",
+    "test/clatr/density",
+    "test/clatr/fcd",
+    "test/clatr/mm_distance",
+    "test/clatr/precision",
+    "test/clatr/recall"
+  ],
+  "metrics": {
+    "test/captions/fscore": 0.6077770590782166,
+    "test/captions/precision": 0.6318250298500061,
+    "test/captions/recall": 0.5936106443405151,
+    "test/clatr/R1": 0.2552848756313324,
+    "test/clatr/R2": 0.3920750916004181,
+    "test/clatr/R3": 0.4880083501338959,
+    "test/clatr/clatr_score": 52.834598541259766,
+    "test/clatr/coverage": 0.8607457095409203,
+    "test/clatr/density": 1.0560241408782192,
+    "test/clatr/fcd": 19.09272575378418,
+    "test/clatr/mm_distance": 24.662531894036906,
+    "test/clatr/precision": 0.9311774633201424,
+    "test/clatr/recall": 0.707937051543936
+  },
+  "mode": "storymotion_generated_eval_with_pulpmotion_official_callbacks",
+  "model_dir": "/data/public/ripemangobox/Motion/PulpMotion_official_eval/pulpmotion-models",
+  "pulp_root": "/data/public/ripemangobox/Motion/PulpMotion",
+  "records_path": "runs/eval/stage2/v3_closure_20260616/full/gpu3_jointheavy_h2_besteval_camera_std_cfg2_eta1.records.jsonl",
+  "run": {
+    "checkpoint": "runs/train/stage2/_best_eval_wrappers/gpu3_jointheavy6_humanbranch_h2_from146k_to196k/last.pt",
+    "joint_loss_mode": "branch_mean",
+    "run_dir": "runs/train/stage2/_best_eval_wrappers/gpu3_jointheavy6_humanbranch_h2_from146k_to196k",
+    "step": 177500
+  },
+  "sample_range": [
+    0,
+    10549
+  ],
+  "sampler": {
+    "cfg_camera": null,
+    "cfg_channel_gated": false,
+    "cfg_human": null,
+    "cfg_mode": "standard_single_cfg",
+    "cfg_scale": 2.0,
+    "cfg_unconditional_text": "torch.zeros_like(text)",
+    "eta": 1.0,
+    "name": "ddim_start_x",
+    "num_steps": 50,
+    "observed_branch_policy": "inject q(z_gt,t,per_sample_noise) at every step; final merge gt observed branch",
+    "padding_policy": "inject q(z_gt,t,per_sample_noise) at every step; final merge gt padded frames",
+    "prediction_type": "START_X",
+    "time_grid": "round(linspace(T-1,0,num_steps)) unique_consecutive, includes 0"
+  },
+  "scope_note": "Uses PulpMotion official metric callbacks/evaluator components, but StoryMotion model and sampler are custom.",
+  "script_hashes": {
+    "build_stage2_pulp_latent_cache.py": "7ea26aef87144636dc038a9378542188eb0e6027b431106a58002e119c518816",
+    "storymotion_official_bridge_smoke.py": "0f119ee371b9695a25882e0e6666c7ed844d7585d2f3ad11c6f541b7a261604b",
+    "storymotion_official_full_eval.py": "1044098a7276575203e3c795b844403afb7a168352d92f52ec0a6a7b0a27a74a",
+    "train_stage2_condmdi_pulp.py": "03848e18ead73368155c9fbfc26df41835ddc6e3ccec94f111c505c240c3a079"
+  },
+  "seed": 20260613,
+  "set_name": "mixed_",
+  "split": "test",
+  "task": "camera",
+  "torch": {
+    "cuda_available": true,
+    "cuda_device": "NVIDIA GeForce RTX 5090",
+    "version": "2.8.0+cu128"
+  },
+  "training_conditioning_contract": {
+    "code_expression": "x = torch.where(obs_mask.bool(), obs_x0, x_t)",
+    "forward_policy": "TemporalObsUNet.forward replaces observed x_t positions with clean obs_x0 before concatenating obs_mask.",
+    "implication": "Observed branches are clean GT conditions inside the model, matching training-time CondMDI replacement."
+  }
+}

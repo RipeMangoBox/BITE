@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="460" viewBox="0 0 1000 460">
+<rect width="100%" height="100%" fill="white"/>
+<text x="500.0" y="26" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700">motionclr_trace1 top layer perturbation L2</text>
+<line x1="70" y1="340" x2="970" y2="340" stroke="#333"/>
+<line x1="70" y1="340" x2="70" y2="55" stroke="#333"/>
+<rect x="76.8" y="55.0" width="31.5" height="285.0" fill="#4C78A8"/>
+<text x="92.5" y="51.0" text-anchor="middle" font-family="Arial" font-size="10">2.6e+03</text>
+<text x="92.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 92.5 354)">cfg_hidden_replacement_L15</text>
+<rect x="121.8" y="74.4" width="31.5" height="265.6" fill="#F58518"/>
+<text x="137.5" y="70.4" text-anchor="middle" font-family="Arial" font-size="10">2.4e+03</text>
+<text x="137.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 137.5 354)">cfg_hidden_replacement_L14</text>
+<rect x="166.8" y="141.7" width="31.5" height="198.3" fill="#4C78A8"/>
+<text x="182.5" y="137.7" text-anchor="middle" font-family="Arial" font-size="10">1.8e+03</text>
+<text x="182.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 182.5 354)">cfg_hidden_replacement_L1</text>
+<rect x="211.8" y="149.4" width="31.5" height="190.6" fill="#F58518"/>
+<text x="227.5" y="145.4" text-anchor="middle" font-family="Arial" font-size="10">1.7e+03</text>
+<text x="227.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 227.5 354)">cfg_hidden_replacement_L13</text>
+<rect x="256.8" y="159.4" width="31.5" height="180.6" fill="#4C78A8"/>
+<text x="272.5" y="155.4" text-anchor="middle" font-family="Arial" font-size="10">1.7e+03</text>
+<text x="272.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 272.5 354)">cfg_hidden_replacement_L12</text>
+<rect x="301.8" y="185.5" width="31.5" height="154.5" fill="#F58518"/>
+<text x="317.5" y="181.5" text-anchor="middle" font-family="Arial" font-size="10">1.4e+03</text>
+<text x="317.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 317.5 354)">ca_output_perturbation_L0</text>
+<rect x="346.8" y="185.5" width="31.5" height="154.5" fill="#4C78A8"/>
+<text x="362.5" y="181.5" text-anchor="middle" font-family="Arial" font-size="10">1.4e+03</text>
+<text x="362.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 362.5 354)">cfg_hidden_replacement_L0</text>
+<rect x="391.8" y="200.1" width="31.5" height="139.9" fill="#F58518"/>
+<text x="407.5" y="196.1" text-anchor="middle" font-family="Arial" font-size="10">1.3e+03</text>
+<text x="407.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 407.5 354)">cfg_hidden_replacement_L3</text>
+<rect x="436.8" y="203.0" width="31.5" height="137.0" fill="#4C78A8"/>
+<text x="452.5" y="199.0" text-anchor="middle" font-family="Arial" font-size="10">1.3e+03</text>
+<text x="452.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 452.5 354)">ca_output_perturbation_L12</text>
+<rect x="481.8" y="209.9" width="31.5" height="130.1" fill="#F58518"/>
+<text x="497.5" y="205.9" text-anchor="middle" font-family="Arial" font-size="10">1.2e+03</text>
+<text x="497.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 497.5 354)">cfg_hidden_replacement_L2</text>
+<rect x="526.8" y="212.0" width="31.5" height="128.0" fill="#4C78A8"/>
+<text x="542.5" y="208.0" text-anchor="middle" font-family="Arial" font-size="10">1.2e+03</text>
+<text x="542.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 542.5 354)">ca_output_perturbation_L1</text>
+<rect x="571.8" y="235.8" width="31.5" height="104.2" fill="#F58518"/>
+<text x="587.5" y="231.8" text-anchor="middle" font-family="Arial" font-size="10">9.5e+02</text>
+<text x="587.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 587.5 354)">ca_output_perturbation_L14</text>
+<rect x="616.8" y="247.2" width="31.5" height="92.8" fill="#4C78A8"/>
+<text x="632.5" y="243.2" text-anchor="middle" font-family="Arial" font-size="10">8.5e+02</text>
+<text x="632.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 632.5 354)">ca_output_perturbation_L13</text>
+<rect x="661.8" y="253.3" width="31.5" height="86.7" fill="#F58518"/>
+<text x="677.5" y="249.3" text-anchor="middle" font-family="Arial" font-size="10">7.9e+02</text>
+<text x="677.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 677.5 354)">ca_output_perturbation_L2</text>
+<rect x="706.8" y="256.5" width="31.5" height="83.5" fill="#4C78A8"/>
+<text x="722.5" y="252.5" text-anchor="middle" font-family="Arial" font-size="10">7.6e+02</text>
+<text x="722.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 722.5 354)">ca_output_perturbation_L15</text>
+<rect x="751.8" y="258.1" width="31.5" height="81.9" fill="#F58518"/>
+<text x="767.5" y="254.1" text-anchor="middle" font-family="Arial" font-size="10">7.5e+02</text>
+<text x="767.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 767.5 354)">cfg_hidden_replacement_L11</text>
+<rect x="796.8" y="264.9" width="31.5" height="75.1" fill="#4C78A8"/>
+<text x="812.5" y="260.9" text-anchor="middle" font-family="Arial" font-size="10">6.9e+02</text>
+<text x="812.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 812.5 354)">cfg_hidden_replacement_L10</text>
+<rect x="841.8" y="272.6" width="31.5" height="67.4" fill="#F58518"/>
+<text x="857.5" y="268.6" text-anchor="middle" font-family="Arial" font-size="10">6.2e+02</text>
+<text x="857.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 857.5 354)">ca_output_perturbation_L3</text>
+<rect x="886.8" y="275.3" width="31.5" height="64.7" fill="#4C78A8"/>
+<text x="902.5" y="271.3" text-anchor="middle" font-family="Arial" font-size="10">5.9e+02</text>
+<text x="902.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 902.5 354)">cfg_hidden_replacement_L5</text>
+<rect x="931.8" y="276.3" width="31.5" height="63.7" fill="#F58518"/>
+<text x="947.5" y="272.3" text-anchor="middle" font-family="Arial" font-size="10">5.8e+02</text>
+<text x="947.5" y="354" text-anchor="end" font-family="Arial" font-size="10" transform="rotate(-55 947.5 354)">cfg_hidden_replacement_L4</text>
+</svg>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="1260" viewBox="0 0 1360 1260" role="img" aria-label="sample-level case cards">
+<!-- diagnostic observation: sample-level internal trace tensors only; no final evaluator -->
+<style>
+text{font-family:'Noto Sans CJK SC','Microsoft YaHei','PingFang SC','DejaVu Sans',sans-serif;fill:#26312f}
+.title{font-size:24px;font-weight:700}.subtitle{font-size:13px;fill:#53615d}.small{font-size:12px;fill:#53615d}.label{font-size:13px}
+.axis{stroke:#60706b;stroke-width:1}.grid{stroke:#d8dfdb;stroke-width:1}.card{fill:#fffdf8;stroke:#d8dfdb;stroke-width:1}
+</style>
+<rect x="0" y="0" width="1360" height="1260" fill="#fbfaf5"/>
+<text class="title" x="60" y="48">sample-level case cards</text>
+<text class="subtitle" x="60" y="74">每张卡连接 sample outcome、human annotation、motion artifact、forward/delta manifest。</text>
+<rect class="card" x="60" y="112" width="610" height="258" rx="8"/>
+<rect x="60" y="112" width="8" height="258" rx="4" fill="#37766f"/>
+<text class="label" x="84" y="140" font-weight="700">MotionGPT · success · row 2</text>
+<text class="small" x="84" y="164">sample: hml_orig100_train_003__full</text>
+<text class="small" x="84" y="190">factor: success_control · delta=0.7941</text>
+<text class="small" x="84.0" y="215.0">prompt: a person jogs straight forward.</text>
+<text class="small" x="84.0" y="255.0">human: 无问题标注</text>
+<text class="small" x="84" y="299">motion: /data/Life Me/ResearchWY Vault/obsidi...pt/002_hml_orig100_train_003__full.mp4</text>
+<text class="small" x="84" y="323">forward: 20260528_000000_motiongpt_success_002_sample_trace/forward_manifest.jsonl</text>
+<text class="small" x="84" y="346">delta: 20260528_000000_motiongpt_success_002_sample_trace/delta_manifest.jsonl</text>
+<rect class="card" x="718" y="112" width="610" height="258" rx="8"/>
+<rect x="718" y="112" width="8" height="258" rx="4" fill="#b4574d"/>
+<text class="label" x="742" y="140" font-weight="700">MotionGPT · failure · row 36</text>
+<text class="small" x="742" y="164">sample: hml_orig100_train_037__full</text>
+<text class="small" x="742" y="190">factor: missing_subaction · delta=0.2644</text>
+<text class="small" x="742.0" y="215.0">prompt: a person does a quick wheel-like spin kick with left leg, pivoting on right leg</text>
+<text class="small" x="742.0" y="232.0">prompt: while</text>
+<text class="small" x="742.0" y="255.0">human: 没完成whell-like spin kick，只是简单的kick</text>
+<text class="small" x="742" y="299">motion: /data/Life Me/ResearchWY Vault/obsidi...pt/036_hml_orig100_train_037__full.mp4</text>
+<text class="small" x="742" y="323">forward: 20260528_000001_motiongpt_failure_036_sample_trace/forward_manifest.jsonl</text>
+<text class="small" x="742" y="346">delta: 20260528_000001_motiongpt_failure_036_sample_trace/delta_manifest.jsonl</text>
+<rect class="card" x="60" y="394" width="610" height="258" rx="8"/>
+<rect x="60" y="394" width="8" height="258" rx="4" fill="#37766f"/>
+<text class="label" x="84" y="422" font-weight="700">MoLingo · success · row 2</text>
+<text class="small" x="84" y="446">sample: hml_orig100_train_003__full</text>
+<text class="small" x="84" y="472">factor: success_control · delta=0.9878</text>
+<text class="small" x="84.0" y="497.0">prompt: a person jogs straight forward.</text>
+<text class="small" x="84.0" y="537.0">human: 无问题标注</text>
+<text class="small" x="84" y="581">motion: /data/Life Me/ResearchWY Vault/obsidi...go/002_hml_orig100_train_003__full.mp4</text>
+<text class="small" x="84" y="605">forward: 20260528_000002_molingo_success_002_sample_trace/forward_manifest.jsonl</text>
+<text class="small" x="84" y="628">delta: 20260528_000002_molingo_success_002_sample_trace/delta_manifest.jsonl</text>
+<rect class="card" x="718" y="394" width="610" height="258" rx="8"/>
+<rect x="718" y="394" width="8" height="258" rx="4" fill="#b4574d"/>
+<text class="label" x="742" y="422" font-weight="700">MoLingo · failure · row 1</text>
+<text class="small" x="742" y="446">sample: hml_orig100_train_002__full</text>
+<text class="small" x="742" y="472">factor: trajectory_error · delta=1.2603</text>
+<text class="small" x="742.0" y="497.0">prompt: a person looking to their right walks in a tight circle while continuing to face</text>
+<text class="small" x="742.0" y="514.0">prompt: the</text>
+<text class="small" x="742.0" y="537.0">human: 没有走完一圈</text>
+<text class="small" x="742" y="581">motion: /data/Life Me/ResearchWY Vault/obsidi...go/001_hml_orig100_train_002__full.mp4</text>
+<text class="small" x="742" y="605">forward: 20260528_000003_molingo_failure_001_sample_trace/forward_manifest.jsonl</text>
+<text class="small" x="742" y="628">delta: 20260528_000003_molingo_failure_001_sample_trace/delta_manifest.jsonl</text>
+<rect class="card" x="60" y="676" width="610" height="258" rx="8"/>
+<rect x="60" y="676" width="8" height="258" rx="4" fill="#37766f"/>
+<text class="label" x="84" y="704" font-weight="700">MoMask original · success · row 2</text>
+<text class="small" x="84" y="728">sample: hml_orig100_train_003__full</text>
+<text class="small" x="84" y="754">factor: success_control · delta=1.0839</text>
+<text class="small" x="84.0" y="779.0">prompt: a person jogs straight forward.</text>
+<text class="small" x="84.0" y="819.0">human: 无问题标注</text>
+<text class="small" x="84" y="863">motion: /data/Life Me/ResearchWY Vault/obsidi...al/002_hml_orig100_train_003__full.mp4</text>
+<text class="small" x="84" y="887">forward: 20260528_000004_momask_original_succ...2_sample_trace/forward_manifest.jsonl</text>
+<text class="small" x="84" y="910">delta: 20260528_000004_momask_original_success_002_sample_trace/delta_manifest.jsonl</text>
+<rect class="card" x="718" y="676" width="610" height="258" rx="8"/>
+<rect x="718" y="676" width="8" height="258" rx="4" fill="#b4574d"/>
+<text class="label" x="742" y="704" font-weight="700">MoMask original · failure · row 0</text>
+<text class="small" x="742" y="728">sample: hml_orig100_train_001__full</text>
+<text class="small" x="742" y="754">factor: artifact_sliding_or_drift · delta=1.1718</text>
+<text class="small" x="742.0" y="779.0">prompt: a person slides from side to side 2 times then takes off running while looking</text>
+<text class="small" x="742.0" y="796.0">prompt: forward</text>
+<text class="small" x="742.0" y="819.0">human: foot sliding严重</text>
+<text class="small" x="742" y="863">motion: /data/Life Me/ResearchWY Vault/obsidi...al/000_hml_orig100_train_001__full.mp4</text>
+<text class="small" x="742" y="887">forward: 20260528_000005_momask_original_fail...0_sample_trace/forward_manifest.jsonl</text>
+<text class="small" x="742" y="910">delta: 20260528_000005_momask_original_failure_000_sample_trace/delta_manifest.jsonl</text>
+<rect class="card" x="60" y="958" width="610" height="258" rx="8"/>
+<rect x="60" y="958" width="8" height="258" rx="4" fill="#37766f"/>
+<text class="label" x="84" y="986" font-weight="700">MoGenTS · success · row 2</text>
+<text class="small" x="84" y="1010">sample: hml_orig100_train_003__full</text>
+<text class="small" x="84" y="1036">factor: success_control · delta=0.8485</text>
+<text class="small" x="84.0" y="1061.0">prompt: a person jogs straight forward.</text>
+<text class="small" x="84.0" y="1101.0">human: 无问题标注</text>
+<text class="small" x="84" y="1145">motion: /data/Life Me/ResearchWY Vault/obsidi...ts/002_hml_orig100_train_003__full.mp4</text>
+<text class="small" x="84" y="1169">forward: 20260528_000006_mogents_success_002_sample_trace/forward_manifest.jsonl</text>
+<text class="small" x="84" y="1192">delta: 20260528_000006_mogents_success_002_sample_trace/delta_manifest.jsonl</text>
+<rect class="card" x="718" y="958" width="610" height="258" rx="8"/>
+<rect x="718" y="958" width="8" height="258" rx="4" fill="#b4574d"/>
+<text class="label" x="742" y="986" font-weight="700">MoGenTS · failure · row 1</text>
+<text class="small" x="742" y="1010">sample: hml_orig100_train_002__full</text>
+<text class="small" x="742" y="1036">factor: trajectory_error · delta=1.3833</text>
+<text class="small" x="742.0" y="1061.0">prompt: a person looking to their right walks in a tight circle while continuing to face</text>
+<text class="small" x="742.0" y="1078.0">prompt: the</text>
+<text class="small" x="742.0" y="1101.0">human: 没有走完一圈</text>
+<text class="small" x="742" y="1145">motion: /data/Life Me/ResearchWY Vault/obsidi...ts/001_hml_orig100_train_002__full.mp4</text>
+<text class="small" x="742" y="1169">forward: 20260528_000007_mogents_failure_001_sample_trace/forward_manifest.jsonl</text>
+<text class="small" x="742" y="1192">delta: 20260528_000007_mogents_failure_001_sample_trace/delta_manifest.jsonl</text>
+<text class="small" x="60" y="1225">这些卡片是 P3 证据索引；不包含 final evaluator，也不把 text/null delta 解释为模型排序。</text>
+</svg>

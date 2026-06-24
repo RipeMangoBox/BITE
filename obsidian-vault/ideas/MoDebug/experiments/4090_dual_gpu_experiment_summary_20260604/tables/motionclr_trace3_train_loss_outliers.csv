@@ -1,0 +1,4 @@
+variant,metric,p99_clip,max_value,max_step
+baseline,loss_mot_rec,0.8109636902809143,650618624.0,3960
+disploss,loss_total,0.8065694570541382,2661.673095703125,3528
+aug_disploss,loss_total,0.8033637404441833,10688.7978515625,1851

@@ -1,0 +1,77 @@
+---
+title: "Dataset: ARCTIC"
+type: paper-index
+dimension: dataset
+tags:
+  - obsidian-vault/index
+generated: 2026-06-24T20:47
+---
+
+# Dataset: ARCTIC
+
+- [[obsidian-vault/analysis/CVPR_2024/AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation.md|AiOS All in One Stage Expressive Human Pose and Shape Estimation (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: AiOS
+	- datasets: AGORA SMPL-X, EHF, ARCTIC
+- [[obsidian-vault/analysis/CVPR_2024/InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffusion.md|InterHandGen Two Hand Interaction Generation via Cascaded Reverse Diffusion (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffusion.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: InterHandGen
+	- datasets: InterHand2.6M, ARCTIC, HIC
+- [[obsidian-vault/analysis/CVPR_2024/Text2HOI_Text_guided_3D_Motion_Generation_for_Hand_Object_Interaction.md|Text2HOI Text guided 3D Motion Generation for Hand Object Interaction (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/Text2HOI_Text_guided_3D_Motion_Generation_for_Hand_Object_Interaction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Text2HOI
+	- datasets: H2O, GRAB, ARCTIC
+- [[obsidian-vault/analysis/ICLR_2024/GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising_via_Denoising_Diffusion.md|GeneOH Diffusion Towards Generalizable Hand Object Interaction Denoising via Denoising Diffusion (ICLR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2024/GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising_via_Denoising_Diffusion.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: GeneOH Diffusion
+	- datasets: GRAB, HOI4D, ARCTIC
+- [[obsidian-vault/analysis/AAAI_2025/DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a_Diffusion_Model.md|DiffGrasp Whole Body Grasping Synthesis Guided by Object Motion Using a Diffusion Model (AAAI 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/AAAI_2025/DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a_Diffusion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DiffGrasp
+	- datasets: GRAB, ARCTIC
+- [[obsidian-vault/analysis/arxiv_2025/DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior.md|DPoser X Diffusion Model as Robust 3D Whole body Human Pose Prior (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DPoser-X
+	- datasets: EHF, AMASS, ReInterHand
+- [[obsidian-vault/analysis/CVPR_2025/BimArt_A_Unified_Approach_for_the_Synthesis_of_3D_Bimanual_Interaction_with_Articulated_Objects.md|BimArt A Unified Approach for the Synthesis of 3D Bimanual Interaction with Articulated Objects (CVPR 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/BimArt_A_Unified_Approach_for_the_Synthesis_of_3D_Bimanual_Interaction_with_Articulated_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: BimArt
+	- datasets: ARCTIC, HOI4D
+- [[obsidian-vault/analysis/CVPR_2026/ArtHOI_Taming_Foundation_Models_for_Monocular_4D_Reconstruction_of_Hand_Articulated_Object_Interactions.md|ArtHOI: Taming Foundation Models for Monocular 4D Reconstruction of Hand-Articulated-Object Interactions (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/ArtHOI_Taming_Foundation_Models_for_Monocular_4D_Reconstruction_of_Hand_Articulated_Object_Interactions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: ArtHOI
+	- datasets: ArtHOI-RGBD, RSRD, ARCTIC
+- [[obsidian-vault/analysis/CVPR_2026/Clay_to_Stone_Phase_wise_3D_Gaussian_Splatting_for_Monocular_Articulated_Hand_Object_Manipulation_Modeling.md|Clay-to-Stone: Phase-wise 3D Gaussian Splatting for Monocular Articulated Hand-Object Manipulation Modeling (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Clay_to_Stone_Phase_wise_3D_Gaussian_Splatting_for_Monocular_Articulated_Hand_Object_Manipulation_Modeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Clay-to-Stone
+	- datasets: ARCTIC
+- [[obsidian-vault/analysis/CVPR_2026/Enhancing_Hands_in_3D_Whole_Body_Pose_Estimation_with_Conditional_Hands_Modulator.md|Enhancing Hands in 3D Whole-Body Pose Estimation with Conditional Hands Modulator (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Enhancing_Hands_in_3D_Whole_Body_Pose_Estimation_with_Conditional_Hands_Modulator.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Hand4Whole++
+	- datasets: AGORA, ARCTIC, EHF
+- [[obsidian-vault/analysis/ICLR_2026/EgoHandICL_Egocentric_3D_Hand_Reconstruction_with_In_Context_Learning.md|EgoHandICL: Egocentric 3D Hand Reconstruction with In-Context Learning (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/EgoHandICL_Egocentric_3D_Hand_Reconstruction_with_In_Context_Learning_e95df01ae740.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: EgoHandICL
+	- datasets: ARCTIC, EgoExo4D
