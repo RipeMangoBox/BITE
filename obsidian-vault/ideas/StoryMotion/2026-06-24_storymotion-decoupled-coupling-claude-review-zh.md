@@ -29,26 +29,24 @@ source_notes:
 
 3. **Observed-branch dominance 是强证据。** A 矩阵显示 completion 任务对 text noise 基本不敏感，但 observed branch 被 zero / shuffle / noise 后会灾难性退化。camera completion 在 observed human zero 时 coverage 只有 `0.35%`；human completion 在 observed camera + noise 时 coverage 从 clean 的 `84.61%` 降到 `72.91%`。根因不是单个指标异常，而是 observed branch 在评估 harness 里 hard replacement，并且又作为显式 `obs_x0` 条件进入模型；训练时 binary mask=1 总是配 clean GT `obs_x0`，checkpoint metadata 也确认 `obs_self_condition_prob=0.0`，没有 corruption training。
 
-4. **Joint text dependence 是强证据。** Joint baseline 的 TMR 为 `23.91`；text shuffle all 降到 `6.37`，text zero all 降到 `4.79`。这说明 joint generation 是 text-driven，而不是像 completion 一样主要依赖 observed branch。
+4. **Generated-camera replay 不能解释或修复 joint degradation。** Replay 的 FDTMR `148.69`、TMR `23.54`、MPJPE `0.1947`，与 joint baseline 的 FDTMR `153.72`、TMR `23.91`、MPJPE `0.1928` 基本同区间。两者都远差于 GT-camera oracle。因此文档中“replay 不是修复路径”的结论正确；瓶颈更像是 generated camera 质量，而不是 simultaneous denoising 这个表面形式。
 
-5. **Generated-camera replay 不能解释或修复 joint degradation。** Replay 的 FDTMR `148.69`、TMR `23.54`、MPJPE `0.1947`，与 joint baseline 的 FDTMR `153.72`、TMR `23.91`、MPJPE `0.1928` 基本同区间。两者都远差于 GT-camera oracle。因此文档中“replay 不是修复路径”的结论正确；瓶颈更像是 generated camera 质量，而不是 simultaneous denoising 这个表面形式。
+5. **GT-camera oracle 的语义解释有过度宣称。** 文档把 GT camera 下 TMR `18.17` 解释为“GT camera suppresses text semantics”。Kiro 认为这只是中等证据：低 TMR 也可能来自 reconstruction-like 任务目标、GT camera 对 human motion 空间的强约束，或者训练中从 GT camera 间接锁定 GT human。没有 ground-truth human TMR baseline 时，不能把它唯一解释成“语义被 camera 压制”。
 
-6. **GT-camera oracle 的语义解释有过度宣称。** 文档把 GT camera 下 TMR `18.17` 解释为“GT camera suppresses text semantics”。Kiro 认为这只是中等证据：低 TMR 也可能来自 reconstruction-like 任务目标、GT camera 对 human motion 空间的强约束，或者训练中从 GT camera 间接锁定 GT human。没有 ground-truth human TMR baseline 时，不能把它唯一解释成“语义被 camera 压制”。
-
-7. **Boundary 结论方向正确，但机制解释要收缩。** Boundary schedule 控制的是 temporal injection schedule / active observed steps，不是 learned coupling。Boundary `0.3 -> 0.7` 时 coverage `59.38% -> 77.96%`、MPJPE `0.1354 -> 0.1073` 变好，TMR `19.82 -> 18.83` 下降。它证明的是 inference-time reconstruction vs generation tradeoff，而不是已经学到了 coupling controller。
+6. **Boundary 结论方向正确，但机制解释要收缩。** Boundary schedule 控制的是 temporal injection schedule / active observed steps，不是 learned coupling。Boundary `0.3 -> 0.7` 时 coverage `59.38% -> 77.96%`、MPJPE `0.1354 -> 0.1073` 变好，TMR `19.82 -> 18.83` 下降。它证明的是 inference-time reconstruction vs generation tradeoff，而不是已经学到了 coupling controller。
 
 ## II. 数据支持表
 
-| 结论 | 实验 | 关键数值 | 证据强度 |
-| ---- | ---- | -------- | -------- |
-| Completion 对 text noise 不敏感 | A camera / human completion text noise | camera FDCLaTr `15.16 / 15.20 / 15.66`；human TMR `18.15 / 18.10 / 18.09` | 强 |
-| Completion 被 observed branch 主导 | A observed branch perturbation | camera observed zero：coverage `0.35%`，FDCLaTr `1044.19`；human observed camera + noise：coverage `72.91%`，MPJPE `0.1162` | 强 |
-| Joint 对文本强依赖 | A joint text shuffle / zero | baseline TMR `23.91`；shuffle `6.37`；zero `4.79` | 强 |
-| Replay 不是修复 joint human 的主路径 | B generated-camera replay | replay FDTMR `148.69` vs joint `153.72`；TMR `23.54` vs `23.91` | 强 |
-| GT camera 给出几何上界 | C GT-camera oracle | HumanCov `84.58%`，MPJPE `0.0884`，Contact Δ `0.1543` | 强 |
-| GT camera “压制语义” | C GT-camera oracle | TMR `18.17` 低于 joint / replay 的 `23+` | 中等，存在替代解释 |
-| Boundary 插值出几何/语义 tradeoff | D boundary scan | Cov `59.38% -> 77.96%`；TMR `19.82 -> 18.83` | 强，但机制是 inference gating |
-| Branch pollution / cross-talk | A joint text perturbation | camera-text noise 更伤 camera F1；human-text noise 更伤 human TMR | 中等到强 |
+| 结论                              | 实验                                     | 关键数值                                                                                                                   | 证据强度                    |
+| ------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| Completion 对 text noise 不敏感     | A camera / human completion text noise | camera FDCLaTr `15.16 / 15.20 / 15.66`；human TMR `18.15 / 18.10 / 18.09`                                               | 强                       |
+| Completion 被 observed branch 主导 | A observed branch perturbation         | camera observed zero：coverage `0.35%`，FDCLaTr `1044.19`；human observed camera + noise：coverage `72.91%`，MPJPE `0.1162` | 强                       |
+| Joint 对文本强依赖                    | A joint text shuffle / zero            | baseline TMR `23.91`；shuffle `6.37`；zero `4.79`                                                                        | 强                       |
+| Replay 不是修复 joint human 的主路径    | B generated-camera replay              | replay FDTMR `148.69` vs joint `153.72`；TMR `23.54` vs `23.91`                                                         | 强                       |
+| GT camera 给出几何上界                | C GT-camera oracle                     | HumanCov `84.58%`，MPJPE `0.0884`，Contact Δ `0.1543`                                                                    | 强                       |
+| GT camera “压制语义”                | C GT-camera oracle                     | TMR `18.17` 低于 joint / replay 的 `23+`                                                                                  | 中等，存在替代解释               |
+| Boundary 插值出几何/语义 tradeoff      | D boundary scan                        | Cov `59.38% -> 77.96%`；TMR `19.82 -> 18.83`                                                                            | 强，但机制是 inference gating |
+| Branch pollution / cross-talk   | A joint text perturbation              | camera-text noise 更伤 camera F1；human-text noise 更伤 human TMR                                                           | 中等到强                    |
 
 ## III. 架构诊断
 
@@ -68,6 +66,8 @@ x = torch.where(obs_mask.bool(), obs_x0, x_t)
 - checkpoint metadata 显示 `obs_self_condition_prob=0.0`，说明当前 v5 checkpoint 没有使用 noisy / mixed observed self-conditioning。
 
 因此，更准确的根因表述是：模型学到的是“mask=1 的 observed branch 完全可靠”，而不是“根据 observed branch 质量动态决定信任程度”。
+
+`疑惑`：具体指违背了哪一条优化实验的claim吗，还是指StoryMotion independent-dropout的训推不合理？
 
 ### 2. Branch-mask 只表达 visibility，不表达 trust / timing
 
@@ -142,14 +142,14 @@ joint 中：
 
 ## VI. 论文 claim 收缩建议
 
-| Claim | 判断 | 建议改写 |
-| ----- | ---- | -------- |
-| Unified three-mode SOTA | Reject | Completion 和 joint 是不同机制；需要 same-tokenizer、same-backbone、same-budget 单任务 baseline 才能写 SOTA |
-| StoryMotion achieves decoupling | Reject | A 矩阵显示 completion 是 observed-dominant，joint 有 text coupling 和 branch cross-talk |
-| Completion has fairly won | Reject | 目前没有公平 single-task completion baseline；observed-GT completion 更像 reconstruction |
-| Controlled coupling is the core problem | Accept | 数据和代码共同支持 condition dominance、branch pollution、timing tradeoff 是核心问题 |
-| Pulp Stage1 is stable foundation | Accept | 在当前 scope 内，Pulp latent contract 是稳定地基；source VAE / GRFSQ 坍塌支持保留它 |
-| Branch-mask diffusion needs upgrade to controlled coupling | Accept | root cause 确认；应升级到 corruption training、learned gate、quality-aware conditioning |
+| Claim                                                      | 判断     | 建议改写                                                                                       |
+| ---------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| Unified three-mode SOTA                                    | Reject | Completion 和 joint 是不同机制；需要 same-tokenizer、same-backbone、same-budget 单任务 baseline 才能写 SOTA |
+| StoryMotion achieves decoupling                            | Reject | A 矩阵显示 completion 是 observed-dominant，joint 有 text coupling 和 branch cross-talk            |
+| Completion has fairly won                                  | Reject | 目前没有公平 single-task completion baseline；observed-GT completion 更像 reconstruction            |
+| Controlled coupling is the core problem                    | Accept | 数据和代码共同支持 condition dominance、branch pollution、timing tradeoff 是核心问题                       |
+| Pulp Stage1 is stable foundation                           | Accept | 在当前 scope 内，Pulp latent contract 是稳定地基；source VAE / GRFSQ 坍塌支持保留它                          |
+| Branch-mask diffusion needs upgrade to controlled coupling | Accept | root cause 确认；应升级到 corruption training、learned gate、quality-aware conditioning             |
 
 ## VII. Next steps 优先级
 
@@ -296,7 +296,7 @@ StoryMotion has validated controlled coupling.
 ```
 
 建议写：
-
+【完全打回，内容完全不在StoryMotion的要点，且没有按重要性分点，也不满足ICLR的风格。另外，`boundary / temporal gating 能移动 reconstruction fidelity 与 text-driven generation 的权衡`只能算是第三个或者更低优先级的贡献点，前两位一个是unified framework for 三模式生成，另一个待定；】
 ```text
 StoryMotion 在统一 latent diffusion 接口下覆盖了 joint human-camera generation 和双向 completion，但当前评估表明这些模式运行在不同条件机制中：joint 更像 text-driven generation，而 completion 更像 observed-branch-dominant reconstruction-like completion。我们识别出当前 branch-mask diffusion 的核心瓶颈是 double-injected observed branch、binary reliability training 和缺少 trust / timing / quality 控制面；这些因素使 completion 对真实或生成的 noisy condition 脆弱，也使 joint 中 generated camera quality 成为 human 质量瓶颈。
 

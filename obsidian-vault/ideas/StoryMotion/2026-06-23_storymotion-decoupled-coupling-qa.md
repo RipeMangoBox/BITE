@@ -62,18 +62,18 @@ web_sources:
 
 A dependency matrix 的 completion 侧结果：
 
-| task | intervention | FDTMR ↓ | TMR ↑ | R3 ↑ | Human Cov ↑ | FDCLaTr ↓ | CLaTr ↑ | F1 ↑ | Camera Cov ↑ | MPJPE ↓ |
-| ---- | ------------ | ------: | ----: | ---: | ----------: | --------: | ------: | ---: | -----------: | ------: |
-| camera | text noise camera | - | - | - | - | 15.16 | 53.87 | 62.45% | 86.50% | - |
-| camera | text noise human | - | - | - | - | 15.20 | 53.84 | 62.43% | 86.71% | - |
-| camera | text noise all | - | - | - | - | 15.66 | 53.30 | 61.71% | 86.75% | - |
-| camera | observed human + noise | - | - | - | - | 303.00 | 25.68 | 27.82% | 31.04% | - |
-| camera | observed human shuffle | - | - | - | - | 117.68 | 14.61 | 19.48% | 50.53% | - |
-| camera | observed human zero | - | - | - | - | 1044.19 | 4.36 | 3.79% | 0.35% | - |
-| human | text noise camera | 126.70 | 18.15 | 21.64% | 84.61% | - | - | - | - | 0.0884 |
-| human | text noise human | 126.66 | 18.10 | 21.77% | 84.61% | - | - | - | - | 0.0888 |
-| human | text noise all | 126.77 | 18.09 | 21.72% | 84.61% | - | - | - | - | 0.0888 |
-| human | observed camera + noise | 154.70 | 14.94 | 20.03% | 72.91% | - | - | - | - | 0.1162 |
+| task   | intervention            | FDTMR ↓ | TMR ↑ |   R3 ↑ | Human Cov ↑ | FDCLaTr ↓ | CLaTr ↑ |   F1 ↑ | Camera Cov ↑ | MPJPE ↓ |
+| ------ | ----------------------- | ------: | ----: | -----: | ----------: | --------: | ------: | -----: | -----------: | ------: |
+| camera | text noise camera       |       - |     - |      - |           - |     15.16 |   53.87 | 62.45% |       86.50% |       - |
+| camera | text noise human        |       - |     - |      - |           - |     15.20 |   53.84 | 62.43% |       86.71% |       - |
+| camera | text noise all          |       - |     - |      - |           - |     15.66 |   53.30 | 61.71% |       86.75% |       - |
+| camera | observed human + noise  |       - |     - |      - |           - |    303.00 |   25.68 | 27.82% |       31.04% |       - |
+| camera | observed human shuffle  |       - |     - |      - |           - |    117.68 |   14.61 | 19.48% |       50.53% |       - |
+| camera | observed human zero     |       - |     - |      - |           - |   1044.19 |    4.36 |  3.79% |        0.35% |       - |
+| human  | text noise camera       |  126.70 | 18.15 | 21.64% |      84.61% |         - |       - |      - |            - |  0.0884 |
+| human  | text noise human        |  126.66 | 18.10 | 21.77% |      84.61% |         - |       - |      - |            - |  0.0888 |
+| human  | text noise all          |  126.77 | 18.09 | 21.72% |      84.61% |         - |       - |      - |            - |  0.0888 |
+| human  | observed camera + noise |  154.70 | 14.94 | 20.03% |      72.91% |         - |       - |      - |            - |  0.1162 |
 
 A dependency matrix 的 joint 侧结果：
 
@@ -115,12 +115,12 @@ Claude / Kiro 复查后的证据强度划分：
 
 后续核心修改意见只保留四个，不凑数，并按复查意见重排优先级：
 
-| 核心实验 | 改什么 | 要回答的问题 | 成功标准 |
-| -------- | ------ | ------------ | -------- |
-| Soft observed branch training | 对 observed branch 加 corruption training：condition noise / dropout / quality token，先复用现有 `make_observed_condition_x0` 路径 | 只训练“可靠 clean observed branch”是否是 completion 脆弱性的直接根因 | observed-noise 曲线明显慢于 hard baseline 退化，同时 clean completion 不明显退化 |
-| Fair separate-task baselines | 训练 same tokenizer / same backbone / same split / same budget 的 joint、human completion、camera completion 单任务模型 | Unified branch-mask 是真实贡献，还是工程拼接后被 reconstruction-like completion 抬高 | Unified controlled-coupling 至少接近单任务模型，并给出参数/训练成本收益 |
-| Learned coupling gate | 在 Stage2 中加入 branch-specific stream + 零初始化 cross residual gate，gate 依赖 timestep、task、condition quality | corruption training 仍不足时，模型是否需要显式学习“何时耦合、耦合多少” | Joint human/camera 指标不低于 baseline，PI / intervention degradation 下降 |
-| Observed-camera hybrid oracle | 用 `α * GT camera + (1-α) * generated camera` 做 human completion，`α∈{0,0.25,0.5,0.75,1}` | joint degradation 是否主要由 generated camera 质量瓶颈导致，还是 coupling 结构本身也有问题 | Human Cov / MPJPE / TMR 随 α 呈清晰趋势；若高 α 才恢复，先修 camera quality；若非线性或不恢复，再上 gate / relation-space |
+| 核心实验                          | 改什么                                                                                                                     | 要回答的问题                                                               | 成功标准                                                                                           |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Soft observed branch training | 对 observed branch 加 corruption training：condition noise / dropout / quality token，先复用现有 `make_observed_condition_x0` 路径 | 只训练“可靠 clean observed branch”是否是 completion 脆弱性的直接根因                 | observed-noise 曲线明显慢于 hard baseline 退化，同时 clean completion 不明显退化                               |
+| Fair separate-task baselines  | 训练 same tokenizer / same backbone / same split / same budget 的 joint、human completion、camera completion 单任务模型           | Unified branch-mask 是真实贡献，还是工程拼接后被 reconstruction-like completion 抬高 | Unified controlled-coupling 至少接近单任务模型，并给出参数/训练成本收益                                             |
+| Learned coupling gate         | 在 Stage2 中加入 branch-specific stream + 零初始化 cross residual gate，gate 依赖 timestep、task、condition quality                  | corruption training 仍不足时，模型是否需要显式学习“何时耦合、耦合多少”                       | Joint human/camera 指标不低于 baseline，PI / intervention degradation 下降                             |
+| Observed-camera hybrid oracle | 用 `α * GT camera + (1-α) * generated camera` 做 human completion，`α∈{0,0.25,0.5,0.75,1}`                                 | joint degradation 是否主要由 generated camera 质量瓶颈导致，还是 coupling 结构本身也有问题 | Human Cov / MPJPE / TMR 随 α 呈清晰趋势；若高 α 才恢复，先修 camera quality；若非线性或不恢复，再上 gate / relation-space |
 
 对 QA 的直接更新：
 
@@ -248,12 +248,12 @@ z_cam self prior: p(z_cam | text_c, r)
 
 优先级仍是先诊断，再加机制。A/B/C/D 已经完成第一轮诊断；下一轮只安排 4 个核心实验，其中前两个先回答“训练可靠性”和“公平基线”，第三个再动架构，第四个用最小 oracle 分解 generated-camera 质量瓶颈：
 
-| 优先级 | 核心实验 | 当前证据来源 | 直接目标 | 继续 / 停止标准 |
-| --- | -------- | ------------ | -------- | --------------- |
-| 1 | Soft observed branch training | A 显示 completion 被 observed branch 主导；代码已有 `make_observed_condition_x0`，但当前 checkpoint `obs_self_condition_prob=0.0` | 用 corruption training 打破 clean-GT observed branch 的可靠性假设 | observed-noise 曲线慢于 hard baseline 退化；clean completion 不明显退化 |
-| 2 | Fair separate-task baselines | 当前 unified 缺 same-budget single-task 对照 | 判断统一三模式到底是贡献还是工程拼接 | Unified controlled-coupling 接近单任务模型，同时给出参数/训练成本收益 |
-| 3 | Learned coupling gate | A/B/C/D 显示 coupling strength 需要按任务、时间步和条件质量调度 | 让模型学习何时打开 cross-branch residual | Joint 指标不低于 baseline，intervention degradation 下降 |
-| 4 | Observed-camera hybrid oracle | C 只有 GT oracle，B 只有 generated-camera replay，还缺中间质量曲线 | 分解 generated-camera 质量瓶颈和 coupling 结构瓶颈 | Human Cov / MPJPE / TMR 随 α 呈清晰趋势；若高 α 才恢复，优先修 camera quality；若不恢复，再证明结构性 coupling 问题 |
+| 优先级 | 核心实验                          | 当前证据来源                                                                                                              | 直接目标                                                     | 继续 / 停止标准                                                                             |
+| --- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 1   | Soft observed branch training | A 显示 completion 被 observed branch 主导；代码已有 `make_observed_condition_x0`，但当前 checkpoint `obs_self_condition_prob=0.0` | 用 corruption training 打破 clean-GT observed branch 的可靠性假设 | observed-noise 曲线慢于 hard baseline 退化；clean completion 不明显退化                           |
+| 2   | Fair separate-task baselines  | 当前 unified 缺 same-budget single-task 对照                                                                             | 判断统一三模式到底是贡献还是工程拼接                                       | Unified controlled-coupling 接近单任务模型，同时给出参数/训练成本收益                                     |
+| 3   | Learned coupling gate         | A/B/C/D 显示 coupling strength 需要按任务、时间步和条件质量调度                                                                       | 让模型学习何时打开 cross-branch residual                          | Joint 指标不低于 baseline，intervention degradation 下降                                      |
+| 4   | Observed-camera hybrid oracle | C 只有 GT oracle，B 只有 generated-camera replay，还缺中间质量曲线                                                                | 分解 generated-camera 质量瓶颈和 coupling 结构瓶颈                  | Human Cov / MPJPE / TMR 随 α 呈清晰趋势；若高 α 才恢复，优先修 camera quality；若不恢复，再证明结构性 coupling 问题 |
 
 当前可写的最小结论：`A/B/C/D` 已经把问题定位到 **condition dominance + branch pollution + coupling strength / timing**，而不是 sampling 同步问题。还不能写“修复已完成”；也不能把 relation-space containment 写成性能已验证。下一步就是上面四个核心实验，不再额外凑诊断项。
 

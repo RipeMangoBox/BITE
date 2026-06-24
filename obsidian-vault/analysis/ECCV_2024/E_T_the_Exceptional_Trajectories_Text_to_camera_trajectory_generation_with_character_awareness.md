@@ -27,15 +27,15 @@ claims:
 > [!tip] 核心洞察
 > 通过从真实电影中构建大规模、多模态的相机-角色轨迹数据集（E.T.），并配套基于对比学习的语言-轨迹嵌入（CLaTr）进行评估，可以训练出对角色运动感知更强、文本遵循度更高的相机轨迹扩散模型（Director），显著提升生成的电影感与可控性。
 
-| 字段 | 内容 |
-|------|------|
-| 中文题名 | E.T.非凡轨迹：具有角色感知的文本到摄像机轨迹生成 |
-| 英文题名 | E.T. the Exceptional Trajectories: Text-to-camera-trajectory generation with character awareness |
-| 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2407.01516) · [Project](https://www.lix.polytechnique.fr/vista/projects/2024\_et\_courant) |
-| Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/vision_multimodal_applications/image_and_video_generation |
-| Method | Director (DiffusIon tRansformEr Camera TrajectORy) |
-| Dataset | E.T. mixed subset |
+| 字段      | 内容                                                                                                                                                                          |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 中文题名    | E.T.非凡轨迹：具有角色感知的文本到摄像机轨迹生成                                                                                                                                                  |
+| 英文题名    | E.T. the Exceptional Trajectories: Text-to-camera-trajectory generation with character awareness                                                                            |
+| 会议/期刊   | ECCV 2024                                                                                                                                                                   |
+| Links   | [paper](https://arxiv.org/abs/2407.01516) · [Project](https://www.lix.polytechnique.fr/vista/projects/2024\_et\_courant) · [Code](https://github.com/robincourant/DIRECTOR) |
+| Topic   | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/vision_multimodal_applications/image_and_video_generation                                   |
+| Method  | Director (DiffusIon tRansformEr Camera TrajectORy)                                                                                                                          |
+| Dataset | E.T. mixed subset                                                                                                                                                           |
 
 > [!tip] 效果简介
 > - E.T. mixed subset 上，FD_CLaTr ↓ 3.76 (Director C) vs 6.79 (MDM) (-3.03)；FD_CLaTr ↓ 3.76 (Director C) vs 35.81 (CCD) (-32.05)；CLaTr-Score (CS) ↑ 21.95 (Director C) vs 18.32 (MDM) (+3.63)。
