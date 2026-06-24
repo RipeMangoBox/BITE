@@ -31,9 +31,9 @@ web_sources:
 > [!abstract] 结论先行
 > StoryMotion 当前路线不应被判定为失败。相反，现有证据说明 **Pulp Stage1 frozen latent contract + branch-mask Stage2** 是目前唯一跑通 official reconstruction、joint generation 与三模式接口的稳定闭环；source VAE / GRFSQ 的坍塌反而证明不能轻易替换这个 contract。
 >
-> 但当前路线确实存在架构上限：Stage2 已经从“利用 human-camera 相关性”滑向“依赖 observed branch latent”，尤其 human completion 中 observed camera latent 的 zero/shuffle 会造成大幅退化，而 camera-text half 扰动几乎无影响。这说明模型存在 **条件优先级失衡、生成相机污染人体、completion 硬条件错误传播** 的风险。
+> 但当前路线确实存在架构上限：completion 分支在这组干预中更像 observed-branch-dominant reconstruction，而不是均衡的 text + observed 条件生成；joint 分支则明显依赖文本，但覆盖/几何质量仍弱于 clean completion / GT-camera oracle。这说明模型存在 **条件优先级失衡、生成相机污染人体、completion 硬条件错误传播** 的风险。
 >
-> 顶会叙事应从“三模式 SOTA”升级为 **受控耦合生成**：在保留 Pulp 稳定 latent 的基础上，提出 human-camera coupling 的诊断指标、可调耦合机制、软条件补全和 camera-projection 可靠性协议。核心 claim 不是“完全联合更强”，而是“少量、可诊断、可调度的人相机耦合能够同时提升 joint modeling 与 conditional completion 鲁棒性”。
+> 顶会叙事应从“三模式 SOTA”收缩为 **受控耦合生成的问题定义与验证路线**：在保留 Pulp 稳定 latent 的基础上，提出 human-camera coupling 的诊断指标、可调耦合机制、软条件补全和 camera-projection 可靠性协议。当前数据支持“受控耦合是核心问题”，但还没有证明最终机制已经解决该问题。
 
 ## 2026-06-24 5090 full eval 核心结论
 
@@ -41,13 +41,13 @@ web_sources:
 
 这批实验不是为了证明某个指标更高，而是回答四个更具体的问题：completion 到底依赖文本还是 observed branch；joint human 退化是不是 simultaneous denoising 造成；GT camera 是否能把 human 拉回几何上界；two-stage coupling schedule 是否已经是可用修复。A dependency matrix 已补齐 `15/15`，可以写依赖诊断结论，但仍不能写“修复已完成”。
 
-| 实验                               | 要回答的问题                                            | 关键结果                                                                                                                                                             | 结果标记                                    |
-| -------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| 实验                               | 要回答的问题                                            | 关键结果                                                                                                                                      | 结果标记                                            |
+| -------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | A dependency matrix              | text half、observed branch、generated branch 谁在支配输出 | `15/15` full items 完成；completion 两个方向对 text noise 基本不变，对 observed branch 破坏明显退化；joint 对 text perturbation 敏感，shuffle / zero text 会把语义指标拉低 | 完成；支持 condition dominance / branch pollution 诊断 |
-| B joint shared-noise             | joint simultaneous denoising 本身是否导致 human 退化      | joint：FDTMR `153.72`，TMR `23.91`，MPJPE `0.1928`                                                                                                                  | 完成；作为 replay 对照                         |
-| B generated-camera replay        | 先生成 camera 再做人，是否比 joint human 明显更好               | replay：FDTMR `148.69`，TMR `23.54`，MPJPE `0.1947`，与 joint 同区间                                                                                                     | 完成；主因不是 simultaneous denoising          |
-| C GT-camera oracle               | 如果 camera 条件完全正确，human 是否恢复                       | Human Cov `84.58%`，MPJPE `0.0884`，Contact Δ `0.1543`，但 TMR `18.17`                                                                                               | 完成；GT camera 是几何/覆盖上界；语义解释需收缩            |
-| D boundary `0.3` / `0.5` / `0.7` | two-stage schedule 能否作为无需训练的修复                    | boundary 后移时 Cov `59.38%→77.96%`、MPJPE `0.1354→0.1073` 变好，但 TMR `19.82→18.83` 下降                                                                                 | 完成；这是 coupling 强度 tradeoff，不是 Pareto 修复 |
+| B joint shared-noise             | joint simultaneous denoising 本身是否导致 human 退化      | joint：FDTMR `153.72`，TMR `23.91`，MPJPE `0.1928`                                                                                           | 完成；作为 replay 对照                                 |
+| B generated-camera replay        | 先生成 camera 再做人，是否比 joint human 明显更好               | replay：FDTMR `148.69`，TMR `23.54`，MPJPE `0.1947`，与 joint 同区间                                                                              | 完成；主因不是 simultaneous denoising                  |
+| C GT-camera oracle               | 如果 camera 条件完全正确，human 是否恢复                       | Human Cov `84.58%`，MPJPE `0.0884`，Contact Δ `0.1543`，但 TMR `18.17`                                                                        | 完成；GT camera 是几何/覆盖上界；语义解释需收缩                   |
+| D boundary `0.3` / `0.5` / `0.7` | two-stage schedule 能否作为无需训练的修复                    | boundary 后移时 Cov `59.38%→77.96%`、MPJPE `0.1354→0.1073` 变好，但 TMR `19.82→18.83` 下降                                                          | 完成；这是 coupling 强度 tradeoff，不是 Pareto 修复         |
 
 核心指标数值如下。A 表只用于依赖诊断，不等价于修复结果。
 
@@ -109,9 +109,9 @@ Claude / Kiro 复查后的证据强度划分：
 | Completion 和 joint 不是同一种条件机制 | 强证据 | Completion 是 observed-dominant reconstruction-like；joint 是 text-driven generation，shuffle / zero text 会把 TMR / R3 / CLaTr / F1 拉低 |
 | replay 不是修复 joint human 的主路径 | 强证据 | generated-camera replay 与 joint shared-noise 指标同区间，不能把 human 拉回 oracle / clean completion 水平 |
 | Boundary 是 coupling strength / timing 诊断旋钮 | 强证据 | Cov / MPJPE 随 boundary 后移变好，TMR 下降；但这是 inference gating，不是 learned controller |
-| GT camera “压制语义” | 中等证据 | TMR 低于 joint / replay，但 alternative explanation 是 reconstruction-like objective 或 GT camera 几何约束，需补 ground-truth human TMR / oracle 对照 |
+| GT camera 降低 semantic metric | 中等证据 | TMR 低于 joint / replay，但 alternative explanation 是 reconstruction-like objective 或 GT camera 几何约束，需补 ground-truth human TMR / oracle 对照 |
 | Raw latent concat 导致无控制耦合 | 中等证据 | 架构与 A 矩阵一致指向该问题，但还缺消融证明 relation-space / gate 一定能改善 |
-| 4090 screen containment 已证明 relation-space 有效 | 推测 | 目前只证明训练原型和 eval 路径可执行；full official metrics 未完成，不能写 Pareto 改善 |
+| 4090 screen containment 的 relation-space 有效性 | 推测 | 目前只证明训练原型和 eval 路径可执行；full official metrics 未完成，不能写 Pareto 改善 |
 
 后续核心修改意见只保留四个，不凑数，并按复查意见重排优先级：
 
@@ -261,7 +261,7 @@ z_cam self prior: p(z_cam | text_c, r)
 
 结论：StoryMotion 顶会门槛的核心不应是“三模式大部分 SOTA”，而应是下面这个更强命题：
 
-> Human-camera motion generation 的难点不是耦合越多越好，而是找到可诊断、可调度、可应用的 **受控耦合边界**。StoryMotion 用一个统一 latent diffusion 覆盖 joint generation 与双向 completion，并提出 coupling diagnostics、soft conditional completion 与 projection reliability protocol，证明少量关系空间耦合能同时提升构图一致性、补全鲁棒性和实际可编辑性。
+> Human-camera motion generation 的难点不是耦合越多越好，而是找到可诊断、可调度、可应用的 **受控耦合边界**。StoryMotion 用一个统一 latent diffusion 覆盖 joint generation 与双向 completion，并提出 coupling diagnostics、soft conditional completion 与 projection reliability protocol；下一步必须证明这些机制能同时改善构图一致性、补全鲁棒性和实际可编辑性。
 
 ### 可形成的三个贡献点
 
@@ -349,7 +349,7 @@ StoryMotion 当前最稳路线是：
 1. **保留 Pulp Stage1 主线**，不要把 source tokenizer replacement 当近期主贡献。
 2. **把 Stage2 从 branch-mask diffusion 升级为 controlled coupling diffusion**：先做 soft observed branch training 和 fair separate-task baselines，再上 branch-specific stream / learned gate；relation-space constraint 等 4090 full official eval 或 hybrid oracle 后再决定是否进入主线。
 3. **把 completion 从附加能力升级为应用任务**：补 fair internal baselines、noise robustness、projection render gate。
-4. **把顶会 insight 写成“受控耦合边界”**：证明少量关系空间耦合能带来 joint framing 和 completion utility，而完全耦合会导致污染和错误传播。
+4. **把顶会 insight 写成“受控耦合边界”**：先证明当前 branch-mask diffusion 的污染和错误传播，再验证软条件、learned gate 或 relation-space 约束能带来 joint framing 与 completion utility 的 Pareto 改善。
 
 最小论文闭环不是继续堆一个更高的单表指标，而是证明以下 Pareto 改善：
 
