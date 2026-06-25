@@ -90,7 +90,15 @@ def result_manifest_path(record: dict[str, Any], baseline_output_root: Path) -> 
     if not task_id:
         return None
     root = resolve_path(output_root, base=REPO_ROOT) if output_root else baseline_output_root
-    return root / task_id / "manifest.json"
+    path = root / task_id / "manifest.json"
+    if path.exists():
+        return path
+    truncated = task_id[:96].strip("._") or task_id
+    if truncated != task_id:
+        fallback = root / truncated / "manifest.json"
+        if fallback.exists():
+            return fallback
+    return path
 
 
 def load_paper_runs(results_path: Path, *, baseline_output_root: Path) -> list[PaperRun]:
@@ -333,12 +341,10 @@ def experiment_manifests(results_path: Path) -> dict[str, dict[str, Any]]:
     by_title: dict[str, dict[str, Any]] = {}
     for record in read_jsonl(results_path):
         command = record.get("command") or []
-        task_id = command_value(command, "--task-id")
-        output_root = command_value(command, "--output-root")
         title = str((record.get("row") or {}).get("paper_title") or command_value(command, "--paper-title") or "").strip()
-        if not task_id or not output_root or not title:
+        if not title:
             continue
-        manifest_path = resolve_path(output_root) / task_id / "manifest.json"
+        manifest_path = result_manifest_path(record, REPO_ROOT / "_private" / "local_analysis_runs")
         if manifest_path.exists():
             by_title[title_key(title)] = json.loads(manifest_path.read_text(encoding="utf-8"))
     return by_title
@@ -433,6 +439,21 @@ def aggregate(label: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def experiment_label(rows: list[dict[str, Any]]) -> str:
+    modes = {str(row.get("main_context_mode") or "").strip() for row in rows}
+    chars = {row.get("main_context_chars") for row in rows}
+    modes.discard("")
+    chars.discard(None)
+    if len(modes) == 1 and len(chars) == 1:
+        mode = next(iter(modes))
+        char_value = next(iter(chars))
+        try:
+            return f"{mode}{int(char_value) // 1000}k_main_context"
+        except (TypeError, ValueError):
+            return f"{mode}_main_context"
+    return "experiment"
+
+
 def summarize(sample_json: Path, experiment_results: Path | None, out_dir: Path, report_name: str) -> None:
     items = load_selection(sample_json)
     experiment_by_title = experiment_manifests(experiment_results) if experiment_results else {}
@@ -454,7 +475,7 @@ def summarize(sample_json: Path, experiment_results: Path | None, out_dir: Path,
         "sample_json": sample_json.relative_to(REPO_ROOT).as_posix() if sample_json.is_relative_to(REPO_ROOT) else str(sample_json),
         "experiment_results": str(experiment_results) if experiment_results else "",
         "baseline": aggregate("baseline_v05", baseline_rows),
-        "experiment": aggregate("structured_main_context", experiment_rows) if experiment_rows else None,
+        "experiment": aggregate(experiment_label(experiment_rows), experiment_rows) if experiment_rows else None,
         "pairs": pair_rows,
         "thresholds": {
             "structure_complete_rate": 1.0,
@@ -681,4 +702,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

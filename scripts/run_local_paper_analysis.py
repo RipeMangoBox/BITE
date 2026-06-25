@@ -485,6 +485,24 @@ Rules:
 7. Motivate every placement in `reason`: which slot it fills and why it is
    essential evidence rather than decorative detail."""
 
+SECTION_WRITER_PROMPT_CONTRACT = """Fixed section writer contract for prompt-cache reuse.
+
+Task: write exactly one requested BITE note section from verified analysis and
+focused evidence. The variable section payload appears after this fixed
+contract.
+
+Use only supplied evidence. Output Markdown only for the requested section
+body, starting with `## <section title>`. Do not include images. Do not create
+`### 补充图表`."""
+
+FIGURE_PLACEMENT_PROMPT_CONTRACT = """Fixed figure-placement contract for prompt-cache reuse.
+
+Task: choose local MinerU figure/table images that directly support the note.
+The variable placement payload appears after this fixed contract.
+
+Return JSON only with a `placements` array. Respect the image budget and prefer
+motivation, method, and comparison evidence over decorative samples."""
+
 FIGURE_VISUAL_SUMMARY_SYSTEM = """You are BITE's local figure/table visual summarizer.
 
 Look at the supplied paper figure/table image and caption. Return JSON only:
@@ -985,6 +1003,25 @@ def is_appendix_figure_table_chunk(chunk_text: str) -> bool:
     caption_count = len(re.findall(r"\b(?:Figure|Table)\s+[0-9]+[A-Za-z]?\s*:", chunk_text, flags=re.IGNORECASE))
     image_count = chunk_text.count("![](")
     return ("appendix" in headings or re.search(r"\bb\.\d+", headings)) and caption_count >= 4 and image_count >= 4
+
+
+def is_low_value_citation_chunk(chunk_text: str) -> bool:
+    headings = chunk_section_role(chunk_text).lower()
+    if re.search(r"\b(references?|bibliography|acknowledg(?:e)?ments?)\b", headings):
+        return True
+
+    lines = [line.strip() for line in chunk_text.splitlines() if line.strip()]
+    if len(lines) < 8:
+        return False
+    citation_like = 0
+    for line in lines:
+        if re.match(r"^\[\d+\]\s+", line):
+            citation_like += 1
+        elif re.match(r"^\d+\.\s+[A-Z][A-Za-z-]+", line):
+            citation_like += 1
+        elif re.search(r"\b(19|20)\d{2}\b", line) and re.search(r"\b(doi|arxiv|proceedings|conference|journal|transactions|ACM|IEEE|CVPR|ICCV|ECCV|SIGGRAPH|NeurIPS|ICML|ICLR)\b", line, flags=re.IGNORECASE):
+            citation_like += 1
+    return citation_like / max(1, len(lines)) >= 0.7
 
 
 def source_sufficiency_report(markdown: str, *, page_count: int | None = None) -> dict[str, Any]:
@@ -6491,14 +6528,34 @@ async def run_part_analysis(
     if args.resume and out_path.exists() and not args.force:
         return json.loads(out_path.read_text(encoding="utf-8"))
 
-    prompt = part_prompt(chunk, title)
-    atomic_write_text(prompt_path, prompt)
+    low_value_local = is_low_value_citation_chunk(chunk.text)
+    appendix_local = is_appendix_figure_table_chunk(chunk.text)
+    prompt = "" if low_value_local else part_prompt(chunk, title)
+    if prompt:
+        atomic_write_text(prompt_path, prompt)
     started = time.monotonic()
     usage: dict[str, Any] = {}
     if args.mock_llm:
         parsed = mock_json("part", part_id=part_id)
         raw = json.dumps(parsed, ensure_ascii=False)
-    elif is_appendix_figure_table_chunk(chunk.text):
+    elif low_value_local:
+        parsed = local_anchor_part_analysis(part_id, chunk.text)
+        parsed["method_evidence"] = []
+        parsed["experiment_evidence"] = []
+        parsed["formula_evidence"] = []
+        parsed["figure_table_roles"] = []
+        raw = json.dumps(parsed, ensure_ascii=False)
+        usage = {
+            "provider": "local",
+            "model": "deterministic_low_value_chunk_anchor_extractor",
+            "prompt_tokens_est": 0,
+            "completion_tokens_est": estimate_tokens(raw),
+            "total_tokens_est": estimate_tokens(raw),
+            "estimated_cost_usd": 0.0,
+            "cost_basis": "local_reference_acknowledgement_citation_anchor_extraction",
+            "local_low_value_chunk": True,
+        }
+    elif appendix_local:
         parsed = local_anchor_part_analysis(part_id, chunk.text)
         raw = json.dumps(parsed, ensure_ascii=False)
         usage = {
@@ -6623,7 +6680,7 @@ async def run_part_analysis(
     }
     if args.mock_llm:
         atomic_write_text(raw_path, raw)
-    elif is_appendix_figure_table_chunk(chunk.text):
+    elif low_value_local or appendix_local:
         atomic_write_text(raw_path, raw)
     atomic_write_json(out_path, parsed)
     append_jsonl(progress_path, {"event": "part_analysis_done", "part_id": part_id, "at": now_iso(), "usage": usage})
@@ -6995,7 +7052,11 @@ def build_section_prompt(
         "section_title": section_title,
         "section_goal": section_goal,
     }
-    return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
+    return (
+        f"{SECTION_WRITER_PROMPT_CONTRACT}\n\n"
+        "=== VARIABLE SECTION PAYLOAD ===\n"
+        f"{json.dumps(prompt_obj, ensure_ascii=False, indent=2)}"
+    )
 
 
 def build_figure_placement_prompt(
@@ -7011,7 +7072,11 @@ def build_figure_placement_prompt(
         "report_excerpt": compact_text(normalize_report_markdown(report), max_len=12000),
         "figure_table_candidates": placement_candidates(figures_tables),
     }
-    return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
+    return (
+        f"{FIGURE_PLACEMENT_PROMPT_CONTRACT}\n\n"
+        "=== VARIABLE FIGURE PLACEMENT PAYLOAD ===\n"
+        f"{json.dumps(prompt_obj, ensure_ascii=False, indent=2)}"
+    )
 
 
 async def run_figure_placement(
@@ -7764,7 +7829,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mineru-batch-id", default="", help="Optional batch id under --mineru-output-root")
     parser.add_argument("--require-existing-mineru-output", action="store_true", help="Fail instead of running MinerU when --pdf has no cached MinerU output")
     parser.add_argument("--chunk-chars", type=int, default=8_000)
-    parser.add_argument("--overlap-chars", type=int, default=800)
+    parser.add_argument("--overlap-chars", type=int, default=350)
     parser.add_argument("--part-workers", type=int, default=2)
     parser.add_argument("--section-workers", type=int, default=1, help="Concurrent section writers. Default 1 preserves prefix-cache reuse; raise only for latency/cost A/B tests.")
     parser.add_argument(
