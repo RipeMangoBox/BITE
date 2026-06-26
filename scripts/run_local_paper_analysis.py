@@ -5582,8 +5582,29 @@ def validate_vault_note(
         "no_legacy_venue_topic_tags": not legacy_venue_topic_tags,
         "note_length_ok": len(note.strip()) >= 1000,
     }
+    fatal_check_names = {
+        "frontmatter_valid",
+        "openreview_forum_id_present",
+        "required_sections_present",
+        "pdf_embed_present",
+        "core_pipeline_images_present",
+        "no_legacy_markdown_image_links",
+        "no_pdf_file_label",
+        "no_table_cell_aliased_wikilinks",
+        "no_fallback_metadata_markers",
+        "no_dangling_numeric_refs",
+        "no_incomplete_effect_callout",
+        "no_multi_label_image_captions",
+        "no_unescaped_lt_in_image_captions",
+        "venue_year_tag_present",
+        "no_legacy_venue_topic_tags",
+        "note_length_ok",
+    }
+    fatal_ok = all(checks[name] for name in fatal_check_names)
     return {
         "ok": all(checks.values()),
+        "fatal_ok": fatal_ok,
+        "nonfatal_checks": ["image_embeds_present", "referenced_image_embeds_present"],
         "checks": checks,
         "note_chars": len(note),
         "missing_frontmatter": missing_frontmatter,
@@ -5806,7 +5827,7 @@ def export_to_vault(
         "validation": validation,
     }
     atomic_write_json(work_dir / "report" / "vault_export.json", export_info)
-    if not validation.get("ok"):
+    if not validation.get("fatal_ok", validation.get("ok")):
         raise RuntimeError(f"vault note validation failed: {validation}")
     return export_info
 

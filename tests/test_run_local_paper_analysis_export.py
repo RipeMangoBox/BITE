@@ -328,6 +328,51 @@ openreview_forum_id: abc123
     assert validation["dangling_numeric_refs"] == []
 
 
+def test_validate_vault_note_missing_selected_image_is_nonfatal():
+    sections = "\n\n".join(
+        f"## {title}\n\n" + ("Enough content. " * 20)
+        for title, _ in runner.SECTION_SPECS
+    )
+    note = f"""---
+title: Paper One
+type: paper
+paper_level: A
+venue: ICLR
+year: 2026
+pdf_ref: paperPDFs/ICLR_2026/Paper_One.pdf
+project_link:
+code_link:
+tags:
+- ICLR_2026
+core_operator: operator
+primary_logic: logic
+claims:
+- claim
+---
+
+# Paper One
+
+{sections}
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/Paper_One.pdf]]
+"""
+
+    validation = runner.validate_vault_note(
+        note,
+        pdf_ref="paperPDFs/ICLR_2026/Paper_One.pdf",
+        copied_figures=[{"item_id": "fig1", "note_image_path": "assets/figures/papers/paper1/figures/fig1.png"}],
+        figure_placements=[{"item_id": "fig1", "section": "实验与分析"}],
+        max_images=12,
+    )
+
+    assert validation["checks"]["image_embeds_present"] is False
+    assert validation["ok"] is False
+    assert validation["fatal_ok"] is True
+    assert "image_embeds_present" in validation["nonfatal_checks"]
+
+
 def test_parser_defaults_do_not_enable_kimi_or_figure_llm():
     parser = runner.build_parser()
     args = parser.parse_args(["--source-md", "paper.md"])
