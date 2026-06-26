@@ -3000,20 +3000,26 @@ def source_preserving_cluster_records(
         source_path = str(item.get("source_path") or "")
         if source_path and source_path not in source_paths:
             source_paths.append(source_path)
-    raw_items = [
-        {
+    raw_items = []
+    for item in cluster_items:
+        raw_item = {
             "type": str(item.get("item_type") or ""),
             "page": item.get("page"),
             "bbox": [round(value, 3) for value in item["bbox"]] if item.get("bbox") is not None else None,
             "caption": str(item.get("caption") or ""),
             "label": str(item.get("explicit_label") or ""),
             "source_path": str(item.get("source_path") or ""),
-            "extra_captions": item.get("extra_captions") or [],
-            "unassigned_extra_captions": item.get("unassigned_extra_captions") or [],
-            "caption_repair": str(item.get("caption_repair") or ""),
         }
-        for item in cluster_items
-    ]
+        extra_captions = item.get("extra_captions") or []
+        unassigned_extra_captions = item.get("unassigned_extra_captions") or []
+        caption_repair = str(item.get("caption_repair") or "")
+        if extra_captions:
+            raw_item["extra_captions"] = extra_captions
+        if unassigned_extra_captions:
+            raw_item["unassigned_extra_captions"] = unassigned_extra_captions
+        if caption_repair:
+            raw_item["caption_repair"] = caption_repair
+        raw_items.append(raw_item)
     cluster_bbox = bbox_union(cluster_items)
     shared = {
         "source_paths": source_paths,
@@ -4205,7 +4211,7 @@ EXPERIMENT_FIGURE_PATTERN = re.compile(
     flags=re.IGNORECASE,
 )
 
-ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"核心方法与创新机理", "实验与关键发现"}
+ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"核心方法与创新机理", "实验与关键发现", "实验与分析"}
 
 
 def placement_text(item: dict[str, Any]) -> str:
@@ -4244,7 +4250,7 @@ def figure_slot_budgets(max_images: int) -> dict[str, int]:
     if max_images >= 6:
         return {"motivation": 1, "method": 2, "comparison": max_images - 3}
     if max_images >= 3:
-        return {"motivation": 1, "method": 1, "comparison": max_images - 2}
+        return {"motivation": 1, "method": 1, "comparison": max_images - 1}
     return {"motivation": 0, "method": 1, "comparison": max(0, max_images - 1)}
 
 
@@ -4343,7 +4349,7 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
             add_placement(
                 item,
                 slot="comparison",
-                section="实验与关键发现",
+                section="实验与分析",
                 reason="complete result or comparison crop from MinerU PDF recrop",
             )
 
@@ -4381,7 +4387,7 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
         add_placement(
             item,
             slot="comparison",
-            section="实验与关键发现",
+            section="实验与分析",
             reason="caption indicates a table or result plot",
         )
     return placements[:max_images]
@@ -7869,11 +7875,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--figure-provider",
         choices=["none", "deepseek", "openai", "kimi"],
-        default="deepseek",
+        default="none",
         help=(
-            "Figure/table placement LLM. Default deepseek uses caption-only visual "
-            "summaries plus DeepSeek placement; openai/kimi also run image visual summaries; "
-            "none uses caption/placement fallback."
+            "Figure/table placement LLM. Default none uses caption/placement fallback; "
+            "deepseek uses caption-only visual summaries plus DeepSeek placement; "
+            "openai/kimi also run image visual summaries."
         ),
     )
     parser.add_argument("--figure-model", default="")
