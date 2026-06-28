@@ -232,6 +232,27 @@ def test_pdf_first_page_links_are_ignored_when_source_link_exists(tmp_path):
     assert links == [{"label": "Project", "url": "https://canonical.github.io/project", "trusted": True}]
 
 
+def test_source_link_filters_paper_urls_from_project_and_code_candidates():
+    args = SimpleNamespace(
+        source_link=[
+            "https://arxiv.org/abs/2305.04451",
+            "https://openreview.net/forum?id=abc123",
+            "https://example.github.io/project",
+            "https://github.com/org/repo",
+        ],
+        paper_link="https://arxiv.org/abs/2305.04451",
+        paper_pdf="",
+        pdf="",
+    )
+
+    links = runner.trusted_source_links_from_args(args)
+
+    assert links == [
+        {"label": "Project", "url": "https://example.github.io/project", "trusted": True},
+        {"label": "Code", "url": "https://github.com/org/repo", "trusted": True},
+    ]
+
+
 def test_title_source_mismatch_raises():
     with pytest.raises(RuntimeError, match="Paper title/source mismatch"):
         runner.assert_title_matches_source(
@@ -293,15 +314,14 @@ def test_render_info_table_uses_paper_not_arxiv_label():
     assert "[Project](https://example.github.io/project)" in table
 
 
-def test_structured_main_context_keeps_key_spans_and_skips_references():
+def test_structured_main_context_filters_noise_without_section_remapping():
     markdown = "\n\n".join([
         "# Paper",
-        "Abstract. " + "abstract signal. " * 200,
-        "## 1 Introduction\n" + "intro motivation. " * 250,
-        "## 2 Related Work\n" + "related citation. " * 300,
-        "## 3 Method\n" + "method pipeline unique mechanism. " * 260,
-        "## 4 Experiments\n" + "experiment table metric ablation. " * 260,
-        "## 5 Conclusion\n" + "conclusion limitation boundary. " * 180,
+        "Abstract. " + "abstract signal. " * 80,
+        "## 1 Introduction\n" + "intro motivation. " * 120,
+        "## 2 Method\n" + "method pipeline unique mechanism. " * 120,
+        "## 3 Experiments\n" + "experiment table metric ablation. " * 120,
+        "## 4 Conclusion\n" + "conclusion limitation boundary. " * 80,
         "## Acknowledgments\n" + "grant agency. " * 200,
         "## References\n" + "reference item. " * 500,
     ])
@@ -309,10 +329,12 @@ def test_structured_main_context_keeps_key_spans_and_skips_references():
     context = runner.main_paper_context(markdown, max_chars=12_000, mode="structured")
 
     assert len(context) <= 12_000
-    assert "Section Headings" in context
     assert "method pipeline unique mechanism" in context
     assert "experiment table metric ablation" in context
     assert "conclusion limitation boundary" in context
+    assert "Section Headings" not in context
+    assert "Method/Implementation Key Span" not in context
+    assert context.index("method pipeline unique mechanism") < context.index("experiment table metric ablation")
     assert "grant agency" not in context
     assert "reference item" not in context
 
@@ -335,6 +357,25 @@ def test_structured_main_context_filters_references_even_under_budget():
     assert "reference item" not in context
 
 
+def test_analysis_markdown_input_filters_noise_and_preserves_body_order():
+    markdown = "\n\n".join([
+        "# Paper",
+        "Abstract text.",
+        "## Method\nmethod first.",
+        "## References\nreference only.",
+        "## Experiments\nexperiment second.",
+        "## Appendix\nappendix details.",
+    ])
+
+    filtered = runner.analysis_markdown_input(markdown)
+
+    assert "method first" in filtered
+    assert "experiment second" in filtered
+    assert filtered.index("method first") < filtered.index("experiment second")
+    assert "reference only" not in filtered
+    assert "appendix details" not in filtered
+
+
 def test_compact_main_context_preserves_existing_head_tail_behavior():
     markdown = "A" * 20_000 + "\nMIDDLE\n" + "Z" * 20_000
 
@@ -345,7 +386,7 @@ def test_compact_main_context_preserves_existing_head_tail_behavior():
     assert "middle omitted in main merge prompt" in context
 
 
-def test_adaptive_budget_does_not_raise_structured_main_context():
+def test_adaptive_budget_does_not_raise_main_context_or_tokens():
     args = _args(
         Path("/tmp"),
         adaptive_tokens=True,
@@ -360,7 +401,7 @@ def test_adaptive_budget_does_not_raise_structured_main_context():
         adaptive_extreme_main_max_tokens=16384,
         adaptive_long_main_context_chars=54_000,
         part_max_tokens=16384,
-        main_max_tokens=16384,
+        main_max_tokens=8192,
         writer_max_tokens=8192,
         main_context_chars=18_000,
         main_context_mode="structured",
@@ -374,6 +415,7 @@ def test_adaptive_budget_does_not_raise_structured_main_context():
     )
 
     assert budget["profile"] == "extreme"
+    assert budget["after"]["main_max_tokens"] == 8192
     assert budget["after"]["main_context_chars"] == 18_000
     assert budget["after"]["main_context_mode"] == "structured"
 
@@ -499,6 +541,24 @@ claims:
     assert "image_embeds_present" in validation["nonfatal_checks"]
 
 
+def test_legacy_experiment_section_alias_injects_into_key_findings():
+    copied = [
+        {
+            "item_id": "fig1",
+            "note_image_path": "assets/figures/papers/paper1/figures/fig1.png",
+        }
+    ]
+
+    items = runner.figure_items_for_note(
+        copied,
+        max_images=1,
+        placements=[{"item_id": "fig1", "section": "实验与分析"}],
+    )
+
+    assert "实验与分析" not in items
+    assert items["实验与关键发现"][0]["item_id"] == "fig1"
+
+
 def test_validate_vault_note_does_not_fail_for_unembedded_referenced_figure():
     sections = "\n\n".join(
         f"## {title}\n\nFigure 2 shows extra qualitative details. " + ("Enough content. " * 20)
@@ -562,6 +622,59 @@ claims:
     assert validation["ok"] is True
 
 
+def test_validate_vault_note_missing_experiment_slot_is_nonfatal():
+    sections = "\n\n".join(
+        f"## {title}\n\n" + ("Enough content. " * 20)
+        for title, _ in runner.SECTION_SPECS
+    )
+    note = f"""---
+title: Paper One
+type: paper
+paper_level: A
+venue: SIGGRAPH
+year: 2023
+pdf_ref: paperPDFs/SIGGRAPH_2023/Paper_One.pdf
+project_link:
+code_link:
+tags:
+- SIGGRAPH_2023
+core_operator: operator
+primary_logic: logic
+claims:
+- claim
+---
+
+# Paper One
+
+{sections}
+
+## 原文 PDF
+
+![[paperPDFs/SIGGRAPH_2023/Paper_One.pdf]]
+"""
+
+    validation = runner.validate_vault_note(
+        note,
+        pdf_ref="paperPDFs/SIGGRAPH_2023/Paper_One.pdf",
+        copied_figures=[
+            {
+                "item_id": "tab1",
+                "type": "table",
+                "label": "Table 1",
+                "caption": "Quantitative comparison benchmark results",
+                "note_image_path": "assets/figures/papers/paper1/figures/table1.png",
+            },
+        ],
+        figure_placements=[],
+        max_images=6,
+    )
+
+    assert validation["checks"]["figure_slot_coverage_present"] is False
+    assert validation["ok"] is False
+    assert validation["fatal_ok"] is True
+    assert "figure_slot_coverage_present" in validation["nonfatal_checks"]
+
+
 def test_parser_defaults_do_not_enable_kimi_or_figure_llm():
     parser = runner.build_parser()
     args = parser.parse_args(["--source-md", "paper.md"])
@@ -571,6 +684,7 @@ def test_parser_defaults_do_not_enable_kimi_or_figure_llm():
     assert args.figure_provider == "none"
     assert args.main_context_chars == 36_000
     assert args.main_context_mode == "structured"
+    assert args.main_length_retry_max_tokens == 0
     assert args.overlap_chars == 350
 
 
@@ -587,6 +701,56 @@ def test_low_value_reference_chunk_uses_local_anchor_extractor():
     ])
 
     assert runner.is_low_value_citation_chunk(chunk)
+
+
+def test_siggraph_topic_fallback_uses_graphics_topics_before_generic_benchmark():
+    analysis = _analysis()
+    analysis["method"] = {"proposed_method_name": "Progressive volumetric mapping"}
+    analysis["analysis_truth"] = {
+        "core_insight": "The method optimizes a mesh frame field and volumetric mapping with quantitative evaluation.",
+        "causal_knob": "mesh frame field",
+        "real_bottleneck": "geometry processing",
+    }
+    analysis["experiments"] = {"main_results": [{"benchmark": "evaluation"}]}
+
+    topic_text = runner.analysis_topic_fallback_text(
+        "Expansion Cones: A Progressive Volumetric Mapping Framework",
+        analysis,
+        "SIGGRAPH_2023",
+    )
+
+    assert "#topic/graphics_geometry_processing" in topic_text
+    assert "#topic/other_unclear" not in topic_text
+
+
+def test_siggraph_topic_fallback_covers_procedural_plant_modeling():
+    analysis = _analysis()
+    analysis["method"] = {"proposed_method_name": "Hierarchical plant graph"}
+    analysis["analysis_truth"] = {
+        "core_insight": "A procedural plant growth model coordinates roots and shoots.",
+        "causal_knob": "root shoot growth signal",
+        "real_bottleneck": "tree procedural modeling",
+    }
+
+    topic_text = runner.analysis_topic_fallback_text(
+        "Rhizomorph: The Coordinated Function of Shoots and Roots",
+        analysis,
+        "SIGGRAPH_2023",
+    )
+
+    assert "#topic/graphics_procedural_modeling" in topic_text
+    assert "#topic/other_unclear" not in topic_text
+
+
+def test_source_sufficiency_gate_marks_short_project_page_needs_fulltext():
+    report = runner.source_sufficiency_report(
+        "# Project page\n\nAbstract only. Supplementary video and project page. " * 20,
+        page_count=1,
+    )
+
+    assert report["needs_fulltext"] is True
+    assert report["status"] == "needs_fulltext"
+    assert "page_count_too_low" in report["reasons"]
 
 
 def test_resolve_figure_llm_config_uses_gpt_env(monkeypatch):
@@ -914,7 +1078,7 @@ def test_fallback_figure_placements_prioritizes_full_region_clusters():
     placements = runner.fallback_figure_placements(figures_tables, max_images=3)
 
     assert [item["item_id"] for item in placements[:2]] == ["full_region_1", "full_region_2"]
-    assert all(item["section"] == "实验与分析" for item in placements[:2])
+    assert all(item["section"] == "实验与关键发现" for item in placements[:2])
 
 
 def test_image_block_wraps_unwrapped_caption_latex_only():
@@ -970,7 +1134,7 @@ def test_ensure_referenced_figure_placements_keeps_explicit_sample_figure():
     )
 
     assert [item["item_id"] for item in placements] == ["fig2", "fig1"]
-    assert placements[1]["section"] == "实验与分析"
+    assert placements[1]["section"] == "实验与关键发现"
 
 
 def test_extract_figures_tables_does_not_invent_numbered_labels_from_empty_subcaptions(tmp_path):

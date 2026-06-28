@@ -1739,15 +1739,9 @@ def apply_adaptive_token_budget(
     if args.adaptive_tokens and extreme_doc:
         profile = "extreme"
         args.part_max_tokens = max(args.part_max_tokens, args.adaptive_long_part_max_tokens)
-        args.main_max_tokens = max(args.main_max_tokens, args.adaptive_extreme_main_max_tokens)
-        if args.main_context_mode != "structured":
-            args.main_context_chars = max(args.main_context_chars, args.adaptive_long_main_context_chars)
     elif args.adaptive_tokens and long_doc:
         profile = "long"
         args.part_max_tokens = max(args.part_max_tokens, args.adaptive_long_part_max_tokens)
-        args.main_max_tokens = max(args.main_max_tokens, args.adaptive_long_main_max_tokens)
-        if args.main_context_mode != "structured":
-            args.main_context_chars = max(args.main_context_chars, args.adaptive_long_main_context_chars)
     after = {
         "part_max_tokens": args.part_max_tokens,
         "main_max_tokens": args.main_max_tokens,
@@ -3195,14 +3189,18 @@ def normalize_extracted_url(url: str) -> str:
 def classify_link(label: str, url: str) -> str:
     label_l = label.lower()
     url_l = url.lower()
+    if "arxiv" in label_l or "arxiv.org" in url_l:
+        return "arXiv"
+    if re.search(r"/(?:abs|pdf)/\d{4}\.\d{4,5}", url_l):
+        return "arXiv"
+    if "openreview.net/forum" in url_l or "doi.org/" in url_l:
+        return "Paper"
     if "github.io" in url_l:
         return "Project"
     if "code" in label_l or "github" in label_l or "github.com" in url_l or "gitlab" in url_l:
         return "Code"
     if "project" in label_l or "project" in url_l:
         return "Project"
-    if "arxiv" in label_l or "arxiv.org" in url_l:
-        return "arXiv"
     return ""
 
 
@@ -3582,6 +3580,113 @@ def analysis_topic_fallback_text(title: str, analysis: dict[str, Any], conf_year
         ]
     ).lower()
     rules: list[tuple[str, tuple[str, ...]]] = [
+        (
+            "topic/graphics_geometry_processing",
+            (
+                "mesh",
+                "meshing",
+                "surface",
+                "geometry",
+                "geometric",
+                "point cloud",
+                "frame field",
+                "t-mesh",
+                "volumetric mapping",
+                "shape editing",
+                "normal orientation",
+                "parameterization",
+                "quantization",
+            ),
+        ),
+        (
+            "topic/graphics_rendering_materials",
+            (
+                "rendering",
+                "radiance",
+                "brdf",
+                "btf",
+                "material",
+                "texture",
+                "relighting",
+                "global illumination",
+                "prefiltering",
+                "view synthesis",
+                "nerf",
+                "neural radiance",
+                "gaussian splatting",
+            ),
+        ),
+        (
+            "topic/graphics_physical_simulation",
+            (
+                "simulation",
+                "fluid",
+                "water",
+                "bubble",
+                "elastodynamic",
+                "contact",
+                "skinning eigenmodes",
+                "complementary dynamics",
+                "cohomology",
+                "shallow water",
+                "viscous",
+                "stokes",
+                "sound synthesis",
+            ),
+        ),
+        (
+            "topic/graphics_fabrication_design",
+            (
+                "fabrication",
+                "3d printing",
+                "printing",
+                "printable",
+                "knit",
+                "infill",
+                "masonry",
+                "shell structure",
+                "mesostructure",
+                "foldable circuit",
+                "appearance fabrication",
+            ),
+        ),
+        (
+            "topic/graphics_procedural_modeling",
+            (
+                "procedural",
+                "grammar",
+                "l-system",
+                "l systems",
+                "plant",
+                "tree",
+                "root",
+                "shoot",
+                "botanical",
+                "growth",
+                "developmental model",
+                "ecosystem",
+                "urban",
+                "terrain",
+            ),
+        ),
+        (
+            "topic/graphics_animation_interaction",
+            (
+                "animation",
+                "rigging",
+                "retargeting",
+                "avatar",
+                "crowd simulation",
+                "character",
+                "motion transition",
+                "human-scene",
+                "physically interact",
+                "sketching",
+                "interactive",
+                "interaction",
+                "facial",
+            ),
+        ),
         (
             "topic/vision_multimodal_applications",
             (
@@ -4344,7 +4449,19 @@ EXPERIMENT_FIGURE_PATTERN = re.compile(
     flags=re.IGNORECASE,
 )
 
-ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"核心方法与创新机理", "实验与关键发现", "实验与分析"}
+ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"核心方法与创新机理", "实验与关键发现"}
+
+
+def canonical_figure_section(section: str) -> str:
+    legacy_sections = {
+        "实验与分析": "实验与关键发现",
+        "Experiments and Analysis": "实验与关键发现",
+        "Experiments and Key Findings": "实验与关键发现",
+        "整体框架": "核心方法与创新机理",
+        "核心模块与公式推导": "核心方法与创新机理",
+    }
+    normalized = legacy_sections.get(str(section or "").strip(), str(section or "").strip())
+    return normalized if normalized in ALLOWED_FIGURE_PLACEMENT_SECTIONS else "实验与关键发现"
 
 
 def placement_text(item: dict[str, Any]) -> str:
@@ -4517,7 +4634,7 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
             add_placement(
                 item,
                 slot="comparison",
-                section="实验与分析",
+                section="实验与关键发现",
                 reason="complete result or comparison crop from MinerU PDF recrop",
             )
 
@@ -4555,7 +4672,7 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
         add_placement(
             item,
             slot="comparison",
-            section="实验与分析",
+            section="实验与关键发现",
             reason="caption indicates a table or result plot",
         )
     return placements[:max_images]
@@ -4580,7 +4697,7 @@ def normalize_figure_placements(
         if not isinstance(item, dict):
             continue
         item_id = str(item.get("item_id") or "")
-        section = str(item.get("section") or "")
+        section = canonical_figure_section(str(item.get("section") or ""))
         if item_id not in valid_ids or item_id in used or section not in ALLOWED_FIGURE_PLACEMENT_SECTIONS:
             continue
         slot = figure_placement_slot(candidates_by_id[item_id], section=section)
@@ -5144,9 +5261,7 @@ def figure_items_for_note(
         item_id = str(placement.get("item_id") or "")
         if item_id in used or item_id not in by_id:
             continue
-        section = str(placement.get("section") or "")
-        if section not in ALLOWED_FIGURE_PLACEMENT_SECTIONS:
-            section = "实验与关键发现"
+        section = canonical_figure_section(str(placement.get("section") or ""))
         items_by_section.setdefault(section, []).append(by_id[item_id])
         used.add(item_id)
         if len(used) >= max_images:
@@ -5755,7 +5870,6 @@ def validate_vault_note(
         "required_sections_present",
         "pdf_embed_present",
         "core_pipeline_images_present",
-        "figure_slot_coverage_present",
         "no_legacy_markdown_image_links",
         "no_pdf_file_label",
         "no_table_cell_aliased_wikilinks",
@@ -5772,7 +5886,7 @@ def validate_vault_note(
     return {
         "ok": all(checks.values()),
         "fatal_ok": fatal_ok,
-        "nonfatal_checks": ["image_embeds_present", "referenced_image_embeds_present"],
+        "nonfatal_checks": ["image_embeds_present", "referenced_image_embeds_present", "figure_slot_coverage_present"],
         "checks": checks,
         "figure_slot_quality": slot_quality,
         "note_chars": len(note),
@@ -6925,11 +7039,13 @@ def compact_paper_context(markdown: str, *, max_chars: int) -> str:
     markdown = markdown.strip()
     if len(markdown) <= max_chars:
         return markdown
-    head = max_chars * 2 // 3
-    tail = max_chars - head
+    marker = "\n\n[... middle omitted in main merge prompt; see parse/full.md and part analyses ...]\n\n"
+    budget = max(0, max_chars - len(marker))
+    head = budget * 2 // 3
+    tail = budget - head
     return (
         markdown[:head]
-        + "\n\n[... middle omitted in main merge prompt; see parse/full.md and part analyses ...]\n\n"
+        + marker
         + markdown[-tail:]
     )
 
@@ -6938,14 +7054,6 @@ SECTION_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", flags=re.MULTILINE)
 MAIN_CONTEXT_EXCLUDE_HEADING_RE = re.compile(
     r"(?i)\b(references?|bibliography|acknowledg(?:e)?ments?|appendix|supplementary)\b"
 )
-MAIN_CONTEXT_KEY_HEADING_RE = re.compile(
-    r"(?i)\b("
-    r"abstracts?|introductions?|overviews?|methods?|approaches?|frameworks?|models?|formulations?|"
-    r"implementations?|algorithms?|training|inference|experiments?|evaluations?|results?|"
-    r"comparisons?|ablations?|discussions?|conclusions?|limitations?|future work"
-    r")\b"
-)
-
 
 def normalize_context_heading(value: str) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()
@@ -6975,50 +7083,18 @@ def split_markdown_sections(markdown: str) -> list[dict[str, Any]]:
     return sections
 
 
-def context_headings_outline(sections: list[dict[str, Any]], *, max_chars: int) -> str:
-    lines: list[str] = []
-    for section in sections:
-        heading = normalize_context_heading(str(section.get("heading") or ""))
-        if not heading or heading == "PREAMBLE":
-            continue
-        level = int(section.get("level") or 2)
-        indent = "  " * max(0, min(level, 6) - 1)
-        lines.append(f"{indent}- {heading}")
-    outline = "\n".join(lines)
-    if len(outline) <= max_chars:
-        return outline
-    return outline[: max(0, max_chars - 4)].rstrip() + "\n..."
-
-
-def append_context_segment(
-    segments: list[str],
-    seen: set[tuple[int, int]],
-    section: dict[str, Any],
-    *,
-    label: str,
-    char_limit: int,
-) -> int:
-    if char_limit <= 0:
-        return 0
-    key = (int(section.get("start") or 0), int(section.get("end") or 0))
-    if key in seen:
-        return 0
-    text = str(section.get("text") or "").strip()
-    if not text:
-        return 0
-    excerpt = text if len(text) <= char_limit else text[:char_limit].rstrip() + "\n[... section truncated ...]"
-    heading = normalize_context_heading(str(section.get("heading") or label))
-    segments.append(f"## {label}: {heading}\n{excerpt}")
-    seen.add(key)
-    return len(segments[-1])
-
-
 def compact_structured_paper_context(markdown: str, *, max_chars: int) -> str:
     markdown = markdown.strip()
     if not markdown:
         return markdown
 
-    target_chars = max(12_000, max_chars)
+    return compact_paper_context(analysis_markdown_input(markdown), max_chars=max_chars)
+
+
+def analysis_markdown_input(markdown: str) -> str:
+    markdown = (markdown or "").strip()
+    if not markdown:
+        return markdown
     sections = split_markdown_sections(markdown)
     content_sections = [
         section
@@ -7026,73 +7102,8 @@ def compact_structured_paper_context(markdown: str, *, max_chars: int) -> str:
         if not MAIN_CONTEXT_EXCLUDE_HEADING_RE.search(str(section.get("heading") or ""))
     ]
     if not content_sections:
-        return compact_paper_context(markdown, max_chars=max_chars)
-    filtered_markdown = "\n\n".join(str(section.get("text") or "").strip() for section in content_sections).strip()
-    if len(filtered_markdown) <= target_chars:
-        return filtered_markdown
-
-    segments: list[str] = []
-    seen: set[tuple[int, int]] = set()
-    used = 0
-
-    outline = context_headings_outline(content_sections, max_chars=3_000)
-    if outline:
-        segment = "## Section Headings\n" + outline
-        segments.append(segment)
-        used += len(segment)
-
-    front_budget = max(3_600, target_chars // 4)
-    for section in content_sections[:3]:
-        used += append_context_segment(
-            segments,
-            seen,
-            section,
-            label="Abstract/Introduction Span",
-            char_limit=max(1_600, front_budget // 2),
-        )
-        if used >= front_budget:
-            break
-
-    remaining = max(0, target_chars - used)
-    key_sections = [
-        section
-        for section in content_sections
-        if MAIN_CONTEXT_KEY_HEADING_RE.search(str(section.get("heading") or ""))
-    ]
-    for section in key_sections:
-        if used >= target_chars:
-            break
-        lower_heading = str(section.get("heading") or "").lower()
-        if any(word in lower_heading for word in ("experiment", "evaluation", "result", "comparison", "ablation")):
-            label = "Experiment/Result Key Span"
-        elif any(word in lower_heading for word in ("conclusion", "limitation", "future work", "discussion")):
-            label = "Conclusion/Limitation Key Span"
-        else:
-            label = "Method/Implementation Key Span"
-        per_section = max(1_400, min(3_000, remaining // max(1, len(key_sections))))
-        used += append_context_segment(
-            segments,
-            seen,
-            section,
-            label=label,
-            char_limit=max(0, min(per_section, target_chars - used)),
-        )
-
-    if used < target_chars:
-        for section in reversed(content_sections):
-            used += append_context_segment(
-                segments,
-                seen,
-                section,
-                label="Tail Non-reference Span",
-                char_limit=max(0, min(1_800, target_chars - used)),
-            )
-            break
-
-    context = "\n\n".join(segment for segment in segments if segment.strip()).strip()
-    if len(context) <= target_chars:
-        return context
-    return context[: max(0, target_chars - 4)].rstrip() + "\n..."
+        return markdown
+    return "\n\n".join(str(section.get("text") or "").strip() for section in content_sections).strip()
 
 
 def main_paper_context(markdown: str, *, max_chars: int, mode: str) -> str:
@@ -7593,14 +7604,15 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         try:
             parse_info = prepare_parse(args, work_dir)
             markdown = (work_dir / "parse" / "full.md").read_text(encoding="utf-8")
+            analysis_markdown = analysis_markdown_input(markdown)
             title = resolved_title(args, markdown, fallback=task_id)
-            chunks = split_markdown(markdown, max_chars=args.chunk_chars, overlap_chars=args.overlap_chars)
+            chunks = split_markdown(analysis_markdown, max_chars=args.chunk_chars, overlap_chars=args.overlap_chars)
             if not chunks:
                 raise RuntimeError("no chunks produced from markdown")
             page_count = page_count_from_content_list(work_dir / "parse" / "content_list.json")
             token_budget = apply_adaptive_token_budget(
                 args,
-                markdown_chars=len(markdown),
+                markdown_chars=len(analysis_markdown),
                 chunk_count=len(chunks),
                 page_count=page_count,
             )
@@ -7612,6 +7624,7 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 "event": "parse_done",
                 "at": now_iso(),
                 "markdown_chars": len(markdown),
+                "analysis_markdown_chars": len(analysis_markdown),
                 "chunk_count": len(chunks),
                 "parse_seconds": parse_info["duration_seconds"],
             })
@@ -8081,7 +8094,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--figure-temperature", type=float, default=0.1)
     parser.add_argument("--part-max-tokens", type=int, default=16384)
     parser.add_argument("--main-max-tokens", type=int, default=16384)
-    parser.add_argument("--main-length-retry-max-tokens", type=int, default=32768)
+    parser.add_argument("--main-length-retry-max-tokens", type=int, default=0)
     parser.add_argument("--main-length-retry-reasoning-effort", default="medium")
     parser.add_argument("--main-length-retry-thinking", choices=THINKING_CHOICES, default="enabled")
     parser.add_argument("--writer-max-tokens", type=int, default=8192)
