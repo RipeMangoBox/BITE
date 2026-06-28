@@ -185,6 +185,114 @@ def test_extract_source_links_finds_project_page_bare_url():
     assert links == [{"label": "Project", "url": "https://ripemangobox.github.io/ReactDance"}]
 
 
+@pytest.mark.skipif(fitz is None, reason="PyMuPDF not installed")
+def test_pdf_first_page_links_fill_project_and_code_when_no_source_link(tmp_path):
+    pdf = tmp_path / "paper.pdf"
+    doc = fitz.open()
+    page = doc.new_page()
+    page.insert_text(
+        (72, 72),
+        "Project page: https://example.github.io/project\nCode: https://github.com/org/repo\nReference: https://arxiv.org/abs/1234.5678",
+    )
+    doc.save(pdf)
+    doc.close()
+
+    args = SimpleNamespace(
+        source_link=[],
+        paper_link="https://arxiv.org/abs/1234.5678",
+        paper_pdf="",
+        pdf=str(pdf),
+    )
+
+    links = runner.trusted_source_links_from_args(args)
+
+    assert {"label": "Project", "url": "https://example.github.io/project", "trusted": True} in links
+    assert {"label": "Code", "url": "https://github.com/org/repo", "trusted": True} in links
+    assert all("arxiv.org" not in item["url"] for item in links)
+
+
+@pytest.mark.skipif(fitz is None, reason="PyMuPDF not installed")
+def test_pdf_first_page_links_are_ignored_when_source_link_exists(tmp_path):
+    pdf = tmp_path / "paper.pdf"
+    doc = fitz.open()
+    page = doc.new_page()
+    page.insert_text((72, 72), "Code: https://github.com/wrong/repo")
+    doc.save(pdf)
+    doc.close()
+
+    args = SimpleNamespace(
+        source_link=["https://canonical.github.io/project"],
+        paper_link="https://paper.example",
+        paper_pdf="",
+        pdf=str(pdf),
+    )
+
+    links = runner.trusted_source_links_from_args(args)
+
+    assert links == [{"label": "Project", "url": "https://canonical.github.io/project", "trusted": True}]
+
+
+def test_title_source_mismatch_raises():
+    with pytest.raises(RuntimeError, match="Paper title/source mismatch"):
+        runner.assert_title_matches_source(
+            expected_title="StyleGAN-XL: Scaling StyleGAN to Large Diverse Datasets",
+            source_label="bad.pdf",
+            candidates=["PROGRESSIVE GROWING OF GANS FOR IMPROVED QUALITY, STABILITY, AND VARIATION"],
+        )
+
+
+def test_title_source_token_overlap_accepts_minor_punctuation_drift():
+    result = runner.assert_title_matches_source(
+        expected_title="Time-multiplexed Neural Holography: A Flexible Framework for Holographic Near-eye Displays",
+        source_label="paper.pdf",
+        candidates=["Time multiplexed Neural Holography A Flexible Framework for Holographic Near eye Displays"],
+    )
+
+    assert result["ok"] is True
+
+
+def test_render_info_table_does_not_add_links_from_report_references():
+    analysis = _analysis(source_links=[
+        {"label": "Project", "url": "https://canonical.example/project"},
+    ])
+
+    table = runner.render_info_table(
+        title="Canonical",
+        conf_year="SIGGRAPH_2022",
+        openreview_forum_id="",
+        paper_link="https://paper.example/paper",
+        acceptance="",
+        analysis=analysis,
+        report="References\n[Code](https://github.com/wrong/reference-code)",
+        topic_text="#topic/other_unclear",
+    )
+
+    assert "[Project](https://canonical.example/project)" in table
+    assert "wrong/reference-code" not in table
+
+
+def test_render_info_table_uses_paper_not_arxiv_label():
+    analysis = _analysis(source_links=[
+        {"label": "arXiv", "url": "https://arxiv.org/abs/1234.5678"},
+        {"label": "Project", "url": "https://example.github.io/project"},
+    ])
+
+    table = runner.render_info_table(
+        title="Canonical",
+        conf_year="SIGGRAPH_2022",
+        openreview_forum_id="",
+        paper_link="https://arxiv.org/abs/1234.5678",
+        acceptance="",
+        analysis=analysis,
+        report="",
+        topic_text="#topic/other_unclear",
+    )
+
+    assert "[paper](https://arxiv.org/abs/1234.5678)" in table
+    assert "[arXiv](" not in table
+    assert "[Project](https://example.github.io/project)" in table
+
+
 def test_structured_main_context_keeps_key_spans_and_skips_references():
     markdown = "\n\n".join([
         "# Paper",
@@ -205,6 +313,24 @@ def test_structured_main_context_keeps_key_spans_and_skips_references():
     assert "method pipeline unique mechanism" in context
     assert "experiment table metric ablation" in context
     assert "conclusion limitation boundary" in context
+    assert "grant agency" not in context
+    assert "reference item" not in context
+
+
+def test_structured_main_context_filters_references_even_under_budget():
+    markdown = "\n\n".join([
+        "# Paper",
+        "Abstract. compact full-text paper.",
+        "## Method\nmethod pipeline unique mechanism.",
+        "## Experiments\nexperiment table metric ablation.",
+        "## Acknowledgments\ngrant agency.",
+        "## References\nreference item.",
+    ])
+
+    context = runner.main_paper_context(markdown, max_chars=36_000, mode="structured")
+
+    assert "method pipeline unique mechanism" in context
+    assert "experiment table metric ablation" in context
     assert "grant agency" not in context
     assert "reference item" not in context
 
@@ -373,6 +499,69 @@ claims:
     assert "image_embeds_present" in validation["nonfatal_checks"]
 
 
+def test_validate_vault_note_does_not_fail_for_unembedded_referenced_figure():
+    sections = "\n\n".join(
+        f"## {title}\n\nFigure 2 shows extra qualitative details. " + ("Enough content. " * 20)
+        for title, _ in runner.SECTION_SPECS
+    )
+    note = f"""---
+title: Paper One
+type: paper
+paper_level: A
+venue: ICLR
+year: 2026
+pdf_ref: paperPDFs/ICLR_2026/Paper_One.pdf
+project_link:
+code_link:
+tags:
+- ICLR_2026
+core_operator: operator
+primary_logic: logic
+claims:
+- claim
+---
+
+# Paper One
+
+{sections}
+
+![[assets/figures/papers/paper1/figures/fig1.png]]
+*Figure 1: Main benchmark comparison.*
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/Paper_One.pdf]]
+"""
+
+    validation = runner.validate_vault_note(
+        note,
+        pdf_ref="paperPDFs/ICLR_2026/Paper_One.pdf",
+        copied_figures=[
+            {
+                "item_id": "fig1",
+                "type": "figure",
+                "label": "Figure 1",
+                "caption": "Main benchmark comparison",
+                "note_image_path": "assets/figures/papers/paper1/figures/fig1.png",
+            },
+            {
+                "item_id": "fig2",
+                "type": "figure",
+                "label": "Figure 2",
+                "caption": "Extra qualitative examples",
+                "note_image_path": "assets/figures/papers/paper1/figures/fig2.png",
+            },
+        ],
+        figure_placements=[{"item_id": "fig1", "section": "实验与关键发现"}],
+        max_images=1,
+    )
+
+    assert validation["missing_referenced_images"]
+    assert validation["checks"]["referenced_image_embeds_present"] is True
+    assert validation["checks"]["figure_slot_coverage_present"] is True
+    assert validation["ok"] is True
+
+
 def test_parser_defaults_do_not_enable_kimi_or_figure_llm():
     parser = runner.build_parser()
     args = parser.parse_args(["--source-md", "paper.md"])
@@ -380,6 +569,24 @@ def test_parser_defaults_do_not_enable_kimi_or_figure_llm():
     assert args.kimi_repair is False
     assert args.kimi_check_repair is False
     assert args.figure_provider == "none"
+    assert args.main_context_chars == 36_000
+    assert args.main_context_mode == "structured"
+    assert args.overlap_chars == 350
+
+
+def test_low_value_reference_chunk_uses_local_anchor_extractor():
+    chunk = "\n".join([
+        "## References",
+        "[1] A. Author. Paper title. ACM SIGGRAPH, 2022.",
+        "[2] B. Author. Paper title. IEEE Transactions, 2021.",
+        "[3] C. Author. Paper title. CVPR, 2020.",
+        "[4] D. Author. Paper title. NeurIPS, 2019.",
+        "[5] E. Author. Paper title. ACM TOG, 2018.",
+        "[6] F. Author. Paper title. ICLR, 2023.",
+        "[7] G. Author. Paper title. ICML, 2024.",
+    ])
+
+    assert runner.is_low_value_citation_chunk(chunk)
 
 
 def test_resolve_figure_llm_config_uses_gpt_env(monkeypatch):

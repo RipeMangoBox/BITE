@@ -39,6 +39,7 @@ import time
 import traceback
 import uuid
 from typing import Any
+from difflib import SequenceMatcher
 
 import certifi
 import httpx
@@ -485,24 +486,6 @@ Rules:
 7. Motivate every placement in `reason`: which slot it fills and why it is
    essential evidence rather than decorative detail."""
 
-SECTION_WRITER_PROMPT_CONTRACT = """Fixed section writer contract for prompt-cache reuse.
-
-Task: write exactly one requested BITE note section from verified analysis and
-focused evidence. The variable section payload appears after this fixed
-contract.
-
-Use only supplied evidence. Output Markdown only for the requested section
-body, starting with `## <section title>`. Do not include images. Do not create
-`### 补充图表`."""
-
-FIGURE_PLACEMENT_PROMPT_CONTRACT = """Fixed figure-placement contract for prompt-cache reuse.
-
-Task: choose local MinerU figure/table images that directly support the note.
-The variable placement payload appears after this fixed contract.
-
-Return JSON only with a `placements` array. Respect the image budget and prefer
-motivation, method, and comparison evidence over decorative samples."""
-
 FIGURE_VISUAL_SUMMARY_SYSTEM = """You are BITE's local figure/table visual summarizer.
 
 Look at the supplied paper figure/table image and caption. Return JSON only:
@@ -831,6 +814,104 @@ def resolve_existing_pdf_path(
                 "attempts": attempts,
             }
     return None, {"input": raw, "attempts": attempts}
+
+
+def title_match_key(text: str) -> str:
+    text = str(text or "").lower()
+    text = text.replace("&", " and ")
+    text = re.sub(r"\barxiv\s*:\s*\S+", " ", text)
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    stopwords = {"a", "an", "the", "for", "with", "of", "and", "to", "in", "on"}
+    tokens = [token for token in text.split() if token not in stopwords]
+    return " ".join(tokens)
+
+
+def title_similarity(left: str, right: str) -> float:
+    left_key = title_match_key(left)
+    right_key = title_match_key(right)
+    if not left_key or not right_key:
+        return 0.0
+    return SequenceMatcher(None, left_key, right_key).ratio()
+
+
+def title_tokens_contained(expected: str, observed: str) -> bool:
+    expected_tokens = set(title_match_key(expected).split())
+    observed_tokens = set(title_match_key(observed).split())
+    if not expected_tokens or not observed_tokens:
+        return False
+    return len(expected_tokens & observed_tokens) / max(1, len(expected_tokens)) >= 0.72
+
+
+def first_markdown_heading(markdown: str) -> str:
+    for line in str(markdown or "").splitlines()[:80]:
+        match = re.match(r"^\s*#\s+(.+?)\s*$", line)
+        if match:
+            return compact_text(match.group(1), max_len=260)
+    return ""
+
+
+def extract_pdf_title_candidates(pdf_path: Path) -> list[str]:
+    candidates: list[str] = []
+    if fitz is None or not pdf_path.exists():
+        return candidates
+    try:
+        with fitz.open(pdf_path) as doc:
+            metadata_title = compact_text((doc.metadata or {}).get("title"), max_len=260)
+            if metadata_title:
+                candidates.append(metadata_title)
+            if doc.page_count:
+                text = doc.load_page(0).get_text("text") or ""
+                full_page = compact_text(text, max_len=3000)
+                if full_page:
+                    candidates.append(full_page)
+                added = 0
+                for raw_line in text.splitlines()[:40]:
+                    line = compact_text(raw_line, max_len=260)
+                    if len(line) >= 12 and re.search(r"[A-Za-z]", line):
+                        candidates.append(line)
+                        added += 1
+                        if added >= 8:
+                            break
+    except Exception:
+        return candidates
+    out: list[str] = []
+    seen: set[str] = set()
+    for item in candidates:
+        key = title_match_key(item)
+        if key and key not in seen:
+            seen.add(key)
+            out.append(item)
+    return out
+
+
+def assert_title_matches_source(
+    *,
+    expected_title: str,
+    source_label: str,
+    candidates: list[str],
+    threshold: float = 0.62,
+) -> dict[str, Any]:
+    expected_title = compact_text(expected_title, max_len=260)
+    candidates = [compact_text(candidate, max_len=3000) for candidate in candidates if compact_text(candidate, max_len=3000)]
+    if not expected_title or not candidates:
+        return {"checked": bool(expected_title and candidates), "ok": True, "candidates": candidates}
+    scored = [
+        {
+            "candidate": compact_text(candidate, max_len=260),
+            "similarity": round(title_similarity(expected_title, candidate), 4),
+            "token_contained": title_tokens_contained(expected_title, candidate),
+        }
+        for candidate in candidates
+        if candidate
+    ]
+    ok = any(item["similarity"] >= threshold or item["token_contained"] for item in scored)
+    if not ok:
+        raise RuntimeError(
+            "Paper title/source mismatch: "
+            f"expected {expected_title!r}, but {source_label} appears to be "
+            f"{[item['candidate'] for item in scored[:4]]!r}"
+        )
+    return {"checked": True, "ok": True, "candidates": scored}
 
 
 def resolved_conf_year(args: argparse.Namespace) -> str:
@@ -1306,9 +1387,9 @@ def normalize_main_analysis(title: str, parsed: dict[str, Any], *, source_links:
     metadata.setdefault("title_zh", title)
     metadata.setdefault("venue", None)
     metadata.setdefault("year", None)
-    merged_links = merge_source_links(normalized.get("source_links"), source_links or [])
-    metadata["project_link"] = metadata_link_for_label(metadata.get("project_link"), "Project") or preferred_source_link(merged_links, "Project") or None
-    metadata["code_link"] = metadata_link_for_label(metadata.get("code_link"), "Code") or preferred_source_link(merged_links, "Code") or None
+    trusted_links = merge_source_links(source_links or [])
+    metadata["project_link"] = preferred_source_link(trusted_links, "Project") or None
+    metadata["code_link"] = preferred_source_link(trusted_links, "Code") or None
     normalized["paper_metadata"] = metadata
 
     for key, default in {
@@ -1335,7 +1416,7 @@ def normalize_main_analysis(title: str, parsed: dict[str, Any], *, source_links:
     for key in ["formulas", "figures_tables", "limitations", "open_questions"]:
         if not isinstance(normalized.get(key), list):
             normalized[key] = []
-    normalized["source_links"] = merged_links
+    normalized["source_links"] = trusted_links
     return normalized
 
 
@@ -3164,7 +3245,7 @@ def normalize_source_links(items: Any) -> list[dict[str, str]]:
             continue
         url = normalize_extracted_url(str(item.get("url") or ""))
         label = classify_link(str(item.get("label") or ""), url) or str(item.get("label") or "").strip()
-        if label not in {"Project", "Code", "arXiv"}:
+        if label not in {"Project", "Code"}:
             continue
         if not url.startswith(("http://", "https://")):
             continue
@@ -3225,6 +3306,39 @@ def valid_source_url(value: Any) -> str:
     return url if url.startswith(("http://", "https://")) else ""
 
 
+def extract_pdf_first_page_links(pdf_path: Path) -> list[dict[str, str]]:
+    links: list[dict[str, str]] = []
+    seen: set[str] = set()
+    if fitz is None or not pdf_path.exists():
+        return links
+
+    def add(label: str, url: str) -> None:
+        clean_url = normalize_extracted_url(url)
+        if not clean_url.startswith(("http://", "https://")) or clean_url in seen:
+            return
+        clean_label = classify_link(label, clean_url)
+        if clean_label not in {"Project", "Code"}:
+            return
+        links.append({"label": clean_label, "url": clean_url, "trusted": True, "source": "pdf_first_page"})
+        seen.add(clean_url)
+
+    try:
+        with fitz.open(pdf_path) as doc:
+            if not doc.page_count:
+                return links
+            page = doc.load_page(0)
+            for item in page.get_links() or []:
+                add("", str(item.get("uri") or ""))
+            text = page.get_text("text") or ""
+            for label, url in re.findall(r"(?i)\b(project\s+page|project|code|github)\s*[:：]\s*(https?://\S+)", text):
+                add(label, url)
+            for url in re.findall(r"https?://\S+", text):
+                add("", url)
+    except Exception:
+        return links
+    return links
+
+
 def source_links_from_args(args: argparse.Namespace) -> list[dict[str, str]]:
     raw_values = getattr(args, "source_link", []) or []
     links = extract_source_links(*raw_values)
@@ -3236,6 +3350,24 @@ def source_links_from_args(args: argparse.Namespace) -> list[dict[str, str]]:
         links.append({"label": classify_link("", url) or "Project", "url": url})
         seen.add(url)
     return links
+
+
+def trusted_source_links_from_args(args: argparse.Namespace) -> list[dict[str, str]]:
+    links = source_links_from_args(args)
+    if not normalize_source_links(links):
+        pdf_arg = getattr(args, "paper_pdf", "") or getattr(args, "pdf", "")
+        if pdf_arg:
+            links = extract_pdf_first_page_links(Path(pdf_arg).expanduser())
+    paper_url = normalize_extracted_url(getattr(args, "paper_link", "") or "")
+    trusted: list[dict[str, str]] = []
+    for item in links:
+        url = normalize_extracted_url(str(item.get("url") or ""))
+        if not url or url == paper_url:
+            continue
+        label = classify_link(str(item.get("label") or ""), url) or "Project"
+        if label in {"Project", "Code"}:
+            trusted.append({"label": label, "url": url, "trusted": True})
+    return trusted
 
 
 def link_is_paper_url(url: str, paper_link: str, openreview_forum_id: str) -> bool:
@@ -4161,6 +4293,7 @@ def placement_candidates(figures_tables: list[dict[str, Any]]) -> list[dict[str,
             "visual_summary": compact_text(item.get("visual_summary"), max_len=260),
             "visual_type": str(item.get("visual_type") or ""),
             "placement_hint": str(item.get("placement_hint") or ""),
+            "note_image_path": str(item.get("note_image_path") or ""),
             "is_sample_only": bool(item.get("is_sample_only")),
             "cluster_size": cluster_size,
             "full_region_source": full_region_source,
@@ -4242,6 +4375,41 @@ def core_pipeline_figure_candidates(figures_tables: list[dict[str, Any]]) -> lis
 
 def core_pipeline_item_ids(figures_tables: list[dict[str, Any]]) -> set[str]:
     return {str(item.get("item_id") or "") for item in core_pipeline_figure_candidates(figures_tables)}
+
+
+def experiment_figure_candidates(figures_tables: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    candidates = [
+        item for item in placement_candidates(figures_tables)
+        if (
+            str(item.get("type") or "").lower() == "table"
+            or EXPERIMENT_FIGURE_PATTERN.search(placement_text(item))
+        )
+        and not sample_only_figure(item)
+    ]
+    candidates.sort(key=figure_label_sort_key)
+    return candidates
+
+
+def figure_slot_quality(copied_figures: list[dict[str, Any]], note: str) -> dict[str, Any]:
+    def present(item: dict[str, Any]) -> bool:
+        path = str(item.get("note_image_path") or "")
+        return bool(path and format_obsidian_image_embed(path) in note)
+
+    core_candidates = core_pipeline_figure_candidates(copied_figures)
+    experiment_candidates = experiment_figure_candidates(copied_figures)
+    present_core = [item for item in core_candidates if present(item)]
+    present_experiment = [item for item in experiment_candidates if present(item)]
+    core_ok = not core_candidates or bool(present_core)
+    experiment_ok = not experiment_candidates or bool(present_experiment)
+    return {
+        "core_pipeline_required": bool(core_candidates),
+        "core_pipeline_present": len(present_core),
+        "core_pipeline_candidate_count": len(core_candidates),
+        "experiment_required": bool(experiment_candidates),
+        "experiment_present": len(present_experiment),
+        "experiment_candidate_count": len(experiment_candidates),
+        "ok": core_ok and experiment_ok,
+    }
 
 
 def figure_slot_budgets(max_images: int) -> dict[str, int]:
@@ -5064,10 +5232,7 @@ def render_info_table(
         links.append(markdown_link("paper", paper_link))
     elif openreview_forum_id:
         links.append(markdown_link("paper", f"https://openreview.net/forum?id={openreview_forum_id}"))
-    all_extra_links = [
-        *(analysis.get("source_links") or []),
-        *extract_source_links(report, json.dumps(analysis, ensure_ascii=False)),
-    ]
+    all_extra_links = normalize_source_links(analysis.get("source_links") or [])
     seen_labels: set[str] = {"paper"} if links else set()
     seen_urls: set[str] = {
         normalize_extracted_url(url)
@@ -5536,6 +5701,7 @@ def validate_vault_note(
         item for item in referenced_assets
         if format_obsidian_image_embed(item["path"]) not in note
     ]
+    slot_quality = figure_slot_quality(copied_figures, note)
     legacy_markdown_image_links = re.findall(r"!\[[^\]]*\]\((?:\.\./\.\./)?assets/[^)]+\)", note)
     legacy_relative_wikilink_images = re.findall(r"!\[\[\.\./\.\./assets/[^\]]+\]\]", note)
     scalar_metadata_keys = set(required_frontmatter) - {"aliases", "tags", "claims", "project_link", "code_link"}
@@ -5569,6 +5735,7 @@ def validate_vault_note(
         "pdf_embed_present": not pdf_ref or expected_pdf_embed in note,
         "image_embeds_present": not note_image_paths or not missing_images,
         "core_pipeline_images_present": not core_pipeline_assets or bool(present_core_pipeline_images),
+        "figure_slot_coverage_present": slot_quality["ok"],
         "referenced_image_embeds_present": True,
         "no_legacy_markdown_image_links": not legacy_markdown_image_links and not legacy_relative_wikilink_images,
         "no_pdf_file_label": "PDF 文件：" not in note,
@@ -5588,6 +5755,7 @@ def validate_vault_note(
         "required_sections_present",
         "pdf_embed_present",
         "core_pipeline_images_present",
+        "figure_slot_coverage_present",
         "no_legacy_markdown_image_links",
         "no_pdf_file_label",
         "no_table_cell_aliased_wikilinks",
@@ -5606,6 +5774,7 @@ def validate_vault_note(
         "fatal_ok": fatal_ok,
         "nonfatal_checks": ["image_embeds_present", "referenced_image_embeds_present"],
         "checks": checks,
+        "figure_slot_quality": slot_quality,
         "note_chars": len(note),
         "missing_frontmatter": missing_frontmatter,
         "expected_openreview_forum_id": openreview_forum_id,
@@ -5764,17 +5933,13 @@ def export_to_vault(
         max_images=args.max_note_images,
     )
     if not analysis.get("source_links"):
-        parse_markdown = work_dir / "parse" / "full.md"
-        if parse_markdown.exists():
+        source_links = trusted_source_links_from_args(args)
+        if source_links:
             analysis = dict(analysis)
-            source_links = merge_source_links(
-                extract_source_links(parse_markdown.read_text(encoding="utf-8")),
-                source_links_from_args(args),
-            )
             analysis["source_links"] = source_links
             metadata = dict(analysis.get("paper_metadata") or {})
-            metadata["project_link"] = metadata.get("project_link") or preferred_source_link(source_links, "Project") or None
-            metadata["code_link"] = metadata.get("code_link") or preferred_source_link(source_links, "Code") or None
+            metadata["project_link"] = preferred_source_link(source_links, "Project") or None
+            metadata["code_link"] = preferred_source_link(source_links, "Code") or None
             analysis["paper_metadata"] = metadata
     topic_text = topic_text_for_note(args.openreview_forum_id, conf_year, args.topic_assignments)
     if not topic_text:
@@ -6084,6 +6249,11 @@ def prepare_parse(args: argparse.Namespace, work_dir: Path) -> dict[str, Any]:
 
     figures_tables = extract_figures_tables(content_path, source_root=source_root)
     markdown = normalize_markdown_full_region_image_refs(markdown, figures_tables, source_root=source_root)
+    title_check = assert_title_matches_source(
+        expected_title=args.paper_title,
+        source_label=str(source),
+        candidates=[first_markdown_heading(markdown)],
+    )
     atomic_write_text(parse_dir / "full.md", markdown)
     atomic_write_json(parse_dir / "figures_tables.json", figures_tables)
     return {
@@ -6092,6 +6262,7 @@ def prepare_parse(args: argparse.Namespace, work_dir: Path) -> dict[str, Any]:
         "source_root": str(source_root),
         "markdown_chars": len(markdown),
         "figures_tables": figures_tables,
+        "title_check": title_check,
         "duration_seconds": round(time.monotonic() - started, 3),
     }
 
@@ -6844,25 +7015,34 @@ def append_context_segment(
 
 def compact_structured_paper_context(markdown: str, *, max_chars: int) -> str:
     markdown = markdown.strip()
-    if not markdown or len(markdown) <= max_chars:
+    if not markdown:
         return markdown
 
     target_chars = max(12_000, max_chars)
     sections = split_markdown_sections(markdown)
+    content_sections = [
+        section
+        for section in sections
+        if not MAIN_CONTEXT_EXCLUDE_HEADING_RE.search(str(section.get("heading") or ""))
+    ]
+    if not content_sections:
+        return compact_paper_context(markdown, max_chars=max_chars)
+    filtered_markdown = "\n\n".join(str(section.get("text") or "").strip() for section in content_sections).strip()
+    if len(filtered_markdown) <= target_chars:
+        return filtered_markdown
+
     segments: list[str] = []
     seen: set[tuple[int, int]] = set()
     used = 0
 
-    outline = context_headings_outline(sections, max_chars=3_000)
+    outline = context_headings_outline(content_sections, max_chars=3_000)
     if outline:
         segment = "## Section Headings\n" + outline
         segments.append(segment)
         used += len(segment)
 
     front_budget = max(3_600, target_chars // 4)
-    for section in sections[:3]:
-        if MAIN_CONTEXT_EXCLUDE_HEADING_RE.search(str(section.get("heading") or "")):
-            continue
+    for section in content_sections[:3]:
         used += append_context_segment(
             segments,
             seen,
@@ -6876,9 +7056,8 @@ def compact_structured_paper_context(markdown: str, *, max_chars: int) -> str:
     remaining = max(0, target_chars - used)
     key_sections = [
         section
-        for section in sections
+        for section in content_sections
         if MAIN_CONTEXT_KEY_HEADING_RE.search(str(section.get("heading") or ""))
-        and not MAIN_CONTEXT_EXCLUDE_HEADING_RE.search(str(section.get("heading") or ""))
     ]
     for section in key_sections:
         if used >= target_chars:
@@ -6900,9 +7079,7 @@ def compact_structured_paper_context(markdown: str, *, max_chars: int) -> str:
         )
 
     if used < target_chars:
-        for section in reversed(sections):
-            if MAIN_CONTEXT_EXCLUDE_HEADING_RE.search(str(section.get("heading") or "")):
-                continue
+        for section in reversed(content_sections):
             used += append_context_segment(
                 segments,
                 seen,
@@ -7030,11 +7207,7 @@ async def run_main_analysis(
     parsed = normalize_main_analysis(
         title,
         parsed,
-        source_links=merge_source_links(
-            extract_source_links(markdown),
-            source_links_from_args(args),
-            *(part.get("source_links") or [] for part in part_results),
-        ),
+        source_links=trusted_source_links_from_args(args),
     )
     parsed["_meta"] = {
         "part_count": len(part_results),
@@ -7079,11 +7252,7 @@ def build_section_prompt(
         "section_title": section_title,
         "section_goal": section_goal,
     }
-    return (
-        f"{SECTION_WRITER_PROMPT_CONTRACT}\n\n"
-        "=== VARIABLE SECTION PAYLOAD ===\n"
-        f"{json.dumps(prompt_obj, ensure_ascii=False, indent=2)}"
-    )
+    return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
 
 
 def build_figure_placement_prompt(
@@ -7099,11 +7268,7 @@ def build_figure_placement_prompt(
         "report_excerpt": compact_text(normalize_report_markdown(report), max_len=12000),
         "figure_table_candidates": placement_candidates(figures_tables),
     }
-    return (
-        f"{FIGURE_PLACEMENT_PROMPT_CONTRACT}\n\n"
-        "=== VARIABLE FIGURE PLACEMENT PAYLOAD ===\n"
-        f"{json.dumps(prompt_obj, ensure_ascii=False, indent=2)}"
-    )
+    return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
 
 
 async def run_figure_placement(
@@ -7366,6 +7531,13 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             conf_year=resolved_conf_year(args),
             search_roots=pdf_search_roots_from_args(args),
         )
+        if source_pdf and args.paper_title:
+            pdf_preflight = dict(pdf_preflight)
+            pdf_preflight["title_check"] = assert_title_matches_source(
+                expected_title=args.paper_title,
+                source_label=str(source_pdf),
+                candidates=extract_pdf_title_candidates(source_pdf),
+            )
 
     task_id = safe_slug(args.task_id or default_task_id(args), max_len=96)
     work_dir = Path(args.output_root).resolve() / task_id
@@ -7920,7 +8092,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--figure-visual-summary-max-items", type=int, default=8)
     parser.add_argument("--figure-visual-summary-max-tokens", type=int, default=1024)
     parser.add_argument("--main-context-chars", type=int, default=36_000)
-    parser.add_argument("--main-context-mode", choices=["compact", "structured"], default="compact")
+    parser.add_argument("--main-context-mode", choices=["compact", "structured"], default="structured")
     parser.add_argument("--adaptive-tokens", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--adaptive-long-chunk-count", type=int, default=11)
     parser.add_argument("--adaptive-long-markdown-chars", type=int, default=144_000)

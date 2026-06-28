@@ -12,6 +12,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urljoin, urlparse, urlunparse
 
@@ -71,6 +72,64 @@ def norm_title(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip().lower()
 
 
+def title_similarity(left: str, right: str) -> float:
+    left_key = norm_title(left)
+    right_key = norm_title(right)
+    if not left_key or not right_key:
+        return 0.0
+    return SequenceMatcher(None, left_key, right_key).ratio()
+
+
+def title_tokens_contained(expected: str, observed: str) -> bool:
+    expected_tokens = set(norm_title(expected).split())
+    observed_tokens = set(norm_title(observed).split())
+    if not expected_tokens or not observed_tokens:
+        return False
+    return len(expected_tokens & observed_tokens) / max(1, len(expected_tokens)) >= 0.72
+
+
+def pdf_title_candidates(path: Path) -> list[str]:
+    candidates: list[str] = []
+    try:
+        with fitz.open(path) as doc:
+            metadata_title = (doc.metadata or {}).get("title") or ""
+            if metadata_title.strip():
+                candidates.append(metadata_title.strip())
+            if doc.page_count:
+                text = doc.load_page(0).get_text("text") or ""
+                full_page = re.sub(r"\s+", " ", text).strip()
+                if full_page:
+                    candidates.append(full_page[:3000])
+                added = 0
+                for raw_line in text.splitlines()[:40]:
+                    line = re.sub(r"\s+", " ", raw_line).strip()
+                    if len(line) >= 12 and re.search(r"[A-Za-z]", line):
+                        candidates.append(line)
+                        added += 1
+                        if added >= 8:
+                            break
+    except Exception:
+        return candidates
+    out: list[str] = []
+    seen: set[str] = set()
+    for item in candidates:
+        key = norm_title(item)
+        if key and key not in seen:
+            seen.add(key)
+            out.append(item)
+    return out
+
+
+def pdf_title_matches(path: Path, expected_title: str) -> tuple[bool, str]:
+    candidates = pdf_title_candidates(path)
+    if not candidates:
+        return True, "title_unchecked"
+    scored = [(candidate, title_similarity(expected_title, candidate), title_tokens_contained(expected_title, candidate)) for candidate in candidates]
+    if any(score >= 0.62 or contained for _, score, contained in scored):
+        return True, "title_match"
+    return False, "title_mismatch:" + " | ".join(candidate for candidate, _, _ in scored[:3])
+
+
 def safe_slug(text: str, max_len: int = 180) -> str:
     text = re.sub(r"[^0-9A-Za-z]+", "_", text or "").strip("_")
     text = re.sub(r"_+", "_", text)
@@ -125,7 +184,7 @@ def resolve_pdf_path(raw: str) -> Path | None:
     return path
 
 
-def is_valid_pdf(path: Path) -> tuple[bool, str]:
+def is_valid_pdf(path: Path, *, expected_title: str = "") -> tuple[bool, str]:
     if not path.exists() or not path.is_file():
         return False, "missing"
     try:
@@ -138,6 +197,10 @@ def is_valid_pdf(path: Path) -> tuple[bool, str]:
                 return False, "zero_pages"
     except Exception as exc:
         return False, f"pdf_invalid:{exc}"
+    if expected_title:
+        ok, why = pdf_title_matches(path, expected_title)
+        if not ok:
+            return False, why
     return True, "ok"
 
 
@@ -312,7 +375,7 @@ def session() -> requests.Session:
     return sess
 
 
-def download_pdf(url: str, out_path: Path, *, timeout: int) -> tuple[bool, str]:
+def download_pdf(url: str, out_path: Path, *, timeout: int, expected_title: str = "") -> tuple[bool, str]:
     reason = skip_url_reason(url)
     if reason and reason != "acm_doi_not_open_pdf":
         return False, reason
@@ -335,10 +398,10 @@ def download_pdf(url: str, out_path: Path, *, timeout: int) -> tuple[bool, str]:
                         return False, "too_large"
                     handle.write(chunk)
             if "pdf" not in content_type:
-                ok, why = is_valid_pdf(tmp_path)
+                ok, why = is_valid_pdf(tmp_path, expected_title=expected_title)
                 if not ok:
                     return False, f"not_pdf:{content_type or why}"
-            ok, why = is_valid_pdf(tmp_path)
+            ok, why = is_valid_pdf(tmp_path, expected_title=expected_title)
             if not ok:
                 return False, why
             tmp_path.replace(out_path)
@@ -381,7 +444,7 @@ def process_row(index: int, row: dict[str, str], rec: dict[str, object] | None, 
     venue = row["venue"]
     out_path = PDF_ROOT / venue.replace(" ", "_") / f"{safe_slug(title)}.pdf"
     if out_path.exists():
-        ok, why = is_valid_pdf(out_path)
+        ok, why = is_valid_pdf(out_path, expected_title=title)
         if ok:
             return {"index": index, "ok": True, "title": title, "venue": venue, "pdf_path": rel(out_path), "source": "existing_target", "note": why}
 
@@ -392,7 +455,7 @@ def process_row(index: int, row: dict[str, str], rec: dict[str, object] | None, 
             attempts.append({"url": candidate.url, "source": candidate.source, "result": reason})
             continue
         if candidate.direct:
-            ok, note = download_pdf(candidate.url, out_path, timeout=timeout)
+            ok, note = download_pdf(candidate.url, out_path, timeout=timeout, expected_title=title)
             attempts.append({"url": candidate.url, "source": candidate.source, "result": note})
             if ok:
                 return {"index": index, "ok": True, "title": title, "venue": venue, "pdf_path": rel(out_path), "source": candidate.source, "url": candidate.url, "attempts": attempts}
@@ -404,7 +467,7 @@ def process_row(index: int, row: dict[str, str], rec: dict[str, object] | None, 
             if reason:
                 attempts.append({"url": pdf_candidate.url, "source": pdf_candidate.source, "result": reason})
                 continue
-            ok, pdf_note = download_pdf(pdf_candidate.url, out_path, timeout=timeout)
+            ok, pdf_note = download_pdf(pdf_candidate.url, out_path, timeout=timeout, expected_title=title)
             attempts.append({"url": pdf_candidate.url, "source": pdf_candidate.source, "result": pdf_note})
             if ok:
                 return {"index": index, "ok": True, "title": title, "venue": venue, "pdf_path": rel(out_path), "source": pdf_candidate.source, "url": pdf_candidate.url, "attempts": attempts}
@@ -427,7 +490,7 @@ def main() -> None:
             continue
         existing = resolve_pdf_path(row.get("pdf_path", ""))
         if existing:
-            ok, _ = is_valid_pdf(existing)
+            ok, _ = is_valid_pdf(existing, expected_title=row.get("paper_title", ""))
             if ok:
                 continue
         rec = records.get((row["venue"], norm_title(row["paper_title"])))
