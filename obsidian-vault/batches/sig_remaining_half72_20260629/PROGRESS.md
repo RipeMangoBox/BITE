@@ -2,12 +2,12 @@
 
 - Run: `sig_remaining_half72_20260629`
 - Mode: `script`
-- Updated: `2026-06-29T05:15:01.001044+00:00`
-- Overall: `0/72` done (`0.0%`), `0` skipped, `0` failed, `72` remaining
+- Updated: `2026-06-29T05:17:14.447567+00:00`
+- Overall: `0/72` done (`4.2%`), `3` skipped, `0` failed, `69` remaining
 
 | Unit | Done | Skipped | Failed | Active paper | Last event | Event age | Last completed |
 | --- | ---: | ---: | ---: | --- | --- | ---: | --- |
-| script | 0/72 (0.0%) | 0 | 0 |  |  |  |  |
+| script | 0/72 (4.2%) | 3 | 0 | AdR-Gaussian: Accelerating Gaussian Splatting with Adaptive Radius | started | 0.1s | Rhythmic Gesticulator: Rhythm-Aware Co-Speech Gesture Synthesis with Hierar... |
 
 ## Refresh
 
