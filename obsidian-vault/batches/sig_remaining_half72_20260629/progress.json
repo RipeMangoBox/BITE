@@ -2,7 +2,7 @@
   "run_dir": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/sig_remaining_half72_20260629",
   "run_id": "sig_remaining_half72_20260629",
   "mode": "script",
-  "generated_at": "2026-06-29T05:17:14.447567+00:00",
+  "generated_at": "2026-06-29T05:20:22.984134+00:00",
   "total": 72,
   "done": 0,
   "skipped": 3,
@@ -10,43 +10,52 @@
   "remaining": 69,
   "percent_done": 4.2,
   "results_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/sig_remaining_half72_20260629/results.jsonl",
-  "active_title": "AdR-Gaussian: Accelerating Gaussian Splatting with Adaptive Radius",
+  "active_title": "Woven Fabric Capture from a Single Photo",
   "progress_events": [
-    {
-      "task_id": "paper_list_l8_https_arxiv_org_abs_2405_18609",
-      "csv_line": 8,
-      "path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/local_analysis_runs/sig_remaining_half72_20260629/paper_list_l8_https_arxiv_org_abs_2405_18609/progress.jsonl",
-      "mtime": 1782710234.3689115,
-      "age_seconds": 0.1,
-      "last_event": "started",
-      "last_event_at": "2026-06-29T05:17:14.369845+00:00"
-    },
     {
       "task_id": "paper_list_l5_https_wangningbei_github_io_2022_Fabrics_html",
       "csv_line": 5,
       "path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/local_analysis_runs/sig_remaining_half72_20260629/paper_list_l5_https_wangningbei_github_io_2022_Fabrics_html/progress.jsonl",
-      "mtime": 1782710234.242913,
-      "age_seconds": 0.2,
+      "mtime": 1782710421.8946939,
+      "age_seconds": 1.1,
       "last_event": "started",
-      "last_event_at": "2026-06-29T05:17:14.244262+00:00"
+      "last_event_at": "2026-06-29T05:20:21.895461+00:00"
     },
     {
-      "task_id": "paper_list_l7_https_lip_neural_subspace_github_io",
-      "csv_line": 7,
-      "path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/local_analysis_runs/sig_remaining_half72_20260629/paper_list_l7_https_lip_neural_subspace_github_io/progress.jsonl",
-      "mtime": 1782710234.1269143,
-      "age_seconds": 0.3,
+      "task_id": "paper_list_l9_https_arxiv_org_abs_2409_08669",
+      "csv_line": 9,
+      "path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/local_analysis_runs/sig_remaining_half72_20260629/paper_list_l9_https_arxiv_org_abs_2409_08669/progress.jsonl",
+      "mtime": 1782710421.865694,
+      "age_seconds": 1.1,
       "last_event": "started",
-      "last_event_at": "2026-06-29T05:17:14.128087+00:00"
+      "last_event_at": "2026-06-29T05:20:21.866603+00:00"
+    },
+    {
+      "task_id": "paper_list_l8_https_arxiv_org_abs_2405_18609",
+      "csv_line": 8,
+      "path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/local_analysis_runs/sig_remaining_half72_20260629/paper_list_l8_https_arxiv_org_abs_2405_18609/progress.jsonl",
+      "mtime": 1782710421.796695,
+      "age_seconds": 1.2,
+      "last_event": "started",
+      "last_event_at": "2026-06-29T05:20:21.797762+00:00"
     },
     {
       "task_id": "paper_list_l6_https_www_cl_cam_ac_uk_research_rainbow_projects_ardavid",
       "csv_line": 6,
       "path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/local_analysis_runs/sig_remaining_half72_20260629/paper_list_l6_https_www_cl_cam_ac_uk_research_rainbow_projects_ardavid/progress.jsonl",
-      "mtime": 1782710233.9619164,
-      "age_seconds": 0.5,
+      "mtime": 1782710421.6656966,
+      "age_seconds": 1.3,
       "last_event": "started",
-      "last_event_at": "2026-06-29T05:17:13.962717+00:00"
+      "last_event_at": "2026-06-29T05:20:21.667236+00:00"
+    },
+    {
+      "task_id": "paper_list_l7_https_lip_neural_subspace_github_io",
+      "csv_line": 7,
+      "path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/_private/local_analysis_runs/sig_remaining_half72_20260629/paper_list_l7_https_lip_neural_subspace_github_io/progress.jsonl",
+      "mtime": 1782710421.622697,
+      "age_seconds": 1.4,
+      "last_event": "started",
+      "last_event_at": "2026-06-29T05:20:21.623377+00:00"
     }
   ],
   "last_completed_title": "Rhythmic Gesticulator: Rhythm-Aware Co-Speech Gesture Synthesis with Hierarchical Neural Embeddings",
@@ -60,11 +69,11 @@
       "failed": 0,
       "remaining": 69,
       "percent_done": 4.2,
-      "active_title": "AdR-Gaussian: Accelerating Gaussian Splatting with Adaptive Radius",
-      "active_task_id": "paper_list_l8_https_arxiv_org_abs_2405_18609",
+      "active_title": "Woven Fabric Capture from a Single Photo",
+      "active_task_id": "paper_list_l5_https_wangningbei_github_io_2022_Fabrics_html",
       "last_event": "started",
-      "last_event_age_seconds": 0.1,
-      "last_event_at": "2026-06-29T05:17:14.369845+00:00",
+      "last_event_age_seconds": 1.1,
+      "last_event_at": "2026-06-29T05:20:21.895461+00:00",
       "last_completed_title": "Rhythmic Gesticulator: Rhythm-Aware Co-Speech Gesture Synthesis with Hierarchical Neural Embeddings",
       "results_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/sig_remaining_half72_20260629/results.jsonl"
     }
