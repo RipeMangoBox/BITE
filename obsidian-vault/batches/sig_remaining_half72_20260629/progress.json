@@ -1,0 +1,35 @@
+{
+  "run_dir": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/sig_remaining_half72_20260629",
+  "run_id": "sig_remaining_half72_20260629",
+  "mode": "script",
+  "generated_at": "2026-06-29T05:15:01.001044+00:00",
+  "total": 72,
+  "done": 0,
+  "skipped": 0,
+  "failed": 0,
+  "remaining": 72,
+  "percent_done": 0.0,
+  "results_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/sig_remaining_half72_20260629/results.jsonl",
+  "active_title": "",
+  "progress_events": [],
+  "last_completed_title": "",
+  "batches": [
+    {
+      "batch": "script",
+      "batch_number": 1,
+      "total": 72,
+      "done": 0,
+      "skipped": 0,
+      "failed": 0,
+      "remaining": 72,
+      "percent_done": 0.0,
+      "active_title": "",
+      "active_task_id": "",
+      "last_event": "",
+      "last_event_age_seconds": null,
+      "last_event_at": "",
+      "last_completed_title": "",
+      "results_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/sig_remaining_half72_20260629/results.jsonl"
+    }
+  ]
+}

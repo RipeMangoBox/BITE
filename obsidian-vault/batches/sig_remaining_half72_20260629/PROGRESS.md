@@ -1,0 +1,20 @@
+# Batch Progress
+
+- Run: `sig_remaining_half72_20260629`
+- Mode: `script`
+- Updated: `2026-06-29T05:15:01.001044+00:00`
+- Overall: `0/72` done (`0.0%`), `0` skipped, `0` failed, `72` remaining
+
+| Unit | Done | Skipped | Failed | Active paper | Last event | Event age | Last completed |
+| --- | ---: | ---: | ---: | --- | --- | ---: | --- |
+| script | 0/72 (0.0%) | 0 | 0 |  |  |  |  |
+
+## Refresh
+
+Run this from the repository root to refresh the snapshot:
+
+```bash
+python3 scripts/write_batch_progress.py /home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/sig_remaining_half72_20260629
+```
+
+Detailed per-paper records remain in `results.jsonl`; active per-paper stage events are under the configured `analysis_output_root`.
