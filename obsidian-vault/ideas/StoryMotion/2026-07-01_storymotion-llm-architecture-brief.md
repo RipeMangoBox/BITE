@@ -1,5 +1,5 @@
 ---
-title: "StoryMotion LLM 架构简报"
+title: "StoryMotion 独立架构简报：给网页端 LLM"
 status: active
 tags:
   - StoryMotion
@@ -10,333 +10,631 @@ tags:
 aliases:
   - StoryMotion-LLM-Brief
 hypothesis: |
-  StoryMotion 的核心问题不是继续堆 Stage1 tokenizer 或照搬 CondMDI 随机 mask，而是要把 human-camera 的非对称条件关系、screen framing relation、observed branch source reliability 和 Stage1 official contract 分开处理。后续 LLM/agent 应基于证据定位病灶，再提出最小可验证修复。
-source_papers:
-  - "[[analysis/ICLR_2026/Pulp_Motion_Framing_aware_multimodal_camera_and_human_motion_generation]]"
-  - "[[analysis/CVPR_2026/Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions]]"
-  - "[[analysis/SIGGRAPH_2024/Flexible_Motion_In_betweening_with_Diffusion_Models_CondMDI]]"
-  - "[[analysis/ICCV_2025/MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Condition_Motion_Paradigm]]"
-  - "[[analysis/ICLR_2024/HUMAN_MOTION_DIFFUSION_AS_A_GENERATIVE_PRIOR]]"
-  - "[[analysis/arxiv_2026/AnyMo_Scaling_Any-Modality_Conditional_Motion_Generation_with_Masked_Modeling]]"
+  StoryMotion 的关键研究问题不是“把 human motion 和 camera motion 拼到一个扩散模型里”，而是如何在 human-camera 非对称依赖下，稳定建模 screen framing、source reliability 和 generated/noisy human condition。当前证据显示：clean GT-human camera completion 可行，但 noisy/generated human condition 会让 camera collapse；因此下一步应修可靠性条件、关系控制面和分支路由，而不是继续盲目三模式随机 mask。
 created: 2026-07-01T22:10:00+0800
-updated: 2026-07-01T22:10:00+0800
+updated: 2026-07-01T22:35:00+0800
 ---
-# StoryMotion LLM 架构简报
+# StoryMotion 独立架构简报：给网页端 LLM
 
-## 0. 给后续 LLM 的任务定义
+> 这份文档是给没有本地代码、没有仓库、不能读取实验文件的网页端 LLM 使用的独立上下文。请只基于本文信息和公开论文/代码链接提出架构诊断与修复方案，不要假设你能读取本地路径。
 
-你要解决的不是“让一个扩散模型同时输出 human 和 camera”这么宽泛的问题。StoryMotion 的目标是：
+## 0. 希望网页端 LLM 做什么
+
+你是一个研究型 motion generation / diffusion architecture 顾问。请帮助诊断和设计 **StoryMotion**：一个面向 story-driven human-camera motion generation 的系统。
+
+请重点回答：
+
+1. 当前 StoryMotion 的架构问题在哪里？
+2. 为什么 CondMDI 式对称随机 mask 不适合直接套到 human-camera 三模式训练？
+3. 如何把 human branch、camera branch、screen framing relation 和 observed branch reliability 重新设计成更合理的非对称框架？
+4. 下一批最小实验应该怎么设计，才能验证架构改动是否真正解决 coupling，而不是只改善 clean oracle completion？
+
+请避免泛泛建议。所有建议都应对应到本文列出的失败现象、公开相关工作或可验证实验 gate。
+
+---
+
+## 1. StoryMotion 想实现什么
+
+StoryMotion 的目标不是普通 text-to-human-motion，也不是单独 camera trajectory generation，而是：
 
 ```text
-给定 story/text，
-生成或补全一段时间对齐的 human motion 与 camera motion，
-使 human 动作语义成立，同时 camera 在屏幕空间中保持合理 framing，
-并且当 human 条件来自 GT、noisy GT 或 generated human 时，camera 仍可靠。
+输入：story / text description
+输出：一段时间对齐的 human motion + camera motion
+要求：
+  1. human 动作符合故事语义
+  2. camera motion 能合理取景、跟随、构图
+  3. human 和 camera 在屏幕空间中协调，不出画、不乱 framing
+  4. 当 camera 条件来自 generated/noisy human，而不是 GT human 时仍可靠
 ```
 
-这里的核心难点是 **human-camera 是耦合但不对称的**：
+关键点：**真实推理时 camera 不会拿到完美 GT human motion**。更真实的流程应该是：
 
-- human branch 承载动作、root、timing，是 camera 的结构条件。
-- camera branch 承载 framing、视角、相机残差，应该读取 human，但不能盲信任何 human source。
-- joint generation 的实际推理应是 `human prior -> camera conditioned on generated human`，而不是把 GT human completion 的 clean 指标当作真实 joint 能力。
+```text
+text_human -> human prior -> H_hat
+text_camera + H_hat -> camera generator -> C_hat
+```
 
-因此，后续建议必须回答三个问题：
+也就是说，camera branch 看到的 human condition 通常是 generated human，可能带有 root drift、latent noise、动作语义偏差。因此，只证明 `GT human -> camera` 的 clean completion 很强，并不能证明 StoryMotion 已经解决 joint human-camera generation。
 
-1. **Stage1 contract 是否可靠？** 如果 autoencoder decode 后进 official TMR/CLaTr/projection 已经弱，Stage2 再好也没用。
-2. **Stage2 是否在 oracle observed branch 下过拟合？** clean GT human 条件强，不代表 generated/noisy human 条件强。
-3. **architecture 是否把不该共享的信息共享了？** raw concat + shared TemporalObsUNet 会让 human/camera latent 互相串扰；camera text 也可能被 observed human shortcut 掩盖。
+---
 
-## 1. 当前系统架构
+## 2. 当前核心架构
 
-### 1.1 Stage1：Pulp-style human-camera latent contract
+StoryMotion 当前是两阶段系统。
 
-当前 StoryMotion 依赖 PulpMotion 风格的 Stage1 autoencoder / tokenizer，把原始 motion feature 压到 latent：
+### 2.1 Stage1：motion autoencoder / latent tokenizer
 
-- human feature：Pulp SMPL/RIFKE 风格，约 `199D`。
-- camera feature：camera trajectory / relative framing 相关特征。
-- latent order：StoryMotion Stage2 cache 使用 `concat([z_hum,z_cam])`，常见维度为 human `128` + camera `64`。
-- Pulp official ckpt 是当前 upper bound；self-trained tokenizer 必须通过 decoded official recon metric，不能只看 training loss。
+Stage1 把原始 human 与 camera motion feature 压成 latent，再由 decoder 还原到 official metric 所需的运动空间。
 
-Pulp Motion 的核心证据见 [[analysis/ICLR_2026/Pulp_Motion_Framing_aware_multimodal_camera_and_human_motion_generation]]。它不是简单 raw concat，而是学习 human-camera latent 到 screen framing latent 的线性桥 `W`，并在采样时用 `W` row-space 做 auxiliary guidance。官方开源入口：[Pulp Motion GitHub](https://github.com/robincourant/pulp-motion)，项目页和数据也公开。
+概念上：
 
-### 1.2 Stage2：CondMDI-style branch-mask diffusion
+```text
+human raw feature H_raw  -> encoder -> z_human
+camera raw feature C_raw -> encoder -> z_camera
+latent = concat([z_human, z_camera])
+decoder(latent) -> reconstructed human/camera motion
+```
 
-当前 Stage2 主干是 `TemporalObsUNet`，不是 Transformer attention。关键训练/推理 contract：
+当前参考上界来自 **Pulp Motion** 的 official Stage1 autoencoder。Pulp Motion 是最直接相关工作：
+
+- Paper: [Pulp Motion: Framing-aware multimodal camera and human motion generation](https://arxiv.org/abs/2510.05097)
+- Code: [https://github.com/robincourant/pulp-motion](https://github.com/robincourant/pulp-motion)
+
+Pulp Motion 的重要思想：human-camera joint generation 不是简单拼接两个 latent，而是引入 screen-space framing latent。它学习一个线性映射 `W`，把 human-camera latent 映射到 screen framing relation，并在采样时用这个 relation subspace 做 auxiliary guidance。
+
+这对 StoryMotion 的启发：
+
+- camera generation 的核心不是 raw trajectory regression，而是 screen framing relation。
+- human-camera 应有显式 relation / framing control 面。
+- Stage1 的好坏不能只看 reconstruction loss，必须看 decoded motion 进入 official TMR/CLaTr/projection metric 后是否仍强。
+
+### 2.2 Stage2：branch-mask diffusion generator
+
+Stage2 在 latent space 上训练一个 diffusion model。当前主干接近 CondMDI-style observed-mask diffusion，但对象从单人体 motion keyframe mask 变成 human/camera 分支 mask。
+
+当前三种任务：
+
+```text
+TASK_CAMERA:
+  observed branch = z_human
+  target branch   = z_camera
+  用 human condition 补全 camera
+
+TASK_HUMAN:
+  observed branch = z_camera
+  target branch   = z_human
+  用 camera condition 补全 human
+
+TASK_JOINT:
+  observed branch = none
+  target branch   = z_human + z_camera
+  从 text 同时生成 human 和 camera
+```
+
+当前关键输入逻辑类似：
 
 ```python
-x = torch.where(obs_mask.bool(), obs_x0, x_t)
-input = concat(x, obs_mask, text, t)
-target_loss = MSE(pred_x0, target_x0) only on target branch
+x = where(obs_mask, obs_x0, x_t)
+model_input = concat(x, obs_mask, text_embedding, timestep)
+loss = MSE(pred_x0, target_x0) only on target branch
 ```
 
-三种任务：
-
-- `TASK_CAMERA`：观察 human latent，预测 camera latent。
-- `TASK_HUMAN`：观察 camera latent，预测 human latent。
-- `TASK_JOINT`：不观察 latent，同时预测 human + camera。
-
-文本约定：
-
-- 1024 维 text embedding。
-- 前 `512` 维是 camera text。
-- 后 `512` 维是 human text。
-
-这个设计借鉴了 CondMDI 的 mask-conditioned diffusion，但 CondMDI 的前提是**同一种人体 motion 中任意 keyframe / joint 观测都可随机缺失**。CondMDI 的官方代码与项目证明了随机 mask 对单人体补间有效：[CondMDI GitHub](https://github.com/setarehc/diffusion-motion-inbetweening)，本地分析见 [[analysis/SIGGRAPH_2024/Flexible_Motion_In_betweening_with_Diffusion_Models_CondMDI]]。
-
-StoryMotion 不满足 CondMDI 的对称前提。human 与 camera 是语义分支，不是同一模态里的任意维度；camera 读 human 是合理的，但 human/camera 双向 share-all 与 hard observed replacement 会导致错误耦合。
-
-## 2. 已知实验事实
-
-### 2.1 Pulp official Stage1 是 upper bound
-
-| checkpoint | split | samples | FDTMR↓ | TMR↑ | HCov↑ | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | Out↓ |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Pulp official Stage1 recon | mixed | 10549 | 124.46 | 18.17 | 85.4% | 15.51 | 58.10 | 87.2% | 0.670 | 4.6% |
-| Pulp official Stage1 recon | pure | 4053 | 109.34 | 15.94 | 92.4% | 17.66 | 60.53 | 84.5% | 0.776 | 3.5% |
-
-这说明 official AE decoded reconstruction 进入 TMR/CLaTr/projection metric 后仍强，可以作为 Stage1 contract 目标。
-
-### 2.2 本地 Pulp Stage1 复现失败
-
-4090 GPU0 完成 mixed official recon；5090 GPU0 完成 pure official recon。结果：
-
-| checkpoint | split | samples | FDTMR↓ | TMR↑ | HCov↑ | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | Out↓ |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| reproduced Stage1 latest | mixed | 10549 | 423.10 | 8.74 | 34.1% | 76.97 | 35.86 | 68.2% | 0.373 | 28.6% |
-| reproduced Stage1 latest | pure | 4053 | 438.99 | 7.88 | 41.4% | 99.98 | 38.27 | 67.1% | 0.453 | 23.3% |
-
-结论：本地训练的 `stage1_official_repro_20260701` 没有复现 Pulp official ckpt。任何基于这个 reproduced Stage1 的 Stage2 正结论都应暂停。
-
-Evidence:
-
-- mixed eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_3_stage1_repro_official_eval_20260701/stage1_repro_latest_mixed_official_recon.json`
-- pure eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_3_stage1_repro_official_eval_5090_pure_20260701/stage1_repro_latest_pure_official_recon.json`
-
-### 2.3 v6.3 三模式拆分不能绕过 self-trained latent failure
-
-v6.3 把三模式拆开训练：camera-only、completion-only、joint-only。所有 runs 都到 `50000` step，但 first-wave clean official eval 已经失败：
-
-| run | task | samples | FDTMR↓ | FDCLaTr↓ | CLaTr↑ | F1↑ | Out↓ | readout |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| `cam_text_only_jointvae_full_b512` | camera | 10549 | - | 957.83 | 3.13 | 0.060 | - | clean camera collapses |
-| `cam_full_text_jointvae_full_b512` | camera | 10549 | - | 957.45 | 3.10 | 0.060 | - | human text does not rescue |
-| `completion_only_jointvae_full_b512` | camera | 10549 | - | 955.99 | 3.18 | 0.060 | - | completion-only also collapses |
-| `joint_only_jointvae_full_b512` | joint | 10549 | 2228.68 | 967.49 | 3.31 | 0.063 | 100.0% | joint collapses |
-
-结论：在 self-trained joint VAE source tokenizer 上，拆任务不能解决 Stage2 transfer。这个负例不能证明非对称框架无效，只能证明当前 Stage1 latent contract 不可用。
-
-Evidence:
-
-- `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_3_mode_conflict_eval_20260701`
-- `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v6_3_mode_conflict_20260701`
-
-### 2.4 v6.4 GPU1：clean 通过，但 noise 与 text-dependence 失败
-
-v6.4 GPU1 是一个 camera-only specialist：
+文本 embedding 约定：
 
 ```text
-task_probs = [1, 0, 0]
-observed branch = human latent
-target branch = camera latent
-Stage1 cache = Pulp official full mixed cache
-P2b reliability augmentation = enabled
+text_embedding dim = 1024
+first 512 dims  = camera text
+last 512 dims   = human text
+```
+
+当前模型问题的核心：它把 human/camera branch 当作类似 CondMDI 的对称 partial observation，但 human-camera 关系不是对称的。
+
+---
+
+## 3. 为什么不能直接套 CondMDI 随机 mask
+
+CondMDI 是优秀的 motion in-betweening 工作：
+
+- Paper: [Flexible Motion In-betweening with Diffusion Models](https://arxiv.org/abs/2405.11126)
+- Code: [https://github.com/setarehc/diffusion-motion-inbetweening](https://github.com/setarehc/diffusion-motion-inbetweening)
+
+CondMDI 的场景是：同一个 human motion 序列中，随机 keyframes / joints 被观测，模型补全缺失部分。它的前提是：
+
+```text
+同一模态内的局部观测 -> 补全同一模态
+```
+
+StoryMotion 的场景不同：
+
+```text
+human action/root/timing -> camera framing/residual
+```
+
+human 与 camera 是两个语义不同的分支：
+
+- human branch 是动作主体和 root/timing source。
+- camera branch 是视角、构图、跟随和 screen framing response。
+- camera 依赖 human 是合理的，但 camera 不应该盲信任何 human source。
+- human branch 不应被 camera branch 的噪声反向污染。
+
+所以 StoryMotion 的 mask 不是 CondMDI 里的“同质局部 mask”，而是“异质语义分支 mask”。这意味着：
+
+1. `TASK_CAMERA` 与 `TASK_HUMAN` 不应作为完全对称任务。
+2. `TASK_JOINT` 不应与 completion tasks 同权混训。
+3. observed branch 不能总被当作 clean truth hard-replace。
+4. 必须显式区分 `GT human`、`noisy GT human`、`generated human`、`missing human`。
+
+---
+
+## 4. 已经完成的尝试与阶段性结论
+
+### 4.1 Stage1 official upper bound 很强
+
+Pulp official Stage1 autoencoder 的 decoded reconstruction 很强，可作为目标上界：
+
+| Stage1 ckpt | split | samples | human FDTMR↓ | human TMR↑ | human coverage↑ | camera FDCLaTr↓ | camera CLaTr↑ | camera coverage↑ | camera F1↑ | Out↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Pulp official AE | mixed | 10549 | 124.46 | 18.17 | 85.4% | 15.51 | 58.10 | 87.2% | 0.670 | 4.6% |
+| Pulp official AE | pure | 4053 | 109.34 | 15.94 | 92.4% | 17.66 | 60.53 | 84.5% | 0.776 | 3.5% |
+
+结论：如果 Stage1 复现达到这个量级，Stage2 的失败才可以更干净地归因到 generator / architecture。
+
+### 4.2 本地 Stage1 复现未通过 official gate
+
+本地尝试复现 Pulp official Stage1 AE，但 posthoc official eval 明显弱于 official ckpt：
+
+| Stage1 ckpt | split | samples | human FDTMR↓ | human TMR↑ | human coverage↑ | camera FDCLaTr↓ | camera CLaTr↑ | camera coverage↑ | camera F1↑ | Out↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| reproduced AE latest | mixed | 10549 | 423.10 | 8.74 | 34.1% | 76.97 | 35.86 | 68.2% | 0.373 | 28.6% |
+| reproduced AE latest | pure | 4053 | 438.99 | 7.88 | 41.4% | 99.98 | 38.27 | 67.1% | 0.453 | 23.3% |
+
+阶段结论：
+
+- 本地 Stage1 复现还没达到 official Pulp AE contract。
+- 不能把 Stage1 training loss 或 feature MSE 当作成功。
+- 不能基于 reproduced Stage1 继续做 Stage2 正结论。
+- 需要优先检查 config、normalization、checkpoint selection、EMA/best epoch、data split、metric loading 是否与 official Pulp 完全一致。
+
+### 4.3 多个自训练 tokenizer / Stage2 组合都失败
+
+已经尝试过：
+
+- separate AE no-z
+- separate VAE with-z
+- joint VAE with-z
+- joint GRFSQ with-z
+- MoLingo-style human-only adaptation
+- v6.3 camera-only / completion-only / joint-only mode conflict split
+
+主要观察：
+
+- 有些 Stage1 feature reconstruction loss 很低，但 Stage2 official metrics 仍崩。
+- self-trained joint VAE source tokenizer 上，即使拆成 camera-only、completion-only、joint-only，clean official eval 仍崩。
+- v6.3 mode-conflict 四个 run 都训练到 step `50000`，但 first-wave clean official eval 已经失败：
+
+| v6.3 run | task | samples | human FDTMR↓ | camera FDCLaTr↓ | camera CLaTr↑ | camera F1↑ | Out↓ | conclusion |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| camera-only, camera-text only | camera | 10549 | - | 957.83 | 3.13 | 0.060 | - | collapse |
+| camera-only, full text | camera | 10549 | - | 957.45 | 3.10 | 0.060 | - | collapse |
+| completion-only | camera | 10549 | - | 955.99 | 3.18 | 0.060 | - | collapse |
+| joint-only | joint | 10549 | 2228.68 | 967.49 | 3.31 | 0.063 | 100.0% | collapse |
+
+阶段结论：
+
+- 这组失败不能证明非对称架构无效，因为它被 self-trained Stage1 latent contract failure 主导。
+- 它只能证明：在当前 self-trained joint VAE latent 上，拆任务不能自动救 Stage2 transfer。
+
+### 4.4 使用 Pulp official Stage1 cache 时，clean camera completion 可以强
+
+在 Pulp official Stage1 cache 上，旧 StoryMotion v6 clean camera completion 曾达到：
+
+```text
+clean GT-human camera completion:
+  camera FDCLaTr = 14.50
+  camera F1      = 0.638
+```
+
+这很重要，因为它说明：
+
+- Stage2 模型容量不一定是最大瓶颈。
+- official metric bridge 不一定有问题。
+- 当 observed human 是 GT clean human，camera completion 能做到很强。
+
+但这只是 oracle setting。
+
+### 4.5 旧 P2a noise test 显示 camera 对 human noise 极敏感
+
+在旧 P2a matched noise protocol 中，给 observed human/root latent 加噪后，camera 迅速退化：
+
+| observed human/root noise std | camera FDCLaTr↓ | camera CLaTr↑ | camera coverage↑ | camera F1↑ |
+| ---: | ---: | ---: | ---: | ---: |
+| 0.00 | 14.50 | 54.85 | 87.1% | 0.638 |
+| 0.05 | 22.02 | 53.15 | 85.6% | 0.625 |
+| 0.10 | 51.89 | 48.66 | 80.2% | 0.573 |
+| 0.15 | 96.87 | 43.54 | 70.1% | 0.503 |
+| 0.30 | 216.79 | 32.96 | 46.7% | 0.360 |
+| 0.50 | 303.00 | 25.68 | 31.0% | 0.278 |
+
+阶段结论：camera branch 在 GT human 下强，但对 noisy/generated human condition 不鲁棒。这是 Stage2 coupling / reliability 的核心证据。
+
+### 4.6 v6.4 GPU1：非对称 camera specialist 的 clean/noise 结果
+
+v6.4 GPU1 是一个更明确的非对称实验：
+
+```text
+task distribution:
+  TASK_CAMERA = 1.0
+  TASK_HUMAN  = 0.0
+  TASK_JOINT  = 0.0
+
+input:
+  observed human latent H
+  camera text
+target:
+  camera latent C
+
+training:
+  Pulp official Stage1 cache
+  camera-only specialist
+  P2b reliability augmentation enabled
 ```
 
 Official eval:
 
-| eval | observed human condition | camera text intervention | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | readout |
+| eval | observed human condition | camera text intervention | camera FDCLaTr↓ | camera CLaTr↑ | camera coverage↑ | camera F1↑ | conclusion |
 | --- | --- | --- | ---: | ---: | ---: | ---: | --- |
-| clean camera | GT | none | 15.00 | 54.87 | 84.9% | 0.629 | clean oracle completion strong |
-| noise `0.15` | matched latent noise | none | 530.27 | 9.46 | 4.0% | 0.103 | noisy observed branch collapses |
-| noise `0.30` | matched latent noise | none | 493.82 | 10.24 | 6.0% | 0.110 | noisy observed branch collapses |
-| text shuffle | GT | shuffle camera half | 15.63 | 53.89 | 84.5% | 0.618 | camera text weak |
-| text zero | GT | zero camera half | 14.16 | 53.29 | 84.0% | 0.609 | camera text not decisive |
+| clean camera | GT human latent | none | 15.00 | 54.87 | 84.9% | 0.629 | clean passes |
+| noise 0.15 | noisy human latent | none | 530.27 | 9.46 | 4.0% | 0.103 | robustness fails |
+| noise 0.30 | noisy human latent | none | 493.82 | 10.24 | 6.0% | 0.110 | robustness fails |
+| text shuffle | GT human latent | camera text shuffled | 15.63 | 53.89 | 84.5% | 0.618 | camera text weak |
+| text zero | GT human latent | camera text zeroed | 14.16 | 53.29 | 84.0% | 0.609 | camera text weak |
 
-Evidence:
+阶段结论：
 
-- train run: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v6_4_asym_human_to_camera_p2b_20260701/camera_p2b_b512_gpu1`
-- eval output: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_4_asym_camera_p2b_eval_5090_20260701`
+- v6.4 camera-only specialist 可以保持 clean camera completion。
+- 但它没有解决 noisy/generated human condition reliability。
+- camera text 控制力弱，模型大概率仍主要依赖 observed human/root shortcut。
+- 因此，非对称方向是合理的，但“只做 camera-only + P2b augmentation”不够。
 
-## 3. v6.4 clean / noise 到底代表什么
+---
 
-### 3.1 Clean
+## 5. Clean / noise 实验到底代表什么
 
-`clean camera` 的意思是：camera branch 观察到的 human latent 是 **GT human latent**，没有扰动、没有生成误差。
+### 5.1 Clean 是什么
+
+`clean camera` 是 oracle camera completion：
 
 ```text
-input condition: H_gt
-target: C_gt
-model predicts: C_hat = camera_specialist(camera_text, H_gt)
+condition = H_gt  # GT human latent, no generation error
+target    = C_gt  # GT camera latent
+model     = camera_specialist(camera_text, H_gt) -> C_hat
 ```
 
-它回答的是：
+它测试：
 
-- 模型在 oracle human 条件下有没有 camera completion 能力？
-- Stage2 sampler、official metric bridge、Pulp official Stage1 cache 是否正常？
-- v6.4 camera-only specialist 是否至少没有破坏 clean quality？
+1. camera specialist 是否有基本生成能力；
+2. Pulp official Stage1 cache 是否能支撑 high-quality camera decode；
+3. sampler 和 official metric bridge 是否正常；
+4. 非对称 camera-only training 是否会破坏 clean camera quality。
 
-clean 通过说明：capacity 和 basic camera completion 没问题。v6.4 clean `FDCLaTr 15.00 / F1 0.629` 接近旧 v6 clean `14.50 / 0.638`。
+v6.4 clean 通过，说明模型不是完全没能力生成 camera。
 
-### 3.2 Noise
+### 5.2 Noise 是什么
 
-`noise015_camera` / `noise030_camera` 的意思是：仍然做 camera completion，但把 observed human latent 加入 matched latent noise。
+`noise 0.15 / 0.30` 是把 observed human latent 加入 matched latent noise：
 
 ```text
-input condition: H_noisy = H_gt + sigma * matched_latent_noise
-target: C_gt
-model predicts: C_hat = camera_specialist(camera_text, H_noisy)
+condition = H_noisy = H_gt + sigma * matched_latent_noise
+target    = C_gt
+model     = camera_specialist(camera_text, H_noisy) -> C_hat
 ```
 
-它不是在测试 camera 采样噪声，而是在测试 **camera 对 human condition 质量的鲁棒性**。
+它不是测试 camera diffusion noise，而是测试 **camera 对 human condition 质量的鲁棒性**。
 
-为什么必要：真实 joint inference 不会给 camera `H_gt`，而是给一个 human prior 生成的 `H_hat`。`H_hat` 一定带有分布偏差、root 误差和 latent noise。若模型只在 `H_gt` 下强，而在 `H_noisy` 下崩，则它只是 oracle completion，不是 robust StoryMotion。
+为什么必要：
 
-### 3.3 它如何帮助定位 coupling 问题
+- 真实 joint inference 中 camera 看到的是 human prior 生成的 `H_hat`，不是 `H_gt`。
+- `H_hat` 会有 root drift、latent noise、动作偏差。
+- 如果 camera branch 只会在 `H_gt` 下工作，一旦 `H` 稍微变脏就崩，那它只是 oracle completion 模型，不是 robust StoryMotion。
 
-clean/noise 形成一个因果隔离：
+### 5.3 clean pass + noise fail 如何定位 coupling
+
+v6.4 的组合结果是：
 
 ```text
-clean pass + noise fail
-=> 模型不是没有 camera 生成能力
-=> failure 不是 official metric bridge 或 Stage1 official cache 本身
-=> failure 集中在 observed human branch 的可靠性假设
+clean pass
+noise fail
+camera text weak
 ```
 
-v6.4 GPU1 正是这个形态：
-
-- clean pass：`FDCLaTr 15.00 / F1 0.629`
-- noise fail：`0.15` 噪声下 `FDCLaTr 530.27 / F1 0.103`
-- text weak：camera text shuffle / zero 几乎不破坏 clean output
-
-这说明当前 camera specialist 大概率仍在用 hard observed human/root shortcut，而不是稳定融合 camera text 与 relation/framing control。对架构的直接启发是：
-
-- 不能继续只加随机 mask。
-- 不能把 `H` 当作永远可信的 clean observed branch。
-- 必须把 `H` 的 source / trust / noise sigma 显式进入模型或 sampler。
-- camera branch 应分成 text-driven global camera prior 与 human-conditioned residual/framing branch。
-
-## 4. 外部工作证据链：哪些能借，哪些不能硬套
-
-### 4.1 Pulp Motion：需要显式 relation/framing control 面
-
-Pulp Motion 证明 human-camera joint generation 的关键不是 raw latent share-all，而是 screen-space framing 关系。它通过 `W` 把 human/camera latent 映射到 framing latent，并用 auxiliary sampling 改善构图。混合子集上，Pulp 分析 note 记录 DiT + Aux 将 `FD_framing` 从 `4.90` 降至 `3.37`，Out-rate 从 `25.98%` 降至 `16.76%`。
-
-对 StoryMotion 的启发：
-
-- 加 `relation token` 或 Pulp `W` row-space guidance。
-- camera 不应只回归 raw trajectory；应显式约束 screen framing。
-- root-relative camera error 需要被拆出来，不应通过 raw concat 传播。
-
-### 4.2 Towards Storytelling Animations：实体交互不是 raw concat
-
-[[analysis/CVPR_2026/Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions]] 把 character 与 camera 作为独立实体，并显式建模 character-camera pairwise interaction。其消融显示交互模块对角色和相机质量及协调性关键。
-
-对 StoryMotion 的启发：
-
-- human / camera 应保留 branch-specific path。
-- relation interaction 应是模块化的，而不是让共享 UNet 通道自由串扰。
-- 如果要 joint model，也应是 entity/relation routing，不是单纯 `[z_hum,z_cam]` concat。
-
-### 4.3 CondMDI：随机 mask 有效，但前提不同
-
-CondMDI 在单人体 motion in-betweening 中通过随机 keyframe / joint mask 获得灵活补全能力。它适合“同一 motion 表示内的任意部分观测”。
-
-对 StoryMotion 的边界：
-
-- 可以借鉴 `mask + observed x0` 输入形式。
-- 不能直接把 human/camera 分支当作对称随机 mask，因为 camera 与 human 语义、误差传播和可靠性不同。
-- StoryMotion 的 bug 不是 mask 数量不够，而是 source reliability 与 branch routing 不对。
-
-### 4.4 MotionLab / AnyMo：统一模型需要 task instruction、curriculum、modality-specific capacity
-
-MotionLab 使用 Motion-Condition-Motion、task instruction modulation 与 curriculum learning；消融显示去掉 curriculum 会让文本生成 FID 从 `0.167` 恶化到 `1.956`。AnyMo 使用大规模多模态数据、R-FSQ、并行掩码建模和分阶段课程训练支持任意模态组合。
-
-对 StoryMotion 的启发：
-
-- 统一任务不是把所有模式同权混在一起。
-- 要有明确 task/source instruction，例如 `gt_human`、`noisy_human`、`generated_human`、`missing_human`。
-- 训练顺序应 human prior -> camera specialist -> relation refinement，而不是一开始三模式随机混训。
-
-MotionLab 官方实现：[GitHub](https://github.com/Diouo/MotionLab)。AnyMo 论文与数据说明见 [arXiv](https://arxiv.org/abs/2605.29488) 与本地 [[analysis/arxiv_2026/AnyMo_Scaling_Any-Modality_Conditional_Motion_Generation_with_Masked_Modeling]]。
-
-### 4.5 PriorMDM / MDM：优先复用强 prior 与轻量协调
-
-PriorMDM 的核心是把 MDM 作为冻结或轻微微调的 motion prior，再用 handshake、communication block 或 model blending 做组合泛化。官方代码见 [PriorMDM GitHub](https://github.com/priorMDM/priorMDM)，MDM 官方代码见 [MDM GitHub](https://github.com/GuyTevet/motion-diffusion-model)。
-
-对 StoryMotion 的启发：
-
-- 不要每次从零重训整个 human-camera generator。
-- 可以先固定强 human prior，再训练 camera specialist。
-- 需要轻量 communication / relation block，而不是 share-all backbone。
-
-## 5. 对阵下药：后续 LLM 应该怎么提方案
-
-### 5.1 先过 Stage1 gate
-
-必须修清楚：
-
-- official training config 是否完全一致。
-- normalizer / feature scaling 是否一致。
-- checkpoint 是否应该用 EMA / best epoch / averaged ckpt，而不是 latest。
-- official model dir symlink 是否完全匹配。
-- pure/mixed split 与 data loader 是否和 Pulp official eval 一致。
-
-成功判据：
+这给出清晰诊断：
 
 ```text
-mixed close to official: FDTMR 124.46, FDCLaTr 15.51, Out 4.6%
-pure close to official: FDTMR 109.34, FDCLaTr 17.66, Out 3.5%
+camera generation capacity exists
+official Stage1 cache / sampler / metric bridge are basically fine
+but model has learned to over-trust observed human/root latent
+and has not learned robust source-aware conditioning or camera-text-driven framing
 ```
 
-### 5.2 Stage2 不要再盲目三模式对称训练
-
-推荐最小架构：
+所以当前 architecture coupling 不是“camera 不能依赖 human”，而是：
 
 ```text
-human prior:
+camera should depend on human,
+but dependence must be source-aware, trust-gated, relation-mediated,
+not hard-clamped and not blind.
+```
+
+---
+
+## 6. 当前最可能的根因
+
+### 6.1 hard observed injection
+
+当前 Stage2 把 observed branch hard-replace 到 input：
+
+```python
+x = where(obs_mask, obs_x0, x_t)
+```
+
+这会让模型学习到：
+
+```text
+observed human is always clean truth
+```
+
+一旦推理时 observed human 是 noisy/generated，camera branch 就会跟着错误 root / latent drift 崩。
+
+### 6.2 root-relative camera contract
+
+Pulp-style camera latent 可能包含 human-root-relative camera quantities。若 camera decode 依赖 human root，那么 human root 的误差会直接变成 world camera 误差。
+
+需要拆分：
+
+```text
+camera = text-driven global camera prior + human-conditioned framing/root residual
+```
+
+而不是让所有 camera latent 都 raw depend on human latent。
+
+### 6.3 camera text 被 observed human shortcut 掩盖
+
+v6.4 中 camera text shuffle / zero 几乎不破坏 clean output，说明模型主要靠 GT human/root shortcut 完成 camera completion。
+
+这对真实 story-driven generation 不够，因为 camera text 描述了 shot type、framing intention、movement style，例如 follow shot、close-up、orbit、pan、tilt、dolly。若 camera text 不控制 output，StoryMotion 只是 human-conditioned camera interpolator。
+
+### 6.4 raw concat + shared denoise 造成错误串扰
+
+human 与 camera latent 被 concat 后交给共享 TemporalObsUNet。joint 模式中二者通过共享通道双向影响；completion 模式中 observed branch hard injection 又让 target branch 盲信 observed branch。
+
+更合理的是：
+
+```text
+human stream: learns action/root/timing prior
+camera stream: reads human through controlled cross-branch interface
+relation stream: encodes screen framing / character-camera geometry
+```
+
+---
+
+## 7. 公开相关工作证据链
+
+### 7.1 Pulp Motion：screen framing relation 是核心控制面
+
+Pulp Motion:
+
+- Paper: [https://arxiv.org/abs/2510.05097](https://arxiv.org/abs/2510.05097)
+- Code: [https://github.com/robincourant/pulp-motion](https://github.com/robincourant/pulp-motion)
+
+关键证据：
+
+- human-camera joint generation 需要 screen-space framing relation。
+- auxiliary sampling 使用 learned linear map `W` 和 row-space projection 引导构图。
+- 公开结果显示 auxiliary guidance 可降低 framing FID 和 out-of-screen rate。
+
+对 StoryMotion：
+
+- 增加 relation token / `W` row-space guidance。
+- 在 camera branch 显式建模 screen framing，而不是只预测 raw camera latent。
+
+### 7.2 Towards Storytelling Animations：human/camera 应作为实体交互建模
+
+Towards Storytelling Animations:
+
+- Paper: [CVPR 2026 openaccess](https://openaccess.thecvf.com/content/CVPR2026/html/Cheng_Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions_CVPR_2026_paper.html)
+
+关键证据：
+
+- 把 character 与 camera 作为独立实体。
+- 显式建模 character-camera pairwise interaction。
+- 消融显示交互模块对 human/camera motion quality 和 coordination 重要。
+
+对 StoryMotion：
+
+- 不要只 raw concat latent。
+- 应设计 branch-specific stream + relation / pairwise adapter。
+
+### 7.3 CondMDI：mask training 有用，但不能照搬
+
+CondMDI:
+
+- Paper: [https://arxiv.org/abs/2405.11126](https://arxiv.org/abs/2405.11126)
+- Code: [https://github.com/setarehc/diffusion-motion-inbetweening](https://github.com/setarehc/diffusion-motion-inbetweening)
+
+关键证据：
+
+- 在单人体 motion 中，训练时随机 keyframe / joint mask 可让模型学会灵活 in-betweening。
+
+对 StoryMotion：
+
+- 可以保留 mask + observed branch idea。
+- 但 human/camera 是异质语义分支，不能当作对称 random mask。
+
+### 7.4 MotionLab：统一多任务需要 task instruction 与 curriculum
+
+MotionLab:
+
+- Paper/project: [https://diouo.github.io/motionlab.github.io/](https://diouo.github.io/motionlab.github.io/)
+- Code: [https://github.com/Diouo/MotionLab](https://github.com/Diouo/MotionLab)
+
+关键证据：
+
+- Motion-Condition-Motion 统一范式。
+- task instruction modulation。
+- motion curriculum learning。
+- 消融显示去掉 curriculum 会造成多任务训练严重退化。
+
+对 StoryMotion：
+
+- 不要把 camera/human/joint 三模式同权随机混训。
+- 应有 task/source instruction：`gt_human`、`noisy_human`、`generated_human`、`missing_human`。
+- 训练顺序应从 human prior、camera specialist 到 relation refinement。
+
+### 7.5 PriorMDM / MDM：强 prior + 轻量协调优于从零 share-all
+
+PriorMDM:
+
+- Paper/project: [https://priormdm.github.io/priorMDM-page/](https://priormdm.github.io/priorMDM-page/)
+- Code: [https://github.com/priorMDM/priorMDM](https://github.com/priorMDM/priorMDM)
+
+MDM:
+
+- Code: [https://github.com/GuyTevet/motion-diffusion-model](https://github.com/GuyTevet/motion-diffusion-model)
+
+关键证据：
+
+- 冻结或轻微微调的 motion diffusion prior 可通过 handshake、communication block、model blending 组合出更复杂能力。
+
+对 StoryMotion：
+
+- 先用可靠 human prior，再训练 camera specialist。
+- 用轻量 relation / communication adapter 协调，而不是让一个 share-all model 同时承担所有任务。
+
+### 7.6 AnyMo：统一任意条件需要规模、分层表示和课程
+
+AnyMo:
+
+- Paper: [https://arxiv.org/abs/2605.29488](https://arxiv.org/abs/2605.29488)
+- Dataset: [https://huggingface.co/datasets/L-yiheng/OmniHuMo](https://huggingface.co/datasets/L-yiheng/OmniHuMo)
+
+关键证据：
+
+- 统一多模态 motion generation 不是简单拼接条件。
+- 需要 residual tokenization、parallel masked modeling、large-scale data、staged curriculum。
+
+对 StoryMotion：
+
+- 若要统一 story / human / camera / relation，必须保留 modality-specific capacity 与 staged training。
+
+---
+
+## 8. 建议的新架构方向
+
+### 8.1 最小推荐框架
+
+```text
+Stage1:
+  Use verified Pulp official-equivalent AE.
+  Do not promote self-trained AE until official recon gate passes.
+
+Human prior:
   text_human -> H_hat
+  goal: generate action/root/timing latent
 
-camera specialist:
-  camera_text + H_condition + source_tag + trust_scalar + relation_token -> C_hat
+Camera specialist:
+  inputs:
+    camera_text
+    H_condition
+    source_tag in {gt, noisy_gt, generated, missing}
+    trust_scalar or sigma
+    relation_token / screen_framing_token
+  output:
+    C_hat
 
-joint inference:
+Joint inference:
   H_hat = human_prior(text_human)
   C_hat = camera_specialist(camera_text, H_hat, source=generated, trust=q)
 ```
 
-必要改动：
+### 8.2 必须新增的机制
 
-1. `trust-gated observed human`：不要用 hard `torch.where(obs_mask, obs_x0, x_t)` 盲写 noisy/generated human；让模型知道 source 和 sigma。
-2. `camera root residual split`：拆成 text-only global camera prior 与 human-conditioned residual/framing branch。
-3. `relation token / W row-space`：加入 screen framing relation 控制面。
-4. `branch-specific heads/adapters`：保留共享低层时序能力，但 human/camera 输出头和条件路由分离。
-5. `external human replay eval`：camera specialist 的 generated-human replay 必须接外部 human prior，不能用 camera-only checkpoint 自己先生成 human。
+1. **Trust-gated observed human**
 
-### 5.3 每个候选必须过的 eval
+不要 hard-clamp noisy/generated human：
 
-任何新方案都必须同时报告：
+```text
+bad:  always replace observed branch with H_obs
+good: use source tag + trust scalar + gated cross-branch read
+```
 
-| gate | why |
-| --- | --- |
-| Stage1 official recon | 防止 tokenizer/reconstruction 假阳性 |
-| clean camera completion | 保证基础 camera capacity 不掉 |
-| P2a noise `0.15/0.30` | 测 noisy/generative human condition robustness |
-| generated-human replay | 测真实 joint inference condition shift |
-| camera text shuffle / zero | 测 camera text 是否真的控制 output |
-| relation/framing metrics | 测 screen-space coherence，而不是只看 latent MSE |
+2. **Camera root residual split**
 
-### 5.4 禁止误判
+```text
+C = C_global_text_prior + C_human_conditioned_residual
+```
 
-- 不要把 clean GT-human camera completion 写成 robust joint generation。
-- 不要把 training loss / feature MSE 写成 Stage1 成功。
-- 不要继续把 CondMDI 的对称随机 mask 原样套到 human-camera 三模式。
-- 不要在 self-trained Stage1 gate 失败时比较 Stage2 架构正负。
-- 不要把 `generated-human replay` 用 camera-only checkpoint 自己生成 human；这不是有效 replay。
+把 text-driven global camera motion 与 human-root-dependent framing residual 分开，避免 human root error 直接污染整个 camera。
 
-## 6. 当前最短行动清单
+3. **Relation / screen framing token**
 
-1. 修 Stage1 reproduction：先复现 official AE，不进入 Stage2 主表。
-2. 在 Pulp official Stage1 cache 上做 `trust-gated observed human` ablation。
-3. 给 v6.4 camera specialist 接一个合法 human prior，跑 generated-human replay。
-4. 加 `camera root residual split` 与 `relation token` 的最小代码版本。
-5. 每个版本只看 official clean/noise/replay/text gates，不再用 teacher loss 做结论。
+引入显式 `R`：
+
+```text
+R = screen framing / human-camera geometry / Pulp W row-space surrogate
+camera branch reads: camera_text + H + R
+```
+
+4. **Branch-specific adapters or heads**
+
+保留共享时序 prior 可以，但输出 head、condition path、cross-branch adapter 应分开。human stream 不应随意读取 camera noise。
+
+5. **External generated-human replay**
+
+测试 camera specialist 时，generated-human replay 必须接一个外部 human prior：
+
+```text
+H_hat = human_prior(text_human)
+C_hat = camera_specialist(camera_text, H_hat, source=generated)
+```
+
+不能用 camera-only checkpoint 自己先生成 human，这不是有效 replay。
+
+---
+
+## 9. 每个新方案必须通过的实验 gate
+
+| gate | setting | success criterion |
+| --- | --- | --- |
+| Stage1 official recon | decode AE output, run human/camera/projection official metrics | close to Pulp official AE upper bound |
+| clean camera completion | condition on GT human latent | camera FDCLaTr/F1 close to old clean `14.50 / 0.638` |
+| noisy human condition | add matched noise `0.15/0.30` to observed human | much better than old P2a and v6.4 noise collapse |
+| generated-human replay | condition camera on external human prior output | not close to replay collapse |
+| camera text shuffle/zero | perturb camera text only | output should meaningfully degrade if camera text controls camera |
+| relation/framing eval | screen framing / out-of-screen / root-in-frame metrics | improved framing without killing human quality |
+| sampler audit | compare teacher, 1-step, 20-step, 50-step | no large teacher-to-sampler gap |
+
+---
+
+## 10. 明确不要做的事
+
+不要：
+
+- 把 clean GT-human camera completion 称为 robust joint generation。
+- 把 Stage1 training loss 或 feature MSE 称为 Stage1 成功。
+- 继续把 CondMDI 的随机 mask 原样套到 human-camera 三模式。
+- 在 Stage1 official recon gate 失败时，比较 self-trained tokenizer 上的 Stage2 架构优劣。
+- 用 camera-only checkpoint 自己生成 human 来做 generated-human replay。
+- 直接换 Transformer / DiT / RF 并期待自动解决 coupling；routing 和 reliability 未修时，backbone 替换大概率只是重置问题。
+
+---
+
+## 11. 请网页端 LLM 给出的理想输出
+
+请基于以上信息输出：
+
+1. **根因诊断**：按 Stage1 contract、hard observed injection、root-relative camera contract、text shortcut、raw concat coupling 分层分析。
+2. **架构方案**：提出一个最小可实现的新 Stage2，不要泛泛说“加 attention”，要说明输入、输出、条件路由、loss、sampler。
+3. **实验矩阵**：列出 3-5 个最小 ablation，每个说明改变什么、验证哪个假设、成功/失败如何解释。
+4. **风险清单**：说明哪些风险必须先排除，哪些可以暂时绕过。
+5. **论文叙事建议**：如果要写 ICLR，贡献应定位为 task/protocol/diagnosis/repair，还是完整 robust generation method。
+
+请用严格研究判断回答；如果某个建议只是猜测，请明确标注“假设”并给出验证实验。
