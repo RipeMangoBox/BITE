@@ -43,6 +43,17 @@ TASK_HUMAN = 1
 TASK_JOINT = 2
 TASK_NAMES = {TASK_CAMERA: "camera", TASK_HUMAN: "human", TASK_JOINT: "joint"}
 
+SOURCE_GT = 0
+SOURCE_NOISY_GT = 1
+SOURCE_GENERATED = 2
+SOURCE_MISSING = 3
+SOURCE_NAMES = {
+    SOURCE_GT: "gt",
+    SOURCE_NOISY_GT: "noisy_gt",
+    SOURCE_GENERATED: "generated",
+    SOURCE_MISSING: "missing",
+}
+
 
 def betas_for_alpha_bar(num_diffusion_timesteps: int, alpha_bar, max_beta: float = 0.999) -> np.ndarray:
     betas = []
@@ -154,14 +165,37 @@ class ResidualBlock(nn.Module):
 
 
 class TemporalObsUNet(nn.Module):
-    """CondMDI-style temporal UNet: replace observed x_t with obs_x0, then append obs_mask."""
+    """CondMDI-style temporal UNet with optional v7.2 source/text routing.
 
-    def __init__(self, width: int, dim_mults: tuple[int, ...], cond_mask_prob: float, zero_final: bool,
-                 cond_mask_prob_cam: float = 0.0, cond_mask_prob_hum: float = 0.0) -> None:
+    Default behavior is bit-compatible with the original path: replace observed
+    x_t with obs_x0, append obs_mask, and condition on the full 1024-dim text.
+    v7.2 options are opt-in and only affect runs launched with --v72-* flags.
+    """
+
+    def __init__(
+        self,
+        width: int,
+        dim_mults: tuple[int, ...],
+        cond_mask_prob: float,
+        zero_final: bool,
+        cond_mask_prob_cam: float = 0.0,
+        cond_mask_prob_hum: float = 0.0,
+        v72_text_role_router: bool = False,
+        v72_aux_text_scale: float = 0.35,
+        v72_soft_source: bool = False,
+        v72_trust_gate: bool = False,
+        v72_relation_surrogate: bool = False,
+        v72_gate_bias: float = 2.0,
+    ) -> None:
         super().__init__()
         self.cond_mask_prob = float(cond_mask_prob)
         self.cond_mask_prob_cam = float(cond_mask_prob_cam)
         self.cond_mask_prob_hum = float(cond_mask_prob_hum)
+        self.v72_text_role_router = bool(v72_text_role_router)
+        self.v72_aux_text_scale = float(v72_aux_text_scale)
+        self.v72_soft_source = bool(v72_soft_source)
+        self.v72_trust_gate_enabled = bool(v72_trust_gate)
+        self.v72_relation_surrogate = bool(v72_relation_surrogate)
         self.time_mlp = nn.Sequential(
             nn.Linear(width, width * 4),
             nn.Mish(),
@@ -173,6 +207,25 @@ class TemporalObsUNet(nn.Module):
             nn.Mish(),
             nn.Linear(width * 4, width),
         )
+        self.task_embed = nn.Embedding(3, width) if self.v72_text_role_router else None
+        self.source_meta_mlp = nn.Sequential(
+            nn.Linear(7, width),
+            nn.Mish(),
+            nn.Linear(width, width),
+        ) if (self.v72_trust_gate_enabled or self.v72_relation_surrogate) else None
+        self.source_pool_mlp = nn.Sequential(
+            nn.LayerNorm(LATENT_DIM),
+            nn.Linear(LATENT_DIM, width),
+            nn.Mish(),
+            nn.Linear(width, width),
+        ) if self.v72_relation_surrogate else None
+        self.v72_gate_net = nn.Sequential(
+            nn.Linear(7, max(32, width // 4)),
+            nn.Mish(),
+            nn.Linear(max(32, width // 4), 1),
+        ) if self.v72_trust_gate_enabled else None
+        if self.v72_gate_net is not None:
+            nn.init.constant_(self.v72_gate_net[-1].bias, float(v72_gate_bias))
         channels = [width * m for m in dim_mults]
         self.in_conv = nn.Conv1d(LATENT_DIM * 2, channels[0], kernel_size=1)
         self.downs = nn.ModuleList()
@@ -257,6 +310,39 @@ class TemporalObsUNet(nn.Module):
 
         return torch.cat([text_cam, text_hum], dim=-1)
 
+    def _route_text(self, text_cond: torch.Tensor, task: torch.Tensor | None) -> torch.Tensor:
+        if not self.v72_text_role_router:
+            return text_cond
+        if task is None:
+            return text_cond
+        if task.shape != (text_cond.shape[0],):
+            raise ValueError(f"expected task [B], got {tuple(task.shape)} for text {tuple(text_cond.shape)}")
+        half = text_cond.shape[-1] // 2
+        text_cam = text_cond[:, :half]
+        text_hum = text_cond[:, half:]
+        aux = self.v72_aux_text_scale
+        cam_scale = torch.ones((text_cond.shape[0], 1), device=text_cond.device, dtype=text_cond.dtype)
+        hum_scale = torch.ones_like(cam_scale)
+        # H2C: camera text dominant, human text auxiliary.
+        hum_scale = torch.where((task == TASK_CAMERA).view(-1, 1), torch.full_like(hum_scale, aux), hum_scale)
+        # C2H: human text dominant, camera text auxiliary.
+        cam_scale = torch.where((task == TASK_HUMAN).view(-1, 1), torch.full_like(cam_scale, aux), cam_scale)
+        return torch.cat([cam_scale * text_cam, hum_scale * text_hum], dim=-1)
+
+    def _source_pool(self, obs_x0: torch.Tensor, obs_mask: torch.Tensor) -> torch.Tensor:
+        weight = obs_mask.float()
+        denom = weight.sum(dim=-1).clamp_min(1.0)
+        return (obs_x0 * weight).sum(dim=-1) / denom
+
+    def _trust_gate(self, source_meta: torch.Tensor | None, batch_size: int, device: torch.device, dtype: torch.dtype) -> torch.Tensor:
+        if not self.v72_trust_gate_enabled:
+            return torch.ones((batch_size, 1, 1), device=device, dtype=dtype)
+        if source_meta is None:
+            source_meta = torch.zeros((batch_size, 7), device=device, dtype=dtype)
+            source_meta[:, 0] = 1.0  # clean gt by default for backward-compatible eval calls.
+        logits = self.v72_gate_net(source_meta.to(device=device, dtype=dtype))
+        return torch.sigmoid(logits).view(batch_size, 1, 1)
+
     @staticmethod
     def _align_time(x: torch.Tensor, target_len: int) -> torch.Tensor:
         if x.shape[-1] == target_len:
@@ -272,13 +358,31 @@ class TemporalObsUNet(nn.Module):
         text: torch.Tensor,
         obs_x0: torch.Tensor,
         obs_mask: torch.Tensor,
+        task: torch.Tensor | None = None,
+        source_meta: torch.Tensor | None = None,
     ) -> torch.Tensor:
         if x_t.shape != obs_x0.shape or x_t.shape != obs_mask.shape:
             raise ValueError(f"x_t, obs_x0 and obs_mask must match, got {x_t.shape}, {obs_x0.shape}, {obs_mask.shape}")
-        x = torch.where(obs_mask.bool(), obs_x0, x_t)
+        gate = self._trust_gate(source_meta, x_t.shape[0], x_t.device, x_t.dtype)
+        if self.v72_soft_source:
+            x = x_t + obs_mask.float() * gate * (obs_x0 - x_t)
+        else:
+            x = torch.where(obs_mask.bool(), obs_x0, x_t)
         x = torch.cat([x, obs_mask.float()], dim=1)
         cond = self.time_mlp(timestep_embedding(timesteps, self.time_mlp[0].in_features))
-        cond = cond + self.text_mlp(self._mask_text(text))
+        routed_text = self._route_text(self._mask_text(text), task)
+        cond = cond + self.text_mlp(routed_text)
+        if self.task_embed is not None:
+            if task is None:
+                task = torch.full((x_t.shape[0],), TASK_JOINT, dtype=torch.long, device=x_t.device)
+            cond = cond + self.task_embed(task)
+        if self.source_meta_mlp is not None:
+            if source_meta is None:
+                source_meta = torch.zeros((x_t.shape[0], 7), device=x_t.device, dtype=x_t.dtype)
+                source_meta[:, 0] = 1.0
+            cond = cond + self.source_meta_mlp(source_meta.to(device=x_t.device, dtype=x_t.dtype))
+        if self.source_pool_mlp is not None:
+            cond = cond + gate.view(x_t.shape[0], 1) * self.source_pool_mlp(self._source_pool(obs_x0, obs_mask))
         h = self.in_conv(x)
         skips: list[torch.Tensor] = []
         for idx, block in enumerate(self.downs):
@@ -358,6 +462,33 @@ def make_branch_masks(z: torch.Tensor, valid: torch.Tensor, task: torch.Tensor) 
     return obs, loss_mask
 
 
+def build_source_meta(
+    obs_mask: torch.Tensor,
+    source_type: torch.Tensor | int,
+    sigma: torch.Tensor | float = 0.0,
+    root_drift: torch.Tensor | float = 0.0,
+) -> torch.Tensor:
+    """Build v7.2 source metadata: 4-way source one-hot + sigma + drift + mask ratio."""
+    b = obs_mask.shape[0]
+    device = obs_mask.device
+    meta = torch.zeros((b, 7), device=device, dtype=torch.float32)
+    if isinstance(source_type, int):
+        source = torch.full((b,), source_type, dtype=torch.long, device=device)
+    else:
+        source = source_type.to(device=device, dtype=torch.long).view(b)
+    meta.scatter_(1, source.clamp(0, 3).view(-1, 1), 1.0)
+    if isinstance(sigma, torch.Tensor):
+        meta[:, 4] = sigma.to(device=device, dtype=torch.float32).view(b)
+    else:
+        meta[:, 4] = float(sigma)
+    if isinstance(root_drift, torch.Tensor):
+        meta[:, 5] = root_drift.to(device=device, dtype=torch.float32).view(b)
+    else:
+        meta[:, 5] = float(root_drift)
+    meta[:, 6] = obs_mask.float().flatten(1).mean(dim=1)
+    return meta
+
+
 def masked_target_mse(
     pred: torch.Tensor,
     target: torch.Tensor,
@@ -432,13 +563,14 @@ def make_observed_condition_x0(
     prob: float,
     mode: str,
     noise_std: float,
-) -> tuple[torch.Tensor, dict[str, float]]:
+) -> tuple[torch.Tensor, torch.Tensor, dict[str, float]]:
+    clean_meta = build_source_meta(obs_mask, SOURCE_GT)
     if prob <= 0.0 or mode == "clean" or not obs_mask.any():
-        return z, {}
+        return z, clean_meta, {}
     sample_use = (torch.rand(z.shape[0], device=z.device) < prob).view(-1, 1, 1)
     value_use = sample_use & obs_mask
     if not value_use.any():
-        return z, {"obs_self_condition_sample_frac": 0.0, "obs_self_condition_value_frac": 0.0}
+        return z, clean_meta, {"obs_self_condition_sample_frac": 0.0, "obs_self_condition_value_frac": 0.0}
 
     noisy_candidate = z + noise_std * torch.randn_like(z)
     generated_candidate = None
@@ -452,7 +584,16 @@ def make_observed_condition_x0(
         was_training = model.training
         model.eval()
         with torch.no_grad():
-            generated_candidate = model(x_t.detach(), t.detach(), text.detach(), obs_x0=z, obs_mask=joint_obs_mask).detach()
+            joint_source_meta = build_source_meta(joint_obs_mask, SOURCE_MISSING)
+            generated_candidate = model(
+                x_t.detach(),
+                t.detach(),
+                text.detach(),
+                obs_x0=z,
+                obs_mask=joint_obs_mask,
+                task=joint_task,
+                source_meta=joint_source_meta,
+            ).detach()
         model.train(was_training)
 
     if mode == "noisy":
@@ -467,12 +608,33 @@ def make_observed_condition_x0(
         raise RuntimeError(f"unknown obs_self_condition_mode: {mode}")
 
     obs_x0 = torch.where(value_use, candidate.detach(), z)
+    source = torch.full((z.shape[0],), SOURCE_GT, dtype=torch.long, device=z.device)
+    if mode == "noisy":
+        source = torch.where(value_use.flatten(1).any(dim=1), torch.full_like(source, SOURCE_NOISY_GT), source)
+    elif mode == "joint_pred":
+        source = torch.where(value_use.flatten(1).any(dim=1), torch.full_like(source, SOURCE_GENERATED), source)
+    elif mode == "mixed":
+        used = value_use.flatten(1).any(dim=1)
+        generated_used = (value_use & generated_sample).flatten(1).any(dim=1)
+        noisy_used = used & (~generated_used)
+        source = torch.where(generated_used, torch.full_like(source, SOURCE_GENERATED), source)
+        source = torch.where(noisy_used, torch.full_like(source, SOURCE_NOISY_GT), source)
+    sigma = torch.zeros((z.shape[0],), device=z.device)
+    if mode in {"noisy", "mixed"}:
+        noisy_used = value_use.flatten(1).any(dim=1)
+        if mode == "mixed":
+            noisy_used = (value_use & (~generated_sample)).flatten(1).any(dim=1)
+        sigma = torch.where(noisy_used, torch.full_like(sigma, float(noise_std)), sigma)
+    source_meta = build_source_meta(obs_mask, source, sigma=sigma, root_drift=sigma)
     sample_frac = value_use.flatten(1).any(dim=1).float().mean()
     value_frac = value_use.float().mean()
     metrics = {
         "obs_self_condition_sample_frac": float(sample_frac.detach().cpu()),
         "obs_self_condition_value_frac": float(value_frac.detach().cpu()),
+        "source_sigma_mean": float(sigma.detach().cpu().mean()),
     }
+    for source_id, source_name in SOURCE_NAMES.items():
+        metrics[f"source_{source_name}_sample_frac"] = float((source == source_id).float().mean().detach().cpu())
     if mode in {"joint_pred", "mixed"}:
         generated_applied = value_use & generated_sample
         metrics["obs_self_condition_generated_sample_frac"] = float(
@@ -483,7 +645,7 @@ def make_observed_condition_x0(
         metrics["obs_self_condition_noisy_sample_frac"] = float(
             noisy_applied.flatten(1).any(dim=1).float().mean().detach().cpu()
         )
-    return obs_x0, metrics
+    return obs_x0, source_meta, metrics
 
 
 def diffusion_loss(
@@ -508,7 +670,7 @@ def diffusion_loss(
         t = torch.randint(0, diffusion.num_timesteps, (z.shape[0],), device=z.device)
     obs_mask, loss_mask = make_branch_masks(z, valid, task)
     x_t = diffusion.q_sample(z, t, noise)
-    obs_x0, obs_metrics = make_observed_condition_x0(
+    obs_x0, source_meta, obs_metrics = make_observed_condition_x0(
         model,
         x_t,
         t,
@@ -520,7 +682,7 @@ def diffusion_loss(
         obs_self_condition_mode,
         obs_self_condition_noise_std,
     )
-    pred_x0 = model(x_t, t, text, obs_x0=obs_x0, obs_mask=obs_mask)
+    pred_x0 = model(x_t, t, text, obs_x0=obs_x0, obs_mask=obs_mask, task=task, source_meta=source_meta)
     if pred_x0.shape != z.shape:
         raise RuntimeError(f"model output shape mismatch: {tuple(pred_x0.shape)} vs {tuple(z.shape)}")
     loss, metrics = masked_target_mse(
@@ -580,14 +742,15 @@ def evaluate(
             if task_id in {TASK_CAMERA, TASK_HUMAN} and z.shape[0] > 1:
                 obs_mask, loss_mask = make_branch_masks(z, valid, task)
                 x_t = diffusion.q_sample(z, t, noise)
-                base = model(x_t, t, text, obs_x0=z, obs_mask=obs_mask)
+                clean_source_meta = build_source_meta(obs_mask, SOURCE_GT)
+                base = model(x_t, t, text, obs_x0=z, obs_mask=obs_mask, task=task, source_meta=clean_source_meta)
                 perm = torch.randperm(z.shape[0], device=device)
                 z_shuf = z.clone()
                 if task_id == TASK_CAMERA:
                     z_shuf[:, :HUM_DIM] = z[perm, :HUM_DIM]
                 else:
                     z_shuf[:, HUM_DIM:] = z[perm, HUM_DIM:]
-                shuf = model(x_t, t, text, obs_x0=z_shuf, obs_mask=obs_mask)
+                shuf = model(x_t, t, text, obs_x0=z_shuf, obs_mask=obs_mask, task=task, source_meta=clean_source_meta)
                 base_loss, _ = masked_target_mse(
                     base,
                     z,
@@ -709,7 +872,20 @@ def train(args: argparse.Namespace) -> None:
     device = torch.device(args.device)
     train_loader, eval_loader, test_loader, sizes = build_loaders(args)
     dim_mults = tuple(int(v) for v in args.dim_mults)
-    model = TemporalObsUNet(args.width, dim_mults, args.cond_mask_prob, args.zero_final, args.cond_mask_prob_cam, args.cond_mask_prob_hum).to(device)
+    model = TemporalObsUNet(
+        args.width,
+        dim_mults,
+        args.cond_mask_prob,
+        args.zero_final,
+        args.cond_mask_prob_cam,
+        args.cond_mask_prob_hum,
+        v72_text_role_router=args.v72_text_role_router,
+        v72_aux_text_scale=args.v72_aux_text_scale,
+        v72_soft_source=args.v72_soft_source,
+        v72_trust_gate=args.v72_trust_gate,
+        v72_relation_surrogate=args.v72_relation_surrogate,
+        v72_gate_bias=args.v72_gate_bias,
+    ).to(device)
     diffusion = CondMDIDiffusion(args.diffusion_steps, args.noise_schedule, device)
     ema_model = copy.deepcopy(model).eval().requires_grad_(False) if args.ema_decay > 0 else None
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, args.adam_beta2))
@@ -735,6 +911,14 @@ def train(args: argparse.Namespace) -> None:
             "mode": args.obs_self_condition_mode,
             "prob": args.obs_self_condition_prob,
             "noise_std": args.obs_self_condition_noise_std,
+        },
+        "v72_config": {
+            "text_role_router": args.v72_text_role_router,
+            "aux_text_scale": args.v72_aux_text_scale,
+            "soft_source": args.v72_soft_source,
+            "trust_gate": args.v72_trust_gate,
+            "relation_surrogate": args.v72_relation_surrogate,
+            "gate_bias": args.v72_gate_bias,
         },
         "selection_metric": args.selection_metric,
         "started_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -919,7 +1103,20 @@ def check(args: argparse.Namespace) -> None:
     human_obs_perturbed, _ = masked_target_mse(pred_human_obs, z, human_loss_mask, human_only)
     if not torch.allclose(human_base, human_obs_perturbed):
         raise RuntimeError("human task loss changed when only observed camera branch was perturbed")
-    model = TemporalObsUNet(args.width, tuple(int(v) for v in args.dim_mults), args.cond_mask_prob, args.zero_final, args.cond_mask_prob_cam, args.cond_mask_prob_hum).to(device)
+    model = TemporalObsUNet(
+        args.width,
+        tuple(int(v) for v in args.dim_mults),
+        args.cond_mask_prob,
+        args.zero_final,
+        args.cond_mask_prob_cam,
+        args.cond_mask_prob_hum,
+        v72_text_role_router=args.v72_text_role_router,
+        v72_aux_text_scale=args.v72_aux_text_scale,
+        v72_soft_source=args.v72_soft_source,
+        v72_trust_gate=args.v72_trust_gate,
+        v72_relation_surrogate=args.v72_relation_surrogate,
+        v72_gate_bias=args.v72_gate_bias,
+    ).to(device)
     diffusion = CondMDIDiffusion(args.diffusion_steps, args.noise_schedule, device)
     loss, metrics, pred_x0 = diffusion_loss(
         model,
@@ -983,6 +1180,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--obs-self-condition-prob", type=float, default=0.0)
     p.add_argument("--obs-self-condition-mode", choices=["clean", "noisy", "joint_pred", "mixed"], default="clean")
     p.add_argument("--obs-self-condition-noise-std", type=float, default=0.0)
+    p.add_argument("--v72-text-role-router", action="store_true")
+    p.add_argument("--v72-aux-text-scale", type=float, default=0.35)
+    p.add_argument("--v72-soft-source", action="store_true")
+    p.add_argument("--v72-trust-gate", action="store_true")
+    p.add_argument("--v72-relation-surrogate", action="store_true")
+    p.add_argument("--v72-gate-bias", type=float, default=2.0)
     p.add_argument("--ema-decay", type=float, default=0.0)
     p.add_argument("--early-stop-patience", type=int, default=0)
     p.add_argument("--early-stop-min-delta", type=float, default=0.0)
@@ -999,6 +1202,8 @@ def main() -> None:
         raise ValueError("--obs-self-condition-noise-std must be non-negative")
     if args.joint_human_branch_weight <= 0.0 or args.joint_camera_branch_weight <= 0.0:
         raise ValueError("--joint-*-branch-weight values must be positive")
+    if not (0.0 <= args.v72_aux_text_scale <= 1.0):
+        raise ValueError("--v72-aux-text-scale must be in [0, 1]")
     if args.mode == "check":
         check(args)
     else:
