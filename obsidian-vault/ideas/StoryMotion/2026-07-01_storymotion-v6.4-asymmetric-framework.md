@@ -16,7 +16,7 @@ source_papers:
   - "[[analysis/SIGGRAPH_2024/Flexible_Motion_In_betweening_with_Diffusion_Models_CondMDI]]"
   - "[[analysis/ICCV_2025/MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Condition_Motion_Paradigm]]"
 created: 2026-07-01T17:58:00+0800
-updated: 2026-07-01T21:55:00+0800
+updated: 2026-07-01T22:10:00+0800
 ---
 # StoryMotion v6.4 非对称 Stage2 框架
 
@@ -125,17 +125,50 @@ Step 1 sanity:
 
 All rows use full mixed test split, `10549` samples, Pulp official Stage1 cache, and 50-step DDIM official callbacks.
 
-| eval | observed human condition | camera text intervention | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | readout |
-| --- | --- | --- | ---: | ---: | ---: | ---: | --- |
-| clean camera | GT | none | 15.00 | 54.87 | 84.9% | 0.629 | clean gate passes; close to v6.2 clean `14.50 / 0.638` |
-| noise `0.15` | matched latent noise | none | 530.27 | 9.46 | 4.0% | 0.103 | reliability gate fails hard; worse than old P2a `96.87` |
-| noise `0.30` | matched latent noise | none | 493.82 | 10.24 | 6.0% | 0.110 | reliability gate fails hard; worse than old P2a `216.79` |
-| text shuffle | GT | shuffle camera half | 15.63 | 53.89 | 84.5% | 0.618 | weak camera-text dependence |
-| text zero | GT | zero camera half | 14.16 | 53.29 | 84.0% | 0.609 | zeroing camera text does not break clean camera |
+| eval         | observed human condition | camera text intervention | FDCLaTr↓ | CLaTr↑ | CCov↑ |   F1↑ | readout                                                  |
+| ------------ | ------------------------ | ------------------------ | -------: | -----: | ----: | ----: | -------------------------------------------------------- |
+| clean camera | GT                       | none                     |    15.00 |  54.87 | 84.9% | 0.629 | clean gate passes; close to v6.2 clean `14.50 / 0.638`   |
+| noise `0.15` | matched latent noise     | none                     |   530.27 |   9.46 |  4.0% | 0.103 | reliability gate fails hard; worse than old P2a `96.87`  |
+| noise `0.30` | matched latent noise     | none                     |   493.82 |  10.24 |  6.0% | 0.110 | reliability gate fails hard; worse than old P2a `216.79` |
+| text shuffle | GT                       | shuffle camera half      |    15.63 |  53.89 | 84.5% | 0.618 | weak camera-text dependence                              |
+| text zero    | GT                       | zero camera half         |    14.16 |  53.29 | 84.0% | 0.609 | zeroing camera text does not break clean camera          |
 
 裁决：**camera-only P2b v1 证明了非对称 camera specialist 可以保持 clean camera completion，但没有解决 generated/noisy observed branch reliability，也没有让 camera branch 强依赖 camera text。** 这支持继续走非对称框架，但否定“只靠 P2b source/noise augmentation 就足够”的版本。
 
 `generated-human replay` 未作为有效主结果运行：当前 v6.4 checkpoint 是 camera-only，脚本内置 replay 会用同一个 checkpoint 先生成 human branch，这不符合 `human prior -> camera specialist` 的设计。有效 replay 需要外接一个已验证 human prior，或改 eval 脚本允许指定外部 human run。
+
+## 3.2 Clean / Noise 实验到底测什么
+
+`clean camera` 是 oracle completion：
+
+```text
+condition = GT human latent H_gt
+target = GT camera latent C_gt
+prediction = camera_specialist(camera_text, H_gt)
+```
+
+它回答的是“在最理想的人体条件下，camera specialist 有没有能力生成高质量相机”。v6.4 clean `FDCLaTr 15.00 / F1 0.629` 接近 v6.2 clean `14.50 / 0.638`，说明模型容量、Pulp official cache、DDIM sampler 和 official callback bridge 都不是主要瓶颈。
+
+`noise015_camera` 和 `noise030_camera` 是可靠性探针：
+
+```text
+condition = H_gt + sigma * matched_latent_noise
+target = C_gt
+prediction = camera_specialist(camera_text, H_noisy)
+```
+
+它不测试 camera 自身采样噪声，而是测试 **observed human branch 变脏时，camera branch 是否仍能稳定生成**。这个探针必要，因为真实 joint inference 中 camera 不会看到 `H_gt`，而会看到 human prior 生成的 `H_hat`；`H_hat` 一定带有 latent 分布偏差、root 误差和局部动作噪声。
+
+因此 clean/noise 的组合能隔离 coupling 病灶：
+
+```text
+clean pass + noise fail
+=> camera 生成能力存在
+=> official eval / Stage1 official cache 正常
+=> failure 集中在 hard observed human injection 与 source reliability 假设
+```
+
+v6.4 GPU1 的结果正是这个形态：clean 过，noise `0.15/0.30` 都崩，camera text shuffle/zero 又几乎不破坏 clean output。这意味着 camera branch 主要仍靠 observed human/root shortcut，而不是稳定融合 camera text 与 relation/framing control。它帮助 StoryMotion 把问题从“要不要非对称”推进到“非对称 camera specialist 必须有 trust gate / residual split / relation token”。
 
 ## 4. 成功判据
 
