@@ -186,6 +186,7 @@ class TemporalObsUNet(nn.Module):
         v72_trust_gate: bool = False,
         v72_relation_surrogate: bool = False,
         v72_gate_bias: float = 2.0,
+        reliability_cond_dim: int = 0,
     ) -> None:
         super().__init__()
         self.cond_mask_prob = float(cond_mask_prob)
@@ -206,6 +207,17 @@ class TemporalObsUNet(nn.Module):
             nn.Linear(TEXT_DIM, width * 4),
             nn.Mish(),
             nn.Linear(width * 4, width),
+        )
+        self.reliability_cond_dim = int(reliability_cond_dim)
+        self.reliability_mlp = (
+            nn.Sequential(
+                nn.LayerNorm(self.reliability_cond_dim),
+                nn.Linear(self.reliability_cond_dim, width * 2),
+                nn.Mish(),
+                nn.Linear(width * 2, width),
+            )
+            if self.reliability_cond_dim > 0
+            else None
         )
         self.task_embed = nn.Embedding(3, width) if self.v72_text_role_router else None
         self.source_meta_mlp = nn.Sequential(
@@ -360,6 +372,7 @@ class TemporalObsUNet(nn.Module):
         obs_mask: torch.Tensor,
         task: torch.Tensor | None = None,
         source_meta: torch.Tensor | None = None,
+        reliability_cond: torch.Tensor | None = None,
     ) -> torch.Tensor:
         if x_t.shape != obs_x0.shape or x_t.shape != obs_mask.shape:
             raise ValueError(f"x_t, obs_x0 and obs_mask must match, got {x_t.shape}, {obs_x0.shape}, {obs_mask.shape}")
@@ -372,6 +385,20 @@ class TemporalObsUNet(nn.Module):
         cond = self.time_mlp(timestep_embedding(timesteps, self.time_mlp[0].in_features))
         routed_text = self._route_text(self._mask_text(text), task)
         cond = cond + self.text_mlp(routed_text)
+        if self.reliability_mlp is not None:
+            if reliability_cond is None:
+                reliability_cond = torch.zeros(
+                    x_t.shape[0],
+                    self.reliability_cond_dim,
+                    device=x_t.device,
+                    dtype=x_t.dtype,
+                )
+            if reliability_cond.shape != (x_t.shape[0], self.reliability_cond_dim):
+                raise ValueError(
+                    f"reliability_cond must be [B,{self.reliability_cond_dim}], "
+                    f"got {tuple(reliability_cond.shape)}"
+                )
+            cond = cond + self.reliability_mlp(reliability_cond.to(device=x_t.device, dtype=x_t.dtype))
         if self.task_embed is not None:
             if task is None:
                 task = torch.full((x_t.shape[0],), TASK_JOINT, dtype=torch.long, device=x_t.device)
