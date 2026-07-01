@@ -33,7 +33,7 @@ tags:
 # StoryMotion Canonical Plan
 
 > [!note] 2026-06-04 继承关系
-> 本文档是 human-motion-only ASG 收缩版，保留为 CSG 新版的地基。camera 协同重构后的当前方案见 [[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan.md|StoryMotion Cinematic Section Graph Plan]]。
+> 本文档是 human-motion-only ASG 收缩版，保留为 CSG 新版的地基。camera 协同重构后的当前方案见 [[2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]]。
 
 > [!abstract] 当前 source of truth
 > 本文档继承并收敛 [[ideas/StoryMotion/2026-06-02_storymotion_novelty_value_positioning|StoryMotion Novelty and Value Positioning]]。旧的 storyboard-conditioned generation 叙事已存档到 `archived/v2`，不再作为当前版本主线。经 DS 多轮反方审查后，核心修正为：**不要把 shot 当电影镜头，也不要把 locked interior / boundary buffer / cache key 伪装成数据集字段。StoryMotion 当前应定义为 Animation Section Graph 上的局部动作编辑与接触一致边界修复。**

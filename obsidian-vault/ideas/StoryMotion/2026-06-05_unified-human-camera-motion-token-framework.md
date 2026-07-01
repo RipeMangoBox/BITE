@@ -12,7 +12,7 @@ tags:
   - motion_editing
   - masked_modeling
 source_notes:
-  - "[[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion CSG Plan]]"
+  - "[[2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion CSG Plan]]"
   - "[[ideas/StoryMotion/2026-06-05_camera-shot-edit|CameraShotEdit Proposal]]"
   - "[[ideas/camera/2026-06-05_camera-movement-generation-system-survey-llm-audit-merged|Camera Movement Survey]]"
 source_papers:
@@ -548,5 +548,5 @@ CameraShotEdit: source motion + edit + shot → token 框架中的 "text-conditi
 ## Source Links
 
 - [[ideas/camera/2026-06-05_camera-movement-generation-system-survey-llm-audit-merged|Camera Movement Generation 系统调研]]
-- [[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion CSG Plan]]
+- [[2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion CSG Plan]]
 - [[ideas/StoryMotion/2026-06-05_camera-shot-edit|CameraShotEdit Proposal]]

@@ -16,7 +16,7 @@ tags:
 # StoryMotion Session Context
 
 > [!warning] Archived
-> 这个文档压缩保留 2026-06-02 版本的旧叙事：`storyboard-conditioned 3D motion generation with editable spatial anchors`。当前 source of truth 已切换到 [[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]]。旧版中关于 4090 环境、已入库论文和早期 MVP 的信息可作为历史记录，但不再代表当前方案。
+> 这个文档压缩保留 2026-06-02 版本的旧叙事：`storyboard-conditioned 3D motion generation with editable spatial anchors`。当前 source of truth 已切换到 [[2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]]。旧版中关于 4090 环境、已入库论文和早期 MVP 的信息可作为历史记录，但不再代表当前方案。
 
 ## 1. Idea 来源
 
@@ -137,7 +137,7 @@ Storyboard:
 ## 6. MVP 设计（旧版，已被替换）
 
 > [!warning] 注意
-> 本节是旧方案。当前新方案见 [[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]]，第一版不再主张 storyboard-conditioned generation，而是 human-camera local editing contract。
+> 本节是旧方案。当前新方案见 [[2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]]，第一版不再主张 storyboard-conditioned generation，而是 human-camera local editing contract。
 
 ```text
 实验: Three-shot 解耦生成 + 局部编辑验证

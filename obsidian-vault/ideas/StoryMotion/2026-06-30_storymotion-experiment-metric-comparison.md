@@ -18,11 +18,11 @@ source_notes:
   - "[[2026-06-29_storymotion-v6.2]]"
   - "[[2026-07-01_storymotion-v6.2-metric-data]]"
 created: 2026-06-30T19:25:00+0800
-updated: 2026-07-01T02:47:56+0800
+updated: 2026-07-01T14:08:43+0800
 ---
 
 > [!abstract] TL;DR
-> 5090 已完成 MoLingo human-only、separate AE no-z、separate VAE with-z 的 full mixed train 与 full mixed official eval；补到 `94050/10549` 后结论仍是负面，不能 promoted。mixed-subset 不是单纯 eval 缺 formal test，而是旧 camera manifest 只导出 `29779/3279` paired rows；full camera files 实际存在，full 评估已单独记录在 [[2026-07-01_storymotion-v6.2-metric-data]]。Stage1 official reconstruction metrics 已补全，deterministic separate AE 的 upper bound 很强，但 Stage2 official metrics 说明“Stage1 可重建”不等于“Stage2 可生成”。4090 GPU1 的 joint GRFSQ full 仍未纳入本轮闭环。
+> 5090 已完成 MoLingo human-only、separate AE no-z、separate VAE with-z、joint VAE with-z、joint GRFSQ with-z 的 full mixed train 与 full mixed official eval；补到 `94050/10549` 后结论仍是负面，不能 promoted。mixed-subset 不是单纯 eval 缺 formal test，而是旧 camera manifest 只导出 `29779/3279` paired rows；full camera files 实际存在，full 评估已单独记录在 [[2026-07-01_storymotion-v6.2-metric-data]]。Stage1 official / posthoc reconstruction metrics 已补全，deterministic separate AE 的 upper bound 很强，但 Stage2 official metrics 说明“Stage1 可重建”不等于“Stage2 可生成”。joint GRFSQ 比 joint VAE 稍好，但 full mixed camera/joint official rows 仍明显坍塌。
 
 ## 0. 可比性规则
 
@@ -50,10 +50,12 @@ full-cache/full-train 与 full mixed official eval 已在 5090 完成，均使�
 | separate AE no-z full | 5090 GPU0 | `v6_2_separate_ae_noz_seed17_fullcache_20260630/mixed_noz_full` | `v6_2_separate_ae_noz_seed17_fulltrain_20260630/mixed_b512_full` | train + full official eval complete; negative |
 | separate VAE with-z full | 5090 GPU1 | `v6_2_separate_vae_wz_seed17_fullcache_20260630/mixed_full` | `v6_2_separate_vae_wz_seed17_fulltrain_20260630/mixed_b512_full` | train + full official eval complete; negative |
 | MoLingo human-only full | 5090 GPU2 | `v6_2_molingo_human_seed17_fullcache_20260630/mixed_noz_full` | `v6_2_molingo_human_seed17_fulltrain_20260630/human_only_b512_full` | train + full official eval complete; negative |
+| joint VAE with-z full | 5090 GPU0 | `v6_2_joint_vae_wz_seed17_fullcache_20260701/mixed_full` | `v6_2_joint_vae_wz_seed17_fulltrain_20260701/mixed_b512_full` | train + full official eval complete; negative |
+| joint GRFSQ with-z full | 5090 GPU1 | `v6_2_joint_grfsq_wz_seed17_fullcache_20260701/mixed_full` | `v6_2_joint_grfsq_wz_seed17_fulltrain_20260701/mixed_b512_full` | train + full official eval complete; negative |
 
 Full mixed official metric rows are stored in [[2026-07-01_storymotion-v6.2-metric-data]].
 
-![[2026-07-01_storymotion-v6.2-metric-data#Full Mixed Official Eval 2026-07-01]]
+![[2026-07-01_storymotion-v6.2-metric-data#1. Full Mixed Main Comparison]]
 
 ## 1. 近期主表与新闭环
 
@@ -138,13 +140,18 @@ Stage1 表只说明 tokenizer reconstruction/posthoc eval，不说明 generation
 | separate VAE with-z | mixed | 3279 | 116500 | 0.004 | 0.002 | 0.002 | 2.696 | official upper bound strong；Stage2 仍弱 |
 | separate AE no-z best | mixed | 3279 | 116500 | 0.002 | 0.001 | 0.001 | - | deterministic separate recon ok |
 | joint VAE with-z KL best | mixed | 3279 | 110000 | 0.008 | 0.004 | 0.008 | 3.690 | KL joint recon weak |
+| joint VAE with-z corrected | mixed full | 10549 | 144000 | 0.003617 | 0.001752 | 0.005145 | 29.66 | Stage1 recon usable; Stage2 still collapses |
+| joint GRFSQ with-z corrected | mixed full | 10549 | 245000 | 0.009264 | 0.004162 | 0.292299 | active 1000 | mixed camera recon weak; Stage2 negative |
+| joint VAE with-z corrected | pure | 4053 | 142000 | 0.001932 | 0.002537 | 0.000338 | 3.05 | pure Stage1 clean |
+| joint GRFSQ with-z corrected | pure | 4053 | 140000 | 0.003852 | 0.003944 | 0.002418 | active 1000 | pure Stage1 clean enough |
 | separate GRFSQ longtrain | mixed | 3279 | 406000 | 0.601149 | 0.007874 | 1.194424 | - | mixed camera 仍受限 |
 | separate HFSQ | mixed | 3279 | 115000 | 0.813651 | 0.022907 | 1.604395 | - | mixed camera 更差 |
 
 **读数**：
 
 - AE no-z 的 official reconstruction upper bound 很强，camera CLaTr `66.26`、caption F1 `0.878`，甚至高于 separate VAE with-z 的 `64.87` / `0.842`；但 Stage2 official eval 仍坍塌，因此问题不只是 KL/采样导致的 reconstruction failure。
-- joint VAE with-z KL 的 Stage1 recon 明显差，不能当作“给 Pulp joint Stage1 加 KL 就会更适合 diffusion”的证据。
+- corrected joint VAE with-z 的 mixed full Stage1 feature-space reconstruction 不差，但 full mixed Stage2 official eval 仍坍塌；这进一步支持“Stage1 reconstruction 可用不等于 Stage2 generation 可用”。
+- corrected joint GRFSQ with-z 的 pure Stage1 可用，但 mixed full camera MSE `0.292299` 明显偏高；其 Stage2 比 joint VAE 稍好，仍远离有效 camera/joint rows。
 
 ## 4. Reliability / observed condition 对照
 
@@ -184,20 +191,29 @@ Stage1 表只说明 tokenizer reconstruction/posthoc eval，不说明 generation
 | recent V6.2 | E.T./DIRECTOR root-only | clean GT/root camera 强，generated-human replay 弱 | 外部 camera baseline + reliability 证据 |
 | recent V6.2 | MoLingo human-only | full mixed FDTMR `2396.07`、HCov `0.04%` | 完成但不 promoted |
 | recent V6.2 | separate AE no-z / VAE / GRFSQ / HFSQ Stage2 | full mixed 仍坍塌；Stage1 可训练不代表 Stage2 official metrics 可用 | tokenizer-to-Stage2 传递风险成立 |
+| recent V6.2 | corrected joint VAE / joint GRFSQ full mixed | joint VAE joint Out `100.0%`；joint GRFSQ joint FDCLaTr `663.60`、Out `99.6%` | joint source tokenizer full 闭环仍负面 |
 
 ## 6. Stage1 tokenizer visualization
 
-已在 5090 GPU3 生成统一 Stage1 tokenizer reconstruction 可视化，输出路径为：
+已在 5090 生成统一 Stage1 tokenizer reconstruction 可视化，输出路径为：
 
-- `runs/visualizations/stage1_tokenizers_20260630/manifest.json`
+- `runs/visualizations/stage1/stage1_tokenizers_20260701_rerun/manifest.json`
+- `runs/visualizations/stage1/v6_2_joint_stage1_20260701_rerun/manifest.json`
 
-覆盖 `4` 个 mixed-test sample、`5` 个 tokenizer：`separate_ae_noz`、`separate_vae_wz`、`separate_hfsq_wscale_noz`、`separate_grfsq_bs128_noz`、`molingo_vae_noz`。每个 sample/model 写出 `fixed_camera.mp4`、`orbiting_camera.mp4`、`camera_trajectory.mp4` 和 `rifke_joints_projection.npz`；加上 manifest 共 `73` 个文件。该可视化用于检查 Stage1 frozen reconstruction，不用于宣称 Stage2 generation 质量。
+旧 manifest 覆盖 `4` 个 mixed-test sample、`5` 个 tokenizer：`separate_ae_noz`、`separate_vae_wz`、`separate_hfsq_wscale_noz`、`separate_grfsq_bs128_noz`、`molingo_vae_noz`。新 joint manifest 覆盖 mixed/pure 各 `2` 个 sample，包含 `gt`、`joint_vae_wz_*`、`joint_grfsq_wz_*`，共 `61` 个文件。每个 sample/model 写出 `fixed_camera.mp4`、`orbiting_camera.mp4`、`camera_trajectory.mp4` 和 `rifke_joints_projection.npz`；该可视化用于检查 Stage1 frozen reconstruction，不用于宣称 Stage2 generation 质量。
+
+Stage2 qualitative visualization 已补到：
+
+- `runs/visualizations/stage2/v6_2_joint_stage2_20260701_rerun/joint_vae_wz_mixed_full/stage2/vis/v4/concat/cfg_h1_c1_seed17_best_eval/v4_4x3_text_global_camera_manifest.json`
+- `runs/visualizations/stage2/v6_2_joint_stage2_20260701_rerun/joint_grfsq_wz_mixed_full/stage2/vis/v4/concat/cfg_h1_c1_seed17_best_eval/v4_4x3_text_global_camera_manifest.json`
+
+两者均为 source-tokenizer-aware 4x3 qualitative vis，覆盖 `2` 个 mixed sample、`joint` / `human_completion` / `camera_completion` 三种 mode，probe `failed=0`。该 vis 使用 `cfg_human=1.0` / `cfg_camera=1.0` 的 split-guidance qualitative sampler，不能替代 official metric eval。
 
 ## 7. 当前裁决
 
 1. **主线有效行**：StoryMotion v6 unified / specialists / E.T. root-only clean camera rows 可以作为 clean-condition comparison，但必须注明 GT/root condition。
 2. **主线风险**：E.T. replay、P2a noise、P2b clean drop 一致说明 generated/noisy human/root condition 是 camera completion 的关键风险。
-3. **tokenizer 结论**：separate AE no-z、VAE、GRFSQ、HFSQ 均不能 promoted；它们是 Stage1-to-Stage2 contract failure 证据。
+3. **tokenizer 结论**：separate AE no-z、VAE、GRFSQ、HFSQ、corrected joint VAE、corrected joint GRFSQ 均不能 promoted；它们是 Stage1-to-Stage2 contract failure 证据。
 4. **MoLingo 结论**：合法 human-only Stage2 eval 已完成；full mixed 结果仍太弱，不能作为有效 external human baseline。
 5. **论文表述边界**：不能写“unified 已解决 robust human-camera generation”，只能写“建立了统一协议、发现并量化了 reliability mismatch，并排除了若干 tokenizer/训练捷径”。
 
@@ -208,10 +224,14 @@ Stage1 表只说明 tokenizer reconstruction/posthoc eval，不说明 generation
 - seed17 tokenizer / E.T. eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_seed17_eval_20260630`
 - VAE human-global eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_separate_humanglobal_20260630`
 - Stage1 official recon eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_stage1_official_recon_20260630`
-- Stage1 tokenizer visualization: `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/stage1_tokenizers_20260630`
+- joint Stage1 posthoc eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_joint_stage1_recon_eval_20260701`
+- Stage1 tokenizer visualization: `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/stage1/stage1_tokenizers_20260701_rerun`
+- joint Stage1 visualization: `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/stage1/v6_2_joint_stage1_20260701_rerun`
+- joint Stage2 visualization: `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/stage2/v6_2_joint_stage2_20260701_rerun`
 - full mixed camera manifests: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage1/manifests/agent2_pulpmotion_camera_mixed_*_manifest_full_20260630.jsonl`
 - full-train logs: `/data/public/ripemangobox/Motion/StoryMotion/logs/v6_2_fulltrain_20260630`
 - full mixed official eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_fulltrain_eval_20260701`
+- joint full mixed official eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_joint_fulltrain_eval_20260701`
 - Stage1 ablation eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_resume_20260629/pulp_stage1_ablation_eval`
 - v6 native baseline: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_p0_native_20260625`
 - reliability eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_p2b_robustness_20260628`

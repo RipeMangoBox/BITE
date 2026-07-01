@@ -30,7 +30,7 @@ tags:
 # StoryMotion Novelty and Value Positioning
 
 > [!note] 继承关系
-> 这份笔记记录 2026-06-02 的 novelty/价值定位推理，核心结论先被 [[ideas/StoryMotion/archived/v3/2026-06-03_storymotion_canonical_plan|StoryMotion Canonical Plan]] 继承并进一步收缩，随后被当前 CSG 主线 [[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]] 取代。
+> 这份笔记记录 2026-06-02 的 novelty/价值定位推理，核心结论先被 [[ideas/StoryMotion/archived/v3/2026-06-03_storymotion_canonical_plan|StoryMotion Canonical Plan]] 继承并进一步收缩，随后被当前 CSG 主线 [[2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]] 取代。
 
 > [!abstract] 核心结论
 > StoryMotion 现在最稳的定位不是“更好的文本到动作生成器”，也不是“第一个 storyboard 到 3D motion”。这些空间已经被 STMC、Sketch2Anim、Sketch2Colab、STAGE、FairyGen、CondMDI、Kimodo、MotionLab、PRISM 和 ActionPlan 大幅压缩。可守的定位应是：**面向生成后 multi-shot motion asset 的局部编辑协议与系统层**。它把 shot 变成可缓存、可锁定、可局部失效、可边界自适应的编辑单元；目标是在动画迭代中避免“改一个局部导致全片漂移”。

@@ -13,7 +13,7 @@ hypothesis: |
 source_papers:
   - "[[analysis/ICLR_2026/Pulp_Motion_Framing_aware_multimodal_camera_and_human_motion_generation]]"
 created: 2026-06-29T00:00:00
-updated: 2026-07-01T02:47:56+0800
+updated: 2026-07-01T14:08:43+0800
 ---
 ## ICLR Abstract Draft
 
@@ -27,7 +27,7 @@ StoryMotion treats joint human-camera generation as a modeling and evaluation pr
 
 ## 结论摘要
 
-v6.2 是独立裁决版，不依赖读者先读 v6.1。核心更新是：camera reliability mismatch 成立；Stage1 tokenizer reconstruction 与 Stage2 joint/completion 进入统一口径；新 tokenizer 的 Stage2 official callback eval 已进入负面诊断表；E.T./DIRECTOR 只保留 StoryMotion/Pulp metric 下的有效 baseline/replay 结果；MoLingo human-only 与 separate AE no-z Stage2 已完成 5090 metric eval，但都只能作为负面闭环。2026-06-30 进一步确认 mixed-subset 不是单纯 eval 子集，而是旧 camera manifest 限制训练 cache 到 `29779/3279`；2026-07-01 已完成 MoLingo、separate AE no-z、separate VAE with-z 的 full mixed train 与 official eval，补到 `94050/10549` 后仍全部负面。
+v6.2 是独立裁决版，不依赖读者先读 v6.1。核心更新是：camera reliability mismatch 成立；Stage1 tokenizer reconstruction 与 Stage2 joint/completion 进入统一口径；新 tokenizer 的 Stage2 official callback eval 已进入负面诊断表；E.T./DIRECTOR 只保留 StoryMotion/Pulp metric 下的有效 baseline/replay 结果；MoLingo human-only 与 separate AE no-z Stage2 已完成 5090 metric eval，但都只能作为负面闭环。2026-06-30 进一步确认 mixed-subset 不是单纯 eval 子集，而是旧 camera manifest 限制训练 cache 到 `29779/3279`；2026-07-01 已完成 MoLingo、separate AE no-z、separate VAE with-z、joint VAE with-z、joint GRFSQ with-z 的 full mixed train 与 official eval，补到 `94050/10549` 后仍全部负面。
 
 1. **根因不变**：camera latent 的 distance block 依赖逐帧 human/root world coordinate，`distance_feat = camera_translation - human_translation`；Stage2 又同步 denoise `concat([z_hum,z_cam])`，因此 observed human/root 偏差会不对称地污染 camera completion。
 2. **C2 reliability 问题成立**：训练和 eval 中 hard observed replacement 加上 `obs_x0 + obs_mask` 条件，使模型学到 observed branch 完全可信，而不是按 source / quality 动态调信任。
@@ -73,7 +73,7 @@ StoryMotion 目前最有价值的不是某个单点指标，而是它把“human
 
 1. **generated-human-aware training**：训练时真的喂 generated human/root condition，而不是只留 `generated` 标签位。
 2. **camera latent 解耦 ablation**：global camera / root-independent camera representation 必须作为强 ablation，验证 relative-distance contract 是否是硬瓶颈。
-3. **Stage2 full eval 闭环**：MoLingo、separate AE no-z、separate VAE with-z 已完成 full mixed official eval；后续 joint GRFSQ 等新 tokenizer / stage2 run 仍必须进入同一 official callback 表，否则只算内部诊断。
+3. **Stage2 full eval 闭环**：MoLingo、separate AE no-z、separate VAE with-z、joint VAE with-z、joint GRFSQ with-z 已完成 full mixed official eval；后续任何新 tokenizer / stage2 run 仍必须进入同一 official callback 表，否则只算内部诊断。
 4. **baseline adapter 清洁化**：MoLingo、E.T. 先过 Pulp contract，再谈正式 comparison。
 
 ## 当前核心裁决
@@ -84,6 +84,7 @@ StoryMotion 目前最有价值的不是某个单点指标，而是它把“human
 - Reliability mismatch 成立：observed human/root 一旦变成 noisy、missing 或 generated，camera branch 退化远大于 human branch。
 - P2a matched additive-noise 证明 camera completion 是脆弱支路；human completion 对 observed camera noise 相对稳健。
 - separate VAE pure、GRFSQ longtrain pure/mixed、HFSQ pure/mixed 的 Stage2 official eval 显著退化，只能作为 tokenizer-to-Stage2 质量传递断裂的诊断证据。
+- corrected joint VAE / joint GRFSQ full mixed Stage2 official eval 也显著退化；joint GRFSQ 比 joint VAE 稍好，但 camera/joint 指标仍远离有效行。
 
 ### 未成立
 
@@ -92,6 +93,7 @@ StoryMotion 目前最有价值的不是某个单点指标，而是它把“human
 - 不能声称 E.T./DIRECTOR 已完成完整因果诊断；当前只有 baseline/replay camera metric，shuffle-based diagnostics 仍未整理。
 - 不能把 camera global-position 版本设为默认；默认版本仍是 Pulp 原生 relative-distance camera latent。
 - 不能把 separate VAE / GRFSQ / HFSQ Stage2 写成 promoted baseline；当前 official callback 指标不支持。
+- 不能把 corrected joint VAE / joint GRFSQ 写成 promoted baseline；full mixed official eval 仍不支持。
 
 ## Settings 与操作解释
 
@@ -122,17 +124,17 @@ StoryMotion 目前最有价值的不是某个单点指标，而是它把“human
 
 #### Official callback rows
 
-| model | split | mode | samples | FDTMR↓ | TMR↑ | FDCLaTr↓ | CLaTr↑ | caption F1↑ | root in-frame↑ |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| GT human | mixed | human reference | 10549 | 0.00 | 17.71 | - | - | - | - |
-| PulpMotion Stage2 | pure | joint/generation | 4053 | 419.24 | 21.69 | 90.62 | 38.90 | 0.520 | - |
-| PulpMotion Stage2 | mixed | joint/generation | 10549 | 426.21 | 24.87 | 80.20 | 32.84 | 0.364 | - |
-| StoryMotion v6 | pure | unified joint | 4053 | 137.12 | 21.25 | 91.47 | 44.46 | 0.594 | - |
-| StoryMotion v6 | mixed | unified human | 10549 | 126.71 | 18.17 | - | - | - | - |
-| StoryMotion v6 | mixed | unified camera | 10549 | - | - | 14.50 | 54.85 | 0.638 | - |
-| StoryMotion v6 | mixed | unified joint | 10549 | 155.73 | 23.95 | 85.70 | 33.52 | 0.374 | - |
-| E.T./DIRECTOR | mixed | camera completion, GT/root condition, seed17 | 10549 | - | - | 14.51 | 54.84 | 0.64 | 0.81 |
-| E.T./DIRECTOR | mixed | camera replay, generated-human condition, seed17 | 10549 | - | - | 92.24 | 33.31 | 0.37 | 0.27 |
+| model             | split | mode                                             | samples | FDTMR↓ |  TMR↑ | FDCLaTr↓ | CLaTr↑ | caption F1↑ | root in-frame↑ |
+| ----------------- | ----- | ------------------------------------------------ | ------: | -----: | ----: | -------: | -----: | ----------: | -------------: |
+| GT human          | mixed | human reference                                  |   10549 |   0.00 | 17.71 |        - |      - |           - |              - |
+| PulpMotion Stage2 | pure  | joint/generation                                 |    4053 | 419.24 | 21.69 |    90.62 |  38.90 |       0.520 |              - |
+| PulpMotion Stage2 | mixed | joint/generation                                 |   10549 | 426.21 | 24.87 |    80.20 |  32.84 |       0.364 |              - |
+| StoryMotion v6    | pure  | unified joint                                    |    4053 | 137.12 | 21.25 |    91.47 |  44.46 |       0.594 |              - |
+| StoryMotion v6    | mixed | unified human                                    |   10549 | 126.71 | 18.17 |        - |      - |           - |              - |
+| StoryMotion v6    | mixed | unified camera                                   |   10549 |      - |     - |    14.50 |  54.85 |       0.638 |              - |
+| StoryMotion v6    | mixed | unified joint                                    |   10549 | 155.73 | 23.95 |    85.70 |  33.52 |       0.374 |              - |
+| E.T./DIRECTOR     | mixed | camera completion, GT/root condition, seed17     |   10549 |      - |     - |    14.51 |  54.84 |        0.64 |           0.81 |
+| E.T./DIRECTOR     | mixed | camera replay, generated-human condition, seed17 |   10549 |      - |     - |    92.24 |  33.31 |        0.37 |           0.27 |
 
 **Stage2 裁决**：clean GT/root camera completion 可以看起来很强，但 generated-human replay 明显退化；这支持 reliability mismatch，而不是支持“统一 joint generator 已解决 camera generation”。Pure/mixed 必须分开看：pure 上 StoryMotion human-side latent/full eval 较干净，mixed 上 camera/root condition mismatch 是主风险。
 
@@ -202,11 +204,11 @@ MoLingo 只接受 Pulp `smpl_rifke` 199 维 in/out contract 下重新训练和�
 | Pulp separate AE no-z | 5090 GPU1 | `runs/train/stage1/separate/separate_ae_noz_mixed_bs128_seed17_500ep_gpu1_20260630` | Stage1 完成并完成 posthoc eval；best=last step `116500` | 去掉 KL/采样，只把 joint AE 改成 separate AE，隔离“联合表示 vs separate 表示” |
 | Pulp joint VAE with-z KL | 5090 GPU1 | `runs/train/stage1/joint/joint_vae_wz_mixed_bs128_seed17_500ep_gpu1_20260630` | Stage1 完成并完成 posthoc eval；best step `110000`，last step `116500` | 在 Pulp human-camera joint Stage1 上加入与 VAE 相同量级的 `kl_weight=1e-5`，测试 KL 是否破坏/改善 Stage2 latent |
 
-| ablation | ckpt | samples | total loss↓ | human MSE↓ | camera MSE↓ | KL loss | 当前读数 |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Pulp separate AE no-z | best_top1 / last | 3279 | 0.002174 | 0.001469 | 0.000933 | - | deterministic separate AE 没有坏；camera recon 接近 separate VAE no-z mixed |
-| Pulp joint VAE with-z KL | best_top1 | 3279 | 0.007822 | 0.003893 | 0.008252 | 3.689679 | KL joint 版本 Stage1 recon 明显变差，不能直接当作更好 tokenizer |
-| Pulp joint VAE with-z KL | last | 3279 | 0.007844 | 0.003877 | 0.008260 | 3.894135 | last 与 best 接近；KL 没有自动带来可用生成能力 |
+| ablation                 | ckpt             | samples | total loss↓ | human MSE↓ | camera MSE↓ |  KL loss | 当前读数                                                                  |
+| ------------------------ | ---------------- | ------: | ----------: | ---------: | ----------: | -------: | --------------------------------------------------------------------- |
+| Pulp separate AE no-z    | best_top1 / last |    3279 |    0.002174 |   0.001469 |    0.000933 |        - | deterministic separate AE 没有坏；camera recon 接近 separate VAE no-z mixed |
+| Pulp joint VAE with-z KL | best_top1        |    3279 |    0.007822 |   0.003893 |    0.008252 | 3.689679 | KL joint 版本 Stage1 recon 明显变差，不能直接当作更好 tokenizer                      |
+| Pulp joint VAE with-z KL | last             |    3279 |    0.007844 |   0.003877 |    0.008260 | 3.894135 | last 与 best 接近；KL 没有自动带来可用生成能力                                        |
 
 separate AE no-z 已完成 Stage2：cache 为 `runs/train/stage2/v6_2_separate_ae_noz_seed17_cache_20260630/mixed_noz`，Stage2 run 为 `runs/train/stage2/v6_2_separate_ae_noz_seed17_20260630/mixed_b512`，5090 GPU1，`batch_size=512`，`seed=17`，`task_probs 1 1 1`。训练完成到 `50000/50000` step，最终 train loss 约 `0.05774`；official callback eval 覆盖 mixed-subset `3279` samples：human FDTMR `2018.28`、TMR `4.450`、HCov `0.1%`；camera FDCLaTr `623.87`、CLaTr `8.476`、CCov `0.8%`、F1 `0.074`；joint FDTMR `2031.69`、FDCLaTr `583.11`、Out `93.7%`。
 
@@ -218,13 +220,13 @@ separate AE no-z 已完成 Stage2：cache 为 `runs/train/stage2/v6_2_separate_a
 
 loss/MSE 只作为辅助诊断，主对比补充为 frozen Stage1 reconstruction 的 official callback metrics。no-z camera/joint 行使用 GT-z passthrough diagnostic，因此可读 camera semantic/framing upper bound，但不能说明 tokenizer 自己学会 z-depth。
 
-| tokenizer | split | samples | task | FDTMR↓ | TMR↑ | FDCLaTr↓ | CLaTr↑ | caption F1↑ | outscreen↓ | 读数 |
-| --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| separate AE no-z | mixed-subset | 3279 | joint | 1360.39 | 10.524 | 2.71 | 66.26 | 0.878 | 20.3% | strongest Stage1 upper bound; Stage2 still fails |
-| separate VAE with-z | mixed-subset | 3279 | joint | 1364.23 | 10.505 | 4.75 | 64.87 | 0.842 | 20.0% | strong Stage1, weak Stage2 |
-| MoLingo VAE no-z | mixed-subset | 3279 | joint | 1366.94 | 10.409 | 11.51 | 63.85 | 0.813 | 20.5% | Stage1 ok, human-only Stage2 fails |
-| HFSQ wscale no-z | mixed-subset | 3279 | joint | 1467.92 | 6.690 | 67.60 | 47.73 | 0.585 | 18.9% | quantized recon weaker |
-| GRFSQ bs128 no-z | mixed-subset | 3279 | joint | 1359.42 | 8.309 | 140.01 | 45.10 | 0.592 | 19.8% | camera upper bound weak |
+| tokenizer           | split        | samples | task  |  FDTMR↓ |   TMR↑ | FDCLaTr↓ | CLaTr↑ | caption F1↑ | outscreen↓ | 读数                                               |
+| ------------------- | ------------ | ------: | ----- | ------: | -----: | -------: | -----: | ----------: | ---------: | ------------------------------------------------ |
+| separate AE no-z    | mixed-subset |    3279 | joint | 1360.39 | 10.524 |     2.71 |  66.26 |       0.878 |      20.3% | strongest Stage1 upper bound; Stage2 still fails |
+| separate VAE with-z | mixed-subset |    3279 | joint | 1364.23 | 10.505 |     4.75 |  64.87 |       0.842 |      20.0% | strong Stage1, weak Stage2                       |
+| MoLingo VAE no-z    | mixed-subset |    3279 | joint | 1366.94 | 10.409 |    11.51 |  63.85 |       0.813 |      20.5% | Stage1 ok, human-only Stage2 fails               |
+| HFSQ wscale no-z    | mixed-subset |    3279 | joint | 1467.92 |  6.690 |    67.60 |  47.73 |       0.585 |      18.9% | quantized recon weaker                           |
+| GRFSQ bs128 no-z    | mixed-subset |    3279 | joint | 1359.42 |  8.309 |   140.01 |  45.10 |       0.592 |      19.8% | camera upper bound weak                          |
 
 证据路径：`stage2/metrics/v6_2_stage1_official_recon_20260630` 和 `stage2/metrics/v6_2_separate_humanglobal_20260630/stage1_separate_vae_wz_mixed_*official_recon*.json`。
 
@@ -242,16 +244,25 @@ loss/MSE 只作为辅助诊断，主对比补充为 frozen Stage1 reconstruction
 | separate AE no-z full | 5090 GPU0 | train + full official eval 完成；negative |
 | separate VAE with-z full | 5090 GPU1 | train + full official eval 完成；negative |
 | MoLingo human-only full | 5090 GPU2 | train + full official eval 完成；negative |
+| joint VAE with-z full | 5090 GPU0 | train + full official eval 完成；negative |
+| joint GRFSQ with-z full | 5090 GPU1 | train + full official eval 完成；negative |
 
 指标数据独立存储在 [[2026-07-01_storymotion-v6.2-metric-data]]：
 
-![[2026-07-01_storymotion-v6.2-metric-data#Full Mixed Official Eval 2026-07-01]]
+![[2026-07-01_storymotion-v6.2-metric-data#1. Full Mixed Main Comparison]]
+![[2026-07-01_storymotion-v6.2-metric-data#3. Stage1 Reconstruction And Ablation]]
 
-日志路径：`logs/v6_2_fulltrain_20260630`；full official eval 路径：`stage2/metrics/v6_2_fulltrain_eval_20260701`。旧 mixed-subset rows 保留为早期/不公平对照，不能与 full mixed `10549` official rows 直接宣称胜负。4090 GPU1 的 joint GRFSQ full 仍未纳入本轮闭环。
+日志路径：`logs/v6_2_fulltrain_20260630` 和 `logs/v6_2_joint_vis_20260701`；full official eval 路径：`stage2/metrics/v6_2_fulltrain_eval_20260701` 与 `stage2/metrics/v6_2_joint_fulltrain_eval_20260701`。旧 mixed-subset rows 保留为早期/不公平对照，不能与 full mixed `10549` official rows 直接宣称胜负。joint VAE / joint GRFSQ 的 full mixed Stage2 已纳入本轮闭环，结论仍为负面。
 
 ### Stage1 visualization
 
-已生成 unified Stage1 tokenizer reconstruction 可视化：`runs/visualizations/stage1_tokenizers_20260630/manifest.json`。覆盖 `4` 个 mixed-test sample、`5` 个 tokenizer：`separate_ae_noz`、`separate_vae_wz`、`separate_hfsq_wscale_noz`、`separate_grfsq_bs128_noz`、`molingo_vae_noz`。每个 sample/model 有 `fixed_camera.mp4`、`orbiting_camera.mp4`、`camera_trajectory.mp4` 和 `rifke_joints_projection.npz`，总计 `73` 个文件。
+已重新生成 unified Stage1 tokenizer reconstruction 可视化：`runs/visualizations/stage1/stage1_tokenizers_20260701_rerun/manifest.json`。覆盖 `4` 个 mixed-test sample、`5` 个 tokenizer：`separate_ae_noz`、`separate_vae_wz`、`separate_hfsq_wscale_noz`、`separate_grfsq_bs128_noz`、`molingo_vae_noz`。每个 sample/model 有 `fixed_camera.mp4`、`orbiting_camera.mp4`、`camera_trajectory.mp4` 和 `rifke_joints_projection.npz`。
+
+2026-07-01 新增 joint Stage1 / Stage2 visualization：
+
+- `runs/visualizations/stage1/v6_2_joint_stage1_20260701_rerun/manifest.json`：mixed/pure 各 `2` 个 sample，GT、joint VAE、joint GRFSQ，共 `61` 个文件。
+- `runs/visualizations/stage2/v6_2_joint_stage2_20260701_rerun/joint_vae_wz_mixed_full/stage2/vis/v4/concat/cfg_h1_c1_seed17_best_eval/v4_4x3_text_global_camera_manifest.json`：`2` samples × `3` modes，probe `failed=0`。
+- `runs/visualizations/stage2/v6_2_joint_stage2_20260701_rerun/joint_grfsq_wz_mixed_full/stage2/vis/v4/concat/cfg_h1_c1_seed17_best_eval/v4_4x3_text_global_camera_manifest.json`：`2` samples × `3` modes，probe `failed=0`。
 
 ## E.T./DIRECTOR 状态
 
@@ -289,7 +300,7 @@ E.T. 不能做“无脑数据替换”。必须满足以下 contract 才能写�
 | P2a matched noise       | 完成               | camera 对 observed human/root noise 极敏感           |
 | Stage1 tokenizer full eval | 完成 | VAE reconstruction 最强；GRFSQ/HFSQ mixed camera 质量不足 |
 | Stage2 tokenizer-cache official eval | 完成 | VAE/GRFSQ/HFSQ separate rows 只保留为负面诊断 |
-| Stage2 full mixed official eval | 完成 | MoLingo、separate AE no-z、separate VAE with-z 均仍为负面；4090 GPU1 joint GRFSQ full 除外 |
+| Stage2 full mixed official eval | 完成 | MoLingo、separate AE no-z、separate VAE with-z、joint VAE with-z、joint GRFSQ with-z 均仍为负面 |
 | SM-global-pos variant   | Stage1 已启动       | 只作 ablation；默认仍是 relative distance               |
 | MoLingo VAE             | Stage2 human-only training + official eval 完成 | FDTMR `2353.96`、HCov `0.1%`；只作负面 external human baseline |
 | Pulp separate AE no-z ablation | Stage1 + Stage2 + official eval 完成 | Stage1 recon 可接受，但 Stage2 human/camera/joint 坍塌，只作负面诊断 |
@@ -315,6 +326,8 @@ E.T. 不能做“无脑数据替换”。必须满足以下 contract 才能写�
 | MoLingo human-only full mixed official callback | 10549 | 完成 | FDTMR `2396.07`、TMR `4.112`、HCov `0.04%`；full train 仍失败 |
 | Pulp separate AE no-z full mixed official callback | 10549 | 完成 | human FDTMR `2147.78`；camera FDCLaTr `676.56`；joint Out `95.5%`；负面诊断 |
 | separate VAE with-z full mixed official callback | 10549 | 完成 | human FDTMR `1823.40`、TMR `0.000`；joint FDCLaTr `885.36`、Out `99.0%`；负面诊断 |
+| joint VAE with-z full mixed official callback | 10549 | 完成 | human FDTMR `2176.30`、TMR `0.000`；joint FDCLaTr `989.53`、Out `100.0%`；负面诊断 |
+| joint GRFSQ with-z full mixed official callback | 10549 | 完成 | human FDTMR `1598.73`、TMR `9.887`；joint FDCLaTr `663.60`、Out `99.6%`；负面诊断 |
 
 **读数边界**：这些完成状态只说明 official callback eval 产物齐全。它们支持 tokenizer-to-Stage2 质量传递风险，不支持 promoted baseline 或 SOTA claim。
 
@@ -351,5 +364,8 @@ E.T. 不能做“无脑数据替换”。必须满足以下 contract 才能写�
 - 2026-06-30 分类比较总表：[[2026-06-30_storymotion-experiment-metric-comparison]]
 - 2026-07-01 full mixed metric data：[[2026-07-01_storymotion-v6.2-metric-data]]
 - 2026-07-01 full mixed official eval：`/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_fulltrain_eval_20260701`
+- 2026-07-01 joint full mixed official eval：`/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_joint_fulltrain_eval_20260701`
+- 2026-07-01 joint Stage1 posthoc eval：`/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_joint_stage1_recon_eval_20260701`
+- 2026-07-01 joint visualization rerun：`/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/stage1/v6_2_joint_stage1_20260701_rerun` and `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/stage2/v6_2_joint_stage2_20260701_rerun`
 
-2026-07-01 02:47 CST 已补充 full mixed train/eval 完成状态、独立 metric data note 和两个结论页的 Obsidian 嵌入引用。仍需补的是 E.T./DIRECTOR shuffle/swap causal diagnostics 的正式整理，以及 4090 GPU1 joint GRFSQ full 完成后的同口径 metric eval。
+2026-07-01 12:23 CST 已补充 joint VAE / joint GRFSQ full mixed train/eval、Stage1 posthoc eval、Stage1/Stage2 visualization 和两个结论页的 Obsidian 嵌入引用。仍需补的是 E.T./DIRECTOR shuffle/swap causal diagnostics 的正式整理，以及后续 global camera / generated-human-aware 方向的正式实验。

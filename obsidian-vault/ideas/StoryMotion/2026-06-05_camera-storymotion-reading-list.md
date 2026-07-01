@@ -56,7 +56,7 @@ tags:
 
 | # | 文档 | 核心问题 | 预计时间 |
 |---|---|---|---|
-| 12 | [[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan\|StoryMotion CSG Plan]] | 已有 human-camera timeline 局部编辑后，如何量化失效范围、保护已批准内容、仅修复 boundary？ | 25min |
+| 12 | [[2026-06-04_storymotion_cinematic_section_graph_plan\|StoryMotion CSG Plan]] | 已有 human-camera timeline 局部编辑后，如何量化失效范围、保护已批准内容、仅修复 boundary？ | 25min |
 | 13 | [[ideas/StoryMotion/2026-06-05_unified-human-camera-motion-token-framework\|Unified Token Framework]] | 能否用 unified mask-then-predict 范式统一 human-camera 的生成和编辑？（Q&A 格式） | 20min |
 
 ---

@@ -1,17 +1,62 @@
 ---
-title: "StoryMotion Decoupled Coupling QA - Claude/Kiro 复查中文整理"
-hypothesis: "Claude/Kiro 复查认为当前证据支持 StoryMotion 的核心问题定位为 condition dominance、branch pollution 与 coupling strength/timing，但不支持把 A/B/C/D 写成修复完成或 controlled coupling 已验证。"
+title: StoryMotion Decoupled Coupling QA - Claude/Kiro 复查中文整理
+hypothesis: Claude/Kiro 复查与后续代码审计共同支持：StoryMotion 的问题应进一步收缩为 camera 表示对 human root 的结构依赖、completion condition dominance 与任务定义混杂；root-first 等方案仍待对照。
 status: draft
 created: 2026-06-24T22:14:01+08:00
-updated: 2026-06-24T22:14:01+08:00
+updated: 2026-06-25T19:38:00+08:00
 source_notes:
-  - "[[ideas/StoryMotion/2026-06-23_storymotion-decoupled-coupling-qa]]"
+  - "[[2026-06-23_storymotion-decoupled-coupling-qa-v5.1]]"
 ---
 
 # StoryMotion Decoupled Coupling QA - Claude/Kiro 复查中文整理
 
 > [!note] 整理说明
 > 本文是对 Claude/Kiro 反馈的中文整理译文。原反馈中存在明显断行、乱码和字段残缺；本文保留可辨认的技术判断、数值和优先级，按原有结构整理为可读中文。本文不是新增实验结论。
+
+> [!warning] 2026-06-25 follow-up 回填
+> 下文 Priority 1 / 2 是 2026-06-24 的审查建议。最新完整数据和重构后的任务定义见 [[2026-06-23_storymotion-decoupled-coupling-qa-v5.1#2026-06-25 follow-up full eval|主 QA follow-up]]。核心变化是：R@K 异常已定位为 eval batch-size 依赖，Pulp pure / mixed b64 Stage1 与 Stage2 公平基线已补齐；第一版 soft observed 没有 clean-task Pareto 改善；代码确认 Pulp camera translation feature 显式依赖 human root，因此下一版优先讨论 root/relation factorization，而不是直接在 raw latent 上加 gate。
+
+## 2026-06-25 follow-up verdict
+
+StoryMotion 与 mixed Pulp full eval 均覆盖 `10549` samples，pure Pulp eval 覆盖 `4053` samples；训练只有单 seed，因此只能报告 point estimates，不能声称统计显著。
+
+| 项目 | 结果 | 对原复查建议的更新 |
+| --- | --- | --- |
+| soft observed `p=0.5, std=0.15` | joint camera 指标部分改善，但 joint human / outscreen 有退化；clean camera completion 全面退化；clean human completion 为质量/coverage tradeoff | Priority 1 已执行第一版，但没有形成 Pareto 解法 |
+| camera specialist | clean camera 与 unified control 总体接近；CLaTr / R3 / F1 更高，FDCLaTr 略差 | Priority 2 的 camera baseline 已完成 |
+| human specialist | clean human 与 unified control 几乎持平 | Priority 2 的 human baseline 已完成 |
+| specialist observed zero / shuffle | 两个方向均大幅崩溃，zero 时 coverage 接近 `0` | single-task training 不能解决 condition dominance |
+| CondMDI-style internal run | 5090 b16 复现 4090 b16；b64 只改变 R@K，FDTMR / TMR / coverage 不变 | checkpoint 有效；历史异常来自 batch-local retrieval，不是数据 |
+| screen projection containment | pre-NaN best 的 Out `0.50%`，但 FDCLaTr `350.06`、F1 `17.42%`、Camera Cov `33.32%`；训练随后 NaN | 当前实现是失败性 tradeoff，不进入主线 |
+| Pulp b64 Stage1 / Stage2 | Stage1 mixed coverage 为 Human `85.41%`、Camera `87.16%`；Stage2 no-Aux 降为 `10.63% / 51.60%` | Pulp 的主要瓶颈在 Stage2 generation，Stage1 stable foundation 获得直接数值证据 |
+| StoryMotion vs Pulp mixed b64 | StoryMotion clean joint 在表列指标上优于 Pulp no-Aux；相对 Pulp Aux 仅 TMR 略低 | 内部同 batch-size 比较已公平；仍不能声称多 seed 显著或论文默认 b128 SOTA |
+
+`observed_noise_matched` 的 follow-up eval 名称具有误导性：实现实际先随机替换整支 observed latent，再叠加 `1.0` 相对噪声，不匹配训练时 `0.15` 加性扰动，也没有 clean-control 同协议对照。因此 soft-observed robustness 仍未被正确验证。下一步先敲定 human task 与 root/relation 接口，再设计 matched reliability protocol；learned gate 后置。
+
+### R@K 与 checkpoint 审计补充
+
+- Pulp local official 默认 eval batch 是 `128/GPU`；2026-06-25 已额外完成 pure / mixed b64 rerun。StoryMotion 当前主表为 b64，历史 4090 异常项为 b16。
+- Pulp retrieval callback 在每个 batch 内构造 `B×B` 候选池，因此 R@K 只在相同 eval batch size 下可比。
+- 两机 b16 同 checkpoint 结果几乎一致；5090 b64 仅使 R@K 回落，FD、score、coverage、F1、Out 基本不变。
+- 新增 Pulp b64 与 StoryMotion b64 可作本地直接对照；Pulp paper/default b128 仍应单独标记，不能混入同一 R@K 表。
+- 两机 train/val cache、split、metric 权重及 screen 原始几何字段同 hash；数据分叉被排除。
+- CondMDI `last@196000` 训练无 NaN 且权重有限；screen `best@170000` 有限，`last@176000` 从 `175100` 起 NaN 并失效。
+
+### Pulp b64 公平基线补充
+
+结果目录：`/data/public/ripemangobox/Motion/StoryMotion/runs/eval/pulpmotion_core_bs64_20260625/`。
+
+| model / split | FDTMR ↓ | TMR ↑ | Human R3 ↑ | Human Cov ↑ | FDCLaTr ↓ | CLaTr ↑ | Camera R3 ↑ | Camera Cov ↑ | F1 ↑ | r_fpd ↓ | Out ↓ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Pulp Stage1 mixed reconstruction | 124.46 | 18.17 | 21.81% | 85.41% | 15.51 | 58.10 | 54.53% | 87.16% | 67.01% | 0.238 | 4.64% |
+| Pulp Stage2 mixed no-Aux | 376.39 | 23.34 | 20.44% | 10.63% | 88.17 | 30.52 | 23.00% | 51.60% | 34.16% | 5.161 | 26.63% |
+| Pulp Stage2 mixed Aux | 426.21 | 24.87 | 21.21% | 8.88% | 80.20 | 32.84 | 24.31% | 49.02% | 36.36% | 3.832 | 17.69% |
+| StoryMotion clean joint | 157.36 | 24.26 | 26.84% | 37.43% | 76.85 | 36.16 | 29.83% | 65.80% | 40.21% | 0.482 | 7.58% |
+
+这组结果改变了两个证据状态：
+
+1. **Pulp Stage1 stable foundation 从推断升级为直接实证。** Stage1 reconstruction 与 Stage2 generation 之间存在明显 gap，说明 Pulp checkpoint 的主要失真来自 Stage2，而不是 tokenizer/decode contract。
+2. **StoryMotion 的本地 Pulp 对比不再受 b64/b128 R@K 混用影响。** 同 mixed split、同 evaluator、同 b64 下，StoryMotion clean joint 相对 Pulp Aux 的 FDTMR 低 `63.1%`、Human / Camera coverage 高 `28.54 / 16.78` 个百分点、`r_fpd` 低 `87.4%`、Out 低 `10.11` 个百分点，但 TMR 低 `0.61`。应写成单 seed point estimate，而不是全面 SOTA。
 
 ## 复查元信息
 
@@ -29,7 +74,7 @@ source_notes:
 
 3. **Observed-branch dominance 是强证据。** A 矩阵显示 completion 任务对 text noise 基本不敏感，但 observed branch 被 zero / shuffle / noise 后会灾难性退化。camera completion 在 observed human zero 时 coverage 只有 `0.35%`；human completion 在 observed camera + noise 时 coverage 从 clean 的 `84.61%` 降到 `72.91%`。根因不是单个指标异常，而是 observed branch 在评估 harness 里 hard replacement，并且又作为显式 `obs_x0` 条件进入模型；训练时 binary mask=1 总是配 clean GT `obs_x0`，checkpoint metadata 也确认 `obs_self_condition_prob=0.0`，没有 corruption training。
 
-4. **Generated-camera replay 不能解释或修复 joint degradation。** Replay 的 FDTMR `148.69`、TMR `23.54`、MPJPE `0.1947`，与 joint baseline 的 FDTMR `153.72`、TMR `23.91`、MPJPE `0.1928` 基本同区间。两者都远差于 GT-camera oracle。因此文档中“replay 不是修复路径”的结论正确；瓶颈更像是 generated camera 质量，而不是 simultaneous denoising 这个表面形式。
+4. **Generated-camera replay 不能修复 joint degradation，但不能据此否定 root-first。** Replay 的 FDTMR `148.69`、TMR `23.54`、MPJPE `0.1947`，与 joint baseline 基本同区间。它测试的是“先生成 full camera，再由 camera 生 human”，与 camera 表示的 `human root -> relative camera` 方向相反；它没有测试“先 human root，再 camera”。
 
 5. **GT-camera oracle 的语义解释有过度宣称。** 文档把 GT camera 下 TMR `18.17` 解释为“GT camera suppresses text semantics”。Kiro 认为这只是中等证据：低 TMR 也可能来自 reconstruction-like 任务目标、GT camera 对 human motion 空间的强约束，或者训练中从 GT camera 间接锁定 GT human。没有 ground-truth human TMR baseline 时，不能把它唯一解释成“语义被 camera 压制”。
 
@@ -101,15 +146,19 @@ joint 中：
 
 因此“raw latent concat 有无控制耦合风险”是中等证据；但“relation-space 一定能修好”仍需实验证明。
 
-### 4. 4090 screen containment 证据不能提前写成性能结论
+### 4. Camera representation 的 root 依赖：代码级强证据
 
-文档可以写 4090 containment 的代码路径和 evalfix 状态，但不能写 relation-space 已验证有效。当前证据只说明：
+Pulp camera feature 明确包含：
 
-- screen projection containment 的训练原型可运行；
-- eval 聚合 bug 已修复；
-- eval / test 路径能够继续通过。
+```text
+camera_translation - human_root_translation
+```
 
-在 full official metrics 完成之前，不能声称它改善了 projection / semantic Pareto。
+decode 时又把 decoded human root 加回 camera translation。因此 camera latent 不是与 human 独立并列的变量。更合理的结构假设是先生成 human root / coarse relation，再生成 body 与 camera；不是先完整 human，也不是先 full camera。该事实提升了 root-first 的研究优先级，但 root-first 的性能仍需 ablation。
+
+### 5. 4090 screen containment 是负面对照，不是 relation-space 成功证据
+
+5090 已复评 pre-NaN `best@170000`。它将 Out 降到 `0.50%`，但 b64 FDCLaTr 为 `350.09`、F1 为 `17.44%`、Camera Cov 为 `33.14%`；后续 `last@176000` 又因训练 NaN 失效。因此只能写“强 projection penalty 造成 containment/camera quality 的失败性 tradeoff”，不能写 relation-space 已验证有效。
 
 ## IV. 文档中过度宣称的地方
 
@@ -140,152 +189,52 @@ joint 中：
 
 6. **Diagonal / off-diagonal text routing。** A 矩阵不仅说明 joint 依赖 text，还说明 text half 的影响有 branch-specific 对角结构和 cross-talk。
 
+7. **Human task 定义混杂。** camera-conditioned actor recovery、root-only conditioned human generation 与 human-text-only generation 回答不同问题。最后一种是有效的解耦对照，但严格说不再是给定 camera 的 completion。
+
 ## VI. 论文 claim 收缩建议
 
-| Claim                                                      | 判断     | 建议改写                                                                                       |
-| ---------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
-| Unified three-mode SOTA                                    | Reject | Completion 和 joint 是不同机制；需要 same-tokenizer、same-backbone、same-budget 单任务 baseline 才能写 SOTA |
-| StoryMotion achieves decoupling                            | Reject | A 矩阵显示 completion 是 observed-dominant，joint 有 text coupling 和 branch cross-talk            |
-| Completion has fairly won                                  | Reject | 目前没有公平 single-task completion baseline；observed-GT completion 更像 reconstruction            |
-| Controlled coupling is the core problem                    | Accept | 数据和代码共同支持 condition dominance、branch pollution、timing tradeoff 是核心问题                       |
-| Pulp Stage1 is stable foundation                           | Accept | 在当前 scope 内，Pulp latent contract 是稳定地基；source VAE / GRFSQ 坍塌支持保留它                          |
-| Branch-mask diffusion needs upgrade to controlled coupling | Accept | root cause 确认；应升级到 corruption training、learned gate、quality-aware conditioning             |
+| Claim                                                          | 判断     | 建议改写                                                                                       |
+| -------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| Unified three-mode SOTA                                        | Reject | Completion 和 joint 是不同机制；需要 same-tokenizer、same-backbone、same-budget 单任务 baseline 才能写 SOTA |
+| StoryMotion achieves decoupling                                | Reject | A 矩阵显示 completion 是 observed-dominant，joint 有 text coupling 和 branch cross-talk            |
+| Completion has fairly won                                      | Reject | 目前没有公平 single-task completion baseline；observed-GT completion 更像 reconstruction            |
+| Root/relation-aware conditional generation is the core problem | Accept | camera 表示依赖 human root，任务条件方向与可靠性需要显式建模                                                    |
+| Pulp Stage1 is stable foundation                               | Accept | mixed b64 reconstruction 的 Human / Camera coverage 为 `85.41% / 87.16%`，明显高于 Pulp Stage2；source VAE / GRFSQ 坍塌进一步支持保留它 |
+| Branch-mask diffusion needs structural upgrade                 | Accept | 优先 root/relation factorization 与任务拆分，其次 reliability training；gate 后置                       |
 
-## VII. Next steps 优先级
+## VII. 重构后的决策顺序
 
-### Priority 1：Soft observed branch training
+当前不直接启动下一轮多卡训练。先依次敲定：
 
-结论：保留，最高优先级。
+1. human mode 是 camera-conditioned actor recovery、root-only generation，还是 human-text-only generation；三者可并存，但不能混称同一任务。
+2. joint 主假设是否改为 root-first；优先比较 current simultaneous 与 root-first，不先做 full human-first。
+3. practical completion 的 condition source 是否覆盖 clean / additive-noisy / generated / missing，并用 quality/source token 显式标记。
+4. 本地公平比较使用已完成的 Pulp / StoryMotion b64；论文对外协议再统一到 Pulp b128，或改成 batch-invariant global retrieval。
+5. 只有前三项仍不能解决问题时，再考虑 root/relation-space gated residual。
 
-要做什么：
+### 候选对照
 
-- 使用现有 `make_observed_condition_x0` 路径；
-- 训练 `obs_self_condition_prob > 0`；
-- 使用 `mode=noisy` 或 `mode=mixed`；
-- 加 condition quality token 或等价质量信号；
-- 不再让 mask=1 永远对应 clean GT observation。
-
-为什么优先：
-
-- 这是对当前根因最直接的修复；
-- 代码路径已经存在，改动相对小；
-- 可以直接验证“clean observed reliability assumption”是否是 completion 脆弱的主要来源。
-
-验证方式：
-
-- 对 human completion / camera completion 做 observed-noise sweep；
-- 噪声强度建议覆盖 `0.0 / 0.3 / 0.5 / 0.7 / 1.0`；
-- 看 FD、coverage、MPJPE、TMR、F1 等完整指标。
-
-成功标准：
-
-- observed branch 质量下降时，退化曲线明显慢于当前 hard baseline；
-- clean completion 不明显退化。
-
-### Priority 2：Fair separate-task baselines
-
-结论：保留，第二优先级。
-
-要做什么：
-
-- 训练 joint-only；
-- 训练 camera-completion-only；
-- 训练 human-completion-only；
-- 使用 same tokenizer、same backbone、same split、same budget。
-
-为什么优先：
-
-- 这是任何 unified / SOTA claim 的前提；
-- 可以判断 unified branch-mask 是真实贡献，还是只是工程拼接；
-- 也能判断 completion 结果好是否只是 reconstruction-like 任务本身简单。
-
-验证方式：
-
-- 每个任务对比 native metrics；
-- 报告参数量、训练 FLOPs、采样成本；
-- 对比 unified vs three separate models。
-
-### Priority 3：Learned coupling gate
-
-结论：保留，但应在 Priority 1 / 2 之后。
-
-要做什么：
-
-- 加 branch-specific streams；
-- 加零初始化 cross residual；
-- gate 条件依赖 timestep、task、condition quality；
-- 让模型学习什么时候耦合、耦合多少。
-
-为什么不是第一优先：
-
-- 它是架构级改动，成本更高；
-- 如果 corruption training 已经让 completion 鲁棒，gate 的必要性会降低；
-- 应先用 Priority 1 判断是否只靠可靠性训练就能解决大部分 dominance。
-
-验证方式：
-
-- A 矩阵 intervention metrics；
-- joint baseline；
-- branch pollution index；
-- semantic pollution index；
-- clean task 指标是否保持。
-
-### Priority 4：Observed-camera hybrid oracle
-
-结论：替代原来的 relation-space constraint，作为第四个核心实验。
-
-为什么替换：
-
-- 4090 screen containment 还没有 full official metrics；
-- relation-space constraint 现在直接进入核心实验过早；
-- 更应该先确认 generated camera quality 是否是 joint degradation 的主要瓶颈。
-
-要做什么：
-
-```text
-observed_camera = α * GT_camera + (1 - α) * generated_camera
-α ∈ {0.0, 0.25, 0.5, 0.75, 1.0}
-```
-
-然后做 human completion。
-
-要回答的问题：
-
-- Human 指标是否随 camera quality 单调恢复；
-- 如果 α 增大就恢复，说明 generated camera quality 是主瓶颈；
-- 如果 α 增大仍不恢复，说明 coupling / conditioning 结构本身也有问题；
-- 如果曲线非线性，说明存在阈值或饱和效应。
-
-指标：
-
-- FDTMR；
-- TMR；
-- R3；
-- HumanCov；
-- MPJPE；
-- Contact Δ。
-
-### 暂缓或删除的候选项
-
-| 候选项 | 处理 | 理由 |
-| ------ | ---- | ---- |
-| Generated-camera distribution adapter | 暂缓 | 先确认 camera quality 是否真是主瓶颈 |
-| Per-timestep coupling schedule | 暂缓 | D 已经有 boundary scan；learned version 应并入 learned gate |
-| Relation-space projection / framing constraint | 暂缓 | 4090 containment 还未完成 full official；先做 hybrid oracle |
-| Render-level projection failure taxonomy | 暂缓 | 对论文可视化有用，但不是下一轮核心训练实验 |
-| Condition quality token | 合并 | 并入 soft observed branch training |
+| 候选                                                    | 回答的问题                                          | 关键指标                                                |
+| ----------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------- |
+| current simultaneous vs root-first joint              | root-level 因果分解是否改善 joint                      | human/camera official metrics、root error、projection |
+| full camera vs root-only vs no-camera human           | camera 提供的是 root posterior 还是 latent 污染        | root MPJPE、body MPJPE excluding root、HumanCov、TMR   |
+| clean/noisy/generated/missing observed + source token | brittle completion 是否来自 clean-only reliability | clean 保真、noise curve、generated-condition recovery   |
+| real/zero/shuffled human text × observed source       | text 在何种 reliability 下有约束价值                    | TMR、output change、root/body 分离指标                    |
+| unified vs task-specific models                       | unified 是否有质量或效率贡献                             | native metrics、参数量、FLOPs、wall time                  |
 
 ## VIII. 需要补查的数据或代码位置
 
 1. **Contact Δ 来源。** 文档列出 C / D 的 Contact Δ 数值，例如 `0.1543 / 0.2853 / 0.2608 / 0.2344`，但需要明确它们来自哪个 JSON 字段或是否为后处理计算。
 
-2. **4090 screen containment full metrics。** 当前只能写 evalfix 路径通过，不能写性能改善。需要等 full official eval 完成。
+2. **4090 screen containment full metrics。** 2026-06-25 已在 5090 重评 pre-NaN `best_eval@170000`：b64 Out `0.50%`、FDCLaTr `350.09`、F1 `17.44%`、Camera Cov `33.14%`；训练从 `175100` 起 NaN。结论是 best 可加载但方法 tradeoff 失败，`last@176000` 无效。
 
-3. **Pulp Stage1 稳定地基的引用证据。** 如果要写 Pulp Stage1 是 stable foundation，需要引用具体 reconstruction upper-bound 或 source VAE / GRFSQ collapse 数值。
+3. **Pulp Stage1 稳定地基的引用证据。** 已完成：mixed b64 reconstruction 的 Human FDTMR / coverage 为 `124.46 / 85.41%`，Camera FDCLaTr / coverage 为 `15.51 / 87.16%`，`r_fpd=0.238`、Out `4.64%`；对应 Stage2 no-Aux coverage 仅 `10.63% / 51.60%`。
 
 4. **Ground-truth human motion TMR。** 用于区分 GT camera 下 TMR `18.17` 到底是 semantic suppression，还是 reconstruction-like oracle 的自然结果。
 
-5. **Training convergence / dominance 过程。** 需要检查 checkpoint 在训练过程中是否逐渐形成 observed branch dominance，还是从一开始就由 hard replacement 诱导。
+5. **Training convergence / dominance 过程。** CondMDI TensorBoard 已确认无 NaN，但仍需按 checkpoint 做 intervention trajectory，判断 observed dominance 是何时形成，而不是只看 loss。
+
+6. **Root-first 具体接口。** 需要决定 root/coarse relation 是从 Pulp human feature 显式切片、独立 tokenizer，还是从 decoded root 监督的辅助 latent；在接口确定前不启动多卡训练。
 
 ## IX. 最终推荐写法
 
@@ -298,11 +247,13 @@ StoryMotion has validated controlled coupling.
 建议写：
 【完全打回，内容完全不在StoryMotion的要点，且没有按重要性分点，也不满足ICLR的风格。另外，`boundary / temporal gating 能移动 reconstruction fidelity 与 text-driven generation 的权衡`只能算是第三个或者更低优先级的贡献点，前两位一个是unified framework for 三模式生成，另一个待定；】
 ```text
-StoryMotion 在统一 latent diffusion 接口下覆盖了 joint human-camera generation 和双向 completion，但当前评估表明这些模式运行在不同条件机制中：joint 更像 text-driven generation，而 completion 更像 observed-branch-dominant reconstruction-like completion。我们识别出当前 branch-mask diffusion 的核心瓶颈是 double-injected observed branch、binary reliability training 和缺少 trust / timing / quality 控制面；这些因素使 completion 对真实或生成的 noisy condition 脆弱，也使 joint 中 generated camera quality 成为 human 质量瓶颈。
+StoryMotion 在统一 latent diffusion 接口下覆盖 joint human-camera generation、camera completion 和 human mode，但这些任务运行在不同条件机制中。Pulp camera representation 显式依赖 human root，而当前 Stage2 同时 denoise human/camera latent，没有显式建模 root-level 条件方向；completion 又把 observed branch 当作高可信条件，使 text、root posterior 和 full latent 污染混在一起。
 
-当前贡献应写成问题定位和机制路线：我们提出 coupling diagnostics，验证 boundary / temporal gating 能移动 reconstruction fidelity 与 text-driven generation 的权衡，并给出下一步 controlled coupling 方案，包括 corrupted observed-branch training、fair separate-task baselines、learned coupling gates 和 observed-camera hybrid oracle。现阶段结论是：受控耦合是 StoryMotion 的核心设计问题，训练好的解决方案仍待验证。
+在同 mixed split、同 evaluator、同 `batch_size=64` 的本地 point estimate 下，StoryMotion clean joint 在表列指标上优于 Pulp no-Aux，相对 Pulp Aux 仅 TMR 略低；同时 Pulp Stage1 reconstruction 明显优于其 Stage2 generation，说明应保留 frozen Stage1，并把下一版改动集中在 Stage2 factorization。
+
+下一版研究问题应写成：能否用 root/relation-first factorization 统一 joint generation 与多种条件方向，并区分 camera-conditioned actor recovery、root-only human generation、human-text-only generation和 reliability-aware completion。Boundary / temporal gating 只保留为辅助诊断；raw-latent learned gate 后置。现阶段已完成根因收缩和协议审计，训练好的解决方案仍待验证。
 ```
 
 ## X. 一句话总结
 
-Claude/Kiro 的核心意见是：**数据支持“问题定位”，不支持“修复已完成”。StoryMotion 现在最该写的是 condition dominance / branch pollution / coupling timing 的诊断，以及 soft observed training、fair baselines、learned gate、hybrid oracle 的验证路线。**
+Claude/Kiro 问答与后续代码审计的核心结论是：**camera latent 的定义依赖 human root，当前 simultaneous raw-latent denoising 没有显式建模这一方向；completion 还混合了 actor recovery、root inference 与 text-only generation。下一步先定任务和 root/relation 接口，再决定训练，不把 gate 或 soft observed 提前写成答案。**

@@ -3,7 +3,7 @@ title: "CameraShotEdit: camera-shot-aware 3D human motion editing"
 created: 2026-06-05T00:26:11+08:00
 updated: 2026-06-05T00:26:11+08:00
 status: proposal
-hypothesis: "现有 2024+ 工作已覆盖 human-camera joint generation、human-conditioned camera planning、camera-controlled video 和 human motion editing，但尚未覆盖 source 3D human motion + edit instruction + shot instruction 下的 edit-aware cinematography；可守切入点是联合决定人体编辑、镜头规划和构图修复，而不是首次生成人体-相机序列。"
+hypothesis: 现有 2024+ 工作已覆盖 human-camera joint generation、human-conditioned camera planning、camera-controlled video 和 human motion editing，但尚未覆盖 source 3D human motion + edit instruction + shot instruction 下的 edit-aware cinematography；可守切入点是联合决定人体编辑、镜头规划和构图修复，而不是首次生成人体-相机序列。
 tags:
   - camera_movement_generation
   - human_motion_editing
@@ -13,7 +13,7 @@ tags:
 source_notes:
   - "[[ideas/poool/2026-06-03_camera-movement-generation-survey|Camera Movement Generation 系统调研]]"
   - "[[ideas/poool/2026-06-04_camera-movement-generation-llm-audit-merged|Camera Movement Generation LLM 审查与合并整理]]"
-  - "[[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]]"
+  - "[[2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion Cinematic Section Graph Plan]]"
 source_papers:
   - "[[analysis/SIGGRAPH_Asia_2024/MotionFix_Text-Driven_3D_Human_Motion_Editing|MotionFix]]"
   - "[[analysis/ICLR_2026/Pulp_Motion_Framing-aware_multimodal_camera_and_human_motion_generation|Pulp Motion]]"
@@ -56,7 +56,7 @@ source_papers:
 
 - **Auteur**：外部新工作 [Auteur](https://arxiv.org/abs/2606.01900) 已经用 human-centric camera parameterization 和 DSL，把语言与 coarse human motion 映射到 6-DoF camera trajectory。它不编辑人体，但如果接一个 MotionFix，就会形成很强的两阶段 baseline。
 - **Pulp Motion**：外部工作 [Pulp Motion](https://arxiv.org/abs/2510.05097) 已经明确做人-相机联合生成和 screen framing latent。它不是 edit，但其 auxiliary sampling 很容易被改造成 editing refiner。
-- **StoryMotion-CSG**：本地已有 [[ideas/StoryMotion/2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion-CSG]] 做 local human-camera timeline asset repair。CameraShotEdit 必须避免重复它的“保护已批准 interiors + boundary repair”主张。
+- **StoryMotion-CSG**：本地已有 [[2026-06-04_storymotion_cinematic_section_graph_plan|StoryMotion-CSG]] 做 local human-camera timeline asset repair。CameraShotEdit 必须避免重复它的“保护已批准 interiors + boundary repair”主张。
 
 ### 0.3 与 StoryMotion-CSG 的关系
 
