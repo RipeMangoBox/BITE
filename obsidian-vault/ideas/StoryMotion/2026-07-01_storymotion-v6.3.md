@@ -17,7 +17,7 @@ source_notes:
   - "[[2026-06-29_storymotion-v6.2]]"
   - "[[2026-06-10_pulp-stage1-continuous-stage2-generator-formal]]"
 created: 2026-07-01T14:08:43+0800
-updated: 2026-07-01T17:48:00+0800
+updated: 2026-07-01T21:55:00+0800
 ---
 # Paper Design
 
@@ -119,11 +119,12 @@ then studies which representation and conditioning contracts reduce this gap.
 
 ## 0. 当前裁决
 
-v6.2 数据不能支持“问题只在 Stage1”或“问题只在 Stage2”任一单因果结论。更稳妥的读法是两个 bottleneck 同时存在：
+v6.2 数据不能支持“问题只在 Stage1”或“问题只在 Stage2”任一单因果结论。2026-07-01 完成的 Pulp official Stage1 复现 eval 与 v6.3 mode-conflict eval 后，当前裁决收紧为：**Stage1 contract gate 未通过；所有基于 self-trained joint VAE source tokenizer 的 Stage2 架构结论必须降级为负例诊断，不能写成可靠架构比较。**
 
 1. **Stage1 contract bottleneck 成立**：Pulp official Stage1 reconstruction 在 pure/mixed 三模式都强；多组自训练 separate / joint / VAE / GRFSQ tokenizer 即使 loss 或 feature MSE 收敛，也没有稳定传递到 Stage2 official metrics。
 2. **Stage2 branch coupling bottleneck 成立**：使用 Pulp official Stage1 的 StoryMotion v6 clean completion 可以很强，但 camera completion 在 noisy/generated human/root condition 下明显退化；latent diagnostics 也显示 completion 使用 visible branch，不是 text-only shortcut。
-3. **尚未证明的点**：本地是否能完整复现 Pulp official Stage1 ckpt 效果还没有闭环。用户提出的怀疑是合理的，应作为 v6.3 第一优先级，而不是继续从当前失败 tokenizer 上推断架构结论。
+3. **Pulp Stage1 复现 gate 已失败**：4090 mixed official recon 与 5090 pure official recon 都明显弱于 Pulp official ckpt；因此要先修 Stage1 train/data/normalization/ckpt-selection，再谈 reproduced ckpt 的 Stage2 transfer。
+4. **v6.3 mode-conflict clean gate 已失败**：5090 四卡完成的 camera-only / completion-only / joint-only 对照在 clean official eval 下已经崩；noise/replay/coupling 后续 wave 被停止，因为 clean gate 失败后 robustness 数字不可解释。
 
 ## 1. Stage1 指标为什么与 loss 脱钩
 
@@ -137,6 +138,23 @@ v6.2 数据不能支持“问题只在 Stage1”或“问题只在 Stage2”任�
 | Pulp official Stage1 recon | pure | joint | 4053 | 109.34 | 15.94 | 92.4% | 17.66 | 60.53 | 84.5% | 0.776 | 3.5% | pure upper bound strong |
 
 这组数据说明：Pulp official Stage1 ckpt 的 decoded reconstruction 进入 TMR/CLaTr/projection metric 后仍强。v6.3 必须先验证“我自己训练是否能复现这个 Stage1 upper bound”，否则无法把后续失败归因到 joint/separate、VAE/GRFSQ 或 Stage2。
+
+### 1.1.1 2026-07-01 Pulp Stage1 复现 gate 结果
+
+4090 GPU0 完成 mixed split official recon；pure split 由 5090 GPU0 使用同一 `latest_model_state.pt` 完成。两者均未接近 Pulp official upper bound：
+
+| checkpoint | split | samples | FDTMR↓ | TMR↑ | HCov↑ | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | Out↓ | readout |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Pulp official Stage1 recon | mixed | 10549 | 124.46 | 18.17 | 85.4% | 15.51 | 58.10 | 87.2% | 0.670 | 4.6% | target upper bound |
+| reproduced Stage1 latest | mixed | 10549 | 423.10 | 8.74 | 34.1% | 76.97 | 35.86 | 68.2% | 0.373 | 28.6% | fail: not an official-equivalent AE |
+| Pulp official Stage1 recon | pure | 4053 | 109.34 | 15.94 | 92.4% | 17.66 | 60.53 | 84.5% | 0.776 | 3.5% | target upper bound |
+| reproduced Stage1 latest | pure | 4053 | 438.99 | 7.88 | 41.4% | 99.98 | 38.27 | 67.1% | 0.453 | 23.3% | fail: pure also does not reproduce official |
+
+直接结论：
+
+- 本地 Pulp official training script / data normalization / checkpoint selection 仍未复现 official ckpt contract。
+- 不能把 reproduced Stage1 的训练 loss 或 validation loss 写成“已复现 Pulp Stage1”。
+- 下一步应先对齐 official repo 的 exact config、normalizer、checkpoint averaging / EMA、dataset split 与 metric loading；在此 gate 通过前，不应继续把 reproduced Stage1 送进 Stage2 主表。
 
 ### 1.2 自训练 tokenizer 的关键负例
 
@@ -194,7 +212,7 @@ v6.2 数据不能支持“问题只在 Stage1”或“问题只在 Stage2”任�
 
 ### 3.1 会不会只是 PulpMotion official Stage1 ckpt 好，我自己训练无法复现？
 
-这是目前最应该优先验证的假设。已有数据只能说明 official ckpt 是强 upper bound；不能证明本地训练 pipeline 已能复现它。v6.3 第一优先级应是用 4090 上的 Pulp 官方仓库、官方训练设置复现 Pulp official Stage1，而不是继续比较当前失败 tokenizer。该复现任务由另一个 agent 负责；本轮不触碰其 tmux、repo 或 checkpoint。
+这是目前最应该优先验证的假设，而且 2026-07-01 的 posthoc official eval 已经给出负面答案：本地训练的 `stage1_official_repro_20260701` latest checkpoint 没有复现 Pulp official Stage1 upper bound。mixed 与 pure 都显著弱于 official ckpt，因此 v6.3 的第一优先级从“验证是否能复现”改为“定位为什么不能复现”。
 
 复现实验的判据应使用 official reconstruction metric，而不是训练 loss：
 
@@ -203,6 +221,8 @@ v6.2 数据不能支持“问题只在 Stage1”或“问题只在 Stage2”任�
 | human recon  | close to FDTMR `124.46`, TMR `18.17`, HCov `85.4%`  | close to FDTMR `109.34`, TMR `15.94`, HCov `92.4%`  | 本地 Stage1 训练或数据/normalization/ckpt selection 不复现 Pulp |
 | camera recon | close to FDCLaTr `15.51`, CLaTr `58.10`, F1 `0.670` | close to FDCLaTr `17.66`, CLaTr `60.53`, F1 `0.776` | camera AE contract 未复现                                |
 | joint recon  | Out close to `4.6%` mixed / `3.5%` pure             | same                                                | projection/camera-root contract 未复现                   |
+
+实测结果已经落入 fail interpretation：mixed `FDTMR 423.10 / FDCLaTr 76.97 / Out 28.6%`，pure `FDTMR 438.99 / FDCLaTr 99.98 / Out 23.3%`。
 
 ### 3.2 Stage2 耦合来自 Stage1 严重约束，还是 Stage2 新增劣势？
 
@@ -269,11 +289,22 @@ v6.2 数据不能支持“问题只在 Stage1”或“问题只在 Stage2”任�
 2. clean camera / human / joint official eval。
 3. P2a noise `0.15/0.30` 和 generated-human replay。只有同时改善 text-dependence 与 reliability，才能写成 architecture fix；否则只能写成 failure diagnosis。
 
+2026-07-01 结果更新：四个 5090 mode-conflict runs 均训练到 `50000` step；first-wave clean official eval 完成后即停止后续 wave，因为 clean gate 已经失败。
+
+| run | official task | samples | FDTMR↓ | FDCLaTr↓ | CLaTr↑ | F1↑ | Out↓ | readout |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `cam_text_only_jointvae_full_b512` | camera | 10549 | - | 957.83 | 3.13 | 0.060 | - | clean camera fails; camera text-only does not rescue self-trained joint VAE latent |
+| `cam_full_text_jointvae_full_b512` | camera | 10549 | - | 957.45 | 3.10 | 0.060 | - | adding human text does not help |
+| `completion_only_jointvae_full_b512` | camera | 10549 | - | 955.99 | 3.18 | 0.060 | - | completion-only training still fails official decode |
+| `joint_only_jointvae_full_b512` | joint | 10549 | 2228.68 | 967.49 | 3.31 | 0.063 | 100.0% | joint-only generation collapses in both human and camera official metrics |
+
+读法：这批对照证明“在 self-trained joint VAE source tokenizer 上，拆成 camera-only / completion-only / joint-only 不能自动解决 Stage2 transfer”。它不能单独证明不对称架构无效，因为 clean official metric 已被 Stage1 latent contract failure 主导。
+
 ## 4. v6.3 实验优先级
 
 | priority | experiment                                                                 | exact purpose                                          | metric gate                                    | decision                                                  |
 | -------: | -------------------------------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------- | --------------------------------------------------------- |
-|        1 | 4090 Pulp 官方仓库复现 Pulp official Stage1 AE                                   | 验证官方训练设置能否达到 official Stage1 upper bound；当前由本轮直接接管并已启动 | mixed/pure 三模式 official recon 接近 Pulp official | 若失败，先修 Stage1 train/data/normalization，不继续 Stage2 推断      |
+|        1 | 4090 Pulp 官方仓库复现 Pulp official Stage1 AE                                   | 验证官方训练设置能否达到 official Stage1 upper bound；2026-07-01 posthoc eval 已失败 | mixed/pure 三模式 official recon 接近 Pulp official | 已失败：先修 Stage1 train/data/normalization/ckpt selection，不继续 reproduced Stage1 的 Stage2 推断 |
 |        2 | reproduced Stage1 + original Stage2 config                                 | 判断复现 ckpt 是否能传递到 Stage2                                | Stage2 mixed human/camera/joint official rows  | 若 Stage1 复现但 Stage2 仍弱，聚焦 Stage2 transfer                 |
 |        3 | official Pulp Stage1 vs reproduced Stage1 vs self-trained source tokenizer | 同 Stage2 seed/config 的 controlled comparison           | full mixed official + P2a reliability          | 隔离 ckpt 质量与 architecture 差异                               |
 |        4 | generated-human-aware training / quality-aware observed branch             | 修复 camera 对 generated/noisy human/root 的盲信             | P2a noise slope、E.T. replay、joint metric       | clean 不掉太多且 noise/replay 明显改善才保留                          |
@@ -425,6 +456,8 @@ story/text -> human intent/root/motion -> camera framing/residual
 - Pulp Stage1 official reproduction log: `/data/public/ripemangobox/Motion/PulpMotion/results/stage1_official_repro_20260701/train.log`
 - Pulp Stage1 official reproduction metrics: `/data/public/ripemangobox/Motion/PulpMotion/results/stage1_official_repro_20260701/metrics.jsonl`
 - Pulp Stage1 official reproduction script: `/data/public/ripemangobox/Motion/PulpMotion/artifacts/repro/stage1_official_20260701/train_stage1_autoencoder_official.py`
+- Pulp Stage1 reproduction mixed official eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_3_stage1_repro_official_eval_20260701/stage1_repro_latest_mixed_official_recon.json`
+- Pulp Stage1 reproduction pure official eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_3_stage1_repro_official_eval_5090_pure_20260701/stage1_repro_latest_pure_official_recon.json`
 - StoryMotion v6 native baseline: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_p0_native_20260625`
 - E.T./DIRECTOR seed17 eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_seed17_eval_20260630`
 - full mixed v6.2 eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_2_fulltrain_eval_20260701`
@@ -438,3 +471,4 @@ story/text -> human intent/root/motion -> camera framing/residual
 - v6.3 coupling diagnostic script: `/data/public/ripemangobox/Motion/StoryMotion/scripts/storymotion_v63_coupling_eval.py`
 - v6.3 coupling diagnostics: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_3_coupling_20260701`
 - v6.3 mode-conflict training runs: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v6_3_mode_conflict_20260701`
+- v6.3 mode-conflict first-wave clean official eval: `/data/public/ripemangobox/Motion/StoryMotion/stage2/metrics/v6_3_mode_conflict_eval_20260701`
