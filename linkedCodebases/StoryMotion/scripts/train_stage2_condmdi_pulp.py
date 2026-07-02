@@ -958,12 +958,20 @@ def train(args: argparse.Namespace) -> None:
     best_eval = best_eval_from_log(log_path, args.selection_metric)
     if args.resume:
         checkpoint = torch.load(args.resume, map_location=device)
-        model.load_state_dict(checkpoint.get("raw_model", checkpoint["model"]))
-        opt.load_state_dict(checkpoint["opt"])
+        resume_strict = not bool(args.v72_relation_surrogate)
+        load_info = model.load_state_dict(checkpoint.get("raw_model", checkpoint["model"]), strict=resume_strict)
+        optimizer_loaded = True
+        try:
+            opt.load_state_dict(checkpoint["opt"])
+        except ValueError as exc:
+            optimizer_loaded = False
+            optimizer_load_error = str(exc)
+        else:
+            optimizer_load_error = ""
         step = int(checkpoint.get("step", 0))
         if ema_model is not None:
             ema_state = checkpoint.get("ema_model", checkpoint.get("model"))
-            ema_model.load_state_dict(ema_state)
+            ema_model.load_state_dict(ema_state, strict=resume_strict)
         write_record(
             log_path,
             {
@@ -972,6 +980,11 @@ def train(args: argparse.Namespace) -> None:
                 "resume_path": str(args.resume),
                 "target_steps": args.steps,
                 "best_eval_loss": best_eval,
+                "resume_strict": resume_strict,
+                "resume_missing_keys": list(load_info.missing_keys),
+                "resume_unexpected_keys": list(load_info.unexpected_keys),
+                "optimizer_loaded": optimizer_loaded,
+                "optimizer_load_error": optimizer_load_error,
             },
         )
     purge_step = args.purge_step
