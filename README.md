@@ -168,7 +168,8 @@ python scripts/sync_assets_from_hf.py \
   --layout auto \
   --mode all \
   --sync-paper-list \
-  --overwrite-paper-list
+  --overwrite-paper-list \
+  --git-skip-worktree
 ```
 
 建议私有仓库同时包含 direct 文件和 shard manifests：direct 文件便于网页端
@@ -183,6 +184,8 @@ python scripts/upload_bite_hf_private.py \
 私有 direct 文件应包含 vault-relative 的 `analysis/`、`assets/` 和
 `paper_list.csv`。同步脚本会忽略 HF 或本地 `.cache` 元数据；当 manifests
 存在时，`--layout auto` 会优先走 shard 下载，避免逐个拉取数万个小文件。
+如果你把私有 evidence 同步到已跟踪公开 vault 的 main clone 中，建议保留
+`--git-skip-worktree`，这样本地私有笔记覆盖不会污染日常 `git status`。
 
 ### ⚙️ 3. 运行集成本地分析链
 

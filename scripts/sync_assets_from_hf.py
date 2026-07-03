@@ -18,6 +18,7 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import tarfile
 from pathlib import Path
 
@@ -280,6 +281,66 @@ def sync_asset_layer(
         raise RuntimeError(f"asset checksum mismatch after extraction: {bad[:10]}")
 
 
+def mark_git_skip_worktree(local_root: Path, mode: str, sync_paper_list_flag: bool) -> None:
+    """Hide synced evidence-layer overlays from routine git status/pull noise.
+
+    This is intended for private evidence overlays synced into a repository that
+    also tracks a public sample vault. It only affects tracked files.
+    """
+    repo = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=Path.cwd(),
+        text=True,
+        capture_output=True,
+    )
+    if repo.returncode != 0:
+        print("warning: not a git worktree; --git-skip-worktree ignored")
+        return
+    repo_root = Path(repo.stdout.strip()).resolve()
+    root = local_root.resolve()
+    try:
+        root.relative_to(repo_root)
+    except ValueError:
+        print("warning: local dir is outside this git worktree; --git-skip-worktree ignored")
+        return
+
+    candidates: list[Path] = []
+    if mode in {"text", "all"}:
+        for dirname in ("analysis", "index", "manifests"):
+            base = root / dirname
+            if base.exists():
+                candidates.extend(p for p in base.rglob("*") if p.is_file())
+    if mode == "paper-list" or sync_paper_list_flag:
+        paper_list = root / "paper_list.csv"
+        if paper_list.exists():
+            candidates.append(paper_list)
+
+    rels = [p.resolve().relative_to(repo_root).as_posix() for p in candidates]
+    if not rels:
+        return
+    tracked = subprocess.run(
+        ["git", "ls-files", "--", *rels],
+        cwd=repo_root,
+        text=True,
+        capture_output=True,
+    )
+    if tracked.returncode != 0:
+        raise RuntimeError(tracked.stderr.strip() or "git ls-files failed")
+    tracked_paths = [line for line in tracked.stdout.splitlines() if line.strip()]
+    if not tracked_paths:
+        print("git skip-worktree: no tracked synced files")
+        return
+    chunk_size = 500
+    for start in range(0, len(tracked_paths), chunk_size):
+        chunk = tracked_paths[start:start + chunk_size]
+        subprocess.run(
+            ["git", "update-index", "--skip-worktree", "--", *chunk],
+            cwd=repo_root,
+            check=True,
+        )
+    print(f"git skip-worktree: marked {len(tracked_paths)} tracked synced files")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--repo-id", default="RipeMangoBox/PaperBite-Assets")
@@ -304,6 +365,11 @@ def main() -> int:
         help="Allow --sync-paper-list or --mode paper-list to replace an existing local paper_list.csv.",
     )
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--git-skip-worktree",
+        action="store_true",
+        help="After sync, mark tracked evidence files under <local-dir> as skip-worktree to keep private overlays out of routine git status.",
+    )
     args = parser.parse_args()
 
     local_root = Path(args.local_dir)
@@ -321,6 +387,8 @@ def main() -> int:
             args.dry_run,
             args.overwrite_paper_list,
         )
+        if args.git_skip_worktree and not args.dry_run:
+            mark_git_skip_worktree(local_root, mode, args.sync_paper_list or mode == "paper-list")
         return 0
 
     print("layout: sharded")
@@ -340,6 +408,9 @@ def main() -> int:
 
     if mode in ("assets", "all"):
         sync_asset_layer(args.repo_id, args.repo_type, local_root, args.revision, args.dry_run)
+
+    if args.git_skip_worktree and not args.dry_run:
+        mark_git_skip_worktree(local_root, mode, args.sync_paper_list or mode == "paper-list")
 
     return 0
 
