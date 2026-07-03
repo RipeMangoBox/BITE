@@ -18,6 +18,7 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import tarfile
 from pathlib import Path
@@ -190,6 +191,10 @@ def _download_and_extract_shard(
     shard = Path(downloaded)
     if shard.stat().st_size != shard_info["size"] or sha256_file(shard) != shard_info["sha256"]:
         raise RuntimeError(f"shard checksum mismatch: {shard_path}")
+    local_shard = local_root / shard_path
+    local_shard.parent.mkdir(parents=True, exist_ok=True)
+    if not local_shard.exists() or local_shard.stat().st_size != shard.stat().st_size:
+        shutil.copy2(shard, local_shard)
     with tarfile.open(shard, "r") as tar:
         tar.extractall(local_root)
     print(shard_path)
@@ -299,7 +304,7 @@ def mark_git_skip_worktree(local_root: Path, mode: str, sync_paper_list_flag: bo
     repo_root = Path(repo.stdout.strip()).resolve()
     root = local_root.resolve()
     try:
-        root.relative_to(repo_root)
+        local_root_rel = root.relative_to(repo_root)
     except ValueError:
         print("warning: local dir is outside this git worktree; --git-skip-worktree ignored")
         return
@@ -319,14 +324,18 @@ def mark_git_skip_worktree(local_root: Path, mode: str, sync_paper_list_flag: bo
     if not rels:
         return
     tracked = subprocess.run(
-        ["git", "ls-files", "--", *rels],
+        ["git", "ls-files", "-z", "--", *rels],
         cwd=repo_root,
-        text=True,
         capture_output=True,
     )
     if tracked.returncode != 0:
-        raise RuntimeError(tracked.stderr.strip() or "git ls-files failed")
-    tracked_paths = [line for line in tracked.stdout.splitlines() if line.strip()]
+        stderr = tracked.stderr.decode("utf-8", errors="replace") if isinstance(tracked.stderr, bytes) else str(tracked.stderr)
+        raise RuntimeError(stderr.strip() or "git ls-files failed")
+    tracked_paths = [
+        item.decode("utf-8", errors="surrogateescape")
+        for item in tracked.stdout.split(b"\0")
+        if item
+    ]
     if not tracked_paths:
         print("git skip-worktree: no tracked synced files")
         return
@@ -339,6 +348,23 @@ def mark_git_skip_worktree(local_root: Path, mode: str, sync_paper_list_flag: bo
             check=True,
         )
     print(f"git skip-worktree: marked {len(tracked_paths)} tracked synced files")
+
+    exclude_patterns: list[str] = []
+    if mode in {"text", "all"}:
+        for dirname in ("analysis", "index", "manifests", "media"):
+            if (root / dirname).exists():
+                exclude_patterns.append(f"/{(local_root_rel / dirname).as_posix()}/")
+    if mode == "paper-list" or sync_paper_list_flag:
+        exclude_patterns.append(f"/{(local_root_rel / 'paper_list.csv').as_posix()}")
+    if exclude_patterns:
+        exclude_path = repo_root / ".git" / "info" / "exclude"
+        existing = exclude_path.read_text(encoding="utf-8", errors="replace") if exclude_path.exists() else ""
+        with exclude_path.open("a", encoding="utf-8") as handle:
+            for pattern in exclude_patterns:
+                marker = f"# BITE private evidence overlay: {pattern}"
+                if marker not in existing:
+                    handle.write(f"\n{marker}\n{pattern}\n")
+        print(f"git info/exclude: ensured {len(exclude_patterns)} private overlay patterns")
 
 
 def main() -> int:
