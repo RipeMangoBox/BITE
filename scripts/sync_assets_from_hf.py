@@ -6,6 +6,10 @@ Modes:
   text   — analysis notes + indexes only (~43 MB)
   assets — figures and tables only (~1.8 GB)
   all    — everything (default)
+
+Layouts:
+  sharded — public PaperBite release with manifests and tar shards
+  direct  — private/internal repo with analysis/, assets/, and paper_list.csv
 """
 
 from __future__ import annotations
@@ -17,7 +21,8 @@ import os
 import tarfile
 from pathlib import Path
 
-from huggingface_hub import hf_hub_download
+from huggingface_hub import hf_hub_download, snapshot_download
+from huggingface_hub.errors import EntryNotFoundError, HfHubHTTPError
 
 
 def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
@@ -50,6 +55,88 @@ def _ensure_manifest(local_root: Path, rel_path: str, repo_id: str, repo_type: s
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(Path(downloaded).read_bytes())
     return target
+
+
+def _repo_file_exists(repo_id: str, repo_type: str, revision: str | None, filename: str) -> bool:
+    try:
+        hf_hub_download(
+            repo_id=repo_id,
+            repo_type=repo_type,
+            filename=filename,
+            revision=revision,
+            local_files_only=False,
+        )
+        return True
+    except EntryNotFoundError:
+        return False
+    except HfHubHTTPError as exc:
+        if getattr(exc.response, "status_code", None) == 404:
+            return False
+        raise
+
+
+def resolve_layout(repo_id: str, repo_type: str, revision: str | None, requested: str) -> str:
+    if requested != "auto":
+        return requested
+    if _repo_file_exists(repo_id, repo_type, revision, "manifests/paperbite_text_shards_manifest.jsonl"):
+        return "sharded"
+    return "direct"
+
+
+def direct_allow_patterns(mode: str, sync_paper_list_flag: bool) -> list[str]:
+    patterns: list[str] = []
+    if mode in {"text", "all"}:
+        patterns.extend(["analysis/**", "index/**"])
+    if mode in {"assets", "all"}:
+        patterns.append("assets/**")
+    if mode == "paper-list" or sync_paper_list_flag:
+        patterns.append("paper_list.csv")
+    return patterns
+
+
+def sync_direct_layout(
+    repo_id: str,
+    repo_type: str,
+    local_root: Path,
+    revision: str | None,
+    mode: str,
+    sync_paper_list_flag: bool,
+    dry_run: bool,
+    overwrite_paper_list: bool,
+) -> None:
+    """Download a direct-layout private/internal evidence repo.
+
+    Direct-layout repos store vault-relative files directly at the repository
+    root: analysis/, optional index/, assets/, and paper_list.csv.
+    """
+    patterns = direct_allow_patterns(mode, sync_paper_list_flag)
+    if not patterns:
+        print("nothing selected for direct-layout sync")
+        return
+
+    if sync_paper_list_flag and (local_root / "paper_list.csv").exists() and not overwrite_paper_list:
+        patterns = [pattern for pattern in patterns if pattern != "paper_list.csv"]
+        print("paper_list.csv exists; pass --overwrite-paper-list to replace it")
+        if not patterns:
+            return
+
+    print("layout: direct")
+    print("allow_patterns:")
+    for pattern in patterns:
+        print(f"  {pattern}")
+    if dry_run:
+        print(f"direct-layout files would be downloaded into: {local_root}")
+        return
+
+    local_root.mkdir(parents=True, exist_ok=True)
+    snapshot_download(
+        repo_id=repo_id,
+        repo_type=repo_type,
+        revision=revision,
+        local_dir=local_root,
+        allow_patterns=patterns,
+        ignore_patterns=[".cache/**", "**/.cache/**", ".git/**"],
+    )
 
 
 def sync_paper_list(
@@ -198,6 +285,12 @@ def main() -> int:
     parser.add_argument("--local-dir", default="obsidian-vault")
     parser.add_argument("--mode", default="all", choices=["paper-list", "text", "assets", "all"])
     parser.add_argument(
+        "--layout",
+        default="auto",
+        choices=["auto", "sharded", "direct"],
+        help="HF repo layout. auto uses sharded manifests when present, otherwise direct files.",
+    )
+    parser.add_argument(
         "--sync-paper-list",
         action="store_true",
         help="Also download remote paper_list.csv into <local-dir>/paper_list.csv.",
@@ -212,6 +305,22 @@ def main() -> int:
 
     local_root = Path(args.local_dir)
     mode = args.mode
+    layout = resolve_layout(args.repo_id, args.repo_type, args.revision, args.layout)
+
+    if layout == "direct":
+        sync_direct_layout(
+            args.repo_id,
+            args.repo_type,
+            local_root,
+            args.revision,
+            mode,
+            args.sync_paper_list or mode == "paper-list",
+            args.dry_run,
+            args.overwrite_paper_list,
+        )
+        return 0
+
+    print("layout: sharded")
 
     if mode == "paper-list" or args.sync_paper_list:
         sync_paper_list(

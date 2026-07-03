@@ -12,6 +12,8 @@ Thumbs.db
 __pycache__/
 **/__pycache__/
 *.py[cod]
+.cache/
+**/.cache/huggingface/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -65,6 +67,7 @@ artifacts/
 # === Obsidian local runtime state ===
 .obsidian/
 obsidian-vault/.obsidian/
+obsidian-vault/.cache/
 obsidian-vault/.trash/
 obsidian-vault/Clippings/
 obsidian-vault/_attachments/
