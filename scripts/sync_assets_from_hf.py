@@ -42,10 +42,13 @@ def load_manifest(path: Path):
 
 
 def _ensure_manifest(local_root: Path, rel_path: str, repo_id: str, repo_type: str, revision: str | None) -> Path:
-    """Download a manifest from HF if it doesn't exist locally."""
+    """Download the manifest for the selected HF repo.
+
+    Manifests are repo-specific. Reusing an existing local manifest can mix a
+    public PaperBite release with a private dataset that happens to use the same
+    local vault root.
+    """
     target = local_root / rel_path
-    if target.exists():
-        return target
     downloaded = hf_hub_download(
         repo_id=repo_id,
         repo_type=repo_type,

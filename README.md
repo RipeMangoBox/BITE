@@ -158,7 +158,7 @@ evidence vault 使用。`paper_list.csv` 需要显式同步；默认不会覆盖
 导入。
 
 如果你维护的是课题组内部私有 Hugging Face dataset，也可以使用同一个同步脚本。
-脚本会自动识别公开 PaperBite shard 布局和私有 direct 布局：
+脚本会自动识别公开 PaperBite shard 布局、私有 shard 布局和私有 direct 布局：
 
 ```bash
 # 需要先 hf auth login，并且账号有私有 dataset 访问权限
@@ -171,8 +171,18 @@ python scripts/sync_assets_from_hf.py \
   --overwrite-paper-list
 ```
 
-私有 direct 布局应包含 vault-relative 的 `analysis/`、`assets/` 和
-`paper_list.csv`。同步脚本会忽略 HF 或本地 `.cache` 元数据。
+建议私有仓库同时包含 direct 文件和 shard manifests：direct 文件便于网页端
+浏览单篇 note，shards 便于新成员首次全量同步。维护者上传时可使用：
+
+```bash
+python scripts/upload_bite_hf_private.py \
+  --repo-id <org-or-user>/<private-dataset> \
+  --with-shards
+```
+
+私有 direct 文件应包含 vault-relative 的 `analysis/`、`assets/` 和
+`paper_list.csv`。同步脚本会忽略 HF 或本地 `.cache` 元数据；当 manifests
+存在时，`--layout auto` 会优先走 shard 下载，避免逐个拉取数万个小文件。
 
 ### ⚙️ 3. 运行集成本地分析链
 

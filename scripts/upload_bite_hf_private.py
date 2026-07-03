@@ -2,9 +2,12 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import os
 import re
 import shutil
+import tarfile
 import tempfile
 from datetime import datetime
 from pathlib import Path
@@ -26,6 +29,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-workers", type=int, default=8)
     parser.add_argument("--stage-dir", default=str(REPO_ROOT / "_private" / "hf_stage" / "bite-process-private"))
     parser.add_argument("--all-assets", action="store_true", help="Upload every file under assets/ instead of only note-referenced assets.")
+    parser.add_argument("--with-shards", action="store_true", help="Also build PaperBite-compatible tar shards and manifests for fast sync.")
+    parser.add_argument("--asset-shard-size-mb", type=int, default=256, help="Approximate unpacked asset bytes per shard when --with-shards is used.")
     parser.add_argument("--reset-repo", action="store_true", help="Delete and recreate the target dataset repo before upload.")
     parser.add_argument("--public", action="store_true", help="Create a public repo instead of the default private repo.")
     parser.add_argument("--dry-run", action="store_true")
@@ -46,6 +51,7 @@ This {visibility} dataset repository stores the shareable BITE evidence layer:
 - `analysis/`: Obsidian Markdown paper analysis notes
 - `assets/`: figure/table assets referenced by analysis notes
 - `paper_list.csv`: canonical paper queue and metadata
+- `manifests/` and `media/*_shards/`: optional tar shards for fast first sync
 
 Generated from `{REPO_ROOT}` on {datetime.now().isoformat(timespec="minutes")}.
 
@@ -57,9 +63,18 @@ python3 scripts/sync_assets_from_hf.py \\
   --repo-type dataset \\
   --local-dir obsidian-vault \\
   --mode all \\
-  --sync-paper-list
+  --sync-paper-list \\
+  --overwrite-paper-list
 ```
 """
+
+
+def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(chunk_size), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def note_referenced_assets(vault_root: Path) -> set[str]:
@@ -87,7 +102,7 @@ def hardlink_or_copy(src: Path, dst: Path) -> None:
 
 def prepare_stage(vault_root: Path, stage_root: Path, *, all_assets: bool) -> dict[str, int]:
     stage_root.mkdir(parents=True, exist_ok=True)
-    for name in ("analysis", "assets"):
+    for name in ("analysis", "assets", "manifests", "media"):
         target = stage_root / name
         if target.exists():
             shutil.rmtree(target)
@@ -134,6 +149,90 @@ def prepare_stage(vault_root: Path, stage_root: Path, *, all_assets: bool) -> di
     }
 
 
+def write_jsonl(path: Path, rows: list[dict[str, object]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+
+
+def make_tar(tar_path: Path, root: Path, members: list[Path]) -> dict[str, object]:
+    tar_path.parent.mkdir(parents=True, exist_ok=True)
+    if tar_path.exists():
+        tar_path.unlink()
+    unpacked_size = 0
+    prefixes: list[str] = []
+    with tarfile.open(tar_path, "w") as tar:
+        for src in members:
+            rel = src.relative_to(root).as_posix()
+            tar.add(src, arcname=rel, recursive=False)
+            unpacked_size += src.stat().st_size
+            prefix = "/".join(rel.split("/")[:3]) if rel.startswith("assets/figures/papers/") else rel.split("/", 1)[0]
+            if prefix not in prefixes:
+                prefixes.append(prefix)
+    return {
+        "path": tar_path.relative_to(root).as_posix(),
+        "size": tar_path.stat().st_size,
+        "sha256": sha256_file(tar_path),
+        "file_count": len(members),
+        "unpacked_size": unpacked_size,
+        "members_prefixes": prefixes[:128],
+    }
+
+
+def chunk_by_size(paths: list[Path], max_unpacked_size: int) -> list[list[Path]]:
+    chunks: list[list[Path]] = []
+    current: list[Path] = []
+    current_size = 0
+    for path in paths:
+        size = path.stat().st_size
+        if current and current_size + size > max_unpacked_size:
+            chunks.append(current)
+            current = []
+            current_size = 0
+        current.append(path)
+        current_size += size
+    if current:
+        chunks.append(current)
+    return chunks
+
+
+def build_shards(stage_root: Path, *, asset_shard_size_mb: int) -> dict[str, int]:
+    manifests_root = stage_root / "manifests"
+    text_members = [p for p in (stage_root / "analysis").glob("*/*.md") if p.is_file()]
+    if (stage_root / "index").exists():
+        text_members.extend(p for p in (stage_root / "index").rglob("*") if p.is_file())
+    text_members = sorted(text_members)
+    text_rows: list[dict[str, object]] = []
+    if text_members:
+        text_rows.append(make_tar(stage_root / "media" / "text_shards" / "bite_text.tar", stage_root, text_members))
+    write_jsonl(manifests_root / "paperbite_text_shards_manifest.jsonl", text_rows)
+
+    asset_members = sorted(p for p in (stage_root / "assets").rglob("*") if p.is_file())
+    max_unpacked_size = max(1, asset_shard_size_mb) * 1024 * 1024
+    asset_rows: list[dict[str, object]] = []
+    asset_shard_rows: list[dict[str, object]] = []
+    for index, members in enumerate(chunk_by_size(asset_members, max_unpacked_size)):
+        shard_rel = f"media/assets_shards/assets_papers_{index:04d}.tar"
+        shard_row = make_tar(stage_root / shard_rel, stage_root, members)
+        asset_shard_rows.append(shard_row)
+        for member in members:
+            asset_rows.append({
+                "path": member.relative_to(stage_root).as_posix(),
+                "size": member.stat().st_size,
+                "sha256": sha256_file(member),
+                "shard": shard_rel,
+            })
+    write_jsonl(manifests_root / "paperbite_assets_manifest.jsonl", asset_rows)
+    write_jsonl(manifests_root / "paperbite_asset_shards_manifest.jsonl", asset_shard_rows)
+    return {
+        "text_shards": len(text_rows),
+        "asset_shards": len(asset_shard_rows),
+        "asset_manifest_rows": len(asset_rows),
+        "shard_files": len(text_rows) + len(asset_shard_rows) + 3,
+    }
+
+
 def main() -> int:
     args = parse_args()
     vault_root = Path(args.vault_root).expanduser().resolve()
@@ -152,6 +251,10 @@ def main() -> int:
     stage_counts = prepare_stage(vault_root, stage_root, all_assets=args.all_assets)
     print(f"stage_root: {stage_root}")
     print(f"stage_counts: {stage_counts}")
+    shard_counts: dict[str, int] = {}
+    if args.with_shards:
+        shard_counts = build_shards(stage_root, asset_shard_size_mb=args.asset_shard_size_mb)
+        print(f"shard_counts: {shard_counts}")
     if args.dry_run:
         print("[DRY-RUN] no HF API calls made")
         return 0
@@ -183,7 +286,7 @@ def main() -> int:
         repo_type=args.repo_type,
         folder_path=stage_root,
         private=private,
-        allow_patterns=["analysis/**", "assets/**", "paper_list.csv"],
+        allow_patterns=["analysis/**", "assets/**", "paper_list.csv", "manifests/**", "media/**"],
         ignore_patterns=[".cache/**", "**/.cache/**"],
         num_workers=args.num_workers,
         print_report=True,

@@ -38,7 +38,7 @@ present. They are not part of the current analysis chain.
 | `run_paper_list_analysis.py` | Script-only queue runner for rows in `obsidian-vault/paper_list.csv`; use `--jobs 50` for high-throughput queues when provider quota and local resources allow |
 | `rebuild_figures_export.py` | Rebuild figure summaries, placements, and vault exports from completed formal analysis runs |
 | `sync_assets_from_hf.py` | Sync public PaperBite shard releases or private direct-layout HF datasets into `obsidian-vault/`; use `--mode paper-list --overwrite-paper-list` only when you want to replace the local paper list |
-| `upload_bite_hf_private.py` | Create/update a private HF dataset from local `analysis/`, note-referenced `assets/`, and `paper_list.csv` without uploading `.cache` or unreferenced historical figures |
+| `upload_bite_hf_private.py` | Create/update a private HF dataset from local `analysis/`, note-referenced `assets/`, and `paper_list.csv` without uploading `.cache` or unreferenced historical figures; pass `--with-shards` for fast first sync by new users |
 | `write_batch_progress.py` | Write batch progress snapshots for `obsidian-vault/batches/<run_id>/` |
 | `smoke_index_workflow.py` | Verify `research-workflow` auto routing and `papers-build-index` behavior on temporary empty and one-note vaults |
 
