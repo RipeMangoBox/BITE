@@ -18,7 +18,7 @@ source_notes:
   - "[[archived/2026-06-23_storymotion-decoupled-coupling-qa-v5.1]]"
   - "[[archived/2026-06-16_storymotion-v3-formal]]"
 created: 2026-07-06T00:00:00+0800
-updated: 2026-07-06T16:02:00+0800
+updated: 2026-07-06T16:36:00+0800
 ---
 
 # StoryMotion v7.4 Causal Asymmetry Diagnosis
@@ -255,6 +255,27 @@ Current long training:
 | run | machine / GPU | path | status | note |
 | --- | --- | --- | --- | --- |
 | `human_text_full_e3like_82688` | 5090 GPU0 | `runs/train/stage2/v7_4_core_20260706/human_text_full_e3like_82688` | running from 2026-07-06 16:00 +0800 | e3-like capacity; `--task-probs 0 0 0 1`; selection metric `human_text_loss` |
+
+Step-12000 official gate, used as the first 10k-neighborhood check because the stable snapshot was taken after the 10k checkpoint advanced:
+
+| checkpoint step | source JSON | samples | FTD↓ | coverage↑ | TMR score↑ | decision |
+| ---: | --- | ---: | ---: | ---: | ---: | --- |
+| 12000 | `runs/eval/stage2/v7_4/strong_asym_human_text_gates_20260706/human_text_step12000_1024.json` | 1024 | 409.20 | 22.85% | 19.34 | passes DS 10k gate; continue to 30k gate |
+
+4090 utilization after `human_text` long training started:
+
+| GPU | experiment | output | status | why core |
+| --- | --- | --- | --- | --- |
+| 4090 GPU0 | step-12000 official `human_text` eval | `human_text_step12000_1024.json` | done | tests whether `H=P(H|text_h)` is already non-collapsed |
+| 4090 GPU1 | e3 JOINT camera-latent intervention render | `runs/visualizations/v7_4_paired_audit_20260706/e3_joint_camera_latent_interventions` | done | visualizes the already-measured raw camera-state dependency |
+| 4090 GPU0/GPU1 | e3 paired human-vs-JOINT render audit | `runs/visualizations/v7_4_paired_audit_20260706/e3_human_vs_joint` | done | directly audits the user-observed human-quality regression |
+
+Gradio manual audit viewer:
+
+- Source copied to 5090: `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/v7_4_paired_audit_20260706`
+- Session: `v74_paired_audit_gradio`
+- Port: `7862`
+- SSH tunnel: `ssh -L 7862:127.0.0.1:7862 5090`, then open `http://127.0.0.1:7862`
 
 ## 6. Candidate Fixes, Not Claims
 

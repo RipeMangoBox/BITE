@@ -19,7 +19,7 @@ source_notes:
   - "[[2026-06-30_storymotion-experiment-metric-comparison]]"
   - "[[2026-07-03_storymotion-v7.3.1]]"
 created: 2026-07-01T02:47:56+0800
-updated: 2026-07-06T16:02:00+0800
+updated: 2026-07-06T16:36:00+0800
 ---
 
 ## 0. Fair Comparison Rules
@@ -634,6 +634,8 @@ e0/e1/e3 的 joint final JSON 来自同 batch `64`、同 seed、同采样配置�
 - v7.4 stronger asymmetry smoke train root: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v7_4_core_20260706/human_text_smoke_20step`
 - v7.4 stronger asymmetry smoke eval root: `/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v7_4/strong_asym_smoke_20260706`
 - v7.4 stronger asymmetry first long train: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v7_4_core_20260706/human_text_full_e3like_82688`
+- v7.4 stronger asymmetry human-text gate eval: `/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v7_4/strong_asym_human_text_gates_20260706`
+- v7.4 paired render audit: `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/v7_4_paired_audit_20260706`
 
 ## 13. v7.4 Causal Asymmetry Core Eval 2026-07-06
 
@@ -694,3 +696,20 @@ Long-training deployment after DS max PASS:
 | `human_text_full_e3like_82688` | 5090 GPU0 | 2026-07-06 16:00 +0800 | `steps=82688`, `batch=512`, `width=384`, `dim_mults=1 2 2`, `task_probs=0 0 0 1`, `selection_metric=human_text_loss` | running |
 
 DS max gate summary: pass for `human_text` long training only. 10k and 30k official `human_text` evals are required before any generated-source H2C training is justified.
+
+First official gate result:
+
+| checkpoint step | task | samples | FDTMR↓ | TMR↑ | HCov↑ | precision | recall | source JSON | decision |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| 12000 | `human_text` | 1024 | 409.20 | 19.34 | 22.85% | 0.327 | 0.663 | `human_text_step12000_1024.json` | passes DS 10k-neighborhood gate |
+
+Note: the first attempted `step_10000` snapshot was invalid because `last.pt` was copied while the 5090 training process was writing it. The accepted gate uses a stable frozen checkpoint whose internal metadata is step `12000`. The 30k watcher was updated to freeze and verify the checkpoint on 5090 before scp.
+
+Paired render audit artifacts:
+
+| artifact group | samples | path | purpose |
+| --- | ---: | --- | --- |
+| e3 human completion vs JOINT | 12 | `runs/visualizations/v7_4_paired_audit_20260706/e3_human_vs_joint` | visual audit of user-observed human degradation |
+| e3 JOINT camera latent zero / shuffle / noise | 12 each | `runs/visualizations/v7_4_paired_audit_20260706/e3_joint_camera_latent_interventions` | visual counterpart to numeric raw-camera-state dependency |
+
+Manual audit viewer is running on 5090 session `v74_paired_audit_gradio`, port `7862`.
