@@ -19,7 +19,7 @@ source_notes:
   - "[[2026-06-30_storymotion-experiment-metric-comparison]]"
   - "[[2026-07-03_storymotion-v7.3.1]]"
 created: 2026-07-01T02:47:56+0800
-updated: 2026-07-06T15:35:00+0800
+updated: 2026-07-06T16:02:00+0800
 ---
 
 ## 0. Fair Comparison Rules
@@ -55,7 +55,7 @@ updated: 2026-07-06T15:35:00+0800
 | G8 asymmetric H2C / RF | §9 | 检验非对称 H2C contract 和 MoLingo FullRF H2C 是否比 v7.2 局部补丁更有前景 | 4090；full mixed `10549`；official camera callback；bs64 / seed17 | H2C matched condition 很强；FullRF+p2b 是当前最好 clean/noisy 折中，但 generated replay 仍未验证 |
 | G9 CondMDI RF process ablation | §10 | 检验只把 CondMDI process 从 diffusion 换成 RF 后三模式是否保持 | 5090；full mixed `10549`；official callbacks；bs64 / seed17；50-step RF Euler | clean camera/human completion 保持强；joint generation 明显退化，不能替代 diffusion baseline |
 | G10 v7.3.1 task/source schedule | §11 | 检验 CLIP task instruction、one-hot task、clean source、reliability schedule 的四组组合是否解决 StoryMotion 核心问题 | 5090；CondMDI + diffusion；full mixed `10549`；official callbacks；bs64 / seed20260613 | one-hot reliability 有 joint / framing 改进信号，但仍弱于旧 clean unified baseline；核心问题未解决 |
-| G11 v7.4 causal asymmetry | §13 | 检验 raw camera latent dependency 与最小 asymmetric human-input shuffle 修法 | 5090；full mixed `10549`；official callbacks；camera/human bs64，joint bs32 OOM-safe rerun | camera completion improves, human completion roughly holds, but JOINT worsens; minimal shuffle repair rejected |
+| G11 v7.4 causal asymmetry | §13 | 检验 raw camera latent dependency、最小 asymmetric human-input shuffle 修法、以及 stronger asymmetry closed-loop smoke | 5090；full mixed `10549` for rejected shuffle；32-sample official smoke for `human_text` / composed JOINT | minimal shuffle repair rejected; explicit `H=P(H|text_h), C=P(C|H,text_c)` path now passes execution smoke but still needs real human-text long training |
 
 ### 0.2 Per-Experiment Purpose Tables
 
@@ -631,6 +631,9 @@ e0/e1/e3 的 joint final JSON 来自同 batch `64`、同 seed、同采样配置�
 - v7.4 causal asymmetry train root: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v7_4_core_20260706/asym_human_input_shuffle_e3`
 - v7.4 causal asymmetry full official eval: `/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v7_4/asym_human_input_20260706/full_10549_last`
 - v7.4 clean human completion reference: `/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v7_4/asym_human_input_20260706/baselines/e3_human_completion_1024.json`
+- v7.4 stronger asymmetry smoke train root: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v7_4_core_20260706/human_text_smoke_20step`
+- v7.4 stronger asymmetry smoke eval root: `/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v7_4/strong_asym_smoke_20260706`
+- v7.4 stronger asymmetry first long train: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v7_4_core_20260706/human_text_full_e3like_82688`
 
 ## 13. v7.4 Causal Asymmetry Core Eval 2026-07-06
 
@@ -665,3 +668,29 @@ e0/e1/e3 的 joint final JSON 来自同 batch `64`、同 seed、同采样配置�
 - The v7.4 human veto triggers: JOINT TMR coverage decreases from `31.6%` to `25.2%`, FDTMR worsens from `195.85` to `204.07`, and CLaTr FCD worsens from `126.91` to `143.70`.
 - The camera/framing hard Out veto does not trigger (`9.0%` to `10.2%`, below the `13.5%` threshold), but the full JOINT row is still worse by TMR, CLaTr, caption F1, and coverage.
 - Mechanistic conclusion: the problem is not fixed by a second forward pass that denies instance-matched camera state to the human-loss channel while sharing the same denoiser. The next serious route should be stronger structural asymmetry: human-first / root-first generation or branch-separated denoisers with explicit `H -> C` conditioning.
+
+### 13.4 Stronger Asymmetry Closed-Loop Smoke
+
+口径：5090 GPU0；official callbacks；`samples=32`、`batch_size=8`、`num_steps=8`、seed `20260613`。这组不是质量评估，而是代码闭环与 DS max gate 证据。`human_text` 使用 20-step smoke checkpoint，因此 generated-source composed JOINT 的质量 collapse 不作为方法否决，只说明必须先长训 human generator。
+
+| condition | source JSON | samples | TMR FTD↓ | TMR↑ | HCov↑ | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | Out↓ | status |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `human_text` official human metric | `human_text_smoke32.json` | 32 | 2266.95 | 3.44 | 0.0% | - | - | - | - | - | pass execution; undertrained quality |
+| composed GT human + H2C clean | `composed_gt_human_h2c_clean_smoke32.json` | 32 | 439.83 | 15.71 | 100.0% | 110.77 | - | 97.1% | 0.557 | 6.0% | pass compose / decode / metric path |
+| composed generated human + H2C replay | `composed_generated_human_h2c_replay_smoke32.json` | 32 | 2266.28 | 3.55 | 0.0% | 1024.98 | - | 0.0% | 0.017 | 15.4% | pass execution; quality dominated by 20-step human generator |
+
+Implementation gates also passed on both remote boxes:
+
+- 5090 and 4090 `py_compile` passed for `train_stage2_condmdi_pulp.py`, `storymotion_official_full_eval.py`, `storymotion_official_bridge_smoke.py`, and `render_bilateral_results.py`.
+- 5090 and 4090 four-task mask check passed with `--task-probs 0 0 0 1`; `human_text` observes no latent and trains only human channels.
+- old e3 three-task checkpoint compatibility smoke passed on 5090 and 4090 after limiting smoke tasks to the checkpoint's `num_task_embeddings`.
+
+Decision: proceed to the first real long training only: `human_text` text-to-human. Do not yet start generated-source H2C long training, because generated-source stress is currently confounded by the deliberately tiny 20-step human generator.
+
+Long-training deployment after DS max PASS:
+
+| run | machine / GPU | start time | config summary | status |
+| --- | --- | --- | --- | --- |
+| `human_text_full_e3like_82688` | 5090 GPU0 | 2026-07-06 16:00 +0800 | `steps=82688`, `batch=512`, `width=384`, `dim_mults=1 2 2`, `task_probs=0 0 0 1`, `selection_metric=human_text_loss` | running |
+
+DS max gate summary: pass for `human_text` long training only. 10k and 30k official `human_text` evals are required before any generated-source H2C training is justified.

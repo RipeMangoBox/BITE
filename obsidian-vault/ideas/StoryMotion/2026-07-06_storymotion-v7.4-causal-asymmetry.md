@@ -18,7 +18,7 @@ source_notes:
   - "[[archived/2026-06-23_storymotion-decoupled-coupling-qa-v5.1]]"
   - "[[archived/2026-06-16_storymotion-v3-formal]]"
 created: 2026-07-06T00:00:00+0800
-updated: 2026-07-06T15:45:19+0800
+updated: 2026-07-06T16:02:00+0800
 ---
 
 # StoryMotion v7.4 Causal Asymmetry Diagnosis
@@ -214,6 +214,47 @@ DS max review: **conditional pass only**. The design is more faithful to causal 
 | generated-source stress | composed JOINT with generated human and H2C source replay | camera collapses so severely that generated-H source mismatch dominates before human-text quality can be assessed |
 
 Only after these gates pass should v7.4 run long training. The first long-training target is not another shared JOINT denoiser; it is `human_text` text-to-human, followed by H2C training or fine-tuning on generated human replay if the generated-source stress test exposes a source shift.
+
+### 5.5 Stronger Asymmetry Closed-Loop Smoke
+
+2026-07-06 code and smoke status:
+
+| gate | machine | artifact | result | readout |
+| --- | --- | --- | --- | --- |
+| four-task implementation check | 5090 GPU0, 4090 GPU0 | `train_stage2_condmdi_pulp.py check --task-probs 0 0 0 1` | pass | `human_text` trains only human channels and observes no latent branch |
+| old checkpoint compatibility | 5090, 4090 | `e3_bridge_smoke_compat_5090.json`, `e3_bridge_smoke_compat_4090.json` | pass | old three-task e3 checkpoint samples camera / human / joint only; no task-id overflow |
+| human-text smoke train | 5090 GPU0 | `runs/train/stage2/v7_4_core_20260706/human_text_smoke_20step` | pass | training loop and four-task checkpoint metadata work; not quality evidence |
+| human-text official metric | 5090 GPU0 | `human_text_smoke32.json` | pass | official human callback accepts `human_text`; 32 samples avoid PRDC k failure |
+| composed JOINT with GT human | 5090 GPU0 | `composed_gt_human_h2c_clean_smoke32.json` | pass | concat `[H_gt, C_h2c]` path, decode path, and official JOINT metric all run |
+| composed JOINT with generated human | 5090 GPU0 | `composed_generated_human_h2c_replay_smoke32.json` | pass as execution, quality failed as expected | generated-source path runs, but 20-step human generator causes severe metric collapse |
+
+Key smoke metrics, 32 samples:
+
+| condition | TMR FTD↓ | TMR cov↑ | TMR score↑ | CLaTr FCD↓ | CLaTr cov↑ | F1↑ | Out↓ | interpretation |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `human_text` smoke | 2266.95 | 0.0% | 3.44 | - | - | - | - | official human metric path works, but 20-step model is not usable quality |
+| composed GT human + H2C clean | 439.83 | 100.0% | 15.71 | 110.77 | 97.1% | 0.557 | 6.0% | H2C compose / decode / metric path is valid under GT human |
+| composed generated human + H2C replay | 2266.28 | 0.0% | 3.55 | 1024.98 | 0.0% | 0.017 | 15.4% | source-shift and weak 20-step human generator dominate; not a method-quality result |
+
+Decision: the stronger-asymmetry code path is ready for the first real long training target, `human_text` text-to-human. It is not yet evidence that v7.4 solves JOINT. The next veto will be the full `human_text` checkpoint quality; generated-source H2C fine-tuning should wait until that checkpoint exists, otherwise the H2C source-shift experiment is confounded by a deliberately undertrained human generator.
+
+DS max post-smoke audit: **PASS for `human_text` long training only**. It explicitly does not approve generated-source H2C long training before a full human generator checkpoint exists.
+
+Required long-training gates:
+
+| gate | check | action |
+| --- | --- | --- |
+| startup | no OOM / NaN; `grad_norm` finite; `human_text_loss` logged | continue |
+| 10k official human-text eval | FTD below `2000`, coverage at least `5%`, TMR score at least `4.0` | if missed, mark weak signal but continue to 30k unless training is unstable |
+| 30k official human-text eval | FTD below `1500`, coverage at least `20%` | if missed, stop and re-check configuration |
+| 50k hard collapse | coverage still `0%` | stop; do not launch H2C replay training |
+| generated-source H2C | only after `human_text` full checkpoint has usable official human metrics | then test / train H2C on generated-human replay |
+
+Current long training:
+
+| run | machine / GPU | path | status | note |
+| --- | --- | --- | --- | --- |
+| `human_text_full_e3like_82688` | 5090 GPU0 | `runs/train/stage2/v7_4_core_20260706/human_text_full_e3like_82688` | running from 2026-07-06 16:00 +0800 | e3-like capacity; `--task-probs 0 0 0 1`; selection metric `human_text_loss` |
 
 ## 6. Candidate Fixes, Not Claims
 
