@@ -85,6 +85,36 @@ def parse_bool(value: Any) -> bool:
     return str(value).lower() in {"1", "true", "yes", "on"}
 
 
+def infer_num_task_embeddings(meta: dict[str, Any], args: dict[str, Any]) -> int:
+    if "num_task_embeddings" in meta:
+        return max(3, int(meta["num_task_embeddings"]))
+    raw_probs = args.get("task_probs")
+    if raw_probs is None:
+        return 3
+    if isinstance(raw_probs, (list, tuple)):
+        return max(3, len(raw_probs))
+    import ast
+
+    try:
+        parsed = ast.literal_eval(str(raw_probs))
+    except (SyntaxError, ValueError):
+        return 3
+    return max(3, len(parsed)) if isinstance(parsed, (list, tuple)) else 3
+
+
+def resolve_existing_path(path_value: str | None, run_dir: Path, train_mod: Any) -> Path | None:
+    if not path_value:
+        return None
+    path = Path(path_value)
+    candidates = [path] if path.is_absolute() else []
+    root = Path(getattr(train_mod, "ROOT", run_dir.parents[3] if len(run_dir.parents) > 3 else run_dir))
+    candidates.extend([root / path, run_dir / path, run_dir.parent / path.name])
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def load_stage2(run_dir: Path, train_mod: Any, device: torch.device):
     meta = json.loads((run_dir / "meta.json").read_text(encoding="utf-8"))
     args = meta.get("args", {})
@@ -94,6 +124,17 @@ def load_stage2(run_dir: Path, train_mod: Any, device: torch.device):
     p2b_meta = meta.get("p2b_reliability", {})
     reliability_cond_dim = 5 if (parse_bool(p2b_meta.get("enabled", False)) or parse_bool(args.get("p2b_enable", False))) else 0
     v72_config = meta.get("v72_config", {})
+    task_instruction_meta = meta.get("task_instruction", {})
+    task_instruction_embeddings = None
+    if parse_bool(task_instruction_meta.get("enabled", False)):
+        task_instruction_path = resolve_existing_path(task_instruction_meta.get("path"), run_dir, train_mod)
+        if task_instruction_path is None:
+            raise FileNotFoundError(f"missing task instruction embeddings: {task_instruction_meta.get('path')}")
+        if hasattr(train_mod, "load_task_instruction_embeddings"):
+            task_instruction_embeddings, _ = train_mod.load_task_instruction_embeddings(task_instruction_path)
+        else:
+            data = torch.load(task_instruction_path, map_location="cpu")
+            task_instruction_embeddings = data.get("embeddings", data.get("task_embeddings")) if isinstance(data, dict) else data
     model = train_mod.TemporalObsUNet(
         int(args.get("width", 384)),
         parse_dim_mults(args.get("dim_mults", [1, 2, 2])),
@@ -108,12 +149,18 @@ def load_stage2(run_dir: Path, train_mod: Any, device: torch.device):
         v72_relation_surrogate=parse_bool(args.get("v72_relation_surrogate", v72_config.get("relation_surrogate", False))),
         v72_gate_bias=float(args.get("v72_gate_bias", v72_config.get("gate_bias", 2.0))),
         reliability_cond_dim=reliability_cond_dim,
+        task_instruction_embeddings=task_instruction_embeddings,
+        task_instruction_scale=float(args.get("task_instruction_scale", task_instruction_meta.get("scale", 1.0))),
+        num_task_embeddings=infer_num_task_embeddings(meta, args),
     ).to(device)
     ckpt_path = run_dir / "last.pt"
     ckpt = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(ckpt["model"])
     model.eval()
-    diffusion = train_mod.CondMDIDiffusion(
+    process_meta = meta.get("stage2_process", {})
+    process_name = args.get("generative_process", process_meta.get("generative_process", "diffusion"))
+    diffusion = train_mod.build_stage2_process(
+        process_name,
         int(args.get("diffusion_steps", 1000)),
         str(args.get("noise_schedule", "cosine")),
         device,
@@ -129,6 +176,8 @@ def load_stage2(run_dir: Path, train_mod: Any, device: torch.device):
         "reliability_cond_dim": reliability_cond_dim,
         "p2b_reliability": p2b_meta,
         "v72_config": v72_config,
+        "task_instruction": task_instruction_meta,
+        "stage2_process": diffusion.metadata(),
     }
 
 
@@ -191,12 +240,19 @@ def make_completion(
 ) -> torch.Tensor:
     task = torch.full((z.shape[0],), task_id, dtype=torch.long, device=z.device)
     obs_mask, _ = train_mod.make_branch_masks(z, valid, task)
-    t = torch.full((z.shape[0],), timestep, dtype=torch.long, device=z.device)
+    if getattr(diffusion, "name", "diffusion") == "rectified_flow":
+        t_value = float(timestep) / float(max(diffusion.num_timesteps - 1, 1))
+        t = torch.full((z.shape[0],), t_value, dtype=torch.float32, device=z.device)
+    else:
+        t = torch.full((z.shape[0],), timestep, dtype=torch.long, device=z.device)
     noise = torch.randn_like(z)
     x_t = diffusion.q_sample(z, t, noise)
-    pred = model(x_t, t, text, obs_x0=z, obs_mask=obs_mask)
+    model_t = diffusion.model_t(t)
+    source_meta = train_mod.build_source_meta(obs_mask, train_mod.SOURCE_GT)
+    pred = model(x_t, model_t, text, obs_x0=z, obs_mask=obs_mask, task=task, source_meta=source_meta)
+    pred_x0 = diffusion.prediction_to_x0(pred, x_t, t)
     valid_bc = valid[:, None, :].expand_as(z)
-    completion = torch.where(obs_mask, z, pred)
+    completion = torch.where(obs_mask, z, pred_x0)
     return torch.where(valid_bc, completion, z)
 
 

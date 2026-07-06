@@ -6,6 +6,7 @@ import copy
 import json
 import math
 import random
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,10 @@ from torch.utils.data import DataLoader, Dataset, Subset
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from storymotion.stage2.processes import build_stage2_process
 
 for _name, _value in {
     "bool": bool,
@@ -41,7 +46,14 @@ TEXT_DIM = 1024
 TASK_CAMERA = 0
 TASK_HUMAN = 1
 TASK_JOINT = 2
-TASK_NAMES = {TASK_CAMERA: "camera", TASK_HUMAN: "human", TASK_JOINT: "joint"}
+TASK_HUMAN_TEXT = 3
+TASK_NAMES = {TASK_CAMERA: "camera", TASK_HUMAN: "human", TASK_JOINT: "joint", TASK_HUMAN_TEXT: "human_text"}
+DEFAULT_TASK_INSTRUCTIONS = {
+    TASK_CAMERA: "generate camera trajectory from the observed human motion and camera description",
+    TASK_HUMAN: "generate human motion from the observed camera trajectory and human description",
+    TASK_JOINT: "generate paired human motion and camera trajectory from human and camera descriptions",
+    TASK_HUMAN_TEXT: "generate human motion from the human description without using camera trajectory",
+}
 
 SOURCE_GT = 0
 SOURCE_NOISY_GT = 1
@@ -99,6 +111,34 @@ def timestep_embedding(timesteps: torch.Tensor, dim: int, max_period: int = 1000
     if dim % 2:
         emb = torch.cat([emb, torch.zeros_like(emb[:, :1])], dim=-1)
     return emb
+
+
+def load_task_instruction_embeddings(path: Path | None) -> tuple[torch.Tensor | None, dict[str, Any]]:
+    if path is None:
+        return None, {"enabled": False}
+    data = torch.load(path, map_location="cpu")
+    if isinstance(data, dict):
+        tensor = data.get("embeddings", data.get("task_embeddings"))
+        labels = data.get("labels", TASK_NAMES)
+        texts = data.get("texts", DEFAULT_TASK_INSTRUCTIONS)
+    else:
+        tensor = data
+        labels = TASK_NAMES
+        texts = DEFAULT_TASK_INSTRUCTIONS
+    if tensor is None:
+        raise ValueError(f"{path} must contain an embeddings or task_embeddings tensor")
+    tensor = torch.as_tensor(tensor, dtype=torch.float32)
+    if tensor.ndim != 2 or tensor.shape[0] not in {3, 4}:
+        raise ValueError(f"expected task instruction embeddings [3,D] or [4,D], got {tuple(tensor.shape)}")
+    if tensor.shape[0] == 3:
+        tensor = torch.cat([tensor, tensor[TASK_HUMAN : TASK_HUMAN + 1]], dim=0)
+    return tensor, {
+        "enabled": True,
+        "path": str(path),
+        "shape": list(tensor.shape),
+        "labels": labels,
+        "texts": texts,
+    }
 
 
 class PulpLatentCache(Dataset):
@@ -187,6 +227,9 @@ class TemporalObsUNet(nn.Module):
         v72_relation_surrogate: bool = False,
         v72_gate_bias: float = 2.0,
         reliability_cond_dim: int = 0,
+        task_instruction_embeddings: torch.Tensor | None = None,
+        task_instruction_scale: float = 1.0,
+        num_task_embeddings: int = 3,
     ) -> None:
         super().__init__()
         self.cond_mask_prob = float(cond_mask_prob)
@@ -197,6 +240,7 @@ class TemporalObsUNet(nn.Module):
         self.v72_soft_source = bool(v72_soft_source)
         self.v72_trust_gate_enabled = bool(v72_trust_gate)
         self.v72_relation_surrogate = bool(v72_relation_surrogate)
+        self.task_instruction_scale = float(task_instruction_scale)
         self.time_mlp = nn.Sequential(
             nn.Linear(width, width * 4),
             nn.Mish(),
@@ -219,7 +263,36 @@ class TemporalObsUNet(nn.Module):
             if self.reliability_cond_dim > 0
             else None
         )
-        self.task_embed = nn.Embedding(3, width) if self.v72_text_role_router else None
+        self.num_task_embeddings = int(num_task_embeddings)
+        if self.num_task_embeddings < 3:
+            raise ValueError(f"num_task_embeddings must be >= 3, got {self.num_task_embeddings}")
+        self.task_embed = (
+            nn.Embedding(self.num_task_embeddings, width)
+            if self.v72_text_role_router and task_instruction_embeddings is None
+            else None
+        )
+        if task_instruction_embeddings is not None:
+            task_instruction_embeddings = torch.as_tensor(task_instruction_embeddings, dtype=torch.float32)
+            if task_instruction_embeddings.ndim != 2 or task_instruction_embeddings.shape[0] not in {3, 4}:
+                raise ValueError(
+                    "task_instruction_embeddings must be [3,D] or [4,D], "
+                    f"got {tuple(task_instruction_embeddings.shape)}"
+                )
+            if task_instruction_embeddings.shape[0] == 3 and self.num_task_embeddings >= 4:
+                task_instruction_embeddings = torch.cat(
+                    [task_instruction_embeddings, task_instruction_embeddings[TASK_HUMAN : TASK_HUMAN + 1]],
+                    dim=0,
+                )
+            self.register_buffer("task_instruction_embeddings", task_instruction_embeddings)
+            self.task_instruction_mlp = nn.Sequential(
+                nn.LayerNorm(task_instruction_embeddings.shape[1]),
+                nn.Linear(task_instruction_embeddings.shape[1], width * 2),
+                nn.Mish(),
+                nn.Linear(width * 2, width),
+            )
+        else:
+            self.task_instruction_embeddings = None
+            self.task_instruction_mlp = None
         self.source_meta_mlp = nn.Sequential(
             nn.Linear(7, width),
             nn.Mish(),
@@ -338,7 +411,8 @@ class TemporalObsUNet(nn.Module):
         # H2C: camera text dominant, human text auxiliary.
         hum_scale = torch.where((task == TASK_CAMERA).view(-1, 1), torch.full_like(hum_scale, aux), hum_scale)
         # C2H: human text dominant, camera text auxiliary.
-        cam_scale = torch.where((task == TASK_HUMAN).view(-1, 1), torch.full_like(cam_scale, aux), cam_scale)
+        human_like = ((task == TASK_HUMAN) | (task == TASK_HUMAN_TEXT)).view(-1, 1)
+        cam_scale = torch.where(human_like, torch.full_like(cam_scale, aux), cam_scale)
         return torch.cat([cam_scale * text_cam, hum_scale * text_hum], dim=-1)
 
     def _source_pool(self, obs_x0: torch.Tensor, obs_mask: torch.Tensor) -> torch.Tensor:
@@ -403,6 +477,11 @@ class TemporalObsUNet(nn.Module):
             if task is None:
                 task = torch.full((x_t.shape[0],), TASK_JOINT, dtype=torch.long, device=x_t.device)
             cond = cond + self.task_embed(task)
+        if self.task_instruction_mlp is not None:
+            if task is None:
+                task = torch.full((x_t.shape[0],), TASK_JOINT, dtype=torch.long, device=x_t.device)
+            task_emb = self.task_instruction_embeddings[task.to(device=x_t.device, dtype=torch.long)]
+            cond = cond + self.task_instruction_scale * self.task_instruction_mlp(task_emb.to(dtype=x_t.dtype))
         if self.source_meta_mlp is not None:
             if source_meta is None:
                 source_meta = torch.zeros((x_t.shape[0], 7), device=x_t.device, dtype=x_t.dtype)
@@ -432,18 +511,30 @@ class TemporalObsUNet(nn.Module):
 
 class CondMDIDiffusion:
     def __init__(self, steps: int, schedule: str, device: torch.device) -> None:
-        betas = get_named_beta_schedule(schedule, steps)
-        alphas = 1.0 - betas
-        alphas_cumprod = np.cumprod(alphas, axis=0)
-        self.num_timesteps = int(steps)
-        self.sqrt_alphas_cumprod = torch.from_numpy(np.sqrt(alphas_cumprod).astype(np.float32)).to(device)
-        self.sqrt_one_minus_alphas_cumprod = torch.from_numpy(np.sqrt(1.0 - alphas_cumprod).astype(np.float32)).to(device)
+        self._process = build_stage2_process("diffusion", steps, schedule, device)
+        self.num_timesteps = self._process.num_timesteps
+        self.sqrt_alphas_cumprod = self._process.sqrt_alphas_cumprod
+        self.sqrt_one_minus_alphas_cumprod = self._process.sqrt_one_minus_alphas_cumprod
+        self.name = self._process.name
+        self.prediction_type = self._process.prediction_type
 
     def q_sample(self, x_start: torch.Tensor, t: torch.Tensor, noise: torch.Tensor) -> torch.Tensor:
-        shape = (x_start.shape[0],) + (1,) * (x_start.ndim - 1)
-        a = self.sqrt_alphas_cumprod[t].view(shape)
-        b = self.sqrt_one_minus_alphas_cumprod[t].view(shape)
-        return a * x_start + b * noise
+        return self._process.q_sample(x_start, t, noise)
+
+    def sample_t(self, batch_size: int, device: torch.device) -> torch.Tensor:
+        return self._process.sample_t(batch_size, device)
+
+    def model_t(self, t: torch.Tensor) -> torch.Tensor:
+        return self._process.model_t(t)
+
+    def training_target(self, x_start: torch.Tensor, noise: torch.Tensor, t: torch.Tensor) -> torch.Tensor:
+        return self._process.training_target(x_start, noise, t)
+
+    def prediction_to_x0(self, prediction: torch.Tensor, x_t: torch.Tensor, t: torch.Tensor) -> torch.Tensor:
+        return self._process.prediction_to_x0(prediction, x_t, t)
+
+    def metadata(self) -> dict[str, Any]:
+        return self._process.metadata()
 
 
 def sample_tasks(batch_size: int, probs: torch.Tensor, device: torch.device) -> torch.Tensor:
@@ -463,12 +554,14 @@ def make_branch_masks(z: torch.Tensor, valid: torch.Tensor, task: torch.Tensor) 
     camera_task = task == TASK_CAMERA
     human_task = task == TASK_HUMAN
     joint_task = task == TASK_JOINT
-    if not torch.all(camera_task | human_task | joint_task):
+    human_text_task = task == TASK_HUMAN_TEXT
+    if not torch.all(camera_task | human_task | joint_task | human_text_task):
         raise RuntimeError("unknown task id")
     obs[camera_task, :HUM_DIM, :] = True
     obs[human_task, HUM_DIM:, :] = True
     obs = obs & valid_bc
     loss_mask = valid_bc & (~obs)
+    loss_mask[human_text_task, HUM_DIM:, :] = False
     if torch.any(obs & loss_mask):
         raise RuntimeError("observed and target masks overlap")
     if torch.any((obs | loss_mask) & (~valid_bc)):
@@ -480,6 +573,7 @@ def make_branch_masks(z: torch.Tensor, valid: torch.Tensor, task: torch.Tensor) 
     expected_loss[camera_task] = valid_counts[camera_task] * CAM_DIM
     expected_obs[human_task] = valid_counts[human_task] * CAM_DIM
     expected_loss[human_task] = valid_counts[human_task] * HUM_DIM
+    expected_loss[human_text_task] = valid_counts[human_text_task] * HUM_DIM
     obs_counts = obs.flatten(1).long().sum(dim=1)
     loss_counts = loss_mask.flatten(1).long().sum(dim=1)
     if not torch.equal(obs_counts.cpu(), expected_obs.cpu()):
@@ -487,6 +581,32 @@ def make_branch_masks(z: torch.Tensor, valid: torch.Tensor, task: torch.Tensor) 
     if not torch.equal(loss_counts.cpu(), expected_loss.cpu()):
         raise RuntimeError(f"unexpected loss counts: {loss_counts.tolist()} vs {expected_loss.tolist()}")
     return obs, loss_mask
+
+
+def perturb_joint_camera_input_for_human(
+    x: torch.Tensor,
+    mode: str,
+) -> torch.Tensor:
+    if mode == "normal":
+        return x
+    out = x.clone()
+    sl = slice(HUM_DIM, None)
+    if mode == "zero":
+        out[:, sl, :] = 0
+        return out
+    if mode == "shuffle":
+        if x.shape[0] < 2:
+            return out
+        perm = torch.randperm(x.shape[0], device=x.device)
+        out[:, sl, :] = x[perm, sl, :]
+        return out
+    if mode == "noise_matched":
+        block = x[:, sl, :]
+        mean = block.mean()
+        std = block.std(unbiased=False).clamp_min(1e-6)
+        out[:, sl, :] = torch.randn_like(block) * std + mean
+        return out
+    raise RuntimeError(f"unknown joint human camera input mode: {mode}")
 
 
 def build_source_meta(
@@ -581,8 +701,10 @@ def masked_target_mse(
 
 def make_observed_condition_x0(
     model: nn.Module,
+    process: Any,
     x_t: torch.Tensor,
     t: torch.Tensor,
+    model_t: torch.Tensor,
     z: torch.Tensor,
     text: torch.Tensor,
     valid: torch.Tensor,
@@ -612,15 +734,16 @@ def make_observed_condition_x0(
         model.eval()
         with torch.no_grad():
             joint_source_meta = build_source_meta(joint_obs_mask, SOURCE_MISSING)
-            generated_candidate = model(
+            generated_pred = model(
                 x_t.detach(),
-                t.detach(),
+                model_t.detach(),
                 text.detach(),
                 obs_x0=z,
                 obs_mask=joint_obs_mask,
                 task=joint_task,
                 source_meta=joint_source_meta,
             ).detach()
+            generated_candidate = process.prediction_to_x0(generated_pred, x_t.detach(), t.detach()).detach()
         model.train(was_training)
 
     if mode == "noisy":
@@ -690,17 +813,22 @@ def diffusion_loss(
     obs_self_condition_prob: float = 0.0,
     obs_self_condition_mode: str = "clean",
     obs_self_condition_noise_std: float = 0.0,
+    joint_human_camera_input_mode: str = "normal",
 ) -> tuple[torch.Tensor, dict[str, float], torch.Tensor]:
     if noise is None:
         noise = torch.randn_like(z)
     if t is None:
-        t = torch.randint(0, diffusion.num_timesteps, (z.shape[0],), device=z.device)
+        t = diffusion.sample_t(z.shape[0], z.device)
     obs_mask, loss_mask = make_branch_masks(z, valid, task)
     x_t = diffusion.q_sample(z, t, noise)
+    model_t = diffusion.model_t(t)
+    target = diffusion.training_target(z, noise, t)
     obs_x0, source_meta, obs_metrics = make_observed_condition_x0(
         model,
+        diffusion,
         x_t,
         t,
+        model_t,
         z,
         text,
         valid,
@@ -709,20 +837,37 @@ def diffusion_loss(
         obs_self_condition_mode,
         obs_self_condition_noise_std,
     )
-    pred_x0 = model(x_t, t, text, obs_x0=obs_x0, obs_mask=obs_mask, task=task, source_meta=source_meta)
-    if pred_x0.shape != z.shape:
-        raise RuntimeError(f"model output shape mismatch: {tuple(pred_x0.shape)} vs {tuple(z.shape)}")
+    pred = model(x_t, model_t, text, obs_x0=obs_x0, obs_mask=obs_mask, task=task, source_meta=source_meta)
+    if pred.shape != z.shape:
+        raise RuntimeError(f"model output shape mismatch: {tuple(pred.shape)} vs {tuple(z.shape)}")
+    pred_for_loss = pred
+    joint_selected = task == TASK_JOINT
+    if joint_human_camera_input_mode != "normal" and joint_selected.any():
+        x_t_human = perturb_joint_camera_input_for_human(x_t, joint_human_camera_input_mode)
+        pred_human_view = model(
+            x_t_human,
+            model_t,
+            text,
+            obs_x0=obs_x0,
+            obs_mask=obs_mask,
+            task=task,
+            source_meta=source_meta,
+        )
+        pred_for_loss = pred.clone()
+        pred_for_loss[joint_selected, :HUM_DIM, :] = pred_human_view[joint_selected, :HUM_DIM, :]
     loss, metrics = masked_target_mse(
-        pred_x0,
-        z,
+        pred_for_loss,
+        target,
         loss_mask,
         task,
         joint_loss_mode=joint_loss_mode,
         joint_human_branch_weight=joint_human_branch_weight,
         joint_camera_branch_weight=joint_camera_branch_weight,
     )
+    if joint_human_camera_input_mode != "normal":
+        metrics["joint_human_camera_input_mode_active"] = float(joint_selected.float().mean().detach().cpu())
     metrics.update(obs_metrics)
-    return loss, metrics, pred_x0
+    return loss, metrics, pred
 
 
 @torch.no_grad()
@@ -736,6 +881,7 @@ def evaluate(
     joint_loss_mode: str = "element_mean",
     joint_human_branch_weight: float = 1.0,
     joint_camera_branch_weight: float = 1.0,
+    joint_human_camera_input_mode: str = "normal",
 ) -> dict[str, float]:
     was_training = model.training
     model.eval()
@@ -749,7 +895,7 @@ def evaluate(
         for task_id, task_name in TASK_NAMES.items():
             task = torch.full((z.shape[0],), task_id, dtype=torch.long, device=device)
             noise = torch.randn_like(z)
-            t = torch.randint(0, diffusion.num_timesteps, (z.shape[0],), device=device)
+            t = diffusion.sample_t(z.shape[0], device)
             _, metrics, _ = diffusion_loss(
                 model,
                 diffusion,
@@ -762,6 +908,7 @@ def evaluate(
                 joint_loss_mode=joint_loss_mode,
                 joint_human_branch_weight=joint_human_branch_weight,
                 joint_camera_branch_weight=joint_camera_branch_weight,
+                joint_human_camera_input_mode=joint_human_camera_input_mode,
             )
             for key, value in metrics.items():
                 totals.setdefault(f"{task_name}_{key}", []).append(value)
@@ -769,18 +916,20 @@ def evaluate(
             if task_id in {TASK_CAMERA, TASK_HUMAN} and z.shape[0] > 1:
                 obs_mask, loss_mask = make_branch_masks(z, valid, task)
                 x_t = diffusion.q_sample(z, t, noise)
+                model_t = diffusion.model_t(t)
+                target = diffusion.training_target(z, noise, t)
                 clean_source_meta = build_source_meta(obs_mask, SOURCE_GT)
-                base = model(x_t, t, text, obs_x0=z, obs_mask=obs_mask, task=task, source_meta=clean_source_meta)
+                base = model(x_t, model_t, text, obs_x0=z, obs_mask=obs_mask, task=task, source_meta=clean_source_meta)
                 perm = torch.randperm(z.shape[0], device=device)
                 z_shuf = z.clone()
                 if task_id == TASK_CAMERA:
                     z_shuf[:, :HUM_DIM] = z[perm, :HUM_DIM]
                 else:
                     z_shuf[:, HUM_DIM:] = z[perm, HUM_DIM:]
-                shuf = model(x_t, t, text, obs_x0=z_shuf, obs_mask=obs_mask, task=task, source_meta=clean_source_meta)
+                shuf = model(x_t, model_t, text, obs_x0=z_shuf, obs_mask=obs_mask, task=task, source_meta=clean_source_meta)
                 base_loss, _ = masked_target_mse(
                     base,
-                    z,
+                    target,
                     loss_mask,
                     task,
                     joint_loss_mode=joint_loss_mode,
@@ -789,7 +938,7 @@ def evaluate(
                 )
                 shuf_loss, _ = masked_target_mse(
                     shuf,
-                    z,
+                    target,
                     loss_mask,
                     task,
                     joint_loss_mode=joint_loss_mode,
@@ -899,6 +1048,8 @@ def train(args: argparse.Namespace) -> None:
     device = torch.device(args.device)
     train_loader, eval_loader, test_loader, sizes = build_loaders(args)
     dim_mults = tuple(int(v) for v in args.dim_mults)
+    task_instruction_embeddings, task_instruction_meta = load_task_instruction_embeddings(args.task_instruction_embeddings)
+    num_task_embeddings = max(3, len(args.task_probs))
     model = TemporalObsUNet(
         args.width,
         dim_mults,
@@ -912,8 +1063,11 @@ def train(args: argparse.Namespace) -> None:
         v72_trust_gate=args.v72_trust_gate,
         v72_relation_surrogate=args.v72_relation_surrogate,
         v72_gate_bias=args.v72_gate_bias,
+        task_instruction_embeddings=task_instruction_embeddings,
+        task_instruction_scale=args.task_instruction_scale,
+        num_task_embeddings=num_task_embeddings,
     ).to(device)
-    diffusion = CondMDIDiffusion(args.diffusion_steps, args.noise_schedule, device)
+    diffusion = build_stage2_process(args.generative_process, args.diffusion_steps, args.noise_schedule, device)
     ema_model = copy.deepcopy(model).eval().requires_grad_(False) if args.ema_decay > 0 else None
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, args.adam_beta2))
     task_probs = torch.tensor(args.task_probs, dtype=torch.float32)
@@ -924,9 +1078,10 @@ def train(args: argparse.Namespace) -> None:
     log_path = out / "train_log.jsonl"
     meta = {
         "args": to_jsonable(args),
-        "diffusion_beta_schedule_source": "inline_openai_guided_diffusion_compatible",
-        "pipeline": "CondMDI-style q_sample + obs_x0/obs_mask input replacement + zero-keyframe target loss",
-        "model_mean_type": "START_X",
+        "stage2_process": diffusion.metadata(),
+        "diffusion_beta_schedule_source": "modular_openai_guided_diffusion_compatible" if args.generative_process == "diffusion" else None,
+        "pipeline": "CondMDI-style obs_x0/obs_mask input replacement + process-specific target loss",
+        "model_mean_type": diffusion.prediction_type,
         "latent_order": "concat([z_hum,z_cam])",
         "human_slice": [0, HUM_DIM],
         "camera_slice": [HUM_DIM, LATENT_DIM],
@@ -934,10 +1089,20 @@ def train(args: argparse.Namespace) -> None:
         "joint_loss_mode": args.joint_loss_mode,
         "joint_human_branch_weight": args.joint_human_branch_weight,
         "joint_camera_branch_weight": args.joint_camera_branch_weight,
+        "joint_human_camera_input_mode": args.joint_human_camera_input_mode,
+        "task_names": TASK_NAMES,
+        "task_probs_normalized": [float(v) for v in task_probs.tolist()],
+        "num_task_embeddings": num_task_embeddings,
         "obs_self_condition": {
             "mode": args.obs_self_condition_mode,
             "prob": args.obs_self_condition_prob,
             "noise_std": args.obs_self_condition_noise_std,
+        },
+        "task_instruction": {
+            **task_instruction_meta,
+            "scale": args.task_instruction_scale,
+            "source": "precomputed CLIP text embedding; projected into denoiser condition",
+            "motionlab_reference": "Task Instruction Modulation uses CLIP text embeddings rather than one-hot task ids.",
         },
         "v72_config": {
             "text_role_router": args.v72_text_role_router,
@@ -1014,6 +1179,7 @@ def train(args: argparse.Namespace) -> None:
                 obs_self_condition_prob=args.obs_self_condition_prob,
                 obs_self_condition_mode=args.obs_self_condition_mode,
                 obs_self_condition_noise_std=args.obs_self_condition_noise_std,
+                joint_human_camera_input_mode=args.joint_human_camera_input_mode,
             )
             opt.zero_grad(set_to_none=True)
             loss.backward()
@@ -1039,6 +1205,7 @@ def train(args: argparse.Namespace) -> None:
                     args.joint_loss_mode,
                     args.joint_human_branch_weight,
                     args.joint_camera_branch_weight,
+                    args.joint_human_camera_input_mode,
                 )
                 record = {"step": step, "split": "eval", **metrics_eval}
                 write_record(log_path, record)
@@ -1068,6 +1235,7 @@ def train(args: argparse.Namespace) -> None:
                     args.joint_loss_mode,
                     args.joint_human_branch_weight,
                     args.joint_camera_branch_weight,
+                    args.joint_human_camera_input_mode,
                 )
                 record = {"step": step, "split": "test", **metrics_test}
                 write_record(log_path, record)
@@ -1104,7 +1272,10 @@ def check(args: argparse.Namespace) -> None:
     z = batch["z"].to(device)
     text = batch["text"].to(device)
     valid = batch["valid"].to(device)
-    task = torch.tensor([TASK_CAMERA, TASK_HUMAN, TASK_JOINT, TASK_CAMERA, TASK_HUMAN, TASK_JOINT, TASK_CAMERA, TASK_HUMAN], device=device)[: z.shape[0]]
+    task = torch.tensor(
+        [TASK_CAMERA, TASK_HUMAN, TASK_JOINT, TASK_HUMAN_TEXT, TASK_CAMERA, TASK_HUMAN, TASK_JOINT, TASK_HUMAN_TEXT],
+        device=device,
+    )[: z.shape[0]]
     obs_mask, loss_mask = make_branch_masks(z, valid, task)
     assert not torch.any(obs_mask & loss_mask)
     assert torch.all(obs_mask[:, HUM_DIM:] == 0) or True
@@ -1143,6 +1314,16 @@ def check(args: argparse.Namespace) -> None:
     human_obs_perturbed, _ = masked_target_mse(pred_human_obs, z, human_loss_mask, human_only)
     if not torch.allclose(human_base, human_obs_perturbed):
         raise RuntimeError("human task loss changed when only observed camera branch was perturbed")
+    human_text_only = torch.full((z.shape[0],), TASK_HUMAN_TEXT, dtype=torch.long, device=device)
+    obs_human_text, human_text_loss_mask = make_branch_masks(z, valid, human_text_only)
+    if obs_human_text.any():
+        raise RuntimeError("human_text task must not observe camera or human latent branches")
+    if human_text_loss_mask[:, HUM_DIM:].any():
+        raise RuntimeError("human_text task must not train camera latent channels")
+    if not human_text_loss_mask[:, :HUM_DIM].flatten(1).any(dim=1).all():
+        raise RuntimeError("human_text task must train human latent channels")
+    task_instruction_embeddings, _ = load_task_instruction_embeddings(args.task_instruction_embeddings)
+    num_task_embeddings = max(3, len(args.task_probs))
     model = TemporalObsUNet(
         args.width,
         tuple(int(v) for v in args.dim_mults),
@@ -1156,8 +1337,11 @@ def check(args: argparse.Namespace) -> None:
         v72_trust_gate=args.v72_trust_gate,
         v72_relation_surrogate=args.v72_relation_surrogate,
         v72_gate_bias=args.v72_gate_bias,
+        task_instruction_embeddings=task_instruction_embeddings,
+        task_instruction_scale=args.task_instruction_scale,
+        num_task_embeddings=num_task_embeddings,
     ).to(device)
-    diffusion = CondMDIDiffusion(args.diffusion_steps, args.noise_schedule, device)
+    diffusion = build_stage2_process(args.generative_process, args.diffusion_steps, args.noise_schedule, device)
     loss, metrics, pred_x0 = diffusion_loss(
         model,
         diffusion,
@@ -1171,6 +1355,7 @@ def check(args: argparse.Namespace) -> None:
         obs_self_condition_prob=args.obs_self_condition_prob,
         obs_self_condition_mode=args.obs_self_condition_mode,
         obs_self_condition_noise_std=args.obs_self_condition_noise_std,
+        joint_human_camera_input_mode=args.joint_human_camera_input_mode,
     )
     if pred_x0.shape != z.shape:
         raise RuntimeError(f"forward shape mismatch: {pred_x0.shape} vs {z.shape}")
@@ -1196,6 +1381,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--cond-mask-prob-hum", type=float, default=0.0, help="Human-only cond mask prob (zeroes only human text half)")
     p.add_argument("--zero-final", action="store_true", default=True)
     p.add_argument("--no-zero-final", action="store_false", dest="zero_final")
+    p.add_argument("--generative-process", choices=["diffusion", "rectified_flow"], default="diffusion")
     p.add_argument("--diffusion-steps", type=int, default=1000)
     p.add_argument("--noise-schedule", default="cosine")
     p.add_argument("--lr", type=float, default=1e-4)
@@ -1212,10 +1398,22 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--test-every", type=int, default=2000)
     p.add_argument("--test-batches", type=int, default=8)
     p.add_argument("--test-samples", type=int, default=128)
-    p.add_argument("--task-probs", type=float, nargs=3, default=[1.0, 1.0, 1.0])
+    p.add_argument(
+        "--task-probs",
+        type=float,
+        nargs="+",
+        default=[1.0, 1.0, 1.0],
+        help="Task sampling probabilities. Use 3 values for camera,human,joint or 4 values for camera,human,joint,human_text.",
+    )
     p.add_argument("--joint-loss-mode", choices=["element_mean", "branch_mean", "branch_sum"], default="element_mean")
     p.add_argument("--joint-human-branch-weight", type=float, default=1.0)
     p.add_argument("--joint-camera-branch-weight", type=float, default=1.0)
+    p.add_argument(
+        "--joint-human-camera-input-mode",
+        choices=["normal", "zero", "shuffle", "noise_matched"],
+        default="normal",
+        help="For JOINT training, compute the human-branch loss from a second forward pass whose camera input channels are perturbed; camera loss keeps the normal forward pass.",
+    )
     p.add_argument("--selection-metric", default="loss")
     p.add_argument("--obs-self-condition-prob", type=float, default=0.0)
     p.add_argument("--obs-self-condition-mode", choices=["clean", "noisy", "joint_pred", "mixed"], default="clean")
@@ -1226,6 +1424,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--v72-trust-gate", action="store_true")
     p.add_argument("--v72-relation-surrogate", action="store_true")
     p.add_argument("--v72-gate-bias", type=float, default=2.0)
+    p.add_argument(
+        "--task-instruction-embeddings",
+        type=Path,
+        help="Path to precomputed CLIP task instruction embeddings [3,D] ordered as camera,human,joint.",
+    )
+    p.add_argument("--task-instruction-scale", type=float, default=1.0)
     p.add_argument("--ema-decay", type=float, default=0.0)
     p.add_argument("--early-stop-patience", type=int, default=0)
     p.add_argument("--early-stop-min-delta", type=float, default=0.0)
@@ -1244,6 +1448,16 @@ def main() -> None:
         raise ValueError("--joint-*-branch-weight values must be positive")
     if not (0.0 <= args.v72_aux_text_scale <= 1.0):
         raise ValueError("--v72-aux-text-scale must be in [0, 1]")
+    if args.task_instruction_scale < 0.0:
+        raise ValueError("--task-instruction-scale must be non-negative")
+    if args.task_instruction_embeddings is not None and not args.task_instruction_embeddings.exists():
+        raise FileNotFoundError(args.task_instruction_embeddings)
+    if len(args.task_probs) not in {3, 4}:
+        raise ValueError("--task-probs must contain 3 values (camera,human,joint) or 4 values (camera,human,joint,human_text)")
+    if sum(args.task_probs) <= 0.0:
+        raise ValueError("--task-probs must have a positive sum")
+    if args.generative_process == "rectified_flow" and args.obs_self_condition_mode in {"joint_pred", "mixed"}:
+        raise ValueError("rectified_flow does not support generated observed self-conditioning in this trainer")
     if args.mode == "check":
         check(args)
     else:

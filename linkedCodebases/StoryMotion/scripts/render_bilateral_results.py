@@ -30,6 +30,16 @@ BONE_CONNECTIONS = [
     (16, 18), (17, 19), (18, 20), (19, 21),
 ]
 
+
+def load_local_module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f'failed to load {path}')
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
 try:
     import imageio_ffmpeg
     FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
@@ -44,18 +54,127 @@ except ImportError:
         FFMPEG = 'ffmpeg'
 
 
+def parse_bool(value, default=False):
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    return str(value).lower() in {'1', 'true', 'yes', 'on'}
+
+
+def load_h2c_model(ckpt_path, ckpt, device):
+    h2c = load_local_module('train_stage2_h2c_minimal_render', ROOT / 'scripts/train_stage2_h2c_minimal.py')
+    meta = ckpt.get('meta', {})
+    raw_args = meta.get('args', {})
+    ns = argparse.Namespace(
+        width=int(raw_args.get('width', 384)),
+        layers=int(raw_args.get('layers', 6)),
+        cond_mask_prob=float(raw_args.get('cond_mask_prob', 0.1)),
+        use_source_type=parse_bool(raw_args.get('use_source_type'), True),
+        use_human_stats=parse_bool(raw_args.get('use_human_stats'), False),
+    )
+    model = h2c.build_model_from_args(ns).to(device)
+    model.load_state_dict(ckpt['model'])
+    model.eval()
+    model.storymotion_h2c_camera_only = True
+    model.storymotion_h2c_source = str(raw_args.get('train_source', raw_args.get('source_mode', 'clean')))
+    model.storymotion_h2c_module = h2c
+    process = argparse.Namespace(name='h2c_camera_only', num_timesteps=1)
+    return model, process, ckpt
+
+
+def load_model_switch_h2c_model(ckpt_path, ckpt, device):
+    h2c = load_local_module('train_stage2_model_switch_render', ROOT / 'scripts/train_stage2_model_switch.py')
+    meta = ckpt.get('meta', {})
+    raw_args = meta.get('args', {})
+    ns = argparse.Namespace(
+        model_name=str(raw_args.get('model_name', meta.get('model_name', 'molingo_fullrf_h2c'))),
+        width=int(raw_args.get('width', 384)),
+        layers=int(raw_args.get('layers', 8)),
+        rf_heads=int(raw_args.get('rf_heads', 8)),
+        rf_ff_mult=float(raw_args.get('rf_ff_mult', 4.0)),
+        rf_dropout=float(raw_args.get('rf_dropout', 0.0)),
+        cond_mask_prob=float(raw_args.get('cond_mask_prob', 0.1)),
+        rf_sample_steps=int(raw_args.get('rf_sample_steps', 16)),
+        rf_local_window=int(raw_args.get('rf_local_window', 5)),
+        use_source_type=parse_bool(raw_args.get('use_source_type'), True),
+        use_human_stats=parse_bool(raw_args.get('use_human_stats'), True),
+    )
+    model = h2c.build_model_from_args(ns).to(device)
+    model.load_state_dict(ckpt['model'])
+    model.eval()
+    train_source = str(raw_args.get('train_source', 'clean'))
+    if train_source == 'noisy':
+        train_source = f"noisy:{float(raw_args.get('train_noise_std', 0.15))}"
+    model.storymotion_h2c_camera_only = True
+    model.storymotion_h2c_source = train_source
+    model.storymotion_h2c_module = h2c
+    model.storymotion_h2c_model_name = ns.model_name
+    process = argparse.Namespace(name='h2c_camera_only', num_timesteps=1)
+    return model, process, ckpt
+
+
+def is_h2c_checkpoint(ckpt):
+    state = ckpt.get('model', {})
+    out_bias = state.get('out.2.bias')
+    return 'blocks.0.conv1.weight' in state and torch.is_tensor(out_bias) and int(out_bias.numel()) == 64
+
+
+def is_model_switch_h2c_checkpoint(ckpt):
+    meta = ckpt.get('meta', {})
+    state = ckpt.get('model', {})
+    return (
+        meta.get('kind') == 'stage2_model_switch'
+        and meta.get('model_name') == 'molingo_fullrf_h2c'
+        and 'camera_pos' in state
+        and 'decoder.layers.0.self_attn.in_proj_weight' in state
+    )
+
+
 def load_model(ckpt_path, device):
     ckpt = torch.load(ckpt_path, map_location='cpu')
+    if is_h2c_checkpoint(ckpt):
+        return load_h2c_model(ckpt_path, ckpt, device)
+    if is_model_switch_h2c_checkpoint(ckpt):
+        return load_model_switch_h2c_model(ckpt_path, ckpt, device)
     meta_args = ckpt.get('meta', {}).get('args', {})
+    v72_config = ckpt.get('meta', {}).get('v72_config', {})
+    p2b_meta = ckpt.get('meta', {}).get('p2b_reliability', {})
     width = int(meta_args.get('width', 384))
     dim_mults = tuple(int(v) for v in ast.literal_eval(meta_args.get('dim_mults', '[1,2,2]')))
     cond_mask_prob = float(meta_args.get('cond_mask_prob', 0.1))
+    cond_mask_prob_cam = float(meta_args.get('cond_mask_prob_cam', 0.0))
+    cond_mask_prob_hum = float(meta_args.get('cond_mask_prob_hum', 0.0))
     zero_final = str(meta_args.get('zero_final', 'True')).lower() == 'true'
     diffusion_steps = int(meta_args.get('diffusion_steps', 1000))
     noise_schedule = str(meta_args.get('noise_schedule', 'cosine'))
-    model = mod.TemporalObsUNet(width, dim_mults, cond_mask_prob, zero_final).to(device)
+    process_meta = ckpt.get('meta', {}).get('stage2_process', {})
+    process_name = str(meta_args.get('generative_process', process_meta.get('generative_process', 'diffusion')))
+
+    p2b_enabled = parse_bool(p2b_meta.get('enabled'), False) or parse_bool(meta_args.get('p2b_enable'), False)
+    reliability_cond_dim = 5 if p2b_enabled else 0
+    model = mod.TemporalObsUNet(
+        width,
+        dim_mults,
+        cond_mask_prob,
+        zero_final,
+        cond_mask_prob_cam,
+        cond_mask_prob_hum,
+        v72_text_role_router=parse_bool(meta_args.get('v72_text_role_router'), parse_bool(v72_config.get('text_role_router'), False)),
+        v72_aux_text_scale=float(meta_args.get('v72_aux_text_scale', v72_config.get('aux_text_scale', 0.35))),
+        v72_soft_source=parse_bool(meta_args.get('v72_soft_source'), parse_bool(v72_config.get('soft_source'), False)),
+        v72_trust_gate=parse_bool(meta_args.get('v72_trust_gate'), parse_bool(v72_config.get('trust_gate'), False)),
+        v72_relation_surrogate=parse_bool(meta_args.get('v72_relation_surrogate'), parse_bool(v72_config.get('relation_surrogate'), False)),
+        v72_gate_bias=float(meta_args.get('v72_gate_bias', v72_config.get('gate_bias', 2.0))),
+        reliability_cond_dim=reliability_cond_dim,
+    ).to(device)
     model.load_state_dict(ckpt['model']); model.eval()
-    diffusion = mod.CondMDIDiffusion(diffusion_steps, noise_schedule, device)
+    if hasattr(mod, 'build_stage2_process'):
+        diffusion = mod.build_stage2_process(process_name, diffusion_steps, noise_schedule, device)
+    elif process_name == 'diffusion':
+        diffusion = mod.CondMDIDiffusion(diffusion_steps, noise_schedule, device)
+    else:
+        raise RuntimeError('train_stage2_condmdi_pulp.py does not expose build_stage2_process; cannot load non-diffusion checkpoint')
     return model, diffusion, ckpt
 
 
@@ -86,12 +205,130 @@ def deterministic_noise(shape, sample_indices, seed, device, dtype):
     return torch.stack(parts, dim=0).to(device=device, dtype=dtype)
 
 
+def apply_joint_camera_latent_intervention(x, intervention, sample_indices, seed, step_idx):
+    if intervention == 'none':
+        return x
+    out = x.clone()
+    sl = slice(mod.HUM_DIM, None)
+    if intervention == 'zero':
+        out[:, sl, :] = 0
+        return out
+    if intervention == 'shuffle':
+        if x.shape[0] < 2:
+            return out
+        g = torch.Generator(device=x.device)
+        g.manual_seed(int(seed) + 9_000_001 + int(step_idx) * 97)
+        perm = torch.randperm(x.shape[0], generator=g, device=x.device)
+        out[:, sl, :] = x[perm, sl, :]
+        return out
+    if intervention == 'noise_matched':
+        block = x[:, sl, :]
+        mean = block.mean()
+        std = block.std(unbiased=False).clamp_min(1e-6)
+        noise = deterministic_noise(tuple(block.shape), sample_indices, int(seed) + 9_000_001 + int(step_idx) * 97, x.device, x.dtype)
+        out[:, sl, :] = noise * std + mean
+        return out
+    raise ValueError(f'unknown joint camera latent intervention: {intervention}')
+
+
+def apply_joint_human_camera_input_mode(x, mode, sample_indices, seed, step_idx):
+    if mode == 'normal':
+        return x
+    out = x.clone()
+    sl = slice(mod.HUM_DIM, None)
+    if mode == 'zero':
+        out[:, sl, :] = 0
+        return out
+    if mode == 'shuffle':
+        if x.shape[0] < 2:
+            return out
+        g = torch.Generator(device=x.device)
+        g.manual_seed(int(seed) + 12_000_001 + int(step_idx) * 131)
+        perm = torch.randperm(x.shape[0], generator=g, device=x.device)
+        out[:, sl, :] = x[perm, sl, :]
+        return out
+    if mode == 'noise_matched':
+        block = x[:, sl, :]
+        mean = block.mean()
+        std = block.std(unbiased=False).clamp_min(1e-6)
+        noise = deterministic_noise(tuple(block.shape), sample_indices, int(seed) + 12_000_001 + int(step_idx) * 131, x.device, x.dtype)
+        out[:, sl, :] = noise * std + mean
+        return out
+    raise ValueError(f'unknown joint human camera input mode: {mode}')
+
+
 def make_timesteps(num_timesteps, num_steps, device):
     ts = torch.linspace(num_timesteps - 1, 0, num_steps, device=device).round().long()
     ts = torch.unique_consecutive(ts)
     if ts.numel() == 0 or int(ts[-1].item()) != 0:
         ts = torch.cat([ts, torch.zeros(1, dtype=torch.long, device=device)])
     return ts
+
+
+@torch.no_grad()
+def rectified_flow_sample_bilateral(model, diffusion, z, text, valid, task_id, sample_indices, seed, num_steps,
+                                    cfg_scale=1.0, cfg_human=None, cfg_camera=None,
+                                    channel_gated_cfg=False, joint_camera_latent_intervention='none',
+                                    joint_human_camera_input_mode='normal'):
+    bilateral = cfg_human is not None and cfg_camera is not None
+    task = torch.full((z.shape[0],), task_id, dtype=torch.long, device=z.device)
+    obs_mask, _ = mod.make_branch_masks(z, valid, task)
+    valid_bc = valid[:, None, :].expand_as(z)
+    fixed_mask = obs_mask | (~valid_bc)
+    base_noise = deterministic_noise(tuple(z.shape), sample_indices, seed, z.device, z.dtype)
+    times = torch.linspace(0.0, 1.0, num_steps + 1, device=z.device, dtype=z.dtype)
+
+    empty_text = torch.zeros_like(text) if (cfg_scale != 1.0 or bilateral) else None
+    half = text.shape[1] // 2
+    cam_text = None
+    hum_text = None
+    if bilateral:
+        cam_text = text.clone(); cam_text[:, half:] = 0
+        hum_text = text.clone(); hum_text[:, :half] = 0
+
+    def q_gt(t_scalar):
+        t = torch.full((z.shape[0],), float(t_scalar.item()), dtype=torch.float32, device=z.device)
+        return diffusion.q_sample(z, t, base_noise)
+
+    def model_forward(x_t, t_scalar, cond_text, step_idx):
+        t = torch.full((z.shape[0],), float(t_scalar.item()), dtype=torch.float32, device=z.device)
+        if joint_camera_latent_intervention != 'none':
+            x_t = apply_joint_camera_latent_intervention(x_t, joint_camera_latent_intervention, sample_indices, seed, step_idx)
+        pred = model(x_t, diffusion.model_t(t), cond_text, obs_x0=z, obs_mask=obs_mask)
+        if task_id != mod.TASK_JOINT or joint_human_camera_input_mode == 'normal':
+            return pred
+        human_x_t = apply_joint_human_camera_input_mode(x_t, joint_human_camera_input_mode, sample_indices, seed, step_idx)
+        human_pred = model(human_x_t, diffusion.model_t(t), cond_text, obs_x0=z, obs_mask=obs_mask)
+        out = pred.clone()
+        out[:, :mod.HUM_DIM, :] = human_pred[:, :mod.HUM_DIM, :]
+        return out
+
+    x = torch.where(fixed_mask, q_gt(times[0]), base_noise)
+    for idx in range(num_steps):
+        t_scalar = times[idx]
+        next_t = times[idx + 1]
+        x = torch.where(fixed_mask, q_gt(t_scalar), x)
+
+        if bilateral:
+            pu = model_forward(x, t_scalar, empty_text, idx)
+            pc = model_forward(x, t_scalar, cam_text, idx)
+            ph = model_forward(x, t_scalar, hum_text, idx)
+            if channel_gated_cfg:
+                velocity = pu.clone()
+                velocity[:, :mod.HUM_DIM] = pu[:, :mod.HUM_DIM] + cfg_human * (ph[:, :mod.HUM_DIM] - pu[:, :mod.HUM_DIM])
+                velocity[:, mod.HUM_DIM:] = pu[:, mod.HUM_DIM:] + cfg_camera * (pc[:, mod.HUM_DIM:] - pu[:, mod.HUM_DIM:])
+            else:
+                velocity = pu + cfg_camera * (pc - pu) + cfg_human * (ph - pu)
+        elif cfg_scale == 1.0:
+            velocity = model_forward(x, t_scalar, text, idx)
+        else:
+            pc = model_forward(x, t_scalar, text, idx)
+            pu = model_forward(x, t_scalar, empty_text, idx)
+            velocity = pu + cfg_scale * (pc - pu)
+
+        x = x + (next_t - t_scalar) * velocity
+        x = torch.where(fixed_mask, q_gt(next_t), x)
+    return torch.where(fixed_mask, z, x)
 
 
 def _as_tensor(value, field_name):
@@ -131,7 +368,44 @@ def get_gt_tensors(sample, device):
 @torch.no_grad()
 def ddim_sample_bilateral(model, diffusion, z, text, valid, task_id, sample_indices, seed, num_steps,
                           cfg_scale=1.0, cfg_human=None, cfg_camera=None, eta=0.0,
-                          channel_gated_cfg=False):
+                          channel_gated_cfg=False, joint_camera_latent_intervention='none',
+                          joint_human_camera_input_mode='normal'):
+    if getattr(model, 'storymotion_h2c_camera_only', False):
+        task_name = mod.TASK_NAMES.get(int(task_id), str(task_id))
+        if task_name != 'camera':
+            return z
+        h2c = model.storymotion_h2c_module
+        human = z[:, :mod.HUM_DIM]
+        source = str(getattr(model, 'storymotion_h2c_source', 'clean'))
+        source_type = None
+        sigma = None
+        human_cond = human
+        if source.startswith('noisy'):
+            noise_sigma = 0.15
+            if ':' in source:
+                try:
+                    noise_sigma = float(source.split(':', 1)[1])
+                except ValueError:
+                    noise_sigma = 0.15
+            noise = deterministic_noise(tuple(human.shape), sample_indices, seed, human.device, human.dtype)
+            human_cond = human + noise_sigma * noise
+            source_type = torch.full((human.shape[0],), h2c.SOURCE_NOISY, dtype=torch.long, device=human.device)
+            sigma = torch.full((human.shape[0],), noise_sigma, dtype=human.dtype, device=human.device)
+        elif source == 'replay':
+            source_type = torch.full((human.shape[0],), h2c.SOURCE_REPLAY, dtype=torch.long, device=human.device)
+            sigma = torch.zeros((human.shape[0],), dtype=human.dtype, device=human.device)
+        pred_camera = model(human_cond, text, valid, source_type=source_type, sigma=sigma)
+        completion = torch.cat([human, pred_camera], dim=1)
+        valid_bc = valid[:, None, :].expand_as(z)
+        return torch.where(valid_bc, completion, z)
+    if getattr(diffusion, 'name', 'diffusion') == 'rectified_flow':
+        return rectified_flow_sample_bilateral(
+            model, diffusion, z, text, valid, task_id, sample_indices, seed, num_steps,
+            cfg_scale=cfg_scale, cfg_human=cfg_human, cfg_camera=cfg_camera,
+            channel_gated_cfg=channel_gated_cfg,
+            joint_camera_latent_intervention=joint_camera_latent_intervention,
+            joint_human_camera_input_mode=joint_human_camera_input_mode,
+        )
     bilateral = cfg_human is not None and cfg_camera is not None
     task = torch.full((z.shape[0],), task_id, dtype=torch.long, device=z.device)
     obs_mask, _ = mod.make_branch_masks(z, valid, task)
@@ -156,9 +430,18 @@ def ddim_sample_bilateral(model, diffusion, z, text, valid, task_id, sample_indi
         b = diffusion.sqrt_one_minus_alphas_cumprod[t_scalar].to(device=z.device, dtype=z.dtype).view(1, 1, 1)
         return a * z + b * base_noise
 
-    def model_forward(x_t, t_scalar, cond_text):
+    def model_forward(x_t, t_scalar, cond_text, step_idx):
         t = torch.full((z.shape[0],), t_scalar, dtype=torch.long, device=z.device)
-        return model(x_t, t, cond_text, obs_x0=z, obs_mask=obs_mask)
+        if joint_camera_latent_intervention != 'none':
+            x_t = apply_joint_camera_latent_intervention(x_t, joint_camera_latent_intervention, sample_indices, seed, step_idx)
+        pred = model(x_t, t, cond_text, obs_x0=z, obs_mask=obs_mask)
+        if task_id != mod.TASK_JOINT or joint_human_camera_input_mode == 'normal':
+            return pred
+        human_x_t = apply_joint_human_camera_input_mode(x_t, joint_human_camera_input_mode, sample_indices, seed, step_idx)
+        human_pred = model(human_x_t, t, cond_text, obs_x0=z, obs_mask=obs_mask)
+        out = pred.clone()
+        out[:, :mod.HUM_DIM, :] = human_pred[:, :mod.HUM_DIM, :]
+        return out
 
     x = torch.where(fixed_mask, q_gt(int(timesteps[0].item())), base_noise)
     pred_x0 = z
@@ -167,9 +450,9 @@ def ddim_sample_bilateral(model, diffusion, z, text, valid, task_id, sample_indi
         x = torch.where(fixed_mask, q_gt(t_scalar), x)
 
         if bilateral:
-            pu = model_forward(x, t_scalar, empty_text)
-            pc = model_forward(x, t_scalar, cam_text)
-            ph = model_forward(x, t_scalar, hum_text)
+            pu = model_forward(x, t_scalar, empty_text, idx)
+            pc = model_forward(x, t_scalar, cam_text, idx)
+            ph = model_forward(x, t_scalar, hum_text, idx)
             if channel_gated_cfg:
                 pred_x0 = pu.clone()
                 pred_x0[:, :mod.HUM_DIM] = pu[:, :mod.HUM_DIM] + cfg_human * (ph[:, :mod.HUM_DIM] - pu[:, :mod.HUM_DIM])
@@ -177,10 +460,10 @@ def ddim_sample_bilateral(model, diffusion, z, text, valid, task_id, sample_indi
             else:
                 pred_x0 = pu + cfg_camera * (pc - pu) + cfg_human * (ph - pu)
         elif cfg_scale == 1.0:
-            pred_x0 = model_forward(x, t_scalar, text)
+            pred_x0 = model_forward(x, t_scalar, text, idx)
         else:
-            pc = model_forward(x, t_scalar, text)
-            pu = model_forward(x, t_scalar, empty_text)
+            pc = model_forward(x, t_scalar, text, idx)
+            pu = model_forward(x, t_scalar, empty_text, idx)
             pred_x0 = pu + cfg_scale * (pc - pu)
 
         pred_for_step = torch.where(fixed_mask, z, pred_x0)
@@ -428,6 +711,10 @@ def main():
     p.add_argument('--seed', type=int, default=20260614)
     p.add_argument('--channel-gated-cfg', action='store_true',
                    help='For bilateral CFG, apply camera text guidance only to camera latent channels and human text guidance only to human latent channels.')
+    p.add_argument('--joint-camera-latent-intervention', choices=['none', 'zero', 'shuffle', 'noise_matched'], default='none',
+                   help='For task=joint only, perturb camera latent channels in the sampler state before model forward passes.')
+    p.add_argument('--joint-human-camera-input-mode', choices=['normal', 'zero', 'shuffle', 'noise_matched'], default='normal',
+                   help='For task=joint only, combine camera prediction from the normal forward pass with human prediction from a forward pass whose camera input channels are perturbed.')
     args = p.parse_args()
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -455,7 +742,9 @@ def main():
 
     results = {'samples': [], 'cfg_mode': 'bilateral' if is_bilateral else 'standard',
                'cfg_scale': args.cfg_scale, 'cfg_human': args.cfg_human, 'cfg_camera': args.cfg_camera,
-               'cfg_channel_gated': bool(args.channel_gated_cfg), 'eta': args.eta, 'tasks': args.tasks}
+               'cfg_channel_gated': bool(args.channel_gated_cfg), 'eta': args.eta, 'tasks': args.tasks,
+               'joint_camera_latent_intervention': args.joint_camera_latent_intervention,
+               'joint_human_camera_input_mode': args.joint_human_camera_input_mode}
     start_time = time.time()
 
     for si, sample_id in enumerate(target_ids):
@@ -487,6 +776,8 @@ def main():
                 args.num_steps,
                 cfg_scale=args.cfg_scale, cfg_human=args.cfg_human, cfg_camera=args.cfg_camera, eta=args.eta,
                 channel_gated_cfg=args.channel_gated_cfg,
+                joint_camera_latent_intervention=args.joint_camera_latent_intervention if task_name == 'joint' else 'none',
+                joint_human_camera_input_mode=args.joint_human_camera_input_mode if task_name == 'joint' else 'normal',
             )
 
             # Decode predicted latent through autoencoder
