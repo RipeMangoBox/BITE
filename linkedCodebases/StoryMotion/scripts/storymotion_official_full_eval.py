@@ -729,6 +729,15 @@ def main() -> None:
     loader, end = collate_cache(cache, args.start, args.samples, args.batch_size, args.workers)
     task_name = args.task
     task_id = {name: task for task, name in train_mod.TASK_NAMES.items()}[task_name]
+    if task_id >= int(run_info.get("num_task_embeddings", 3)):
+        raise ValueError(f"run {args.run_dir} does not support task {task_name!r}; num_task_embeddings={run_info.get('num_task_embeddings', 3)}")
+    if compose_joint and args.joint_compose_human_source == "generated":
+        human_task_id = {name: task for task, name in train_mod.TASK_NAMES.items()}[args.joint_compose_human_task]
+        if human_task_id >= int(run_info.get("num_task_embeddings", 3)):
+            raise ValueError(
+                f"run {args.run_dir} does not support composed human task {args.joint_compose_human_task!r}; "
+                f"num_task_embeddings={run_info.get('num_task_embeddings', 3)}"
+            )
     callback, module = instantiate_official_metrics(cfg, pulp_root, metric_task_name, device)
     records_path = args.records or args.output.with_suffix(".records.jsonl")
     records_path.parent.mkdir(parents=True, exist_ok=True)

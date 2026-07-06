@@ -170,6 +170,7 @@ def load_stage2(run_dir: Path, train_mod: Any, device: torch.device):
         "checkpoint": str(ckpt_path),
         "step": int(ckpt.get("step", -1)),
         "joint_loss_mode": args.get("joint_loss_mode") or meta.get("joint_loss_mode") or "element_mean",
+        "num_task_embeddings": infer_num_task_embeddings(meta, args),
         "cond_mask_prob": cond_mask_prob,
         "cond_mask_prob_cam": cond_mask_prob_cam,
         "cond_mask_prob_hum": cond_mask_prob_hum,
@@ -412,12 +413,17 @@ def main() -> None:
     loader = DataLoader(Subset(cache, range(args.start, end)), batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
 
     start_time = time.time()
-    mode_checks: dict[str, list[dict[str, Any]]] = {name: [] for name in train_mod.TASK_NAMES.values()}
+    supported_task_items = [
+        (task_id, task_name)
+        for task_id, task_name in train_mod.TASK_NAMES.items()
+        if task_id < int(run_info.get("num_task_embeddings", 3))
+    ]
+    mode_checks: dict[str, list[dict[str, Any]]] = {name: [] for _, name in supported_task_items}
     metric_callbacks: dict[str, Any] = {}
     metric_modules: dict[str, DummyModule] = {}
     metric_errors: dict[str, str] = {}
     if args.run_metrics:
-        for task_name in train_mod.TASK_NAMES.values():
+        for _, task_name in supported_task_items:
             try:
                 metric_callbacks[task_name], metric_modules[task_name] = instantiate_official_metrics(cfg, pulp_root, task_name, device)
             except Exception as exc:
@@ -432,7 +438,7 @@ def main() -> None:
             pulp_batch = batch_from_sample_ids(dataset, sample_ids, device)
             intrinsics = pulp_batch["x_raw"]["intrinsics"]
             x_input, raw_input = reference_feature_and_raw(dataset, pulp_batch, intrinsics)
-            for task_id, task_name in train_mod.TASK_NAMES.items():
+            for task_id, task_name in supported_task_items:
                 completion = make_completion(model, diffusion, train_mod, z, text, valid, task_id, args.timestep)
                 x_output, raw_output = decode_feature_and_raw(autoencoder, dataset, train_mod, completion, intrinsics)
                 outputs = {"raw_input": raw_input, "raw_output": raw_output, "x_output": x_output}
