@@ -316,6 +316,8 @@ Latent H2C adaptation result so far:
 | step 3000 | 2048 | 0.3635 | 0.4915 | -0.2604 | selected for first composed official eval |
 | step 4000 | 2048 | 0.3425 | 0.4661 | -0.2651 | training still improving |
 | step 5000 | 2048 | 0.3307 | 0.4487 | -0.2629 | latent gate still improves; composed metric becomes non-monotonic |
+| step 10000 | 2048 | 0.2980 | 0.4130 | -0.2786 | best latent so far, but official composed degrades |
+| step 11000 | 2048 | 0.2965 | 0.4079 | -0.2732 | stopped after DS review; not an official candidate |
 
 First closed-loop composed official eval:
 
@@ -324,16 +326,17 @@ First closed-loop composed official eval:
 | generated human + original H2C replay | 1024 | 376.06 | 27.83% | 18.13 | 500.95 | 14.94% | 0.108 | 38.65% | pre-adaptation collapse |
 | generated human + replay-ft H2C step3000 | 1024 | 386.38 | 25.39% | 18.70 | 112.67 | 58.89% | 0.238 | 20.51% | camera / framing metrics recover substantially; human-side TMR remains bounded by human generator |
 | generated human + replay-ft H2C step5000 | 1024 | 386.38 | 25.39% | 18.70 | 141.44 | 60.55% | 0.236 | 18.64% | Out and coverage improve, but FCD regresses vs step3000 |
+| generated human + replay-ft H2C step10000 | 1024 | 386.38 | 25.39% | 18.70 | 193.86 | 51.86% | 0.236 | 18.89% | official composed degrades despite better latent MSE |
 
 Interpretation: replay fine-tuning fixes a large part of the generated-source H2C camera-domain shift. It does not fix the human generator distribution: TMR FTD and coverage remain close to the pre-adaptation generated-human row and far from the GT-human upper bound. This is the expected separation of responsibilities under the factorization `H=P(H|text_h)`, `C=P(C|H,text_c)`.
 
-Step5000 warning: latent MSE keeps improving, but CLaTr FCD is not monotonic. Do not select the final H2C checkpoint by latent `cache_replay_camera_mse` alone. Preserve step3000, step5000, final, and best-latent snapshots for side-by-side official eval / visual audit.
+Step5000 / step10000 warning: latent MSE keeps improving, but CLaTr FCD is not monotonic and worsens after step3000. Do not select the final H2C checkpoint by latent `cache_replay_camera_mse` alone. Preserve step3000 and step5000 for side-by-side official eval / visual audit; step10000 and step11000 are evidence that over-training toward latent replay loss can hurt composed camera semantics.
 
-DS max post-step3000 review: **PASS**. Continue the planned 20k H2C replay fine-tune without switching to clean/replay mixing, because the clean guard is improving rather than degrading. Required next checks:
+DS max post-step10000 review: **STOP**. The planned 20k H2C replay fine-tune was interrupted at step11000 because official composed metrics had already peaked earlier while latent MSE continued to improve. Current candidate checkpoints:
 
-- composed official eval at `5k`, `10k`, final, and best-latent checkpoints.
-- final/best composed eval after 20k.
-- stop or revise only if clean MSE rises for multiple gates or composed camera metrics stop improving while latent MSE continues to fall.
+- primary candidate: step3000, best CLaTr FCD (`112.67`) and F1 (`0.238`).
+- secondary candidate: step5000, best Out (`18.64%`) and CCov (`60.55%`).
+- rejected selector: best latent checkpoint (`best_eval.pt` / step11000) without official composed validation.
 
 ## 6. Candidate Fixes, Not Claims
 

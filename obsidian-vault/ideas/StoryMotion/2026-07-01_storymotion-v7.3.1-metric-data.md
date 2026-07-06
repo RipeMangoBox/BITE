@@ -753,6 +753,8 @@ Fine-tune config: `--train-source cache-replay`, `--eval-sources cache-replay cl
 | step 3000 | 2048 | 0.3635 | 0.4915 | -0.2604 | first composed official eval checkpoint |
 | step 4000 | 2048 | 0.3425 | 0.4661 | -0.2651 | still improving |
 | step 5000 | 2048 | 0.3307 | 0.4487 | -0.2629 | latent gate still improves |
+| step 10000 | 2048 | 0.2980 | 0.4130 | -0.2786 | best latent before stop, but official composed degrades |
+| step 11000 | 2048 | 0.2965 | 0.4079 | -0.2732 | interrupted after DS stop review |
 
 ### 14.3 Step3000 Composed Closed Loop
 
@@ -761,6 +763,7 @@ Fine-tune config: `--train-source cache-replay`, `--eval-sources cache-replay cl
 | generated human + original H2C replay | 1024 | 376.06 | 18.13 | 27.83% | 500.95 | - | 14.94% | 0.108 | 38.65% | `composed_final_last_generated_h2c_replay_1024.json` |
 | generated human + replay-ft H2C step3000 | 1024 | 386.38 | 18.70 | 25.39% | 112.67 | 20.97 | 58.89% | 0.238 | 20.51% | `composed_step3000_generated_h2c_replay_1024.json` |
 | generated human + replay-ft H2C step5000 | 1024 | 386.38 | 18.70 | 25.39% | 141.44 | - | 60.55% | 0.236 | 18.64% | `composed_step5000_generated_h2c_replay_1024.json` |
+| generated human + replay-ft H2C step10000 | 1024 | 386.38 | 18.70 | 25.39% | 193.86 | - | 51.86% | 0.236 | 18.89% | `composed_step10000_generated_h2c_replay_1024.json` |
 
 Delta against generated-source baseline:
 
@@ -772,6 +775,6 @@ Delta against generated-source baseline:
 | Out↓ | 38.65% | 20.51% | -18.14pp | framing improves but still not solved |
 | FDTMR↓ | 376.06 | 386.38 | +10.32 | human-side distribution not improved by H2C, as expected |
 
-Step5000 note: latent MSE continues to improve, CLaTr coverage and Out improve vs step3000, but CLaTr FCD regresses from `112.67` to `141.44`. Therefore latent `cache_replay_camera_mse` is not a sufficient checkpoint selector.
+Step5000 / step10000 note: latent MSE continues to improve, but CLaTr FCD regresses from `112.67` to `141.44` and then `193.86`. Therefore latent `cache_replay_camera_mse` is not a sufficient checkpoint selector.
 
-Decision: DS max reviewed the step3000 closed loop and passed continuation. Continue the same 20k run; do not switch to clean/replay mixing while clean MSE is improving. Preserve step3000, step5000, final, and best-latent checkpoints for official eval / visual audit.
+Decision: DS max reviewed the step10000 regression and recommended early stop. The run was interrupted at step11000; `last.pt` and `best_eval.pt` both contain internal step `11000`, but they are not official candidates. Preserve step3000 and step5000 as the meaningful candidates for official eval / visual audit.
