@@ -19,7 +19,7 @@ source_notes:
   - "[[2026-06-30_storymotion-experiment-metric-comparison]]"
   - "[[2026-07-03_storymotion-v7.3.1]]"
 created: 2026-07-01T02:47:56+0800
-updated: 2026-07-06T16:36:00+0800
+updated: 2026-07-06T20:35:00+0800
 ---
 
 ## 0. Fair Comparison Rules
@@ -636,6 +636,9 @@ e0/e1/e3 的 joint final JSON 来自同 batch `64`、同 seed、同采样配置�
 - v7.4 stronger asymmetry first long train: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v7_4_core_20260706/human_text_full_e3like_82688`
 - v7.4 stronger asymmetry human-text gate eval: `/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v7_4/strong_asym_human_text_gates_20260706`
 - v7.4 paired render audit: `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/v7_4_paired_audit_20260706`
+- v7.4 generated-source H2C replay cache: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v7_4_core_20260706/human_text_replay_cache_final_full_50step`
+- v7.4 generated-source H2C replay fine-tune: `/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/v7_4_core_20260706/h2c_generated_replay_final_ft20k_from_p2b`
+- v7.4 generated-source H2C replay eval: `/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2/v7_4/strong_asym_h2c_replay_ft_20260706`
 
 ## 13. v7.4 Causal Asymmetry Core Eval 2026-07-06
 
@@ -713,3 +716,62 @@ Paired render audit artifacts:
 | e3 JOINT camera latent zero / shuffle / noise | 12 each | `runs/visualizations/v7_4_paired_audit_20260706/e3_joint_camera_latent_interventions` | visual counterpart to numeric raw-camera-state dependency |
 
 Manual audit viewer is running on 5090 session `v74_paired_audit_gradio`, port `7862`.
+
+## 14. v7.4 Generated-Source H2C Replay Adaptation 2026-07-06
+
+口径：stronger asymmetry composed JOINT；human generator is `human_text_full_e3like_82688` final `last.pt`; H2C camera generator is MoLingo FullRF p2b baseline or replay fine-tuned checkpoint. Official composed eval uses `samples=1024`, `num_steps=50`, `cfg_scale=1.0`, `eta=0.0`, seed `17`.
+
+### 14.1 Source-Shift Diagnosis
+
+| condition | samples | FDTMR↓ | TMR↑ | HCov↑ | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | Out↓ | source JSON |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| GT human + H2C clean | 1024 | 150.04 | 18.54 | 93.94% | 24.35 | - | 90.92% | 0.626 | 5.40% | `composed_gt_human_h2c_clean_1024.json` |
+| generated human + original H2C replay | 1024 | 376.06 | 18.13 | 27.83% | 500.95 | - | 14.94% | 0.108 | 38.65% | `composed_final_last_generated_h2c_replay_1024.json` |
+
+Readout: GT-human composition proves the H2C clean upper bound is strong. The generated-human row collapses mainly in CLaTr / caption / Out, so the next bottleneck is generated-source H2C domain shift rather than another shared JOINT denoiser.
+
+### 14.2 Replay Cache And Latent H2C Gates
+
+Replay cache construction:
+
+| artifact | train samples | val samples | generator | status |
+| --- | ---: | ---: | --- | --- |
+| `human_text_replay_cache_final_full_50step` | 94050 | 10549 | `human_text_full_e3like_82688` final `last.pt`, `num_steps=50` | built on 5090 GPU0; synced to 4090 |
+
+Full-val original p2b latent baseline:
+
+| run | eval samples | cache-replay MSE↓ | clean MSE↓ | cache-replay clean gap | source JSON |
+| --- | ---: | ---: | ---: | ---: | --- |
+| original p2b H2C | 10549 | 1.2192 | 0.8994 | 0.3555 | `h2c_generated_replay_final_full_50step_p2b_baseline_val.json` |
+
+Fine-tune config: `--train-source cache-replay`, `--eval-sources cache-replay clean`, `--selection-metric cache_replay_camera_mse`, `--init-run-dir stage2_molingo_fullrf_h2c_v64_p2b_20260703`, `lr=2e-5`, planned `20000` steps.
+
+| checkpoint | eval samples | cache-replay MSE↓ | clean MSE↓ | cache-replay clean gap | readout |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| step 1000 | 2048 | 0.5617 | 0.6094 | -0.0783 | replay adapts and clean guard improves |
+| step 2000 | 2048 | 0.3982 | 0.5353 | -0.2561 | continued improvement |
+| step 3000 | 2048 | 0.3635 | 0.4915 | -0.2604 | first composed official eval checkpoint |
+| step 4000 | 2048 | 0.3425 | 0.4661 | -0.2651 | still improving |
+| step 5000 | 2048 | 0.3307 | 0.4487 | -0.2629 | latent gate still improves |
+
+### 14.3 Step3000 Composed Closed Loop
+
+| condition | samples | FDTMR↓ | TMR↑ | HCov↑ | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | Out↓ | source JSON |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| generated human + original H2C replay | 1024 | 376.06 | 18.13 | 27.83% | 500.95 | - | 14.94% | 0.108 | 38.65% | `composed_final_last_generated_h2c_replay_1024.json` |
+| generated human + replay-ft H2C step3000 | 1024 | 386.38 | 18.70 | 25.39% | 112.67 | 20.97 | 58.89% | 0.238 | 20.51% | `composed_step3000_generated_h2c_replay_1024.json` |
+| generated human + replay-ft H2C step5000 | 1024 | 386.38 | 18.70 | 25.39% | 141.44 | - | 60.55% | 0.236 | 18.64% | `composed_step5000_generated_h2c_replay_1024.json` |
+
+Delta against generated-source baseline:
+
+| metric | baseline | step3000 | change | readout |
+| --- | ---: | ---: | ---: | --- |
+| FDCLaTr↓ | 500.95 | 112.67 | -388.28 | large camera / semantic recovery |
+| CCov↑ | 14.94% | 58.89% | +43.95pp | generated-source camera no longer collapsed |
+| F1↑ | 0.108 | 0.238 | +0.130 | caption alignment improves but remains below GT-human upper bound |
+| Out↓ | 38.65% | 20.51% | -18.14pp | framing improves but still not solved |
+| FDTMR↓ | 376.06 | 386.38 | +10.32 | human-side distribution not improved by H2C, as expected |
+
+Step5000 note: latent MSE continues to improve, CLaTr coverage and Out improve vs step3000, but CLaTr FCD regresses from `112.67` to `141.44`. Therefore latent `cache_replay_camera_mse` is not a sufficient checkpoint selector.
+
+Decision: DS max reviewed the step3000 closed loop and passed continuation. Continue the same 20k run; do not switch to clean/replay mixing while clean MSE is improving. Preserve step3000, step5000, final, and best-latent checkpoints for official eval / visual audit.

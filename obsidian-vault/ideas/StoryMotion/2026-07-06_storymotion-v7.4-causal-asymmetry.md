@@ -18,7 +18,7 @@ source_notes:
   - "[[archived/2026-06-23_storymotion-decoupled-coupling-qa-v5.1]]"
   - "[[archived/2026-06-16_storymotion-v3-formal]]"
 created: 2026-07-06T00:00:00+0800
-updated: 2026-07-06T16:36:00+0800
+updated: 2026-07-06T20:35:00+0800
 ---
 
 # StoryMotion v7.4 Causal Asymmetry Diagnosis
@@ -276,6 +276,64 @@ Gradio manual audit viewer:
 - Session: `v74_paired_audit_gradio`
 - Port: `7862`
 - SSH tunnel: `ssh -L 7862:127.0.0.1:7862 5090`, then open `http://127.0.0.1:7862`
+
+## 5.6 Generated-Source H2C Replay Adaptation
+
+After `human_text_full_e3like_82688` completed, the stronger-asymmetry bottleneck moved from human generation to camera adaptation under generated human source. The decisive stress test was:
+
+```text
+H = human_text final_last_82688 generated human
+C = original p2b H2C conditioned on generated H as replay source
+```
+
+This collapsed mainly on camera / framing metrics, while the GT-human sanity check remained strong. Therefore the next core experiment is not another human generator long training; it is generated-source H2C adaptation.
+
+| condition | samples | TMR FTD↓ | TMR cov↑ | TMR score↑ | CLaTr FCD↓ | CLaTr cov↑ | F1↑ | Out↓ | readout |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| GT human + H2C clean | 1024 | 150.04 | 93.94% | 18.54 | 24.35 | 90.92% | 0.626 | 5.40% | H2C compose upper bound is strong |
+| generated human + original H2C replay | 1024 | 376.06 | 27.83% | 18.13 | 500.95 | 14.94% | 0.108 | 38.65% | generated-source H2C domain shift dominates |
+
+Implementation added after DS max PASS:
+
+- `build_stage2_human_text_replay_cache.py` builds an offline H2C cache with generated `H_syn` from the `human_text` generator and GT camera `C_gt`.
+- `train_stage2_model_switch.py` supports `--train-source cache-replay`, `--eval-sources cache-replay`, and `--init-run-dir`.
+- Smoke passed on 4090: replay cache `limit=32`, full read check, and 1-step strict-load training from the original p2b H2C checkpoint.
+
+Full replay cache:
+
+| artifact | machine / GPU | samples | path | status |
+| --- | --- | ---: | --- | --- |
+| final human-text replay cache | 5090 GPU0 | train `94050`, val `10549` | `runs/train/stage2/v7_4_core_20260706/human_text_replay_cache_final_full_50step` | done; synced to 4090 |
+| original p2b H2C full-val replay baseline | 4090 GPU1 | val `10549` | `runs/eval/stage2/v7_4/h2c_generated_replay_final_full_50step_p2b_baseline_val.json` | done |
+
+Latent H2C adaptation result so far:
+
+| checkpoint | samples | cache-replay MSE↓ | clean MSE↓ | clean retention gap | readout |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| original p2b baseline | 10549 | 1.2192 | 0.8994 | 0.3555 | generated source is harder than clean |
+| step 1000 | 2048 | 0.5617 | 0.6094 | -0.0783 | replay adapts; clean guard improves |
+| step 2000 | 2048 | 0.3982 | 0.5353 | -0.2561 | continued improvement |
+| step 3000 | 2048 | 0.3635 | 0.4915 | -0.2604 | selected for first composed official eval |
+| step 4000 | 2048 | 0.3425 | 0.4661 | -0.2651 | training still improving |
+| step 5000 | 2048 | 0.3307 | 0.4487 | -0.2629 | latent gate still improves; composed metric becomes non-monotonic |
+
+First closed-loop composed official eval:
+
+| condition | samples | TMR FTD↓ | TMR cov↑ | TMR score↑ | CLaTr FCD↓ | CLaTr cov↑ | F1↑ | Out↓ | readout |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| generated human + original H2C replay | 1024 | 376.06 | 27.83% | 18.13 | 500.95 | 14.94% | 0.108 | 38.65% | pre-adaptation collapse |
+| generated human + replay-ft H2C step3000 | 1024 | 386.38 | 25.39% | 18.70 | 112.67 | 58.89% | 0.238 | 20.51% | camera / framing metrics recover substantially; human-side TMR remains bounded by human generator |
+| generated human + replay-ft H2C step5000 | 1024 | 386.38 | 25.39% | 18.70 | 141.44 | 60.55% | 0.236 | 18.64% | Out and coverage improve, but FCD regresses vs step3000 |
+
+Interpretation: replay fine-tuning fixes a large part of the generated-source H2C camera-domain shift. It does not fix the human generator distribution: TMR FTD and coverage remain close to the pre-adaptation generated-human row and far from the GT-human upper bound. This is the expected separation of responsibilities under the factorization `H=P(H|text_h)`, `C=P(C|H,text_c)`.
+
+Step5000 warning: latent MSE keeps improving, but CLaTr FCD is not monotonic. Do not select the final H2C checkpoint by latent `cache_replay_camera_mse` alone. Preserve step3000, step5000, final, and best-latent snapshots for side-by-side official eval / visual audit.
+
+DS max post-step3000 review: **PASS**. Continue the planned 20k H2C replay fine-tune without switching to clean/replay mixing, because the clean guard is improving rather than degrading. Required next checks:
+
+- composed official eval at `5k`, `10k`, final, and best-latent checkpoints.
+- final/best composed eval after 20k.
+- stop or revise only if clean MSE rises for multiple gates or composed camera metrics stop improving while latent MSE continues to fall.
 
 ## 6. Candidate Fixes, Not Claims
 
