@@ -98,3 +98,9 @@ obsidian-vault/paper_list.csv.bak*
 artifacts/storymotion_geo_patch/joint_cache_pure/train.pt
 artifacts/storymotion_geo_patch/joint_cache_pure/val.pt
 linkedCodebases/audit_quarantine/_hf_stage/cvpr26_nonmotion/media/assets_shards/assets_cvpr26_nonmotion.tar
+
+
+
+## obsidian-vault
+obsidian-vault/
+linkedCodebases/
