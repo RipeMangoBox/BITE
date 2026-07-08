@@ -37,7 +37,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--figure-visual-summary-max-items", type=int, default=8)
     parser.add_argument("--figure-visual-summary-max-tokens", type=int, default=1024)
     parser.add_argument("--figure-placement-max-tokens", type=int, default=4096)
-    parser.add_argument("--max-note-images", type=int, default=12)
+    parser.add_argument("--max-note-images", type=int, default=8)
     parser.add_argument("--force", action="store_true", help="Overwrite existing figure/export artifacts")
     parser.add_argument("--continue-on-error", action="store_true", help="Record per-run failures instead of aborting the whole batch")
     parser.add_argument("--jobs", type=int, default=1)

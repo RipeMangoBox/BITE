@@ -10,9 +10,9 @@ This skill is the user-facing spec for a deep single-paper report. In the
 current local workflow, use it as the writing contract when a user asks for a
 deep report, detailed paper analysis, or formula derivation.
 
-A deep report is a single linear narrative that a reader can scroll
+A deep report is a compact linear narrative that a reader can scroll
 top-to-bottom and finish with a complete understanding of the paper:
-background → core insight → framework → formulas → experiments → position.
+problem → core mechanism → formulas → experiments → position.
 
 ---
 
@@ -28,27 +28,25 @@ Useful upstream artifacts before this skill runs:
 
 ## Output
 
-- A local Markdown report following the seven-section structure below.
+- A local Markdown report following the four-section structure below.
 - If saved into the vault, place it under `obsidian-vault/analysis/` using the
   current repository naming convention.
 
 ---
 
-## Section Spec (exactly 7 sections, in this order)
+## Section Spec (exactly 4 sections, in this order)
 
 | # | section_type          | title             | length (chars) | must contain                                  |
 |---|-----------------------|-------------------|----------------|-----------------------------------------------|
-| 1 | `metadata_overview`   | 概览              | 300-500        | 元数据表 + `> [!abstract]` TL;DR + 性能要点 |
-| 2 | `background_motivation` | 背景与动机     | 800-1200       | 问题 + 2-3 个具体 baseline + 局限 + 1 句预告; `{{FIG:motivation}}` 若有动机图 |
-| 3 | `core_innovation`     | 核心创新          | 400-700        | 一句话核心洞察 + 与 baseline 差异 3 列表 |
-| 4 | `framework_overview`  | 整体框架          | 700-1100       | **必须以 `{{FIG:pipeline}}` 或 `{{FIG:architecture}}` 起头** + 数据流 + 模块清单 |
-| 5 | `module_formulas`     | 核心模块与公式推导 | 1200-2200     | 每模块: 直觉 → baseline 公式 → 变化点 → 推导步骤 → 最终公式 → 对应消融 |
-| 6 | `experiment_analysis` | 实验与分析        | 800-1400       | 主表 + `{{FIG:result}}` + 消融 + 公平性检查 |
-| 7 | `lineage_positioning` | 方法谱系与知识库定位 | 400-700     | 方法族 + 父方法 + 改了哪些 slot + 后续方向 + facets |
+| 1 | `summary`             | 概要              | 150-250        | 问题 + 方法 + 主要结果 + 方法定位 |
+| 2 | `method_mechanism`    | 核心方法与创新机理 | 1800-2800    | 唯一瓶颈 + changed slots + pipeline/机制 + 1-3 个关键公式 |
+| 3 | `experiment_findings` | 实验与关键发现    | 1500-2400      | 主结果 + 指标对比表/图 + 消融 + 失败模式/适用边界 |
+| 4 | `kb_positioning`      | 定位与知识库关联  | 500-900        | 方法族 + 与 baseline 的本质差异 + 后续方向 + facets |
 
-Total length: 4000-7000 Chinese characters.
+Total length: 4500-7000 Chinese characters. Avoid repeating the same
+bottleneck, formula, dataset fact, or metric across sections.
 
-### Section 1 (metadata_overview) detailed format
+### Section 1 (summary) detailed format
 
 ```markdown
 | 中文题名 | {title_zh} |
@@ -67,15 +65,16 @@ Total length: 4000-7000 Chinese characters.
 - {benchmark2}: {metric2} {value2}
 ```
 
-This section's `body_md` is rendered WITHOUT a `## 概览` heading so it sits
-naturally at the top of the page below the title.
+The current vault exporter renders metadata separately; the report section
+itself should start with `## 概要` and stay short.
 
 ---
 
-## Formula Derivation Rules (Section 5, CRITICAL)
+## Formula Derivation Rules (Section 2, CRITICAL)
 
 The archived legacy Markdown fallback avoided formula derivation. This skill
-does the **opposite** — formula derivation is the core deliverable of section 5.
+does the **opposite** — formula derivation is a core deliverable of
+`核心方法与创新机理`.
 
 For each of the 2-3 most important modules:
 
@@ -101,7 +100,7 @@ Rules:
 1. Always show the baseline formula first when one exists.
 2. Each derivation step must explain WHY (not just WHAT) changed.
 3. Tie every formula to the framework module and an ablation row.
-4. Pick the 2-3 most important formulas — quality over quantity.
+4. Pick the 1-3 most important formulas — quality over quantity.
 
 ---
 
@@ -122,9 +121,12 @@ The agent must:
 4. Distribute markers across the narrative — never cluster all figures in
    one place, never dump them at the end.
 
-Required markers when a matching figure exists:
-- `framework_overview` → `{{FIG:pipeline}}` or `{{FIG:architecture}}`
-- `experiment_analysis` → `{{FIG:result}}`
+Preferred markers when a matching figure exists:
+- `method_mechanism` → motivation/problem figure and `{{FIG:pipeline}}` or `{{FIG:architecture}}`
+- `experiment_findings` → `{{FIG:result}}` or a metric comparison table
+
+Do not use sample galleries as filler. A split pipeline may use two figures.
+For normal papers, keep the final note to roughly 3-8 figure/table embeds, using category-slot allocation: ≤1 motivation, ≤3 method/pipeline, ≤4 comparison/result.
 
 The Obsidian exporter (`vault_export_v6._resolve_figure_markers`) resolves
 each marker by:

@@ -18,6 +18,19 @@ The same run then turns parsed paper evidence into structured analysis objects,
 sectioned reports, figure/table-aware notes, and deterministic validation
 records.
 
+The current default note format is the v06 four-section chain:
+
+- `概要`
+- `核心方法与创新机理`
+- `实验与关键发现`
+- `定位与知识库关联`
+
+This replaces the older seven-section format that separately expanded
+background, innovation, framework, formulas, experiments, and method lineage.
+The four-section chain is intentionally denser: it preserves source anchors and
+method/experiment evidence while reducing repeated prose, duplicated caption
+blocks, and non-core supplemental tables.
+
 ## Pipeline
 
 ```text
@@ -31,6 +44,39 @@ PDF batch
   -> vault export
   -> deterministic validation
 ```
+
+## Quality and Cost Controls
+
+The v06 chain lowers per-paper analysis cost without weakening the evidence
+contract by moving repeated work into structured intermediate artifacts:
+
+- chunk-level anchor extraction captures only grounded method, formula,
+  experiment, figure/table, and limitation evidence;
+- the main analysis JSON merges anchors before prose generation, so section
+  writers receive compact verified context rather than the full paper text;
+- section writers produce four focused body sections instead of the older
+  seven-section report;
+- figure/table placement uses a slot budget and defaults to
+  `--max-note-images 6`, keeping only motivation, core method/pipeline, and
+  key result/ablation visuals;
+- deterministic validation catches structural export failures before notes are
+  treated as usable knowledge-base entries.
+
+For large downloaded queues, `scripts/run_paper_list_analysis.py` can safely
+drive many independent child analyses. When model quota, MinerU I/O, and local
+memory are sufficient, the recommended high-throughput setting is:
+
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded \
+  --jobs 50 \
+  --export-vault \
+  --max-note-images 6
+```
+
+If the provider starts rate limiting, or if local parsing becomes the bottleneck,
+drop to `--jobs 10` or `--jobs 20` and rerun with the default resume behavior.
 
 ## Stage 0. MinerU Parse or Reuse
 
@@ -119,7 +165,8 @@ useful ones into the note.
   summaries are available through `openai` or `kimi`.
 - Caption/placement fallback is available only for explicit offline runs
   (`--figure-provider none`) or mock runs.
-- `--max-note-images 6` keeps notes readable
+- `--max-note-images 6` keeps notes readable and prevents supplemental figure
+  dumps from dominating the final note.
 
 **Outputs.**
 
@@ -137,6 +184,13 @@ vault, and copy selected figure/table assets.
 - Notes: `obsidian-vault/analysis/<Venue_Year>/<Title>.md`
 - PDFs: `obsidian-vault/paperPDFs/<Venue_Year>/<Title>.pdf`
 - Images: `obsidian-vault/assets/figures/papers/<task_id>/figures/...`
+- Frontmatter keeps `title`, `type`, `paper_level`, `venue`, `year`,
+  `pdf_ref`, `project_link`, `code_link`, `aliases`, `tags`, `core_operator`,
+  `primary_logic`, and `claims`.
+- `project_link` and `code_link` are present with `null` values when unknown.
+- `Links` table entries use `[paper](...)` for the paper page/PDF URL; arXiv
+  should not be duplicated as a separate display label when it points to the
+  same paper identity.
 - PDF embeds: `![[paperPDFs/...]]`
 - Image embeds: `![[assets/...]]`
 - Figure/table captions escape Obsidian reserved `<` characters as `\<`.

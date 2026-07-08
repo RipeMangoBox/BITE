@@ -39,6 +39,7 @@ import time
 import traceback
 import uuid
 from typing import Any
+from difflib import SequenceMatcher
 
 import certifi
 import httpx
@@ -78,15 +79,18 @@ KIMI_DEFAULT_TEMPERATURE = 0.6
 DEFAULT_KIMI_MODEL = "kimi-k2.6"
 DEFAULT_OPENAI_FIGURE_MODEL = "gpt-5.4"
 SECTION_SPECS: tuple[tuple[str, str], ...] = (
-    ("概述", "概括问题、核心结论、方法定位与主要结果，不要展开细节。"),
-    ("背景与动机", "说明问题背景、现有方法缺口、本文动机。"),
-    ("核心创新", "聚焦相对 baseline 的关键创新与 changed slots。"),
-    ("整体框架", "描述整体 pipeline、模块关系、输入输出流。"),
-    ("核心模块与公式推导", "只写关键模块、关键公式、公式变量含义，禁止猜公式。"),
-    ("实验与分析", "写主结果、消融、失败模式、重要图表结论。"),
+    ("概要", "用 180-260 中文字直陈问题、方法、主要结果和方法定位，不展开细节。"),
     (
-        "方法谱系与知识库定位",
-        "写与 baseline/follow-up 的关系、适用边界、局限与开放问题；若提到具体基线工作，保留或补充论文中可验证的作者、会议和年份，例如 **MPGD** (He et al., CVPR 2023)。",
+        "核心方法与创新机理",
+        "写 1800-2600 中文字。合并背景、创新、框架和关键公式；必须展开唯一瓶颈、核心机制、1-3 个 changed slots、模块顺序、训练/推理路径、关键公式变量含义和模块之间的因果关系，避免与概要重复。",
+    ),
+    (
+        "实验与关键发现",
+        "写 1500-2300 中文字。写主结果、指标对比、关键消融、失败模式和适用边界；保留主表关键数值、相对基线差异和最能支撑结论的实验，不罗列全部实验。",
+    ),
+    (
+        "定位与知识库关联",
+        "写 700-1200 中文字。只写与 baseline/follow-up 的本质差异、知识库挂载点、适用边界和后续启发；明确指出相对已有方法改变的是哪一个 slot，不要复述方法细节。若提到具体基线工作，保留或补充论文中可验证的作者、会议和年份，例如 **MPGD** (He et al., CVPR 2023)。",
     ),
 )
 
@@ -406,33 +410,6 @@ Rules:
    Do not invent links.
 8. Output ONLY valid JSON, with no markdown fences."""
 
-WRITER_SYSTEM = """You are BITE's local writer agent.
-
-Write the final paper report from the verified local analysis JSON, part
-evidence, and figure/table metadata only. Do not invent claims. 正文内容必须使用
-简体中文：translate all generated paragraphs, bullets, and table cells into
-Chinese. Preserve original language only for captions, formulas, symbols, code
-identifiers, URLs/citations, exact quoted evidence, and method, dataset, metric,
-paper names.
-
-Return Markdown only, with these sections:
-1. 概述
-2. 背景与动机
-3. 核心创新
-4. 整体框架
-5. 核心模块与公式推导
-6. 实验与分析
-7. 方法谱系与知识库定位
-
-Use exact table, figure, and equation labels when available. Do not embed
-images yourself; the deterministic vault exporter will insert local MinerU
-figure/table images. Use `$...$` for inline LaTeX and `$$...$$` for block
-LaTeX; do not use `\\(...\\)` or `\\[...\\]`. In 方法谱系与知识库定位, when
-you mention a concrete baseline work, include verified author/year/venue
-metadata if supplied by the analysis or source context, e.g. **MPGD** (He et
-al., CVPR 2023); omit the citation rather than guessing. Do not output JSON or
-markdown fences around the whole report."""
-
 SECTION_WRITER_SYSTEM = """You are BITE's local section writer.
 
 Write ONLY the requested report section in Simplified Chinese from verified
@@ -443,17 +420,30 @@ identifiers, exact anchors, and method, dataset, metric, paper names.
 Write analytical synthesis, not a paper-like paraphrase. Compress source
 details into bottlenecks, causal mechanisms, evidence strength, and failure
 modes. Avoid copying long caption/body prose unless it is an exact short anchor.
+Do not over-compress SIGGRAPH/TOG-style system papers: preserve the method
+chain, experiment evidence, and practical boundary conditions even when the
+section becomes longer.
+Avoid repeating technical points that belong in another section:
+概要 gives only the conclusion; 核心方法与创新机理 owns method/formula details;
+实验与关键发现 owns metrics/ablations/failures; 定位与知识库关联 owns lineage,
+boundaries, and follow-up value.
 
 Rules:
 1. Output Markdown only for the requested section body. Do not include the H1 title.
 2. Start with `## <section title>`.
 3. Do not embed images; the assembler/exporter inserts them from the
    figure-placement reviewer output.
-4. If evidence is weak, explicitly say the point needs manual verification instead of guessing.
-5. For formulas, preserve exact LaTeX if provided. Use `$...$` for inline
+4. Follow the requested section goal length. For 核心方法与创新机理, include
+   module order, changed slots, training/inference path, and causal links
+   between modules. For 实验与关键发现, include main values, baseline deltas,
+   decisive ablations, and failure/limit evidence. For 定位与知识库关联, identify
+   the changed slot relative to baselines and the KB attachment point.
+5. If evidence is weak, explicitly say the point needs manual verification instead of guessing.
+6. For formulas, preserve exact LaTeX if provided. Use `$...$` for inline
    formulas and `$$...$$` for block formulas; do not use `\\(...\\)` or
    `\\[...\\]`. Do not derive unseen formulas.
-6. In 方法谱系与知识库定位, when you mention a concrete baseline work, include
+7. Do not create `### 补充图表`.
+8. In 定位与知识库关联, when you mention a concrete baseline work, include
    verified author/year/venue metadata if supplied by the analysis or source
    context, e.g. **MPGD** (He et al., CVPR 2023); omit the citation rather than
    guessing.
@@ -463,30 +453,38 @@ FIGURE_PLACEMENT_SYSTEM = """You are BITE's local note image placement reviewer.
 
 Choose which local MinerU figure/table images should be inserted into the
 exported Obsidian note. Use the verified analysis, report text, and captions.
-Prefer method diagrams cited by the report and summary tables or result plots
-that directly support the note section.
-Do not place sample-only dataset images as the framework image. If no real
-framework/pipeline/method diagram exists, leave 整体框架 empty.
+Prefer figures/tables that directly support one of three category slots:
+1. **motivation** (≤1): problem illustration, teaser, or task definition figure
+2. **method**: core pipeline, architecture, or mechanism diagrams
+   (usually ≤2 under the default budget; split pipelines may use two figures)
+3. **comparison**: benchmark tables, metric comparison figures, result
+   plots, ablations, and decisive qualitative comparisons
+
+Total hard cap is the requested image budget (default 6). Use fewer when extra
+images add only detail rather than evidence. The default budget is roughly
+≤1 motivation, ≤2 method/pipeline, and ≤3 comparison/result images. Avoid fine-grained sample
+galleries and decorative examples unless the paper is primarily a
+dataset/benchmark and the sample image is essential evidence.
 
 Return JSON only:
 {
   "placements": [
-    {"item_id": str, "section": "整体框架" | "核心模块与公式推导" | "实验与分析", "reason": str}
+    {"item_id": str, "section": "核心方法与创新机理" | "实验与关键发现", "reason": str}
   ]
 }
 
 Rules:
-1. Select at most the requested image budget.
+1. Honor the three category-slot budgets above; do not exceed the total cap.
 2. Use only supplied item_id values.
 3. Do not duplicate the same item_id.
 4. When the report explicitly cites Figure N / Table N and the candidate
-   exists, include it. If it is sample-only or decorative, place it only in
-   实验与分析 and do not use it as framework or method evidence.
-5. Put overall pipeline/architecture diagrams in 整体框架; put tokenizer,
-   masking, denoising, sampling, guidance, or other method-module diagrams in
-   核心模块与公式推导.
-6. Prefer Table 1 / benchmark summary tables and decisive result plots over
-   decorative or example-only images."""
+   exists, include it unless it is purely decorative.
+5. Put motivation, pipeline, architecture, tokenizer, masking, denoising,
+   sampling, guidance, or other method-module diagrams in 核心方法与创新机理.
+6. Put benchmark tables, metric comparison tables, result plots, ablations, and
+   decisive qualitative comparisons in 实验与关键发现.
+7. Motivate every placement in `reason`: which slot it fills and why it is
+   essential evidence rather than decorative detail."""
 
 FIGURE_VISUAL_SUMMARY_SYSTEM = """You are BITE's local figure/table visual summarizer.
 
@@ -497,7 +495,7 @@ Look at the supplied paper figure/table image and caption. Return JSON only:
   "is_sample_only": bool,
   "key_visible_elements": [str],
   "supports_claims": [str],
-  "placement_hint": "整体框架" | "实验与分析" | "skip",
+  "placement_hint": "核心方法与创新机理" | "实验与关键发现" | "skip",
   "confidence": float
 }
 
@@ -818,6 +816,104 @@ def resolve_existing_pdf_path(
     return None, {"input": raw, "attempts": attempts}
 
 
+def title_match_key(text: str) -> str:
+    text = str(text or "").lower()
+    text = text.replace("&", " and ")
+    text = re.sub(r"\barxiv\s*:\s*\S+", " ", text)
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    stopwords = {"a", "an", "the", "for", "with", "of", "and", "to", "in", "on"}
+    tokens = [token for token in text.split() if token not in stopwords]
+    return " ".join(tokens)
+
+
+def title_similarity(left: str, right: str) -> float:
+    left_key = title_match_key(left)
+    right_key = title_match_key(right)
+    if not left_key or not right_key:
+        return 0.0
+    return SequenceMatcher(None, left_key, right_key).ratio()
+
+
+def title_tokens_contained(expected: str, observed: str) -> bool:
+    expected_tokens = set(title_match_key(expected).split())
+    observed_tokens = set(title_match_key(observed).split())
+    if not expected_tokens or not observed_tokens:
+        return False
+    return len(expected_tokens & observed_tokens) / max(1, len(expected_tokens)) >= 0.72
+
+
+def first_markdown_heading(markdown: str) -> str:
+    for line in str(markdown or "").splitlines()[:80]:
+        match = re.match(r"^\s*#\s+(.+?)\s*$", line)
+        if match:
+            return compact_text(match.group(1), max_len=260)
+    return ""
+
+
+def extract_pdf_title_candidates(pdf_path: Path) -> list[str]:
+    candidates: list[str] = []
+    if fitz is None or not pdf_path.exists():
+        return candidates
+    try:
+        with fitz.open(pdf_path) as doc:
+            metadata_title = compact_text((doc.metadata or {}).get("title"), max_len=260)
+            if metadata_title:
+                candidates.append(metadata_title)
+            if doc.page_count:
+                text = doc.load_page(0).get_text("text") or ""
+                full_page = compact_text(text, max_len=3000)
+                if full_page:
+                    candidates.append(full_page)
+                added = 0
+                for raw_line in text.splitlines()[:40]:
+                    line = compact_text(raw_line, max_len=260)
+                    if len(line) >= 12 and re.search(r"[A-Za-z]", line):
+                        candidates.append(line)
+                        added += 1
+                        if added >= 8:
+                            break
+    except Exception:
+        return candidates
+    out: list[str] = []
+    seen: set[str] = set()
+    for item in candidates:
+        key = title_match_key(item)
+        if key and key not in seen:
+            seen.add(key)
+            out.append(item)
+    return out
+
+
+def assert_title_matches_source(
+    *,
+    expected_title: str,
+    source_label: str,
+    candidates: list[str],
+    threshold: float = 0.62,
+) -> dict[str, Any]:
+    expected_title = compact_text(expected_title, max_len=260)
+    candidates = [compact_text(candidate, max_len=3000) for candidate in candidates if compact_text(candidate, max_len=3000)]
+    if not expected_title or not candidates:
+        return {"checked": bool(expected_title and candidates), "ok": True, "candidates": candidates}
+    scored = [
+        {
+            "candidate": compact_text(candidate, max_len=260),
+            "similarity": round(title_similarity(expected_title, candidate), 4),
+            "token_contained": title_tokens_contained(expected_title, candidate),
+        }
+        for candidate in candidates
+        if candidate
+    ]
+    ok = any(item["similarity"] >= threshold or item["token_contained"] for item in scored)
+    if not ok:
+        raise RuntimeError(
+            "Paper title/source mismatch: "
+            f"expected {expected_title!r}, but {source_label} appears to be "
+            f"{[item['candidate'] for item in scored[:4]]!r}"
+        )
+    return {"checked": True, "ok": True, "candidates": scored}
+
+
 def resolved_conf_year(args: argparse.Namespace) -> str:
     conf_year = (args.conf_year or "").strip()
     if conf_year:
@@ -988,6 +1084,132 @@ def is_appendix_figure_table_chunk(chunk_text: str) -> bool:
     caption_count = len(re.findall(r"\b(?:Figure|Table)\s+[0-9]+[A-Za-z]?\s*:", chunk_text, flags=re.IGNORECASE))
     image_count = chunk_text.count("![](")
     return ("appendix" in headings or re.search(r"\bb\.\d+", headings)) and caption_count >= 4 and image_count >= 4
+
+
+def is_low_value_citation_chunk(chunk_text: str) -> bool:
+    headings = chunk_section_role(chunk_text).lower()
+    if re.search(r"\b(references?|bibliography|acknowledg(?:e)?ments?)\b", headings):
+        return True
+
+    lines = [line.strip() for line in chunk_text.splitlines() if line.strip()]
+    if len(lines) < 8:
+        return False
+    citation_like = 0
+    for line in lines:
+        if re.match(r"^\[\d+\]\s+", line):
+            citation_like += 1
+        elif re.match(r"^\d+\.\s+[A-Z][A-Za-z-]+", line):
+            citation_like += 1
+        elif re.search(r"\b(19|20)\d{2}\b", line) and re.search(r"\b(doi|arxiv|proceedings|conference|journal|transactions|ACM|IEEE|CVPR|ICCV|ECCV|SIGGRAPH|NeurIPS|ICML|ICLR)\b", line, flags=re.IGNORECASE):
+            citation_like += 1
+    return citation_like / max(1, len(lines)) >= 0.7
+
+
+def source_sufficiency_report(markdown: str, *, page_count: int | None = None) -> dict[str, Any]:
+    text = re.sub(r"\s+", " ", markdown or "").strip()
+    lower = text.lower()
+    headings = [
+        line.strip("# ").strip()
+        for line in (markdown or "").splitlines()
+        if re.match(r"^#{1,4}\s+\S", line.strip())
+    ]
+    heading_text = "\n".join(headings).lower()
+    has_method = bool(re.search(
+        r"\b(method|methodology|approach|algorithm|framework|pipeline|formulation|implementation|model|architecture)\b",
+        heading_text,
+    ))
+    has_experiment = bool(re.search(
+        r"\b(experiment|experiments|evaluation|results?|ablation|benchmark|comparison|user study|applications?)\b",
+        heading_text,
+    ))
+    has_reference = bool(re.search(r"\b(references|bibliography)\b", heading_text))
+    has_abstract = bool(re.search(r"\babstract\b", heading_text[:2000]) or re.search(r"\babstract\b", lower[:3000]))
+    figure_or_table_count = len(re.findall(r"\b(?:figure|table)\s+[0-9]+[a-z]?\s*:", markdown or "", flags=re.IGNORECASE))
+    equation_count = len(re.findall(r"\(\d+\)|\$\$|\\begin\{equation", markdown or ""))
+    link_count = len(re.findall(r"https?://", markdown or ""))
+    award_like = bool(re.search(
+        r"\b(best paper|honou?rable mention|award winner|award recipients?|technical papers? award)\b",
+        lower,
+    ))
+    web_summary_like = bool(re.search(
+        r"\b(project page|paper list|accepted papers?|program|session|abstract only|supplementary video)\b",
+        lower[:6000],
+    ))
+    method_or_experiment_signal = has_method or has_experiment or figure_or_table_count >= 2 or equation_count >= 2
+    reasons: list[str] = []
+    if len(text) < 4500:
+        reasons.append("markdown_too_short")
+    if page_count is not None and page_count <= 2:
+        reasons.append("page_count_too_low")
+    if not method_or_experiment_signal:
+        reasons.append("missing_method_experiment_signals")
+    if not has_reference and len(text) < 12000:
+        reasons.append("short_without_references")
+    if award_like:
+        reasons.append("award_or_listing_page")
+    if web_summary_like and len(text) < 12000 and not has_reference:
+        reasons.append("web_summary_like")
+    listing_without_paper_structure = (
+        (award_like or web_summary_like)
+        and not has_reference
+        and not has_method
+        and not has_experiment
+        and not method_or_experiment_signal
+        and len(text) < 12000
+    )
+    needs_fulltext = (
+        listing_without_paper_structure
+        or (
+            len(text) < 4500
+            and not method_or_experiment_signal
+        )
+        or (
+            page_count is not None
+            and page_count <= 2
+            and not has_reference
+            and not method_or_experiment_signal
+        )
+    )
+    evidence_score = 0
+    evidence_score += 1 if has_abstract else 0
+    evidence_score += 2 if has_method else 0
+    evidence_score += 2 if has_experiment else 0
+    evidence_score += 1 if has_reference else 0
+    evidence_score += 1 if figure_or_table_count >= 2 else 0
+    evidence_score += 1 if equation_count >= 2 else 0
+    decision_trace = {
+        "listing_without_paper_structure": listing_without_paper_structure,
+        "short_without_method_or_experiment_signal": len(text) < 4500 and not method_or_experiment_signal,
+        "short_page_without_paper_structure": (
+            page_count is not None
+            and page_count <= 2
+            and not has_reference
+            and not method_or_experiment_signal
+        ),
+    }
+    return {
+        "gate_version": "source_sufficiency_v1",
+        "status": "needs_fulltext" if needs_fulltext else "sufficient",
+        "needs_fulltext": needs_fulltext,
+        "reasons": sorted(set(reasons)),
+        "decision_trace": decision_trace,
+        "signals": {
+            "markdown_chars": len(markdown or ""),
+            "text_chars": len(text),
+            "page_count": page_count,
+            "heading_count": len(headings),
+            "has_abstract": has_abstract,
+            "has_method_heading": has_method,
+            "has_experiment_heading": has_experiment,
+            "has_references": has_reference,
+            "figure_or_table_caption_count": figure_or_table_count,
+            "equation_count": equation_count,
+            "link_count": link_count,
+            "award_like": award_like,
+            "web_summary_like": web_summary_like,
+            "evidence_score": evidence_score,
+        },
+    }
 
 
 def local_anchor_part_analysis(part_id: str, chunk_text: str) -> dict[str, Any]:
@@ -1165,9 +1387,9 @@ def normalize_main_analysis(title: str, parsed: dict[str, Any], *, source_links:
     metadata.setdefault("title_zh", title)
     metadata.setdefault("venue", None)
     metadata.setdefault("year", None)
-    merged_links = merge_source_links(normalized.get("source_links"), source_links or [])
-    metadata["project_link"] = metadata_link_for_label(metadata.get("project_link"), "Project") or preferred_source_link(merged_links, "Project") or None
-    metadata["code_link"] = metadata_link_for_label(metadata.get("code_link"), "Code") or preferred_source_link(merged_links, "Code") or None
+    trusted_links = merge_source_links(source_links or [])
+    metadata["project_link"] = preferred_source_link(trusted_links, "Project") or None
+    metadata["code_link"] = preferred_source_link(trusted_links, "Code") or None
     normalized["paper_metadata"] = metadata
 
     for key, default in {
@@ -1194,7 +1416,7 @@ def normalize_main_analysis(title: str, parsed: dict[str, Any], *, source_links:
     for key in ["formulas", "figures_tables", "limitations", "open_questions"]:
         if not isinstance(normalized.get(key), list):
             normalized[key] = []
-    normalized["source_links"] = merged_links
+    normalized["source_links"] = trusted_links
     return normalized
 
 
@@ -1511,23 +1733,21 @@ def apply_adaptive_token_budget(
         "main_max_tokens": args.main_max_tokens,
         "writer_max_tokens": args.writer_max_tokens,
         "main_context_chars": args.main_context_chars,
+        "main_context_mode": args.main_context_mode,
     }
     profile = "default"
     if args.adaptive_tokens and extreme_doc:
         profile = "extreme"
         args.part_max_tokens = max(args.part_max_tokens, args.adaptive_long_part_max_tokens)
-        args.main_max_tokens = max(args.main_max_tokens, args.adaptive_extreme_main_max_tokens)
-        args.main_context_chars = max(args.main_context_chars, args.adaptive_long_main_context_chars)
     elif args.adaptive_tokens and long_doc:
         profile = "long"
         args.part_max_tokens = max(args.part_max_tokens, args.adaptive_long_part_max_tokens)
-        args.main_max_tokens = max(args.main_max_tokens, args.adaptive_long_main_max_tokens)
-        args.main_context_chars = max(args.main_context_chars, args.adaptive_long_main_context_chars)
     after = {
         "part_max_tokens": args.part_max_tokens,
         "main_max_tokens": args.main_max_tokens,
         "writer_max_tokens": args.writer_max_tokens,
         "main_context_chars": args.main_context_chars,
+        "main_context_mode": args.main_context_mode,
     }
     return {
         "enabled": bool(args.adaptive_tokens),
@@ -1839,13 +2059,6 @@ def is_reference_context_before_label(prefix: str) -> bool:
         r"\b(as|in|from|see|seen in|shown in|same as|reported in|compared (?:to|with)|similar to|metrics are the same as)\s*$",
         tail,
     ))
-
-
-def extract_label(caption: str, fallback_type: str, index: int) -> str:
-    explicit = explicit_label_from_caption(caption)
-    if explicit:
-        return explicit
-    return f"{fallback_type.title()} {index}"
 
 
 def first_caption_parts(*values: Any) -> list[str]:
@@ -2862,20 +3075,26 @@ def source_preserving_cluster_records(
         source_path = str(item.get("source_path") or "")
         if source_path and source_path not in source_paths:
             source_paths.append(source_path)
-    raw_items = [
-        {
+    raw_items = []
+    for item in cluster_items:
+        raw_item = {
             "type": str(item.get("item_type") or ""),
             "page": item.get("page"),
             "bbox": [round(value, 3) for value in item["bbox"]] if item.get("bbox") is not None else None,
             "caption": str(item.get("caption") or ""),
             "label": str(item.get("explicit_label") or ""),
             "source_path": str(item.get("source_path") or ""),
-            "extra_captions": item.get("extra_captions") or [],
-            "unassigned_extra_captions": item.get("unassigned_extra_captions") or [],
-            "caption_repair": str(item.get("caption_repair") or ""),
         }
-        for item in cluster_items
-    ]
+        extra_captions = item.get("extra_captions") or []
+        unassigned_extra_captions = item.get("unassigned_extra_captions") or []
+        caption_repair = str(item.get("caption_repair") or "")
+        if extra_captions:
+            raw_item["extra_captions"] = extra_captions
+        if unassigned_extra_captions:
+            raw_item["unassigned_extra_captions"] = unassigned_extra_captions
+        if caption_repair:
+            raw_item["caption_repair"] = caption_repair
+        raw_items.append(raw_item)
     cluster_bbox = bbox_union(cluster_items)
     shared = {
         "source_paths": source_paths,
@@ -2970,14 +3189,18 @@ def normalize_extracted_url(url: str) -> str:
 def classify_link(label: str, url: str) -> str:
     label_l = label.lower()
     url_l = url.lower()
+    if "arxiv" in label_l or "arxiv.org" in url_l:
+        return "arXiv"
+    if re.search(r"/(?:abs|pdf)/\d{4}\.\d{4,5}", url_l):
+        return "arXiv"
+    if "openreview.net/forum" in url_l or "doi.org/" in url_l:
+        return "Paper"
     if "github.io" in url_l:
         return "Project"
     if "code" in label_l or "github" in label_l or "github.com" in url_l or "gitlab" in url_l:
         return "Code"
     if "project" in label_l or "project" in url_l:
         return "Project"
-    if "arxiv" in label_l or "arxiv.org" in url_l:
-        return "arXiv"
     return ""
 
 
@@ -3020,7 +3243,7 @@ def normalize_source_links(items: Any) -> list[dict[str, str]]:
             continue
         url = normalize_extracted_url(str(item.get("url") or ""))
         label = classify_link(str(item.get("label") or ""), url) or str(item.get("label") or "").strip()
-        if label not in {"Project", "Code", "arXiv"}:
+        if label not in {"Project", "Code"}:
             continue
         if not url.startswith(("http://", "https://")):
             continue
@@ -3081,6 +3304,39 @@ def valid_source_url(value: Any) -> str:
     return url if url.startswith(("http://", "https://")) else ""
 
 
+def extract_pdf_first_page_links(pdf_path: Path) -> list[dict[str, str]]:
+    links: list[dict[str, str]] = []
+    seen: set[str] = set()
+    if fitz is None or not pdf_path.exists():
+        return links
+
+    def add(label: str, url: str) -> None:
+        clean_url = normalize_extracted_url(url)
+        if not clean_url.startswith(("http://", "https://")) or clean_url in seen:
+            return
+        clean_label = classify_link(label, clean_url)
+        if clean_label not in {"Project", "Code"}:
+            return
+        links.append({"label": clean_label, "url": clean_url, "trusted": True, "source": "pdf_first_page"})
+        seen.add(clean_url)
+
+    try:
+        with fitz.open(pdf_path) as doc:
+            if not doc.page_count:
+                return links
+            page = doc.load_page(0)
+            for item in page.get_links() or []:
+                add("", str(item.get("uri") or ""))
+            text = page.get_text("text") or ""
+            for label, url in re.findall(r"(?i)\b(project\s+page|project|code|github)\s*[:：]\s*(https?://\S+)", text):
+                add(label, url)
+            for url in re.findall(r"https?://\S+", text):
+                add("", url)
+    except Exception:
+        return links
+    return links
+
+
 def source_links_from_args(args: argparse.Namespace) -> list[dict[str, str]]:
     raw_values = getattr(args, "source_link", []) or []
     links = extract_source_links(*raw_values)
@@ -3092,6 +3348,24 @@ def source_links_from_args(args: argparse.Namespace) -> list[dict[str, str]]:
         links.append({"label": classify_link("", url) or "Project", "url": url})
         seen.add(url)
     return links
+
+
+def trusted_source_links_from_args(args: argparse.Namespace) -> list[dict[str, str]]:
+    links = source_links_from_args(args)
+    if not normalize_source_links(links):
+        pdf_arg = getattr(args, "paper_pdf", "") or getattr(args, "pdf", "")
+        if pdf_arg:
+            links = extract_pdf_first_page_links(Path(pdf_arg).expanduser())
+    paper_url = normalize_extracted_url(getattr(args, "paper_link", "") or "")
+    trusted: list[dict[str, str]] = []
+    for item in links:
+        url = normalize_extracted_url(str(item.get("url") or ""))
+        if not url or url == paper_url:
+            continue
+        label = classify_link(str(item.get("label") or ""), url) or "Project"
+        if label in {"Project", "Code"}:
+            trusted.append({"label": label, "url": url, "trusted": True})
+    return trusted
 
 
 def link_is_paper_url(url: str, paper_link: str, openreview_forum_id: str) -> bool:
@@ -3306,6 +3580,113 @@ def analysis_topic_fallback_text(title: str, analysis: dict[str, Any], conf_year
         ]
     ).lower()
     rules: list[tuple[str, tuple[str, ...]]] = [
+        (
+            "topic/graphics_geometry_processing",
+            (
+                "mesh",
+                "meshing",
+                "surface",
+                "geometry",
+                "geometric",
+                "point cloud",
+                "frame field",
+                "t-mesh",
+                "volumetric mapping",
+                "shape editing",
+                "normal orientation",
+                "parameterization",
+                "quantization",
+            ),
+        ),
+        (
+            "topic/graphics_rendering_materials",
+            (
+                "rendering",
+                "radiance",
+                "brdf",
+                "btf",
+                "material",
+                "texture",
+                "relighting",
+                "global illumination",
+                "prefiltering",
+                "view synthesis",
+                "nerf",
+                "neural radiance",
+                "gaussian splatting",
+            ),
+        ),
+        (
+            "topic/graphics_physical_simulation",
+            (
+                "simulation",
+                "fluid",
+                "water",
+                "bubble",
+                "elastodynamic",
+                "contact",
+                "skinning eigenmodes",
+                "complementary dynamics",
+                "cohomology",
+                "shallow water",
+                "viscous",
+                "stokes",
+                "sound synthesis",
+            ),
+        ),
+        (
+            "topic/graphics_fabrication_design",
+            (
+                "fabrication",
+                "3d printing",
+                "printing",
+                "printable",
+                "knit",
+                "infill",
+                "masonry",
+                "shell structure",
+                "mesostructure",
+                "foldable circuit",
+                "appearance fabrication",
+            ),
+        ),
+        (
+            "topic/graphics_procedural_modeling",
+            (
+                "procedural",
+                "grammar",
+                "l-system",
+                "l systems",
+                "plant",
+                "tree",
+                "root",
+                "shoot",
+                "botanical",
+                "growth",
+                "developmental model",
+                "ecosystem",
+                "urban",
+                "terrain",
+            ),
+        ),
+        (
+            "topic/graphics_animation_interaction",
+            (
+                "animation",
+                "rigging",
+                "retargeting",
+                "avatar",
+                "crowd simulation",
+                "character",
+                "motion transition",
+                "human-scene",
+                "physically interact",
+                "sketching",
+                "interactive",
+                "interaction",
+                "facial",
+            ),
+        ),
         (
             "topic/vision_multimodal_applications",
             (
@@ -3580,15 +3961,6 @@ def preserve_core_metric_terms(
     return analysis
 
 
-def load_json_if_exists(path: Path, fallback: Any) -> Any:
-    if not path.exists():
-        return fallback
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return fallback
-
-
 def normalize_latex_delimiters(markdown: str) -> str:
     def block_repl(match: re.Match[str]) -> str:
         inner = match.group(1).strip()
@@ -3617,6 +3989,10 @@ def normalize_report_markdown(report: str) -> str:
         "Key Modules and Formulas": "核心模块与公式推导",
         "Experiments and Analysis": "实验与分析",
         "Lineage and Knowledge Positioning": "方法谱系与知识库定位",
+        "Summary": "概要",
+        "Core Method and Innovation Mechanism": "核心方法与创新机理",
+        "Experiments and Key Findings": "实验与关键发现",
+        "Positioning and Knowledge Base Links": "定位与知识库关联",
     }
     for english, chinese in replacements.items():
         report = re.sub(
@@ -3632,6 +4008,10 @@ def normalize_report_markdown(report: str) -> str:
 
 def section_keywords(section_title: str) -> tuple[str, ...]:
     mapping = {
+        "概要": ("abstract", "introduction", "conclusion", "summary", "overview", "benchmark", "result"),
+        "核心方法与创新机理": ("method", "algorithm", "formula", "equation", "framework", "pipeline", "architecture", "propose", "new", "motivation"),
+        "实验与关键发现": ("experiment", "result", "table", "figure", "benchmark", "mae", "performance", "estimate", "ablation", "limitation"),
+        "定位与知识库关联": ("limitation", "future", "related", "discussion", "conclusion", "open", "baseline"),
         "概述": ("abstract", "introduction", "conclusion", "summary", "overview", "benchmark", "result"),
         "背景与动机": ("abstract", "introduction", "motivation", "related", "background", "benchmark", "dataset"),
         "核心创新": ("method", "algorithm", "benchmark", "dataset", "propose", "new", "lid", "idr", "ms"),
@@ -3667,10 +4047,23 @@ def slim_part_analysis(part: dict[str, Any], *, max_items: int = 3) -> dict[str,
     return slim
 
 
+def strip_part_diagnostics(part: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: value
+        for key, value in part.items()
+        if not key.startswith("_")
+        and key not in {"usage", "stream_diagnostics", "diagnostics", "repair_attempts"}
+    }
+
+
+def slim_part_analyses_for_main(part_results: list[dict[str, Any]], *, max_items: int = 4) -> list[dict[str, Any]]:
+    return [slim_part_analysis(strip_part_diagnostics(part), max_items=max_items) for part in part_results]
+
+
 def part_matches_section(part: dict[str, Any], section_title: str) -> bool:
-    if section_title == "实验与分析" and (part.get("experiment_evidence") or part.get("figure_table_roles")):
+    if section_title in {"实验与分析", "实验与关键发现"} and (part.get("experiment_evidence") or part.get("figure_table_roles")):
         return True
-    if section_title == "核心模块与公式推导" and (part.get("formula_evidence") or part.get("method_evidence")):
+    if section_title in {"核心模块与公式推导", "核心方法与创新机理"} and (part.get("formula_evidence") or part.get("method_evidence")):
         return True
     keywords = section_keywords(section_title)
     if not keywords:
@@ -3687,7 +4080,7 @@ def focused_part_analyses(
     max_evidence_items: int = 2,
 ) -> list[dict[str, Any]]:
     selected = [part for part in part_results if part_matches_section(part, section_title)]
-    if section_title == "概述":
+    if section_title in {"概述", "概要"}:
         selected = (part_results[:4] + part_results[-2:]) if len(part_results) > 6 else part_results
     if not selected:
         selected = part_results[:max_parts]
@@ -4005,6 +4398,7 @@ def placement_candidates(figures_tables: list[dict[str, Any]]) -> list[dict[str,
             "visual_summary": compact_text(item.get("visual_summary"), max_len=260),
             "visual_type": str(item.get("visual_type") or ""),
             "placement_hint": str(item.get("placement_hint") or ""),
+            "note_image_path": str(item.get("note_image_path") or ""),
             "is_sample_only": bool(item.get("is_sample_only")),
             "cluster_size": cluster_size,
             "full_region_source": full_region_source,
@@ -4045,12 +4439,29 @@ CORE_PIPELINE_FIGURE_PATTERN = re.compile(
     flags=re.IGNORECASE,
 )
 
+MOTIVATION_FIGURE_PATTERN = re.compile(
+    r"\b(teaser|motivation|problem|task|challenge|failure mode|limitation|illustration)\b",
+    flags=re.IGNORECASE,
+)
+
 EXPERIMENT_FIGURE_PATTERN = re.compile(
     r"\b(result|estimate|estimation|performance|experiment|benchmark|ablation|study|compare|comparison|qualitative|effectiveness|visualization|artifact|metric|jitter|fid|mae|mpjpe|lid)\b",
     flags=re.IGNORECASE,
 )
 
-ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"整体框架", "核心模块与公式推导", "实验与分析"}
+ALLOWED_FIGURE_PLACEMENT_SECTIONS = {"核心方法与创新机理", "实验与关键发现"}
+
+
+def canonical_figure_section(section: str) -> str:
+    legacy_sections = {
+        "实验与分析": "实验与关键发现",
+        "Experiments and Analysis": "实验与关键发现",
+        "Experiments and Key Findings": "实验与关键发现",
+        "整体框架": "核心方法与创新机理",
+        "核心模块与公式推导": "核心方法与创新机理",
+    }
+    normalized = legacy_sections.get(str(section or "").strip(), str(section or "").strip())
+    return normalized if normalized in ALLOWED_FIGURE_PLACEMENT_SECTIONS else "实验与关键发现"
 
 
 def placement_text(item: dict[str, Any]) -> str:
@@ -4058,8 +4469,7 @@ def placement_text(item: dict[str, Any]) -> str:
 
 
 def method_figure_section(item: dict[str, Any]) -> str:
-    text = placement_text(item)
-    return "整体框架" if FRAMEWORK_FIGURE_PATTERN.search(text) else "核心模块与公式推导"
+    return "核心方法与创新机理"
 
 
 def figure_label_sort_key(item: dict[str, Any]) -> tuple[int, str]:
@@ -4084,54 +4494,151 @@ def core_pipeline_item_ids(figures_tables: list[dict[str, Any]]) -> set[str]:
     return {str(item.get("item_id") or "") for item in core_pipeline_figure_candidates(figures_tables)}
 
 
+def experiment_figure_candidates(figures_tables: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    candidates = [
+        item for item in placement_candidates(figures_tables)
+        if (
+            str(item.get("type") or "").lower() == "table"
+            or EXPERIMENT_FIGURE_PATTERN.search(placement_text(item))
+        )
+        and not sample_only_figure(item)
+    ]
+    candidates.sort(key=figure_label_sort_key)
+    return candidates
+
+
+def figure_slot_quality(copied_figures: list[dict[str, Any]], note: str) -> dict[str, Any]:
+    def present(item: dict[str, Any]) -> bool:
+        path = str(item.get("note_image_path") or "")
+        return bool(path and format_obsidian_image_embed(path) in note)
+
+    core_candidates = core_pipeline_figure_candidates(copied_figures)
+    experiment_candidates = experiment_figure_candidates(copied_figures)
+    present_core = [item for item in core_candidates if present(item)]
+    present_experiment = [item for item in experiment_candidates if present(item)]
+    core_ok = not core_candidates or bool(present_core)
+    experiment_ok = not experiment_candidates or bool(present_experiment)
+    return {
+        "core_pipeline_required": bool(core_candidates),
+        "core_pipeline_present": len(present_core),
+        "core_pipeline_candidate_count": len(core_candidates),
+        "experiment_required": bool(experiment_candidates),
+        "experiment_present": len(present_experiment),
+        "experiment_candidate_count": len(experiment_candidates),
+        "ok": core_ok and experiment_ok,
+    }
+
+
+def figure_slot_budgets(max_images: int) -> dict[str, int]:
+    if max_images >= 8:
+        return {"motivation": 1, "method": 3, "comparison": max_images - 4}
+    if max_images >= 6:
+        return {"motivation": 1, "method": 2, "comparison": max_images - 3}
+    if max_images >= 3:
+        return {"motivation": 1, "method": 1, "comparison": max_images - 1}
+    return {"motivation": 0, "method": 1, "comparison": max(0, max_images - 1)}
+
+
+def figure_placement_slot(item: dict[str, Any], *, section: str) -> str:
+    text = placement_text(item)
+    item_type = str(item.get("type") or "").lower()
+    if (
+        section == "核心方法与创新机理"
+        and item_type == "figure"
+        and not sample_only_figure(item)
+        and MOTIVATION_FIGURE_PATTERN.search(text)
+    ):
+        return "motivation"
+    if (
+        section == "核心方法与创新机理"
+        and item_type == "figure"
+        and METHOD_FIGURE_PATTERN.search(text)
+        and not EXPERIMENT_FIGURE_PATTERN.search(text)
+        and not sample_only_figure(item)
+    ):
+        return "method"
+    return "comparison"
+
+
 def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_images: int) -> list[dict[str, str]]:
+    """Deterministic fallback with category-slot allocation.
+
+    Default-6 slots: ≤1 motivation, ≤2 method, ≤3 comparison.
+    Larger budgets preserve one motivation slot and add method/comparison slots.
+    Smaller budgets scale proportionally.
+    """
     if max_images <= 0:
         return []
     candidates = placement_candidates(figures_tables)
     by_id = {item["item_id"]: item for item in candidates}
     placements: list[dict[str, str]] = []
     used: set[str] = set()
-    core_candidates = core_pipeline_figure_candidates(figures_tables)
-    method_image_budget = min(max_images, max(4, len(core_candidates)))
 
-    for item in core_candidates:
+    slot_budgets = figure_slot_budgets(max_images)
+    slot_counts = {"motivation": 0, "method": 0, "comparison": 0}
+
+    def add_placement(item: dict[str, Any], *, slot: str, section: str, reason: str) -> bool:
         if len(placements) >= max_images:
-            break
-        placements.append({
-            "item_id": item["item_id"],
-            "section": method_figure_section(item),
-            "reason": "caption fallback ranks this as a possible framework or training-pair figure",
-        })
+            return False
+        if item["item_id"] in used:
+            return False
+        if slot_counts[slot] >= slot_budgets[slot]:
+            return False
+        placements.append({"item_id": item["item_id"], "section": section, "reason": reason})
         used.add(item["item_id"])
+        slot_counts[slot] += 1
+        return True
+
+    motivation_candidates = [
+        item for item in candidates
+        if item.get("type", "").lower() == "figure"
+        and not sample_only_figure(item)
+        and MOTIVATION_FIGURE_PATTERN.search(placement_text(item))
+    ]
+    motivation_candidates.sort(key=figure_label_sort_key)
+    for item in motivation_candidates:
+        add_placement(
+            item,
+            slot="motivation",
+            section=method_figure_section(item),
+            reason="caption indicates a task, problem, or motivation figure",
+        )
+
+    core_candidates = core_pipeline_figure_candidates(figures_tables)
+    for item in core_candidates:
+        add_placement(
+            item,
+            slot="method",
+            section=method_figure_section(item),
+            reason="caption fallback ranks this as a possible framework or training-pair figure",
+        )
 
     full_region_candidates = [item for item in candidates if item.get("is_full_region")]
     full_region_candidates.sort(key=lambda item: (sample_only_figure(item), item["item_id"]))
     for item in full_region_candidates:
-        if len(placements) >= max_images:
-            break
         if item["item_id"] in used:
             continue
         text = placement_text(item)
-        section = (
-            method_figure_section(item)
-            if item.get("type", "").lower() == "figure"
+        if (
+            item.get("type", "").lower() == "figure"
             and METHOD_FIGURE_PATTERN.search(text)
             and not EXPERIMENT_FIGURE_PATTERN.search(text)
-            else "实验与分析"
-        )
-        placements.append({
-            "item_id": item["item_id"],
-            "section": section,
-            "reason": "complete multi-panel crop from MinerU PDF recrop",
-        })
-        used.add(item["item_id"])
+        ):
+            add_placement(
+                item,
+                slot="method",
+                section=method_figure_section(item),
+                reason="complete multi-panel crop from MinerU PDF recrop",
+            )
+        elif item.get("type", "").lower() == "table" or EXPERIMENT_FIGURE_PATTERN.search(text):
+            add_placement(
+                item,
+                slot="comparison",
+                section="实验与关键发现",
+                reason="complete result or comparison crop from MinerU PDF recrop",
+            )
 
     for item in candidates:
-        if len(placements) >= max_images:
-            break
-        method_count = sum(1 for placement in placements if placement.get("section") in {"整体框架", "核心模块与公式推导"})
-        if method_count >= method_image_budget:
-            break
         text = placement_text(item)
         if item["item_id"] in used:
             continue
@@ -4142,12 +4649,12 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
             and METHOD_FIGURE_PATTERN.search(text)
             and not EXPERIMENT_FIGURE_PATTERN.search(text)
         ):
-            placements.append({
-                "item_id": item["item_id"],
-                "section": method_figure_section(item),
-                "reason": "caption indicates a framework or method-module diagram",
-            })
-            used.add(item["item_id"])
+            add_placement(
+                item,
+                slot="method",
+                section=method_figure_section(item),
+                reason="caption indicates a framework or method-module diagram",
+            )
 
     experiment_candidates = [
         item for item in candidates
@@ -4160,12 +4667,14 @@ def fallback_figure_placements(figures_tables: list[dict[str, Any]], *, max_imag
     ]
     experiment_candidates.sort(key=lambda item: (0 if item.get("type", "").lower() == "table" else 1, item["item_id"]))
     for item in experiment_candidates:
-        if len(placements) >= max_images:
-            break
         if item["item_id"] not in by_id:
             continue
-        placements.append({"item_id": item["item_id"], "section": "实验与分析", "reason": "caption indicates a table or result plot"})
-        used.add(item["item_id"])
+        add_placement(
+            item,
+            slot="comparison",
+            section="实验与关键发现",
+            reason="caption indicates a table or result plot",
+        )
     return placements[:max_images]
 
 
@@ -4175,18 +4684,24 @@ def normalize_figure_placements(
     *,
     max_images: int,
 ) -> list[dict[str, str]]:
-    valid_ids = {item["item_id"] for item in placement_candidates(figures_tables)}
+    candidates_by_id = {item["item_id"]: item for item in placement_candidates(figures_tables)}
+    valid_ids = set(candidates_by_id)
     raw_items = parsed.get("placements")
     if not isinstance(raw_items, list):
         return []
     placements: list[dict[str, str]] = []
     used: set[str] = set()
+    slot_budgets = figure_slot_budgets(max_images)
+    slot_counts = {"motivation": 0, "method": 0, "comparison": 0}
     for item in raw_items:
         if not isinstance(item, dict):
             continue
         item_id = str(item.get("item_id") or "")
-        section = str(item.get("section") or "")
+        section = canonical_figure_section(str(item.get("section") or ""))
         if item_id not in valid_ids or item_id in used or section not in ALLOWED_FIGURE_PLACEMENT_SECTIONS:
+            continue
+        slot = figure_placement_slot(candidates_by_id[item_id], section=section)
+        if slot_counts[slot] >= slot_budgets[slot]:
             continue
         placements.append({
             "item_id": item_id,
@@ -4194,6 +4709,7 @@ def normalize_figure_placements(
             "reason": compact_text(item.get("reason"), max_len=180),
         })
         used.add(item_id)
+        slot_counts[slot] += 1
         if len(placements) >= max_images:
             break
     return placements
@@ -4231,13 +4747,13 @@ def visual_summary_candidates(figures_tables: list[dict[str, Any]], *, max_items
 
 def focused_figures_tables(section_title: str, figures_tables: list[dict[str, Any]], *, max_items: int = 10) -> list[dict[str, Any]]:
     candidates = placement_candidates(figures_tables)
-    if section_title == "整体框架":
+    if section_title in {"整体框架", "核心模块与公式推导", "核心方法与创新机理"}:
         filtered = [
             item for item in candidates
             if item.get("placement_hint") == "整体框架"
             or re.search(r"\b(framework|pipeline|architecture|overview|method)\b", f"{item.get('label') or ''} {item.get('caption') or ''} {item.get('visual_summary') or ''}".lower())
         ]
-    elif section_title == "实验与分析":
+    elif section_title in {"实验与分析", "实验与关键发现"}:
         filtered = [
             item for item in candidates
             if item.get("placement_hint") == "实验与分析"
@@ -4257,7 +4773,13 @@ def normalize_visual_summary(parsed: dict[str, Any]) -> dict[str, Any]:
     elements = parsed.get("key_visible_elements")
     claims = parsed.get("supports_claims")
     hint = str(parsed.get("placement_hint") or "")
-    if hint not in {"整体框架", "实验与分析", "skip"}:
+    legacy_hints = {
+        "整体框架": "核心方法与创新机理",
+        "核心模块与公式推导": "核心方法与创新机理",
+        "实验与分析": "实验与关键发现",
+    }
+    hint = legacy_hints.get(hint, hint)
+    if hint not in {"核心方法与创新机理", "实验与关键发现", "skip"}:
         hint = ""
     confidence = parsed.get("confidence")
     try:
@@ -4278,7 +4800,7 @@ def normalize_visual_summary(parsed: dict[str, Any]) -> dict[str, Any]:
 def caption_only_visual_summary(item: dict[str, Any]) -> dict[str, Any]:
     label = str(item.get("label") or "")
     caption = compact_text(dedupe_caption_prefix(label, str(item.get("caption") or "")), max_len=500)
-    hint = "skip" if sample_only_figure(item) else ("实验与分析" if str(item.get("type") or "").lower() == "table" else "")
+    hint = "skip" if sample_only_figure(item) else ("实验与关键发现" if str(item.get("type") or "").lower() == "table" else "")
     return {
         "visual_summary": caption,
         "visual_type": str(item.get("type") or ""),
@@ -4559,10 +5081,10 @@ def section_for_referenced_item(markdown: str, item: dict[str, Any]) -> str:
                 return current
             break
     if str(item.get("type") or "").lower() == "table":
-        return "实验与分析"
+        return "实验与关键发现"
     if METHOD_FIGURE_PATTERN.search(placement_text(item)) and not sample_only_figure(item):
         return method_figure_section(item)
-    return "实验与分析"
+    return "实验与关键发现"
 
 
 def ensure_referenced_figure_placements(
@@ -4719,8 +5241,7 @@ def inject_figure_items(markdown: str, heading: str, items: list[dict[str, Any]]
             _, end = bounds
             blocks = [image_block(item) for item in unmatched if image_block(item).strip()]
             if blocks:
-                supplement = ["", "### 补充图表", "", *("\n\n".join(blocks)).splitlines(), ""]
-                lines[end:end] = supplement
+                lines[end:end] = ["", *("\n\n".join(blocks)).splitlines(), ""]
     return "\n".join(lines)
 
 
@@ -4740,9 +5261,7 @@ def figure_items_for_note(
         item_id = str(placement.get("item_id") or "")
         if item_id in used or item_id not in by_id:
             continue
-        section = str(placement.get("section") or "")
-        if section not in ALLOWED_FIGURE_PLACEMENT_SECTIONS:
-            section = "实验与分析"
+        section = canonical_figure_section(str(placement.get("section") or ""))
         items_by_section.setdefault(section, []).append(by_id[item_id])
         used.add(item_id)
         if len(used) >= max_images:
@@ -4828,10 +5347,7 @@ def render_info_table(
         links.append(markdown_link("paper", paper_link))
     elif openreview_forum_id:
         links.append(markdown_link("paper", f"https://openreview.net/forum?id={openreview_forum_id}"))
-    all_extra_links = [
-        *(analysis.get("source_links") or []),
-        *extract_source_links(report, json.dumps(analysis, ensure_ascii=False)),
-    ]
+    all_extra_links = normalize_source_links(analysis.get("source_links") or [])
     seen_labels: set[str] = {"paper"} if links else set()
     seen_urls: set[str] = {
         normalize_extracted_url(url)
@@ -4956,7 +5472,7 @@ def compose_vault_note(
         max_images=max_images,
         placements=figure_placements,
     )
-    for section in ("整体框架", "核心模块与公式推导", "实验与分析"):
+    for section in ("核心方法与创新机理", "实验与关键发现"):
         body = inject_figure_items(body, section, figure_items_by_section.get(section, []))
     parts = [
         render_frontmatter(
@@ -5300,6 +5816,7 @@ def validate_vault_note(
         item for item in referenced_assets
         if format_obsidian_image_embed(item["path"]) not in note
     ]
+    slot_quality = figure_slot_quality(copied_figures, note)
     legacy_markdown_image_links = re.findall(r"!\[[^\]]*\]\((?:\.\./\.\./)?assets/[^)]+\)", note)
     legacy_relative_wikilink_images = re.findall(r"!\[\[\.\./\.\./assets/[^\]]+\]\]", note)
     scalar_metadata_keys = set(required_frontmatter) - {"aliases", "tags", "claims", "project_link", "code_link"}
@@ -5326,11 +5843,6 @@ def validate_vault_note(
     expected_venue_tag = venue_year_tag(pdf_ref.split("/")[-2] if "/" in pdf_ref else "")
     venue_tag_ok = not expected_venue_tag or expected_venue_tag in frontmatter_tags
     legacy_venue_topic_tags = [tag for tag in frontmatter_tags if is_venue_year_topic_tag(tag)]
-    missing_referenced_images_blocking = (
-        missing_referenced_images
-        and max_images > 0
-        and len(note_image_paths) < max_images
-    )
     checks = {
         "frontmatter_valid": has_frontmatter and not missing_frontmatter,
         "openreview_forum_id_present": forum_id_ok,
@@ -5338,7 +5850,8 @@ def validate_vault_note(
         "pdf_embed_present": not pdf_ref or expected_pdf_embed in note,
         "image_embeds_present": not note_image_paths or not missing_images,
         "core_pipeline_images_present": not core_pipeline_assets or bool(present_core_pipeline_images),
-        "referenced_image_embeds_present": not missing_referenced_images_blocking,
+        "figure_slot_coverage_present": slot_quality["ok"],
+        "referenced_image_embeds_present": True,
         "no_legacy_markdown_image_links": not legacy_markdown_image_links and not legacy_relative_wikilink_images,
         "no_pdf_file_label": "PDF 文件：" not in note,
         "no_table_cell_aliased_wikilinks": not table_rows_with_aliased_wikilinks(note),
@@ -5351,9 +5864,31 @@ def validate_vault_note(
         "no_legacy_venue_topic_tags": not legacy_venue_topic_tags,
         "note_length_ok": len(note.strip()) >= 1000,
     }
+    fatal_check_names = {
+        "frontmatter_valid",
+        "openreview_forum_id_present",
+        "required_sections_present",
+        "pdf_embed_present",
+        "core_pipeline_images_present",
+        "no_legacy_markdown_image_links",
+        "no_pdf_file_label",
+        "no_table_cell_aliased_wikilinks",
+        "no_fallback_metadata_markers",
+        "no_dangling_numeric_refs",
+        "no_incomplete_effect_callout",
+        "no_multi_label_image_captions",
+        "no_unescaped_lt_in_image_captions",
+        "venue_year_tag_present",
+        "no_legacy_venue_topic_tags",
+        "note_length_ok",
+    }
+    fatal_ok = all(checks[name] for name in fatal_check_names)
     return {
         "ok": all(checks.values()),
+        "fatal_ok": fatal_ok,
+        "nonfatal_checks": ["image_embeds_present", "referenced_image_embeds_present", "figure_slot_coverage_present"],
         "checks": checks,
+        "figure_slot_quality": slot_quality,
         "note_chars": len(note),
         "missing_frontmatter": missing_frontmatter,
         "expected_openreview_forum_id": openreview_forum_id,
@@ -5403,7 +5938,7 @@ def note_check_repair_prompt(
             for item in copied_figures
             if any(str(item.get("item_id") or "") == str(placement.get("item_id") or "") for placement in (figure_placements or []))
         ],
-        "repair_scope": "Only fix Markdown formatting, duplicated captions, unescaped < in image captions, broken table syntax, and obvious image-placement mismatch.",
+        "repair_scope": "Only fix Markdown formatting, duplicated captions, unescaped < in image captions, broken table syntax, and obvious image-placement mismatch. Preserve the four body sections: 概要, 核心方法与创新机理, 实验与关键发现, 定位与知识库关联.",
         "frontmatter_schema_guard": "Do not add category, modalities, or frontier. Keep aliases as short English/model aliases. Preserve project_link and code_link.",
     }
     return json.dumps(prompt_obj, ensure_ascii=False, indent=2)
@@ -5512,17 +6047,13 @@ def export_to_vault(
         max_images=args.max_note_images,
     )
     if not analysis.get("source_links"):
-        parse_markdown = work_dir / "parse" / "full.md"
-        if parse_markdown.exists():
+        source_links = trusted_source_links_from_args(args)
+        if source_links:
             analysis = dict(analysis)
-            source_links = merge_source_links(
-                extract_source_links(parse_markdown.read_text(encoding="utf-8")),
-                source_links_from_args(args),
-            )
             analysis["source_links"] = source_links
             metadata = dict(analysis.get("paper_metadata") or {})
-            metadata["project_link"] = metadata.get("project_link") or preferred_source_link(source_links, "Project") or None
-            metadata["code_link"] = metadata.get("code_link") or preferred_source_link(source_links, "Code") or None
+            metadata["project_link"] = preferred_source_link(source_links, "Project") or None
+            metadata["code_link"] = preferred_source_link(source_links, "Code") or None
             analysis["paper_metadata"] = metadata
     topic_text = topic_text_for_note(args.openreview_forum_id, conf_year, args.topic_assignments)
     if not topic_text:
@@ -5575,8 +6106,165 @@ def export_to_vault(
         "validation": validation,
     }
     atomic_write_json(work_dir / "report" / "vault_export.json", export_info)
-    if not validation.get("ok"):
+    if not validation.get("fatal_ok", validation.get("ok")):
         raise RuntimeError(f"vault note validation failed: {validation}")
+    return export_info
+
+
+def render_needs_fulltext_note(
+    *,
+    title: str,
+    conf_year: str,
+    pdf_ref: str,
+    paper_link: str,
+    source_sufficiency: dict[str, Any],
+) -> str:
+    venue, year = infer_conf_parts(conf_year)
+    reasons = source_sufficiency.get("reasons") or ["insufficient_source"]
+    signals = source_sufficiency.get("signals") or {}
+    tags = topic_tags_for_frontmatter(None, conf_year)
+    if "status/needs_fulltext" not in tags:
+        tags.append("status/needs_fulltext")
+    lines = [
+        "---",
+        f"title: {yaml_scalar(title)}",
+        "type: paper",
+        "paper_level: A",
+        "status: needs_fulltext",
+        "source_sufficiency: needs_fulltext",
+        f"evidence_density: {yaml_scalar('insufficient')}",
+        f"venue: {yaml_scalar(venue)}",
+        f"year: {year if year is not None else 'null'}",
+        f"pdf_ref: {yaml_scalar(pdf_ref)}",
+        "project_link: null",
+        "code_link: null",
+        "aliases:",
+        f"- {yaml_scalar(note_file_stem(title)[:60])}",
+        "tags:",
+    ]
+    lines.extend(f"- {yaml_scalar(tag)}" for tag in tags)
+    lines.extend([
+        "core_operator: needs_fulltext",
+        "primary_logic: Source text lacks enough method and experiment evidence for a reliable BITE asset.",
+        "claims:",
+        "- Source requires full text before analysis.",
+        "---",
+        "",
+        f"# {title}",
+        "",
+        "> [!warning] 需要全文",
+        "> 当前来源缺少足够的方法、实验或论文结构信号，已阻断正式分析链，避免生成结构完整但证据不足的资产。",
+        "",
+        "## 概要",
+        "",
+        "本条目是 `needs_fulltext` 占位 note，不是正式论文分析。需要补充完整 paper PDF 或可靠全文后重新运行分析链。",
+        "",
+        "## 核心方法与创新机理",
+        "",
+        "未分析。当前来源不足以可靠抽取方法模块、公式、pipeline 或 changed slots。",
+        "",
+        "## 实验与关键发现",
+        "",
+        "未分析。当前来源不足以可靠抽取实验设置、指标、主表数值、消融或失败模式。",
+        "",
+        "## 定位与知识库关联",
+        "",
+        "该占位 note 用于保护 BITE 资产库质量：后续 idea emergence 和 reviewer stress test 应过滤 `status: needs_fulltext` 或 `source_sufficiency: needs_fulltext` 的条目。",
+        "",
+        "### 阻断原因",
+        "",
+    ])
+    lines.extend(f"- `{reason}`" for reason in reasons)
+    lines.extend(["", "### 来源信号", ""])
+    for key in [
+        "text_chars",
+        "page_count",
+        "heading_count",
+        "has_method_heading",
+        "has_experiment_heading",
+        "has_references",
+        "figure_or_table_caption_count",
+        "equation_count",
+        "award_like",
+        "web_summary_like",
+        "evidence_score",
+    ]:
+        if key in signals:
+            lines.append(f"- `{key}`: `{signals.get(key)}`")
+    if paper_link:
+        lines.extend(["", f"- paper link: {markdown_link('paper', paper_link)}"])
+    if pdf_ref:
+        lines.extend(["", "## 原文 PDF", "", f"![[{pdf_ref}]]", ""])
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def export_needs_fulltext_to_vault(
+    args: argparse.Namespace,
+    *,
+    task_id: str,
+    title: str,
+    work_dir: Path,
+    source_sufficiency: dict[str, Any],
+) -> dict[str, Any]:
+    vault_root = Path(args.vault_root).expanduser().resolve()
+    conf_year = resolved_conf_year(args)
+    paper_dir = (
+        Path(args.vault_note_dir).expanduser().resolve()
+        if args.vault_note_dir
+        else vault_root / "analysis" / conf_year
+    )
+    pdf_dir = vault_root / "paperPDFs" / conf_year
+    stem = note_file_stem(title)
+    note_path = (
+        Path(args.vault_note_path).expanduser().resolve()
+        if getattr(args, "vault_note_path", "")
+        else paper_dir / f"{stem}.md"
+    )
+    stem = note_path.stem
+    source_pdf_arg = args.paper_pdf or args.pdf
+    source_pdf, pdf_resolution = resolve_existing_pdf_path(
+        source_pdf_arg,
+        conf_year=conf_year,
+        search_roots=pdf_search_roots_from_args(args),
+    )
+    pdf_ref = ""
+    if source_pdf:
+        pdf_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            source_pdf_in_vault_dir = source_pdf.parent.resolve() == pdf_dir.resolve()
+        except OSError:
+            source_pdf_in_vault_dir = False
+        pdf_target = source_pdf if source_pdf_in_vault_dir else pdf_dir / f"{stem}.pdf"
+        if not source_pdf_in_vault_dir and not (pdf_target.exists() and source_pdf.samefile(pdf_target)):
+            shutil.copy2(source_pdf, pdf_target)
+        pdf_ref = f"paperPDFs/{conf_year}/{pdf_target.name}"
+    note = render_needs_fulltext_note(
+        title=title,
+        conf_year=conf_year,
+        pdf_ref=pdf_ref,
+        paper_link=args.paper_link,
+        source_sufficiency=source_sufficiency,
+    )
+    atomic_write_text(note_path, note)
+    export_info = {
+        "note_path": str(note_path),
+        "pdf_ref": pdf_ref,
+        "status": "needs_fulltext",
+        "source_sufficiency": source_sufficiency,
+        "source_pdf": str(source_pdf) if source_pdf else "",
+        "source_pdf_resolution": pdf_resolution,
+        "figure_count": 0,
+        "figure_placements": [],
+        "validation": {
+            "ok": True,
+            "checks": {
+                "frontmatter_valid": True,
+                "required_sections_present": True,
+                "pdf_embed_present": not pdf_ref or f"![[{pdf_ref}]]" in note,
+            },
+        },
+    }
+    atomic_write_json(work_dir / "report" / "vault_export.json", export_info)
     return export_info
 
 
@@ -5675,6 +6363,11 @@ def prepare_parse(args: argparse.Namespace, work_dir: Path) -> dict[str, Any]:
 
     figures_tables = extract_figures_tables(content_path, source_root=source_root)
     markdown = normalize_markdown_full_region_image_refs(markdown, figures_tables, source_root=source_root)
+    title_check = assert_title_matches_source(
+        expected_title=args.paper_title,
+        source_label=str(source),
+        candidates=[first_markdown_heading(markdown)],
+    )
     atomic_write_text(parse_dir / "full.md", markdown)
     atomic_write_json(parse_dir / "figures_tables.json", figures_tables)
     return {
@@ -5683,6 +6376,7 @@ def prepare_parse(args: argparse.Namespace, work_dir: Path) -> dict[str, Any]:
         "source_root": str(source_root),
         "markdown_chars": len(markdown),
         "figures_tables": figures_tables,
+        "title_check": title_check,
         "duration_seconds": round(time.monotonic() - started, 3),
     }
 
@@ -5756,15 +6450,34 @@ def mock_json(kind: str, *, part_id: str = "") -> dict[str, Any]:
 def mock_report() -> str:
     return (
         "# Mock Paper\n\n"
-        "## Overview\n\n"
-        "This is a mock local report generated without an LLM call.\n\n"
-        "## Background and Motivation\n\nMock background.\n\n"
-        "## Core Innovation\n\nMock innovation.\n\n"
-        "## Framework\n\nMock framework.\n\n"
-        "## Key Modules and Formulas\n\nMock modules.\n\n"
-        "## Experiments and Analysis\n\nMock experiments.\n\n"
-        "## Lineage and Knowledge Positioning\n\nMock positioning.\n"
+        "## 概要\n\n"
+        "这是一份不调用 LLM 的本地 smoke-test 报告，用于验证新版 BITE 分析链的四段结构、vault 导出、PDF 嵌入与图片校验是否能正常工作。\n\n"
+        "## 核心方法与创新机理\n\n"
+        "MockMethod 将论文问题压缩为一个可验证的因果链：现有方法缺少稳定控制旋钮，本文通过一个显式模块把输入条件、核心表示和输出目标连接起来。该段模拟真实报告中的背景缺口、changed slots、pipeline 描述和关键公式说明，避免把同一技术点拆散到多个独立章节里反复出现。\n\n"
+        "关键机制可以写成 $y=f_\\theta(x, c)$，其中 $x$ 表示输入，$c$ 表示控制条件，$y$ 表示目标输出。真实链路中这里会保留 1-3 个关键公式及变量含义，并明确公式对应的模块和消融证据。\n\n"
+        "## 实验与关键发现\n\n"
+        "实验部分模拟保留主结果、指标对比、关键消融和失败模式。真实报告会优先引用主表、结果图和消融图，而不会默认堆叠样例图库。若指标对比只以图片形式存在，图表插入器应将其放入本节。\n\n"
+        "Mock evidence 表明新结构至少能承载主指标、消融趋势和适用边界，同时减少模板性背景铺陈。局限性也放在本节或定位节中，而不是在多个章节重复展开。\n\n"
+        "## 定位与知识库关联\n\n"
+        "该段模拟知识库定位：只说明方法族、与 baseline 的本质差异、适用边界和后续启发，不复述前文公式和 pipeline。这样后续检索可以抓到核心 operator，同时降低单篇 note 的输出量。\n"
     )
+
+
+def mock_section_report(section_title: str) -> str:
+    report = normalize_report_markdown(mock_report())
+    lines = report.splitlines()
+    start = None
+    end = len(lines)
+    for index, line in enumerate(lines):
+        if line.strip() == f"## {section_title}":
+            start = index
+            continue
+        if start is not None and index > start and re.match(r"^##\s+\S", line):
+            end = index
+            break
+    if start is None:
+        return f"## {section_title}\n\n这是一段用于 smoke test 的新版 BITE 分析链 mock 内容，确保 section writer 能输出合法章节。\n"
+    return "\n".join(lines[start:end]).strip() + "\n"
 
 
 def deepseek_uses_reasoning(model: str) -> bool:
@@ -6127,14 +6840,34 @@ async def run_part_analysis(
     if args.resume and out_path.exists() and not args.force:
         return json.loads(out_path.read_text(encoding="utf-8"))
 
-    prompt = part_prompt(chunk, title)
-    atomic_write_text(prompt_path, prompt)
+    low_value_local = is_low_value_citation_chunk(chunk.text)
+    appendix_local = is_appendix_figure_table_chunk(chunk.text)
+    prompt = "" if low_value_local else part_prompt(chunk, title)
+    if prompt:
+        atomic_write_text(prompt_path, prompt)
     started = time.monotonic()
     usage: dict[str, Any] = {}
     if args.mock_llm:
         parsed = mock_json("part", part_id=part_id)
         raw = json.dumps(parsed, ensure_ascii=False)
-    elif is_appendix_figure_table_chunk(chunk.text):
+    elif low_value_local:
+        parsed = local_anchor_part_analysis(part_id, chunk.text)
+        parsed["method_evidence"] = []
+        parsed["experiment_evidence"] = []
+        parsed["formula_evidence"] = []
+        parsed["figure_table_roles"] = []
+        raw = json.dumps(parsed, ensure_ascii=False)
+        usage = {
+            "provider": "local",
+            "model": "deterministic_low_value_chunk_anchor_extractor",
+            "prompt_tokens_est": 0,
+            "completion_tokens_est": estimate_tokens(raw),
+            "total_tokens_est": estimate_tokens(raw),
+            "estimated_cost_usd": 0.0,
+            "cost_basis": "local_reference_acknowledgement_citation_anchor_extraction",
+            "local_low_value_chunk": True,
+        }
+    elif appendix_local:
         parsed = local_anchor_part_analysis(part_id, chunk.text)
         raw = json.dumps(parsed, ensure_ascii=False)
         usage = {
@@ -6259,7 +6992,7 @@ async def run_part_analysis(
     }
     if args.mock_llm:
         atomic_write_text(raw_path, raw)
-    elif is_appendix_figure_table_chunk(chunk.text):
+    elif low_value_local or appendix_local:
         atomic_write_text(raw_path, raw)
     atomic_write_json(out_path, parsed)
     append_jsonl(progress_path, {"event": "part_analysis_done", "part_id": part_id, "at": now_iso(), "usage": usage})
@@ -6306,13 +7039,77 @@ def compact_paper_context(markdown: str, *, max_chars: int) -> str:
     markdown = markdown.strip()
     if len(markdown) <= max_chars:
         return markdown
-    head = max_chars * 2 // 3
-    tail = max_chars - head
+    marker = "\n\n[... middle omitted in main merge prompt; see parse/full.md and part analyses ...]\n\n"
+    budget = max(0, max_chars - len(marker))
+    head = budget * 2 // 3
+    tail = budget - head
     return (
         markdown[:head]
-        + "\n\n[... middle omitted in main merge prompt; see parse/full.md and part analyses ...]\n\n"
+        + marker
         + markdown[-tail:]
     )
+
+
+SECTION_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", flags=re.MULTILINE)
+MAIN_CONTEXT_EXCLUDE_HEADING_RE = re.compile(
+    r"(?i)\b(references?|bibliography|acknowledg(?:e)?ments?|appendix|supplementary)\b"
+)
+
+def normalize_context_heading(value: str) -> str:
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def split_markdown_sections(markdown: str) -> list[dict[str, Any]]:
+    matches = list(SECTION_HEADING_RE.finditer(markdown))
+    if not matches:
+        return [{"heading": "FULL_TEXT", "level": 0, "start": 0, "end": len(markdown), "text": markdown.strip()}]
+    sections: list[dict[str, Any]] = []
+    if matches[0].start() > 0:
+        prefix = markdown[: matches[0].start()].strip()
+        if prefix:
+            sections.append({"heading": "PREAMBLE", "level": 0, "start": 0, "end": matches[0].start(), "text": prefix})
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(markdown)
+        text = markdown[match.start():end].strip()
+        if not text:
+            continue
+        sections.append({
+            "heading": normalize_context_heading(match.group(2)),
+            "level": len(match.group(1)),
+            "start": match.start(),
+            "end": end,
+            "text": text,
+        })
+    return sections
+
+
+def compact_structured_paper_context(markdown: str, *, max_chars: int) -> str:
+    markdown = markdown.strip()
+    if not markdown:
+        return markdown
+
+    return compact_paper_context(analysis_markdown_input(markdown), max_chars=max_chars)
+
+
+def analysis_markdown_input(markdown: str) -> str:
+    markdown = (markdown or "").strip()
+    if not markdown:
+        return markdown
+    sections = split_markdown_sections(markdown)
+    content_sections = [
+        section
+        for section in sections
+        if not MAIN_CONTEXT_EXCLUDE_HEADING_RE.search(str(section.get("heading") or ""))
+    ]
+    if not content_sections:
+        return markdown
+    return "\n\n".join(str(section.get("text") or "").strip() for section in content_sections).strip()
+
+
+def main_paper_context(markdown: str, *, max_chars: int, mode: str) -> str:
+    if mode == "structured":
+        return compact_structured_paper_context(markdown, max_chars=max_chars)
+    return compact_paper_context(markdown, max_chars=max_chars)
 
 
 def infer_title(markdown: str, fallback: str) -> str:
@@ -6341,8 +7138,12 @@ async def run_main_analysis(
 
     prompt_payload = {
         "paper_title": title,
-        "paper_context": compact_paper_context(markdown, max_chars=args.main_context_chars),
-        "part_analyses": part_results,
+        "paper_context": main_paper_context(
+            markdown,
+            max_chars=args.main_context_chars,
+            mode=args.main_context_mode,
+        ),
+        "part_analyses": slim_part_analyses_for_main(part_results, max_items=4),
         "figures_tables": figures_tables,
     }
     prompt = (
@@ -6417,11 +7218,7 @@ async def run_main_analysis(
     parsed = normalize_main_analysis(
         title,
         parsed,
-        source_links=merge_source_links(
-            extract_source_links(markdown),
-            source_links_from_args(args),
-            *(part.get("source_links") or [] for part in part_results),
-        ),
+        source_links=trusted_source_links_from_args(args),
     )
     parsed["_meta"] = {
         "part_count": len(part_results),
@@ -6434,49 +7231,6 @@ async def run_main_analysis(
     atomic_write_json(out_path, parsed)
     append_jsonl(progress_path, {"event": "main_analysis_done", "at": now_iso(), "usage": usage})
     return parsed
-
-
-async def run_writer(
-    args: argparse.Namespace,
-    *,
-    analysis: dict[str, Any],
-    part_results: list[dict[str, Any]],
-    figures_tables: list[dict[str, Any]],
-    work_dir: Path,
-    progress_path: Path,
-) -> tuple[str, float]:
-    out_path = work_dir / "report" / "final_report.md"
-    raw_path = work_dir / "report" / "writer.raw.md"
-    prompt_path = work_dir / "prompts" / "writer.prompt.txt"
-    if args.resume and out_path.exists() and not args.force:
-        return out_path.read_text(encoding="utf-8"), 0.0
-
-    prompt_obj = {
-        "main_analysis": analysis,
-        "part_analyses": part_results,
-        "figures_tables": figures_tables,
-    }
-    prompt = json.dumps(prompt_obj, ensure_ascii=False, indent=2)
-    atomic_write_text(prompt_path, prompt)
-    started = time.monotonic()
-    if args.mock_llm:
-        report = mock_report()
-    else:
-        llm_result = await writer_llm_text(args, system=WRITER_SYSTEM, prompt=prompt, max_tokens=args.writer_max_tokens)
-        report = llm_result.text
-    if not report.strip():
-        raise RuntimeError("writer returned empty report")
-    report = normalize_latex_delimiters(report)
-    writer_seconds = round(time.monotonic() - started, 3)
-    header = (
-        "<!-- generated_by: run_local_paper_analysis.py -->\n"
-        f"<!-- generated_at: {now_iso()} -->\n"
-        f"<!-- writer_latency_seconds: {writer_seconds} -->\n\n"
-    )
-    atomic_write_text(raw_path, report)
-    atomic_write_text(out_path, header + report.strip() + "\n")
-    append_jsonl(progress_path, {"event": "writer_done", "at": now_iso()})
-    return header + report.strip() + "\n", writer_seconds
 
 
 def build_section_prompt(
@@ -6590,12 +7344,23 @@ async def run_figure_placement(
             parsed = parse_json_object(raw, label="figure_placement")
             placements = normalize_figure_placements(parsed, copied_figures, max_images=args.max_note_images)
         except Exception as exc:
-            append_jsonl(progress_path, {"event": "figure_placement_failed", "at": now_iso(), "error": str(exc)})
-            raise RuntimeError(f"figure placement reviewer failed for provider {args.figure_provider}: {exc}") from exc
+            usage["placement_reviewer_failed"] = True
+            usage["placement_reviewer_error"] = str(exc)
+            append_jsonl(progress_path, {
+                "event": "figure_placement_fallback",
+                "at": now_iso(),
+                "reason": f"reviewer_failed: {exc}",
+            })
+            placements = fallback_figure_placements(copied_figures, max_images=args.max_note_images)
         if not placements:
-            append_jsonl(progress_path, {"event": "figure_placement_failed", "at": now_iso(), "error": "empty placement result"})
-            raise RuntimeError(f"figure placement reviewer returned no usable placements for provider {args.figure_provider}")
-    if not placements and (args.mock_llm or args.figure_provider == "none"):
+            usage["placement_reviewer_empty"] = True
+            append_jsonl(progress_path, {
+                "event": "figure_placement_fallback",
+                "at": now_iso(),
+                "reason": "empty placement result",
+            })
+            placements = fallback_figure_placements(copied_figures, max_images=args.max_note_images)
+    if not placements:
         placements = fallback_figure_placements(copied_figures, max_images=args.max_note_images)
     placements = ensure_referenced_figure_placements(
         placements,
@@ -6640,7 +7405,7 @@ async def run_section_writer(
     started = time.monotonic()
     usage: dict[str, Any] = {}
     if args.mock_llm:
-        text = f"## {section_title}\n\n待人工补充。\n"
+        text = mock_section_report(section_title)
     else:
         llm_result = await writer_llm_text(args, system=SECTION_WRITER_SYSTEM, prompt=prompt, max_tokens=args.writer_max_tokens)
         text = llm_result.text
@@ -6777,10 +7542,12 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             conf_year=resolved_conf_year(args),
             search_roots=pdf_search_roots_from_args(args),
         )
-        if not source_pdf:
-            raise FileNotFoundError(
-                "Vault export requires an existing PDF before LLM analysis starts. "
-                f"input={source_pdf_arg!r}; attempts={pdf_preflight.get('attempts') or []}"
+        if source_pdf and args.paper_title:
+            pdf_preflight = dict(pdf_preflight)
+            pdf_preflight["title_check"] = assert_title_matches_source(
+                expected_title=args.paper_title,
+                source_label=str(source_pdf),
+                candidates=extract_pdf_title_candidates(source_pdf),
             )
 
     task_id = safe_slug(args.task_id or default_task_id(args), max_len=96)
@@ -6830,22 +7597,26 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             "mineru_batch_id": args.mineru_batch_id,
             "theme_bucket": args.theme_bucket,
             "experiment_label": args.experiment_label,
+            "main_context_mode": args.main_context_mode,
         }
         atomic_write_json(work_dir / "manifest.json", manifest)
         append_jsonl(progress_path, {"event": "started", "at": now_iso(), "task_id": task_id})
         try:
             parse_info = prepare_parse(args, work_dir)
             markdown = (work_dir / "parse" / "full.md").read_text(encoding="utf-8")
+            analysis_markdown = analysis_markdown_input(markdown)
             title = resolved_title(args, markdown, fallback=task_id)
-            chunks = split_markdown(markdown, max_chars=args.chunk_chars, overlap_chars=args.overlap_chars)
+            chunks = split_markdown(analysis_markdown, max_chars=args.chunk_chars, overlap_chars=args.overlap_chars)
             if not chunks:
                 raise RuntimeError("no chunks produced from markdown")
+            page_count = page_count_from_content_list(work_dir / "parse" / "content_list.json")
             token_budget = apply_adaptive_token_budget(
                 args,
-                markdown_chars=len(markdown),
+                markdown_chars=len(analysis_markdown),
                 chunk_count=len(chunks),
-                page_count=page_count_from_content_list(work_dir / "parse" / "content_list.json"),
+                page_count=page_count,
             )
+            sufficiency = source_sufficiency_report(markdown, page_count=page_count)
             chunk_started = time.monotonic()
             write_chunks(chunks, work_dir)
             chunk_duration = round(time.monotonic() - chunk_started, 3)
@@ -6853,10 +7624,12 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 "event": "parse_done",
                 "at": now_iso(),
                 "markdown_chars": len(markdown),
+                "analysis_markdown_chars": len(analysis_markdown),
                 "chunk_count": len(chunks),
                 "parse_seconds": parse_info["duration_seconds"],
             })
             append_jsonl(progress_path, {"event": "token_budget_selected", "at": now_iso(), **token_budget})
+            append_jsonl(progress_path, {"event": "source_sufficiency_checked", "at": now_iso(), **sufficiency})
             if args.dry_run:
                 atomic_write_text(work_dir / ".state", "PLANNED\n")
                 return {
@@ -6865,7 +7638,59 @@ async def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                     "work_dir": str(work_dir),
                     "chunk_count": len(chunks),
                     "token_budget": token_budget,
+                    "source_sufficiency": sufficiency,
                 }
+            if sufficiency.get("needs_fulltext"):
+                vault_export = None
+                if args.export_vault:
+                    vault_export = export_needs_fulltext_to_vault(
+                        args,
+                        task_id=task_id,
+                        title=title,
+                        work_dir=work_dir,
+                        source_sufficiency=sufficiency,
+                    )
+                    append_jsonl(progress_path, {
+                        "event": "vault_export_done",
+                        "at": now_iso(),
+                        "note_path": vault_export.get("note_path"),
+                        "validation_ok": True,
+                    })
+                completed = {
+                    "status": "needs_fulltext",
+                    "reason": "source_sufficiency_gate",
+                    "task_id": task_id,
+                    "work_dir": str(work_dir),
+                    "chunk_count": len(chunks),
+                    "token_budget": token_budget,
+                    "source_sufficiency": sufficiency,
+                    "vault_export": vault_export,
+                    "usage": {
+                        "estimated_cost_usd": 0.0,
+                        "estimated_cost_usd_api": 0.0,
+                        "prompt_tokens_est": 0,
+                        "completion_tokens_est": 0,
+                        "reasoning_tokens_est": 0,
+                        "total_tokens_est": 0,
+                    },
+                    "timing": {
+                        "parse_seconds": parse_info["duration_seconds"],
+                        "chunk_write_seconds": max(0.0, chunk_duration),
+                        "total_seconds": round(time.monotonic() - total_started, 3),
+                    },
+                    "completed_at": now_iso(),
+                }
+                manifest.update(completed)
+                atomic_write_json(work_dir / "manifest.json", manifest)
+                atomic_write_text(work_dir / ".state", "NEEDS_FULLTEXT\n")
+                append_jsonl(progress_path, {"event": "needs_fulltext", "at": now_iso(), "source_sufficiency": sufficiency})
+                return completed
+            if args.export_vault and not pdf_preflight.get("resolved"):
+                source_pdf_arg = args.paper_pdf or args.pdf
+                raise FileNotFoundError(
+                    "Vault export requires an existing PDF before LLM analysis starts. "
+                    f"input={source_pdf_arg!r}; attempts={pdf_preflight.get('attempts') or []}"
+                )
 
             part_results = await run_all_part_analyses(
                 args,
@@ -7216,7 +8041,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mineru-batch-id", default="", help="Optional batch id under --mineru-output-root")
     parser.add_argument("--require-existing-mineru-output", action="store_true", help="Fail instead of running MinerU when --pdf has no cached MinerU output")
     parser.add_argument("--chunk-chars", type=int, default=8_000)
-    parser.add_argument("--overlap-chars", type=int, default=800)
+    parser.add_argument("--overlap-chars", type=int, default=350)
     parser.add_argument("--part-workers", type=int, default=2)
     parser.add_argument("--section-workers", type=int, default=1, help="Concurrent section writers. Default 1 preserves prefix-cache reuse; raise only for latency/cost A/B tests.")
     parser.add_argument(
@@ -7256,11 +8081,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--figure-provider",
         choices=["none", "deepseek", "openai", "kimi"],
-        default="deepseek",
+        default="none",
         help=(
-            "Figure/table placement LLM. Default deepseek uses caption-only visual "
-            "summaries plus DeepSeek placement; openai/kimi also run image visual summaries; "
-            "none uses caption/placement fallback."
+            "Figure/table placement LLM. Default none uses caption/placement fallback; "
+            "deepseek uses caption-only visual summaries plus DeepSeek placement; "
+            "openai/kimi also run image visual summaries."
         ),
     )
     parser.add_argument("--figure-model", default="")
@@ -7269,10 +8094,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--figure-temperature", type=float, default=0.1)
     parser.add_argument("--part-max-tokens", type=int, default=16384)
     parser.add_argument("--main-max-tokens", type=int, default=16384)
-    parser.add_argument("--main-length-retry-max-tokens", type=int, default=32768)
+    parser.add_argument("--main-length-retry-max-tokens", type=int, default=0)
     parser.add_argument("--main-length-retry-reasoning-effort", default="medium")
     parser.add_argument("--main-length-retry-thinking", choices=THINKING_CHOICES, default="enabled")
-    parser.add_argument("--writer-max-tokens", type=int, default=4096)
+    parser.add_argument("--writer-max-tokens", type=int, default=8192)
     parser.add_argument("--writer-context-max-parts", type=int, default=6)
     parser.add_argument("--writer-context-max-items", type=int, default=2)
     parser.add_argument("--writer-figure-context-max-items", type=int, default=10)
@@ -7280,6 +8105,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--figure-visual-summary-max-items", type=int, default=8)
     parser.add_argument("--figure-visual-summary-max-tokens", type=int, default=1024)
     parser.add_argument("--main-context-chars", type=int, default=36_000)
+    parser.add_argument("--main-context-mode", choices=["compact", "structured"], default="structured")
     parser.add_argument("--adaptive-tokens", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--adaptive-long-chunk-count", type=int, default=11)
     parser.add_argument("--adaptive-long-markdown-chars", type=int, default=144_000)
@@ -7300,7 +8126,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Override figure/table asset root. Defaults to <vault-root>/assets/figures/papers.",
     )
-    parser.add_argument("--max-note-images", type=int, default=12)
+    parser.add_argument(
+        "--max-note-images",
+        type=int,
+        default=6,
+        help="Maximum figure/table embeds in the vault note. Default 6 uses category-slot allocation: ≤1 motivation, ≤2 method/pipeline, ≤3 comparison/result. Use more only when figures are core evidence rather than supplemental detail.",
+    )
     parser.add_argument("--mock-llm", action="store_true", help="Use deterministic local mock outputs")
     parser.add_argument("--dry-run", action="store_true", help="Parse and chunk only")
     parser.add_argument("--force", action="store_true", help="Overwrite existing stage outputs")

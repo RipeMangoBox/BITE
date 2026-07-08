@@ -1,0 +1,10 @@
+/* 阅读模式加粗颜色 */
+.markdown-preview-view strong {
+  /* color: #a020f0 !important; /* 紫色 */ */
+  color: #ff9f9f !important; /* 橘红色 */
+}
+
+/* 编辑模式加粗颜色 */
+.cm-strong {
+  color: #DB78E4 !important; /* 紫色 */
+}

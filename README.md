@@ -27,6 +27,8 @@
 > 🔥 **BITE 社区交流** | **[💬 微信交流 / BITE微信交流群](./WECHAT_CN.md)**
 >
 > 🔥 **News**：BITE 的公开证据层已发布至 HuggingFace dataset [PaperBite-Assets](https://huggingface.co/datasets/RipeMangoBox/PaperBite-Assets)，覆盖 `L0-L3` 的结构化论文资产（Markdown 分析笔记 + 图表 + manifests）。可直接用 `scripts/sync_assets_from_hf.py` 增量同步；如果你本身做 AI 相关研究，建议在此之上构建自己的 evidence vault。
+>
+> 🔥 **News**：正式本地分析链已更新为 v06 四段式 note：集成 MinerU 解析/复用、chunk anchor 抽取、主分析 JSON、分段写作、图表 slot 选择和结构校验。默认最多保留 6 个核心图表，减少冗余贴图和单篇分析成本；批量队列在 API quota 允许时推荐 `--jobs 50` 并行。
 
 ---
 
@@ -155,6 +157,36 @@ evidence vault 使用。`paper_list.csv` 需要显式同步；默认不会覆盖
 清单。当前公开资产不包含完整原始 PDF corpus，`paperPDFs/` 仍按需本地下载或
 导入。
 
+如果你维护的是课题组内部私有 Hugging Face dataset，也可以使用同一个同步脚本。
+脚本会自动识别公开 PaperBite shard 布局、私有 shard 布局和私有 direct 布局：
+
+```bash
+# 需要先 hf auth login，并且账号有私有 dataset 访问权限
+python scripts/sync_assets_from_hf.py \
+  --repo-id <org-or-user>/<private-dataset> \
+  --repo-type dataset \
+  --layout auto \
+  --mode all \
+  --sync-paper-list \
+  --overwrite-paper-list \
+  --git-skip-worktree
+```
+
+建议私有仓库同时包含 direct 文件和 shard manifests：direct 文件便于网页端
+浏览单篇 note，shards 便于新成员首次全量同步。维护者上传时可使用：
+
+```bash
+python scripts/upload_bite_hf_private.py \
+  --repo-id <org-or-user>/<private-dataset> \
+  --with-shards
+```
+
+私有 direct 文件应包含 vault-relative 的 `analysis/`、`assets/` 和
+`paper_list.csv`。同步脚本会忽略 HF 或本地 `.cache` 元数据；当 manifests
+存在时，`--layout auto` 会优先走 shard 下载，避免逐个拉取数万个小文件。
+如果你把私有 evidence 同步到已跟踪公开 vault 的 main clone 中，建议保留
+`--git-skip-worktree`，这样本地私有笔记覆盖不会污染日常 `git status`。
+
 ### ⚙️ 3. 运行集成本地分析链
 
 单篇论文可以直接从 PDF 进入完整链路：MinerU 解析或复用、分块证据抽取、
@@ -167,6 +199,27 @@ python3 scripts/run_local_paper_analysis.py \
   --conf-year "<Venue_Year>" \
   --export-vault
 ```
+
+当前默认输出为四个正文段落：`概要`、`核心方法与创新机理`、
+`实验与关键发现`、`定位与知识库关联`。`--max-note-images 6` 是默认值，
+用于保留任务定义、核心 pipeline、关键结果/消融等必要图表，避免把补充表格
+机械贴入顶层 note。
+
+批量分析时，队列 runner 会逐行调用同一条正式分析链。对已经下载 PDF 且
+模型/API quota 足够的队列，可以用 `--jobs 50` 并行降低总耗时：
+
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded \
+  --jobs 50 \
+  --export-vault \
+  --max-note-images 6
+```
+
+如果遇到 provider 限流、MinerU I/O 压力或本机内存不足，先降到 `--jobs 10`
+或 `--jobs 20`，再按失败日志恢复运行。脚本默认 `--resume`，已完成或已存在
+的 note 会跳过。
 
 ## 📚 延伸简介
 
@@ -230,7 +283,7 @@ python3 scripts/run_local_paper_analysis.py \
 python3 scripts/run_paper_list_analysis.py \
   --source obsidian-vault/paper_list.csv \
   --state Downloaded \
-  --jobs 2 \
+  --jobs 50 \
   --export-vault
 ```
 

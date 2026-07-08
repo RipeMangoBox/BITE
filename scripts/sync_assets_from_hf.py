@@ -6,6 +6,10 @@ Modes:
   text   — analysis notes + indexes only (~43 MB)
   assets — figures and tables only (~1.8 GB)
   all    — everything (default)
+
+Layouts:
+  sharded — public PaperBite release with manifests and tar shards
+  direct  — private/internal repo with analysis/, assets/, and paper_list.csv
 """
 
 from __future__ import annotations
@@ -14,10 +18,13 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
+import subprocess
 import tarfile
 from pathlib import Path
 
-from huggingface_hub import hf_hub_download
+from huggingface_hub import hf_hub_download, snapshot_download
+from huggingface_hub.errors import EntryNotFoundError, HfHubHTTPError
 
 
 def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
@@ -37,10 +44,13 @@ def load_manifest(path: Path):
 
 
 def _ensure_manifest(local_root: Path, rel_path: str, repo_id: str, repo_type: str, revision: str | None) -> Path:
-    """Download a manifest from HF if it doesn't exist locally."""
+    """Download the manifest for the selected HF repo.
+
+    Manifests are repo-specific. Reusing an existing local manifest can mix a
+    public PaperBite release with a private dataset that happens to use the same
+    local vault root.
+    """
     target = local_root / rel_path
-    if target.exists():
-        return target
     downloaded = hf_hub_download(
         repo_id=repo_id,
         repo_type=repo_type,
@@ -50,6 +60,88 @@ def _ensure_manifest(local_root: Path, rel_path: str, repo_id: str, repo_type: s
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(Path(downloaded).read_bytes())
     return target
+
+
+def _repo_file_exists(repo_id: str, repo_type: str, revision: str | None, filename: str) -> bool:
+    try:
+        hf_hub_download(
+            repo_id=repo_id,
+            repo_type=repo_type,
+            filename=filename,
+            revision=revision,
+            local_files_only=False,
+        )
+        return True
+    except EntryNotFoundError:
+        return False
+    except HfHubHTTPError as exc:
+        if getattr(exc.response, "status_code", None) == 404:
+            return False
+        raise
+
+
+def resolve_layout(repo_id: str, repo_type: str, revision: str | None, requested: str) -> str:
+    if requested != "auto":
+        return requested
+    if _repo_file_exists(repo_id, repo_type, revision, "manifests/paperbite_text_shards_manifest.jsonl"):
+        return "sharded"
+    return "direct"
+
+
+def direct_allow_patterns(mode: str, sync_paper_list_flag: bool) -> list[str]:
+    patterns: list[str] = []
+    if mode in {"text", "all"}:
+        patterns.extend(["analysis/**", "index/**"])
+    if mode in {"assets", "all"}:
+        patterns.append("assets/**")
+    if mode == "paper-list" or sync_paper_list_flag:
+        patterns.append("paper_list.csv")
+    return patterns
+
+
+def sync_direct_layout(
+    repo_id: str,
+    repo_type: str,
+    local_root: Path,
+    revision: str | None,
+    mode: str,
+    sync_paper_list_flag: bool,
+    dry_run: bool,
+    overwrite_paper_list: bool,
+) -> None:
+    """Download a direct-layout private/internal evidence repo.
+
+    Direct-layout repos store vault-relative files directly at the repository
+    root: analysis/, optional index/, assets/, and paper_list.csv.
+    """
+    patterns = direct_allow_patterns(mode, sync_paper_list_flag)
+    if not patterns:
+        print("nothing selected for direct-layout sync")
+        return
+
+    if sync_paper_list_flag and (local_root / "paper_list.csv").exists() and not overwrite_paper_list:
+        patterns = [pattern for pattern in patterns if pattern != "paper_list.csv"]
+        print("paper_list.csv exists; pass --overwrite-paper-list to replace it")
+        if not patterns:
+            return
+
+    print("layout: direct")
+    print("allow_patterns:")
+    for pattern in patterns:
+        print(f"  {pattern}")
+    if dry_run:
+        print(f"direct-layout files would be downloaded into: {local_root}")
+        return
+
+    local_root.mkdir(parents=True, exist_ok=True)
+    snapshot_download(
+        repo_id=repo_id,
+        repo_type=repo_type,
+        revision=revision,
+        local_dir=local_root,
+        allow_patterns=patterns,
+        ignore_patterns=[".cache/**", "**/.cache/**", ".git/**"],
+    )
 
 
 def sync_paper_list(
@@ -99,6 +191,10 @@ def _download_and_extract_shard(
     shard = Path(downloaded)
     if shard.stat().st_size != shard_info["size"] or sha256_file(shard) != shard_info["sha256"]:
         raise RuntimeError(f"shard checksum mismatch: {shard_path}")
+    local_shard = local_root / shard_path
+    local_shard.parent.mkdir(parents=True, exist_ok=True)
+    if not local_shard.exists() or local_shard.stat().st_size != shard.stat().st_size:
+        shutil.copy2(shard, local_shard)
     with tarfile.open(shard, "r") as tar:
         tar.extractall(local_root)
     print(shard_path)
@@ -190,6 +286,87 @@ def sync_asset_layer(
         raise RuntimeError(f"asset checksum mismatch after extraction: {bad[:10]}")
 
 
+def mark_git_skip_worktree(local_root: Path, mode: str, sync_paper_list_flag: bool) -> None:
+    """Hide synced evidence-layer overlays from routine git status/pull noise.
+
+    This is intended for private evidence overlays synced into a repository that
+    also tracks a public sample vault. It only affects tracked files.
+    """
+    repo = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=Path.cwd(),
+        text=True,
+        capture_output=True,
+    )
+    if repo.returncode != 0:
+        print("warning: not a git worktree; --git-skip-worktree ignored")
+        return
+    repo_root = Path(repo.stdout.strip()).resolve()
+    root = local_root.resolve()
+    try:
+        local_root_rel = root.relative_to(repo_root)
+    except ValueError:
+        print("warning: local dir is outside this git worktree; --git-skip-worktree ignored")
+        return
+
+    candidates: list[Path] = []
+    if mode in {"text", "all"}:
+        for dirname in ("analysis", "index", "manifests"):
+            base = root / dirname
+            if base.exists():
+                candidates.extend(p for p in base.rglob("*") if p.is_file())
+    if mode == "paper-list" or sync_paper_list_flag:
+        paper_list = root / "paper_list.csv"
+        if paper_list.exists():
+            candidates.append(paper_list)
+
+    rels = [p.resolve().relative_to(repo_root).as_posix() for p in candidates]
+    if not rels:
+        return
+    tracked = subprocess.run(
+        ["git", "ls-files", "-z", "--", *rels],
+        cwd=repo_root,
+        capture_output=True,
+    )
+    if tracked.returncode != 0:
+        stderr = tracked.stderr.decode("utf-8", errors="replace") if isinstance(tracked.stderr, bytes) else str(tracked.stderr)
+        raise RuntimeError(stderr.strip() or "git ls-files failed")
+    tracked_paths = [
+        item.decode("utf-8", errors="surrogateescape")
+        for item in tracked.stdout.split(b"\0")
+        if item
+    ]
+    if not tracked_paths:
+        print("git skip-worktree: no tracked synced files")
+        return
+    chunk_size = 500
+    for start in range(0, len(tracked_paths), chunk_size):
+        chunk = tracked_paths[start:start + chunk_size]
+        subprocess.run(
+            ["git", "update-index", "--skip-worktree", "--", *chunk],
+            cwd=repo_root,
+            check=True,
+        )
+    print(f"git skip-worktree: marked {len(tracked_paths)} tracked synced files")
+
+    exclude_patterns: list[str] = []
+    if mode in {"text", "all"}:
+        for dirname in ("analysis", "index", "manifests", "media"):
+            if (root / dirname).exists():
+                exclude_patterns.append(f"/{(local_root_rel / dirname).as_posix()}/")
+    if mode == "paper-list" or sync_paper_list_flag:
+        exclude_patterns.append(f"/{(local_root_rel / 'paper_list.csv').as_posix()}")
+    if exclude_patterns:
+        exclude_path = repo_root / ".git" / "info" / "exclude"
+        existing = exclude_path.read_text(encoding="utf-8", errors="replace") if exclude_path.exists() else ""
+        with exclude_path.open("a", encoding="utf-8") as handle:
+            for pattern in exclude_patterns:
+                marker = f"# BITE private evidence overlay: {pattern}"
+                if marker not in existing:
+                    handle.write(f"\n{marker}\n{pattern}\n")
+        print(f"git info/exclude: ensured {len(exclude_patterns)} private overlay patterns")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--repo-id", default="RipeMangoBox/PaperBite-Assets")
@@ -197,6 +374,12 @@ def main() -> int:
     parser.add_argument("--revision", default=None)
     parser.add_argument("--local-dir", default="obsidian-vault")
     parser.add_argument("--mode", default="all", choices=["paper-list", "text", "assets", "all"])
+    parser.add_argument(
+        "--layout",
+        default="auto",
+        choices=["auto", "sharded", "direct"],
+        help="HF repo layout. auto uses sharded manifests when present, otherwise direct files.",
+    )
     parser.add_argument(
         "--sync-paper-list",
         action="store_true",
@@ -208,10 +391,33 @@ def main() -> int:
         help="Allow --sync-paper-list or --mode paper-list to replace an existing local paper_list.csv.",
     )
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--git-skip-worktree",
+        action="store_true",
+        help="After sync, mark tracked evidence files under <local-dir> as skip-worktree to keep private overlays out of routine git status.",
+    )
     args = parser.parse_args()
 
     local_root = Path(args.local_dir)
     mode = args.mode
+    layout = resolve_layout(args.repo_id, args.repo_type, args.revision, args.layout)
+
+    if layout == "direct":
+        sync_direct_layout(
+            args.repo_id,
+            args.repo_type,
+            local_root,
+            args.revision,
+            mode,
+            args.sync_paper_list or mode == "paper-list",
+            args.dry_run,
+            args.overwrite_paper_list,
+        )
+        if args.git_skip_worktree and not args.dry_run:
+            mark_git_skip_worktree(local_root, mode, args.sync_paper_list or mode == "paper-list")
+        return 0
+
+    print("layout: sharded")
 
     if mode == "paper-list" or args.sync_paper_list:
         sync_paper_list(
@@ -228,6 +434,9 @@ def main() -> int:
 
     if mode in ("assets", "all"):
         sync_asset_layer(args.repo_id, args.repo_type, local_root, args.revision, args.dry_run)
+
+    if args.git_skip_worktree and not args.dry_run:
+        mark_git_skip_worktree(local_root, mode, args.sync_paper_list or mode == "paper-list")
 
     return 0
 

@@ -68,7 +68,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--export-vault", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--conf-year", default="", help="Override venue/year folder. Defaults to venue column normalized as VENUE_YEAR.")
     parser.add_argument("--acceptance", default="")
-    parser.add_argument("--max-note-images", type=int, default=12)
+    parser.add_argument("--max-note-images", type=int, default=6)
     parser.add_argument("--mineru-output-root", default="")
     parser.add_argument("--mineru-batch-id", default="")
     parser.add_argument("--require-existing-mineru-output", action="store_true")
@@ -362,6 +362,10 @@ def command_for_row(args: argparse.Namespace, row: dict[str, str], *, variant: d
         repo_root=REPO_ROOT,
         search_roots=[Path(root) for root in args.pdf_search_root],
     ) or resolve_pdf_path(row)
+    mineru_output = row_value(row, "mineru_output_path", "mineru_output")
+    mineru_output_path = Path(mineru_output).expanduser() if mineru_output else None
+    if mineru_output_path and not mineru_output_path.is_absolute():
+        mineru_output_path = (REPO_ROOT / mineru_output_path).resolve()
     conf_year = args.conf_year or venue_to_conf_year(row.get("venue", ""))
     variant_id = str(variant.get("id") or "")
     variant_extra_args = [str(item) for item in (variant.get("extra_args") or [])]
@@ -372,10 +376,13 @@ def command_for_row(args: argparse.Namespace, row: dict[str, str], *, variant: d
     cmd = [
         sys.executable,
         str(REPO_ROOT / "scripts" / "run_local_paper_analysis.py"),
-        "--pdf", str(pdf_path),
         "--acceptance", acceptance_for_row(args, row),
         "--task-id", row_task_id(row, suffix=variant_id),
     ]
+    if mineru_output_path:
+        cmd += ["--mineru-output", str(mineru_output_path), "--paper-pdf", str(pdf_path)]
+    else:
+        cmd += ["--pdf", str(pdf_path)]
     paper_title = row_value(row, "paper_title", "title")
     if paper_title:
         cmd += ["--paper-title", paper_title]

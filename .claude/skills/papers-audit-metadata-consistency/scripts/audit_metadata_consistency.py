@@ -27,10 +27,17 @@ REQUIRED_FRONTMATTER_KEYS = {
     "claims",
 }
 
-REQUIRED_BODY_SECTIONS = (
+LEGACY_BODY_SECTIONS = (
     "整体框架",
     "核心模块与公式推导",
     "实验与分析",
+)
+
+COMPACT_BODY_SECTIONS = (
+    "概要",
+    "核心方法与创新机理",
+    "实验与关键发现",
+    "定位与知识库关联",
 )
 
 PAPER_HOST_HINTS = (
@@ -199,6 +206,35 @@ def extract_h1(body: str) -> str:
     return ""
 
 
+def missing_semantic_sections(body: str) -> List[str]:
+    headings = set(re.findall(r"^##\s+(.+?)\s*$", body, flags=re.MULTILINE))
+    if all(section in headings for section in COMPACT_BODY_SECTIONS):
+        return []
+    legacy_missing = [section for section in LEGACY_BODY_SECTIONS if section not in headings]
+    if not legacy_missing:
+        return []
+    compact_missing = [section for section in COMPACT_BODY_SECTIONS if section not in headings]
+    return compact_missing if len(compact_missing) <= len(legacy_missing) else legacy_missing
+
+
+def pdf_ref_exists(pdf_ref: str) -> bool:
+    if not pdf_ref:
+        return True
+    raw = Path(pdf_ref)
+    candidates: List[Path] = []
+    if raw.is_absolute():
+        candidates.append(raw)
+    else:
+        candidates.append(VAULT_ROOT / raw)
+        candidates.append(VAULT_ROOT / "obsidian-vault" / raw)
+        text = str(raw)
+        if text.startswith("obsidian-vault/"):
+            candidates.append(VAULT_ROOT / text[len("obsidian-vault/") :])
+        elif text.startswith("paperPDFs/"):
+            candidates.append(VAULT_ROOT / "obsidian-vault" / text)
+    return any(path.exists() for path in candidates)
+
+
 def looks_like_analysis_note(path: Path) -> bool:
     rel = path.relative_to(PAPER_ANALYSIS_DIR)
     if len(rel.parts) == 2:
@@ -304,16 +340,11 @@ def load_md_records() -> List[MdRecord]:
 
         invalid_year = bool(year) and not bool(re.fullmatch(r"\d{4}", year))
 
-        missing_sections = [
-            section
-            for section in REQUIRED_BODY_SECTIONS
-            if not re.search(rf"^##\s+{re.escape(section)}\s*$", body, flags=re.MULTILINE)
-        ]
+        missing_sections = missing_semantic_sections(body)
 
         pdf_missing = False
         if pdf_ref:
-            pdf_abs = VAULT_ROOT / pdf_ref
-            pdf_missing = not pdf_abs.exists()
+            pdf_missing = not pdf_ref_exists(pdf_ref)
 
         out.append(
             MdRecord(
