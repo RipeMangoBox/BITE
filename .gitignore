@@ -65,7 +65,6 @@ _private/
 artifacts/
 
 # === Obsidian local runtime state ===
-.obsidian/
 obsidian-vault/.cache/
 obsidian-vault/.trash/
 obsidian-vault/Clippings/
