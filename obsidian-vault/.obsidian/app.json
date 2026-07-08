@@ -1,0 +1,23 @@
+{
+  "alwaysUpdateLinks": true,
+  "attachmentFolderPath": "_attachments",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "ideas",
+  "promptDelete": false,
+  "trashOption": "local",
+  "userIgnoreFilters": [
+    "linkedCodebases/",
+    "platform/",
+    "_private/",
+    "batches/",
+    "paperPDFs/",
+    "assets/"
+  ],
+  "pdfExportSettings": {
+    "includeName": false,
+    "pageSize": "Letter",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  }
+}

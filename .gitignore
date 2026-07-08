@@ -95,5 +95,11 @@ artifacts/storymotion_geo_patch/joint_cache_pure/val.pt
 
 
 ## obsidian-vault
-obsidian-vault/
+obsidian-vault/*
+obsidian-vault/.*
+!obsidian-vault/.obsidian/
+!obsidian-vault/.obsidian/**
+obsidian-vault/.obsidian/workspace*.json
+obsidian-vault/.obsidian/workspaces.json
+obsidian-vault/.obsidian/researchflow_backups/
 linkedCodebases/
