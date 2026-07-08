@@ -4,14 +4,14 @@ updated: 2026-03-17T19:54
 ---
 # paper_collector_online
 
-Generate triage lists like `obsidian-vault/analysis/ICLR_2026.txt` by fetching web pages, saving HTML locally, extracting paper candidates, and writing a pipe-delimited list.
+Append paper candidates to `obsidian-vault/paper_list.csv` by fetching web
+pages, saving HTML locally, and extracting paper links.
 
 ## Quick start
 
 ```bash
 python3 ".claude/skills/papers-collect-from-web/scripts/paper_collector_online/collect_from_urls.py" \
   --venue-time "ICLR 2026" \
-  --out "obsidian-vault/analysis/ICLR_2026.txt" \
   --urls "https://example.com/papers.html" "https://another.example.org/list" \
   --include "motion;diffusion" \
   --exclude "workshop;dataset" \
@@ -20,11 +20,11 @@ python3 ".claude/skills/papers-collect-from-web/scripts/paper_collector_online/c
 
 ## Output columns
 
-`state | title | venue&time | paper link | project link/github link | category`
+`state,importance,paper_title,venue,project_link_or_github_link,paper_link,sort,pdf_path`
 
 Notes:
-- `state` defaults to `Wait` (use `--status checked` if you want).
-- `category` is left blank for per-item manual fill.
+- `state` defaults to `Wait`.
+- `importance`, `sort`, and `pdf_path` are left blank for later stages.
 
 ## Where HTML is stored
 

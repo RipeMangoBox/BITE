@@ -296,8 +296,8 @@ python3 scripts/run_paper_list_analysis.py \
 | 判断下一步 pipeline | `research-workflow` |
 | 从网页收集候选论文 | `papers-collect-from-web` |
 | 从 GitHub 论文列表收集候选论文 | `papers-collect-from-github-repo` |
-| 根据 triage list 下载 PDF | `papers-download-from-list` |
-| 生成单篇深度报告 | `paper-report` |
+| 根据候选列表下载 PDF | `papers-download-from-list` |
+| 生成结构化单篇论文分析 | `scripts/run_local_paper_analysis.py` |
 | 重建本地索引 | `papers-build-index` |
 | 基于本地笔记查询 / 对比论文 | `papers-query-knowledge-base` |
 | 基于知识库生成研究想法 | `research-brainstorm-from-kb` |

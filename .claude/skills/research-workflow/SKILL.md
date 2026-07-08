@@ -7,9 +7,7 @@ description: >
   (import-local-pdfs/collect/download/analyze/build/query/ideate/focus/review/audit/export),
   recommends the right existing skill/command, supports step-by-step and
   end-to-end guidance, and keeps stage boundaries clear without duplicating
-  underlying capabilities. Note: question-bank and pdfs-compress have been
-  retired; their functions are covered by brainstorm and the download/analyze
-  pipeline respectively.
+  underlying capabilities.
 ---
 
 # Research Workflow Entry
@@ -58,8 +56,6 @@ Support chain:
   - default route: `scripts/run_local_paper_analysis.py` formal analysis chain
     (MinerU parse/reuse → chunk anchor extraction → main analysis JSON →
     section writers → DeepSeek figure/table placement review → vault export and validation)
-  - `paper-report` supplies the deep-report writing contract for single-paper
-    reports and formula derivation
   - batch queue route: `scripts/run_paper_list_analysis.py --state Downloaded`
     writes per-row results under `obsidian-vault/batches/<run_id>/` and leaves
     `paper_list.csv` unchanged until reviewed consolidation.
@@ -83,7 +79,7 @@ Support chain:
 
 - import local PDFs: PDF folder path; optional category/sort and venue/year hints
 - collect: URLs or GitHub repo URL + venue/year + include/exclude
-- download: triage/log file path
+- download: `obsidian-vault/paper_list.csv` rows in `state=Wait`
 - analyze: local PDF path, existing MinerU output directory, or `Downloaded` queue
 - build: no extra input (defaults to current repository)
 - query: task description/keywords (optional changed files, mode=brief/deep; comparison requests also route here)

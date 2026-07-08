@@ -18,7 +18,8 @@ python3 ".claude/skills/papers-collect-from-web/scripts/paper_collector_online/c
 `state,importance,paper_title,venue,project_link_or_github_link,paper_link,sort,pdf_path`
 
 Notes:
-- `state` defaults to `Wait`. Use `--status checked` if needed.
+- `state` defaults to `Wait`; later stages advance it to `Downloaded` and
+  `checked`.
 - `importance`, `sort`, `pdf_path` are left blank for later manual fill.
 - Output is now unified with `papers-collect-from-github-repo`.
 

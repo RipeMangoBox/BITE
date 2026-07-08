@@ -44,7 +44,7 @@ def parse_args() -> argparse.Namespace:
         description="Unified research workflow entry (advisor): detect/choose stage and print suggested next commands."
     )
     p.add_argument("--stage", choices=STAGES + sorted(STAGE_ALIASES) + ["auto"], default="auto")
-    p.add_argument("--log-file", default="", help="Optional triage/log file or paper_list.csv path")
+    p.add_argument("--log-file", default="", help="Optional paper_list.csv path")
     p.add_argument("--mode", choices=["brief", "deep"], default="brief", help="Query mode hint")
     return p.parse_args()
 
@@ -208,13 +208,13 @@ def stage_spec(stage: str, mode: str, log_hint: str) -> Dict[str, object]:
             "next": "download",
         }
     if stage == "download":
-        log = log_hint or "<triage-log>.txt"
+        log = log_hint or "obsidian-vault/paper_list.csv"
         return {
-            "inputs": "triage/log file (contains Wait entries)",
-            "outputs": "obsidian-vault/paperPDFs/** + log state updates",
+            "inputs": "paper_list.csv rows with state=Wait",
+            "outputs": "obsidian-vault/paperPDFs/** + paper_list.csv rows advanced to Downloaded",
             "commands": [
                 "Use /papers-download-from-list",
-                f'Or run: python3 ".claude/skills/papers-download-from-list/scripts/paper_download_tools/download_wait_papers.py" --log "{log}" --out-root "obsidian-vault/paperPDFs"',
+                f'Or run: python3 ".claude/skills/papers-download-from-list/scripts/paper_download_tools/download_wait_papers.py" --source "{log}" --out-root "obsidian-vault/paperPDFs"',
             ],
             "next": "analyze",
         }
@@ -226,7 +226,6 @@ def stage_spec(stage: str, mode: str, log_hint: str) -> Dict[str, object]:
                 'Default single-paper chain: python3 "scripts/run_local_paper_analysis.py" --pdf "<pdf>" --conf-year "<Venue_Year>" --export-vault',
                 'Reuse existing MinerU output: python3 "scripts/run_local_paper_analysis.py" --mineru-output "<mineru_output_dir>" --paper-pdf "<pdf>" --conf-year "<Venue_Year>" --export-vault',
                 'Downloaded queue: python3 "scripts/run_paper_list_analysis.py" --source "obsidian-vault/paper_list.csv" --state Downloaded --limit 25',
-                "Use /paper-report when the user asks for a deep report or formula derivation",
                 "Note: after analyze you can go directly to query; run build only if statistics/navigation pages are needed",
             ],
             "next": "query (or optional build)",

@@ -62,7 +62,7 @@ Show how BITE's 17 routed skills map to target-domain skills (the shared Markdow
 | papers-collect-from-web | `<domain>-collect-from-web` | ✅ | source websites become domain-specific |
 | papers-collect-from-github-repo | `<domain>-collect-from-curated-list` | ✅/❌ | depends on whether curated lists exist |
 | papers-download-from-list | `<domain>-download-from-list` | ✅ | download objects become domain documents |
-| scripts/run_local_paper_analysis.py / paper-report | `<domain>-analyze-document` | ✅ | analysis template rewritten for domain |
+| scripts/run_local_paper_analysis.py | `<domain>-analyze-document` | ✅ | analysis template rewritten for domain |
 | papers-audit-metadata-consistency | `<domain>-audit-metadata` | ✅ | metadata fields adjusted for domain |
 | papers-build-index | `<domain>-build-index` | ✅ | index dimensions adjusted for domain |
 | papers-query-knowledge-base | `<domain>-query-kb` | ✅ | query dimensions adjusted for domain; handles comparison requests |
