@@ -1,0 +1,103 @@
+paper_title,reason,paper_link
+Efficiently Reconstructing Dynamic Scenes One D4RT at a Time,duplicate_title,https://arxiv.org/abs/2512.08924
+NitroGen: An Open Foundation Model for Generalist Gaming Agents,duplicate_title,https://arxiv.org/abs/2601.02427
+SAM 3D: 3Dfy Anything in Images,duplicate_title,https://arxiv.org/abs/2511.16624
+Native and Compact Structured Latents for 3D Generation,duplicate_title,https://arxiv.org/abs/2512.14692
+Molmo2: Open Weights and Data for Vision-Language Models with Video Understanding and Grounding,duplicate_title,https://arxiv.org/abs/2601.10611
+The SA-FARI Dataset: Segment Anything in Footage of Animals for Recognition and Identification,duplicate_title,https://arxiv.org/abs/2511.15622
+MAMMA: Markerless Accurate Multi-person Motion Acquisition,duplicate_title,https://arxiv.org/abs/2506.13040
+VGGT-Segmentor: Geometry-Enhanced Cross-View Segmentation,duplicate_title,https://arxiv.org/abs/2604.13596
+TEAR: Temporal-aware Automated Red-teaming for Text-to-Video Models,duplicate_title,https://arxiv.org/abs/2511.21145
+INSID3: Training-Free In-Context Segmentation with DINOv3,duplicate_title,https://arxiv.org/abs/2603.28480
+MARCO: Navigating the Unseen Space of Semantic Correspondence,duplicate_title,https://arxiv.org/abs/2604.18267
+Featurising Pixels from Dynamic 3D Scenes with Linear In-Context Learners,duplicate_title,https://arxiv.org/abs/2604.26488
+Guiding a Diffusion Model by Swapping Its Tokens,duplicate_link,https://arxiv.org/abs/2604.08048
+PPISP: Physically-Plausible Compensation and Control of Photometric Variations in Radiance Field Reconstruction,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Deutsch_PPISP_Physically-Plausible_Compensation_and_Control_of_Photometric_Variations_in_Radiance_CVPR_2026_paper.html
+Learning Convex Decomposition via Feature Fields,duplicate_title,https://arxiv.org/abs/2603.09285
+VideoNet: A Large-Scale Dataset for Domain-Specific Action Recognition,duplicate_title,https://arxiv.org/abs/2605.02834
+tttLRM: Test-Time Training for Long Context and Autoregressive 3D Reconstruction,duplicate_title,https://arxiv.org/abs/2602.20160
+A Frame is Worth One Token: Efficient Generative World Modeling with Delta Tokens,duplicate_title,https://arxiv.org/abs/2604.04913
+4D-RGPT: Toward Region-level 4D Understanding via Perceptual Distillation,duplicate_title,https://arxiv.org/abs/2512.17012
+MSPT: Efficient Large-Scale Physical Modeling via Parallelized Multi-Scale Attention,duplicate_title,https://arxiv.org/abs/2512.01738
+ActionMesh: Animated 3D Mesh Generation with Temporal 3D Diffusion,duplicate_title,https://arxiv.org/abs/2601.16148
+V^2-SAM: Marrying SAM2 with Multi-Prompt Experts for Cross-View Object Correspondence,duplicate_link,https://arxiv.org/abs/2511.20886
+MacTok: Robust Continuous Tokenization for Image Generation,duplicate_title,https://arxiv.org/abs/2603.29634
+AsymLoc: Towards Asymmetric Feature Matching for Efficient Visual Localization,duplicate_title,https://arxiv.org/abs/2604.09445
+FMPose3D: monocular 3D pose estimation via flow matching,duplicate_title,https://arxiv.org/abs/2602.05755
+"B$^3$-Seg: Camera-Free, Training-Free 3DGS Segmentation via Analytic EIG and Beta-Bernoulli Bayesian Updates",duplicate_link,https://arxiv.org/abs/2602.17134
+MatAnyone 2: Scaling Video Matting via a Learned Quality Evaluator,duplicate_title,https://arxiv.org/abs/2512.11782
+TIPSv2: Advancing Vision-Language Pretraining with Enhanced Patch-Text Alignment,duplicate_title,https://arxiv.org/abs/2604.12012
+Self-Consistency for LLM-Based Motion Trajectory Generation and Verification,duplicate_title,https://arxiv.org/abs/2603.29301
+TempoControl: Temporal Attention Guidance for Text-to-Video Models,duplicate_title,https://arxiv.org/abs/2510.02226
+Depth Any Panoramas: A Foundation Model for Panoramic Depth Estimation,duplicate_title,https://arxiv.org/abs/2512.16913
+DiffusionHarmonizer: Bridging Neural Reconstruction and Photorealistic Simulation with Online Diffusion Enhancer,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_DiffusionHarmonizer_Bridging_Neural_Reconstruction_and_Photorealistic_Simulation_with_Online_Diffusion_CVPR_2026_paper.html
+LAMP: Language-Assisted Motion Planning for Controllable Video Generation,duplicate_title,https://arxiv.org/abs/2512.03619
+MeshWeaver: Sparse-Voxel-Guided Surface Weaving for Autoregressive Mesh Generation,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Xu_MeshWeaver_Sparse-Voxel-Guided_Surface_Weaving_for_Autoregressive_Mesh_Generation_CVPR_2026_paper.html
+MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second,duplicate_title,https://arxiv.org/abs/2507.10065
+NeoVerse: Enhancing 4D World Model with in-the-wild Monocular Videos,duplicate_title,https://arxiv.org/abs/2601.00393
+Realiz3D: 3D Generation Made Photorealistic via Domain-Aware Learning,duplicate_title,https://arxiv.org/abs/2605.13852
+Towards Storytelling Animations: Joint Synthesis of Human and Camera Motions,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Cheng_Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions_CVPR_2026_paper.html
+Unified Camera Positional Encoding for Controlled Video Generation,duplicate_link,https://arxiv.org/abs/2512.07237
+WorldReel: 4D Video Generation with Consistent Geometry and Motion Modeling,duplicate_title,https://arxiv.org/abs/2512.07821
+WorldStereo: Bridging Camera-Guided Video Generation and Scene Reconstruction via 3D Geometric Memories,duplicate_link,https://arxiv.org/abs/2603.02049
+Real-World Point Tracking with Verifier-Guided Pseudo-Labeling,duplicate_title,https://arxiv.org/abs/2603.12217
+Retrieve and Segment: Are a Few Examples Enough to Bridge the Supervision Gap in Open-Vocabulary Segmentation?,duplicate_title,https://arxiv.org/abs/2602.23339
+ARC Is a Vision Problem!,duplicate_title,https://arxiv.org/abs/2511.14761
+Back to Basics: Let Denoising Generative Models Denoise,duplicate_title,https://arxiv.org/abs/2511.13720
+EgoX: Egocentric Video Generation from a Single Exocentric Video,duplicate_title,https://arxiv.org/abs/2512.08269
+Emergent Outlier View Rejection in Visual Geometry Grounded Transformers,duplicate_title,https://arxiv.org/abs/2512.04012
+MuM: Multi-View Masked Image Modeling for 3D Vision,duplicate_title,https://arxiv.org/abs/2511.17309
+SAM 3D Body: Robust Full-Body Human Mesh Recovery,duplicate_title,https://arxiv.org/abs/2602.15989
+MoReGen: Multi-Agent Motion-Reasoning Engine for Code-based Text-to-Video Synthesis,duplicate_title,https://arxiv.org/abs/2512.04221
+SceMoS: Scene-Aware 3D Human Motion Synthesis by Planning with Geometry-Grounded Tokens,duplicate_title,https://arxiv.org/abs/2602.20476
+LaMoGen: Language to Motion Generation Through LLM-Guided Symbolic Inference,duplicate_title,https://arxiv.org/abs/2603.11605
+MotionHiFlow: Text-to-Motion via Hierarchical Flow Matching,duplicate_title,https://arxiv.org/abs/2604.23264
+Multi-level Causal LLM-based Text-to-Motion Generation with Human Alignment,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Chen_Multi-level_Causal_LLM-based_Text-to-Motion_Generation_with_Human_Alignment_CVPR_2026_paper.html
+Next-Scale Autoregressive Models for Text-to-Motion Generation,duplicate_title,https://arxiv.org/abs/2604.03799
+ParTY: Part-Guidance for Expressive Text-to-Motion Synthesis,duplicate_title,https://arxiv.org/abs/2603.09611
+Unified Number-Free Text-to-Motion Generation Via Flow Matching,duplicate_title,https://arxiv.org/abs/2603.27040
+3D-Aware Implicit Motion Control for View-Adaptive Human Video Generation,duplicate_title,https://arxiv.org/abs/2602.03796
+AnyLift: Scaling Motion Reconstruction from Internet Videos via 2D Diffusion,duplicate_link,https://arxiv.org/abs/2604.17818
+BiMotion: B-spline Motion for Text-guided Dynamic 3D Character Generation,duplicate_title,https://arxiv.org/abs/2602.18873
+Generative Video Motion Editing with 3D Point Tracks,duplicate_title,https://arxiv.org/abs/2512.02015
+Human Geometry Distribution for 3D Animation Generation,duplicate_title,https://arxiv.org/abs/2512.07459
+InterPhys: Physics-aware Human Motion Synthesis in a Dynamic Scene,duplicate_title,https://arxiv.org/abs/2605.01036
+MoCapAnything: Unified 3D Motion Capture for Arbitrary Skeletons from Monocular Videos,duplicate_title,https://arxiv.org/abs/2512.10881
+Motion 3-to-4: 3D Motion Reconstruction for 4D Synthesis,duplicate_title,https://arxiv.org/abs/2601.14253
+Stability-Driven Motion Generation for Object-Guided Human-Human Co-Manipulation,duplicate_title,https://arxiv.org/abs/2604.20336
+SymphoMotion: Joint Control of Camera Motion and Object Dynamics for Coherent Video Generation,duplicate_link,https://arxiv.org/abs/2604.03723
+TeamHOI: Learning a Unified Policy for Cooperative Human-Object Interactions with Any Team Size,duplicate_title,https://arxiv.org/abs/2603.07988
+Text-Driven 3D Hand Motion Generation from Sign Language Data,duplicate_title,https://arxiv.org/abs/2508.15902
+Tracking-Guided 4D Generation: Foundation-Tracker Motion Priors for 3D Model Animation,duplicate_title,https://arxiv.org/abs/2512.06158
+Learning to Assist: Physics-Grounded Human-Human Control via Multi-Agent Reinforcement Learning,duplicate_title,https://arxiv.org/abs/2603.11346
+"RoMo: A Large-Scale, Richly Organized Dataset and Semantic Taxonomy for Human Motion Generation",duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_RoMo_A_Large-Scale_Richly_Organized_Dataset_and_Semantic_Taxonomy_for_CVPR_2026_paper.html
+Learning Long-term Motion Embeddings for Efficient Kinematics Generation,duplicate_title,https://arxiv.org/abs/2604.11737
+"Envisioning the Future, One Step at a Time",duplicate_title,https://arxiv.org/abs/2604.09527
+Causal Motion Diffusion Models for Autoregressive Motion Generation,duplicate_link,https://arxiv.org/abs/2602.22594
+DeX-Portrait: Disentangled and Expressive Portrait Animation via Explicit and Latent Motion Representations,duplicate_title,https://arxiv.org/abs/2512.15524
+EgoFlow: Gradient-Guided Flow Matching for Egocentric 6DoF Object Motion Generation,duplicate_title,https://arxiv.org/abs/2604.01421
+FloodDiffusion: Tailored Diffusion Forcing for Streaming Motion Generation,duplicate_title,https://arxiv.org/abs/2512.03520
+FrankenMotion: Part-level Human Motion Generation and Composition,duplicate_title,https://arxiv.org/abs/2601.10909
+Hierarchical Enhancement of Semantic Priors for Disentangled Text-Driven Motion Generation,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Lv_Hierarchical_Enhancement_of_Semantic_Priors_for_Disentangled_Text-Driven_Motion_Generation_CVPR_2026_paper.html
+Interact2Ar: Full-Body Human-Human Interaction Generation via Autoregressive Diffusion Models,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Ruiz-Ponce_Interact2Ar_Full-Body_Human-Human_Interaction_Generation_via_Autoregressive_Diffusion_Models_CVPR_2026_paper.html
+Iterative Closed-Loop Motion Synthesis for Scaling the Capabilities of Humanoid Control,duplicate_title,https://arxiv.org/abs/2602.21599
+LLaMo: Scaling Pretrained Language Models for Unified Motion Understanding and Generation with Continuous Autoregressive Tokens,duplicate_title,https://arxiv.org/abs/2602.12370
+MoCoDiff: A Controllable Autoregressive Diffusion Model for Expressive Motion Generation,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Song_MoCoDiff_A_Controllable_Autoregressive_Diffusion_Model_for_Expressive_Motion_Generation_CVPR_2026_paper.html
+MoLingo: Motion-Language Alignment for Text-to-Human Motion Generation,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/He_MoLingo_Motion-Language_Alignment_for_Text-to-Human_Motion_Generation_CVPR_2026_paper.html
+MotionEdit: Benchmarking and Learning Motion-Centric Image Editing,duplicate_title,https://arxiv.org/abs/2512.10284
+MotionMaster: Generalizable Text-Driven Motion Generation and Editing,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Jiang_MotionMaster_Generalizable_Text-Driven_Motion_Generation_and_Editing_CVPR_2026_paper.html
+Open the Motion Door: Atomic Motion Decomposition and Recomposition for Open-Vocabulary Motion Generation,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Fan_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_CVPR_2026_paper.html
+"OpenT2M: No-frill Motion Generation with Open-source, Large-scale, High-quality Data",duplicate_title,https://arxiv.org/abs/2603.18623
+PAMotion: Physics-Aware Motion Generation for Full-Body Interaction with Multiple Objects,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Di_PAMotion_Physics-Aware_Motion_Generation_for_Full-Body_Interaction_with_Multiple_Objects_CVPR_2026_paper.html
+RigMo: Unifying Rig and Motion Learning for Generative Animation,duplicate_title,https://arxiv.org/abs/2601.06378
+SMRABooth: Subject and Motion Representation Alignment for Customized Video Generation,duplicate_title,https://arxiv.org/abs/2512.12193
+Superman: Unifying Skeleton and Vision for Human Motion Perception and Generation,duplicate_title,https://arxiv.org/abs/2602.02401
+Towards Decompositional Human Motion Generation with Energy-Based Diffusion Models,duplicate_title,https://arxiv.org/abs/2512.22324
+Towards Highly-Constrained Human Motion Generation with Retrieval-Guided Diffusion Noise Optimization,duplicate_title,https://arxiv.org/abs/2605.08054
+ViHOI: Human-Object Interaction Synthesis with Visual Priors,duplicate_title,https://arxiv.org/abs/2603.24383
+Cross-Axis Feature Fusion with Joint-Wise Motion Difference Prediction for Text-Based 3D Human Motion Editing,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Han_Cross-Axis_Feature_Fusion_with_Joint-Wise_Motion_Difference_Prediction_for_Text-Based_CVPR_2026_paper.html
+RAM: Recover Any 3D Human Motion in-the-Wild,duplicate_title,https://arxiv.org/abs/2603.19929
+Sketch2Colab: Sketch-Conditioned Multi-Human Animation via Controllable Flow Distillation,duplicate_link,https://arxiv.org/abs/2603.02190
+FlowMotion: Training-Free Flow Guidance for Video Motion Transfer,duplicate_title,https://arxiv.org/abs/2603.06289
+Let Your Image Move with Your Motion! -- Implicit Multi-Object Multi-Motion Transfer,duplicate_title,https://arxiv.org/abs/2603.01000
+Omni-Supervised Motion Editing: Balancing Change and Invariance through Positive-Negative Learning,duplicate_title,https://openaccess.thecvf.com/content/CVPR2026/html/Shi_Omni-Supervised_Motion_Editing_Balancing_Change_and_Invariance_through_Positive-Negative_Learning_CVPR_2026_paper.html

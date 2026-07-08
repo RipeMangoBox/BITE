@@ -1,0 +1,225 @@
+{
+  "created_at": "2026-06-29T08:48:05.524029+00:00",
+  "dry_run": false,
+  "source": "paperSources/sig_coverage_20260629/kesen_siga2025Papers.md",
+  "records_out": "paperSources/sig_coverage_20260629/kesen_siga2025_records.jsonl",
+  "source_records": 319,
+  "source_marker_counts": {
+    "SIG": 199,
+    "SIG/TOG": 105,
+    "TOG": 15
+  },
+  "selected_markers": [
+    "SIG/TOG",
+    "TOG"
+  ],
+  "selected_records": 120,
+  "added_rows": 114,
+  "skipped_existing": {
+    "title": 6
+  },
+  "sample_added": [
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "PoissonNet: A Local-Global Approach for Learning on Surfaces",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "https://github.com/ArmanMaesumi/poissonnet",
+      "paper_link": "https://doi.org/10.1145/3763298",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "PhysFiT: Physical-aware 3D Shape Understanding for Finishing Incomplete Assembly",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3702226",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "STGlight: Online Indoor Lighting Estimation via Spatio-Temporal Gaussian Fusion",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "https://github.com/nauyihsnehs/STGlight",
+      "paper_link": "https://doi.org/10.1145/3763350",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "GS-ROR2: Bidirectional-guided 3DGS and SDF for Reflective Object Relighting and Reconstruction",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "https://github.com/NK-CS-ZZL/GS-ROR",
+      "paper_link": "https://doi.org/10.1145/3759248",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Frame-Free Representation of Polarized Light for Resolving Stokes Vector Singularities",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3763276",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Viscous Vortex Dynamics on Surfaces",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "https://cunchengzhu.github.io/project_pages/ViscousVortex2025.html",
+      "paper_link": "https://doi.org/10.1145/3763320",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Fast Galerkin Multigrid Method for Unstructured Meshes",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3763327",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "A Stack-Free Parallel h-Adaptation Algorithm for Dynamically Balanced Trees on GPUs",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3763349",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Reliable Iterative Dynamics: A Versatile Method for Fast and Robust Simulation",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3734518",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Implicit Bonded Discrete Element Method with Manifold Optimization",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3711852",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Scattering-Aware Color Calibration for 3D Printers Using a Simple Calibration Target",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3763293",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Example-Based Feature Painting on Textures",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3763301",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "DiffTex: Differentiable Texturing for Architectural Proxy Models",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3763312",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Fine-Grained Spatially Varying Material Selection in Images",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "https://github.com/juliagviu/finegrained_mat_selection",
+      "paper_link": "https://doi.org/10.1145/3763332",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Simplifying Textured Triangle Meshes in the Wild",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3763277",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Local Surface Parameterizations via Smoothed Geodesic Splines",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3767323",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "A fast, efficient, and robust feature protected denoising method",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3765902",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "NeuVAS: Neural Implicit Surfaces for Variational Shape Modeling",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "",
+      "paper_link": "https://doi.org/10.1145/3763331",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Neural Octahedral Field: Octahedral Prior for Simultaneous Smoothing and Sharp Edge Regularization",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "https://github.com/Ankbzpx/frame-field",
+      "paper_link": "https://doi.org/10.1145/3763362",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    },
+    {
+      "state": "Wait",
+      "importance": "",
+      "paper_title": "Practical Gaussian process implicit surfaces with sparse convolutions",
+      "venue": "SIGGRAPH ASIA 2025",
+      "project_link_or_github_link": "https://cs.dartmouth.edu/~wjarosz/publications/xu25practical.html",
+      "paper_link": "https://doi.org/10.1145/3763329",
+      "sort": "SIGGRAPH ASIA 2025 / Technical Papers / Ke-Sen / SIG/TOG",
+      "pdf_path": ""
+    }
+  ],
+  "paper_list_backup": "obsidian-vault/paper_list.csv.bak_siga2025_kesen_20260629T084805Z",
+  "selection_rule": "Ke-Sen SIGGRAPH Asia 2025 papers page, whose header says ACM permission and defines SIG/TOG as conditionally accepted Journal Paper, SIG as Conference Paper, and TOG as selected ACM TOG Paper. Default import excludes SIG because ACM 10.1145/3757377 Crossref already covers the conference proceedings."
+}

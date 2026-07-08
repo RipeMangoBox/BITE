@@ -1,0 +1,980 @@
+{
+  "run_id": "20260612T062909Z",
+  "source_backup": "obsidian-vault/paper_list.csv.bak_20260612T062909Z",
+  "total": 51,
+  "ok": 51,
+  "failed": 0,
+  "downloaded": 51,
+  "reused": 0,
+  "results": [
+    {
+      "row_index": 3134,
+      "csv_line": 3136,
+      "title": "Deformable Gaussian Occupancy: Decoupling Rigid and Nonrigid Motion with Factorized Distillation",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Deformable_Gaussian_Occupancy:_Decoupling_Rigid_and_Nonrigid_Motion_with_Factorized_Distillation.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Gao_Deformable_Gaussian_Occupancy_Decoupling_Rigid_and_Nonrigid_Motion_with_Factorized_CVPR_2026_paper.pdf",
+      "bytes": 5700075,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Gao_Deformable_Gaussian_Occupancy_Decoupling_Rigid_and_Nonrigid_Motion_with_Factorized_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "5700075"
+        }
+      ]
+    },
+    {
+      "row_index": 3135,
+      "csv_line": 3137,
+      "title": "MotionScale: Reconstructing Appearance, Geometry, and Motion of Dynamic Scenes with Scalable 4D Gaussian Splatting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/MotionScale:_Reconstructing_Appearance,_Geometry,_and_Motion_of_Dynamic_Scenes_with_Scalable_4D_Gaussian_Splatting.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.29296.pdf",
+      "bytes": 14239939,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.29296.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "14239939"
+        }
+      ]
+    },
+    {
+      "row_index": 3136,
+      "csv_line": 3138,
+      "title": "Real-Time Dynamic Scene Rendering with Controlled Compressibility and Contact Awareness",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Real-Time_Dynamic_Scene_Rendering_with_Controlled_Compressibility_and_Contact_Awareness.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Shi_Real-Time_Dynamic_Scene_Rendering_with_Controlled_Compressibility_and_Contact_Awareness_CVPR_2026_paper.pdf",
+      "bytes": 3206086,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Shi_Real-Time_Dynamic_Scene_Rendering_with_Controlled_Compressibility_and_Contact_Awareness_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "3206086"
+        }
+      ]
+    },
+    {
+      "row_index": 3137,
+      "csv_line": 3139,
+      "title": "SpeeDe3DGS: Speedy Deformable 3D Gaussian Splatting with Temporal Pruning and Motion Grouping",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/SpeeDe3DGS:_Speedy_Deformable_3D_Gaussian_Splatting_with_Temporal_Pruning_and_Motion_Grouping.pdf",
+      "source_url": "https://arxiv.org/pdf/2506.07917.pdf",
+      "bytes": 9620211,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2506.07917.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "9620211"
+        }
+      ]
+    },
+    {
+      "row_index": 3138,
+      "csv_line": 3140,
+      "title": "U4D: Uncertainty-Aware 4D World Modeling from LiDAR Sequences",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/U4D:_Uncertainty-Aware_4D_World_Modeling_from_LiDAR_Sequences.pdf",
+      "source_url": "https://arxiv.org/pdf/2512.02982.pdf",
+      "bytes": 10377767,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2512.02982.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "10377767"
+        }
+      ]
+    },
+    {
+      "row_index": 3139,
+      "csv_line": 3141,
+      "title": "RAYNOVA: Scale-Temporal Autoregressive World Modeling in Ray Space",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/RAYNOVA:_Scale-Temporal_Autoregressive_World_Modeling_in_Ray_Space.pdf",
+      "source_url": "https://arxiv.org/pdf/2602.20685.pdf",
+      "bytes": 4975394,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2602.20685.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "4975394"
+        }
+      ]
+    },
+    {
+      "row_index": 3140,
+      "csv_line": 3142,
+      "title": "SpaceTimePilot: Generative Rendering of Dynamic Scenes Across Space and Time",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/SpaceTimePilot:_Generative_Rendering_of_Dynamic_Scenes_Across_Space_and_Time.pdf",
+      "source_url": "https://arxiv.org/pdf/2512.25075.pdf",
+      "bytes": 9303508,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2512.25075.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "9303508"
+        }
+      ]
+    },
+    {
+      "row_index": 3141,
+      "csv_line": 3143,
+      "title": "$L^{2}DGS$: Low-Light Dynamic Gaussian Splatting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/$L^{2}DGS$:_Low-Light_Dynamic_Gaussian_Splatting.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Kumar_L2DGS_Low-Light_Dynamic_Gaussian_Splatting_CVPR_2026_paper.pdf",
+      "bytes": 10178157,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Kumar_L2DGS_Low-Light_Dynamic_Gaussian_Splatting_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "10178157"
+        }
+      ]
+    },
+    {
+      "row_index": 3142,
+      "csv_line": 3144,
+      "title": "4C4D: 4 Camera 4D Gaussian Splatting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/4C4D:_4_Camera_4D_Gaussian_Splatting.pdf",
+      "source_url": "https://arxiv.org/pdf/2604.04063.pdf",
+      "bytes": 9802691,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2604.04063.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "9802691"
+        }
+      ]
+    },
+    {
+      "row_index": 3143,
+      "csv_line": 3145,
+      "title": "4DEquine: Disentangling Motion and Appearance for 4D Equine Reconstruction from Monocular Video",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/4DEquine:_Disentangling_Motion_and_Appearance_for_4D_Equine_Reconstruction_from_Monocular_Video.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.10125.pdf",
+      "bytes": 6726851,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.10125.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "6726851"
+        }
+      ]
+    },
+    {
+      "row_index": 3144,
+      "csv_line": 3146,
+      "title": "4DSurf: High-Fidelity Dynamic Scene Surface Reconstruction",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/4DSurf:_High-Fidelity_Dynamic_Scene_Surface_Reconstruction.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.28064.pdf",
+      "bytes": 10482768,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.28064.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "10482768"
+        }
+      ]
+    },
+    {
+      "row_index": 3145,
+      "csv_line": 3147,
+      "title": "AeroDGS: Physically Consistent Dynamic Gaussian Splatting for Single-Sequence Aerial 4D Reconstruction",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/AeroDGS:_Physically_Consistent_Dynamic_Gaussian_Splatting_for_Single-Sequence_Aerial_4D_Reconstruction.pdf",
+      "source_url": "https://arxiv.org/pdf/2602.22376.pdf",
+      "bytes": 21440316,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2602.22376.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "21440316"
+        }
+      ]
+    },
+    {
+      "row_index": 3146,
+      "csv_line": 3148,
+      "title": "Catalyst4D: High-Fidelity 3D-to-4D Scene Editing via Dynamic Propagation",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Catalyst4D:_High-Fidelity_3D-to-4D_Scene_Editing_via_Dynamic_Propagation.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.12766.pdf",
+      "bytes": 22068474,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.12766.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "22068474"
+        }
+      ]
+    },
+    {
+      "row_index": 3147,
+      "csv_line": 3149,
+      "title": "ClipGStream: Clip-Stream Gaussian Splatting for Any Length and Any Motion Multi-View Dynamic Scene Reconstruction",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/ClipGStream:_Clip-Stream_Gaussian_Splatting_for_Any_Length_and_Any_Motion_Multi-View_Dynamic_Scene_Reconstruction.pdf",
+      "source_url": "https://arxiv.org/pdf/2604.13746.pdf",
+      "bytes": 28455496,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2604.13746.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "28455496"
+        }
+      ]
+    },
+    {
+      "row_index": 3148,
+      "csv_line": 3150,
+      "title": "Complet4R: Geometric Complete 4D Reconstruction",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Complet4R:_Geometric_Complete_4D_Reconstruction.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.27300.pdf",
+      "bytes": 4736712,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.27300.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "4736712"
+        }
+      ]
+    },
+    {
+      "row_index": 3149,
+      "csv_line": 3151,
+      "title": "Consistent Instance Field for Dynamic Scene Understanding",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Consistent_Instance_Field_for_Dynamic_Scene_Understanding.pdf",
+      "source_url": "https://arxiv.org/pdf/2512.14126.pdf",
+      "bytes": 7976432,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2512.14126.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "7976432"
+        }
+      ]
+    },
+    {
+      "row_index": 3150,
+      "csv_line": 3152,
+      "title": "DetAny4D: Detect Anything 4D Temporally in a Streaming RGB Video",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/DetAny4D:_Detect_Anything_4D_Temporally_in_a_Streaming_RGB_Video.pdf",
+      "source_url": "https://arxiv.org/pdf/2511.18814.pdf",
+      "bytes": 6809322,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2511.18814.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "6809322"
+        }
+      ]
+    },
+    {
+      "row_index": 3151,
+      "csv_line": 3153,
+      "title": "DGGT: Feedforward 4D Reconstruction of Dynamic Driving Scenes using Unposed Images",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/DGGT:_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_Images.pdf",
+      "source_url": "https://arxiv.org/pdf/2512.03004.pdf",
+      "bytes": 44644658,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2512.03004.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "44644658"
+        }
+      ]
+    },
+    {
+      "row_index": 3152,
+      "csv_line": 3154,
+      "title": "Differentiable Adaptive 4D Structured Illumination for Joint Capture of Shape and Reflectance",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Differentiable_Adaptive_4D_Structured_Illumination_for_Joint_Capture_of_Shape_and_Reflectance.pdf",
+      "source_url": "https://arxiv.org/pdf/2605.06214.pdf",
+      "bytes": 38184669,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2605.06214.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "38184669"
+        }
+      ]
+    },
+    {
+      "row_index": 3153,
+      "csv_line": 3155,
+      "title": "DynamicVGGT: Learning Dynamic Point Maps for 4D Scene Reconstruction in Autonomous Driving",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/DynamicVGGT:_Learning_Dynamic_Point_Maps_for_4D_Scene_Reconstruction_in_Autonomous_Driving.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.08254.pdf",
+      "bytes": 7779670,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.08254.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "7779670"
+        }
+      ]
+    },
+    {
+      "row_index": 3154,
+      "csv_line": 3156,
+      "title": "FastEventDGS: Deformable Gaussian Splatting for Fast Dynamic Scenes from a Single Event Camera",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/FastEventDGS:_Deformable_Gaussian_Splatting_for_Fast_Dynamic_Scenes_from_a_Single_Event_Camera.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Dai_FastEventDGS_Deformable_Gaussian_Splatting_for_Fast_Dynamic_Scenes_from_a_CVPR_2026_paper.pdf",
+      "bytes": 6232720,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Dai_FastEventDGS_Deformable_Gaussian_Splatting_for_Fast_Dynamic_Scenes_from_a_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "6232720"
+        }
+      ]
+    },
+    {
+      "row_index": 3155,
+      "csv_line": 3157,
+      "title": "Flow4DGS-SLAM: Optical Flow-Guided 4D Gaussian Splatting SLAM",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Flow4DGS-SLAM:_Optical_Flow-Guided_4D_Gaussian_Splatting_SLAM.pdf",
+      "source_url": "https://arxiv.org/pdf/2604.22339.pdf",
+      "bytes": 10150246,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2604.22339.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "10150246"
+        }
+      ]
+    },
+    {
+      "row_index": 3156,
+      "csv_line": 3158,
+      "title": "GeoWorld: Geometric World Models",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/GeoWorld:_Geometric_World_Models.pdf",
+      "source_url": "https://arxiv.org/pdf/2602.23058.pdf",
+      "bytes": 3646088,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2602.23058.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "3646088"
+        }
+      ]
+    },
+    {
+      "row_index": 3157,
+      "csv_line": 3159,
+      "title": "GP-4DGS: Probabilistic 4D Gaussian Splatting from Monocular Video via Variational Gaussian Processes",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/GP-4DGS:_Probabilistic_4D_Gaussian_Splatting_from_Monocular_Video_via_Variational_Gaussian_Processes.pdf",
+      "source_url": "https://arxiv.org/pdf/2604.02915.pdf",
+      "bytes": 15070146,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2604.02915.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "15070146"
+        }
+      ]
+    },
+    {
+      "row_index": 3158,
+      "csv_line": 3160,
+      "title": "Inferring Compositional 4D Scenes without Ever Seeing One",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Inferring_Compositional_4D_Scenes_without_Ever_Seeing_One.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Gokmen_Inferring_Compositional_4D_Scenes_without_Ever_Seeing_One_CVPR_2026_paper.pdf",
+      "bytes": 8555135,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Gokmen_Inferring_Compositional_4D_Scenes_without_Ever_Seeing_One_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "8555135"
+        }
+      ]
+    },
+    {
+      "row_index": 3159,
+      "csv_line": 3161,
+      "title": "LangField4D: Learning Identity-Adaptive and Spatio-Temporal Continuous 4D Language Fields for Dynamic Scenes",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/LangField4D:_Learning_Identity-Adaptive_and_Spatio-Temporal_Continuous_4D_Language_Fields_for_Dynamic_Scenes.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Xu_LangField4D_Learning_Identity-Adaptive_and_Spatio-Temporal_Continuous_4D_Language_Fields_for_CVPR_2026_paper.pdf",
+      "bytes": 6690040,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Xu_LangField4D_Learning_Identity-Adaptive_and_Spatio-Temporal_Continuous_4D_Language_Fields_for_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "6690040"
+        }
+      ]
+    },
+    {
+      "row_index": 3160,
+      "csv_line": 3162,
+      "title": "LASER: Layer-wise Scale Alignment for Training-Free Streaming 4D Reconstruction",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/LASER:_Layer-wise_Scale_Alignment_for_Training-Free_Streaming_4D_Reconstruction.pdf",
+      "source_url": "https://arxiv.org/pdf/2512.13680.pdf",
+      "bytes": 14191981,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2512.13680.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "14191981"
+        }
+      ]
+    },
+    {
+      "row_index": 3161,
+      "csv_line": 3163,
+      "title": "Layered 4D-Rotor Gaussian Splatting: A Compressed Representation for Long Dynamic Scenes",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Layered_4D-Rotor_Gaussian_Splatting:_A_Compressed_Representation_for_Long_Dynamic_Scenes.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Xu_Layered_4D-Rotor_Gaussian_Splatting_A_Compressed_Representation_for_Long_Dynamic_CVPR_2026_paper.pdf",
+      "bytes": 48008181,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Xu_Layered_4D-Rotor_Gaussian_Splatting_A_Compressed_Representation_for_Long_Dynamic_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "48008181"
+        }
+      ]
+    },
+    {
+      "row_index": 3162,
+      "csv_line": 3164,
+      "title": "MAPo: Motion-Aware Partitioning of Deformable 3D Gaussian Splatting for High-Fidelity Dynamic Scene Reconstruction",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/MAPo:_Motion-Aware_Partitioning_of_Deformable_3D_Gaussian_Splatting_for_High-Fidelity_Dynamic_Scene_Reconstruction.pdf",
+      "source_url": "https://arxiv.org/pdf/2508.19786.pdf",
+      "bytes": 19646093,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2508.19786.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "19646093"
+        }
+      ]
+    },
+    {
+      "row_index": 3163,
+      "csv_line": 3165,
+      "title": "Mark4D: Temporally-Consistent Watermarking for 4D Gaussian Splatting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Mark4D:_Temporally-Consistent_Watermarking_for_4D_Gaussian_Splatting.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Lee_Mark4D_Temporally-Consistent_Watermarking_for_4D_Gaussian_Splatting_CVPR_2026_paper.pdf",
+      "bytes": 3225674,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Lee_Mark4D_Temporally-Consistent_Watermarking_for_4D_Gaussian_Splatting_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "3225674"
+        }
+      ]
+    },
+    {
+      "row_index": 3164,
+      "csv_line": 3166,
+      "title": "Mesh4D: 4D Mesh Reconstruction and Tracking from Monocular Video",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Mesh4D:_4D_Mesh_Reconstruction_and_Tracking_from_Monocular_Video.pdf",
+      "source_url": "https://arxiv.org/pdf/2601.05251.pdf",
+      "bytes": 14740941,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2601.05251.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "14740941"
+        }
+      ]
+    },
+    {
+      "row_index": 3165,
+      "csv_line": 3167,
+      "title": "MORE-STEM: Long-Short MemOry REcall and Spatio-TEmporal Consistency Model for Query-Driven 3D/4D Point Cloud Segmentation",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/MORE-STEM:_Long-Short_MemOry_REcall_and_Spatio-TEmporal_Consistency_Model_for_Query-Driven_3D/4D_Point_Cloud_Segmentation.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Li_MORE-STEM_Long-Short_MemOry_REcall_and_Spatio-TEmporal_Consistency_Model_for_Query-Driven_CVPR_2026_paper.pdf",
+      "bytes": 5095086,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Li_MORE-STEM_Long-Short_MemOry_REcall_and_Spatio-TEmporal_Consistency_Model_for_Query-Driven_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "5095086"
+        }
+      ]
+    },
+    {
+      "row_index": 3166,
+      "csv_line": 3168,
+      "title": "MoRel: Long-Range Flicker-Free 4D Motion Modeling via Anchor Relay-based Bidirectioanl Blending with Hierarchical Densification",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/MoRel:_Long-Range_Flicker-Free_4D_Motion_Modeling_via_Anchor_Relay-based_Bidirectioanl_Blending_with_Hierarchical_Densification.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Kwak_MoRel_Long-Range_Flicker-Free_4D_Motion_Modeling_via_Anchor_Relay-based_Bidirectioanl_CVPR_2026_paper.pdf",
+      "bytes": 2551569,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Kwak_MoRel_Long-Range_Flicker-Free_4D_Motion_Modeling_via_Anchor_Relay-based_Bidirectioanl_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "2551569"
+        }
+      ]
+    },
+    {
+      "row_index": 3167,
+      "csv_line": 3169,
+      "title": "MSCD-GS: Motion-Separated Cooperative Deblurring Dynamic Reconstruction via Gaussian Splatting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/MSCD-GS:_Motion-Separated_Cooperative_Deblurring_Dynamic_Reconstruction_via_Gaussian_Splatting.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Liao_MSCD-GS_Motion-Separated_Cooperative_Deblurring_Dynamic_Reconstruction_via_Gaussian_Splatting_CVPR_2026_paper.pdf",
+      "bytes": 6933748,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Liao_MSCD-GS_Motion-Separated_Cooperative_Deblurring_Dynamic_Reconstruction_via_Gaussian_Splatting_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "6933748"
+        }
+      ]
+    },
+    {
+      "row_index": 3168,
+      "csv_line": 3170,
+      "title": "Node-RF: Learning Generalized Continuous Space-Time Scene Dynamics with Neural ODE-based NeRFs",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Node-RF:_Learning_Generalized_Continuous_Space-Time_Scene_Dynamics_with_Neural_ODE-based_NeRFs.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.12078.pdf",
+      "bytes": 8024545,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.12078.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "8024545"
+        }
+      ]
+    },
+    {
+      "row_index": 3169,
+      "csv_line": 3171,
+      "title": "PackUV: Packed Gaussian UV Maps for 4D Volumetric Video",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/PackUV:_Packed_Gaussian_UV_Maps_for_4D_Volumetric_Video.pdf",
+      "source_url": "https://arxiv.org/pdf/2602.23040.pdf",
+      "bytes": 13477167,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2602.23040.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "13477167"
+        }
+      ]
+    },
+    {
+      "row_index": 3170,
+      "csv_line": 3172,
+      "title": "Point4Cast: Streaming Dynamic Scene Reconstruction and Forecasting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Point4Cast:_Streaming_Dynamic_Scene_Reconstruction_and_Forecasting.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Liu_Point4Cast_Streaming_Dynamic_Scene_Reconstruction_and_Forecasting_CVPR_2026_paper.pdf",
+      "bytes": 4686436,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Liu_Point4Cast_Streaming_Dynamic_Scene_Reconstruction_and_Forecasting_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "4686436"
+        }
+      ]
+    },
+    {
+      "row_index": 3171,
+      "csv_line": 3173,
+      "title": "REArtGS++: Generalizable Articulation Reconstruction with Temporal Geometry Constraint via Planar Gaussian Splatting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/REArtGS++:_Generalizable_Articulation_Reconstruction_with_Temporal_Geometry_Constraint_via_Planar_Gaussian_Splatting.pdf",
+      "source_url": "https://arxiv.org/pdf/2511.17059.pdf",
+      "bytes": 9748306,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2511.17059.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "9748306"
+        }
+      ]
+    },
+    {
+      "row_index": 3172,
+      "csv_line": 3174,
+      "title": "ReFlow: Self-correction Motion Learning for Dynamic Scene Reconstruction",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/ReFlow:_Self-correction_Motion_Learning_for_Dynamic_Scene_Reconstruction.pdf",
+      "source_url": "https://arxiv.org/pdf/2604.01561.pdf",
+      "bytes": 8301207,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2604.01561.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "8301207"
+        }
+      ]
+    },
+    {
+      "row_index": 3173,
+      "csv_line": 3175,
+      "title": "ReScene4D: Temporally Consistent Semantic Instance Segmentation of Evolving Indoor 3D Scenes",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/ReScene4D:_Temporally_Consistent_Semantic_Instance_Segmentation_of_Evolving_Indoor_3D_Scenes.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Steiner_ReScene4D_Temporally_Consistent_Semantic_Instance_Segmentation_of_Evolving_Indoor_3D_CVPR_2026_paper.pdf",
+      "bytes": 9821181,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Steiner_ReScene4D_Temporally_Consistent_Semantic_Instance_Segmentation_of_Evolving_Indoor_3D_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "9821181"
+        }
+      ]
+    },
+    {
+      "row_index": 3174,
+      "csv_line": 3176,
+      "title": "Revisiting Monocular SLAM with Spatio-Temporal Scene Modeling",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Revisiting_Monocular_SLAM_with_Spatio-Temporal_Scene_Modeling.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Piedade_Revisiting_Monocular_SLAM_with_Spatio-Temporal_Scene_Modeling_CVPR_2026_paper.pdf",
+      "bytes": 13394522,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Piedade_Revisiting_Monocular_SLAM_with_Spatio-Temporal_Scene_Modeling_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "13394522"
+        }
+      ]
+    },
+    {
+      "row_index": 3175,
+      "csv_line": 3177,
+      "title": "SharpTimeGS: Sharp and Stable Dynamic Gaussian Splatting via Lifespan Modulation",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/SharpTimeGS:_Sharp_and_Stable_Dynamic_Gaussian_Splatting_via_Lifespan_Modulation.pdf",
+      "source_url": "https://arxiv.org/pdf/2602.02989.pdf",
+      "bytes": 28083951,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2602.02989.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "28083951"
+        }
+      ]
+    },
+    {
+      "row_index": 3176,
+      "csv_line": 3178,
+      "title": "SLARM: Streaming and Language-Aligned Reconstruction Model for Dynamic Scenes",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/SLARM:_Streaming_and_Language-Aligned_Reconstruction_Model_for_Dynamic_Scenes.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.22893.pdf",
+      "bytes": 6200765,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.22893.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "6200765"
+        }
+      ]
+    },
+    {
+      "row_index": 3177,
+      "csv_line": 3179,
+      "title": "Space-Time Forecasting of Dynamic Scenes with Motion-aware Gaussian Grouping",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Space-Time_Forecasting_of_Dynamic_Scenes_with_Motion-aware_Gaussian_Grouping.pdf",
+      "source_url": "https://arxiv.org/pdf/2602.21668.pdf",
+      "bytes": 16538021,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2602.21668.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "16538021"
+        }
+      ]
+    },
+    {
+      "row_index": 3178,
+      "csv_line": 3180,
+      "title": "SparseCam4D: Spatio-Temporally Consistent 4D Reconstruction from Sparse Cameras",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/SparseCam4D:_Spatio-Temporally_Consistent_4D_Reconstruction_from_Sparse_Cameras.pdf",
+      "source_url": "https://arxiv.org/pdf/2603.26481.pdf",
+      "bytes": 48540669,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2603.26481.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "48540669"
+        }
+      ]
+    },
+    {
+      "row_index": 3179,
+      "csv_line": 3181,
+      "title": "ST4R-Splat: Spatio-Temporal Referring Segmentation in 4D Gaussian Splatting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/ST4R-Splat:_Spatio-Temporal_Referring_Segmentation_in_4D_Gaussian_Splatting.pdf",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Meng_ST4R-Splat_Spatio-Temporal_Referring_Segmentation_in_4D_Gaussian_Splatting_CVPR_2026_paper.pdf",
+      "bytes": 4982036,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Meng_ST4R-Splat_Spatio-Temporal_Referring_Segmentation_in_4D_Gaussian_Splatting_CVPR_2026_paper.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "4982036"
+        }
+      ]
+    },
+    {
+      "row_index": 3180,
+      "csv_line": 3182,
+      "title": "SV-GS: Sparse View 4D Reconstruction with Skeleton-Driven Gaussian Splatting",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/SV-GS:_Sparse_View_4D_Reconstruction_with_Skeleton-Driven_Gaussian_Splatting.pdf",
+      "source_url": "https://arxiv.org/pdf/2601.00285.pdf",
+      "bytes": 4345719,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2601.00285.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "4345719"
+        }
+      ]
+    },
+    {
+      "row_index": 3181,
+      "csv_line": 3183,
+      "title": "TraceGen: World Modeling in 3D Trace Space Enables Learning from Cross-Embodiment Videos",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/TraceGen:_World_Modeling_in_3D_Trace_Space_Enables_Learning_from_Cross-Embodiment_Videos.pdf",
+      "source_url": "https://arxiv.org/pdf/2511.21690.pdf",
+      "bytes": 19041601,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2511.21690.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "19041601"
+        }
+      ]
+    },
+    {
+      "row_index": 3182,
+      "csv_line": 3184,
+      "title": "V-DPM: 4D Video Reconstruction with Dynamic Point Maps",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/V-DPM:_4D_Video_Reconstruction_with_Dynamic_Point_Maps.pdf",
+      "source_url": "https://arxiv.org/pdf/2601.09499.pdf",
+      "bytes": 13097134,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2601.09499.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "13097134"
+        }
+      ]
+    },
+    {
+      "row_index": 3183,
+      "csv_line": 3185,
+      "title": "Velox: Learning Representations of 4D Geometry and Appearance",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Velox:_Learning_Representations_of_4D_Geometry_and_Appearance.pdf",
+      "source_url": "https://arxiv.org/pdf/2605.04527.pdf",
+      "bytes": 9761298,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2605.04527.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "9761298"
+        }
+      ]
+    },
+    {
+      "row_index": 3184,
+      "csv_line": 3186,
+      "title": "Vista4D: Video Reshooting with 4D Point Clouds",
+      "ok": true,
+      "pdf_path": "obsidian-vault/paperPDFs/CVPR_2026/Vista4D:_Video_Reshooting_with_4D_Point_Clouds.pdf",
+      "source_url": "https://arxiv.org/pdf/2604.21915.pdf",
+      "bytes": 46789027,
+      "status": "downloaded",
+      "reason": "",
+      "attempts": [
+        {
+          "url": "https://arxiv.org/pdf/2604.21915.pdf",
+          "ok": "True",
+          "reason": "",
+          "bytes": "46789027"
+        }
+      ]
+    }
+  ]
+}

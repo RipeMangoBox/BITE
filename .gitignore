@@ -84,7 +84,6 @@ obsidian-vault/paper_list.csv.bak*
 
 # === Generated/local batch aliases ===
 /batches
-paperSources/
 
 # Keep generated vault data and linked codebases out of Git sync.
 # Use the private Hugging Face dataset for obsidian-vault transfer.

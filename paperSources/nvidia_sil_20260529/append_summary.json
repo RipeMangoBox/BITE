@@ -1,0 +1,17 @@
+{
+  "run_id": "nvidia_sil_20260529",
+  "source_total": 319,
+  "appended": 318,
+  "duplicates_skipped": 1,
+  "new_wait_with_paper": 310,
+  "new_skip_without_paper": 8,
+  "resource_types": {
+    "paper": 301,
+    "dataset": 2,
+    "whitepaper": 9,
+    "library": 3,
+    "course": 3
+  },
+  "subset_all": "obsidian-vault/batches/nvidia_sil_20260529/nvidia_sil_subset_all.csv",
+  "subset_wait": "obsidian-vault/batches/nvidia_sil_20260529/nvidia_sil_subset_wait.csv"
+}

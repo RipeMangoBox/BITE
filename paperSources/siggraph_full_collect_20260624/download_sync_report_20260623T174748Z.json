@@ -1,0 +1,31 @@
+{
+  "created_at": "2026-06-23T17:47:48.044742+00:00",
+  "paper_list_backup": "obsidian-vault/paper_list.csv.bak_20260623T174748Z",
+  "updated_rows": 778,
+  "already_valid_rows": 48,
+  "new_downloaded_by_venue": {
+    "SIGGRAPH 2022": 144,
+    "SIGGRAPH 2023": 125,
+    "SIGGRAPH 2024": 46,
+    "SIGGRAPH ASIA 2022": 80,
+    "SIGGRAPH ASIA 2023": 217,
+    "SIGGRAPH ASIA 2024": 166
+  },
+  "missing_pdf_by_venue": {
+    "SIGGRAPH 2022": 165,
+    "SIGGRAPH 2023": 108,
+    "SIGGRAPH 2024": 211,
+    "SIGGRAPH ASIA 2022": 124,
+    "SIGGRAPH ASIA 2023": 1,
+    "SIGGRAPH ASIA 2024": 89
+  },
+  "valid_pdf_by_venue": {
+    "SIGGRAPH 2022": 147,
+    "SIGGRAPH 2023": 134,
+    "SIGGRAPH 2024": 67,
+    "SIGGRAPH ASIA 2022": 82,
+    "SIGGRAPH ASIA 2023": 222,
+    "SIGGRAPH ASIA 2024": 174
+  },
+  "note": "The prior downloader was terminated after 1475/1476 tasks because the final request hung; this sync reports PDFs actually present and readable on disk."
+}
