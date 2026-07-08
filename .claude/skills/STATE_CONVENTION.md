@@ -18,8 +18,8 @@ Wait → Downloaded → checked
 
 | state | Meaning | Written by | Next action |
 |-------|---------|------------|-------------|
-| `Wait` | Newly collected candidate, waiting for download | collect (from-web / from-github-awesome) | Run download |
-| `Downloaded` | PDF exists under `obsidian-vault/paperPDFs/` or a reviewed local path is registered in `pdf_path`; ready for the formal local analysis chain | download / import-local-pdfs / Zotero sync | Run analyze |
+| `Wait` | Newly collected candidate, waiting for download | collect (from-web / from-github-repo) | Run download |
+| `Downloaded` | PDF exists under `obsidian-vault/paperPDFs/` or a reviewed local path is registered in `pdf_path`; ready for the formal local analysis chain | download / import-local-pdfs | Run analyze |
 | `checked` | Structured analysis note exists under `obsidian-vault/analysis/`; when `--export-vault` is used, deterministic vault validation passed | analyze / reviewed batch consolidation | Ready for query / build index |
 
 ## Abnormal states (from analyze stage)

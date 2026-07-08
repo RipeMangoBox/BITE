@@ -312,7 +312,7 @@ def make_log_row(spec: PaperSpec, paper: ArxivPaper, pdf_path: Path) -> list[str
     year = year_from_paper(paper)
     venue = spec.venue or f"arXiv {year}"
     return [
-        "checked",
+        "Downloaded",
         spec.importance,
         display_title(spec, paper),
         venue,
@@ -380,10 +380,10 @@ def process_spec(spec: PaperSpec, log_path: Path, dry_run: bool = False) -> Down
 
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Search arXiv papers from user-provided info, download PDFs, and append analysis log entries."
+        description="Search arXiv papers from user-provided info, download PDFs, and append paper_list.csv rows."
     )
     parser.add_argument("--spec-file", required=True, help="JSON array of paper specs")
-    parser.add_argument("--log-path", default=str(DEFAULT_LOG_PATH), help="analysis log file to append")
+    parser.add_argument("--log-path", default=str(DEFAULT_LOG_PATH), help="paper_list.csv path to append")
     parser.add_argument("--dry-run", action="store_true", help="validate matches without downloading or editing logs")
     args = parser.parse_args(argv)
 

@@ -27,6 +27,8 @@
 > 🔥 **BITE Community** | **[💬 WeChat / BITE WeChat Group](./WECHAT.md)**
 >
 > 🔥 **News**: BITE's public evidence layer is published on HuggingFace dataset [PaperBite-Assets](https://huggingface.co/datasets/RipeMangoBox/PaperBite-Assets), covering `L0-L3` structured paper assets (Markdown analysis notes + figures + manifests). Incrementally sync with `scripts/sync_assets_from_hf.py`; if you work on AI-related research, it is a strong starting point for building your own evidence vault.
+>
+> 🔥 **News**: The formal local analysis chain now uses the v06 four-section note format: MinerU parse/reuse, chunk anchor extraction, main analysis JSON, section writing, figure/table slot selection, and structural validation. The default keeps up to 6 core figures/tables to reduce redundant visual dumps and per-paper analysis cost. For downloaded queues with enough API quota, use `--jobs 50` for high-throughput batch analysis.
 
 ---
 
@@ -183,6 +185,26 @@ python3 scripts/run_local_paper_analysis.py \
   --export-vault
 ```
 
+The default note body has four sections: `概要`, `核心方法与创新机理`,
+`实验与关键发现`, and `定位与知识库关联`. `--max-note-images 6` is the
+default figure/table budget for retaining task definition, core pipeline, and
+key result or ablation visuals without flooding the top-level note.
+
+For batch analysis, the queue runner calls the same formal chain per row:
+
+```bash
+python3 scripts/run_paper_list_analysis.py \
+  --source obsidian-vault/paper_list.csv \
+  --state Downloaded \
+  --jobs 50 \
+  --export-vault \
+  --max-note-images 6
+```
+
+If provider rate limits, MinerU I/O, or local memory become the bottleneck,
+drop to `--jobs 10` or `--jobs 20` and rerun. The runner resumes completed
+work by default.
+
 ## 📚 Further Reading
 
 - [Asset Architecture](docs/asset-architecture.md)
@@ -245,8 +267,9 @@ For batch analysis, the queue runner calls the same formal chain per row:
 python3 scripts/run_paper_list_analysis.py \
   --source obsidian-vault/paper_list.csv \
   --state Downloaded \
-  --jobs 2 \
-  --export-vault
+  --jobs 50 \
+  --export-vault \
+  --max-note-images 6
 ```
 
 </details>
@@ -258,8 +281,8 @@ python3 scripts/run_paper_list_analysis.py \
 | Decide the next pipeline step | `research-workflow` |
 | Collect candidates from web pages | `papers-collect-from-web` |
 | Collect candidates from GitHub paper lists | `papers-collect-from-github-repo` |
-| Download PDFs from a triage list | `papers-download-from-list` |
-| Generate a deep single-paper report | `paper-report` |
+| Download PDFs from candidate rows | `papers-download-from-list` |
+| Generate a structured single-paper analysis | `scripts/run_local_paper_analysis.py` |
 | Rebuild the local index | `papers-build-index` |
 | Query or compare papers from local notes | `papers-query-knowledge-base` |
 | Generate grounded research ideas | `research-brainstorm-from-kb` |

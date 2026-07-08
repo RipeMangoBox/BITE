@@ -294,7 +294,7 @@ def _format_line(
 
 def main(argv: Optional[list[str]] = None) -> int:
     ap = argparse.ArgumentParser(
-        description="Fetch web pages, store HTML locally, extract paper candidates, and generate a triage list."
+        description="Fetch web pages, store HTML locally, extract paper candidates, and append paper_list.csv rows."
     )
     ap.add_argument("--urls", nargs="+", required=True, help="One or more URLs to fetch (static HTML).")
     ap.add_argument("--include", default="", help="Include keywords (all must match). Separator: ';' or ','.")

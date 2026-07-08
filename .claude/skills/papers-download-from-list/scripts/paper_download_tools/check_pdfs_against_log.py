@@ -118,7 +118,7 @@ def update_analysis_log() -> None:
     mapping = load_paper_list()
     rows = load_rows()
 
-    count_checked = 0
+    count_downloaded = 0
     count_wait = 0
 
     for i in range(1, len(rows)):
@@ -148,13 +148,16 @@ def update_analysis_log() -> None:
             row[0] = "Wait"
             count_wait += 1
         else:
-            row[0] = status.strip() or "checked"
-            count_checked += 1
+            if status.strip() in {"", "Wait"}:
+                row[0] = "Downloaded"
+            else:
+                row[0] = status.strip()
+            count_downloaded += 1
 
         rows[i] = row
 
     save_rows(rows)
-    print(f"Summary: checked={count_checked}, Wait={count_wait}")
+    print(f"Summary: Downloaded={count_downloaded}, Wait={count_wait}")
 
 
 if __name__ == "__main__":

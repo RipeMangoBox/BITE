@@ -37,7 +37,6 @@ The current default workflow is local-file based. The skills below operate on
 | `papers-build-index` | local index | Regenerates `obsidian-vault/index` from local notes. |
 | `papers-query-knowledge-base` | active local query | Search and compare papers from local notes and indexes. |
 | `papers-audit-metadata-consistency` | local audit | Audits local exported notes and logs. |
-| `paper-report` | active deep report | Use for deep single-paper reports. |
 | `rf-obsidian-markdown` | Markdown convention | Applies to generated/local Markdown output. |
 | `notes-export-share-version` | export utility | Creates shareable Markdown from local notes. |
 
@@ -59,7 +58,8 @@ The current default workflow is local-file based. The skills below operate on
     survey companion repos, lab paper lists, accepted-paper repos, and benchmark
     repos.
 - **papers-download-from-list**
-  - Download, verify, repair, and deduplicate PDFs from a curated triage list.
+  - Download, verify, repair, and deduplicate PDFs from `paper_list.csv`
+    candidate rows.
 - **Local PDF folder import**
   - No dedicated library-sync skill is maintained. If you already have PDFs,
     provide the folder path to `research-workflow` or directly to the agent.
@@ -98,9 +98,6 @@ The current default workflow is local-file based. The skills below operate on
 
 ## Reports, Markdown, and Export
 
-- **paper-report**
-  - Generate a seven-section paper report: overview, background, core
-    contribution, framework, formulas, experiments, and lineage.
 - **scripts/run_local_paper_analysis.py**
   - Formal single-paper analysis chain for the default local workflow:
     MinerU parse/reuse, chunk anchor extraction, main analysis JSON, section
@@ -136,7 +133,7 @@ The current default workflow is local-file based. The skills below operate on
 | Collect candidates from web pages | `papers-collect-from-web` |
 | Collect candidates from a GitHub paper list | `papers-collect-from-github-repo` |
 | Download PDFs from candidate rows | `papers-download-from-list` |
-| Generate a deep single-paper report | `paper-report` |
+| Generate a structured single-paper analysis note | `scripts/run_local_paper_analysis.py` |
 | Rebuild the local index | `papers-build-index` |
 | Audit metadata consistency | `papers-audit-metadata-consistency` |
 | Search, summarize, or compare papers | `papers-query-knowledge-base` |
