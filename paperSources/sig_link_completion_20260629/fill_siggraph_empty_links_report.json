@@ -1,0 +1,80 @@
+{
+  "created_at": "2026-06-29T07:58:56.115077+00:00",
+  "updated_rows": 6,
+  "updated_fields": {
+    "paper_link": 6,
+    "sort": 2
+  },
+  "unmatched_rows": 0,
+  "updates_by_venue": {
+    "SIGGRAPH_ASIA_2024": 3,
+    "SIGGRAPH 2025": 3
+  },
+  "updates_by_source_kind": {
+    "collected_or_raw_record": 1,
+    "papercopilot_sig2025_ajax": 1,
+    "pdf_first_page_doi": 4
+  },
+  "unmatched": [],
+  "sample_updates": [
+    {
+      "line": "1642",
+      "venue": "SIGGRAPH_ASIA_2024",
+      "paper_title": "GVHMR World Grounded Human Motion Recovery via Gravity View Coordinates",
+      "paper_link": "https://zju3dv.github.io/gvhmr/",
+      "source_kind": "collected_or_raw_record",
+      "record_source": "paperSources/siggraph_full_collect_20260624/collected_records.jsonl",
+      "changed_fields": "paper_link,sort"
+    },
+    {
+      "line": "1795",
+      "venue": "SIGGRAPH 2025",
+      "paper_title": "PhysicsFC Learning User Controlled Skills for a Physics Based Football Player Controller",
+      "paper_link": "https://s2025.conference-schedule.org/presentation/?id=papers_334&sess=sess156",
+      "source_kind": "papercopilot_sig2025_ajax",
+      "record_source": "paperSources/sig_link_completion_20260629/papercopilot_sig2025_records.jsonl",
+      "changed_fields": "paper_link,sort"
+    },
+    {
+      "line": "1798",
+      "venue": "SIGGRAPH_ASIA_2024",
+      "paper_title": "LINGO Autonomous Character Scene Interaction Synthesis from Text Instruction",
+      "paper_link": "https://doi.org/10.1145/3680528.3687595",
+      "source_kind": "pdf_first_page_doi",
+      "record_source": "obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.pdf",
+      "changed_fields": "paper_link"
+    },
+    {
+      "line": "1799",
+      "venue": "SIGGRAPH_ASIA_2024",
+      "paper_title": "Shuai et al. Reconstructing Close Human Interactions from Multiple Views",
+      "paper_link": "https://doi.org/10.1145/3618336",
+      "source_kind": "pdf_first_page_doi",
+      "record_source": "obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views.pdf",
+      "changed_fields": "paper_link"
+    },
+    {
+      "line": "1916",
+      "venue": "SIGGRAPH 2025",
+      "paper_title": "Chang et al. Large Scale Multi Character Interaction Synthesis",
+      "paper_link": "https://doi.org/10.1145/3721238.3730750",
+      "source_kind": "pdf_first_page_doi",
+      "record_source": "obsidian-vault/paperPDFs/SIGGRAPH_2025/Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis.pdf",
+      "changed_fields": "paper_link"
+    },
+    {
+      "line": "1917",
+      "venue": "SIGGRAPH 2025",
+      "paper_title": "MECo Motion example controlled Co speech Gesture Generation Leveraging Large Language Models",
+      "paper_link": "https://doi.org/10.1145/3721238.3730611",
+      "source_kind": "pdf_first_page_doi",
+      "record_source": "obsidian-vault/paperPDFs/SIGGRAPH_2025/MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_Large_Language_Models.pdf",
+      "changed_fields": "paper_link"
+    }
+  ],
+  "dry_run": false,
+  "all_states": true,
+  "empty_wait_sig_paper_link_before": 0,
+  "empty_wait_sig_paper_link_after": 0,
+  "paper_list_backup": "obsidian-vault/paper_list.csv.bak_sig_links_20260629T075856Z"
+}

@@ -582,6 +582,80 @@ def sample_composed_human_first_joint(
     return torch.cat([human, camera], dim=1)
 
 
+def _motion_stats_np(joints: np.ndarray, gt_joints: np.ndarray) -> dict[str, float]:
+    n = min(joints.shape[0], gt_joints.shape[0])
+    if n <= 0:
+        return {
+            "mpjpe_root_aligned": 0.0,
+            "joint_velocity_mean": 0.0,
+            "joint_accel_mean": 0.0,
+            "root_path_len": 0.0,
+            "root_accel_mean": 0.0,
+        }
+    joints = joints[:n]
+    gt_joints = gt_joints[:n]
+    root = joints[:, 0]
+    gt_root = gt_joints[:, 0]
+    rel = joints - root[:, None, :]
+    gt_rel = gt_joints - gt_root[:, None, :]
+    velocity = np.diff(joints, axis=0)
+    accel = np.diff(velocity, axis=0)
+    root_velocity = np.diff(root, axis=0)
+    root_accel = np.diff(root_velocity, axis=0)
+    return {
+        "mpjpe_root_aligned": float(np.linalg.norm(rel - gt_rel, axis=-1).mean()),
+        "joint_velocity_mean": float(np.linalg.norm(velocity, axis=-1).mean()) if velocity.size else 0.0,
+        "joint_accel_mean": float(np.linalg.norm(accel, axis=-1).mean()) if accel.size else 0.0,
+        "root_path_len": float(np.linalg.norm(root_velocity, axis=-1).sum()) if root_velocity.size else 0.0,
+        "root_accel_mean": float(np.linalg.norm(root_accel, axis=-1).mean()) if root_accel.size else 0.0,
+    }
+
+
+def human_motion_stats_for_batch(
+    raw_output: dict[str, Any],
+    raw_input: dict[str, Any],
+    padding_mask: torch.Tensor,
+    sample_ids: list[str],
+) -> list[dict[str, Any]]:
+    out_human = raw_output["human"].detach().float().cpu().numpy()
+    gt_human = raw_input["human"].detach().float().cpu().numpy()
+    masks = padding_mask.detach().bool().cpu().numpy()
+    records = []
+    for index, sample_id in enumerate(sample_ids):
+        valid = masks[index]
+        records.append(
+            {
+                "sample_id": sample_id,
+                "valid_frames": int(valid.sum()),
+                **_motion_stats_np(out_human[index][valid], gt_human[index][valid]),
+            }
+        )
+    return records
+
+
+def summarize_human_motion_stats(records: list[dict[str, Any]], task_name: str) -> dict[str, Any]:
+    keys = [
+        "mpjpe_root_aligned",
+        "joint_velocity_mean",
+        "joint_accel_mean",
+        "root_path_len",
+        "root_accel_mean",
+    ]
+    summary: dict[str, Any] = {
+        "task": task_name,
+        "count": len(records),
+        "note": "Human branch statistics against GT human over valid frames.",
+    }
+    if not records:
+        return summary
+    for key in keys:
+        values = np.asarray([float(record[key]) for record in records], dtype=np.float64)
+        summary[f"{key}_mean"] = float(values.mean())
+        summary[f"{key}_median"] = float(np.median(values))
+        summary[f"{key}_p90"] = float(np.percentile(values, 90))
+    return summary
+
+
 def collate_cache(cache: Any, start: int, samples: int, batch_size: int, workers: int) -> tuple[DataLoader, int]:
     end = len(cache) if samples <= 0 else min(len(cache), start + samples)
     if start < 0 or start >= len(cache) or end <= start:
