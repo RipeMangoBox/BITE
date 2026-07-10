@@ -1,0 +1,62 @@
+{
+  "part_id": "part_001",
+  "section_role": "preamble and title",
+  "method_evidence": [],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_001",
+    "part_index": 1,
+    "part_count": 12,
+    "chunk_chars": 7587,
+    "latency_seconds": 2.696,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3113,
+      "completion_tokens_est": 65,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3178,
+      "total_with_reasoning_tokens_est": 3178,
+      "estimated_cost_usd": 0.001411,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 3835,
+      "completion_tokens_api": 69,
+      "total_tokens_api": 3904,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 3195,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 69,
+        "prompt_tokens": 3835,
+        "total_tokens": 3904,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 3195
+      },
+      "estimated_cost_usd_api": 0.001452,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 217,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 71,
+        "api_usage_present": true
+      }
+    }
+  }
+}

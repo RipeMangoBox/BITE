@@ -1,0 +1,60 @@
+{
+  "tasks": 6,
+  "updated": 5,
+  "results": [
+    {
+      "line": 3311,
+      "title": "Motion-Aligned Word Embeddings for Text-to-Motion Generation",
+      "venue": "ICLR 2026",
+      "url": "https://openreview.net/pdf?id=zbHpRwzrq5",
+      "ok": false,
+      "note": "http_403",
+      "pdf_path": ""
+    },
+    {
+      "line": 3327,
+      "title": "Plan, Don't Pose: Long Composite Motion Generation with Text-Aligned BFM",
+      "venue": "arXiv 2026",
+      "url": "https://arxiv.org/pdf/2605.29906.pdf",
+      "ok": true,
+      "note": "existing",
+      "pdf_path": "obsidian-vault/paperPDFs/arXiv_2026/Plan_Don_t_Pose_Long_Composite_Motion_Generation_with_Text_Aligned_BFM.pdf"
+    },
+    {
+      "line": 3328,
+      "title": "Reconstruction-Anchored Diffusion Model for Text-to-Motion Generation",
+      "venue": "arXiv 2026",
+      "url": "https://arxiv.org/pdf/2601.14788.pdf",
+      "ok": true,
+      "note": "existing",
+      "pdf_path": "obsidian-vault/paperPDFs/arXiv_2026/Reconstruction_Anchored_Diffusion_Model_for_Text_to_Motion_Generation.pdf"
+    },
+    {
+      "line": 3329,
+      "title": "MoGeFlow: Flowing Through Motion Codebook Geometry for Text-to-Motion Generation",
+      "venue": "arXiv 2026",
+      "url": "https://arxiv.org/pdf/2606.11656.pdf",
+      "ok": true,
+      "note": "existing",
+      "pdf_path": "obsidian-vault/paperPDFs/arXiv_2026/MoGeFlow_Flowing_Through_Motion_Codebook_Geometry_for_Text_to_Motion_Generation.pdf"
+    },
+    {
+      "line": 3330,
+      "title": "Temporal Consistency-Aware Text-to-Motion Generation",
+      "venue": "Visual Intelligence 2026",
+      "url": "https://arxiv.org/pdf/2602.18057.pdf",
+      "ok": true,
+      "note": "existing",
+      "pdf_path": "obsidian-vault/paperPDFs/Visual_Intelligence_2026/Temporal_Consistency_Aware_Text_to_Motion_Generation.pdf"
+    },
+    {
+      "line": 3517,
+      "title": "High-Fidelity Novel View Synthesis via Splatting-Guided Diffusion",
+      "venue": "SIGGRAPH 2025",
+      "url": "https://arxiv.org/pdf/2205.15595.pdf",
+      "ok": true,
+      "note": "downloaded:7761632",
+      "pdf_path": "obsidian-vault/paperPDFs/SIGGRAPH_2025/High_Fidelity_Novel_View_Synthesis_via_Splatting_Guided_Diffusion.pdf"
+    }
+  ]
+}

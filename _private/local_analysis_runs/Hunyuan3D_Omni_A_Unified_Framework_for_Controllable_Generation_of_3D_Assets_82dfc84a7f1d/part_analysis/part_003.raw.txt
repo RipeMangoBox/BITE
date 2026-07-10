@@ -1,0 +1,25 @@
+{
+  "part_id": "3/6",
+  "section_role": "introduction and related work",
+  "method_evidence": [
+    {
+      "claim": "We utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings.",
+      "section": "Introduction",
+      "anchor": "we utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We concatenate the extracted embeddings with the DINO features of the input image.",
+      "section": "Introduction",
+      "anchor": "we concatenate the extracted embeddings with the DINO features of the input image",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": [
+    "How to flexibly integrate diverse control signals such as points, voxels, bounding boxes, and poses within a single model to achieve fine-grained and cross-modal controllability of 3D contents remains an important yet insufficiently explored challenge."
+  ]
+}

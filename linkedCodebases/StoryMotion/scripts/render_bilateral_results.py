@@ -707,7 +707,7 @@ def main():
     p.add_argument('--num-samples', type=int, default=3)
     p.add_argument('--start-index', type=int, default=0)
     p.add_argument('--sample-ids', nargs='*')
-    p.add_argument('--tasks', nargs='+', choices=['camera', 'human', 'joint'], default=['camera', 'human', 'joint'])
+    p.add_argument('--tasks', nargs='+', choices=['camera', 'human', 'joint', 'human_text'], default=['camera', 'human', 'joint'])
     p.add_argument('--seed', type=int, default=20260614)
     p.add_argument('--channel-gated-cfg', action='store_true',
                    help='For bilateral CFG, apply camera text guidance only to camera latent channels and human text guidance only to human latent channels.')
@@ -715,6 +715,12 @@ def main():
                    help='For task=joint only, perturb camera latent channels in the sampler state before model forward passes.')
     p.add_argument('--joint-human-camera-input-mode', choices=['normal', 'zero', 'shuffle', 'noise_matched'], default='normal',
                    help='For task=joint only, combine camera prediction from the normal forward pass with human prediction from a forward pass whose camera input channels are perturbed.')
+    p.add_argument('--joint-compose-camera-run-dir', type=Path,
+                   help='For task=joint, compose generated human from --ckpt with camera from this H2C run dir.')
+    p.add_argument('--joint-compose-human-task', choices=['human_text', 'human'], default='human_text',
+                   help='Human task used by --ckpt before passing generated human to the H2C camera run.')
+    p.add_argument('--joint-compose-h2c-source', choices=['replay', 'clean', 'noisy'], default='replay',
+                   help='Source type passed to the H2C camera model during composed joint rendering.')
     args = p.parse_args()
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -724,6 +730,15 @@ def main():
     model, diffusion, ckpt = load_model(args.ckpt, device)
     _, dataset, autoencoder = build_pulp(args, device)
     cache = mod.PulpLatentCache(args.cache_dir / 'val.pt')
+    compose_joint = args.joint_compose_camera_run_dir is not None
+    if compose_joint and 'joint' not in set(args.tasks):
+        raise ValueError('--joint-compose-camera-run-dir is only useful when --tasks includes joint')
+    full_eval = None
+    h2c_model = None
+    h2c_mod = None
+    if compose_joint:
+        full_eval = load_local_module('storymotion_official_full_eval_render', ROOT / 'scripts/storymotion_official_full_eval.py')
+        h2c_model, h2c_mod, _ = full_eval.load_h2c_camera_model(ROOT, args.joint_compose_camera_run_dir.resolve(), device)
 
     if args.sample_ids:
         target_ids = [str(sample_id) for sample_id in args.sample_ids]
@@ -744,7 +759,10 @@ def main():
                'cfg_scale': args.cfg_scale, 'cfg_human': args.cfg_human, 'cfg_camera': args.cfg_camera,
                'cfg_channel_gated': bool(args.channel_gated_cfg), 'eta': args.eta, 'tasks': args.tasks,
                'joint_camera_latent_intervention': args.joint_camera_latent_intervention,
-               'joint_human_camera_input_mode': args.joint_human_camera_input_mode}
+               'joint_human_camera_input_mode': args.joint_human_camera_input_mode,
+               'joint_compose_camera_run_dir': str(args.joint_compose_camera_run_dir) if compose_joint else None,
+               'joint_compose_human_task': args.joint_compose_human_task if compose_joint else None,
+               'joint_compose_h2c_source': args.joint_compose_h2c_source if compose_joint else None}
     start_time = time.time()
 
     for si, sample_id in enumerate(target_ids):
@@ -770,15 +788,24 @@ def main():
 
         for task_id, task_name in task_items:
             sample_indices = [args.seed + si * 1000 + task_id]
-            completion = ddim_sample_bilateral(
-                model, diffusion, z, text, valid, task_id, sample_indices,
-                args.seed + {'camera': 11, 'human': 23, 'joint': 37}[task_name],
-                args.num_steps,
-                cfg_scale=args.cfg_scale, cfg_human=args.cfg_human, cfg_camera=args.cfg_camera, eta=args.eta,
-                channel_gated_cfg=args.channel_gated_cfg,
-                joint_camera_latent_intervention=args.joint_camera_latent_intervention if task_name == 'joint' else 'none',
-                joint_human_camera_input_mode=args.joint_human_camera_input_mode if task_name == 'joint' else 'normal',
-            )
+            seed = args.seed + {'camera': 11, 'human': 23, 'joint': 37, 'human_text': 41}[task_name]
+            if task_name == 'joint' and compose_joint:
+                completion = full_eval.sample_composed_human_first_joint(
+                    model, diffusion, h2c_model, h2c_mod, mod, z, text, valid, sample_indices, seed, args.num_steps,
+                    human_source='generated',
+                    human_task_name=args.joint_compose_human_task,
+                    h2c_source=args.joint_compose_h2c_source,
+                    cfg_scale=args.cfg_scale, cfg_human=args.cfg_human, cfg_camera=args.cfg_camera, eta=args.eta,
+                    channel_gated_cfg=args.channel_gated_cfg,
+                )
+            else:
+                completion = ddim_sample_bilateral(
+                    model, diffusion, z, text, valid, task_id, sample_indices, seed, args.num_steps,
+                    cfg_scale=args.cfg_scale, cfg_human=args.cfg_human, cfg_camera=args.cfg_camera, eta=args.eta,
+                    channel_gated_cfg=args.channel_gated_cfg,
+                    joint_camera_latent_intervention=args.joint_camera_latent_intervention if task_name == 'joint' else 'none',
+                    joint_human_camera_input_mode=args.joint_human_camera_input_mode if task_name == 'joint' else 'normal',
+                )
 
             # Decode predicted latent through autoencoder
             raw_output = decode_raw(autoencoder, dataset, completion, gt_intrinsics)

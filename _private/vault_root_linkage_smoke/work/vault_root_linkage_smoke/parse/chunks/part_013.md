@@ -1,0 +1,48 @@
+<!-- part 13/15 chars 74453-79495 -->
+
+hilic ratios are summarized in in Table 7.
+
+We use the directed clean version of Chameleon and Squirrel provided by (Platonov et al., 2023) which removes repeated nodes in graphs. The large heterophilic dataset is proposed in (Platonov et al., 2023). The datasets Tolokers, Minesweeper and Questions are classified as homophilic datasets under the $H _ { e d g e }$ metric (Zhu et al., 2020), although they belong to heterophilic datasets according to the adjusted homophily metric in (Platonov et al., 2023).
+
+## B.2 DATA DISTRIBUTION IN REAL-WORLD DATASETS
+
+We show eigenvalues distributions of normalized graph adjacency matrix of real-world datasets in Figure 3. Distributions of frequency components of node feature column vectors in eigenspace of normalized graph adjacency matrix in Figure 4.
+
+## B.3 HYPERPARAMETER SETTINGS
+
+All experiments are run on a GPU NVIDIA RTX A6000 with 48G memory.
+
+Following (Platonov et al., 2023), we fix the hidden size of the MLP to 512 and set early stopping with patience of 100 steps on five large heterophilic datasets (Roman\_Empire, Amazon\_Ratings, Tolokers, Minesweeper, Questions). Following (Chien et al., 2021; He et al., 2021), we For all other fix the hidden size of the MLP to 64 and set early stopping with patience of 200 steps on all other datatsets. The maximum number of epochs is set to 1,000.
+
+We conduct a grid search for hyperparameters used during the training of spectral GNNs, including learning rates, dropout rates, exponential decay parameters, propagating coefficient for GPRGNN and JacobiConv, parameters a, b in JacobiConv. For different datasets, we use different grid search range, The exact search ranges for different hyperparameters on different datasets are detailed in Table 8.
+
+![](images/250e10f1155fe98f4ae3bd6a1655a03ef27c219da4e5c99fa4777d198a045c21.jpg)
+
+![](images/34fce409145ea6a71fbc94f87d1f0a7cc8a15f34b75d07b1275a7d191a1ac087.jpg)  
+(a)
+
+![](images/ca1a4bc0f0136e5b3b7065ad8724fb5ffc5e806b325767fef864b24fbf15ed9c.jpg)
+
+(b)  
+![](images/3f6e5bca981ec9aea2a9038710a55ab53c3b66c245bfe1805e75c5397ebc2df6.jpg)
+
+![](images/e9d344a946e526cbcdde3b03e8e198fa0691a7a18c83db757a2a06c05a66353c.jpg)
+
+(e)  
+![](images/93a67d4f741ebdb1f40937cedda1cc5124d4b1fe657a22a3593b00ecc0454ccd.jpg)  
+(f)
+
+(c)  
+![](images/0224a1b2e3bee7474ba823b8240711faeac75021201886f338d04a4aaed47564.jpg)  
+(g)
+
+![](images/58d73823547e4ffb5356379dfeba0a6eafbc2bb6a82b37cacf34f35ace9236d0.jpg)  
+(h)
+
+![](images/5fde20020b42994a7ce5ce658ef0990e293f59836154dd6e0129ee99f377a00e.jpg)  
+(i)  
+Figure 4: Distributions of frequency components of graph signals in eigenspace of normalized graph adjacency matrix.
+
+<table><tr><td rowspan=1 colspan=1>Datasets</td><td rowspan=1 colspan=2>Hyperparameters</td><td rowspan=1 colspan=2>GNNs</td><td rowspan=1 colspan=1>Range</td></tr><tr><td rowspan=2 colspan=3>&#x27;Cora&#x27;,&#x27;Citeseer&#x27;, &#x27;Pubmed&#x27;,            dropout in MLP&#x27;Chameleon&#x27;,&#x27;Squirrel&#x27;,&#x27;Actor&#x27;,       dropout after MLP&#x27;Texas&#x27;,&#x27;Cornell&#x27;,&#x27;Wisconsin&#x27;          dropout in MLPdropout after MLPlearning rate of Θlearning rate of Wweight decay of Oweight decay of Wabpropagation parameter αpropagation parameter α&#x27;amazon_ratings&#x27;,&#x27;minesweeper&#x27;,       dropout in MLP&#x27;questions&#x27;,&#x27;roman_empire&#x27;,           dropout after MLP&#x27;tolokers&#x27;                              learning rate of Θlearning rate of Wweight decay of Θweight decay of Wabpropagation parameter αpropagation parameter α</td><td rowspan=1 colspan=2>All/JacobiConvAll/JacobiConvJacobiConvJacobiConvAllAllAllAllJacobiConvJacobiConvJacobiConvGPRGNN</td><td rowspan=1 colspan=1>0.5,0.7, 0.90.5,0.7, 0.90.5,0.70.5,0.70.001, 0.010.01,0.050.0, 0.00050.0,0.0005−0.5,0.5−0.5,0.50.1, 0.90.1, 0.2, 0.9</td></tr><tr><td rowspan=1 colspan=2>AllAllAllAllAllAllJacobiConvJacobiConvJacobiConvGPRGNN</td><td rowspan=1 colspan=1>0.50.5,0.70.001, 0.010.01, 0.050.0,0.00050.0,0.0005−0.5,0.5−0.5,0.50.1, 1.00.0,0.9</td></tr><tr><td rowspan=4 colspan=1>&#x27;computers&#x27;,&#x27;photo&#x27;,&#x27;coauthor-cs&#x27;,&#x27;coauthor-physics&#x27;</td><td rowspan=4 colspan=2>dropout in MLPdropout after MLPlearning rate of Θlearning rate of Wweight decay of Θweight decay of Wabpropagation parameter αpropagation parameter α</td><td rowspan=1 colspan=2>AllAll</td><td rowspan=1 colspan=1>0.5,0.70.5,0.7</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>AllAll</td><td rowspan=2 colspan=1>0.001, 0.010.01,0.050.0,0.00050.0, 0.0005-0.5,0.5−0.5,0.50.1,0.9</td></tr><tr><td rowspan=2 colspan=2>AllAllJacobiConvJacobiConvJacobiConvGPRGNN</td></tr><tr><td rowspan=1 colspan=1>0.1, 0.2, 0.9</td></tr></table>
+
+Table 8: Grid search ranges of hyperparameters. Dropout search ranges of JacobiConv is smaller than other spectral GNNs as it contains too many hyperparameters, we have to reduce the search range to guarantee that the searching process can be finished in accepted computing time.

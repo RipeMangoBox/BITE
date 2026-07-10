@@ -1,0 +1,75 @@
+{
+  "part_id": "10/12",
+  "section_role": "UV unwrapping evaluation, ablation, and texture generation intro",
+  "method_evidence": [
+    {
+      "claim": "SeamGPT uses autoregressive transformer with point cloud sampling along edges and vertices for seam generation",
+      "section": "Ablation Study",
+      "anchor": "sampling point clouds along edges and vertices produces seams that naturally conform to the mesh topologies... sampling along edges and vertices significantly improves model convergence, as the transformer gains explicit positional awareness of potential cutting coordinates",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Point-cloud encoder outperforms mesh encoder for seam generation",
+      "section": "Ablation Study",
+      "anchor": "point-cloud encoder yields superior results compared to mesh encoders",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Pointer Network fails to generate consistent seams",
+      "section": "Ablation Study",
+      "anchor": "Pointer network struggles to generate consistent seams, often resulting in discontinuous cuts",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Seam length ratio R defined as seam segment count / number of mesh vertices, valid range [0.1, 0.35]",
+      "section": "Ablation Study",
+      "anchor": "We define R as the ratio of seam segment count to the number of mesh vertices. Empirically, valid cutting seams typically has R value within the range [0.1,0.35]",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "SeamGPT outperforms XAtlas, Nuvo, FAM, Edge-CLS in user study on Boundary quality and Editability",
+      "table_or_figure": "Table 1",
+      "metric": "Avg. Boundary",
+      "value": "4.00",
+      "confidence": 0.98
+    },
+    {
+      "claim": "SeamGPT outperforms XAtlas, Nuvo, FAM, Edge-CLS in user study on Boundary quality and Editability",
+      "table_or_figure": "Table 1",
+      "metric": "Avg. Editability",
+      "value": "4.02",
+      "confidence": 0.98
+    }
+  ],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Table 1",
+      "role_hint": "User study results comparing Boundary quality and Editability across methods",
+      "caption": "User Study about Boundary quality and Editability.",
+      "confidence": 0.98
+    },
+    {
+      "label": "Figure 1",
+      "role_hint": "Ablation of point sampling strategy",
+      "caption": "Ablation of point sampling strategy.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Figure 2",
+      "role_hint": "Ablation study of encoder and decoder (mesh vs point cloud, pointer network)",
+      "caption": "Ablation study of encoder and decoder.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Figure 3",
+      "role_hint": "Seam length control and diversity demonstration",
+      "caption": "Seam length control and diversity. We can control the cutting granularity by adjusting seam length. Diverse valid cutting seams can be generated.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

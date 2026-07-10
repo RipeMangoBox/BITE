@@ -1,0 +1,64 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: HY3D-Bench: Generation of 3D Assets
+Part: 7/9
+Character span: 42908-50503
+
+=== PART CONTENT ===
+hin structures under certain viewpoints are difficult to observe or even completely invisible in 2D images (such as when viewing along the thin sheet direction), which reduces the stability and convergence speed of model learning. Therefore, excluding assets containing large areas of thin structures helps improve overall training effectiveness.
+
+
+
+
+
+\textbf{Post Processing}.
+After obtaining high-quality 3D assets, we further perform post-processing to generate training-ready data. The post-processing steps primarily include: watertight processing and point cloud sampling. (1) Watertight processing. Given an artist-created triangle mesh, we first compute the Unsigned Distance Field (UDF) on a uniform grid with $512^3$ resolution, and extract an $\epsilon$-contour thin shell mesh $\mathcal{M}$ using Marching Cubes with $\epsilon=1/512$. We then sample points on $\mathcal{M}$ and apply Delaunay triangulation to construct a volumetric tetrahedral mesh. Following the approach of ConvexMeshing~\cite{diazzi2021convexmeshing}, we optimize the tetrahedral cell labels (0 for inner, 1 for outer) using graph cut optimization, and extract the boundary surface as the final watertight mesh. (2) Point cloud sampling. Following the sampling strategies of Dora~\cite{chen2025dora} and Hunyuan3D 2.1~\cite{hunyuan3d2025hunyuan3d}, we implement a hybrid sampling scheme on watertight meshes by combining surface uniform sampling and edge importance sampling to ensure that the sampled point clouds can both adequately represent the overall geometric shape and accurately capture local detail features. It is worth noting that we rotated the coordinate system to Y-up during the post-processing stage.
+
+
+
+\subsection{Part-level Data Processing}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.98\linewidth]{figures/data_processing_pipeline_part.png}
+    \caption{Part-level Data Processing Pipeline.}
+    \label{fig:part_level_data_pipeline}
+\end{figure}
+
+For part-level data, we have designed a specialized data processing pipeline aimed at decomposing holistic static meshes into semantically consistent component collections. This pipeline consists primarily of three core steps: part splitting, asset filtering, and post-processing. Through this systematic processing workflow, we are able to transform original holistic static meshes into part-level components suitable for training part-aware generation networks. The overall processing pipeline is illustrated in Figure~\ref{fig:part_level_data_pipeline}.
+
+\textbf{Part Splitting.} Part splitting is the critical step of breaking down holistic meshes into meaningful part units. We adopt a splitting strategy based on topological connectivity, first utilizing Connected Component Analysis to perform initial splitting of 3D assets, obtaining a collection of topologically independent original components. This step can automatically identify physically separated parts within the mesh, aligning the division of the holistic mesh with the semantic granularity designed by artists during the creation process.
+
+After obtaining the initial decomposition results, we need to perform preliminary quality control filtering to exclude two types of extreme cases: (1) Complex assets with excessive components (component count $\textgreater$ 888): These assets typically contain numerous trivial small parts or decorative elements, whose excessive complexity significantly increases the difficulty of data processing; (2) Indivisible assets (component count $\textless$ 2): These assets cannot provide structural information at the part-level and do not meet the data requirements of part-aware generation tasks and are therefore excluded.
+
+To address the over-fragmentation issue in the initial decomposition results, we further implement an automatic merging strategy. Specifically, we calculate the surface area of each original component and set area thresholds to identify small trivial parts. For components with areas significantly below the threshold, we merge them into adjacent larger components based on spatial adjacency relationships, thereby obtaining more reasonable part granularity. After this merging process, the final component count for the vast majority of assets is controlled between 10 and 40, a range that both retains sufficient semantic granularity and avoids excessive complexity, making it highly suitable for the training requirements of part-level generation tasks.
+
+\textbf{Asset Filtering.} After completing part splitting, we establish a rigorous set of multi-dimensional filtering criteria to ensure that the retained data possesses both reasonable part-level structure and is suitable for model learning. The specific filtering rules are as follows: (1) Component quantity reasonableness verification. We exclude data with too few components ($\leq$1) or too many components ($\textgreater$50). Too few components indicate splitting failure or that the asset itself lacks structural complexity; too many components suggest that even after merging, the asset remains overly complex and may affect network learning. This filtering ensures that all assets in the dataset have moderate part-level complexity. (2) Part scale balance verification. We exclude data where the area of a single component exceeds 85\% of the total area of the surface of the object. These assets have extremely imbalanced part distributions, typically manifesting as one massive dominant part accompanied by several tiny auxiliary parts (such as a large tabletop with tiny leg connectors). This imbalanced part distribution is detrimental to the model learning reasonable proportional relationships and compositional logic among parts, and is therefore excluded. (3) Isolated small part quantity verification. We exclude data containing too many isolated small-area components. These isolated small parts are often decorative trivial elements that typically do not provide valuable semantic information and can interfere with the model's learning of relationships among major parts. By counting the proportion of isolated small parts, we can effectively identify and filter such low-quality data.
+
+\textbf{Post Processing}. The post processing step aims to generate complete training data packages for each asset that passes the filtering. First, we perform systematic multi-view rendering of assets based on splitting results, generating two types of complementary image data: (1) RGB texture images: Rendered using original texture maps to obtain realistic appearance representations; (2) Part ID masks: Based on the splitting results, we assign a unique ID to each part and render 2D part mask images. In the mask images, each pixel's value corresponds to the ID of the part it belongs to. By simultaneously providing RGB images and part masks, this data can be used for training controllable part-aware object generation model. Subsequently, we perform watertight processing on the geometric data, separately processing the holistic mesh and individual part meshes: (1) Holistic mesh watertightening: We perform watertight processing on the merged complete object mesh to generate a topologically closed holistic representation; (2) Part mesh watertightening: We perform watertight processing on each independent part mesh separately, ensuring that each part is a topologically closed geometric entity. This step is crucial because many parts may have open boundaries at connection points after decomposition, and watertight processing can complete these boundaries, making each part an independent, complete 3D object.

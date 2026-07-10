@@ -1,0 +1,354 @@
+Fixed merge contract for prompt-cache reuse.
+
+Task: merge chunk-level anchors, compact paper context, and figure/table
+metadata into one verified BITE analysis object. The variable paper
+payload appears after this fixed contract.
+
+正文/分析内容必须使用简体中文：translate generated explanatory fields into Chinese,
+while preserving original caption text, formulas, symbols, code identifiers,
+exact evidence anchors, and method, dataset, metric, paper names.
+
+Return exactly one valid JSON object:
+{
+  "paper_metadata": {"title": str, "title_zh": str, "venue": str | null, "year": int | null, "project_link": str | null, "code_link": str | null},
+  "source_links": [{"label": "Project" | "Code" | "arXiv", "url": str, "anchor": str | null, "confidence": float | null}],
+  "analysis_truth": {
+    "real_bottleneck": str,
+    "causal_knob": str,
+    "core_insight": str,
+    "decisive_evidence": [{"claim": str, "anchor": str, "confidence": float}]
+  },
+  "method": {
+    "proposed_method_name": str,
+    "baseline_methods": [{"name": str, "role": str, "citation": str | null}],
+    "changed_slots": [{"slot_name": str, "baseline_value": str, "proposed_value": str, "evidence_anchor": str, "confidence": float}],
+    "pipeline_modules": [{"name": str, "role": str, "evidence_anchor": str}]
+  },
+  "experiments": {
+    "main_results": [{"benchmark": str, "metric": str, "proposed": str, "baseline": str, "delta": str, "anchor": str, "confidence": float}],
+    "ablations": [{"claim": str, "anchor": str, "confidence": float}],
+    "fairness_notes": [str]
+  },
+  "formulas": [{"name": str, "latex": str, "meaning": str, "anchor": str}],
+  "figures_tables": [{"label": str, "role": str, "caption": str}],
+  "limitations": [str],
+  "open_questions": [str]
+}
+
+Rules:
+1. Do not add unsupported claims.
+2. Resolve conflicts by preferring directly anchored evidence.
+3. If evidence is weak or absent, keep the field empty or use open_questions.
+4. Set paper_metadata.title to the original paper title. Set
+   paper_metadata.title_zh to a concise Chinese title when a faithful
+   translation is possible; otherwise repeat the original title.
+5. Natural-language explanations MUST be Simplified Chinese. Keep the original
+   language only for caption text, formulas, symbols, code identifiers, exact
+   anchors, and method, dataset, metric, paper names.
+6. For each concrete baseline method, fill citation when the paper provides
+   verifiable author/year/venue metadata, e.g. "He et al., CVPR 2023"; otherwise
+   use null instead of guessing.
+7. Preserve directly visible project page and code repository links in
+   source_links. Also put the best project page in paper_metadata.project_link
+   and the best code repository/GitHub/GitLab link in paper_metadata.code_link.
+   Do not invent links.
+8. Output ONLY valid JSON, with no markdown fences.
+
+=== VARIABLE PAPER PAYLOAD ===
+{
+  "paper_title": "Hunyuan3D-Omni: A Unified Framework for Controllable Generation of 3D Assets",
+  "paper_context": "# Hunyuan3D-Omni: A Unified Framework for Controllable Generation of 3D Assets\n\n\\documentclass{article}\n\\usepackage{colm2024_conference}\n\n\\usepackage{booktabs}\n\\usepackage{graphicx}\n\\usepackage{enumitem}\n\\usepackage{wrapfig}\n\\usepackage{algorithm}\n\\usepackage{algpseudocode}\n\\usepackage{wrapfig}\n\\usepackage{float}\n\\usepackage{microtype}\n\\usepackage{amsmath}\n\\usepackage{amssymb}\n\\usepackage{colortbl}\n\\usepackage[utf8]{inputenc}\n\\definecolor{lightgray}{rgb}{0.9,0.9,0.9}\n\\usepackage{caption}\n\\usepackage{subcaption}\n\\usepackage{xcolor}\n\\usepackage{setspace}\n\\usepackage{url}\n\\usepackage{multirow}\n\\usepackage{colortbl}\n\\usepackage{tabularx}\n\\usepackage{blindtext}\n\\usepackage{pgfplots}\n\\pgfplotsset{compat=1.18}\n\\usepackage{tikz}\n\\usetikzlibrary{er,positioning,bayesnet}\n\\usepackage{makecell}\n\\usepackage{tipa}\n\\usepackage{siunitx}\n\\usepackage{nicefrac}\n\\usepackage{tocloft}\n\\usepackage{listings}\n\\usepackage[raster,skins]{tcolorbox}\n\\usepackage{xltabular}\n\\usepackage{adjustbox}\n\\usepackage{xurl}\n\\usepackage{multicol}\n\n\\usepackage{amsmath,amsfonts,bm}\n\n\\newcommand{\\figleft}{{\\em (Left)}}\n\\newcommand{\\figcenter}{{\\em (Center)}}\n\\newcommand{\\figright}{{\\em (Right)}}\n\\newcommand{\\figtop}{{\\em (Top)}}\n\\newcommand{\\figbottom}{{\\em (Bottom)}}\n\\newcommand{\\captiona}{{\\em (a)}}\n\\newcommand{\\captionb}{{\\em (b)}}\n\\newcommand{\\captionc}{{\\em (c)}}\n\\newcommand{\\captiond}{{\\em (d)}}\n\n\\newcommand{\\newterm}[1]{{\\bf #1}}\n\n\n\\def\\figref#1{figure~\\ref{#1}}\n\\def\\Figref#1{Figure~\\ref{#1}}\n\\def\\twofigref#1#2{figures \\ref{#1} and \\ref{#2}}\n\\def\\quadfigref#1#2#3#4{figures \\ref{#1}, \\ref{#2}, \\ref{#3} and \\ref{#4}}\n\\def\\secref#1{section~\\ref{#1}}\n\\def\\Secref#1{Section~\\ref{#1}}\n\\def\\twosecrefs#1#2{sections \\ref{#1} and \\ref{#2}}\n\\def\\secrefs#1#2#3{sections \\ref{#1}, \\ref{#2} and \\ref{#3}}\n\\def\\eqref#1{equation~\\ref{#1}}\n\\def\\Eqref#1{Equation~\\ref{#1}}\n\\def\\plaineqref#1{\\ref{#1}}\n\\def\\chapref#1{chapter~\\ref{#1}}\n\\def\\Chapref#1{Chapter~\\ref{#1}}\n\\def\\rangechapref#1#2{chapters\\ref{#1}--\\ref{#2}}\n\\def\\algref#1{algorithm~\\ref{#1}}\n\\def\\Algref#1{Algorithm~\\ref{#1}}\n\\def\\twoalgref#1#2{algorithms \\ref{#1} and \\ref{#2}}\n\\def\\Twoalgref#1#2{Algorithms \\ref{#1} and \\ref{#2}}\n\\def\\partref#1{part~\\ref{#1}}\n\\def\\Partref#1{Part~\\ref{#1}}\n\\def\\twopartref#1#2{parts \\ref{#1} and \\ref{#2}}\n\n\\def\\ceil#1{\\lceil #1 \\rceil}\n\\def\\floor#1{\\lfloor #1 \\rfloor}\n\\def\\1{\\bm{1}}\n\\newcommand{\\train}{\\mathcal{D}}\n\\newcommand{\\valid}{\\mathcal{D_{\\mathrm{valid}}}}\n\\newcommand{\\test}{\\mathcal{D_{\\mathrm{test}}}}\n\n\\def\\eps{{\\epsilon}}\n\n\n\\def\\reta{{\\textnormal{$\\eta$}}}\n\\def\\ra{{\\textnormal{a}}}\n\\def\\rb{{\\textnormal{b}}}\n\\def\\rc{{\\textnormal{c}}}\n\\def\\rd{{\\textnormal{d}}}\n\\def\\re{{\\textnormal{e}}}\n\\def\\rf{{\\textnormal{f}}}\n\\def\\rg{{\\textnormal{g}}}\n\\def\\rh{{\\textnormal{h}}}\n\\def\\ri{{\\textnormal{i}}}\n\\def\\rj{{\\textnormal{j}}}\n\\def\\rk{{\\textnormal{k}}}\n\\def\\rl{{\\textnormal{l}}}\n\\def\\rn{{\\textnormal{n}}}\n\\def\\ro{{\\textnormal{o}}}\n\\def\\rp{{\\textnormal{p}}}\n\\def\\rq{{\\textnormal{q}}}\n\\def\\rr{{\\textnormal{r}}}\n\\def\\rs{{\\textnormal{s}}}\n\\def\\rt{{\\textnormal{t}}}\n\\def\\ru{{\\textnormal{u}}}\n\\def\\rv{{\\textnormal{v}}}\n\\def\\rw{{\\textnormal{w}}}\n\\def\\rx{{\\textnormal{x}}}\n\\def\\ry{{\\textnormal{y}}}\n\\def\\rz{{\\textnormal{z}}}\n\n\\def\\rvepsilon{{\\mathbf{\\epsilon}}}\n\\def\\rvtheta{{\\mathbf{\\theta}}}\n\\def\\rva{{\\mathbf{a}}}\n\\def\\rvb{{\\mathbf{b}}}\n\\def\\rvc{{\\mathbf{c}}}\n\\def\\rvd{{\\mathbf{d}}}\n\\def\\rve{{\\mathbf{e}}}\n\\def\\rvf{{\\mathbf{f}}}\n\\def\\rvg{{\\mathbf{g}}}\n\\def\\rvh{{\\mathbf{h}}}\n\\def\\rvu{{\\mathbf{i}}}\n\\def\\rvj{{\\mathbf{j}}}\n\\def\\rvk{{\\mathbf{k}}}\n\\def\\rvl{{\\mathbf{l}}}\n\\def\\rvm{{\\mathbf{m}}}\n\\def\\rvn{{\\mathbf{n}}}\n\\def\\rvo{{\\mathbf{o}}}\n\\def\\rvp{{\\mathbf{p}}}\n\\def\\rvq{{\\mathbf{q}}}\n\\def\\rvr{{\\mathbf{r}}}\n\\def\\rvs{{\\mathbf{s}}}\n\\def\\rvt{{\\mathbf{t}}}\n\\def\\rvu{{\\mathbf{u}}}\n\\def\\rvv{{\\mathbf{v}}}\n\\def\\rvw{{\\mathbf{w}}}\n\\def\\rvx{{\\mathbf{x}}}\n\\def\\rvy{{\\mathbf{y}}}\n\\def\\rvz{{\\mathbf{z}}}\n\n\\def\\erva{{\\textnormal{a}}}\n\\def\\ervb{{\\textnormal{b}}}\n\\def\\ervc{{\\textnormal{c}}}\n\\def\\ervd{{\\textnormal{d}}}\n\\def\\erve{{\\textnormal{e}}}\n\\def\\ervf{{\\textnormal{f}}}\n\\def\\ervg{{\\textnormal{g}}}\n\\def\\ervh{{\\textnormal{h}}}\n\\def\\ervi{{\\textnormal{i}}}\n\\def\\ervj{{\\textnormal{j}}}\n\\def\\ervk{{\\textnormal{k}}}\n\\def\\ervl{{\\textnormal{l}}}\n\\def\\ervm{{\\textnormal{m}}}\n\\def\\ervn{{\\textnormal{n}}}\n\\def\\ervo{{\\textnormal{o}}}\n\\def\\ervp{{\\textnormal{p}}}\n\\def\\ervq{{\\textnormal{q}}}\n\\def\\ervr{{\\textnormal{r}}}\n\\def\\ervs{{\\textnormal{s}}}\n\\def\\ervt{{\\textnormal{t}}}\n\\def\\ervu{{\\textnormal{u}}}\n\\def\\ervv{{\\textnormal{v}}}\n\\def\\ervw{{\\textnormal{w}}}\n\\def\\ervx{{\\textnormal{x}}}\n\\def\\ervy{{\\textnormal{y}}}\n\\def\\ervz{{\\textnormal{z}}}\n\n\\def\\rmA{{\\mathbf{A}}}\n\\def\\rmB{{\\mathbf{B}}}\n\\def\\rmC{{\\mathbf{C}}}\n\\def\\rmD{{\\mathbf{D}}}\n\\def\\rmE{{\\mathbf{E}}}\n\\def\\rmF{{\\mathbf{F}}}\n\\def\\rmG{{\\mathbf{G}}}\n\\def\\rmH{{\\mathbf{H}}}\n\\def\\rmI{{\\mathbf{I}}}\n\\def\\rmJ{{\\mathbf{J}}}\n\\def\\rmK{{\\mathbf{K}}}\n\\def\\rmL{{\\mathbf{L}}}\n\\def\\rmM{{\\mathbf{M}}}\n\\def\\rmN{{\\mathbf{N}}}\n\\def\\rmO{{\\mathbf{O}}}\n\\def\\rmP{{\\mathbf{P}}}\n\\def\\rmQ{{\\mathbf{Q}}}\n\\def\\rmR{{\\mathbf{R}}}\n\\def\\rmS{{\\mathbf{S}}}\n\\def\\rmT{{\\mathbf{T}}}\n\\def\\rmU{{\\mathbf{U}}}\n\\def\\rmV{{\\mathbf{V}}}\n\\def\\rmW{{\\mathbf{W}}}\n\\def\\rmX{{\\mathbf{X}}}\n\\def\\rmY{{\\mathbf{Y}}}\n\\def\\rmZ{{\\mathbf{Z}}}\n\n\\def\\ermA{{\\textnormal{A}}}\n\\def\\ermB{{\\textnormal{B}}}\n\\def\\ermC{{\\textnormal{C}}}\n\\def\\ermD{{\\textnormal{D}}}\n\\def\\ermE{{\\textnormal{E}}}\n\\def\\ermF{{\\textnormal{F}}}\n\\def\\ermG{{\\textnormal{G}}}\n\\def\\ermH{{\\textnormal{H}}}\n\\def\\ermI{{\\textnormal{I}}}\n\\def\\ermJ{{\\textnormal{J}}}\n\\def\\ermK{{\\textnormal{K}}}\n\\def\\ermL{{\\textnormal{L}}}\n\\def\\ermM{{\\textnormal{M}}}\n\\def\\ermN{{\\textnormal{N}}}\n\\def\\ermO{{\\textnormal{O}}}\n\\def\\ermP{{\\textnormal{P}}}\n\\def\\ermQ{{\\textnormal{Q}}}\n\\def\\ermR{{\\textnormal{R}}}\n\\def\\ermS{{\\textnormal{S}}}\n\\def\\ermT{{\\textnormal{T}}}\n\\def\\ermU{{\\textnormal{U}}}\n\\def\\ermV{{\\textnormal{V}}}\n\\def\\ermW{{\\textnormal{W}}}\n\\def\\ermX{{\\textnormal{X}}}\n\\def\\ermY{{\\textnormal{Y}}}\n\\def\\ermZ{{\\textnormal{Z}}}\n\n\\def\\vzero{{\\bm{0}}}\n\\def\\vone{{\\bm{1}}}\n\\def\\vmu{{\\bm{\\mu}}}\n\\def\\vtheta{{\\bm{\\theta}}}\n\\def\\va{{\\bm{a}}}\n\\def\\vb{{\\bm{b}}}\n\\def\\vc{{\\bm{c}}}\n\\def\\vd{{\\bm{d}}}\n\\def\\ve{{\\bm{e}}}\n\\def\\vf{{\\bm{f}}}\n\\def\\vg{{\\bm{g}}}\n\\def\\vh{{\\bm{h}}}\n\\def\\vi{{\\bm{i}}}\n\\def\\vj{{\\bm{j}}}\n\\def\\vk{{\\bm{k}}}\n\\def\\vl{{\\bm{l}}}\n\\def\\vm{{\\bm{m}}}\n\\def\\vn{{\\bm{n}}}\n\\def\\vo{{\\bm{o}}}\n\\def\\vp{{\\bm{p}}}\n\\def\\vq{{\\bm{q}}}\n\\def\\vr{{\\bm{r}}}\n\\def\\vs{{\\bm{s}}}\n\\def\\vt{{\\bm{t}}}\n\\def\\vu{{\\bm{u}}}\n\\def\\vv{{\\bm{v}}}\n\\def\\vw{{\\bm{w}}}\n\\def\\vx{{\\bm{x}}}\n\\def\\vy{{\\bm{y}}}\n\\def\\vz{{\\bm{z}}}\n\n\\def\\evalpha{{\\alpha}}\n\\def\\evbeta{{\\beta}}\n\\def\\evepsilon{{\\epsilon}}\n\\def\\evlambda{{\\lambda}}\n\\def\\evomega{{\\omega}}\n\\def\\evmu{{\\mu}}\n\\def\\evpsi{{\\psi}}\n\\def\\evsigma{{\\sigma}}\n\\def\\evtheta{{\\theta}}\n\\def\\eva{{a}}\n\\def\\evb{{b}}\n\\def\\evc{{c}}\n\\def\\evd{{d}}\n\\def\\eve{{e}}\n\\def\\evf{{f}}\n\\def\\evg{{g}}\n\\def\\evh{{h}}\n\\def\\evi{{i}}\n\\def\\evj{{j}}\n\\def\\evk{{k}}\n\\def\\evl{{l}}\n\\def\\evm{{m}}\n\\def\\evn{{n}}\n\\def\\evo{{o}}\n\\def\\evp{{p}}\n\\def\\evq{{q}}\n\\def\\evr{{r}}\n\\def\\evs{{s}}\n\\def\\evt{{t}}\n\\def\\evu{{u}}\n\\def\\evv{{v}}\n\\def\\evw{{w}}\n\\def\\evx{{x}}\n\\def\\evy{{y}}\n\\def\\evz{{z}}\n\n\\def\\mA{{\\bm{A}}}\n\\def\\mB{{\\bm{B}}}\n\\def\\mC{{\\bm{C}}}\n\\def\\mD{{\\bm{D}}}\n\\def\\mE{{\\bm{E}}}\n\\def\\mF{{\\bm{F}}}\n\\def\\mG{{\\bm{G}}}\n\\def\\mH{{\\bm{H}}}\n\\def\\mI{{\\bm{I}}}\n\\def\\mJ{{\\bm{J}}}\n\\def\\mK{{\\bm{K}}}\n\\def\\mL{{\\bm{L}}}\n\\def\\mM{{\\bm{M}}}\n\\def\\mN{{\\bm{N}}}\n\\def\\mO{{\\bm{O}}}\n\\def\\mP{{\\bm{P}}}\n\\def\\mQ{{\\bm{Q}}}\n\\def\\mR{{\\bm{R}}}\n\\def\\mS{{\\bm{S}}}\n\\def\\mT{{\\bm{T}}}\n\\def\\mU{{\\bm{U}}}\n\\def\\mV{{\\bm{V}}}\n\\def\\mW{{\\bm{W}}}\n\\def\\mX{{\\bm{X}}}\n\\def\\mY{{\\bm{Y}}}\n\\def\\mZ{{\\bm{Z}}}\n\\def\\mBeta{{\\bm{\\beta}}}\n\\def\\mPhi{{\\bm{\\Phi}}}\n\\def\\mLambda{{\\bm{\\Lambda}}}\n\\def\\mSigma{{\\bm{\\Sigma}}}\n\n\\DeclareMathAlphabet{\\mathsfit}{\\encodingdefault}{\\sfdefault}{m}{sl}\n\\SetMathAlphabet{\\mathsfit}{bold}{\\encodingdefault}{\\sfdefault}{bx}{n}\n\\newcommand{\\tens}[1]{\\bm{\\mathsfit{#1}}}\n\\def\\tA{{\\tens{A}}}\n\\def\\tB{{\\tens{B}}}\n\\def\\tC{{\\tens{C}}}\n\\def\\tD{{\\tens{D}}}\n\\def\\tE{{\\tens{E}}}\n\\def\\tF{{\\tens{F}}}\n\\def\\tG{{\\tens{G}}}\n\\def\\tH{{\\tens{H}}}\n\\def\\tI{{\\tens{I}}}\n\\def\\tJ{{\\tens{J}}}\n\\def\\tK{{\\tens{K}}}\n\\def\\tL{{\\tens{L}}}\n\\def\\tM{{\\tens{M}}}\n\\def\\tN{{\\tens{N}}}\n\\def\\tO{{\\tens{O}}}\n\\def\\tP{{\\tens{P}}}\n\\def\\tQ{{\\tens{Q}}}\n\\def\\tR{{\\tens{R}}}\n\\def\\tS{{\\tens{S}}}\n\\def\\tT{{\\tens{T}}}\n\\def\\tU{{\\tens{U}}}\n\\def\\tV{{\\tens{V}}}\n\\def\\tW{{\\tens{W}}}\n\\def\\tX{{\\tens{X}}}\n\\def\\tY{{\\tens{Y}}}\n\\def\\tZ{{\\tens{Z}}}\n\n\n\\def\\gA{{\\mathcal{A}}}\n\\def\\gB{{\\mathcal{B}}}\n\\def\\gC{{\\mathcal{C}}}\n\\def\\gD{{\\mathcal{D}}}\n\\def\\gE{{\\mathcal{E}}}\n\\def\\gF{{\\mathcal{F}}}\n\\def\\gG{{\\mathcal{G}}}\n\\def\\gH{{\\mathcal{H}}}\n\\def\\gI{{\\mathcal{I}}}\n\\def\\gJ{{\\mathcal{J}}}\n\\def\\gK{{\\mathcal{K}}}\n\\def\\gL{{\\mathcal{L}}}\n\\def\\gM{{\\mathcal{M}}}\n\\def\\gN{{\\mathcal{N}}}\n\\def\\gO{{\\mathcal{O}}}\n\\def\\gP{{\\mathcal{P}}}\n\\def\\gQ{{\\mathcal{Q}}}\n\\def\\gR{{\\mathcal{R}}}\n\\def\\gS{{\\mathcal{S}}}\n\\def\\gT{{\\mathcal{T}}}\n\\def\\gU{{\\mathcal{U}}}\n\\def\\gV{{\\mathcal{V}}}\n\\def\\gW{{\\mathcal{W}}}\n\\def\\gX{{\\mathcal{X}}}\n\\def\\gY{{\\mathcal{Y}}}\n\\def\\gZ{{\\mathcal{Z}}}\n\n\\def\\sA{{\\mathbb{A}}}\n\\def\\sB{{\\mathbb{B}}}\n\\def\\sC{{\\mathbb{C}}}\n\\def\\sD{{\\mathbb{D}}}\n\\def\\sF{{\\mathbb{F}}}\n\\def\\sG{{\\mathbb{G}}}\n\\def\\sH{{\\mathbb{H}}}\n\\def\\sI{{\\mathbb{I}}}\n\\def\\sJ{{\\mathbb{J}}}\n\\def\\sK{{\\mathbb{K}}}\n\\def\\sL{{\\mathbb{L}}}\n\\def\\sM{{\\mathbb{M}}}\n\\def\\sN{{\\mathbb{N}}}\n\\def\\sO{{\\mathbb{O}}}\n\\def\\sP{{\\mathbb{P}}}\n\\def\\sQ{{\\mathbb{Q}}}\n\\def\\sR{{\\mathbb{R}}}\n\\def\\sS{{\\mathbb{S}}}\n\\def\\sT{{\\mathbb{T}}}\n\\def\\sU{{\\mathbb{U}}}\n\\def\\sV{{\\mathbb{V}}}\n\\def\\sW{{\\mathbb{W}}}\n\\def\\sX{{\\mathbb{X}}}\n\\def\\sY{{\\mathbb{Y}}}\n\\def\\sZ{{\\mathbb{Z}}}\n\n\\def\\emLambda{{\\Lambda}}\n\\def\\emA{{A}}\n\\def\\emB{{B}}\n\\def\\emC{{C}}\n\\def\\emD{{D}}\n\\def\\emE{{E}}\n\\def\\emF{{F}}\n\\def\\emG{{G}}\n\\def\\emH{{H}}\n\\def\\emI{{I}}\n\\def\\emJ{{J}}\n\\def\\emK{{K}}\n\\def\\emL{{L}}\n\\def\\emM{{M}}\n\\def\\emN{{N}}\n\\def\\emO{{O}}\n\\def\\emP{{P}}\n\\def\\emQ{{Q}}\n\\def\\emR{{R}}\n\\def\\emS{{S}}\n\\def\\emT{{T}}\n\\def\\emU{{U}}\n\\def\\emV{{V}}\n\\def\\emW{{W}}\n\\def\\emX{{X}}\n\\def\\emY{{Y}}\n\\def\\emZ{{Z}}\n\\def\\emSigma{{\\Sigma}}\n\n\\newcommand{\\etens}[1]{\\mathsfit{#1}}\n\\def\\etLambda{{\\etens{\\Lambda}}}\n\\def\\etA{{\\etens{A}}}\n\\def\\etB{{\\etens{B}}}\n\\def\\etC{{\\etens{C}}}\n\\def\\etD{{\\etens{D}}}\n\\def\\etE{{\\etens{E}}}\n\\def\\etF{{\\etens{F}}}\n\\def\\etG{{\\etens{G}}}\n\\def\\etH{{\\etens{H}}}\n\\def\\etI{{\\etens{I}}}\n\\def\\etJ{{\\etens{J}}}\n\\def\\etK{{\\etens{K}}}\n\\def\\etL{{\\etens{L}}}\n\\def\\etM{{\\etens{M}}}\n\\def\\etN{{\\etens{N}}}\n\\def\\etO{{\\etens{O}}}\n\\def\\etP{{\\etens{P}}}\n\\def\\etQ{{\\etens{Q}}}\n\\def\\etR{{\\etens{R}}}\n\\def\\etS{{\\etens{S}}}\n\\def\\etT{{\\etens{T}}}\n\\def\\etU{{\\etens{U}}}\n\\def\\etV{{\\etens{V}}}\n\\def\\etW{{\\etens{W}}}\n\\def\\etX{{\\etens{X}}}\n\\def\\etY{{\\etens{Y}}}\n\\def\\etZ{{\\etens{Z}}}\n\n\\newcommand{\\pdata}{p_{\\rm{data}}}\n\\newcommand{\\ptrain}{\\hat{p}_{\\rm{data}}}\n\\newcommand{\\Ptrain}{\\hat{P}_{\\rm{data}}}\n\\newcommand{\\pmodel}{p_{\\rm{model}}}\n\\newcommand{\\Pmodel}{P_{\\rm{model}}}\n\\newcommand{\\ptildemodel}{\\tilde{p}_{\\rm{model}}}\n\\newcommand{\\pencode}{p_{\\rm{encoder}}}\n\\newcommand{\\pdecode}{p_{\\rm{decoder}}}\n\\newcommand{\\precons}{p_{\\rm{reconstruct}}}\n\n\\newcommand{\\laplace}{\\mathrm{Laplace}}\n\n\\newcommand{\\E}{\\mathbb{E}}\n\\newcommand{\\Ls}{\\mathcal{L}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\emp}{\\tilde{p}}\n\\newcommand{\\lr}{\\alpha}\n\\newcommand{\\reg}{\\lambda}\n\\newcommand{\\rect}{\\mathrm{rectifier}}\n\\newcommand{\\softmax}{\\mathrm{softmax}}\n\\newcommand{\\sigmoid}{\\sigma}\n\\newcommand{\\softplus}{\\zeta}\n\\newcommand{\\KL}{D_{\\mathrm{KL}}}\n\\newcommand{\\Var}{\\mathrm{Var}}\n\\newcommand{\\standarderror}{\\mathrm{SE}}\n\\newcommand{\\Cov}{\\mathrm{Cov}}\n\\newcommand{\\normlzero}{L^0}\n\\newcommand{\\normlone}{L^1}\n\\newcommand{\\normltwo}{L^2}\n\\newcommand{\\normlp}{L^p}\n\\newcommand{\\normmax}{L^\\infty}\n\n\\newcommand{\\parents}{Pa}\n\n\\DeclareMathOperator*{\\argmax}{arg\\,max}\n\\DeclareMathOperator*{\\argmin}{arg\\,min}\n\n\\DeclareMathOperator{\\sign}{sign}\n\\DeclareMathOperator{\\Tr}{Tr}\n\\let\\ab\\allowbreak\n\n\n\\newcommand{\\specialcell}[2][c]{\n  \\begin{tabular}[#1]{@{}c@{}}#2\\end{tabular}}\n\n\\makeatletter\n\\DeclareRobustCommand\\onedot{\\futurelet\\@let@token\\@onedot}\n\\def\\@onedot{\\ifx\\@let@token.\\else.\\null\\fi\\xspace}\n\n\\def\\eg{\\emph{e.g}\\onedot} \\def\\Eg{\\emph{E.g}\\onedot}\n\\def\\ie{\\emph{i.e}\\onedot} \\def\\Ie{\\emph{I.e}\\onedot}\n\\def\\cf{\\emph{cf}\\onedot} \\def\\Cf{\\emph{Cf}\\onedot}\n\\def\\etc{\\emph{etc}\\onedot} \\def\\vs{\\emph{vs}\\onedot}\n\\def\\wrt{w.r.t\\onedot} \\def\\dof{d.o.f\\onedot}\n\\def\\iid{i.i.d\\onedot} \\def\\wolog{w.l.o.g\\onedot}\n\\def\\etal{\\emph{et al}\\onedot}\n\\makeatother\n\n\n\\newcommand{\\fix}{\\marginpar{FIX}}\n\\newcommand{\\new}{\\marginpar{NEW}}\n\\newcommand{\\shortname}{Hunyuan3D-Omni\\xspace}\n\n\\title{\\shortname: A Unified Framework for Controllable Generation of 3D Assets}\n\n\n\\author{\n\\bf Tencent Hunyuan3D\n}\n\n\n\\begin{document}\n\n\\maketitle\n\n\\begin{figure}[h]\n\\centering\n\\includegraphics[width=0.99\\linewidth]{figures/teaser.png}\n\\caption{\\shortname is a unified framework for supporting controllable generation based on point cloud, bounding box, voxel, and skeleton.}\n\\label{fig:teaser-top}\n\\end{figure}\n\n\\begin{abstract}\n\n\nRecent advances in 3D-native generative models have accelerated asset creation for games, film, and design. However, most methods still rely primarily on image or text conditioning and lack fine-grained, cross-modal controls, which limits controllability and practical adoption. To address this gap, we present \\shortname, a unified framework for fine-grained, controllable 3D asset generation built on Hunyuan3D 2.1. In addition to images, \\shortname accepts point clouds, voxels, bounding boxes, and skeletal pose priors as conditioning signals, enabling precise control over geometry, topology, and pose. Instead of separate heads for each modality, our model unifies all signals in a single cross-modal architecture. We train with a progressive, difficulty-aware sampling strategy that selects one control modality per example and biases sampling toward harder signals (~\\eg, skeletal pose) while downweighting easier ones (~\\eg, point clouds), encouraging robust multi-modal fusion and graceful handling of missing inputs. Experiments show that these additional controls improve generation accuracy, enable geometry-aware transformations, and increase robustness for production workflows.\n\\end{abstract}\n\n\n\\section{Introduction}\n3D generation is a fundamental task in computer vision and computational imaging, with applications spanning virtual reality, gaming, and film. As the volume of 3D data continues to grow, native 3D generation has emerged as a mainstream approach, offering significant advantages in both quality and speed. It is anticipated that, with the ongoing expansion of high-quality 3D datasets, 3D generation models will evolve into the next generation of automated modeling tools, facilitating faster workflows and dynamic interactions in digital content creation.\n\nNative 3D generation primarily involves two key components: the 3D Variational Autoencoder (VAE) and the 3D latent diffusion model (LDM). For example, a method utilizing VecSet representation employs a 3D VAE to compress point clouds into a VecSet, from which a decoder retrieves the Signed Distance Function (SDF) field for the 3D model. An iso-surface sampling technique is then applied to generate the visible 3D model from the SDF field. Similarly, the 3D LDM builds on the VecSet representation by stacking multiple layers of Diffusion Transformers (DiT) to facilitate the learning process from images to their corresponding 3D representations in VecSet form. Recent advancements, such as Hunyuan3D 2.1~\\cite{hunyuan3d2025hunyuan3d21imageshighfidelity}, have showcased the powerful capabilities of native 3D generation for efficient and high-quality 3D modeling~\\cite{zhao2024michelangelo,li2024craftsman}.\n\nDespite these significant advancements, generating 3D assets from a single image remains an ill-posed problem, complicating the accurate reconstruction of complete 3D structures. This often results in uncertainties and ambiguities in 3D geometry generation. To enhance geometric accuracy, it is crucial to incorporate additional information through controllable generation techniques. Such techniques not only improve geometric fidelity but also enable customized outputs by imposing specific conditions. For instance, the integration of depth information can alleviate geometric distortions and spatial misalignments caused by viewpoint variations and self-occlusion, while also enriching geometric details. Recent studies, including Clay~\\cite{zhang2024clay} and PoseMaster~\\cite{yan2025posemaster}, have made notable progress in introducing additional conditions for downstream editing and pose control within the realm of 3D native generation models. Nevertheless, there remains a need for further exploration in developing a systematic and unified 3D controllable model.\n\nIn this paper, we introduce \\shortname, a unified framework for fine-grained and controllable 3D asset generation. Building upon the foundational model Hunyuan3D 2.1 and following the workflow of 2D controllable generation models, \\shortname enhances controllability and geometric accuracy by integrating various additional conditions, including point clouds, voxels, bounding boxes, and skeletons. To optimize training and model deployment costs, we consolidate these additional conditions into a single generative model. Specifically, we utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings. To preserve the structure and functionality of the base model, we concatenate the extracted embeddings with the DINO features of the input image. This approach allows us to achieve controllable 3D generation with minimal training steps. Experimental results demonstrate that \\shortname effectively addresses common challenges in native 3D generation, such as distortions, flatness, missing details, and aspect ratio discrepancies, by providing additional control signals. Furthermore, it facilitates the standardization of character poses and the stylization of generated outputs, offering new perspectives and solutions for post-training applications in 3D generation.\n\n\\section{Related Work}\n\n\\subsection{3D Native Generation}\nIn recent years, the field of 3D generation has advanced rapidly, bringing significant impact to domains such as gaming, film, and animation. Early works include SDS and multi-view supervision approaches ~\\cite{poole2022dreamfusion, liu2023zero, liu2023one, liu2024one, voleti2025sv3d} leverage pretrained image diffusion models to supervise the optimization of radiance fields~\\cite{mildenhall2021nerf} or NeuS~\\cite{wang2021neus}, thereby enabling 3D object generation. However, these methods suffer from multi-view consistency issues and slow generation speed, often producing noisy geometry. To address efficiency, LRM~\\cite{hong2023lrm} introduces a feed-forward architecture that directly outputs a tri-plane radiance field, enabling fast single-image-to-3D generation. Subsequent works ~\\cite{yang2024hunyuan3d, tang2024lgm, xu2024instantmesh, zhang2024gs} adopt similar strategies, but their results remain limited in geometric detail and texture fidelity.\n\n3DShape2VecSet~\\cite{zhang20233dshape2vecset} introduces a point cloud–based VAE to build a native 3D generation framework combining VAE and LDM, offering higher quality and faster generation. Michelangelo~\\cite{zhao2024michelangelo} further aligns the VecSet latent space with semantics to enable text-conditioned generation. Many later works follow the VecSet paradigm, scaling up models and datasets, replacing EDM with flow matching, and incorporating MoE architectures. These techniques have yielded high-quality 3D generation models such as CLAY~\\cite{zhang2024clay}, Craftsman3D~\\cite{li2024craftsman}, TripoSG~\\cite{li2025triposg}, FlashVDM~\\cite{lai2025flashvdm}, and Hunyuan3D 2.0/2.1/2.5~\\cite{zhao2025hunyuan3d, hunyuan3d2025hunyuan3d21imageshighfidelity, lai2025hunyuan3d2_5}, which can rapidly generate high-quality 3D assets from modalities such as single images or text. Another line of research utilizes voxel-based VAE representations to achieve similarly high-quality 3D generation, including works such as XCube~\\cite{ren2024xcube}, TRELLIS~\\cite{xiang2024structured}, and SparseFlex~\\cite{he2025sparseflex}. Meanwhile, some works build upon these models, enabling low-poly generation~\\cite{weng2024scaling}, part generation~\\cite{yan2025x, zhang2025bang}, scene generation~\\cite{yao2025cast}, material generation~\\cite{jiang2025flexitex, he2025materialmvp, feng2025romantex}, and assets generation pipeline~\\cite{lei2025hunyuan3d}, supporting many downstream applications.\n\nAlthough these methods enable fast generation of 3D objects from images or text, they generally lack support for more complex conditioning signals, such as points, bounding boxes, or voxels, which limits controllability and practical adoption.\n\\subsection{3D Controllable Generation}\nRecently, 2D controllable generation has made remarkable progress in image synthesis and editing. Methods such as ControlNet~\\cite{zhang2023adding}, T2I-Adapter~\\cite{mou2024t2i}, and IP-Adapter~\\cite{ye2023ip} introduce various structured conditions (e.g., edges, depth, and pose) into diffusion models, enabling high-precision control over generation results and highlighting the great potential of multimodal conditions in enhancing controllability and practicality.\n\nIn the area of 3D generation, similar approaches have emerged to support multiple types of control inputs. CLAY~\\cite{zhang2024clay} explores the integration of point cloud, bounding box, and voxel conditions into generative models via LoRA finetuning, thereby adapting to different input modalities. PoseMaster~\\cite{yan2025posemaster} incorporates pose control signals, enabling precise control over the pose of generated 3D characters. These works collectively demonstrate that accurate controllability is also achievable in 3D generation.\n\nHowever, most existing research focuses on single or limited conditions, and a unified multi-condition framework for 3D controllable generation is still lacking. How to flexibly integrate diverse control signals such as points, voxels, bounding boxes, and poses within a single model to achieve fine-grained and cross-modal controllability of 3D contents remains an important yet insufficiently explored challenge.\n\n\n\n\\section{Method}\n\\subsection{Preliminaries}\n{\\bf 3D VAE}. Given an input point cloud $P \\in R^{N \\times (3 + C)}$ sampled from the mesh surface, where $C$ denotes surface normals, 3D VAE first extract point features and then obtain the corresponding latent vector set $Z \\in R^{L \\times d}$ via resampling from estimated distribution, where $L$ and $d$ indicate the length and dimension of latent VecSet, respectively. Subsequently, a decoder is applied to reconstruct the signed distance function (SDF) field $F_{sdf}$, in which we can leverage the iso-surface extraction to obtain explicit mesh output. The procedure of VAE can be formulated as follows:\n\\begin{align}\nZ = \\mathcal{E}(P), F_{sdf} = \\mathcal{D}(Z)\n\\end{align}\n\n{\\bf 3D Diffusion}. Given an image and its latent set representation $Z$ of a shape, the 3D diffusion model aims to model the denoising process, thereby achieving conditional generation from an arbitrary image. It first leverages an image encoder, such as DINO-v2~\\cite{}, to capture image embeddings $c_i$ and then exploits the multi layers of DiT to predict the added noise or velocity. For a flow matching model used in Hunyuan3D 2.1~\\cite{}, its training objective is to transform a simple noise distribution $x_0 \\sim \\mathcal{N}(0, I)$ into a complex data distribution $x_1 \\sim D$ conditioned on image embeddings $c_i$, which can be formulated as follows:\n\\begin{equation}\n\\mathbb{E}_{t, {x}_0, {x_1}, c}\\vert\\vert{v}_\\theta({x}, t, c)-(x_1-x_0)\\vert\\vert_2^2\n\\end{equation}\n\n\\begin{figure}[h]\n\\centering\n\\includegraphics[width=0.99\\linewidth]{figures/framework.pdf}\n\\caption{Overview of \\shortname Architecture. This framework integrates four conditioning modalities—point clouds, boun\n\n[... middle omitted in main merge prompt; see parse/full.md and part analyses ...]\n\nmethods~\\cite{yan2022fbnet,yu2021pointr,yan2025symmcompletion}. Additionally, we also support the input of complete point clouds, which can be obtained from reconstruction models. We directly use the 3D coordinates of the point clouds in space as their representation, employing three resolutions: 512, 1024, or 2048. To simulate noisy point clouds from depth sensors and LiDAR scans, we further apply noise perturbation by generating noise and adding it to the condition point cloud. Therefore, we can represent the point cloud condition as $P_c \\in \\mathbb{R}^{N_c \\times 3}$, where $N_c$ is the number of points.\n\n\\subsubsection{Voxel Condition}\nSimilar to point clouds, voxels also serve as a strong conditioning signal, and we represent each voxel by the coordinates of its center. During Training, we construct a voxel condition from the surface point cloud. We uniformly sample from the object surface to obtain the initial point cloud $\\text{P}$, and then convert the point cloud into voxels. First, we normalize the coordinates of $\\text{P}$ to $\\left[0, 16\\right]^3$, quantize them into integers, and remove duplicate coordinates to obtain voxel coordinates at a resolution of $16\\times16\\times16$. Then, we map these coordinates back to the center coordinates of the voxels in the $[-1, 1]^3$ space.\n\n\\subsubsection{Unified Control Encoder}\nThe unified control encoder is used to unify and distinguish these extra control signals. As all control signals can be represented as a type of point cloud, we can design a shared point encoder to extract the corresponding features easily. In particular, we leverage the bone points as the skeleton representation to control the pose of the humanoid input. To align the dimensions of all extra conditions, we repeat the feature channel of the condition of voxel, point cloud, and bounding box. As a result, all controls can be represented as a point cloud $P_c \\in \\mathbb{R}^{N \\times 6}$, where $N$ is the number of points or bones.\n\n\nWe then apply a position embedding followed by a linear layer on the point cloud $P_c$ to extract the condition features. Additionally, Different conditions correspond to distinct control objectives. For example, the point cloud condition aims to provide depth information from the image, reducing geometric distortions caused by artifacts, without altering the corresponding geometry of the image. In contrast, the skeleton condition is designed to control the pose of the input image, which does modify the corresponding geometry. Meanwhile, all these conditions are represented by point clouds, which tends to lead to control confusion. Therefore, to differentiate between the various conditions, we employ an embedding function to construct embeddings for the different control signals. Finally, we aggregate the extracted condition features and the distinguished embedding to obtain the final condition features. Thus, we can formulate our shared control encoder as follows:\n\\begin{align}\n\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)], i \\in [0,1,2,3]\n\\end{align}\nwhere $\\beta_i \\in \\mathbb{R}^{N \\times C}$ is final control feature. $P_i^c$ is the control condition. ${E}$ and $M$ are the embedding function and the linear projection, respectively. $\\mathcal{R}$ is a repeat operation, and $r$ is the time of repeating, which is used to enhance the signal for the condition type. $[\\cdot]$ is a concatenation operation.\n\nBenefiting from the scalability of the attention structure, we can concatenate the image feature $c_i$ and control feature $\\beta$ to form a joint feature that is fed into the DiT model of Hunyuan3D 2.1. As a result, we can define the training objective of our \\shortname as follows:\n\\begin{equation}\n\\mathbb{E}_{t, {x}_0, {x_1}, c'}\\vert\\vert{v}_\\theta({x}, t, c')-(x_1-x_0)\\vert\\vert_2^2\n\\end{equation}\nwhere $c'=[c, \\beta_i]$ is the joint feature.\n\n\\section{Experiment}\n\n\\subsection{Implementation Details}\n\nWe follow the PoseMaster~\\cite{yan2025posemaster} approach to construct the training data for pose control and adopt the dataset of Hunyuan3D 2.1~\\cite{hunyuan3d2025hunyuan3d21imageshighfidelity} for other conditions.  We follow the setting of Hunyuan3D 2.1~\\cite{hunyuan3d2025hunyuan3d21imageshighfidelity} to train our \\shortname. Due to the varying lengths of different conditions, we set the batch size to 1. Additionally, we employ a random sampling strategy to select the control conditions for the current batch. Notably, since the data for the pose condition is less abundant and more challenging to learn, we use a higher sampling probability to prioritize tasks related to pose control. We directly train our diffusion model and unified control encoder using a fixed learning rate of 1e-5 and the AdamW optimizer. we utilize DINO-v2-Large~\\cite{oquab2023dinov2} to extract image features.\n\n\\subsection{Qualitative Results}\nIn this section, we showcase the qualitative results for our \\shortname. Specifically, we first use our \\shortname to generate the controlled result and then leverage the Hunyuan3D 2.5~\\cite{lai2025hunyuan3d2_5} to refine its geometry.\n\n\\begin{figure}[h]\n    \\centering\n    \\includegraphics[width=0.95\\linewidth]{figures/exp_pose_control.png}\n    \\caption{Qualitative results of pose control, demonstrating that our Omni model generates accurately aligned geometry across diverse poses and input styles.}\n    \\label{fig:exp_pose_control}\n\\end{figure}\n\n\\begin{figure}[h]\n    \\centering\n    \\includegraphics[width=0.95\\linewidth]{figures/exp_bbox_ratio.png}\n    \\caption{Qualitative results of bounding box control, our Omni model can generate objects at different scales, given different bounding boxes. }\n    \\label{fig:image-generation bbox ratio}\n\n    \\includegraphics[width=0.95\\linewidth]{figures/exp_bbox_compare.png}\n    \\caption{Qualitative results of bounding box control, given the bounding box condition, our Omni model can avoid generating thin, sheet-like geometry.}\n    \\label{fig:image-generation bbox compare}\n\\end{figure}\n\n\\begin{figure}[h]\n    \\centering\n    \\includegraphics[width=0.95\\linewidth]{figures/exp_point_control.png}\n    \\caption{Qualitative results of point cloud control, showing improved alignment and detail recovery across complete, depth-projected, and scanned point cloud conditions compared to image-only results.}\n    \\label{fig:exp_point_control}\n\\end{figure}\n\n\\begin{figure}[h]\n    \\centering\n    \\includegraphics[width=0.95\\linewidth]{figures/exp_voxel_control.png}\n    \\caption{Qualitative results of voxel control, demonstrating improved scale alignment and fine detail recovery with voxel conditions compared to image-only results.}\n    \\label{fig:exp_voxel_control}\n\\end{figure}\n\n{\\bf Skeleton condition}. In contrast to the point cloud condition and voxel condition that provide sparse 3D information to enhance geometry accuracy, the skeleton condition aims to adjust the pose of the input image, which is usually used in character generation. As shown in Figure~\\ref{fig:exp_pose_control}, with the skeleton condition as additional input, our Omni model can generate high-quality character geometry which accurately corresponds to the target pose, including A pose, sky pose, and hands-up pose. In our experiments, we use character images of various styles as conditional inputs, including rendered images from 3D character data and synthetic images produced by generative models. Regardless of the input style, our Omni model consistently produces human body meshes with fine geometric details that remain strictly aligned with the input skeleton, without artifacts. This strong capability for pose control demonstrates significant practical value for downstream applications such as 3D animation production and 3D figurine printing.\n\n{\\bf Bounding box condition}. Bounding box control signals allow flexible adjustment of the aspect ratio of the generated object. As shown in Figure~\\ref{fig:image-generation bbox ratio}, given the same image condition, different bounding boxes successfully regulate the size of the output mesh. Notably, this manipulation is not a naive stretching: when the sofa is lengthened, extra supporting legs appear, and the Arc de Triomphe likewise acquires a plausible shape. Moreover, as shown in Figure~\\ref{fig:image-generation bbox compare}, the bounding box signal can inject an activation cue into the generation network when single-image conditioned generation fails, yielding a valid mesh.\n\n{\\bf Point cloud condition}.\nAs shown in Figure~\\ref{fig:exp_point_control}, we present the generation results under two settings: image only and image with point cloud control. For the latter, we further consider three types of point cloud inputs: complete point clouds, point clouds from depth images, and point clouds from scans. For the first two cases in the figure, we observe that providing a complete point cloud as a control signal effectively resolves the ambiguity inherent in single-view inputs and allows the recovery of occluded internal structures. In the third and fifth cases, where surface point clouds are obtained via a depth map, the additional input similarly mitigates single-view ambiguity, ensuring that the generated geometry is well-aligned in scale with the ground truth. In the fourth case, given a noisy surface point cloud from a scan, the generated geometry is also better aligned with the original object compared with the image-only baseline, addressing the issue where the image encoder tends to ignore the true object pose. In summary, once point cloud input is provided, our Omni model can effectively align the generated geometry with real-world geometry. This further demonstrates that even partial point clouds serve as a strong cue for improving the quality of 3D geometry generation.\n\n{\\bf Voxel Condition}.\nSimilar to the point cloud condition, the voxel condition provides sparse geometric cues that help resolve the ambiguities inherent in a single image. As shown in Figure~\\ref{fig:exp_voxel_control}, in the first and fifth cases, the additional voxel control condition ensures that the generated objects are properly aligned in scale with the ground truth geometry. Cases 2, 3, and 4 further illustrate how the voxel condition contributes to recovering fine geometric details. For instance, restoring the flat surface of the shield, capturing the shape of the bird's wing, and reproducing the low-poly style geometry of the cup. These examples clearly demonstrate that incorporating voxel conditions enables the model to faithfully recover both the proportions and the details of object geometry, thereby further improving generation quality.\n\n\\section{Conclusion}\nIn this paper, we propose a unified framework, called \\shortname, for fine-grained and controllable 3D asset generation. We incorporate point cloud, voxel, bounding box, and skeleton to mitigate geometry distortion in image-only 3D generation and achieve style control. To unify these extra conditions in one diffusion model, we design a lightweight unified control encoder. Building on the powerful existing 3D generation model, such as Hunyuan3D 2.1, \\shortname just introduces a lightweight encoder to achieve high-quality controllable generation. Experiments show that these additional controls improve generation accuracy, enable geometry-aware transformations, and increase robustness for production workflows.\n\n\\section{Contributors}\n\\large{Authors are listed \\textbf{alphabetically by the first name}.}\n\\definecolor{tencentblue}{RGB}{38,54,221}\n\n\\large{\n\\color{tencentblue}\n\\begin{multicols}{2}\n\\raggedcolumns\nBowen Zhang\\\\\nChunchao Guo\\\\\nHaolin Liu\\\\\nHongyu Yan\\\\\nHuiwen Shi\\\\\nJingwei Huang\\\\\nJunlin Yu\\\\\nKunhong Li\\\\\nLinus\\\\\nPenghao Wang\\\\\nQingxiang Lin\\\\\nSicong Liu\\\\\nXianghui Yang\\\\\nYixuan Tang\\\\\nYunfei Zhao\\\\\nZeqiang Lai\\\\\nZhihao Liang\\\\\nZibo Zhao\n\\end{multicols}}\n\n\\clearpage\n\n\\bibliography{colm2024_conference}\n\\bibliographystyle{colm2024_conference}\n\n\n\\end{document}",
+  "part_analyses": [
+    {
+      "part_id": "part_001",
+      "section_role": "preamble and macro definitions",
+      "method_evidence": [],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_002",
+      "section_role": "preamble and abstract",
+      "method_evidence": [
+        {
+          "claim": "Hunyuan3D-Omni accepts point clouds, voxels, bounding boxes, and skeletal pose priors as conditioning signals.",
+          "section": "Abstract",
+          "anchor": "In addition to images, \\shortname accepts point clouds, voxels, bounding boxes, and skeletal pose priors as conditioning signals",
+          "confidence": 0.95
+        },
+        {
+          "claim": "The model unifies all signals in a single cross-modal architecture.",
+          "section": "Abstract",
+          "anchor": "Instead of separate heads for each modality, our model unifies all signals in a single cross-modal architecture.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Training uses a progressive, difficulty-aware sampling strategy that selects one control modality per example and biases sampling toward harder signals.",
+          "section": "Abstract",
+          "anchor": "We train with a progressive, difficulty-aware sampling strategy that selects one control modality per example and biases sampling toward harder signals (~\\eg, skeletal pose) while downweighting easier ones (~\\eg, point...",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "fig:teaser-top",
+          "role_hint": "Teaser figure showing controllable generation based on point cloud, bounding box, voxel, and skeleton.",
+          "caption": "\\shortname is a unified framework for supporting controllable generation based on point cloud, bounding box, voxel, and skeleton.",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_003",
+      "section_role": "introduction and related work",
+      "method_evidence": [
+        {
+          "claim": "We utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings.",
+          "section": "Introduction",
+          "anchor": "we utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings",
+          "confidence": 0.95
+        },
+        {
+          "claim": "We concatenate the extracted embeddings with the DINO features of the input image.",
+          "section": "Introduction",
+          "anchor": "we concatenate the extracted embeddings with the DINO features of the input image",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [],
+      "open_questions": [
+        "How to flexibly integrate diverse control signals such as points, voxels, bounding boxes, and poses within a single model to achieve fine-grained and cross-modal controllability of 3D contents remains an important yet insufficiently explored challenge."
+      ]
+    },
+    {
+      "part_id": "part_004",
+      "section_role": "Method",
+      "method_evidence": [
+        {
+          "claim": "Hunyuan3D-Omni constructs a unified control encoder to introduce additional control signals: point cloud, voxel, skeleton, and bounding box.",
+          "section": "3.2",
+          "anchor": "\\shortname constructs a unified control encoder to introduce additional control signals, including point cloud, voxel, skeleton, and bounding box.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Skeleton condition uses 3D coordinates of bone starting points, selecting body and hand bones, represented as P_pose ∈ R^{M×6}.",
+          "section": "3.2.1",
+          "anchor": "we use the 3D coordinates of the starting points of the bones to represent each bone, selecting both body bones and hand bones. Consequently, we can define the input for the skeleton condition as $P_{pose} \\in \\mathbb{R...",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Bounding box condition converts length, width, height ratios into coordinates of eight vertices in canonical space, represented as P_box ∈ R^{8×3}.",
+          "section": "3.2.2",
+          "anchor": "we convert the length, width, and height ratios into the coordinates of the eight vertices in canonical space... we can define the input for the bounding box condition as $P_{box} \\in \\mathbb{R}^{8 \\times 3}$",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Point cloud condition uses 3D coordinates with resolutions 512, 1024, or 2048, and applies noise perturbation to simulate sensor data.",
+          "section": "3.2.3",
+          "anchor": "We directly use the 3D coordinates of the point clouds in space as their representation, employing three resolutions: 512, 1024, or 2048. To simulate noisy point clouds... we further apply noise perturbation",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [],
+      "formula_evidence": [
+        {
+          "name": "3D VAE formulation",
+          "latex": "Z = \\mathcal{E}(P), F_{sdf} = \\mathcal{D}(Z)",
+          "meaning": "Encoder E maps point cloud P to latent Z; decoder D reconstructs SDF field F_sdf.",
+          "section": "3.1",
+          "confidence": 0.95
+        },
+        {
+          "name": "Flow matching training objective",
+          "latex": "\\mathbb{E}_{t, {x}_0, {x}_1, c}\\vert\\vert{v}_\\theta({x}, t, c)-(x_1-x_0)\\vert\\vert_2^2",
+          "meaning": "Training objective for flow matching model used in Hunyuan3D 2.1, transforming noise x_0 to data x_1 conditioned on image embeddings c.",
+          "section": "3.1",
+          "confidence": 0.95
+        }
+      ],
+      "figure_table_roles": [
+        {
+          "label": "fig:framework",
+          "role_hint": "Architecture overview",
+          "caption": "Overview of Hunyuan3D-Omni Architecture. This framework integrates four conditioning modalities—point clouds, bounding boxes, voxels, and skeletons—through a unified control encoder. Hunyuan3D-Omni leverages a Diffusion...",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_005",
+      "section_role": "Method details and experiments",
+      "method_evidence": [
+        {
+          "claim": "All control signals can be represented as a type of point cloud.",
+          "section": "Unified Control Encoder",
+          "anchor": "As all control signals can be represented as a type of point cloud, we can design a shared point encoder to extract the corresponding features easily.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "All controls can be represented as a point cloud P_c ∈ R^{N×6}.",
+          "section": "Unified Control Encoder",
+          "anchor": "all controls can be represented as a point cloud $P_c \\in \\mathbb{R}^{N \\times 6}$, where $N$ is the number of points or bones.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Shared control encoder formula.",
+          "section": "Unified Control Encoder",
+          "anchor": "\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)], i \\in [0,1,2,3]",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Training objective uses joint feature of image and control.",
+          "section": "Unified Control Encoder",
+          "anchor": "\\mathbb{E}_{t, {x}_0, {x_1}, c'}\\vert\\vert{v}_\\theta({x}, t, c')-(x_1-x_0)\\vert\\vert_2^2",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Pose control generates accurately aligned geometry across diverse poses and input styles.",
+          "table_or_figure": "Figure 1",
+          "metric": "qualitative",
+          "value": "accurately aligned geometry",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Bounding box control generates objects at different scales.",
+          "table_or_figure": "Figure 2",
+          "metric": "qualitative",
+          "value": "generates objects at different scales",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Bounding box control avoids generating thin, sheet-like geometry.",
+          "table_or_figure": "Figure 3",
+          "metric": "qualitative",
+          "value": "avoids generating thin, sheet-like geometry",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Point cloud control shows improved alignment and detail recovery.",
+          "table_or_figure": "Figure 4",
+          "metric": "qualitative",
+          "value": "improved alignment and detail recovery",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [
+        {
+          "name": "Shared control encoder",
+          "latex": "\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)], i \\in [0,1,2,3]",
+          "meaning": "Final control feature β_i is concatenation of linear-projected position embedding of point cloud and repeated type embedding.",
+          "section": "Unified Control Encoder",
+          "confidence": 0.95
+        },
+        {
+          "name": "Training objective",
+          "latex": "\\mathbb{E}_{t, {x}_0, {x_1}, c'}\\vert\\vert{v}_\\theta({x}, t, c')-(x_1-x_0)\\vert\\vert_2^2",
+          "meaning": "Flow matching loss with joint condition c' = [c, β_i].",
+          "section": "Unified Control Encoder",
+          "confidence": 0.95
+        }
+      ],
+      "figure_table_roles": [
+        {
+          "label": "fig:exp_pose_control",
+          "role_hint": "Qualitative results of pose control",
+          "caption": "Qualitative results of pose control, demonstrating that our Omni model generates accurately aligned geometry across diverse poses and input styles.",
+          "confidence": 0.95
+        },
+        {
+          "label": "fig:image-generation bbox ratio",
+          "role_hint": "Qualitative results of bounding box control (scale)",
+          "caption": "Qualitative results of bounding box control, our Omni model can generate objects at different scales, given different bounding boxes.",
+          "confidence": 0.95
+        },
+        {
+          "label": "fig:image-generation bbox compare",
+          "role_hint": "Qualitative results of bounding box control (geometry)",
+          "caption": "Qualitative results of bounding box control, given the bounding box condition, our Omni model can avoid generating thin, sheet-like geometry.",
+          "confidence": 0.95
+        },
+        {
+          "label": "fig:exp_point_control",
+          "role_hint": "Qualitative results of point cloud control",
+          "caption": "Qualitative results of point cloud control, showing improved alignment and detail recovery across complete, depth-projected, and scanned point cloud conditions compared to image-only results.",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_006",
+      "section_role": "experiments and conclusion",
+      "method_evidence": [
+        {
+          "claim": "We incorporate point cloud, voxel, bounding box, and skeleton to mitigate geometry distortion in image-only 3D generation and achieve style control.",
+          "section": "Conclusion",
+          "anchor": "We incorporate point cloud, voxel, bounding box, and skeleton to mitigate geometry distortion in image-only 3D generation and achieve style control.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "To unify these extra conditions in one diffusion model, we design a lightweight unified control encoder.",
+          "section": "Conclusion",
+          "anchor": "To unify these extra conditions in one diffusion model, we design a lightweight unified control encoder.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Point cloud control resolves single-view ambiguity and recovers occluded internal structures.",
+          "table_or_figure": "Figure 11",
+          "metric": "qualitative",
+          "value": "effectively resolves the ambiguity inherent in single-view inputs and allows the recovery of occluded internal structures",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Voxel condition ensures proper scale alignment and recovers fine geometric details.",
+          "table_or_figure": "Figure 12",
+          "metric": "qualitative",
+          "value": "ensures that the generated objects are properly aligned in scale with the ground truth geometry ... contributes to recovering fine geometric details",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Bounding box signal injects activation cue when single-image conditioned generation fails.",
+          "table_or_figure": "Figure 10",
+          "metric": "qualitative",
+          "value": "the bounding box signal can inject an activation cue into the generation network when single-image conditioned generation fails, yielding a valid mesh",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Figure 10",
+          "role_hint": "image-generation bbox compare",
+          "caption": "the bounding box signal can inject an activation cue into the generation network when single-image conditioned generation fails, yielding a valid mesh",
+          "confidence": 0.9
+        },
+        {
+          "label": "Figure 11",
+          "role_hint": "exp_point_control",
+          "caption": "generation results under two settings: image only and image with point cloud control",
+          "confidence": 0.9
+        },
+        {
+          "label": "Figure 12",
+          "role_hint": "exp_voxel_control",
+          "caption": "voxel condition contributes to recovering fine geometric details",
+          "confidence": 0.9
+        }
+      ],
+      "open_questions": []
+    }
+  ],
+  "figures_tables": []
+}

@@ -1,0 +1,593 @@
+{
+  "verified_analysis": {
+    "paper_metadata": {
+      "title": "MaterialMVP: Illumination-Invariant Material Generation via Multi-view PBR Diffusion",
+      "title_zh": "MaterialMVP: 基于多视图PBR扩散的光照不变材质生成",
+      "venue": "ICCV",
+      "year": 2025,
+      "project_link": "https://zebinhe.github.io/MaterialMVP/",
+      "code_link": null
+    },
+    "source_links": [
+      {
+        "label": "Project",
+        "url": "https://zebinhe.github.io/MaterialMVP/"
+      }
+    ],
+    "analysis_truth": {
+      "real_bottleneck": "现有方法在图像引导的多视图 PBR 纹理生成中存在三个核心瓶颈：(1) 光照信息与材质属性纠缠，导致反照率图含有光照残留；(2) 参考图像微小视角或光照变化引起输出纹理大幅波动，缺乏多视图稳定性；(3) 反照率与金属度-粗糙度（MR）通道特征不对齐，造成纹理模糊与伪影。",
+      "causal_knob": "采用一致性正则化训练策略（使用具有细微视角和光照差异的参考图像对，并施加噪声预测一致性损失）迫使模型学习光照不变材质表示；同时通过双通道材质生成框架中的多通道对齐注意力（反照率保留参考交叉注意力，MR 通道通过残差继承反照率特征）和可学习材质嵌入，从结构上分离并精确对齐两个通道。",
+      "core_insight": "在扩散模型训练中引入图像对一致性损失，能够有效解耦光照与材质，提升多视图生成稳定性；将 MR 通道的生成从直接参考条件中解耦，并通过反照率特征的残差连接进行对齐，可在不增加参数量的前提下维持材质生成的空间一致性和多样性。",
+      "decisive_evidence": [
+        {
+          "claim": "定量实验中，MaterialMVP 在 CLIP-FID (24.78)、FID (168.5)、CMMD (2.191)、CLIP-I (0.9207)、LPIPS (0.1211) 等指标上全面优于所有对比方法，包括最强的图像条件基线 Paint3D (image)。",
+          "anchor": "Table 1 (tab: comparisons)",
+          "confidence": 0.98
+        },
+        {
+          "claim": "消融实验显示，移除一致性损失导致模型错误预测过高的金属度；移除多通道对齐注意力（MCAA）造成反照率与 MR 图不对齐，产生模糊纹理。",
+          "anchor": "Figure 7 (fig: ablation) (b), (c)",
+          "confidence": 0.95
+        },
+        {
+          "claim": "定性对比表明，MaterialMVP 在复杂光照下的真实感、前后视图一致性和光照不变性方面显著优于 Text2Tex、Paint3D 和 TexGen 等方法。",
+          "anchor": "Figure 5 (fig: t_comparison), Figure 6 (fig: i_comparison), Figure 8 (fig: re-light)",
+          "confidence": 0.95
+        }
+      ]
+    },
+    "method": {
+      "proposed_method_name": "MaterialMVP",
+      "baseline_methods": [
+        {
+          "name": "Text2Tex",
+          "role": "Text-conditioned baseline",
+          "citation": "Chen et al., ICCV 2023"
+        },
+        {
+          "name": "SyncMVD",
+          "role": "Text-conditioned baseline",
+          "citation": "Liu et al., SIGGRAPH Asia 2024"
+        },
+        {
+          "name": "Paint-it",
+          "role": "Text-conditioned baseline",
+          "citation": "Youwang et al., CVPR 2024"
+        },
+        {
+          "name": "Paint3D",
+          "role": "Text/Image-conditioned baseline",
+          "citation": "Zeng et al., CVPR 2024"
+        },
+        {
+          "name": "TexGen",
+          "role": "Text+Image conditioned baseline",
+          "citation": "Yu et al., TOG 2024"
+        },
+        {
+          "name": "SuperMat",
+          "role": "Two-stage generation baseline (ablation)",
+          "citation": null
+        }
+      ],
+      "changed_slots": [
+        {
+          "slot_name": "Training schema",
+          "baseline_value": "single reference image training",
+          "proposed_value": "consistency-regularized training with image pairs and L_cons loss",
+          "evidence_anchor": "Section 3.2: we propose a consistency-regularized training strategy that trains the model on pairs of reference images",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "Material generation architecture",
+          "baseline_value": "standard diffusion output with shared attention for albedo and MR or two-stage pipeline",
+          "proposed_value": "Dual-Channel Material Generation with MCAA (albedo retains cross-attention, MR uses residual from albedo) and learnable material embeddings",
+          "evidence_anchor": "Section 3.3: Dual-Channel Material Generation, Multi-Channel Aligned Attention, Learnable Material Embeddings",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "MR channel conditioning",
+          "baseline_value": "direct reference conditioning for both channels",
+          "proposed_value": "MR channel discards direct reference and uses residual from albedo attention",
+          "evidence_anchor": "Equation (5): z_MR^{new} = z_MR + Attn_{albedo}",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "Multi-view consistency enforcement",
+          "baseline_value": "multi-view attention only",
+          "proposed_value": "multi-view attention + L_cons regularization on noise predictions",
+          "evidence_anchor": "Section 3.2.2, Equation (L_cons)",
+          "confidence": 0.9
+        }
+      ],
+      "pipeline_modules": [
+        {
+          "name": "Reference Attention",
+          "role": "从参考图像提取信息并编码潜在特征，指导纹理生成",
+          "evidence_anchor": "Our approach leverages Reference Attention to extract and encode informative latent from the input reference images"
+        },
+        {
+          "name": "Multi-view Diffusion Model",
+          "role": "生成多视图一致的 PBR 贴图",
+          "evidence_anchor": "we employ a Multiview Diffusion Model framework designed to generate multiple view-consistent PBR maps from image prompts"
+        },
+        {
+          "name": "Consistency-Regularized Training",
+          "role": "通过参考图像对训练和一致性损失增强光照不变性与多视图稳定性",
+          "evidence_anchor": "we propose a consistency-regularized training strategy that trains the model on pairs of reference images rather than individual samples"
+        },
+        {
+          "name": "Multi-Channel Aligned Attention (MCAA)",
+          "role": "分离反照率与 MR 通道的生成，并通过残差连接保持空间对齐",
+          "evidence_anchor": "we propose Multi-Channel Aligned Attention that independently optimizes the albedo and MR channels while maintaining their material consistency"
+        },
+        {
+          "name": "Learnable Material Embeddings",
+          "role": "捕获反照率和 MR 纹理的独特分布，消除伪影",
+          "evidence_anchor": "we introduce learnable embeddings for both the albedo and MR channels to explicitly model their differences"
+        }
+      ]
+    },
+    "experiments": {
+      "main_results": [
+        {
+          "benchmark": "Objaverse subset (176 objects)",
+          "metric": "CLIP-FID",
+          "proposed": "24.78",
+          "baseline": "26.86 (Paint3D, Image-conditioned)",
+          "delta": "-2.08",
+          "anchor": "Table 1 (tab: comparisons)",
+          "confidence": 0.98
+        },
+        {
+          "benchmark": "Objaverse subset (176 objects)",
+          "metric": "FID",
+          "proposed": "168.5",
+          "baseline": "176.9 (Paint3D, Image-conditioned)",
+          "delta": "-8.4",
+          "anchor": "Table 1 (tab: comparisons)",
+          "confidence": 0.98
+        },
+        {
+          "benchmark": "Objaverse subset (176 objects)",
+          "metric": "CMMD",
+          "proposed": "2.191",
+          "baseline": "2.400 (Paint3D, Image-conditioned)",
+          "delta": "-0.209",
+          "anchor": "Table 1 (tab: comparisons)",
+          "confidence": 0.98
+        },
+        {
+          "benchmark": "Objaverse subset (176 objects)",
+          "metric": "CLIP-I",
+          "proposed": "0.9207",
+          "baseline": "0.8871 (Paint3D, Image-conditioned)",
+          "delta": "+0.0336",
+          "anchor": "Table 1 (tab: comparisons)",
+          "confidence": 0.98
+        },
+        {
+          "benchmark": "Objaverse subset (176 objects)",
+          "metric": "LPIPS",
+          "proposed": "0.1211",
+          "baseline": "0.1261 (Paint3D, Image-conditioned)",
+          "delta": "-0.005",
+          "anchor": "Table 1 (tab: comparisons)",
+          "confidence": 0.98
+        }
+      ],
+      "ablations": [
+        {
+          "claim": "单阶段端到端生成（MaterialMVP）优于两阶段方法（SuperMat），后者易将玻璃或金属渲染成塑料质感，说明端到端联合学习更适合 PBR 生成。",
+          "anchor": "Figure 7 (fig: ablation) (a)",
+          "confidence": 0.92
+        },
+        {
+          "claim": "移除一致性损失后，模型频繁错误预测过高金属度，将多种材质误判为金属，证明了光照一致性约束对材质解耦的必要性。",
+          "anchor": "Figure 7 (fig: ablation) (b)",
+          "confidence": 0.92
+        },
+        {
+          "claim": "替换 MCAA 为标准权重共享后，反照率与 MR 图在细节区域不对齐，导致最终渲染纹理模糊，验证了多通道对齐注意力的有效性。",
+          "anchor": "Figure 7 (fig: ablation) (c)",
+          "confidence": 0.92
+        }
+      ],
+      "fairness_notes": []
+    },
+    "formulas": [
+      {
+        "name": "Multi-view Attention",
+        "latex": "z_i^{new} = {\\sum_{j=1}^{n}} \\text{Softmax}(\\frac{ Q_i K_j^T}{\\sqrt{d}}) \\cdot V_j",
+        "meaning": "多视图扩散模型中的跨视图注意力，同步去噪以保持几何一致性。",
+        "anchor": "Equation (1)"
+      },
+      {
+        "name": "Reference Pair Subset",
+        "latex": "\\mathcal{S}\\left(I_{1}\\right)=\\left\\{I \\in \\mathcal{I} \\mid \\phi_{c}(I) \\in\\left\\{\\phi_{c}\\left(I_{1}\\right), \\phi_{c}\\left(I_{1}\\right)\\pm15^{\\circ}\\right\\}\\right\\}",
+        "meaning": "选择与第一张参考图像相机方位角相差不超过15°的图像作为候选对，以构建小幅视角与光照差异的训练对。",
+        "anchor": "Section 3.2.1"
+      },
+      {
+        "name": "PBR Loss",
+        "latex": "\\mathcal{L}_{\\text{pbr}} = \\mathbb{E}_{\\epsilon \\sim \\mathcal{N} (0,1),t}[\\|\\epsilon - \\epsilon_t^1\\|_2^2]",
+        "meaning": "扩散模型的去噪损失，作用于其中一个参考图像条件的预测噪声。",
+        "anchor": "Section 3.2.2, Training Strategy"
+      },
+      {
+        "name": "Consistency Loss",
+        "latex": "\\mathcal{L}_{\\text{cons}} = \\mathbb{E}_{t}[ \\|\\epsilon_t^1 - \\epsilon_t^2\\|_2^2]",
+        "meaning": "强制两个参考图像条件下的噪声预测一致，实现光照与视角不变性。",
+        "anchor": "Section 3.2.2, Equation"
+      },
+      {
+        "name": "Total Training Loss",
+        "latex": "\\mathcal{L} = (1-\\lambda)\\mathcal{L}_{\\text{pbr}} + \\lambda \\mathcal{L}_{\\text{cons}}, \\lambda=0.1",
+        "meaning": "PBR损失与一致性损失的加权组合，λ=0.1 平衡重建质量与一致性。",
+        "anchor": "Equation (7)"
+      },
+      {
+        "name": "Albedo Cross-Attention",
+        "latex": "\\text{Attn}_{albedo} = \\text{Softmax}\\left(\\frac{ Q_{albedo} K_{ref}^T}{\\sqrt{d}}\\right) \\cdot V_{ref}",
+        "meaning": "反照率通道保留参考图像引导的交叉注意力，确保纹理跟随参考图像。",
+        "anchor": "Equation (4)"
+      },
+      {
+        "name": "MR Residual Update",
+        "latex": "z_{MR}^{new} = z_{MR} + \\text{Attn}_{albedo}",
+        "meaning": "MR通道不直接接收参考信息，而是通过残差连接从反照率注意力继承空间一致性。",
+        "anchor": "Equation (5)"
+      }
+    ],
+    "figures_tables": [
+      {
+        "label": "fig:teaser",
+        "role": "Teaser figure showing textured meshes with PBR material generated by MaterialMVP.",
+        "caption": "A series of textured meshes with PBR material generated by MaterialMVP, showcasing exceptional texture generation and realistic physical behavior under environmental illumination. More results and code can be found on https://github.com/ZebinHe/MaterialMVP."
+      },
+      {
+        "label": "fig:pipeline",
+        "role": "Overview of the proposed method.",
+        "caption": "Overview of MaterialMVP, which takes a 3D mesh and a reference image as input and generates high-quality PBR textures through multi-view PBR diffusion. The albedo and MR channels are aligned via MCAA, effectively reducing artifacts. And Consistency-Regularized Training effectively eliminates illumination and addresses material inconsistency across multi-view PBR textures."
+      },
+      {
+        "label": "fig:img_pair",
+        "role": "Illustration of reference image pair selection with camera pose and lighting perturbations.",
+        "caption": "Reference Image Pair Selection. The selected image pair exhibits perturbations in camera pose and/or lighting. The solid box indicates the chosen reference image, and the dashed box indicates the perturbed reference image."
+      },
+      {
+        "label": "tab: comparisons",
+        "role": "Quantitative comparison with state-of-the-art methods.",
+        "caption": "Quantitative comparison with state-of-the-art methods. We compare with two classes of methods, one conditioned on text only, and the other one based on image. Our method achieves the best performance compared with both classes."
+      },
+      {
+        "label": "fig: t_comparison",
+        "role": "Qualitative comparison of text-conditioned 3D generation methods.",
+        "caption": "Qualitative comparison of text-conditioned 3D generation methods and our approach. Our method achieves superior fidelity in texture and pattern coherence, avoiding blur, inconsistent lighting, and misaligned patterns found in other approaches."
+      },
+      {
+        "label": "fig: i_comparison",
+        "role": "Qualitative comparison of image-conditioned 3D texture generation methods.",
+        "caption": "Qualitative comparison of image-conditioned 3D texture generation methods. It demonstrates that our method outperforms other methods in terms of faithfully following the image and its semantics, as well as generating textures with superior coherence."
+      },
+      {
+        "label": "fig: re-texture",
+        "role": "Demonstration of PBR texture diversity and semantic alignment.",
+        "caption": "We show a variety of PBR textures for two different 3D assets, demonstrating the diversity and semantic alignment capabilities of our model. (Better viewed by zooming in)"
+      },
+      {
+        "label": "fig: re-light",
+        "role": "Demonstration of PBR textures under various environmental illuminations.",
+        "caption": "We show PBR textures for two meshes with image prompts and display them under various environmental illuminations. The results demonstrate high accuracy in our PBR textures and the ability to remain unaffected by the input image's lighting."
+      },
+      {
+        "label": "fig: ablation",
+        "role": "Ablation study on one-stage generation, consistency loss, and MCAA.",
+        "caption": "We ablate the one-stage generation scheme, the consistency loss, and the MCAA, validating the effectiveness of our method in generating high-quality and semantically accurate textures, as well as eliminating blurring artifacts caused by PBR misalignment."
+      }
+    ],
+    "limitations": [
+      "论文未明确讨论局限性。"
+    ],
+    "open_questions": [],
+    "_meta": {
+      "part_count": 5,
+      "latency_seconds": 108.455,
+      "created_at": "2026-07-05T05:49:13.278712+00:00",
+      "usage": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "enabled",
+        "reasoning_effort": "max",
+        "prompt_tokens_est": 17748,
+        "completion_tokens_est": 4258,
+        "reasoning_tokens_est": 3997,
+        "total_tokens_est": 22006,
+        "total_with_reasoning_tokens_est": 26003,
+        "estimated_cost_usd": 0.011425,
+        "cost_basis": "discounted_estimate_from_local_text_lengths",
+        "prompt_tokens_api": 14713,
+        "completion_tokens_api": 7909,
+        "total_tokens_api": 22622,
+        "reasoning_tokens_api": 4080,
+        "prompt_cache_hit_tokens": 1536,
+        "prompt_cache_miss_tokens": 13177,
+        "cached_tokens_api": 1536,
+        "api_usage_raw": {
+          "completion_tokens": 7909,
+          "prompt_tokens": 14713,
+          "total_tokens": 22622,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": null,
+            "audio_tokens": null,
+            "reasoning_tokens": 4080,
+            "rejected_prediction_tokens": null
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1536
+          },
+          "prompt_cache_hit_tokens": 1536,
+          "prompt_cache_miss_tokens": 13177
+        },
+        "estimated_cost_usd_api": 0.012618,
+        "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+        "stream_diagnostics": {
+          "content_chars": 13255,
+          "reasoning_chars": 10737,
+          "finish_reason": "stop",
+          "finish_reasons": [
+            "stop",
+            "stop"
+          ],
+          "stream_chunk_count": 7910,
+          "api_usage_present": true
+        }
+      }
+    }
+  },
+  "focused_part_analyses": [
+    {
+      "part_id": "part_001",
+      "section_role": "Title, Abstract, Introduction",
+      "method_evidence": [
+        {
+          "claim": "Reference Attention extracts and encodes informative latent from input reference images.",
+          "section": "Abstract",
+          "anchor": "Our approach leverages Reference Attention to extract and encode informative latent from the input reference images, enabling intuitive and controllable texture generation.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Consistency-Regularized Training enforces stability across varying viewpoints and illumination conditions.",
+          "section": "Abstract",
+          "anchor": "We also introduce a Consistency-Regularized Training strategy to enforce stability across varying viewpoints and illumination conditions, ensuring illumination-invariant and geometrically consistent results.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "fig:teaser",
+          "role_hint": "Teaser figure showing textured meshes with PBR material generated by MaterialMVP.",
+          "caption": "A series of textured meshes with PBR material generated by MaterialMVP, showcasing exceptional texture generation and realistic physical behavior under environmental illumination. More results and code can be found on \\...",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_002",
+      "section_role": "introduction and related work and method start",
+      "method_evidence": [
+        {
+          "claim": "We introduce MaterialMVP, a one-stage model designed to generate PBR textures for 3D meshes.",
+          "section": "Introduction",
+          "anchor": "We introduce MaterialMVP, a one-stage model designed to generate PBR textures for 3D meshes.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "We employ a Multiview Diffusion Model framework designed to generate multiple view-consistent PBR maps from image prompts.",
+          "section": "Introduction",
+          "anchor": "we employ a Multiview Diffusion Model framework designed to generate multiple view-consistent PBR maps from image prompts.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "fig:pipeline",
+          "role_hint": "overview of the proposed method",
+          "caption": "Overview of MaterialMVP, which takes a 3D mesh and a reference image as input and generates high-quality PBR textures through multi-view PBR diffusion. The albedo and MR channels are aligned via MCAA, effectively reduci...",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_003",
+      "section_role": "Method section with preliminary, proposed training strategy, and quantitative results table",
+      "method_evidence": [
+        {
+          "claim": "MaterialMVP generates PBR textures conditioned on a 3D mesh and an image prompt.",
+          "section": "3",
+          "anchor": "As shown in Fig. 1, our MaterialMVP generates PBR textures conditioned on a 3D mesh and an image prompt.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "The 3D mesh is input as normal maps and position maps, encoded into latent space and concatenated with noise latent.",
+          "section": "3",
+          "anchor": "The 3D mesh is input in the form of normal maps and position maps, which are encoded into latent space and concatenated channel-wise with noise latent as U-Net input.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Our method achieves best CLIP-FID, FID, CMMD, CLIP-I, and LPIPS compared to state-of-the-art.",
+          "table_or_figure": "Table 1",
+          "metric": "CLIP-FID",
+          "value": "24.78",
+          "confidence": 0.98
+        },
+        {
+          "claim": "Our method achieves best FID score.",
+          "table_or_figure": "Table 1",
+          "metric": "FID",
+          "value": "168.5",
+          "confidence": 0.98
+        }
+      ],
+      "formula_evidence": [
+        {
+          "name": "Multi-view attention",
+          "latex": "z_i^{new} = {\\sum_{j=1}^{n}} \\text{Softmax}(\\frac{ Q_i K_j^T}{\\sqrt{d}}) \\cdot V_j",
+          "meaning": "Synchronized denoising of geometrically consistent multi-view outputs via multi-view attention.",
+          "section": "3.1",
+          "confidence": 0.95
+        },
+        {
+          "name": "Reference pair subset definition",
+          "latex": "\\mathcal{S}\\left(I_{1}\\right)=\\left\\{I \\in \\mathcal{I} \\mid \\phi_{c}(I) \\in\\left\\{\\phi_{c}\\left(I_{1}\\right), \\phi_{c}\\left(I_{1}\\right)\\pm15^{\\circ}\\right\\}\\right\\}",
+          "meaning": "Subset of images with camera azimuth within 15 degrees of I1.",
+          "section": "3.2.1",
+          "confidence": 0.95
+        }
+      ],
+      "figure_table_roles": [
+        {
+          "label": "Fig. 2",
+          "role_hint": "Illustration of reference image pair selection with camera pose and lighting perturbations.",
+          "caption": "Reference Image Pair Selection. The selected image pair exhibits perturbations in camera pose and/or lighting. The solid box indicates the chosen reference image, and the dashed box indicates the perturbed reference ima...",
+          "confidence": 0.95
+        },
+        {
+          "label": "Table 1",
+          "role_hint": "Quantitative comparison with state-of-the-art methods on texture generation metrics.",
+          "caption": "Quantitative comparison with state-of-the-art methods. We compare with two classes of methods, one conditioned on text only, and the other one based on image. Our method achieves the best performance compared with both...",
+          "confidence": 0.98
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_004",
+      "section_role": "Method details (Training Strategy, Dual-Channel Material Generation) and Experiment setup",
+      "method_evidence": [
+        {
+          "claim": "Training uses consistency regularization between two reference images.",
+          "section": "Training Strategy",
+          "anchor": "Following the input of reference image pair $(I_1, I_2)$, the network processes each image sequentially while enforcing output equivalence through consistency regularization.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Albedo channel uses reference-guided cross-attention.",
+          "section": "Multi-Channel Aligned Attention",
+          "anchor": "the albedo channel retains the conventional reference-guided cross-attention",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Training dataset consists of 70,000 high-quality 3D assets from Objaverse and Objaverse-XL.",
+          "table_or_figure": "Dataset description",
+          "metric": "Dataset size",
+          "value": "70,000",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Model trained for approximately 180 GPU days.",
+          "table_or_figure": "Experimental Setup",
+          "metric": "Training time",
+          "value": "180 GPU days",
+          "confidence": 0.95
+        }
+      ],
+      "formula_evidence": [
+        {
+          "name": "PBR loss",
+          "latex": "\\mathcal{L}_{\\text{pbr}} = \\mathbb{E}_{\\epsilon \\sim \\mathcal{N} (0,1),t}[\\|\\epsilon - \\epsilon_t^1\\|_2^2]",
+          "meaning": "Diffusion denoising loss on one reference image.",
+          "section": "Training Strategy",
+          "confidence": 0.95
+        },
+        {
+          "name": "Consistency loss",
+          "latex": "\\mathcal{L}_{\\text{cons}} = \\mathbb{E}_{t}[ \\|\\epsilon_t^1 - \\epsilon_t^2\\|_2^2]",
+          "meaning": "L2 loss enforcing consistency between noise predictions from two reference images.",
+          "section": "Training Strategy",
+          "confidence": 0.95
+        }
+      ],
+      "figure_table_roles": [
+        {
+          "label": "fig: t_comparison",
+          "role_hint": "Qualitative comparison of text-conditioned 3D generation methods.",
+          "caption": "Qualitative comparison of text-conditioned 3D generation methods and our approach. Our method achieves superior fidelity in texture and pattern coherence, avoiding blur, inconsistent lighting, and misaligned patterns fo...",
+          "confidence": 0.95
+        },
+        {
+          "label": "fig: i_comparison",
+          "role_hint": "Qualitative comparison of image-conditioned 3D texture generation methods.",
+          "caption": "Qualitative comparison of image-conditioned 3D texture generation methods. It demonstrates that our method outperforms other methods in terms of faithfully following the image and its semantics, as well as generating te...",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_005",
+      "section_role": "experiments, conclusion, acknowledgments",
+      "method_evidence": [
+        {
+          "claim": "MaterialMVP is a one-stage framework that generates PBR textures from image prompts via multi-view PBR diffusion.",
+          "section": "Conclusion",
+          "anchor": "We present MaterialMVP, a novel one-stage framework that generates high-quality PBR textures for 3D meshes from image prompts. We extend the conventional multi-view diffusion to a multi-view PBR diffusion process, gener...",
+          "confidence": 0.95
+        },
+        {
+          "claim": "An additional perturbed reference image is used during training for stable texture generation.",
+          "section": "Conclusion",
+          "anchor": "We also incorporate an additional perturbed reference image during training, ensuring stable texture generation in varying lighting conditions or unstable viewpoints.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "MaterialMVP achieves leading performance in FID, LPIPS, CMMD, CLIP-I, and CLIP-FID metrics.",
+          "table_or_figure": "Table 1 (tab: comparisons)",
+          "metric": "FID, LPIPS, CMMD, CLIP-I, CLIP-FID",
+          "value": "leading performance",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Ablation shows one-stage generation outperforms two-stage (SuperMat) in material estimation.",
+          "table_or_figure": "Figure 7 (fig: ablation)",
+          "metric": "visual quality",
+          "value": "end-to-end generation better suited; SuperMat renders glass/metal with plastic-like appearance",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "fig: re-texture",
+          "role_hint": "application result",
+          "caption": "ter viewed by zooming in)",
+          "confidence": 0.5
+        },
+        {
+          "label": "fig: re-light",
+          "role_hint": "application result",
+          "caption": "We show PBR textures for two meshes with image prompts and display them under various environmental illuminations. The results demonstrate high accuracy in our PBR textures and the ability to remain unaffected by the in...",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    }
+  ],
+  "focused_figures_tables": [],
+  "context_note": "Part and figure/table context is filtered for this section; use verified_analysis for global facts.",
+  "section_title": "概要",
+  "section_goal": "用 180-260 中文字直陈问题、方法、主要结果和方法定位，不展开细节。"
+}

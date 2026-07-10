@@ -1,0 +1,62 @@
+[
+  {
+    "source": "analysis/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditioning.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditioning.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditions.md"
+  },
+  {
+    "source": "analysis/CVPR_2024/HGM_Hierarchical_Generative_Masked_Motion_Modeling_with_Hard_Token_Mining.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/CVPR_2024/HGM_Hierarchical_Generative_Masked_Motion_Modeling_with_Hard_Token_Mining.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/CVPR_2024/MMM_Generative_Masked_Motion_Model.md"
+  },
+  {
+    "source": "analysis/arxiv_2026/AnyLift_Lifting_Unseen_In_the_Wild_Human_Motions_via_Camera_Aware_2D_Diffusion.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/arxiv_2026/AnyLift_Lifting_Unseen_In_the_Wild_Human_Motions_via_Camera_Aware_2D_Diffusion.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/CVPR_2026/AnyLift_Scaling_Motion_Reconstruction_from_Internet_Videos_via_2D_Diffusion.md"
+  },
+  {
+    "source": "analysis/arxiv_2025/MAMMA_Markerless_and_Automatic_Multi_Person_Motion_Action_Capture.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/arxiv_2025/MAMMA_Markerless_and_Automatic_Multi_Person_Motion_Action_Capture.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/CVPR_2026/MAMMA_Markerless_Accurate_Multi_person_Motion_Acquisition.md"
+  },
+  {
+    "source": "analysis/arxiv_2026/SAM_3D_Body_Robust_Full_Body_Human_Mesh_Recovery.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/arxiv_2026/SAM_3D_Body_Robust_Full_Body_Human_Mesh_Recovery.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/CVPR_2026/SAM_3D_Body_Robust_Full_Body_Human_Mesh_Recovery.md"
+  },
+  {
+    "source": "analysis/ICCV_2025/SceneMI_Motion_In_betweening_for_Modeling_Human_Scene_Interaction.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/ICCV_2025/SceneMI_Motion_In_betweening_for_Modeling_Human_Scene_Interaction.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/ICCV_2025/SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions.md"
+  },
+  {
+    "source": "analysis/ICLR_2025/INTERMASK_3D_HUMAN_INTERACTION_GENERATION_VIA_COLLABORATIVE_MASKED_MODELING.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/ICLR_2025/INTERMASK_3D_HUMAN_INTERACTION_GENERATION_VIA_COLLABORATIVE_MASKED_MODELING.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/ICLR_2025/InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Modelling.md"
+  },
+  {
+    "source": "analysis/ICLR_2026/Huxley_Godel_Machine_Human_Level_Coding_Agent_Development_by_an_Approximation_of_the_Optimal_Self_Improving_Machine.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/ICLR_2026/Huxley_Godel_Machine_Human_Level_Coding_Agent_Development_by_an_Approximation_of_the_Optimal_Self_Improving_Machine.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/ICLR_2026/Huxley_Gödel_Machine_Human_Level_Coding_Agent_Development_by_an_Approximation_of_the_Optimal_Self_Improving_Machine.md"
+  },
+  {
+    "source": "analysis/NEURIPS_2024/InterControl_Generate_Human_Motion_Interactions_by_Controlling_Every_Joint.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/NEURIPS_2024/InterControl_Generate_Human_Motion_Interactions_by_Controlling_Every_Joint.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/NEURIPS_2024/InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every_Joint.md"
+  },
+  {
+    "source": "analysis/arxiv_2026/PST_Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.md",
+    "archive": "_private/archives/duplicate_analysis_md/20260612_224456/analysis/arxiv_2026/PST_Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.md",
+    "status": "archived_removed_from_analysis",
+    "kept": "analysis/arxiv_2026/Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.md"
+  }
+]

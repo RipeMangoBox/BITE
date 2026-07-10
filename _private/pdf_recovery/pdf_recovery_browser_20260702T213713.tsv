@@ -1,0 +1,53 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Semantic_Shape_Editing_With_Parametric_Implicit_Templates.pdf	https://doi.org/10.1145/3641519.3657421	144357248	1061838	144357248	5985808	gs-600dpi-q100; 5.71MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Adaptive_Fast_Multipole_Accelerated_Hybrid_Boundary_Integral_Equation_Method_for_Accurate_Diffusion_Curves.pdf	https://doi.org/10.1145/3618374	137247397	1740325	137247397	7292564	gs-600dpi-q100; 6.95MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2023/Effect_based_Multi_viewer_Caching_for_Cloud_native_Rendering.pdf	https://doi.org/10.1145/3592431	128995670	2781087	128995670	6626804	gs-600dpi-q100; 6.32MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/MVD_2_Efficient_Multiview_3D_Reconstruction_for_Multiview_Diffusion.pdf	https://doi.org/10.1145/3641519.3657403	126003156	2018426	126003156	6899481	gs-600dpi-q100; 6.58MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/NeurCADRecon_Neural_Representation_for_Reconstructing_CAD_Surfaces_by_Enforcing_Zero_Gaussian_Curvature.pdf	https://doi.org/10.1145/3658171	124632133	1244546	23141723			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Multi_color_Holograms_Improve_Brightness_in_Holographic_Displays.pdf	https://doi.org/10.1145/3610548.3618135	112703727	1018961	112703727	4809866	gs-600dpi-q100; 4.59MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Real_time_Neural_Woven_Fabric_Rendering.pdf	https://doi.org/10.1145/3641519.3657496	106388413	1578875	106388413	5580071	gs-600dpi-q100; 5.32MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SOL_NeRF_Sunlight_Modeling_for_Outdoor_Scene_Decomposition_and_Relighting.pdf	https://doi.org/10.1145/3610548.3618143	100695071	2412615	100695071	7974896	gs-600dpi-q100; 7.61MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Variational_Feature_Extraction_in_Scientific_Visualization.pdf	https://doi.org/10.1145/3658219	99476363	827841	99476363	4568437	gs-600dpi-q100; 4.36MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/VRMM_A_Volumetric_Relightable_Morphable_Head_Model.pdf	https://doi.org/10.1145/3641519.3657406	98972763	1138631	98972763	4684006	gs-600dpi-q100; 4.47MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2022/Simulation_and_Optimization_of_Magnetoelastic_Thin_Shells.pdf	https://doi.org/10.1145/3528223.3530142	98435430	1694448	98435430	14086932	gs-450dpi-q95; 13.43MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/Controllable_Neural_Style_Transfer_for_Dynamic_Meshes.pdf	https://doi.org/10.1145/3641519.3657474	90198088	1380831	19423232			"qpdf failed: WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3641519.3657474.pdf: file is damaged
+WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3641519.3657474.pdf: can't find startxref
+WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3641519.3657474.pdf: Attempting to reconstruct cross-reference table
+qpdf: /home/ripemangobox/Downloads/acm_sig_auto/3641519.3657474.pdf: unable to find trailer dictionary while recovering damaged file"
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/Seamless_Parametrization_in_Penner_Coordinates.pdf	https://doi.org/10.1145/3658202	89068284	1333570	34811388			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fast_MSX_Fast_Multiple_Scattering_Approximation.pdf	https://doi.org/10.1145/3610548.3618231	84613113	1000949	23493815			"qpdf failed: WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3610548.3618231 (1).pdf: file is damaged
+WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3610548.3618231 (1).pdf: can't find startxref
+WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3610548.3618231 (1).pdf: Attempting to reconstruct cross-reference table
+qpdf: /home/ripemangobox/Downloads/acm_sig_auto/3610548.3618231 (1).pdf: unable to find trailer dictionary while recovering damaged file"
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Implicitly_Stable_Mixture_Model_for_Dynamic_Multi_fluid_Simulations.pdf	https://doi.org/10.1145/3610548.3618215	84511332	586907	84511332	2268863	gs-600dpi-q100; 2.16MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2023/Deep_SVBRDF_Estimation_From_Single_Image_Under_Learned_Planar_Lighting.pdf	https://doi.org/10.1145/3588432.3591559	83960757	548829	83960757	2889834	gs-600dpi-q100; 2.76MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Lifting_Directional_Fields_to_Minimal_Sections.pdf	https://doi.org/10.1145/3658198	82601504	1405352	82601504	8174460	gs-600dpi-q100; 7.80MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/TensoSDF_Roughness_aware_Tensorial_Representation_for_Robust_Geometry_and_Material_Reconstruction.pdf	https://doi.org/10.1145/3658211	81165801	2035773	30445127			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Mixed_Variational_Finite_Elements_for_Implicit_Simulation_of_Deformables.pdf	https://doi.org/10.1145/3550469.3555418	80383930	653230	24005610			"qpdf failed: WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3550469.3555418 (1).pdf: file is damaged
+WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3550469.3555418 (1).pdf: can't find startxref
+WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3550469.3555418 (1).pdf: Attempting to reconstruct cross-reference table
+qpdf: /home/ripemangobox/Downloads/acm_sig_auto/3550469.3555418 (1).pdf: unable to find trailer dictionary while recovering damaged file"
+download_invalid	obsidian-vault/paperPDFs/TOG_2022/DeepPhase_periodic_autoencoders_for_learning_motion_phase_manifolds.pdf	https://doi.org/10.1145/3528223.3530178	78681518	920628	22214348			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Invalid XRef entry 540
+Syntax Error: Invalid XRef entry 536
+Syntax Error: Top-level pages object is wrong type (null)
+Command Line Error: Wrong page range given: the first page (1) can not be after the last page (0)."
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/StopThePop_Sorted_Gaussian_Splatting_for_View_consistent_Real_time_Rendering.pdf	https://doi.org/10.1145/3658187	77706922	1712845	77706922	5829468	gs-600dpi-q100; 5.56MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Creating_LEGO_Figurines_From_Single_Images.pdf	https://doi.org/10.1145/3658167	75236050	1453166	75236050	8844186	gs-600dpi-q100; 8.43MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/Proxy_Tracing_Unbiased_Reciprocal_Estimation_for_Optimized_Sampling_in_BDPT.pdf	https://doi.org/10.1145/3658216	74949824	1807583	23343479			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/Learning_Images_Across_Scales_Using_Adversarial_Training.pdf	https://doi.org/10.1145/3658190	74902575	4580202	28298645			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Invalid XRef entry 1627
+Syntax Error: Invalid XRef entry 1623
+Syntax Error: Top-level pages object is wrong type (null)
+Command Line Error: Wrong page range given: the first page (1) can not be after the last page (0)."
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/LightFormer_Light_oriented_Global_Neural_Rendering_in_Dynamic_Scene.pdf	https://doi.org/10.1145/3658229	74454711	1528379	35379087			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"

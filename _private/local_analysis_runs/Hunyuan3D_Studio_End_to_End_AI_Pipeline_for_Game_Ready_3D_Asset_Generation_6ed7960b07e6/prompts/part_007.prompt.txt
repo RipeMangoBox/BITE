@@ -1,0 +1,152 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Hunyuan3D Studio: End-to-End AI Pipeline for Game-Ready 3D Asset Generation
+Part: 7/12
+Character span: 43718-51552
+
+=== PART CONTENT ===
+bf{Method} & CD↓ & Fscore-0.1↑ & Fscore-0.5↑ \\
+\midrule
+SAMPart3D  & 0. &  & 0. \\
+PartField  & 0.17 & 0.68 & 0.57 \\
+HoloPart  & 0.26 & 0.59 & 0.43  \\
+OmniPart  & 0.23 & 0.63 & 0.46 \\
+Ours      & \textbf{0.11} & \textbf{0.80} & \textbf{0.71}  \\
+\bottomrule
+\end{tabular}
+\caption{Shape Decomposition Results}
+\label{tab:xpart-tabel}
+\end{table}
+
+
+\begin{figure*}[!ht]
+  \centering
+  \includegraphics[width=1\linewidth]{./figures/part/xpart/compare_parts.jpg}
+  \caption{Shape Decomposition Results.}
+  \label{fig:xpart-parts}
+\end{figure*}
+
+
+
+
+
+  \label{sec:part}
+
+\section{Polygon Generation with Auto-regressive Models}
+
+In this section, our goal is to generate a clean topology for shapes produced by geometry generative models or given by users. Despite the delicate shapes produced in previous sections, they typically consist of a huge amount of messy triangles and are hard to be directly applied in downstream applications (e.g., UV segmentation and rigging).
+Therefore, we leverage an auto-regressive model to directly predict vertices and faces from the point cloud of generated shapes.
+Our model is trained in two stages, including pre-training and post-training as shown in Figure \ref{fig:poly-pipeline}.
+
+
+\begin{figure*}[th]
+\centering
+\vspace{-0.3mm}
+\includegraphics[width=\linewidth]{figures/poly_figures/pipeline.pdf}
+\caption{\textbf{Mesh-RFT Framework Overview.} The pipeline comprises two stages: \textbf{1) Mesh Generation Pre-training} using an Hourglass AutoRegressive Transformer and a Shape Encoder;  and \textbf{2) Reinforcement Post-training} which employs Mask DPO with reference and policy networks for subsequent refinement.}
+\label{fig:poly-pipeline}
+\vspace{-5pt}
+\end{figure*}
+
+
+\subsection{Mesh Pretrianing with Efficient Tokenization and Architecture}
+
+
+\paragraph{Mesh Tokenization.}
+
+To model meshes with the next-token-prediction paradigm, the first step is to tokenize them into 1D sequences.
+We leverage the Blocked and Patchified Tokenization (BPT) \citep{weng2025scaling} as the basic tokenization for meshes.
+Specifically, BPT combines two core mechanisms: 1) \textit{Block-wise Indexing} partitions 3D coordinates into discrete spatial blocks, converting Cartesian coordinates into block-offset indexes to exploit spatial locality. 2) \textit{Patch Aggregation} further compresses face-level data by selecting high-degree vertices as patch centers and aggregating connected faces into unified patches. Each patch is encoded as a center vertex followed by peripheral vertices, reducing vertex repetition and enhancing spatial coherence.
+With BPT, both training and inference efficiency are significantly improved.
+
+
+\paragraph{Network Architecture.}
+Our polygon generative model consists of a point cloud encoder and an auto-regressive mesh decoder.
+The point cloud encoder is highly motivated by Michelangelo \citep{zhao2023michelangelo} and Hunyuan3D series \citep{zhao2025hunyuan3d,hunyuan3d2025hunyuan3d}, which applies the Perceiver \citep{jaegle2021perceiver} architecture to encode point cloud into condition tokens $c_p$.
+Then, we leverage the Hourglass Transformer \citep{hao2024meshtron} as the mesh decoder backbone, conditioned on point cloud tokens by cross attention layers.
+
+
+\paragraph{Training \& Inference Scheme.}
+
+The mesh token distribution $p(m_i)$ is modeled with Hourglass Transformer with parameter $\theta$, maximizing the log probability. The \textit{cross-attention} is leveraged for various conditions $c_p$.
+\begin{equation}
+    L(\theta) =  \prod_{i=1}^{|m|} p(m_{i} | m_{1:i-1}, c_p;\theta),
+\end{equation}
+To further leverage the high-poly mesh data and improve training efficiency, we adopt the truncated training strategy \citep{hao2024meshtron}.
+Specifically, for each training iteration, we randomly selected a slice of mesh sequence with a fixed number of faces (e.g., 4k faces).
+And in the inference stages, we apply the rolling cache strategy to reduce the gap between the training and inference stages.
+
+\subsection{Mesh Post-Training with Topology-Aware Masked DPO}
+
+\begin{figure*}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figures/poly_figures/dpo.pdf}
+    \caption{\textbf{The effectiveness of the post-training stage.} The post-training stage enhances the mesh completeness (Row \#1) and connectivity (Row \#2) and reduces the broken faces (Row \#3).}
+    \label{fig:poly-prepost}
+    \vspace{-0.1cm}
+\end{figure*}
+
+\paragraph{Preference Dataset Construction.}
+We establish a pipeline for constructing the preference dataset used in the second-stage fine-tuning, which consists of candidate generation, multi-metric evaluation, and preference ranking.
+
+For each input point cloud $\mathcal{P}$, we generate eight candidate meshes $\{\mathcal{M}_{\mathcal{P}}^1, \mathcal{M}_{\mathcal{P}}^2, \ldots, \mathcal{M}_{\mathcal{P}}^8\}$ using the pre-trained model $G_{\theta}^{\text{pre}}$. Each candidate is evaluated using three metrics: Boundary Edge Ratio (BER) and Topology Score (TS) for topological quality, and Hausdorff Distance (HD) for geometric consistency.
+
+A preference relation $\mathcal{M}_{\mathcal{P}}^i \succ \mathcal{M}_{\mathcal{P}}^j$ is defined if and only if:
+\begin{equation}
+\begin{aligned}
+\text{BER}(\mathcal{M}_{\mathcal{P}}^i) &< \text{BER}(\mathcal{M}_{\mathcal{P}}^j) \quad \land \\
+\text{TS}(\mathcal{M}_{\mathcal{P}}^i) &> \text{TS}(\mathcal{M}_{\mathcal{P}}^j) \quad \land \\
+\text{HD}(\mathcal{M}_{\mathcal{P}}^i) &< \text{HD}(\mathcal{M}_{\mathcal{P}}^j)
+\end{aligned}
+\end{equation}
+We compile preference triplets $(\mathcal{P}, \mathcal{M}_{\mathcal{P}}^+, \mathcal{M}_{\mathcal{P}}^-)$ from all pairwise comparisons to form the dataset.
+
+
+
+
+\paragraph{Masked Direct Preference Optimization.}
+To address localized geometric imperfections and inconsistent face density, we leverage Masked Direct Preference Optimization (M-DPO) \citep{liu2025mesh}, which extends DPO with quality-aware localization masks.
+
+We define a binary masking function $\phi(\mathcal{M}) \in \{0,1\}^{|\mathcal{M}|}$ that identifies high-quality regions (value 1) versus low-quality regions (value 0) based on per-face quality assessment. Each region corresponds to a subsequence in the block patch tokenization (BPT). A subsequence is classified as a high-quality region only if all faces within it have a quad ratio above a predefined threshold and the average topology score exceeds another threshold.
+
+Let $G_{\text{ref}} = G_\theta^{\text{pre}}$ be the frozen reference model and $G_\psi$ be the trainable policy. The M-DPO objective is:
+\begin{equation}
+\mathcal{L}_{\text{M-DPO}}(\pi_\psi; \pi_{\text{ref}}) = -\mathbb{E}_{(\mathcal{P}, \mathcal{M}_{\mathcal{P}}^+, \mathcal{M}_{\mathcal{P}}^-) \sim \mathcal{D}} \left[ \log \sigma \left( \beta \mathcal{L}^+(\mathcal{P}, \mathcal{M}_{\mathcal{P}}^+) -\beta \mathcal{L}^-(\mathcal{P}, \mathcal{M}_{\mathcal{P}}^-) \right)\right]
+\end{equation}
+where the positive and negative terms are:
+\begin{equation}
+\begin{aligned}
+\mathcal{L}^+(\mathcal{P}, \mathcal{M}_{\mathcal{P}}^+) &= \log \frac{\left|\pi_\psi(\mathcal{M}_{\mathcal{P}}^+ | \mathcal{P}) \odot \phi(\mathcal{M}_{\mathcal{P}}^+)\right|_1}{\left|\pi_{\text{ref}}(\mathcal{M}_{\mathcal{P}}^+ | \mathcal{P}) \odot \phi(\mathcal{M}_{\mathcal{P}}^+)\right|_1} \\
+\mathcal{L}^-(\mathcal{P}, \mathcal{M}_{\mathcal{P}}^-) &= \log \frac{\left|\pi_\psi(\mathcal{M}_{\mathcal{P}}^- | \mathcal{P}) \odot (1-\phi(\mathcal{M}_{\mathcal{P}}^-))\right|_1}{\left|\pi_{\text{ref}}(\mathcal{M}_{\mathcal{P}}^- | \mathcal{P}) \odot (1-\phi(\mathcal{M}_{\mathcal{P}}^-))\right|_1}
+\end{aligned}
+\end{equation}
+Here, $\odot$ denotes element-wise multiplication and $|\cdot|_1$ is the $\ell_1$ norm. M-DPO enables targeted refinement of low-quality regions while preserving satisfactory areas.
+
+
+\subsection{Experiments}

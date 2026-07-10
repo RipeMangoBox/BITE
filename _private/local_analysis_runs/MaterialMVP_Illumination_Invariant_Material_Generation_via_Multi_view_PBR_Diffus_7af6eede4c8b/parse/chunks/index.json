@@ -1,0 +1,42 @@
+[
+  {
+    "part_id": "part_001",
+    "index": 1,
+    "total": 5,
+    "start": 0,
+    "end": 6674,
+    "chars": 6674
+  },
+  {
+    "part_id": "part_002",
+    "index": 2,
+    "total": 5,
+    "start": 6324,
+    "end": 13456,
+    "chars": 7130
+  },
+  {
+    "part_id": "part_003",
+    "index": 3,
+    "total": 5,
+    "start": 13106,
+    "end": 20480,
+    "chars": 7374
+  },
+  {
+    "part_id": "part_004",
+    "index": 4,
+    "total": 5,
+    "start": 20130,
+    "end": 27735,
+    "chars": 7604
+  },
+  {
+    "part_id": "part_005",
+    "index": 5,
+    "total": 5,
+    "start": 27385,
+    "end": 34902,
+    "chars": 7517
+  }
+]

@@ -11,7 +11,7 @@ aliases:
 source_notes:
   - "[[2026-07-01_storymotion-v6.2-metric-data]]"
 created: 2026-07-01T14:30:00+0800
-updated: 2026-07-01T17:45:00+0800
+updated: 2026-07-10T00:20:46+0800
 ---
 
 ## 0. 当前裁决
@@ -28,6 +28,9 @@ updated: 2026-07-01T17:45:00+0800
 | --- | --- | ---: | --- | --- | --- |
 | Stage1 source tokenizers | `runs/visualizations/stage1/stage1_tokenizers_20260701_rerun/manifest.json` | 4 mixed samples | `gt`, `molingo_vae_noz`, `separate_ae_noz`, `separate_grfsq_bs128_noz`, `separate_hfsq_wscale_noz`, `separate_vae_wz` | `fixed_camera_mp4`, `orbiting_camera_mp4`, `camera_trajectory_mp4`, `npz` | active rerun; `rerun_reason` set |
 | Stage1 joint tokenizers | `runs/visualizations/stage1/v6_2_joint_stage1_20260701_rerun/manifest.json` | 2 mixed + 2 pure samples | `gt`, `joint_vae_wz_*`, `joint_grfsq_wz_*` | `fixed_camera_mp4`, `orbiting_camera_mp4`, `camera_trajectory_mp4`, `rifke_joints_projection_npz` | active rerun; `rerun_reason` set |
+| Stage1 v7.12 non-causal default ae_train_split | `runs/visualizations/v7_12_correct_fast_stage1_bigtitle_20260709/summary.json` | 8 pure samples | `gt`, `separate_ae_v7_12`, `separate_vae_v7_12`, `separate_grfsq_v7_12`; trained on original paired full `ae_train_split` | `fixed_camera.mp4`, `orbiting_camera.mp4`, `camera_trajectory.mp4`, `rifke_joints.npz`, concat summaries | active synced-row group; 120 mp4 files; velocity preset AE/VAE `1.0`, GRFSQ `0.5` |
+| Stage1 v7.13 joint default ae_train_split | `runs/visualizations/v7_13_joint_default_stage1_bigtitle_20260710/summary.json` | 8 pure samples | `gt`, `joint_ae_v7_13`, `joint_vae_v7_13`, `joint_hfsq_v7_13`; trained on original paired full `ae_train_split` | `fixed_camera.mp4`, `orbiting_camera.mp4`, `camera_trajectory.mp4`, `rifke_joints.npz`, concat summaries | active synced-row group; 120 mp4 files; default group |
+| Stage1 Pulp AE official vs self-trained | `runs/visualizations/v7_13_pulp_ae_official_selftrained_stage1_bigtitle_20260709/summary.json` | 8 pure samples | `gt`, `official_pretrained_pulp_ae`, `selftrained_pulp_ae_epoch325`; official pretrained uses Pulp released checkpoint, self-trained uses original Pulp mixed train epoch325 | `fixed_camera.mp4`, `orbiting_camera.mp4`, `camera_trajectory.mp4`, `rifke_joints.npz`, concat summaries | active synced-row group; 96 mp4 files; for last-frame distortion audit |
 | Stage2 joint VAE | `runs/visualizations/stage2/v6_2_joint_stage2_20260701_rerun/joint_vae_wz_mixed_full/stage2/vis/v4/concat/cfg_h1_c1_seed17_best_eval/v4_4x3_text_global_camera_manifest.json` | 2 mixed samples | `joint`, `human_completion`, `camera_completion` | `gt`, `pulp`, `storymotion` × camera/global × SMPL/skeleton | active rerun; `missing=0` |
 | Stage2 joint GRFSQ | `runs/visualizations/stage2/v6_2_joint_stage2_20260701_rerun/joint_grfsq_wz_mixed_full/stage2/vis/v4/concat/cfg_h1_c1_seed17_best_eval/v4_4x3_text_global_camera_manifest.json` | 2 mixed samples | `joint`, `human_completion`, `camera_completion` | `gt`, `pulp`, `storymotion` × camera/global × SMPL/skeleton | active rerun; `missing=0` |
 | Screen projection containment | `runs/visualizations/archived/screen_projection_containment_20260625/*/manifest.json` | legacy diagnostic | `clean_best`, `clean_last`, `screen_best` | per-sample camera projection / camera view videos | archived; exclude from registry |
@@ -153,7 +156,7 @@ Gradio registry 禁止递归纳入 `runs/visualizations/archived/`。截至 2026
 | 2 | Stage1 global skeleton canonical row | `fixed_camera` 与 `orbiting_camera` 不等价于 Stage2 global row | 输出 `{variant}_global_skeleton_camera.mp4` |
 | 3 | Stage1 SMPL camera projection / global mp4 | 与 Stage2 四行 grid 对齐 | 如果 Stage1 renderer 能稳定加载 mesh，则补齐；否则明确标 missing |
 | 4 | E.T./DIRECTOR camera completion single assets | 当前 metric 有 baseline/replay，Gradio comparison 还没有统一 single assets | 加入 Stage2 `camera_completion` columns：`et_root_only`, `et_replay` |
-| 5 | Pulp official Stage1 recon visual | v6.3 要验证 official ckpt 是否可复现，需要 qualitative upper bound | 与 self-trained Stage1 放同一 Stage1 grid |
+| 5 | Pulp official Stage1 recon visual | v6.3 要验证 official ckpt 是否可复现，需要 qualitative upper bound | done in `v7_13_pulp_ae_official_selftrained_stage1_bigtitle_20260709`; remaining work is human last-frame inspection |
 
 ## 6. 实现检查
 
@@ -170,4 +173,9 @@ Gradio loader 必须做这些检查：
 - 已重新渲染 active rerun 到 `runs/visualizations/stage1/` 和 `runs/visualizations/stage2/` 两个主目录。
 - Stage2 joint VAE / joint GRFSQ 的 single assets 已经存在于 active rerun 的 `v4_4x3_work`，concat 只是 summary。
 - Stage1 所有已完成 tokenizer 的 reconstruction 可视化已有 manifest，但还没补齐与 Stage2 对齐的 SMPL / camera projection single mp4。
+- 5090 Gradio `/tmp/v75_paired_audit_gradio.py` 已在 `2026-07-10` 更新；Stage1 active groups 为 `non-causal joint default ae_train_split`、`Pulp AE official vs self-trained`、`causal original`、`non-causal VAE original`、`non-causal default ae_train_split`，不再展示 branch-reweighted visual groups。
+- Stage1 元信息表已标注训练数据：`causal original` / `non-causal VAE original` 使用 original paired full，v7.12 使用 original paired full `ae_train_split`；`default velocity` 明确为 AE/VAE `1.0`、GRFSQ/HFSQ `0.5`、acceleration `0`。
+- Pulp AE 对比已上线 Gradio synced-row：official pretrained Pulp AE 与 self-trained Pulp AE epoch325 使用同一批 8 个 pure sample，可直接查看 fixed / orbiting / camera trajectory 的末帧形变；synced-row 现在有独立的 `Group sample` 下拉框，切换 group 时只显示该 group 的可用 sample，避免跨 render-set sample 导致全列 missing。
+- Mixed GT eval 已停止，不进入正式 metric ledger；当前对比表以 pure official `4053` 为主。
+- v7.13 joint default AE / VAE / HFSQ 训练、pure `4053` official eval、8-sample Stage1 visualization 已完成；Gradio synced-row 默认打开 `non-causal joint default ae_train_split`。
 - 下一步不是继续做 concat，而是实现 Gradio registry loader，并补 Stage1 missing rows。

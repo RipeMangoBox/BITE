@@ -1,0 +1,29 @@
+{
+  "run_id": "siggraph2025_selected10_20260623_s0",
+  "source": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/siggraph2025_selected10_20260623.csv",
+  "state": "Downloaded",
+  "shard_index": 0,
+  "shard_count": 5,
+  "jobs": 1,
+  "selected": 2,
+  "planned": 2,
+  "planned_child_runs": 2,
+  "variants": [
+    {
+      "id": "",
+      "label": "",
+      "extra_args": [],
+      "writer_effort": ""
+    }
+  ],
+  "out_dir": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/siggraph2025_selected10_20260623_s0",
+  "analysis_output_root": "",
+  "vault_root": "",
+  "experiment_label": "",
+  "created_at": "2026-06-23T08:18:17.554469+00:00",
+  "done": 2,
+  "failed": 0,
+  "skipped": 0,
+  "results_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/batches/siggraph2025_selected10_20260623_s0/results.jsonl",
+  "finished_at": "2026-06-23T08:30:57.366103+00:00"
+}

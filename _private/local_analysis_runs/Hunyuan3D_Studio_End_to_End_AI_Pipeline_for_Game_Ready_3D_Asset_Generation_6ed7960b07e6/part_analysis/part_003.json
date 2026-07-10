@@ -1,0 +1,106 @@
+{
+  "part_id": "part_003",
+  "section_role": "Introduction and Pipeline Overview",
+  "method_evidence": [
+    {
+      "claim": "The pipeline comprises seven core technological modules.",
+      "section": "2",
+      "anchor": "The pipeline, as shown in Figure. \\ref{fig:studio-pipeline}, comprises seven core technological modules",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Image stylization uses Qwen-Image-Edit adapted with LoRA.",
+      "section": "3.1",
+      "anchor": "It employs a multi-style image-to-image generation model based on Qwen-Image-Edit \\cite{wu2025qwen} and further adapted with Low-Rank Adaptation (LoRA) \\cite{hu2022lora}.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Stylization training data uses triplet format.",
+      "section": "3.1",
+      "anchor": "The training data is constructed in a triplet format \\textit{\\{input reference image, style type, stylized 3D design drawing\\}}",
+      "confidence": 0.95
+    },
+    {
+      "claim": "PolyGen uses an autoregressive model for face-by-face generation.",
+      "section": "2",
+      "anchor": "employs an autoregressive model for face-by-face generation to construct low-polygon assets",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Semantic UV Unwrapping groups surfaces by material type and texel density.",
+      "section": "2",
+      "anchor": "context-aware UV segmentation that groups surfaces by material type and texel density requirements",
+      "confidence": 0.9
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "fig:studio-pipeline",
+      "role_hint": "Pipeline overview diagram",
+      "caption": "The pipeline of Hunyuan3D Studio.",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:image-stylization",
+      "role_hint": "Stylization results",
+      "caption": "Visualization results of our image stylization module with pre-defined styles.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_003",
+    "part_index": 3,
+    "part_count": 12,
+    "chunk_chars": 7893,
+    "latency_seconds": 5.979,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3206,
+      "completion_tokens_est": 607,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3813,
+      "total_with_reasoning_tokens_est": 3813,
+      "estimated_cost_usd": 0.001923,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2319,
+      "completion_tokens_api": 529,
+      "total_tokens_api": 2848,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1679,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 529,
+        "prompt_tokens": 2319,
+        "total_tokens": 2848,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1679
+      },
+      "estimated_cost_usd_api": 0.001193,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 2024,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 531,
+        "api_usage_present": true
+      }
+    }
+  }
+}

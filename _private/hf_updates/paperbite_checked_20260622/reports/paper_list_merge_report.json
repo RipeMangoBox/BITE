@@ -1,0 +1,67 @@
+{
+  "created_at": "2026-06-22T07:43:43.688187+00:00",
+  "source_iclr_csv": "_private/hf_updates/paperbite_iclr26_20260610/paper_list_iclr26.csv",
+  "source_vault_csv": "obsidian-vault/paper_list.csv",
+  "source_cvpr_manifest": "_hf_stage/cvpr26_nonmotion/reports/cvpr26_nonmotion_upload_manifest.json",
+  "output_csv": "_private/hf_updates/paperbite_checked_20260622/paper_list.csv",
+  "fieldnames": [
+    "state",
+    "importance",
+    "paper_title",
+    "venue",
+    "project_link_or_github_link",
+    "paper_link",
+    "sort",
+    "pdf_path",
+    "analysis_path"
+  ],
+  "iclr_rows": 990,
+  "cvpr26_manifest_notes": 716,
+  "cvpr26_rows_matched": 716,
+  "cvpr26_rows_unmatched": 0,
+  "output_rows": 1706,
+  "state_counts": {
+    "checked": 1706
+  },
+  "venue_counts": {
+    "ICLR 2026": 990,
+    "CVPR 2026": 716
+  },
+  "duplicate_count": 3,
+  "duplicates_sample": [
+    {
+      "first_index": 2,
+      "second_index": 3,
+      "key": [
+        "link",
+        "https://openreview.net/forum?id=KkoS6y0pHP"
+      ],
+      "title": "3DSMT A Hybrid Spiking Mamba-Transformer for Point Cloud Analysis"
+    },
+    {
+      "first_index": 483,
+      "second_index": 484,
+      "key": [
+        "link",
+        "https://openreview.net/forum?id=T0EiEuhOOL"
+      ],
+      "title": "Huxley-Gödel Machine: Human-Level Coding Agent Development by an Approximation of the Optimal Self-Improving Machine"
+    },
+    {
+      "first_index": 561,
+      "second_index": 586,
+      "key": [
+        "link",
+        "https://openreview.net/forum?id=oIdzliJAeA"
+      ],
+      "title": "Mixture-of-Experts Can Surpass Dense LLMs Under Strictly Equal Resource"
+    }
+  ],
+  "match_kind_counts": {
+    "exact_title": 715,
+    "normalized_note_stem": 1
+  },
+  "has_cubid": true,
+  "unmatched_path": "_private/hf_updates/paperbite_checked_20260622/reports/cvpr26_manifest_unmatched.jsonl",
+  "matches_path": "_private/hf_updates/paperbite_checked_20260622/reports/cvpr26_manifest_matches.jsonl"
+}

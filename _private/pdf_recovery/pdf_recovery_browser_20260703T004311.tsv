@@ -1,0 +1,2 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2025/Deformable_Beta_Splatting.pdf	https://openreview.net/pdf?id=676a6a4678	63388082	940706				timeout url=https://openreview.net/pdf?id=676a6a4678

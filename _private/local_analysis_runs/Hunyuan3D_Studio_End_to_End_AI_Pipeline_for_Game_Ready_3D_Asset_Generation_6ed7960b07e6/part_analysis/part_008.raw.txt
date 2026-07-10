@@ -1,0 +1,103 @@
+{
+  "part_id": "8/12",
+  "section_role": "experiments and method introduction",
+  "method_evidence": [
+    {
+      "claim": "M-DPO enables targeted refinement of low-quality regions while preserving satisfactory areas.",
+      "section": "3.3",
+      "anchor": "M-DPO enables targeted refinement of low-quality regions while preserving satisfactory areas.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "SeamGPT formulates surface cutting as a sequence prediction problem, where cutting seams are represented as an ordered series of 3D line segments.",
+      "section": "4",
+      "anchor": "we introduce SeamGPT, a novel framework that generates artist-style cutting seams through an auto-regressive approach. Our method formulates surface cutting as a sequence prediction problem, where cutting seams are represented as an ordered series of 3D line segments.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Seam ordering sorts vertices yzx order and then sorts edges lexicographically.",
+      "section": "4.1",
+      "anchor": "we first sort vertices $yzx$ order, where $y$ represents the vertical axis, and then sort two vertices within an edge lexicographically, placing the lowest $yzx$-ordered vertex first. Finally, seam edges are sorted in ascending $yzx$-order based on the sorted values of their vertices.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Vertex coordinates are quantized into 1024 discrete bins.",
+      "section": "4.1",
+      "anchor": "we employ 1024-level quantization, enabling effective representation of complex seams.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Point cloud encoder uses 61,440 structural points (30,720 on vertices, 30,720 on edges) and compresses to a latent shape embedding of length 3072 and dimension 1024.",
+      "section": "4.2",
+      "anchor": "we sample a total of 61,440 points, evenly split between: 30,720 points on vertices and 30,720 points on edges. ... the input points are fed into a jointly trained point cloud encoder ... compresses the point cloud to a latent shape embedding of length 3072 and dimension 1024.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Post-training stage is crucial for improving completeness and topology quality.",
+      "table_or_figure": "Figure 6",
+      "metric": "qualitative",
+      "value": "improvement after post-training",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Our model generates much more complex meshes with significantly improved topology quality and stability compared to existing methods.",
+      "table_or_figure": "Figure 7",
+      "metric": "qualitative",
+      "value": "superior geometric fidelity and surface continuity",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Model can generate meshes conditioned on partial point clouds separately without further fine-tuning.",
+      "table_or_figure": "Figure 8",
+      "metric": "qualitative",
+      "value": "part-aware polygon generation",
+      "confidence": 0.9
+    }
+  ],
+  "formula_evidence": [
+    {
+      "name": "Seam sequence decomposition",
+      "latex": "S = \\{s^1, s^2, \\ldots s^{N_s}\\} = \\{p^1_h, p^1_t, p^2_h, p^2_t, \\ldots, p^{N_h}_t, p^{N_h}_t\\} = \\{x^1_h, y^1_h, z^1_h, x^1_t, y^1_t, z^1_t, \\ldots, x^{N_s}_t, y^{N_s}_t, z^{N_s}_t\\}",
+      "meaning": "Decomposition of seam sequence into segment, point, and coordinate levels.",
+      "section": "4.1",
+      "confidence": 0.95
+    },
+    {
+      "name": "Autoregressive seam probability",
+      "latex": "P(S) = \\prod_{i=1}^{6N_s} P(c_i | c_{<i})",
+      "meaning": "Joint probability of the entire seam sequence as product of conditional coordinate probabilities.",
+      "section": "4.2",
+      "confidence": 0.95
+    }
+  ],
+  "figure_table_roles": [
+    {
+      "label": "Figure 7",
+      "role_hint": "comparison with existing polygon generation methods",
+      "caption": "Generalization results on dense, out-of-distribution meshes. Our model demonstrates superior geometric fidelity and surface continuity, maintaining high-quality reconstruction even under complex and unseen input conditions.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Figure 8",
+      "role_hint": "part-aware polygon generation",
+      "caption": "Part-aware polygon generation. With shapes segmented into several parts as input, our model can generate the corresponding meshes conditioned on partial point clouds separately without further fine-tuning.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Figure 6",
+      "role_hint": "pre-training vs post-training improvement",
+      "caption": "In Figure 6, we show the improvement after the post-training.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Figure 9",
+      "role_hint": "SeamGPT architecture overview",
+      "caption": "SeamGPT architecture: Point cloud encoder extracts shape context; Causal transformer decoder generates axis-ordered seam coordinates. Color indicates the prediction order is of the seam segments (red to blue).",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

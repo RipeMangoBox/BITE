@@ -1,0 +1,122 @@
+[
+  {
+    "part_id": "part_001",
+    "index": 1,
+    "total": 15,
+    "start": 0,
+    "end": 5270,
+    "chars": 5269
+  },
+  {
+    "part_id": "part_002",
+    "index": 2,
+    "total": 15,
+    "start": 4470,
+    "end": 9538,
+    "chars": 5067
+  },
+  {
+    "part_id": "part_003",
+    "index": 3,
+    "total": 15,
+    "start": 8738,
+    "end": 15716,
+    "chars": 6978
+  },
+  {
+    "part_id": "part_004",
+    "index": 4,
+    "total": 15,
+    "start": 14916,
+    "end": 22753,
+    "chars": 7836
+  },
+  {
+    "part_id": "part_005",
+    "index": 5,
+    "total": 15,
+    "start": 21953,
+    "end": 29307,
+    "chars": 7353
+  },
+  {
+    "part_id": "part_006",
+    "index": 6,
+    "total": 15,
+    "start": 28507,
+    "end": 36141,
+    "chars": 7634
+  },
+  {
+    "part_id": "part_007",
+    "index": 7,
+    "total": 15,
+    "start": 35341,
+    "end": 43286,
+    "chars": 7945
+  },
+  {
+    "part_id": "part_008",
+    "index": 8,
+    "total": 15,
+    "start": 42486,
+    "end": 50229,
+    "chars": 7743
+  },
+  {
+    "part_id": "part_009",
+    "index": 9,
+    "total": 15,
+    "start": 49429,
+    "end": 57419,
+    "chars": 7990
+  },
+  {
+    "part_id": "part_010",
+    "index": 10,
+    "total": 15,
+    "start": 56619,
+    "end": 64495,
+    "chars": 7876
+  },
+  {
+    "part_id": "part_011",
+    "index": 11,
+    "total": 15,
+    "start": 63695,
+    "end": 71523,
+    "chars": 7826
+  },
+  {
+    "part_id": "part_012",
+    "index": 12,
+    "total": 15,
+    "start": 70723,
+    "end": 75253,
+    "chars": 4529
+  },
+  {
+    "part_id": "part_013",
+    "index": 13,
+    "total": 15,
+    "start": 74453,
+    "end": 79495,
+    "chars": 5041
+  },
+  {
+    "part_id": "part_014",
+    "index": 14,
+    "total": 15,
+    "start": 78695,
+    "end": 84504,
+    "chars": 5808
+  },
+  {
+    "part_id": "part_015",
+    "index": 15,
+    "total": 15,
+    "start": 83704,
+    "end": 90076,
+    "chars": 6372
+  }
+]

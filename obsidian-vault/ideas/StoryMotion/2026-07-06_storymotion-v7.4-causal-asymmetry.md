@@ -275,7 +275,7 @@ Gradio manual audit viewer:
 - Source copied to 5090: `/data/public/ripemangobox/Motion/StoryMotion/runs/visualizations/v7_4_paired_audit_20260706`
 - Session: `v74_paired_audit_gradio`
 - Port: `7862`
-- SSH tunnel: `ssh -L 7862:127.0.0.1:7862 5090`, then open `http://127.0.0.1:7862`
+- SSH tunnel: `ssh -L 7863:127.0.0.1:7862 5090`, then open `http://127.0.0.1:7863`
 
 ## 5.6 Generated-Source H2C Replay Adaptation
 

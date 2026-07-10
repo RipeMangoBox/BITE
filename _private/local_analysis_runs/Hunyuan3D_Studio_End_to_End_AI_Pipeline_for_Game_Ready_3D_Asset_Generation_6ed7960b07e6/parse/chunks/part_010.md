@@ -1,0 +1,115 @@
+<!-- part 10/12 chars 65802-73576 -->
+
+erformance across all metrics. In contrast: XAtlas generates over-fragmented cuts, FAM fails to produce subtle cuts consistently, Edge-CLS performs well only on sharp edge features but struggles with generating seams on smooth, featureless regions.
+Our method consistently produces semantic and reasonable cuts regardless of surface characteristics.
+
+
+\textbf{User study.} To further assess our method's practical utility, we conducted a user study with 20 professional 3D artists evaluating \textbf{Boundary} quality and \textbf{Editability}. Boundary quality measures how unfragmented a UV map is, while editability reflects how well the mapping supports appearance editing. Participants rated UV unwrappings from all methods on a 5-point scale. As shown in Table ~\ref{tab:userstudy}, SeamGPT significantly outperforms existing methods in both metrics.
+
+\begin{table}[!ht]
+
+\centering
+\resizebox{\textwidth}{!}
+{
+\small
+\renewcommand{\arraystretch}{1.2}
+
+\begin{tabular}{l|cc|cc|cc|cc}
+\toprule
+\multicolumn{1}{c}{} & \multicolumn{2}{|c}{\texttt{Fandisk}} & \multicolumn{2}{|c}{ Cow} & \multicolumn{2}{|c}{\texttt{Nefertiti}} & \multicolumn{2}{|c}{ Avg. }\\
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{Boundary $\uparrow$} & \multicolumn{1}{c|}{Editability $\uparrow$} & \multicolumn{1}{c}{Boundary $\uparrow$} & \multicolumn{1}{c|}{Editability $\uparrow$} & \multicolumn{1}{c}{Boundary $\uparrow$} & \multicolumn{1}{c|}{Editability $\uparrow$} & \multicolumn{1}{c}{Boundary $\uparrow$} & \multicolumn{1}{c}{Editability $\uparrow$} \\ \hline
+
+Xatalas~\cite{xatlas}
+& \textbf{4.42} & \textbf{4.42} & 2.68  & 2.37 & 2.79  & 2.47 & 3.30 & 3.09 \\ \hline
+
+Nuvo~\cite{srinivasan2024nuvo}
+& 1.32  & 1.32  & 1.16  & 1.21  & 1.42 & 1.42 & 1.30 & 1.32 \\ \hline
+
+FAM~\cite{zhang2024flattenanything}
+& 1.74  & 1.53 & 1.84  & 1.53 & 2.05  & 1.84 & 1.88 & 1.63 \\ \hline
+
+Edge-CLS
+& 3.89  & 3.84 & 2.79  & 2.32 & 2.58 & 2.16 & 3.09 & 2.77 \\ \hline
+
+Ours
+& 4.37  & 4.32 & \textbf{4.16}  & \textbf{4.16} & \textbf{3.47}  & \textbf{3.58} & \textbf{4.00} & \textbf{4.02} \\
+\bottomrule
+\end{tabular}
+}
+\caption{User Study about Boundary quality and Editability.}
+\vspace{-10pt}
+\label{tab:userstudy}
+\end{table}
+
+
+\subsection{Ablation Study}
+
+
+
+\begin{wrapfigure}{r} {0.5\textwidth}
+\vspace{-15pt}
+\centering
+\begin{center}
+\includegraphics[width=\linewidth]{figures/uv_figs/ablation-sample.jpg}
+\end{center}
+\vspace{-5pt}
+\caption{Ablation of point sampling strategy.}
+\label{fig:ablation-point-sampling}
+\vspace{-10pt}
+\end{wrapfigure}
+
+\textbf{Point cloud sampling strategy.} As shown in Figure.~\ref{fig:ablation-point-sampling}, when conditioned on point clouds uniformly sampled across the mesh surface, the generated seams remain logically valid from a surface-cutting perspective but may not precisely align with the input mesh's vertices and edges.
+In contrast, sampling point clouds along edges and vertices produces seams that naturally conform to the mesh topologies. This could prevents creating excessive extra mesh faces.
+We also found that sampling along edges and vertices significantly improves model convergence, as the transformer gains explicit positional awareness of potential cutting coordinates.
+
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+\vspace{-5pt}
+\centering
+\begin{center}
+\includegraphics[width=\linewidth]{figures/uv_figs/ablation-ptrnet-meshcond.jpg}
+\end{center}
+\begin{minipage}{0.5\textwidth}
+\vspace{5pt}
+    \caption{Ablation study of encoder and decoder.}
+    \label{fig:ablation-ptrnet-meshcond}
+\end{minipage}
+\end{wrapfigure}
+
+
+\textbf{Mesh encoder vs Point cloud encoder.}  An alternative approach for generating shape embeddings employs mesh encoders, as demonstrated by Zhou et al.~\cite{zhou2020fullymeshae}.
+We implemented an encoder combining graph convolutions (operating on both vertices and edges) with a full self-attention transformer. This encoder produces vertex-wise tokens that are subsequently fed to the decoder via cross-attention mechanisms.
+As shown in Figure~\ref{fig:ablation-ptrnet-meshcond}, point-cloud encoder yields superior results compared to mesh encoders. Furthermore, the computational cost of our mesh encoder scales poorly with increasing vertex counts.
+Mesh encoder-based methods often fail to accurately capture the precise positions of original vertices, resulting in significant misalignment between the generated seam edges and the original mesh.
+
+\textbf{Does Pointer networks works?}
+In the case that the cutting seam forms a subset of the edges in the mesh, we can also adopt the Pointer Network~\cite{vinyals2015pointer-networks} architecture, which auto-regressively produce the pointers to the mesh edges.
+We follow the implementation of Polygen~\cite{nash2020polygen} to build a pointer network with a mesh encoder that produces edge-wise embedding and a casual transformer to create pointers to the edges that lie on the seams auto-regressively.
+Pointer network struggles to generate consistent seams, often resulting in discontinuous cuts as demonstrated in Figure~\ref{fig:ablation-ptrnet-meshcond}.
+
+
+
+
+\textbf{Seam length control and diversity.}  We define R as the ratio of seam segment count to the number of mesh vertices. Empirically, valid cutting seams typically has R value within the range [0.1,0.35]. Above this range result in over-cutting, while values below it lead to insufficient cuts. As shown in Figure~\ref{fig:bunny-alation}, controlling R allows us to adjust the granularity of the cuts.
+Additionally, due to the non-deterministic nature of autoregressive transformers, we can generate diverse valid cutting seams from the same length control.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/uv_figs/bunny-ablation.jpg}
+\caption{Seam length control and diversity. We can control the cutting granularity by adjusting seam length. Diverse valid cutting seams can be generated.}
+\label{fig:bunny-alation}
+\end{figure}
+
+
+\section{Texture Generation and Editing}  \label{sec:texture}
+
+Texture generation and editing technologies have critical importance in 3D asset creation. Physically Based Rendering (PBR) workflows rely on accurate texture maps to emulate real-world material behaviors under varying lighting conditions. High quality texture bridge the gap between geometric abstraction and perceptual realism, enhencing immersion and aesthetic coherence.
+
+we introduced a high-fidelity texture synthesis methodology in ~\cite{zhao2025hunyuan3d, hunyuan3d2025hunyuan3d21imageshighfidelity, lai2025hunyuan3d} that lift a 2D diffusion model into a geometry-conditioned multi-view generative model i, subsequently baking its outputs into high-resolution texture maps via view projection. This framework systematically addresses two critical challenges in multi-view based texture generation:
+\begin{itemize}
+\item Cross-view consistency and geometric alignment in ~\cite{feng2025romantexdecoupling3dawarerotary}.
+\item Expansion of RGB textures into photorealistic PBR material textures in ~\cite{he2025materialmvpilluminationinvariantmaterialgeneration}.
+\end{itemize}
+
+In this report, we extend our texture generation framework into a comprehensive system supporting multimodal texture editing. First, we augment our existing multi-view PBR material generation model to accommodate text and image-guided multimodal editing. Second, we propose a material-based 3D segmentation method that generates part-wise material segmentation maps from input geometry-only meshes, enabling localized texture editing. Finally, we introduce a 4K material ball generation model that synthesizes high-resolution tileable texture balls—including Base Color, Metallic, Roughness, and Normal maps—from textual prompts, facilitating professional artistic workflows.

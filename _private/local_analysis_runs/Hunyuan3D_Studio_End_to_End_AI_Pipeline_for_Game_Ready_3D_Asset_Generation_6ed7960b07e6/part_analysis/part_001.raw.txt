@@ -1,0 +1,10 @@
+{
+  "part_id": "1/12",
+  "section_role": "preamble and title",
+  "method_evidence": [],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": []
+}

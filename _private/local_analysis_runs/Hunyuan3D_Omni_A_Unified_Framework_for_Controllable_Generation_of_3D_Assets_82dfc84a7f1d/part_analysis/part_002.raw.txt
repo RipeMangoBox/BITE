@@ -1,0 +1,36 @@
+{
+  "part_id": "2/6",
+  "section_role": "preamble and abstract",
+  "method_evidence": [
+    {
+      "claim": "Hunyuan3D-Omni accepts point clouds, voxels, bounding boxes, and skeletal pose priors as conditioning signals.",
+      "section": "Abstract",
+      "anchor": "In addition to images, \\shortname accepts point clouds, voxels, bounding boxes, and skeletal pose priors as conditioning signals",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The model unifies all signals in a single cross-modal architecture.",
+      "section": "Abstract",
+      "anchor": "Instead of separate heads for each modality, our model unifies all signals in a single cross-modal architecture.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Training uses a progressive, difficulty-aware sampling strategy that selects one control modality per example and biases sampling toward harder signals.",
+      "section": "Abstract",
+      "anchor": "We train with a progressive, difficulty-aware sampling strategy that selects one control modality per example and biases sampling toward harder signals (~\\eg, skeletal pose) while downweighting easier ones (~\\eg, point clouds)",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "fig:teaser-top",
+      "role_hint": "Teaser figure showing controllable generation based on point cloud, bounding box, voxel, and skeleton.",
+      "caption": "\\shortname is a unified framework for supporting controllable generation based on point cloud, bounding box, voxel, and skeleton.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

@@ -1,0 +1,88 @@
+{
+  "note_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/analysis/arxiv_2026/HY3D-Bench_Generation_of_3D_Assets.md",
+  "pdf_ref": "paperPDFs/arxiv_2026/HY3D_Bench_Generation_of_3D_Assets.pdf",
+  "acceptance": "",
+  "source_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/paperPDFs/arxiv_2026/HY3D_Bench_Generation_of_3D_Assets.pdf",
+  "source_pdf_resolution": {
+    "input": "obsidian-vault/paperPDFs/arxiv_2026/HY3D_Bench_Generation_of_3D_Assets.pdf",
+    "resolved": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/paperPDFs/arxiv_2026/HY3D_Bench_Generation_of_3D_Assets.pdf",
+    "attempts": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/paperPDFs/arxiv_2026/HY3D_Bench_Generation_of_3D_Assets.pdf"
+    ]
+  },
+  "figure_count": 0,
+  "figure_placements": [],
+  "asset_root": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/BITE_Process/obsidian-vault/assets/figures/papers",
+  "numeric_ref_sanitizer": {
+    "changed": false,
+    "removed_refs": [],
+    "removed_count": 0
+  },
+  "validation": {
+    "ok": true,
+    "fatal_ok": true,
+    "nonfatal_checks": [
+      "image_embeds_present",
+      "referenced_image_embeds_present",
+      "figure_slot_coverage_present"
+    ],
+    "checks": {
+      "frontmatter_valid": true,
+      "openreview_forum_id_present": true,
+      "required_sections_present": true,
+      "pdf_embed_present": true,
+      "image_embeds_present": true,
+      "core_pipeline_images_present": true,
+      "figure_slot_coverage_present": true,
+      "referenced_image_embeds_present": true,
+      "no_legacy_markdown_image_links": true,
+      "no_pdf_file_label": true,
+      "no_table_cell_aliased_wikilinks": true,
+      "no_fallback_metadata_markers": true,
+      "no_dangling_numeric_refs": true,
+      "no_incomplete_effect_callout": true,
+      "no_multi_label_image_captions": true,
+      "no_unescaped_lt_in_image_captions": true,
+      "venue_year_tag_present": true,
+      "no_legacy_venue_topic_tags": true,
+      "note_length_ok": true
+    },
+    "figure_slot_quality": {
+      "core_pipeline_required": false,
+      "core_pipeline_present": 0,
+      "core_pipeline_candidate_count": 0,
+      "experiment_required": false,
+      "experiment_present": 0,
+      "experiment_candidate_count": 0,
+      "ok": true
+    },
+    "note_chars": 11777,
+    "missing_frontmatter": [],
+    "expected_openreview_forum_id": "",
+    "openreview_forum_id": "",
+    "missing_sections": [],
+    "pdf_ref": "paperPDFs/arxiv_2026/HY3D_Bench_Generation_of_3D_Assets.pdf",
+    "image_embed_count": 0,
+    "expected_image_count": 0,
+    "missing_image_paths": [],
+    "missing_core_pipeline_images": [],
+    "missing_referenced_images": [],
+    "legacy_markdown_image_links": [],
+    "legacy_relative_wikilink_images": [],
+    "pdf_file_label_count": 0,
+    "table_cell_aliased_wikilink_lines": [],
+    "fallback_markers": [],
+    "dangling_numeric_refs": [],
+    "incomplete_effect_callout_lines": [],
+    "multi_label_image_caption_lines": [],
+    "unescaped_lt_image_caption_lines": [],
+    "expected_venue_year_tag": "arxiv_2026",
+    "frontmatter_tags": [
+      "arxiv_2026",
+      "topic/vision_multimodal_applications",
+      "topic/vision_multimodal_applications/3d_rendering_reconstruction",
+      "topic/generative_models_diffusion"
+    ],
+    "legacy_venue_topic_tags": []
+  }
+}

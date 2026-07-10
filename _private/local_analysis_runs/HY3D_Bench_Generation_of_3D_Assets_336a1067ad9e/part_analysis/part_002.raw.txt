@@ -1,0 +1,17 @@
+{
+  "part_id": "2/9",
+  "section_role": "preamble and abstract",
+  "method_evidence": [],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "fig:teaser-top",
+      "role_hint": "teaser figure",
+      "caption": "HY3D-Bench is a unified ecosystem for high-fidelity 3D content generation. Our framework introduces (a) 252k high-quality assets with watertight meshes and multi-view renderings, (b) 240k structured part-level decomposition enabling fine-grained control, and (c) AIGC-synthesized 125k long-tail category assets. This benchmark provides standardized training data and evaluation protocols for advancing 3D generation research.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

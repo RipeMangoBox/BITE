@@ -1,0 +1,64 @@
+<!-- part 3/12 chars 14191-22085 -->
+
+tual production, and the metaverse. However, traditional 3D asset creation remains a complex, time-consuming, and often costly endeavor, typically requiring expertise across multiple software suites for modeling, UV mapping, texturing, and rigging. This process can form a bottleneck in game production, limiting creative iteration and accessibility.
+
+Recent advancements in generative AI~\citep{zhang2024clay, xiang2025structured, bpt, lei2024diffusiongan3d}, particularly diffusion models, have driven rapid progress in specific areas of 3D content creation, such as geometry generation where systems like Hunyuan3D series~\citep{yang2024hunyuan3d, zhao2025hunyuan3d, lai2025unleashing, hunyuan3d2025hunyuan3d, lai2025hunyuan3d} demonstrate scalable, high-resolution asset synthesis from single images or text prompts. However, despite these breakthroughs in shape formation, the field continues to struggle with integrating these advances into assets that simultaneously meet the dual demands of high visual fidelity and technical readiness for real-time rendering in game engines. Many existing solutions address only isolated parts of the pipeline (e.g., generating geometry without game-optimized topology or producing textures that lack material accuracy), leaving artists with the challenging task of integrating and refining these outputs into a usable, performant asset.
+
+To bridge this critical gap, we introduce Hunyuan3D Studio, a comprehensive AI platform that reimagines the entire 3D asset creation workflow from the ground up. Our system is built upon the foundation of large-scale generative models but extends far beyond them into a fully integrated production environment. This report details the architecture of this end-to-end pipeline, which is designed to transform a high-level creative concept into a game-engine-ready asset with minimal manual intervention. We demonstrate that this integrated approach not only significantly accelerates content creation but also democratizes 3D artistry by lowering the technical barriers to producing production-quality assets.
+
+This paper is organized as follows: Section ~\ref{sec:pipeline} provides a comprehensive overview of the Hunyuan3D Studio pipeline and its core modules. Sections ~\ref{sec:image} through ~\ref{sec:animation} delve into the technical specifics of each module. Finally, Section ~\ref{sec:conclusion} discusses conclusions, limitations, and future work.
+
+
+
+
+\section{Hunyuan3D Studio Pipeline}  \label{sec:pipeline}
+
+The Hunyuan3D Studio pipeline is architected as a sequential yet modular workflow, where each stage processes the asset and enriches it with data crucial for the next. This design ensures that the entire process—from an initial idea to a deployed game asset—is seamless, automated, and maintains the highest possible fidelity. The pipeline, as shown in Figure. \ref{fig:studio-pipeline}, comprises seven core technological modules, each addressing a fundamental stage in the asset creation process:
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\linewidth]{./figures/studio_pipeline3.pdf}
+    \caption{The pipeline of Hunyuan3D Studio.}
+    \label{fig:studio-pipeline}
+\end{figure}
+
+
+\begin{itemize}
+\item \textbf{Controllable Image Generation (Concept Design)}: The pipeline initiates with multi-modal input processing, supporting text-to-image and image-to-multi-view synthesis. A dedicated A-Pose standardization module ensures character models maintain consistent skeletal orientation, while neural style transfer adapts visual aesthetics to match target game art styles.
+
+\item \textbf{High-Fidelity Geometry Generation}: This module generates detailed 3D geometry (high-poly mesh) from single or multi-view images, leveraging advanced diffusion-based architectures to ensure geometric alignment with input references and preserve intricate surface details.
+
+\item \textbf{Part-level 3D Generation}: Using connectivity analysis and semantic partitioning algorithms, complex models are automatically decomposed into logical, functional components (e.g., a rifle's magazine, barrel, and stock), enabling independent editing and animation.
+
+\item \textbf{Polygon Generation (PolyGen)}: This module abandons traditional graphics-based retopology methods and instead employs an autoregressive model for face-by-face generation to construct low-polygon assets. Taking a point cloud of the geometric surface as input, PolyGen intelligently retopologizes high-fidelity meshes, producing game-ready assets with low vertex counts and well-structured, deformation-aware edge flow.
+
+\item \textbf{Semantic UV Unwrapping}: This module implements context-aware UV segmentation that groups surfaces by material type and texel density requirements, minimizing seams and ensuring efficient texture space utilization.
+
+\item \textbf{Texture Synthesis and Editing}: Integrating generative models, the system produces physically-accurate PBR texture sets from text or image prompts, supported by a non-destructive editing layer for refinement via natural language commands.
+
+\item \textbf{Animation Module}: The final automation stage infers joint placement and bone hierarchies, calculating vertex weights to create ready-to-animate assets that are configured for standard game engines.
+\end{itemize}
+
+
+These modules are orchestrated through a unified asset graph, where outputs from each stage propagate metadata to downstream processes. This enables parametric control, where high-level artistic adjustments cascade through the entire pipeline, and reversibility, allowing for incremental updates without full recomputation. The final output is configured and exported with all necessary specifications for the target game engine, such as Unity or Unreal Engine.
+
+This modular yet integrated approach ensures Hunyuan3D Studio addresses the full spectrum of game asset creation—from conceptualization to engine integration—while maintaining artistic control and technical rigor. The following sections will provide a detailed technical dissection of each module's architecture and functionality.
+
+
+
+
+
+\section{Controllable Image Generation}  \label{sec:image}
+Our controllable image generation pipeline leverages state-of-the-art open-source models, comprising modules for image stylization and pose standardization, as described below.
+
+\subsection{Image Stylization}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\linewidth]{./figures/image_figures/vis_style.pdf}
+    \caption{Visualization results of our image stylization module with pre-defined styles.}
+    \label{fig:image-stylization}
+\end{figure}
+
+Our image stylization module enables users to generate 3D design drawings in diverse, pre-defined popular game art styles through a configurable option prior to 3D model generation, as shown in Figure. ~\ref{fig:image-stylization}. It employs a multi-style image-to-image generation model based on Qwen-Image-Edit \cite{wu2025qwen} and further adapted with Low-Rank Adaptation (LoRA) \cite{hu2022lora}. The model processes a user-provided subject image with a textual style instruction formatted as \textit{“Change the style to \{style type\} 3D model. White Background.”} to produce a stylized output that maintains content consistency with the input image while faithfully adhering to the specified artistic style.  The training data is constructed in a triplet format \textit{\{input reference image, style type, stylized 3D design drawing\}}, which establishes a precise correspondence between photorealistic subject images and their stylized counterparts. For text-to-image stylization, where no reference image is provided, the system first generates a reference image from the text prompt using an in-house general text-to-image model, and then processes it through the same image-to-image stylization pipeline to achieve the final stylized output.

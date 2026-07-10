@@ -1,0 +1,94 @@
+{
+  "part_id": "part_006",
+  "section_role": "Data Processing Pipeline and Related Work",
+  "method_evidence": [
+    {
+      "claim": "Full-level data processing pipeline consists of three core steps: data rendering and format conversion, asset filtering, and post processing.",
+      "section": "Full-level Data Processing",
+      "anchor": "For full-level data, our processing pipeline consists primarily of three core steps: data rendering and format conversion, asset filtering, and post processing.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Data rendering and conversion standardizes assets to single-frame static mesh representations with aligned orientations.",
+      "section": "Full-level Data Processing",
+      "anchor": "We combine manual annotation and automated conversion workflows to uniformly convert all 3D assets into single-frame static mesh representations with aligned orientations.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Multi-view rendering uses Blender with orthographic and perspective projection camera modes.",
+      "section": "Full-level Data Processing",
+      "anchor": "The rendering configuration includes two camera modes—orthographic projection and perspective projection—to cover different visual representation requirements.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Asset filtering excludes data with poor geometric quality, poor texture quality, and large areas of thin structures.",
+      "section": "Full-level Data Processing",
+      "anchor": "We comprehensively utilize the visual quality of rendering results and the geometric attributes of original 3D assets for data filtering, primarily excluding the following three categories of inadequate data: (1) Data with poor geometric quality... (2) Data with poor texture quality... (3) Data with large areas of thin structures.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "Figure 1",
+      "role_hint": "Illustrates the full-level data processing pipeline.",
+      "caption": "Full-level Data Processing Pipeline.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_006",
+    "part_index": 6,
+    "part_count": 9,
+    "chunk_chars": 7931,
+    "latency_seconds": 5.943,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3205,
+      "completion_tokens_est": 668,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3873,
+      "total_with_reasoning_tokens_est": 3873,
+      "estimated_cost_usd": 0.001975,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2185,
+      "completion_tokens_api": 469,
+      "total_tokens_api": 2654,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1545,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 469,
+        "prompt_tokens": 2185,
+        "total_tokens": 2654,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1545
+      },
+      "estimated_cost_usd_api": 0.001082,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 2227,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 471,
+        "api_usage_present": true
+      }
+    }
+  }
+}

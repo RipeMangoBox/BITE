@@ -1,0 +1,100 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Hunyuan3D Studio: End-to-End AI Pipeline for Game-Ready 3D Asset Generation
+Part: 11/12
+Character span: 73226-80221
+
+=== PART CONTENT ===
+tes part-wise material segmentation maps from input geometry-only meshes, enabling localized texture editing. Finally, we introduce a 4K material ball generation model that synthesizes high-resolution tileable texture balls—including Base Color, Metallic, Roughness, and Normal maps—from textual prompts, facilitating professional artistic workflows.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/texture/text_image_edit.pdf
+    }
+    \caption{visualization results of multimodal texture editing: Perform text- and image-guided editing on textured meshes.}
+    \label{fig:text_image_edit}
+\end{figure}
+
+\subsection{Multimodal Texture Editing}
+We introduce a text-guided texture editing model trained on a meticulously curated dataset of 80k high-quality 3D assets with PBR materials. These assets were rendered into multi-view HDR images, and a Vision-Language Model (VLM) was employed to generate descriptive captions for textures and editing instructions. Leveraging the Flux Kontext framework, we constructed extensive image editing pairs across multiple viewpoints. Our texture foundation model then inferred consistent multi-view textures from these pairs, synthesizing a large-scale corpus of text-texture pairs for fine-tuning the editing model. During training, we followed flux kontext to unify textual prompts and reference image features into a joint latent sequence. Starting from a base texture generation model, the system was optimized end-to-end using 30,000 text-texture pairs, resulting in a unified model capable of texture synthesis and editing under both textual and visual guidance.
+
+We introduce a streamlined Mixture of Experts (MoE) architecture for the image-guided texture editing model to handle diverse image inputs. To determine whether an input image aligns with the target geometry, we compute the CLIP similarity between geometrically rendered views and the input image. If the guidance image exhibits high geometric correspondence with the target mesh, we inject image features via a VAE encoder; otherwise, we use CLIP image embeddings for feature infusion—analogous to IP-Adapter's methodology. This adaptive conditioning mechanism ensures robust texture editing under arbitrary image conditions.
+
+The fascinating multimodal editing results are demonstrated in Fig.~\ref{fig:text_image_edit}, indicating that we can perform material editing with diverse styles on objects in games, such as props and characters, both globally and locally.
+
+
+
+
+
+
+\subsection{4K Matertial Map Generation}
+
+We innovatively adapt the 3D VAE framework~\ref{fig:pbr_pipe}—originally designed for encoding continuous video frames—to compress multi-domain material data (renders, base color, bump, roughness, metallic, etc.) into unified latent representations, enabling scalable 4K-resolution texture synthesis. Specifically, we fine-tune the 3D VAE using textured 3D assets to achieve domain-invariant feature extraction, resulting in a PBR-VAE module. Subsequently, we fine-tune a 3D Diffusion Transformer (DiT) with material ball datasets to establish the core architecture of our material ball generation model.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/texture/material_balls.pdf}
+    \caption{Visualization of material generation framework. }
+    \label{fig:pbr_pipe}
+\end{figure}
+
+\section{Animation Module}  \label{sec:animation}
+
+\subsection{Method overview}
+In this section, we present the animation module, which is composed of two main branches: the humanoid character animation module and the general character animation module. Each character input is first processed by a detection module. If the input is identified as a humanoid character, it is directed to the humanoid animation branch; otherwise, it is routed to the general branch.
+
+The humanoid branch consists of a template-based auto-rigging module and a motion retargeting module. To balance the accuracy of skeleton generation with ease of use, we adopt 22 body joints as the template skeleton. We follow~\cite{Guo_2025_CVPR} to construct our rigging and skinning model. However, unlike~\cite{Guo_2025_CVPR}, which does not incorporate rig-related information during skinning prediction, our model integrates both skeletal and vertex features to achieve more accurate results. In addition, our system includes a pose standardization module that converts user-provided models in arbitrary poses into a canonical T-pose. Feeding T-pose models into the motion retargeting module yields more reliable and precise outcomes.
+
+In contrast, the general branch integrates an autoregressive skeleton generation module with a geometry topology-aware skinning module. Since general characters vary in both skeletal topology and the number of joints, most existing approaches to skeleton generation are based on autoregressive techniques, such as~\cite{Song_2025_CVPR,zhang2025unirig,guo2025auto,liu2025riganything}. These architectures have already demonstrated stability and accuracy in skeleton generation tasks, and our module is built upon these autoregressive methods. With respect to the skinning module, prior algorithms typically consider only mesh vertices and skeletal joints as input features, while paying little attention to the topological relationships among them. In contrast, our skinning module explicitly incorporates these topological relationships, leading to more robust and stable results.
+
+\begin{figure}[t!]
+\centering
+  \begin{center}
+    \includegraphics[width=1\textwidth]{figures/animation_figures/animation_result.png}
+  \end{center}
+\caption{Comparison with UniRig~\cite{zhang2025unirig}. Left: results of rigging for a general character using our generated mesh. Right: results of skinning applied to the general character input.
+}\label{fig:animation_result}
+\vspace{-1em}
+\end{figure}
+
+
+\subsection{Implement details}
+We used internally purchased and manually annotated datasets, which consist of approximately 80,000 high-quality general-character samples and 10,000 humanoid samples. All modules employ~\cite{zhao2023michelangelo} as the mesh encoder, while the autoregressive module is implemented using OPT-350M~\cite{zhang2022opt} as the transformer backbone.
+
+For the humanoid auto-rigging and skinning module, we apply motion-based data augmentation during training. The model is trained with a batch size of 6 on 8 H20 GPUs for 3 days. For the general-purpose rigging module, we train with a batch size of 16 on 24 H20 GPUs for 2 days. For the general-purpose skinning module, we adopt a batch size of 16 and train on 8 GPUs for 2 days.
+
+
+
+
+\subsection{Qualitative results}
+
+
+
+
+As shown in Figure~\ref{fig:animation_result}, our method produces more detailed results with fewer errors on general characters. Moreover, for the general skinning task, since our algorithm incorporates both skeletal and mesh topology information, it achieves higher overall accuracy compared to existing approaches.

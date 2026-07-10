@@ -1,0 +1,474 @@
+{
+  "verified_analysis": {
+    "paper_metadata": {
+      "title": "Hunyuan3D-Omni: A Unified Framework for Controllable Generation of 3D Assets",
+      "title_zh": "Hunyuan3D-Omni: 面向三维资产可控生成的统一框架",
+      "venue": null,
+      "year": null,
+      "project_link": null,
+      "code_link": "https://github.com/Tencent-Hunyuan/Hunyuan3D-Omni"
+    },
+    "source_links": [
+      {
+        "label": "Code",
+        "url": "https://github.com/Tencent-Hunyuan/Hunyuan3D-Omni"
+      }
+    ],
+    "analysis_truth": {
+      "real_bottleneck": "单图像三维生成具有内在的几何模糊性，导致生成结果出现扭曲、比例误差和细节丢失，无法精确重建完整的三维结构。",
+      "causal_knob": "引入多种显式三维控制信号（点云、体素、包围盒、骨骼），为扩散模型提供强几何先验，以约束生成过程并提高精度。",
+      "core_insight": "所有额外的控制信号均可表示为点云形式，通过轻量级统一控制编码器与类型区分嵌入，即可在单个扩散模型中灵活注入和区分多模态几何约束。",
+      "decisive_evidence": [
+        {
+          "claim": "引入点云控制可有效解决单视图歧义并恢复被遮挡的内部结构。",
+          "anchor": "providing a complete point cloud as a control signal effectively resolves the ambiguity inherent in single-view inputs and allows the recovery of occluded internal structures.",
+          "confidence": 0.9
+        },
+        {
+          "claim": "统一控制编码器通过位置嵌入和类型嵌入区分不同条件，并将所有控制信号统一为 N×6 的点云表示。",
+          "anchor": "all controls can be represented as a point cloud $P_c \\in \\mathbb{R}^{N \\times 6}$ ... $\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)]$",
+          "confidence": 0.95
+        },
+        {
+          "claim": "困难感知采样策略偏向更难的信号（如骨骼姿态）并抑制简单信号，促进鲁棒的多模态融合。",
+          "anchor": "We train with a progressive, difficulty-aware sampling strategy that selects one control modality per example and biases sampling toward harder signals (~\\eg, skeletal pose) while downweighting easier ones (~\\eg, point clouds)",
+          "confidence": 0.95
+        }
+      ]
+    },
+    "method": {
+      "proposed_method_name": "Hunyuan3D-Omni",
+      "baseline_methods": [
+        {
+          "name": "Hunyuan3D 2.1",
+          "role": "仅接受图像输入的基线三维生成模型",
+          "citation": null
+        }
+      ],
+      "changed_slots": [
+        {
+          "slot_name": "Conditioning Input",
+          "baseline_value": "仅图像特征（DINO 嵌入）",
+          "proposed_value": "拼接图像特征和统一控制编码器输出的联合条件特征",
+          "evidence_anchor": "we can concatenate the image feature $c_i$ and control feature $\\beta$ to form a joint feature",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "Control Encoder",
+          "baseline_value": "无额外控制编码器",
+          "proposed_value": "统一控制编码器：包含位置嵌入、线性投影以及带重复操作的类型嵌入",
+          "evidence_anchor": "Unified Control Encoder: $\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)]$",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "Training Sampling Strategy",
+          "baseline_value": "均匀随机采样条件",
+          "proposed_value": "渐进式、困难感知采样策略，偏向更难的控制信号（如骨骼）并抑制简单信号",
+          "evidence_anchor": "progressive, difficulty-aware sampling strategy that biases sampling toward harder signals while downweighting easier ones",
+          "confidence": 0.95
+        },
+        {
+          "slot_name": "Input Modalities",
+          "baseline_value": "仅图像",
+          "proposed_value": "图像 + 点云、体素、包围盒、骨骼",
+          "evidence_anchor": "accepts point clouds, voxels, bounding boxes, and skeletal pose priors as conditioning signals",
+          "confidence": 0.95
+        }
+      ],
+      "pipeline_modules": [
+        {
+          "name": "DINO-v2 Image Encoder",
+          "role": "从输入图像提取语义特征",
+          "evidence_anchor": "we utilize DINO-v2-Large to extract image features"
+        },
+        {
+          "name": "Unified Control Encoder",
+          "role": "将点云/体素/包围盒/骨骼统一编码为控制特征，并区分不同条件类型",
+          "evidence_anchor": "Unified Control Encoder section: shared point encoder with type embeddings"
+        },
+        {
+          "name": "Joint Feature Concatenation",
+          "role": "将图像特征与控制特征拼接形成联合条件 c'",
+          "evidence_anchor": "[c, β_i]"
+        },
+        {
+          "name": "DiT-based Latent Diffusion Model",
+          "role": "基于流匹配的扩散Transformer，从噪声生成3D潜在表示（VecSet）",
+          "evidence_anchor": "3D Diffusion: flow matching model used in Hunyuan3D 2.1"
+        },
+        {
+          "name": "3D VAE Decoder",
+          "role": "从潜在向量集重建SDF场并提取网格表面",
+          "evidence_anchor": "3D VAE: $F_{sdf} = \\mathcal{D}(Z)$"
+        }
+      ]
+    },
+    "experiments": {
+      "main_results": [
+        {
+          "benchmark": "Custom dataset (Hunyuan3D 2.1 + PoseMaster data)",
+          "metric": "定性几何对齐与细节恢复评估",
+          "proposed": "在多种控制条件下更好地对齐真实几何并恢复细节",
+          "baseline": "无控制信号的图像生成产生扭曲、丢失细节",
+          "delta": "显著改善对齐度和细节",
+          "anchor": "Figures 4-6: qualitative results for point cloud, voxel, bounding box controls",
+          "confidence": 0.85
+        }
+      ],
+      "ablations": [],
+      "fairness_notes": []
+    },
+    "formulas": [
+      {
+        "name": "3D VAE formulation",
+        "latex": "Z = \\mathcal{E}(P), F_{sdf} = \\mathcal{D}(Z)",
+        "meaning": "编码器 E 将点云 P 映射到潜在表示 Z；解码器 D 从 Z 重建符号距离函数场 F_sdf",
+        "anchor": "Section 3.1"
+      },
+      {
+        "name": "Flow matching training objective (baseline)",
+        "latex": "\\mathbb{E}_{t, {x}_0, {x}_1, c}\\vert\\vert{v}_\\theta({x}, t, c)-(x_1-x_0)\\vert\\vert_2^2",
+        "meaning": "流匹配训练目标：预测速度场以将噪声 x_0 变换为数据 x_1，条件为图像嵌入 c",
+        "anchor": "Section 3.1"
+      },
+      {
+        "name": "Shared control encoder",
+        "latex": "\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)], i \\in [0,1,2,3]",
+        "meaning": "统一控制编码器：对输入点云 P_i^c 进行位置嵌入和线性投影，并与重复 r 次的类型嵌入 E(i) 拼接，得到控制特征 β_i",
+        "anchor": "Unified Control Encoder section"
+      },
+      {
+        "name": "Joint training objective",
+        "latex": "\\mathbb{E}_{t, {x}_0, {x}_1, c'}\\vert\\vert{v}_\\theta({x}, t, c')-(x_1-x_0)\\vert\\vert_2^2",
+        "meaning": "联合训练目标：使用拼接条件 c' = [c, β_i] 进行流匹配训练",
+        "anchor": "Unified Control Encoder section"
+      }
+    ],
+    "figures_tables": [
+      {
+        "label": "fig:teaser-top",
+        "role": "Teaser图：展示Hunyuan3D-Omni支持基于点云、包围盒、体素和骨骼的可控生成",
+        "caption": "\\shortname is a unified framework for supporting controllable generation based on point cloud, bounding box, voxel, and skeleton."
+      },
+      {
+        "label": "fig:framework",
+        "role": "架构概览图：展示四种条件模态通过统一控制编码器集成到DiT扩散模型",
+        "caption": "Overview of \\shortname Architecture. This framework integrates four conditioning modalities—point clouds, bounding boxes, voxels, and skeletons—through a unified control encoder."
+      },
+      {
+        "label": "fig:exp_pose_control",
+        "role": "姿势控制定性结果：展示在多种姿势和风格下生成的准确对齐几何",
+        "caption": "Qualitative results of pose control, demonstrating that our Omni model generates accurately aligned geometry across diverse poses and input styles."
+      },
+      {
+        "label": "fig:image-generation bbox ratio",
+        "role": "包围盒控制定性结果（比例调整）：给定不同包围盒可生成不同尺寸的物体",
+        "caption": "Qualitative results of bounding box control, our Omni model can generate objects at different scales, given different bounding boxes."
+      },
+      {
+        "label": "fig:image-generation bbox compare",
+        "role": "包围盒控制定性结果（几何增强）：包围盒信号可避免生成薄片状几何",
+        "caption": "Qualitative results of bounding box control, given the bounding box condition, our Omni model can avoid generating thin, sheet-like geometry."
+      },
+      {
+        "label": "fig:exp_point_control",
+        "role": "点云控制定性结果：展示不同点云输入下（完整、深度、扫描）的对齐和细节恢复改进",
+        "caption": "Qualitative results of point cloud control, showing improved alignment and detail recovery across complete, depth-projected, and scanned point cloud conditions compared to image-only results."
+      },
+      {
+        "label": "fig:exp_voxel_control",
+        "role": "体素控制定性结果：展示体素条件改善尺寸对齐和细节恢复",
+        "caption": "Qualitative results of voxel control, demonstrating improved scale alignment and fine detail recovery with voxel conditions compared to image-only results."
+      }
+    ],
+    "limitations": [
+      "论文未提供定量实验和消融研究，主要依赖定性可视化展示效果。",
+      "目前仅支持四种控制类型（点云、体素、包围盒、骨骼），尚未扩展到文本等更灵活的条件。"
+    ],
+    "open_questions": [
+      "如何灵活地将多种控制信号（点、体素、包围盒和姿态）集成到单一模型中，以实现细粒度和跨模态的三维内容可控制性，仍是一个重要但尚未充分探索的挑战。"
+    ],
+    "_meta": {
+      "part_count": 6,
+      "latency_seconds": 138.513,
+      "created_at": "2026-07-05T05:49:39.762398+00:00",
+      "usage": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "enabled",
+        "reasoning_effort": "max",
+        "prompt_tokens_est": 17536,
+        "completion_tokens_est": 2621,
+        "reasoning_tokens_est": 7556,
+        "total_tokens_est": 20157,
+        "total_with_reasoning_tokens_est": 27713,
+        "estimated_cost_usd": 0.009908,
+        "cost_basis": "discounted_estimate_from_local_text_lengths",
+        "prompt_tokens_api": 16327,
+        "completion_tokens_api": 9925,
+        "total_tokens_api": 26252,
+        "reasoning_tokens_api": 7418,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 16327,
+        "cached_tokens_api": 0,
+        "api_usage_raw": {
+          "completion_tokens": 9925,
+          "prompt_tokens": 16327,
+          "total_tokens": 26252,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": null,
+            "audio_tokens": null,
+            "reasoning_tokens": 7418,
+            "rejected_prediction_tokens": null
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 16327
+        },
+        "estimated_cost_usd_api": 0.015737,
+        "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+        "stream_diagnostics": {
+          "content_chars": 7742,
+          "reasoning_chars": 20342,
+          "finish_reason": "stop",
+          "finish_reasons": [
+            "stop",
+            "stop"
+          ],
+          "stream_chunk_count": 9926,
+          "api_usage_present": true
+        }
+      }
+    }
+  },
+  "focused_part_analyses": [
+    {
+      "part_id": "part_001",
+      "section_role": "preamble and macro definitions",
+      "method_evidence": [],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_002",
+      "section_role": "preamble and abstract",
+      "method_evidence": [
+        {
+          "claim": "Hunyuan3D-Omni accepts point clouds, voxels, bounding boxes, and skeletal pose priors as conditioning signals.",
+          "section": "Abstract",
+          "anchor": "In addition to images, \\shortname accepts point clouds, voxels, bounding boxes, and skeletal pose priors as conditioning signals",
+          "confidence": 0.95
+        },
+        {
+          "claim": "The model unifies all signals in a single cross-modal architecture.",
+          "section": "Abstract",
+          "anchor": "Instead of separate heads for each modality, our model unifies all signals in a single cross-modal architecture.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "fig:teaser-top",
+          "role_hint": "Teaser figure showing controllable generation based on point cloud, bounding box, voxel, and skeleton.",
+          "caption": "\\shortname is a unified framework for supporting controllable generation based on point cloud, bounding box, voxel, and skeleton.",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_003",
+      "section_role": "introduction and related work",
+      "method_evidence": [
+        {
+          "claim": "We utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings.",
+          "section": "Introduction",
+          "anchor": "we utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings",
+          "confidence": 0.95
+        },
+        {
+          "claim": "We concatenate the extracted embeddings with the DINO features of the input image.",
+          "section": "Introduction",
+          "anchor": "we concatenate the extracted embeddings with the DINO features of the input image",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [],
+      "formula_evidence": [],
+      "figure_table_roles": [],
+      "open_questions": [
+        "How to flexibly integrate diverse control signals such as points, voxels, bounding boxes, and poses within a single model to achieve fine-grained and cross-modal controllability of 3D contents remains an important yet insufficiently explored challenge."
+      ]
+    },
+    {
+      "part_id": "part_004",
+      "section_role": "Method",
+      "method_evidence": [
+        {
+          "claim": "Hunyuan3D-Omni constructs a unified control encoder to introduce additional control signals: point cloud, voxel, skeleton, and bounding box.",
+          "section": "3.2",
+          "anchor": "\\shortname constructs a unified control encoder to introduce additional control signals, including point cloud, voxel, skeleton, and bounding box.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "Skeleton condition uses 3D coordinates of bone starting points, selecting body and hand bones, represented as P_pose ∈ R^{M×6}.",
+          "section": "3.2.1",
+          "anchor": "we use the 3D coordinates of the starting points of the bones to represent each bone, selecting both body bones and hand bones. Consequently, we can define the input for the skeleton condition as $P_{pose} \\in \\mathbb{R...",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [],
+      "formula_evidence": [
+        {
+          "name": "3D VAE formulation",
+          "latex": "Z = \\mathcal{E}(P), F_{sdf} = \\mathcal{D}(Z)",
+          "meaning": "Encoder E maps point cloud P to latent Z; decoder D reconstructs SDF field F_sdf.",
+          "section": "3.1",
+          "confidence": 0.95
+        },
+        {
+          "name": "Flow matching training objective",
+          "latex": "\\mathbb{E}_{t, {x}_0, {x}_1, c}\\vert\\vert{v}_\\theta({x}, t, c)-(x_1-x_0)\\vert\\vert_2^2",
+          "meaning": "Training objective for flow matching model used in Hunyuan3D 2.1, transforming noise x_0 to data x_1 conditioned on image embeddings c.",
+          "section": "3.1",
+          "confidence": 0.95
+        }
+      ],
+      "figure_table_roles": [
+        {
+          "label": "fig:framework",
+          "role_hint": "Architecture overview",
+          "caption": "Overview of Hunyuan3D-Omni Architecture. This framework integrates four conditioning modalities—point clouds, bounding boxes, voxels, and skeletons—through a unified control encoder. Hunyuan3D-Omni leverages a Diffusion...",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_005",
+      "section_role": "Method details and experiments",
+      "method_evidence": [
+        {
+          "claim": "All control signals can be represented as a type of point cloud.",
+          "section": "Unified Control Encoder",
+          "anchor": "As all control signals can be represented as a type of point cloud, we can design a shared point encoder to extract the corresponding features easily.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "All controls can be represented as a point cloud P_c ∈ R^{N×6}.",
+          "section": "Unified Control Encoder",
+          "anchor": "all controls can be represented as a point cloud $P_c \\in \\mathbb{R}^{N \\times 6}$, where $N$ is the number of points or bones.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Pose control generates accurately aligned geometry across diverse poses and input styles.",
+          "table_or_figure": "Figure 1",
+          "metric": "qualitative",
+          "value": "accurately aligned geometry",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Bounding box control generates objects at different scales.",
+          "table_or_figure": "Figure 2",
+          "metric": "qualitative",
+          "value": "generates objects at different scales",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [
+        {
+          "name": "Shared control encoder",
+          "latex": "\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)], i \\in [0,1,2,3]",
+          "meaning": "Final control feature β_i is concatenation of linear-projected position embedding of point cloud and repeated type embedding.",
+          "section": "Unified Control Encoder",
+          "confidence": 0.95
+        },
+        {
+          "name": "Training objective",
+          "latex": "\\mathbb{E}_{t, {x}_0, {x_1}, c'}\\vert\\vert{v}_\\theta({x}, t, c')-(x_1-x_0)\\vert\\vert_2^2",
+          "meaning": "Flow matching loss with joint condition c' = [c, β_i].",
+          "section": "Unified Control Encoder",
+          "confidence": 0.95
+        }
+      ],
+      "figure_table_roles": [
+        {
+          "label": "fig:exp_pose_control",
+          "role_hint": "Qualitative results of pose control",
+          "caption": "Qualitative results of pose control, demonstrating that our Omni model generates accurately aligned geometry across diverse poses and input styles.",
+          "confidence": 0.95
+        },
+        {
+          "label": "fig:image-generation bbox ratio",
+          "role_hint": "Qualitative results of bounding box control (scale)",
+          "caption": "Qualitative results of bounding box control, our Omni model can generate objects at different scales, given different bounding boxes.",
+          "confidence": 0.95
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "part_id": "part_006",
+      "section_role": "experiments and conclusion",
+      "method_evidence": [
+        {
+          "claim": "We incorporate point cloud, voxel, bounding box, and skeleton to mitigate geometry distortion in image-only 3D generation and achieve style control.",
+          "section": "Conclusion",
+          "anchor": "We incorporate point cloud, voxel, bounding box, and skeleton to mitigate geometry distortion in image-only 3D generation and achieve style control.",
+          "confidence": 0.95
+        },
+        {
+          "claim": "To unify these extra conditions in one diffusion model, we design a lightweight unified control encoder.",
+          "section": "Conclusion",
+          "anchor": "To unify these extra conditions in one diffusion model, we design a lightweight unified control encoder.",
+          "confidence": 0.95
+        }
+      ],
+      "experiment_evidence": [
+        {
+          "claim": "Point cloud control resolves single-view ambiguity and recovers occluded internal structures.",
+          "table_or_figure": "Figure 11",
+          "metric": "qualitative",
+          "value": "effectively resolves the ambiguity inherent in single-view inputs and allows the recovery of occluded internal structures",
+          "confidence": 0.9
+        },
+        {
+          "claim": "Voxel condition ensures proper scale alignment and recovers fine geometric details.",
+          "table_or_figure": "Figure 12",
+          "metric": "qualitative",
+          "value": "ensures that the generated objects are properly aligned in scale with the ground truth geometry ... contributes to recovering fine geometric details",
+          "confidence": 0.9
+        }
+      ],
+      "formula_evidence": [],
+      "figure_table_roles": [
+        {
+          "label": "Figure 10",
+          "role_hint": "image-generation bbox compare",
+          "caption": "the bounding box signal can inject an activation cue into the generation network when single-image conditioned generation fails, yielding a valid mesh",
+          "confidence": 0.9
+        },
+        {
+          "label": "Figure 11",
+          "role_hint": "exp_point_control",
+          "caption": "generation results under two settings: image only and image with point cloud control",
+          "confidence": 0.9
+        }
+      ],
+      "open_questions": []
+    }
+  ],
+  "focused_figures_tables": [],
+  "context_note": "Part and figure/table context is filtered for this section; use verified_analysis for global facts.",
+  "section_title": "实验与关键发现",
+  "section_goal": "写 1500-2300 中文字。写主结果、指标对比、关键消融、失败模式和适用边界；保留主表关键数值、相对基线差异和最能支撑结论的实验，不罗列全部实验。"
+}

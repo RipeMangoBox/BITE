@@ -1,0 +1,149 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: AdaSpec Adaptive Spectrum for Enhanced Node Distinguishability
+Part: 10/15
+Character span: 56619-64495
+
+=== PART CONTENT ===
+e $\mu _ { 1 } , \ldots , \mu _ { m }$ are the eigenvalues of the compressed matrix
+
+$$
+H _ { \lambda } \ = \ V _ { \lambda } ^ { \top } \ { \frac { d } { d t } } \Omega ( t ) { \bigg | } _ { t = 0 } V _ { \lambda } .
+$$
+
+In particular, the multiplicity-m eigenvalue λ splits to first order precisely when $H _ { \lambda }$ is not a scalar multiple of the identity.
+
+Theorem 5.1 (Increased Distinct Eigenvalues). Given a graph G with the adjacency matrix A, and the degree matrix $D ,$ we have:
+
+$$
+d _ { \Omega _ { D } ( A ) } \geq d _ { \tilde { A } }
+$$
+
+Proof. When $\tilde { A }$ has an eigenvalue λ of multiplicity $k > 1$ and let $V _ { \lambda } \in \mathbb { R } ^ { n \times k }$ have orthonormal columns spanning the corresponding eigenspace $E _ { \lambda }$
+
+Consider the analytic family
+
+$$
+\Omega ( t ) : = ( D + t B ) ^ { - 1 / 2 } ( A + t B ) ( D + t B ) ^ { - 1 / 2 } , \qquad t \in [ 0 , t _ { 0 } ] ,
+$$
+
+so $\Omega ( 0 ) = { \widetilde A }$ . The first-order perturbation matrix at $t = 0$ is
+
+$$
+P : = \left. { \frac { d } { d t } } \Omega ( t ) \right| _ { t = 0 } = - { \textstyle { \frac { 1 } { 2 } } } D ^ { - 3 / 2 } B A D ^ { - 1 / 2 } + D ^ { - 1 / 2 } B D ^ { - 1 / 2 } - { \textstyle { \frac { 1 } { 2 } } } D ^ { - 1 / 2 } A D ^ { - 3 / 2 } B .
+$$
+
+Equivalently, conjugating by $D ^ { 1 / 2 }$ yields the simpler form
+
+$$
+\begin{array} { r } { Q : = D ^ { 1 / 2 } P D ^ { 1 / 2 } = B - \frac { 1 } { 2 } \big ( D ^ { - 1 } B A + A D ^ { - 1 } B \big ) , } \end{array}
+$$
+
+from which $P = D ^ { - 1 / 2 } Q D ^ { - 1 / 2 }$
+
+$B = d i a g ( b ) = ( b _ { 1 } , \dots , b _ { n } )$ and Q depends linearly on the diagonal vector $b ,$ hence so does $P .$
+
+By Lemma A.1, the first-order shifts of the k eigenvalue branches emanating from λ are the eigenvalues of the $k \times k$ symmetric matrix
+
+$$
+H _ { \lambda } \ = \ V _ { \lambda } ^ { \top } P V _ { \lambda } = V _ { \lambda } ^ { \top } D ^ { - 1 / 2 } Q D ^ { - 1 / 2 } V _ { \lambda } .
+$$
+
+Since $Q$ and $H _ { \lambda }$ is linear in b, the condition that $H _ { \lambda }$ be a scalar matrix is a finite system of homogeneous linear equations in b. Thus the “bad set”
+
+$$
+S _ { \lambda } : = \{ b \in \mathbb { R } ^ { n } : H _ { \lambda } { \mathrm { ~ i s ~ s c a l a r } } \}
+$$
+
+is a proper linear subspace of $\mathbb { R } ^ { n }$ (for $k > 1$ the system is nontrivial unless the eigenspace has a special coordinate structure). Taking the finite union over all repeated eigenvalues produces a proper algebraic subset $\textstyle S = \bigcup _ { \lambda } S _ { \lambda } \subset \mathbb { R } ^ { n }$
+
+Choose $b ^ { * } \notin S$ (and $b _ { i } ^ { * } > 0 )$ . Then for each repeated eigenvalue λ the corresponding $H _ { \lambda }$ is non-scalar, so the multiplicity of λ splits into at least two distinct eigenvalue branches for small $t > 0$ Therefore for sufficiently small $t > 0$ the matrix Ω(t) has strictly more distinct eigenvalues than A˜. Setting $B ^ { * } = t \ \mathrm { d i a g } ( b ^ { * } ) $ yields the desired diagonal perturbation.
+
+Because we have produced a point outside the discriminant variety, the discriminant polynomial is not identically zero; hence the complement (the set of B giving simple spectrum) is Zariski-open and dense in $\mathbb { R } ^ { \bar { n } }$
+
+In summary, there exists a diagonal $B ^ { * }$ (indeed a Zariski-open dense set of such diagonals) for which $\Omega _ { D } ( A ) = ( D + B ^ { * } ) ^ { - 1 / 2 } ( A + B ^ { * } ) ( D + B ^ { * } ) ^ { - 1 / 2 }$ has all eigenvalues simple, i.e., $d _ { \Omega _ { D } ( A ) } =$ $n \geq d _ { \tilde { A } }$
+
+Theorem A.2 (First-order Perturbation Theorem (Stewart, 1990)). When a system described by a matrix $A \in \mathbb { R } ^ { n \times n }$ of no repeated eigenvalues is slightly altered by a small perturbation $\boldsymbol { \zeta } \in \mathbb { R } ^ { n \times n }$ and the new new system can be represented as $A ^ { \prime } = \dot { A _ { } } + \epsilon \zeta ,$ , where ϵ is a non-zero constant. A has eigenvalues $\{ \lambda _ { i } \} _ { i \in [ n ] }$ and eigenvectors $\{ u _ { i } \} _ { i \in [ n ] }$ . A′ has eigenvalues $\{ \lambda _ { i } ^ { \prime } \} _ { i \in [ n ] }$ and eigenvectors $\{ u _ { i } ^ { \prime } \} _ { i \in [ n ] }$
+
+Relations between eigenvalues and eigenvectors of $A , A ^ { \prime }$ are:
+
+$$
+\lambda _ { i } ^ { \prime } = \lambda _ { i } + \epsilon \delta \lambda _ { i } = u _ { i } ^ { \top } \zeta u _ { i } + O ( \epsilon ^ { 2 } )
+$$
+
+$$
+u _ { i } ^ { \prime } = u _ { i } + \epsilon \sum _ { j \neq i } \frac { u _ { j } ^ { \top } \zeta u _ { i } } { \lambda _ { i } - \lambda _ { j } } u _ { j } + O ( \epsilon ^ { 2 } )
+$$
+
+Theorem 5.2 (Non-Decreasing Frequency Components). For a real symmetric matrix $C \in \mathbb { R } ^ { n \times n }$ of no repeated eigenvalues with orthonormal basis $\{ u _ { r } \} _ { r \in [ n ] }$ . Under Condition 5.3, the following holds for index $i \in [ h ] .$
+
+$$
+\| \tilde { X } _ { : i } ^ { ( C + \epsilon \Omega _ { F } ) } \| _ { 0 } > \| \tilde { X } _ { : i } ^ { ( C ) } \| _ { 0 }
+$$
+
+where ϵ is a non-zero constant.
+
+Proof. Since C is a real symmetric matrix, it can be diagonalized
+
+$$
+\boldsymbol { C } = \boldsymbol { U } \boldsymbol { \Lambda } \boldsymbol { U } ^ { T }
+$$
+
+where $U = [ u _ { 1 } , \dotsc , u _ { n } ]$ is orthonormal eigenvectors and $\boldsymbol { \Lambda } = \operatorname { d i a g } ( \lambda _ { 1 } , \ldots , \lambda _ { n } )$ is the diagonal matrix of eigenvalues.
+
+We denote $\{ \tilde { \lambda } _ { i } \} _ { i \in [ n ] }$ and $\{ \tilde { u } _ { i } \} _ { i \in [ n ] }$ eigenvalues and eigenvectors of $C + \epsilon \Omega _ { F }$
+
+According to Theorem $\mathbf { A . } 2 .$ , we have
+
+$$
+\tilde { u } _ { j } = u _ { j } + \epsilon \sum _ { k \neq j } \frac { u _ { k } ^ { \top } \Omega _ { F } u _ { j } } { \lambda _ { j } - \lambda _ { k } } u _ { k } + O ( \epsilon ^ { 2 } )
+$$
+
+Then,
+
+$$
+\tilde { u } _ { j } ^ { \top } X _ { : i } = u _ { j } ^ { \top } X _ { : i } + \epsilon \sum _ { k \neq j } \frac { u _ { k } ^ { \top } \Omega _ { F } u _ { j } } { \lambda _ { j } - \lambda _ { k } } u _ { k } X _ { : i } + O ( \epsilon ^ { 2 } )
+$$
+
+(1) For $\{ j | u _ { j } ^ { T } X _ { : i } \neq 0 \}$
+
+The leading term $u _ { j } ^ { T } X _ { : i } \neq 0$ ensures that $\tilde { u } _ { j } ^ { \top } X _ { : i } \ne 0$
+
+It indicates that non-zero components of $X _ { : i }$ in eigenspace of C is still non-zero components in eigenspace of $C + \epsilon \Omega _ { F }$
+
+(2) For $\{ j | u _ { i } ^ { T } X _ { : i } = 0 \}$
+
+We have
+
+$$
+\begin{array} { r l r } {  { \widetilde { u } _ { j } ^ { \top } X _ { : i } = \epsilon \sum _ { k \neq j } \frac { u _ { k } ^ { \top } \Omega _ { F } u _ { j } } { \lambda _ { j } - \lambda _ { k } } u _ { k } X _ { : i } + O ( \epsilon ^ { 2 } ) } } \\ & { } & { = \epsilon \sum _ { j \neq i } [ \sum _ { l = 1 } ^ { h } \frac { ( u _ { k } ^ { \top } X _ { : l } ) ( X _ { : l } ^ { \top } u _ { j } ) } { \| X _ { : l } \| _ { F } ^ { 2 } ( \lambda _ { j } - \lambda _ { k } ) } ] u _ { k } ^ { \top } X _ { : i } + O ( \epsilon ^ { 2 } ) } \end{array}
+$$
+
+When there exist k that $u _ { k } ^ { T } X _ { : i } \ne 0$ and there exist l that $u _ { k } ^ { \top } X _ { : l } \ne 0 , u _ { j } ^ { \top } X _ { : l } \ne 0$ . Thus, $( u _ { k } ^ { \top } X _ { : l } ) ( X _ { : l } ^ { \top } u _ { j } ) \neq 0$ and $\tilde { u } _ { k } ^ { \top } X _ { : i } \ne 0$
+
+It indicates that the zero-components of $X _ { : i }$ in eigenspace of $C$ becomes non-zero components in eigenspace of $C + \epsilon \Omega _ { F }$
+
+In summary, when perturbing matrix $C$ with $\epsilon \Omega _ { F }$ , the non-zero frequency component $\| \tilde { X } _ { : i } ^ { ( C + \epsilon \Omega _ { F } ) } \| _ { 0 } > \| \tilde { X } _ { : i } ^ { ( C ) } \| _ { 0 }$ .

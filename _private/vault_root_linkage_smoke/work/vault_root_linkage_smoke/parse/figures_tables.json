@@ -1,0 +1,470 @@
+[
+  {
+    "label": "Figure 1",
+    "type": "figure",
+    "caption": "(a)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/82a657c2ab6e82c100d0fd302a7efdc2adccbf4deabef76c98f2d11189de1047.jpg",
+    "page": null,
+    "bbox": [
+      194,
+      77,
+      328,
+      154
+    ]
+  },
+  {
+    "label": "Figure 2",
+    "type": "figure",
+    "caption": "(b)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/d5432892de3fd52f5a10f6756811a84b720df67856cc100db1f7da9cbfe7fd71.jpg",
+    "page": null,
+    "bbox": [
+      351,
+      77,
+      488,
+      154
+    ]
+  },
+  {
+    "label": "Figure 3",
+    "type": "figure",
+    "caption": "(c)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/9db69f65f2b7099768483fff629350ba0c658b34afd1a5018357b388cba456d1.jpg",
+    "page": null,
+    "bbox": [
+      508,
+      77,
+      643,
+      154
+    ]
+  },
+  {
+    "label": "Figure 2",
+    "type": "figure",
+    "caption": "(d) Figure 2: Eigenvalues and frequency component distributions.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/92005ff8750efaaa9abd09736142ecda741c49119336cfa5a2b09f683eff80a7.jpg",
+    "page": null,
+    "bbox": [
+      665,
+      77,
+      800,
+      154
+    ]
+  },
+  {
+    "label": "Figure 5",
+    "type": "figure",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/0064dc4120ce66ec3dc396d213f510643d3bcfee36b4fd3121ab6160db4001b0.jpg",
+    "page": null,
+    "bbox": [
+      627,
+      275,
+      720,
+      323
+    ]
+  },
+  {
+    "label": "Figure 6",
+    "type": "figure",
+    "caption": "(a)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/919d283cccf856d16bcac5e635335005ac14e41cb935ef377f22ef5fd1bc4f7a.jpg",
+    "page": null,
+    "bbox": [
+      736,
+      262,
+      821,
+      323
+    ]
+  },
+  {
+    "label": "Table 2",
+    "type": "table",
+    "caption": "Effectiveness of AdaSpec. We present the node classification performance with and without the AdaSpec on all small heterophilic datasets and a subset of large heterophilic datasets in Table 2. The Minesweeper and Question datasets are particularly challenging to classify, as their label informativeness (i.e., the mutual information between the labels of the central node and its neighbors) is zero (Platonov et al., 2023). The complete experimental results are in Table 9 (Appendix). Results on homophilic graphs are shown in Table 3 . Table 1: Time complexity comparison of GNNs with and without AdaSpec. V and E denotes the node and edge set respectively. h is the node feature dimension. T is the node class number. K is the polynomial order of spectral GNNs.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/a0871b281ba53d42be5127d4043f5b18f1a571254e3fd4aa676db04ee51d092a.jpg",
+    "page": null,
+    "bbox": [
+      222,
+      819,
+      769,
+      866
+    ]
+  },
+  {
+    "label": "Table 2",
+    "type": "table",
+    "caption": "Table 2: Performance of spectral GNNs with/without AdaSpec on heterophilic datasets. ROC AUC is reported on Minesweeper, Questions. Testing accuracy is reported on other datasets. High accuracy and ROC AUC indicate good performance.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/011b074c47248d0ee6ff986c10710e617816dfcfbdfbb339a1758503e6f5ecb3.jpg",
+    "page": null,
+    "bbox": [
+      173,
+      101,
+      820,
+      284
+    ]
+  },
+  {
+    "label": "Table 3",
+    "type": "table",
+    "caption": "Table 3: Test accuracy of spectral GNNs with/without AdaSpec on homophilic datasets. High accuracy indicates good performance.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/ed9c7c03a0565fe13a719e49ce0648d97fac51b21f8c0f7310d69397b77e5c3f.jpg",
+    "page": null,
+    "bbox": [
+      173,
+      353,
+      820,
+      545
+    ]
+  },
+  {
+    "label": "Table 4",
+    "type": "table",
+    "caption": "Table 4: Test accuracy of ChebNet with different components of AdaSpec across datasets that \\Omega ( A , X ) contains all three components.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/10d3c4fb13966eb5e73e0df8b34ad8eb28a4b33df25a786fab84b9f292317220.jpg",
+    "page": null,
+    "bbox": [
+      251,
+      83,
+      736,
+      162
+    ]
+  },
+  {
+    "label": "Table 5",
+    "type": "table",
+    "caption": "Table 5: Number of distinct eigenvalues of the graph matrix. |V| denotes the number of nodes in graphs. d _ { \\tilde { A } } and d _ { \\Omega _ { D } ( A ) } are numbers of distinct eigenvalues of A˜ and \\Omega _ { D } ( A ) in AdaSpec respectively.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/9b96e14a76f534e909277140c198a84fc8dbe25eba84d335383371e10ae31eac.jpg",
+    "page": null,
+    "bbox": [
+      254,
+      364,
+      738,
+      435
+    ]
+  },
+  {
+    "label": "Table 6",
+    "type": "table",
+    "caption": "Table 6: Average training and pre-computing time (in seconds) for ChebNet with and without AdaSpec on large heterophilic and homophilic datasets. Pre-computing is for \\Omega _ { F } ( X ) in AdaSpec.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/601d6b9ea93eee8e22b9dfcda21b3468102094d9277c698758b687e0dd89bf47.jpg",
+    "page": null,
+    "bbox": [
+      173,
+      617,
+      820,
+      696
+    ]
+  },
+  {
+    "label": "Figure 7",
+    "type": "figure",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/27039b425ca96aeeac153464638cbe1cd69504fc58fa4955785997fa6c3eef32.jpg",
+    "page": null,
+    "bbox": [
+      179,
+      627,
+      287,
+      689
+    ]
+  },
+  {
+    "label": "Figure 8",
+    "type": "figure",
+    "caption": "(a) (b)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/4d3d4ce5ba06a1c0359c39b9b2e6f0da4f0b2782dbb8db737528f50902085e4e.jpg",
+    "page": null,
+    "bbox": [
+      359,
+      627,
+      464,
+      689
+    ]
+  },
+  {
+    "label": "Figure 9",
+    "type": "figure",
+    "caption": "(c)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/d88d4d09a0405cd929d092e17ebcae324de3c641e2052f4cb50eb6013c5cee1f.jpg",
+    "page": null,
+    "bbox": [
+      534,
+      627,
+      638,
+      689
+    ]
+  },
+  {
+    "label": "Figure 10",
+    "type": "figure",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/9ff78ec000112ff3df072fde8bf7a8a37f414b898fbba5c149623bce82b6f6f8.jpg",
+    "page": null,
+    "bbox": [
+      705,
+      627,
+      813,
+      688
+    ]
+  },
+  {
+    "label": "Figure 11",
+    "type": "figure",
+    "caption": "(e)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/827ee8c3cd64f8c97f7128421ea1851d41d66b38c8e095fdb7529952e8b0c98f.jpg",
+    "page": null,
+    "bbox": [
+      181,
+      710,
+      287,
+      770
+    ]
+  },
+  {
+    "label": "Figure 12",
+    "type": "figure",
+    "caption": "(d) (f)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/33c6ca8063437eb19169e7725717708e08c349f73b03f51911ab7e74ac5a37ad.jpg",
+    "page": null,
+    "bbox": [
+      310,
+      710,
+      419,
+      771
+    ]
+  },
+  {
+    "label": "Figure 13",
+    "type": "figure",
+    "caption": "(g)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/37273ea8639d634099f73a3654a7ea03ead3a3a9f0c3a59d8a0b9f34c569ed21.jpg",
+    "page": null,
+    "bbox": [
+      442,
+      710,
+      552,
+      771
+    ]
+  },
+  {
+    "label": "Figure 14",
+    "type": "figure",
+    "caption": "(h)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/95cef3697426b07386685eb9442669cfbbaab2beb604f67a1f58163e6ffd9dac.jpg",
+    "page": null,
+    "bbox": [
+      576,
+      709,
+      683,
+      770
+    ]
+  },
+  {
+    "label": "Figure 3",
+    "type": "figure",
+    "caption": "(i) Figure 3: Distributions of eigenvalues of normalized graph adjacency matrix.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/b77b29bbfec12a9e20d082ea5ed23850060eac6a4e3dabc65f9456a8b9a042fe.jpg",
+    "page": null,
+    "bbox": [
+      705,
+      710,
+      813,
+      771
+    ]
+  },
+  {
+    "label": "Table 7",
+    "type": "table",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/6bfea456d5f3d3b68abc64695503197f4ea0f8214037922ffa64eecbed4781dd.jpg",
+    "page": null,
+    "bbox": [
+      290,
+      102,
+      707,
+      170
+    ]
+  },
+  {
+    "label": "Table 8",
+    "type": "table",
+    "caption": "Statistics of six small heterophilic datasets (Pei et al., 2020; Rozemberczki et al., 2021; Platonov et al., 2023).",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/62ed53aed535be94bac3b9205c2639d118af45061b9793f422f129f5fa33f3ef.jpg",
+    "page": null,
+    "bbox": [
+      274,
+      224,
+      723,
+      290
+    ]
+  },
+  {
+    "label": "Table 7",
+    "type": "table",
+    "caption": "Statistics of five large heterophilic datasets Platonov et al. (2023). Statistics of homophilic datasets, including three small datasets (Citeseer, Pubmed, Cora) and four large datasets (Computers, Photo, Coauthor-CS, Coauthor-Physics) (Kipf & Welling, 2017; Zeng et al., 2020; Shchur et al., 2018). Table 7: Statistics of real-world datasets.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/ec0daf0d7ce66e154bfda2db5484cfde1fe8aad1dda2a802a305337bc7e6d07b.jpg",
+    "page": null,
+    "bbox": [
+      241,
+      330,
+      754,
+      397
+    ]
+  },
+  {
+    "label": "Figure 16",
+    "type": "figure",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/250e10f1155fe98f4ae3bd6a1655a03ef27c219da4e5c99fa4777d198a045c21.jpg",
+    "page": null,
+    "bbox": [
+      181,
+      137,
+      289,
+      198
+    ]
+  },
+  {
+    "label": "Figure 17",
+    "type": "figure",
+    "caption": "(a)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/34fce409145ea6a71fbc94f87d1f0a7cc8a15f34b75d07b1275a7d191a1ac087.jpg",
+    "page": null,
+    "bbox": [
+      354,
+      136,
+      465,
+      198
+    ]
+  },
+  {
+    "label": "Figure 18",
+    "type": "figure",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/ca1a4bc0f0136e5b3b7065ad8724fb5ffc5e806b325767fef864b24fbf15ed9c.jpg",
+    "page": null,
+    "bbox": [
+      531,
+      136,
+      640,
+      198
+    ]
+  },
+  {
+    "label": "Figure 19",
+    "type": "figure",
+    "caption": "(b)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/3f6e5bca981ec9aea2a9038710a55ab53c3b66c245bfe1805e75c5397ebc2df6.jpg",
+    "page": null,
+    "bbox": [
+      179,
+      219,
+      289,
+      281
+    ]
+  },
+  {
+    "label": "Figure 20",
+    "type": "figure",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/e9d344a946e526cbcdde3b03e8e198fa0691a7a18c83db757a2a06c05a66353c.jpg",
+    "page": null,
+    "bbox": [
+      702,
+      136,
+      815,
+      198
+    ]
+  },
+  {
+    "label": "Figure 21",
+    "type": "figure",
+    "caption": "(e) (f)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/93a67d4f741ebdb1f40937cedda1cc5124d4b1fe657a22a3593b00ecc0454ccd.jpg",
+    "page": null,
+    "bbox": [
+      310,
+      218,
+      421,
+      281
+    ]
+  },
+  {
+    "label": "Figure 22",
+    "type": "figure",
+    "caption": "(c) (g)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/0224a1b2e3bee7474ba823b8240711faeac75021201886f338d04a4aaed47564.jpg",
+    "page": null,
+    "bbox": [
+      437,
+      219,
+      553,
+      281
+    ]
+  },
+  {
+    "label": "Figure 23",
+    "type": "figure",
+    "caption": "(h)",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/58d73823547e4ffb5356379dfeba0a6eafbc2bb6a82b37cacf34f35ace9236d0.jpg",
+    "page": null,
+    "bbox": [
+      576,
+      218,
+      686,
+      281
+    ]
+  },
+  {
+    "label": "Figure 4",
+    "type": "figure",
+    "caption": "(i) Figure 4: Distributions of frequency components of graph signals in eigenspace of normalized graph adjacency matrix.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/5fde20020b42994a7ce5ce658ef0990e293f59836154dd6e0129ee99f377a00e.jpg",
+    "page": null,
+    "bbox": [
+      707,
+      218,
+      815,
+      281
+    ]
+  },
+  {
+    "label": "Table 10",
+    "type": "table",
+    "caption": "",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/d9ecf6c61b43676ae53c8c4d750f4e5022c26600f5db28b8547d489d5863fc76.jpg",
+    "page": null,
+    "bbox": [
+      210,
+      405,
+      787,
+      840
+    ]
+  },
+  {
+    "label": "Table 9",
+    "type": "table",
+    "caption": "Table 9: Performance with/without AdaSpec on large heterophilic datasets (Roman_Empire, Amazon_Ratings, Tolokers, Minesweeper, Questions ). Test accuracy is used as the metric for Roman-Empire and Amazon-Ratings datasets and ROC AUC is reported on Minesweeper, Tolokers, Questions. High accuracy and ROC AUC indicate good performance.",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/4c22ecd6fdbeec1b2c7b7b9c3775974f12ca917bf58775c6a1365d4419f7a92f.jpg",
+    "page": null,
+    "bbox": [
+      238,
+      375,
+      756,
+      560
+    ]
+  },
+  {
+    "label": "Table 10",
+    "type": "table",
+    "caption": "Table 10: Impact of AdaSpec applied on top of GDC. Our method (GDC + ChebNet(M)) consistently improves performance across most benchmarks. Three configurations: (1) Standard ChebNet ( ChebNet(O) ), (2) ChebNet with GDC ( GDC+ChebNet(O) ), and (3) ChebNet with GDC + AdaSpec ( GDC+ChebNet(M) ).",
+    "source_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/local_analysis_runs/iclr26_0008_eHhUYoZwWs_AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Dist/parse/mineru_raw/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability__c1fc1e492936/auto/images/a94d75da9e1b828afaf34bc1913c48774c52b8c967f57af76c2e117e6a412038.jpg",
+    "page": null,
+    "bbox": [
+      176,
+      654,
+      820,
+      717
+    ]
+  }
+]

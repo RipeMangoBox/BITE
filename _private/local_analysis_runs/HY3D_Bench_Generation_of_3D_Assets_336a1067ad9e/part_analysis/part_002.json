@@ -1,0 +1,69 @@
+{
+  "part_id": "part_002",
+  "section_role": "preamble and abstract",
+  "method_evidence": [],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "fig:teaser-top",
+      "role_hint": "teaser figure",
+      "caption": "HY3D-Bench is a unified ecosystem for high-fidelity 3D content generation. Our framework introduces (a) 252k high-quality assets with watertight meshes and multi-view renderings, (b) 240k structured part-level decomposition enabling fine-grained control, and (c) AIGC-synthesized 125k long-tail category assets. This benchmark provides standardized training data and evaluation protocols for advancing 3D generation research.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_002",
+    "part_index": 2,
+    "part_count": 9,
+    "chunk_chars": 7719,
+    "latency_seconds": 3.005,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3141,
+      "completion_tokens_est": 232,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3373,
+      "total_with_reasoning_tokens_est": 3373,
+      "estimated_cost_usd": 0.001568,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 3520,
+      "completion_tokens_api": 203,
+      "total_tokens_api": 3723,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 3520,
+      "cached_tokens_api": 0,
+      "api_usage_raw": {
+        "completion_tokens": 203,
+        "prompt_tokens": 3520,
+        "total_tokens": 3723,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 3520
+      },
+      "estimated_cost_usd_api": 0.001708,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 774,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 205,
+        "api_usage_present": true
+      }
+    }
+  }
+}

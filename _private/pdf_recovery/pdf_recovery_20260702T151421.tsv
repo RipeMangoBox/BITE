@@ -1,0 +1,10 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+replaced	obsidian-vault/paperPDFs/CVPR_2026/CMDM_HP.pdf	https://arxiv.org/abs/2602.22594	21536655	1529901	21536655	20434339	lossless-qpdf; 19.49MiB	ok
+replaced	obsidian-vault/paperPDFs/CVPR_2026/Bridging_Facial_Understanding_and_Animation_via_Language_Models.pdf	https://arxiv.org/abs/2603.16936	21502003	1982265	21502003	17208724	lossless-qpdf; 16.41MiB	ok
+replaced	obsidian-vault/paperPDFs/CVPR_2026/NeoVerse_Enhancing_4D_World_Model_with_in_the_wild_Monocular_Videos.pdf	https://arxiv.org/abs/2601.00393	21351870	1142552	21351870	20250348	lossless-qpdf; 19.31MiB	ok
+replaced	obsidian-vault/paperPDFs/CVPR_2026/AeroDGS_Physically_Consistent_Dynamic_Gaussian_Splatting_for_Single_Sequence_Aerial_4D_Reconstruction.pdf	https://arxiv.org/abs/2602.22376	21440316	549881	21440316	1919677	gs-600dpi-q100; 1.83MiB	ok
+replaced	obsidian-vault/paperPDFs/CVPR_2026/Learning_Straight_Flows_Variational_Flow_Matching_for_Efficient_Generation.pdf	https://arxiv.org/abs/2511.17583	21244910	696082	21244910	3966477	gs-600dpi-q100; 3.78MiB	ok
+replaced	obsidian-vault/paperPDFs/arxiv_2025/DualFlow_Unified_Multi_Modal_Interactive_Reactive_3D_Motion_Generation_via_Rectified_Flow.pdf	https://arxiv.org/abs/2509.24099	21202362	806930	21202362	10147957	lossless-qpdf; 9.68MiB	ok
+replaced	obsidian-vault/paperPDFs/CVPR_2026/DMGD_Train_Free_Dataset_Distillation_with_Semantic_Distribution_Matching_in_Diffusion_Models.pdf	https://arxiv.org/abs/2605.03877	21150143	1412430	21150143	4564369	gs-600dpi-q100; 4.35MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2025/Interspatial_Attention_for_Efficient_4D_Human_Video_Generation.pdf	http://arxiv.org/abs/2505.15800v2	21034219	1406577	21034219	20573218	lossless-qpdf; 19.62MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Interactive_Character_Control_with_Auto_Regressive_Motion_Diffusion_Models.pdf	https://arxiv.org/abs/2306.00416	20974343	1112329	20974343	20536739	lossless-qpdf; 19.59MiB	ok

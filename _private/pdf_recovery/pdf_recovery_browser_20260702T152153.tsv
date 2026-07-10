@@ -1,0 +1,4 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2025/Optimal_r_Adaptive_In_Timestep_Remeshing_for_Elastodynamics.pdf	https://dl.acm.org/doi/pdf/10.1145/3731204	289762206	2486425				timeout url=https://dl.acm.org/doi/pdf/10.1145/3731204
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/PhysiOpt_Physics_Driven_Shape_Optimization_for_3D_Generative_Models.pdf	https://dl.acm.org/doi/pdf/10.1145/3757377.3763884	149362074	1753914	149362074	7136311	gs-600dpi-q100; 6.81MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2023/Computational_Exploration_of_Multistable_Elastic_Knots.pdf	https://dl.acm.org/doi/pdf/10.1145/3592399	146118726	2256145	146118726	9626929	gs-600dpi-q100; 9.18MiB	ok

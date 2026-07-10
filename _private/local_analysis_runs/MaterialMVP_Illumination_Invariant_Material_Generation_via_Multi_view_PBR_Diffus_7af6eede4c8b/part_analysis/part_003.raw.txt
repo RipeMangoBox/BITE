@@ -1,0 +1,105 @@
+{
+  "part_id": "3/5",
+  "section_role": "Method section with preliminary, proposed training strategy, and quantitative results table",
+  "method_evidence": [
+    {
+      "claim": "MaterialMVP generates PBR textures conditioned on a 3D mesh and an image prompt.",
+      "section": "3",
+      "anchor": "As shown in Fig. 1, our MaterialMVP generates PBR textures conditioned on a 3D mesh and an image prompt.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The 3D mesh is input as normal maps and position maps, encoded into latent space and concatenated with noise latent.",
+      "section": "3",
+      "anchor": "The 3D mesh is input in the form of normal maps and position maps, which are encoded into latent space and concatenated channel-wise with noise latent as U-Net input.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Consistency-Regularized Training uses pairs of reference images to stabilize multi-view generation and disentangle lighting.",
+      "section": "3.2",
+      "anchor": "we propose a consistency-regularized training strategy that trains the model on pairs of reference images rather than individual samples.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Reference pair selection uses a candidate set of 312 images with varied camera poses and lighting.",
+      "section": "3.2.1",
+      "anchor": "For each object, we construct a candidate set I of 312 images rendered in various camera poses and lighting conditions...",
+      "confidence": 0.95
+    },
+    {
+      "claim": "The model is jointly conditioned on two reference images at each training step.",
+      "section": "3.2",
+      "anchor": "At each training step, the diffusion model is jointly conditioned on two reference images.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Our method achieves best CLIP-FID, FID, CMMD, CLIP-I, and LPIPS compared to state-of-the-art.",
+      "table_or_figure": "Table 1",
+      "metric": "CLIP-FID",
+      "value": "24.78",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Our method achieves best FID score.",
+      "table_or_figure": "Table 1",
+      "metric": "FID",
+      "value": "168.5",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Our method achieves best CMMD score.",
+      "table_or_figure": "Table 1",
+      "metric": "CMMD",
+      "value": "2.191",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Our method achieves best CLIP-I score.",
+      "table_or_figure": "Table 1",
+      "metric": "CLIP-I",
+      "value": "0.9207",
+      "confidence": 0.98
+    },
+    {
+      "claim": "Our method achieves best LPIPS score.",
+      "table_or_figure": "Table 1",
+      "metric": "LPIPS",
+      "value": "0.1211",
+      "confidence": 0.98
+    }
+  ],
+  "formula_evidence": [
+    {
+      "name": "Multi-view attention",
+      "latex": "z_i^{new} = {\\sum_{j=1}^{n}} \\text{Softmax}(\\frac{ Q_i K_j^T}{\\sqrt{d}}) \\cdot V_j",
+      "meaning": "Synchronized denoising of geometrically consistent multi-view outputs via multi-view attention.",
+      "section": "3.1",
+      "confidence": 0.95
+    },
+    {
+      "name": "Reference pair subset definition",
+      "latex": "\\mathcal{S}\\left(I_{1}\\right)=\\left\\{I \\in \\mathcal{I} \\mid \\phi_{c}(I) \\in\\left\\{\\phi_{c}\\left(I_{1}\\right), \\phi_{c}\\left(I_{1}\\right)\\pm15^{\\circ}\\right\\}\\right\\}",
+      "meaning": "Subset of images with camera azimuth within 15 degrees of I1.",
+      "section": "3.2.1",
+      "confidence": 0.95
+    }
+  ],
+  "figure_table_roles": [
+    {
+      "label": "Fig. 2",
+      "role_hint": "Illustration of reference image pair selection with camera pose and lighting perturbations.",
+      "caption": "Reference Image Pair Selection. The selected image pair exhibits perturbations in camera pose and/or lighting. The solid box indicates the chosen reference image, and the dashed box indicates the perturbed reference image.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Table 1",
+      "role_hint": "Quantitative comparison with state-of-the-art methods on texture generation metrics.",
+      "caption": "Quantitative comparison with state-of-the-art methods. We compare with two classes of methods, one conditioned on text only, and the other one based on image. Our method achieves the best performance compared with both classes.",
+      "confidence": 0.98
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

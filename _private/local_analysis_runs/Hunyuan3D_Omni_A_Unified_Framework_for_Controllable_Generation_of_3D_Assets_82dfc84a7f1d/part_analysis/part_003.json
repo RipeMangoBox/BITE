@@ -1,0 +1,77 @@
+{
+  "part_id": "part_003",
+  "section_role": "introduction and related work",
+  "method_evidence": [
+    {
+      "claim": "We utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings.",
+      "section": "Introduction",
+      "anchor": "we utilize point clouds to represent these extra conditions and propose a unified control encoder to differentiate between them and obtain corresponding embeddings",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We concatenate the extracted embeddings with the DINO features of the input image.",
+      "section": "Introduction",
+      "anchor": "we concatenate the extracted embeddings with the DINO features of the input image",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": [
+    "How to flexibly integrate diverse control signals such as points, voxels, bounding boxes, and poses within a single model to achieve fine-grained and cross-modal controllability of 3D contents remains an important yet insufficiently explored challenge."
+  ],
+  "_meta": {
+    "part_id": "part_003",
+    "part_index": 3,
+    "part_count": 6,
+    "chunk_chars": 7947,
+    "latency_seconds": 3.27,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3222,
+      "completion_tokens_est": 360,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3582,
+      "total_with_reasoning_tokens_est": 3582,
+      "estimated_cost_usd": 0.001715,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2455,
+      "completion_tokens_api": 262,
+      "total_tokens_api": 2717,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1815,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 262,
+        "prompt_tokens": 2455,
+        "total_tokens": 2717,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1815
+      },
+      "estimated_cost_usd_api": 0.00102,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 1201,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 264,
+        "api_usage_present": true
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "part_id": "7/9",
+  "section_role": "Data Processing Pipeline (Post Processing & Part-level)",
+  "method_evidence": [
+    {
+      "claim": "Watertight processing uses UDF on 512^3 grid, Marching Cubes with epsilon=1/512, Delaunay triangulation, and graph cut optimization.",
+      "section": "Post Processing",
+      "anchor": "we first compute the Unsigned Distance Field (UDF) on a uniform grid with $512^3$ resolution, and extract an $\\epsilon$-contour thin shell mesh $\\mathcal{M}$ using Marching Cubes with $\\epsilon=1/512$. We then sample points on $\\mathcal{M}$ and apply Delaunay triangulation to construct a volumetric tetrahedral mesh. Following the approach of ConvexMeshing, we optimize the tetrahedral cell labels (0 for inner, 1 for outer) using graph cut optimization, and extract the boundary surface as the final watertight mesh.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Point cloud sampling combines surface uniform sampling and edge importance sampling.",
+      "section": "Post Processing",
+      "anchor": "we implement a hybrid sampling scheme on watertight meshes by combining surface uniform sampling and edge importance sampling",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Part splitting uses Connected Component Analysis followed by automatic merging based on surface area thresholds.",
+      "section": "Part Splitting",
+      "anchor": "We adopt a splitting strategy based on topological connectivity, first utilizing Connected Component Analysis to perform initial splitting... we calculate the surface area of each original component and set area thresholds to identify small trivial parts. For components with areas significantly below the threshold, we merge them into adjacent larger components based on spatial adjacency relationships",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Asset filtering excludes assets with component count <=1 or >50, single component area >85% of total, or too many isolated small parts.",
+      "section": "Asset Filtering",
+      "anchor": "We exclude data with too few components ($\\leq$1) or too many components ($\\textgreater$50)... We exclude data where the area of a single component exceeds 85\\% of the total area... We exclude data containing too many isolated small-area components.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "fig:part_level_data_pipeline",
+      "role_hint": "Pipeline overview",
+      "caption": "Part-level Data Processing Pipeline.",
+      "confidence": 0.9
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

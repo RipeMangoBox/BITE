@@ -1,0 +1,2 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2023/Symmetric_Volume_Maps_Order_invariant_Volumetric_Mesh_Correspondence_With_Free_Boundary.pdf	https://arxiv.org/abs/2202.02568	142643777	12384693	142643777	20811428	gs-240dpi-q95; 19.85MiB	ok

@@ -1,0 +1,155 @@
+{
+  "part_id": "part_007",
+  "section_role": "Polygon Generation with Auto-regressive Models",
+  "method_evidence": [
+    {
+      "claim": "Mesh tokenization uses Blocked and Patchified Tokenization (BPT).",
+      "section": "Mesh Pretrianing with Efficient Tokenization and Architecture",
+      "anchor": "We leverage the Blocked and Patchified Tokenization (BPT) ... as the basic tokenization for meshes.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Point cloud encoder uses Perceiver architecture.",
+      "section": "Mesh Pretrianing with Efficient Tokenization and Architecture",
+      "anchor": "The point cloud encoder ... applies the Perceiver architecture to encode point cloud into condition tokens $c_p$.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Mesh decoder uses Hourglass Transformer with cross-attention.",
+      "section": "Mesh Pretrianing with Efficient Tokenization and Architecture",
+      "anchor": "we leverage the Hourglass Transformer as the mesh decoder backbone, conditioned on point cloud tokens by cross attention layers.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Post-training uses Masked Direct Preference Optimization (M-DPO).",
+      "section": "Mesh Post-Training with Topology-Aware Masked DPO",
+      "anchor": "we leverage Masked Direct Preference Optimization (M-DPO) ... which extends DPO with quality-aware localization masks.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Preference dataset construction uses Boundary Edge Ratio, Topology Score, and Hausdorff Distance.",
+      "section": "Mesh Post-Training with Topology-Aware Masked DPO",
+      "anchor": "Each candidate is evaluated using three metrics: Boundary Edge Ratio (BER) and Topology Score (TS) for topological quality, and Hausdorff Distance (HD) for geometric consistency.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Shape decomposition results comparison.",
+      "table_or_figure": "Table 1",
+      "metric": "CD↓, Fscore-0.1↑, Fscore-0.5↑",
+      "value": "Ours: CD 0.11, Fscore-0.1 0.80, Fscore-0.5 0.71",
+      "confidence": 0.95
+    }
+  ],
+  "formula_evidence": [
+    {
+      "name": "Mesh token distribution loss",
+      "latex": "L(\\theta) = \\prod_{i=1}^{|m|} p(m_{i} | m_{1:i-1}, c_p;\\theta)",
+      "meaning": "Maximizing log probability of mesh tokens conditioned on point cloud tokens.",
+      "section": "Mesh Pretrianing with Efficient Tokenization and Architecture",
+      "confidence": 0.95
+    },
+    {
+      "name": "Preference relation definition",
+      "latex": "\\text{BER}(\\mathcal{M}_{\\mathcal{P}}^i) < \\text{BER}(\\mathcal{M}_{\\mathcal{P}}^j) \\land \\text{TS}(\\mathcal{M}_{\\mathcal{P}}^i) > \\text{TS}(\\mathcal{M}_{\\mathcal{P}}^j) \\land \\text{HD}(\\mathcal{M}_{\\mathcal{P}}^i) < \\text{HD}(\\mathcal{M}_{\\mathcal{P}}^j)",
+      "meaning": "Defines when one mesh is preferred over another based on BER, TS, and HD.",
+      "section": "Mesh Post-Training with Topology-Aware Masked DPO",
+      "confidence": 0.95
+    },
+    {
+      "name": "M-DPO objective",
+      "latex": "\\mathcal{L}_{\\text{M-DPO}}(\\pi_\\psi; \\pi_{\\text{ref}}) = -\\mathbb{E}_{(\\mathcal{P}, \\mathcal{M}_{\\mathcal{P}}^+, \\mathcal{M}_{\\mathcal{P}}^-) \\sim \\mathcal{D}} \\left[ \\log \\sigma \\left( \\beta \\mathcal{L}^+(\\mathcal{P}, \\mathcal{M}_{\\mathcal{P}}^+) -\\beta \\mathcal{L}^-(\\mathcal{P}, \\mathcal{M}_{\\mathcal{P}}^-) \\right)\\right]",
+      "meaning": "Masked DPO loss function for post-training refinement.",
+      "section": "Mesh Post-Training with Topology-Aware Masked DPO",
+      "confidence": 0.95
+    },
+    {
+      "name": "Positive and negative terms in M-DPO",
+      "latex": "\\mathcal{L}^+(\\mathcal{P}, \\mathcal{M}_{\\mathcal{P}}^+) = \\log \\frac{\\left|\\pi_\\psi(\\mathcal{M}_{\\mathcal{P}}^+ | \\mathcal{P}) \\odot \\phi(\\mathcal{M}_{\\mathcal{P}}^+)\\right|_1}{\\left|\\pi_{\\text{ref}}(\\mathcal{M}_{\\mathcal{P}}^+ | \\mathcal{P}) \\odot \\phi(\\mathcal{M}_{\\mathcal{P}}^+)\\right|_1} \\\\ \\mathcal{L}^-(\\mathcal{P}, \\mathcal{M}_{\\mathcal{P}}^-) = \\log \\frac{\\left|\\pi_\\psi(\\mathcal{M}_{\\mathcal{P}}^- | \\mathcal{P}) \\odot (1-\\phi(\\mathcal{M}_{\\mathcal{P}}^-))\\right|_1}{\\left|\\pi_{\\text{ref}}(\\mathcal{M}_{\\mathcal{P}}^- | \\mathcal{P}) \\odot (1-\\phi(\\mathcal{M}_{\\mathcal{P}}^-))\\right|_1}",
+      "meaning": "Positive term focuses on high-quality regions, negative term on low-quality regions.",
+      "section": "Mesh Post-Training with Topology-Aware Masked DPO",
+      "confidence": 0.95
+    }
+  ],
+  "figure_table_roles": [
+    {
+      "label": "tab:xpart-tabel",
+      "role_hint": "Quantitative comparison of shape decomposition methods.",
+      "caption": "Shape Decomposition Results",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:xpart-parts",
+      "role_hint": "Visual comparison of shape decomposition results.",
+      "caption": "Shape Decomposition Results.",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:poly-pipeline",
+      "role_hint": "Overview of the two-stage Mesh-RFT framework.",
+      "caption": "Mesh-RFT Framework Overview. The pipeline comprises two stages: 1) Mesh Generation Pre-training using an Hourglass AutoRegressive Transformer and a Shape Encoder; and 2) Reinforcement Post-training which employs Mask DPO with reference and policy networks for subsequent refinement.",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:poly-prepost",
+      "role_hint": "Demonstrates effectiveness of post-training on mesh completeness, connectivity, and broken faces.",
+      "caption": "The effectiveness of the post-training stage. The post-training stage enhances the mesh completeness (Row #1) and connectivity (Row #2) and reduces the broken faces (Row #3).",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_007",
+    "part_index": 7,
+    "part_count": 12,
+    "chunk_chars": 7833,
+    "latency_seconds": 15.353,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3188,
+      "completion_tokens_est": 1766,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 4954,
+      "total_with_reasoning_tokens_est": 4954,
+      "estimated_cost_usd": 0.002923,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2774,
+      "completion_tokens_api": 1627,
+      "total_tokens_api": 4401,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 2134,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 1627,
+        "prompt_tokens": 2774,
+        "total_tokens": 4401,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 2134
+      },
+      "estimated_cost_usd_api": 0.002346,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 5886,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 1629,
+        "api_usage_present": true
+      }
+    }
+  }
+}

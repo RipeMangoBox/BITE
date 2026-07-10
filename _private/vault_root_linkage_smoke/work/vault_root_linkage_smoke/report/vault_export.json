@@ -1,0 +1,59 @@
+{
+  "note_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/vault_root_linkage_smoke/vault/analysis/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.md",
+  "pdf_ref": "paperPDFs/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.pdf",
+  "source_pdf": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/obsidian-vault/paperPDFs/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.pdf",
+  "source_pdf_resolution": {
+    "input": "obsidian-vault/paperPDFs/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.pdf",
+    "resolved": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/obsidian-vault/paperPDFs/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.pdf",
+    "attempts": [
+      "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/obsidian-vault/paperPDFs/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.pdf"
+    ]
+  },
+  "figure_count": 36,
+  "figure_placements": [
+    {
+      "item_id": "item_007",
+      "section": "实验与分析",
+      "reason": "caption indicates a table or result plot"
+    },
+    {
+      "item_id": "item_008",
+      "section": "实验与分析",
+      "reason": "caption indicates a table or result plot"
+    }
+  ],
+  "asset_root": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/vault_root_linkage_smoke/vault/assets/figures/papers",
+  "validation": {
+    "ok": false,
+    "checks": {
+      "frontmatter_valid": true,
+      "openreview_forum_id_present": true,
+      "required_sections_present": true,
+      "pdf_embed_present": true,
+      "image_embeds_present": true,
+      "no_legacy_markdown_image_links": true,
+      "no_pdf_file_label": true,
+      "no_table_cell_aliased_wikilinks": true,
+      "no_fallback_metadata_markers": false,
+      "no_dangling_numeric_refs": true,
+      "note_length_ok": true
+    },
+    "note_chars": 2097,
+    "missing_frontmatter": [],
+    "expected_openreview_forum_id": "",
+    "openreview_forum_id": "",
+    "missing_sections": [],
+    "pdf_ref": "paperPDFs/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.pdf",
+    "image_embed_count": 2,
+    "expected_image_count": 2,
+    "missing_image_paths": [],
+    "legacy_markdown_image_links": [],
+    "legacy_relative_wikilink_images": [],
+    "pdf_file_label_count": 0,
+    "table_cell_aliased_wikilink_lines": [],
+    "fallback_markers": [
+      "acceptance: unknown"
+    ],
+    "dangling_numeric_refs": []
+  }
+}

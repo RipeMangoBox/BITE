@@ -1,0 +1,106 @@
+<!-- part 4/5 chars 20130-27735 -->
+
+{blue}{\textsubscript{TOG'24}}  & Text + Image & 28.23    & 178.6      & 2.447 & 0.8818 & 0.1331       \\
+Ours     & Image         & \textbf{24.78}    & \textbf{168.5}      & \textbf{2.191} & \textbf{0.9207} & \textbf{0.1211}       \\ \bottomrule
+\end{tabular}
+\label{tab: comparisons}
+\vspace{-5.5mm}
+\end{table*}
+
+
+\subsubsection{Training Strategy}
+
+Following the input of reference image pair $(I_1, I_2)$, the network processes each image sequentially while enforcing output equivalence through consistency regularization. Specifically, at each training timestep $t$ the model $\epsilon_\theta$ generates diffusion noises $\epsilon_t^1$ and $\epsilon_t^2$ by conditioning on $I_1$ and $I_2$ respectively. We arbitrarily select one of them to compute the PBR loss, using $\epsilon_t^1$ as an example
+\begin{equation}
+\epsilon_t^1 = \epsilon_\theta(z_t,t,c(I_1)),\nonumber \ \ \
+\epsilon_t^2 = \epsilon_\theta(z_t,t,c(I_2)),\nonumber
+\end{equation}
+\begin{equation}
+\mathcal{L}_{\text{pbr}} = \mathbb{E}_{\epsilon \sim \mathcal{N} (0,1),t}[\|\epsilon - \epsilon_t^1\|_2^2].\nonumber
+\end{equation}
+To achieve consistency under varying camera poses and lighting conditions, we enforce $\epsilon_t^1 \approx \epsilon_t^2$. This is formulated through an $L_2$ consistency loss as
+\begin{equation}
+\mathcal{L}_{\text{cons}} = \mathbb{E}_{t}[ \|\epsilon_t^1 - \epsilon_t^2\|_2^2],\nonumber
+\end{equation}
+which is combined with the PBR loss via a weighting parameter $\lambda=0.1$ as
+\begin{equation}
+    \mathcal{L} = (1-\lambda)\mathcal{L}_{\text{pbr}} + \lambda \mathcal{L}_{\text{cons}}.
+    \label{eq:loss}
+\end{equation}
+
+\subsection{Dual-Channel Material Generation}
+\label{subsec:dual_channel}
+
+Albedo and MR textures serve distinct roles in PBR material synthesis. However, existing approaches are not designed to handle the unique requirements of PBR material generation, particularly the need to address the inherent differences between albedo and MR. To bridge this gap, we propose strategies that independently optimize albedo and MR generation, ensuring not only precise alignment but also high-quality texture synthesis.
+
+
+
+
+
+
+\subsubsection{Multi-Channel Aligned Attention}
+Some approaches guide diffusion generation by incorporating conditional image prompts through a reference diffusion branch, where the latent representation $z_{ref}$ is injected into the generation branch via cross-attention. However, when applied to PBR material generation, it is unsuitable due to the distributional gap between the reference image and the MR texture. Specifically, attention mechanisms struggle to align these mismatched latent features, leading to inconsistent material synthesis and texture degradation, particularly in geometrically flat regions of 3D meshes where subtle material variations are critical.
+
+To resolve these issues, as illustrated in \cref{fig:pipeline}, we propose Multi-Channel Aligned Attention that independently optimizes the albedo and MR channels while maintaining their material consistency. Specifically, the albedo channel retains the conventional reference-guided cross-attention
+\begin{equation}
+    \text{Attn}_{albedo} = \text{Softmax}\left(\frac{ Q_{albedo} K_{ref}^T}{\sqrt{d}}\right) \cdot V_{ref},
+    \label{eq:mcaa_albedo}
+\end{equation}
+ensuring that the generated albedo correctly follows the reference image.
+In contrast, the MR latent $z_{MR}$ discards direct reference conditioning and instead leverages residual connections from the albedo channel
+\begin{equation}
+    z_{MR}^{new} = z_{MR} + \text{Attn}_{albedo},
+    \label{eq:mcaa_mr}
+\end{equation}
+allowing it to inherit spatial coherence and geometric priors from the albedo features.
+
+This design addresses the unalignment between different domains of PBR material, and maintains generation diversity without increasing parameter complexity, as no additional trainable parameters are introduced beyond the baseline cross-attention framework.
+
+\subsubsection{Learnable Material Embeddings}
+Inspired by IC-Light \cite{zhang2025scaling}, we introduce learnable embeddings for both the albedo and MR channels to explicitly model their differences. Specifically, we initialize two independent 16×1024 embeddings, which are injected into the respective channels via cross-attention layers as shown in \cref{fig:pipeline}. Both the embeddings and the attention modules are trainable, enabling the model to effectively capture the distinct characteristics of albedo and MR textures.
+\section{Experiment}
+\label{sec:experiment}
+
+
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{./fig/txt_prompt.pdf}
+    \vspace{-3.5mm}
+    \caption{Qualitative comparison of text-conditioned 3D generation methods and our approach. Our method achieves superior fidelity in texture and pattern coherence, avoiding blur, inconsistent lighting, and misaligned patterns found in other approaches.}
+    \label{fig: t_comparison}
+    \vspace{-3mm}
+\end{figure*}
+
+\noindent\textbf{Dataset.}
+Our training dataset consists of 70,000 high-quality 3D assets selected from Objaverse \cite{deitke2023objaverse} and Objaverse-XL \cite{deitke2023objaversexl}. For each 3D object, we rendered data from four elevation angles: $-20^{\circ}$, $0^{\circ}$, $20^{\circ}$, and a randomly sampled angle. At each elevation, we captured 24 uniformly distributed views, generating corresponding albedo, metallic, roughness maps, and HDR/Point-light images of 512 $\times$ 512 resolution. During each training step, we selected 6 sets of uniformly distributed PBR maps from the same elevation and 2 HDR/Point-light images as reference data (see \cref{subsubsec: RefPair} for the selection methodology).
+
+\noindent\textbf{Evaluation Metrics.}
+We use Fréchet Inception Distance (FID), CLIP-based FID (CLIP-FID), and Learned Perceptual Image Patch Similarity (LPIPS) to measure the similarity between the generated textures and the ground truth. CLIP Maximum-Mean Discrepancy (CMMD) is used to assess the diversity and richness of the generated texture details. And CLIP-Image Similarity (CLIP-I) is employed to evaluate how well the generated textures semantically align with the input images (for image prompt methods).
+
+\noindent\textbf{Experimental Setup.}
+Our model is initialized from the ZSNR checkpoint \cite{lin2024common} of Stable Diffusion 2.1 and trained using the AdamW optimizer with a learning rate of $5 \times 10^{-5}$. The training process includes 2000 warm-up steps and requires approximately 180 GPU days.
+
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{./fig/image_prompt_compare.png}
+   \vspace{-3.5mm}
+    \caption{Qualitative comparison of image-conditioned 3D texture generation methods. It demonstrates that our method outperforms other methods in terms of faithfully following the image and its semantics, as well as generating textures with superior coherence.}
+    \label{fig: i_comparison}
+    \vspace{-5.5mm}
+\end{figure*}
+
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{./fig/re-texture_comp.png}
+    \vspace{-3.5mm}
+    \caption{We show a variety of PBR textures for two different 3D assets, demonstrating the diversity and semantic alignment capabilities of our model. (Better viewed by zooming in)}
+    \label{fig: re-texture}
+    \vspace{-3.5mm}
+\end{figure*}
+
+\noindent\textbf{Compared Methods.}
+We compare with text- and image-conditioned methods, including
+ Text2Tex \cite{chen2023text2tex}, Paint3D \cite{zeng2024paint3d}, Paint-it \cite{youwang2024paint}, SyncMVD \cite{liu2024text}, and TexGen \cite{yu2024texgen}.

@@ -1,0 +1,54 @@
+{
+  "part_id": "3/12",
+  "section_role": "Introduction and Pipeline Overview",
+  "method_evidence": [
+    {
+      "claim": "The pipeline comprises seven core technological modules.",
+      "section": "2",
+      "anchor": "The pipeline, as shown in Figure. \\ref{fig:studio-pipeline}, comprises seven core technological modules",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Image stylization uses Qwen-Image-Edit adapted with LoRA.",
+      "section": "3.1",
+      "anchor": "It employs a multi-style image-to-image generation model based on Qwen-Image-Edit \\cite{wu2025qwen} and further adapted with Low-Rank Adaptation (LoRA) \\cite{hu2022lora}.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Stylization training data uses triplet format.",
+      "section": "3.1",
+      "anchor": "The training data is constructed in a triplet format \\textit{\\{input reference image, style type, stylized 3D design drawing\\}}",
+      "confidence": 0.95
+    },
+    {
+      "claim": "PolyGen uses an autoregressive model for face-by-face generation.",
+      "section": "2",
+      "anchor": "employs an autoregressive model for face-by-face generation to construct low-polygon assets",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Semantic UV Unwrapping groups surfaces by material type and texel density.",
+      "section": "2",
+      "anchor": "context-aware UV segmentation that groups surfaces by material type and texel density requirements",
+      "confidence": 0.9
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "fig:studio-pipeline",
+      "role_hint": "Pipeline overview diagram",
+      "caption": "The pipeline of Hunyuan3D Studio.",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:image-stylization",
+      "role_hint": "Stylization results",
+      "caption": "Visualization results of our image stylization module with pre-defined styles.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": []
+}

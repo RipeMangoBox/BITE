@@ -1,0 +1,169 @@
+{
+  "part_id": "part_005",
+  "section_role": "Method details and experiments",
+  "method_evidence": [
+    {
+      "claim": "All control signals can be represented as a type of point cloud.",
+      "section": "Unified Control Encoder",
+      "anchor": "As all control signals can be represented as a type of point cloud, we can design a shared point encoder to extract the corresponding features easily.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "All controls can be represented as a point cloud P_c ∈ R^{N×6}.",
+      "section": "Unified Control Encoder",
+      "anchor": "all controls can be represented as a point cloud $P_c \\in \\mathbb{R}^{N \\times 6}$, where $N$ is the number of points or bones.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Shared control encoder formula.",
+      "section": "Unified Control Encoder",
+      "anchor": "\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)], i \\in [0,1,2,3]",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Training objective uses joint feature of image and control.",
+      "section": "Unified Control Encoder",
+      "anchor": "\\mathbb{E}_{t, {x}_0, {x_1}, c'}\\vert\\vert{v}_\\theta({x}, t, c')-(x_1-x_0)\\vert\\vert_2^2",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [
+    {
+      "claim": "Pose control generates accurately aligned geometry across diverse poses and input styles.",
+      "table_or_figure": "Figure 1",
+      "metric": "qualitative",
+      "value": "accurately aligned geometry",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Bounding box control generates objects at different scales.",
+      "table_or_figure": "Figure 2",
+      "metric": "qualitative",
+      "value": "generates objects at different scales",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Bounding box control avoids generating thin, sheet-like geometry.",
+      "table_or_figure": "Figure 3",
+      "metric": "qualitative",
+      "value": "avoids generating thin, sheet-like geometry",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Point cloud control shows improved alignment and detail recovery.",
+      "table_or_figure": "Figure 4",
+      "metric": "qualitative",
+      "value": "improved alignment and detail recovery",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Voxel control demonstrates improved scale alignment and fine detail recovery.",
+      "table_or_figure": "Figure 5",
+      "metric": "qualitative",
+      "value": "improved scale alignment and fine detail recovery",
+      "confidence": 0.9
+    }
+  ],
+  "formula_evidence": [
+    {
+      "name": "Shared control encoder",
+      "latex": "\\beta_i = [\\text{Linear}(\\text{PosEmb}(P_i^c)), \\mathcal{R}(\\mathcal{M}(E(i)), r)], i \\in [0,1,2,3]",
+      "meaning": "Final control feature β_i is concatenation of linear-projected position embedding of point cloud and repeated type embedding.",
+      "section": "Unified Control Encoder",
+      "confidence": 0.95
+    },
+    {
+      "name": "Training objective",
+      "latex": "\\mathbb{E}_{t, {x}_0, {x_1}, c'}\\vert\\vert{v}_\\theta({x}, t, c')-(x_1-x_0)\\vert\\vert_2^2",
+      "meaning": "Flow matching loss with joint condition c' = [c, β_i].",
+      "section": "Unified Control Encoder",
+      "confidence": 0.95
+    }
+  ],
+  "figure_table_roles": [
+    {
+      "label": "fig:exp_pose_control",
+      "role_hint": "Qualitative results of pose control",
+      "caption": "Qualitative results of pose control, demonstrating that our Omni model generates accurately aligned geometry across diverse poses and input styles.",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:image-generation bbox ratio",
+      "role_hint": "Qualitative results of bounding box control (scale)",
+      "caption": "Qualitative results of bounding box control, our Omni model can generate objects at different scales, given different bounding boxes.",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:image-generation bbox compare",
+      "role_hint": "Qualitative results of bounding box control (geometry)",
+      "caption": "Qualitative results of bounding box control, given the bounding box condition, our Omni model can avoid generating thin, sheet-like geometry.",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:exp_point_control",
+      "role_hint": "Qualitative results of point cloud control",
+      "caption": "Qualitative results of point cloud control, showing improved alignment and detail recovery across complete, depth-projected, and scanned point cloud conditions compared to image-only results.",
+      "confidence": 0.95
+    },
+    {
+      "label": "fig:exp_voxel_control",
+      "role_hint": "Qualitative results of voxel control",
+      "caption": "Qualitative results of voxel control, demonstrating improved scale alignment and fine detail recovery with voxel conditions compared to image-only results.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_005",
+    "part_index": 5,
+    "part_count": 6,
+    "chunk_chars": 7513,
+    "latency_seconds": 12.734,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 3092,
+      "completion_tokens_est": 1498,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 4590,
+      "total_with_reasoning_tokens_est": 4590,
+      "estimated_cost_usd": 0.002648,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2461,
+      "completion_tokens_api": 1315,
+      "total_tokens_api": 3776,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1821,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 1315,
+        "prompt_tokens": 2461,
+        "total_tokens": 3776,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1821
+      },
+      "estimated_cost_usd_api": 0.001939,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 4994,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 1317,
+        "api_usage_present": true
+      }
+    }
+  }
+}

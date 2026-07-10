@@ -1,0 +1,11 @@
+registries:
+  - id: chenhsing__awesome-video-diffusion-models
+    url: https://github.com/ChenHsing/Awesome-Video-Diffusion-Models
+    domain: github_awesome
+    priority: P0
+    enabled: true
+  - id: weitianxin__awesome-agentic-reasoning
+    url: https://github.com/weitianxin/Awesome-Agentic-Reasoning
+    domain: github_awesome
+    priority: P0
+    enabled: true

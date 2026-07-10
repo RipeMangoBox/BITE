@@ -1,0 +1,38 @@
+{
+  "part_id": "5/9",
+  "section_role": "related work / dataset description and method overview",
+  "method_evidence": [
+    {
+      "claim": "3D VAE encodes point cloud to latent VecSet and decodes to SDF field",
+      "section": "Methods",
+      "anchor": "Given an input point cloud $P \\in R^{N \\times (3 + C)}$ sampled from the mesh surface, where $C$ denotes surface normals, 3D VAE first extract point features and then obtain the corresponding latent vector set $Z \\in R^{L \\times d}$ via resampling from estimated distribution... Subsequently, a decoder is applied to reconstruct the signed distance function (SDF) field $F_{sdf}$",
+      "confidence": 0.95
+    },
+    {
+      "claim": "Diffusion model uses image encoder and DiT layers for conditional generation",
+      "section": "Methods",
+      "anchor": "It first leverages an image encoder, such as DINO-v2~\\cite{}, to capture image embeddings $c_i$ and then exploits the multi layers of DiT to predict the added noise or velocity.",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [
+    {
+      "name": "VAE encoding-decoding",
+      "latex": "Z = \\mathcal{E}(P), F_{sdf} = \\mathcal{D}(Z)",
+      "meaning": "Encoder maps point cloud P to latent VecSet Z; decoder maps Z to SDF field",
+      "section": "Methods",
+      "confidence": 0.95
+    },
+    {
+      "name": "Flow matching training objective",
+      "latex": "\\mathbb{E}_{t, {x}_0, {x}_1, c}\\vert\\vert{v}_\\theta({x}, t, c)-(x_1-x_0)\\vert\\vert_2^2",
+      "meaning": "Training objective for flow matching model used in Hunyuan3D 2.1, transforming noise to data conditioned on image embeddings",
+      "section": "Methods",
+      "confidence": 0.95
+    }
+  ],
+  "figure_table_roles": [],
+  "source_links": [],
+  "open_questions": []
+}

@@ -1,0 +1,14 @@
+{
+  "figures_tables": [],
+  "usage": {
+    "provider": "none",
+    "model": "",
+    "prompt_tokens_est": 0,
+    "completion_tokens_est": 0,
+    "reasoning_tokens_est": 0,
+    "total_tokens_est": 0,
+    "total_with_reasoning_tokens_est": 0,
+    "estimated_cost_usd": 0.0,
+    "cost_basis": "caption_only_no_llm"
+  }
+}

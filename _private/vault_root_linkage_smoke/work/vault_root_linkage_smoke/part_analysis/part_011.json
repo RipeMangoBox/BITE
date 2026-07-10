@@ -1,0 +1,24 @@
+{
+  "part_id": "part_011",
+  "section_role": "mock_chunk",
+  "method_evidence": [
+    {
+      "claim": "Mock method claim from this chunk.",
+      "section": "chunk",
+      "anchor": "part_011",
+      "confidence": 0.8
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_011",
+    "part_index": 11,
+    "part_count": 15,
+    "chunk_chars": 7826,
+    "latency_seconds": 0.0,
+    "usage": {}
+  }
+}

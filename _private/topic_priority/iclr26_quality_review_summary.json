@@ -1,0 +1,511 @@
+[
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__BWCache_Accelerating_Video_Diffusion_Transformers_through_Block-Wise_Caching.md",
+    "title": "BWCache: Accelerating Video Diffusion Transformers through Block-Wise Caching",
+    "issues": [
+      "dup_caption_prefix",
+      "topic_placeholder",
+      "suspicious_short_formula:1",
+      "missing_figure_embed:10,12,14"
+    ],
+    "topic_row": "[[T__ICLR_2026]]",
+    "figure_lines": [],
+    "table_lines": [
+      "*Table 1: Table 1: Comparison of visual quality and efficiency on a single GPU. Video generation specifications: Open-Sora (51 frames, 480P), Open-Sora-Plan (65 frames, 512×512), Latte (16 frames, 512×512), Wan 2.1 (81 frames, 480P), HunyuanVideo (129 frames, 544P). LPIPS, SSIM, and PSNR are calculated against the original model results.*",
+      "*Table 2: Table 2: Inference efficiency when scaling to multiple GPUs with DSP.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 相似性指标\n\n**相对L1距离**（Eq.(5)）：衡量块i在相邻时间步t和t+1之间的特征变化：\n$$\\mathrm{L1}_{\\mathrm{rel}}(h_{t,i}) = \\frac{\\|h_{t,i} - h_{t+1,i}\\|_1}{\\|h_{t+1,i}\\|_1}$$\n\n**聚合相对L1距离**（Eq.(6)）：时间步t上所有N个DiT块的相对L1距离之和：\n$$\\mathrm{ARL1}(t) = \\sum_{n=1}^N \\mathrm{L1}_{\\mathrm{rel}}(h_{t,i})$$\n\n**BWCache相似性指标**（Eq.(7)）：触发缓存的条件——平均相对L1距离低于阈值δ：\n$$\\sum_{n=1}^N \\mathrm{L1}_{\\mathrm{rel}}(h_{t,i}) / N < \\delta$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Beyond_Masks_Efficient_Flexible_Diffusion_Language_Models_via_Deletion-Insertion_Processes.md",
+    "title": "Beyond Masks: Efficient, Flexible Diffusion Language Models via Deletion-Insertion Processes",
+    "issues": [
+      "dup_caption_prefix",
+      "topic_placeholder",
+      "suspicious_short_formula:1",
+      "missing_figure_embed:2"
+    ],
+    "topic_row": "[[T__ICLR_2026]]",
+    "figure_lines": [
+      "*Figure 1: (a) MDLMs, sequences padded to length 10.*"
+    ],
+    "table_lines": [
+      "*Table 1: Table 1: Zero-shot language modeling perplexity. Results for diffusion models are perplexity upper bounds.*",
+      "*Table 2: Table 2: Generative perplexity (PPL, evaluated by GPT2 Large), unigram entropy, inference time (in seconds), speedup, and average generation length for fixed-length models under different total denoising steps.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 后向插入过程与插入分数\n\n后向过程的目标是学习前向过程的时间反转。为此，定义插入分数：\n\n$$\\bar{s}(\\mathbf{x}_t, t)[i, v] = \\frac{\\mathbb{E}_{\\mathbf{x}_0}\\left[(1 - e^{-\\bar{\\sigma}(t)})^{|\\mathbf{x}_0|} N(\\mathrm{Ins}(\\mathbf{x}_t, i, v), \\mathbf{x}_0)\\right]}{\\mathbb{E}_{\\mathbf{x}_0}\\left[(1 - e^{-\\bar{\\sigma}(t)})^{|\\mathbf{x}_0|} N(\\mathbf{x}_t, \\mathbf{x}_0)\\right]}$$\n\n该分数表示在位置i插入标记v的期望概率比。反向转移率可表示为插入分数的加权和：\n\n$$\\tilde{Q}_t(\\mathbf{x}_t, \\mathbf{y}) = \\sum_{i \\in I(\\mathbf{x}_t, \\mathbf{y})} \\left( \\frac{\\sigma(t) e^{-\\bar{\\sigma}(t)}}{1 - e^{-\\bar{\\sigma}(t)}} \\bar{s}(\\mathbf{x}_t, t)[i, v(\\mathbf{x}_t, \\mathbf{y})] \\right)$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Boomerang_Distillation_Enables_Zero-Shot_Model_Size_Interpolation.md",
+    "title": "Boomerang Distillation Enables Zero-Shot Model Size Interpolation",
+    "issues": [
+      "dup_caption_prefix",
+      "topic_placeholder",
+      "suspicious_short_formula:1",
+      "missing_figure_embed:10,23,3"
+    ],
+    "topic_row": "[[T__ICLR_2026]]",
+    "figure_lines": [
+      "*Figure 1: Figure 1: Overview of boomerang distillation. ➀ In this example, the student model is initialized by dropping layers from the pretrained teacher model. ➁ The teacher model is distilled into the student model with cross-entropy loss, knowledge distillation loss, and cosine distance loss (Equation 1). ➂ After training the student model, a block of teacher layers corresponding to a student layer is inserted back into the model to get the zero-shot interpolated model.*",
+      "*Figure 2: Qwen3-4B-Base Distilled models Pruned models Interpolated models*"
+    ],
+    "table_lines": [
+      "*Table 1: Table 1: The sizes of the initialized student models after pruning the layers from the teacher model. We note that the Pythia models do not employ weight tying, so their train and inference parameters are equivalent. On the other hand, the Qwen and Llama models weight tie their embedding layers and LM heads, so their inference-time parameters are higher than their training parameters. This is because both the embedding layer and LM head are used during inference.*",
+      "*Table 2: Table 2: Hyperparameters used to train the student model. We choose the training hyperparameters to align with the values used in Pythia training (Biderman et al., 2023) and set the KLDiv and cosine distance weights such that the cross entropy, KLDiv, and cosine distance loss are approximately equal in magnitude at the beginning of training.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 知识蒸馏目标\n\n学生模型训练的总损失为（Equation 1）：\n\n$$\\mathcal{L}(x, \\pmb{\\theta}_S) = \\mathcal{L}_{\\mathrm{CE}}(x_j \\mid x_{<j}; \\pmb{\\theta}_S) + \\lambda_{\\mathrm{KL}} \\mathcal{L}_{\\mathrm{KL}}(x_{<j}; \\pmb{\\theta}_S) + \\lambda_{\\mathrm{cos}} \\sum_{i=1}^M \\mathcal{L}_{\\mathrm{cos}}^{(i)}(x_{<j}; \\pmb{\\theta}_S)$$\n\n其中：\n\n- **交叉熵损失** $\\mathcal{L}_{\\mathrm{CE}}$：标准语言建模损失。\n- **KL 散度损失**（知识蒸馏损失）：\n\n$$\\mathcal{L}_{\\mathrm{KL}}(\\boldsymbol{x}_{<j}; \\boldsymbol{\\theta}_S) = \\boldsymbol{\\tau}^2 \\cdot \\mathrm{KL}\\big(\\mathrm{softmax}(\\boldsymbol{z}_j^T / \\boldsymbol{\\tau}) ~ \\lVert ~ \\mathrm{softmax}(\\boldsymbol{z}_j^S / \\boldsymbol{\\tau})\\big)$$\n\n温度 τ 控制软化程度。\n\n- **余弦距离损失**（对齐损失）：\n\n$$\\mathcal{L}_{\\mathrm{cos}}^"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Bridging_Degradation_Discrimination_and_Generation_for_Universal_Image_Restoration.md",
+    "title": "Bridging Degradation Discrimination and Generation for Universal Image Restoration",
+    "issues": [
+      "dup_caption_prefix",
+      "topic_placeholder",
+      "suspicious_short_formula:6",
+      "missing_figure_embed:2,9"
+    ],
+    "topic_row": "[[T__ICLR_2026]]",
+    "figure_lines": [],
+    "table_lines": [
+      "*Table 1: Table 1: MAS-GLCM has substantial capability in the classification of both types and levels of degradation.*",
+      "*Table 2: We train a 5D all-in-one image restoration model with simulated dataset following DiffUIR (Zheng et al., 2024). This model is validated on simulated and real-world scenarios. Table 2: All-in-one Image Restoration results. † means the methods are retrained within datasets we used for fair comparison. The best and second results are shown in red and blue respectively.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 扩散模型采样公式\n\n前向过程（Eq.3）：\n$$x_t = x_{t-1} + \\alpha_t x_{res} + \\beta_t \\epsilon_{t-1} - \\delta_t x_{lq}$$\n\n其中x_res = x_lq - x_hq为残差，α_t、β_t、δ_t分别为残差、噪声和低质量图像的系数。\n\n采样公式（Eq.4，隐式概率模型）：\n$$x_{t-1} = x_t - \\alpha_t x_{res}^\\theta - \\frac{\\beta_t^2}{\\overline{\\beta}_t} \\epsilon^\\theta + \\delta_t x_{lq}$$\n\n三个系数共同控制模型行为模式：\n- 当α_t≡0且δ_t≡0时，模型仅具备生成能力（退化为VE SDE去噪公式）\n- 当仅δ_t≡0时，模型进入桥接阶段，可同时保留生成先验并感知退化\n- 当所有系数正常调度时，模型进入复原阶段，直接注入低质量图像以增强保真度\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__ACCORD_Alleviating_Concept_Coupling_through_Dependence_Regularization_for_Text-to-Image_Diffusion_Personalization.md",
+    "title": "ACCORD: Alleviating Concept Coupling through Dependence Regularization for Text-to-Image Diffusion Personalization",
+    "issues": [
+      "manual_review_placeholder",
+      "suspicious_short_formula:3",
+      "missing_figure_embed:12,14,15"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Image and Video Generation",
+    "figure_lines": [
+      "*Figure 1: Illustration of the concept coupling problem. The target is a “backpack*”, but reference images always pair it with a “girl”. Standard finetuning incorrectly learns to bind these concepts, causing the model to generate the unwanted ’girl’ and violate the text prompt.*"
+    ],
+    "table_lines": [
+      "*Table 1: Quantitative results on DreamBench. The “*” indicates results using per-subject/style loss weights, tuned on a small validation set. “Params.” indicates the number of tunable parameters. The W(in)/L(oss) rate is calculated by pairwise human comparison between the anonymous generated results of the baseline and Ours*, with ties omitted. ‘PA’ denotes percent agreement, namely the percentage of samples receiving consistent judgments from human annotators. The comparison methods improved based on the baseline are italicized. Lemma 2. For an observation \\mathbf { c } _ { j } and condition \\mathbf { c } _ { k } , the InfoNCE objective seeks to estimate a function \\mathcal { F } ( \\mathbf...*",
+      "*Table 2: Quantitative results on StyleBench. The “*” denotes adjusting DDLoss and PDLoss weights across different styles. “Gram-D” is the gram matrix distance.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 概念耦合的形式化\n\n概念耦合的特征为：\n\n$$\\mathbb{E}_{\\mathbf{x}_\\theta}[ |\\log r(\\mathbf{c}_p, \\mathbf{c}_g | \\mathbf{x}_{\\theta,0}) - \\log r(\\mathbf{c}_s, \\mathbf{c}_g) | ] \\gg 0$$\n\n其中 $\\mathbf{c}_s$ 是 $\\mathbf{c}_p$ 的超类（如“背包”是“背包*”的超类）。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__BranchGRPO_Stable_and_Efficient_GRPO_with_Structured_Branching_in_Diffusion_Models.md",
+    "title": "BranchGRPO: Stable and Efficient GRPO with Structured Branching in Diffusion Models",
+    "issues": [
+      "dup_caption_prefix",
+      "topic_placeholder",
+      "missing_figure_embed:3,6,7"
+    ],
+    "topic_row": "[[T__ICLR_2026]]",
+    "figure_lines": [],
+    "table_lines": [
+      "*Table 1: Table 1: Efficiency–quality comparison. The best and second-best results in each column are highlighted in bold and underline, respectively. NFE denotes the number of function evaluations of the denoiser. For branching methods, we report the average per-sample NFE, computed as the total function evaluations in the tree divided by the number of final samples.*",
+      "*Table 2: Table 2: Generalization on SD3.5-M and integration into GRPO-style training pipelines. Branch-GRPO consistently improves alignment quality and training efficiency.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 分支采样（分裂步）\n\n在分裂步生成K个相关子节点，使用共享噪声ξ_0和分支特定创新η_b，由相关性参数s控制：\n\n$$z _ { i + 1 } ^ { ( b ) } = \\mu _ { \\theta } ( z _ { i } , t _ { i } ) \\ + \\ g _ { t _ { i } } \\sqrt { h _ { i } } \\xi _ { b } , \\qquad \\xi _ { b } = \\frac { \\xi _ { 0 } + s \\eta _ { b } } { \\sqrt { 1 + s ^ { 2 } } } , \\quad b = 1 , \\ldots , K$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Bridging_the_Distribution_Gap_to_Harness_Pretrained_Diffusion_Priors_for_Super-Resolution.md",
+    "title": "Bridging the Distribution Gap to Harness Pretrained Diffusion Priors for Super-Resolution",
+    "issues": [
+      "dup_caption_prefix",
+      "topic_placeholder",
+      "missing_figure_embed:2,5,6"
+    ],
+    "topic_row": "[[T__ICLR_2026]]",
+    "figure_lines": [
+      "*Figure 1: Figure 1: ×4 super-resolution comparison on various images. The left half of each image shows the bicubic upsampled input, and the right half shows the output from our DM-SR. Compared to previous methods, DM-SR produces the most perceptually pleasing results. (Zoom-in for best view)*"
+    ],
+    "table_lines": [
+      "*Table 1: Table 1: × 4 SR non-reference metrics comparison on various benchmark datasets. Best numbers are denoted with bold.*",
+      "*Table 2: Table 2: (Left) × 4 SR reference metrics comparison on RealSR dataset. (Right) Efficiency Comparison of DM-SR with previous SR methods on SR task. Specifically, we upsample images of size \\mathbb { R } ^ { 1 2 8 \\times 1 2 8 \\times 3 } using a single NVIDIA A100 GPU to measure the runtime of each method. Table 3: Comparison of DM-SR on Realset80 with various timesteps. Our final model adaptively predicts \\hat { t } \\in \\ [ 0 , 5 0 0 ] from \\mathbf { I } _ { \\mathrm { L R } } instead of relying on fixed timesteps. Table 4: Comparison of DM-SR on Realset80 with various number of steps.Despite being controllable, single-step application still produces high-quality results.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 图像编码\n\n图像编码器 E_θ 采用预训练VAE编码器，通过ControlNet风格设计将预测时间步 t̂ 的特征注入各中间层。编码器将 I_LR 映射到潜在表示 X_SR^t̂，旨在匹配对应噪声HR潜在 X_HR^t̂ 的分布。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Why_We_Need_New_Benchmarks_for_Local_Intrinsic_Dimension_Estimation.md",
+    "title": "Why We Need New Benchmarks for Local Intrinsic Dimension Estimation",
+    "issues": [
+      "known_formula_suspect_lidl",
+      "suspicious_short_formula:2",
+      "missing_figure_embed:13,24,3"
+    ],
+    "topic_row": "Representation, Self-Supervision & Transfer, Representation Learning",
+    "figure_lines": [
+      "*Figure 1: Few samples from Gaussian (IDR) dataset.*"
+    ],
+    "table_lines": [
+      "*Table 1: Summary of our experiments. Columns: LID-estimation aspects tested by our benchmarks; rows: neural-based algorithms (ESS as a classical benchmark). Performance of methods was classified following the legend – H: high, M: moderate, L: low, O: out-of-range (unassessable) (more can be found in Sec. B). Gray color marks cells where similar aspects in the method’s original paper were investigated; parentheses give that paper’s reported performance (assumed H if absent). We show that algorithms that passed original simple tests for many of aspects did worse on our benchmarks; many aspects – especially on real-world datasets (RWD) – remain untested and some only partly explored.*",
+      "*Table 2: LID estimations with MAE for the datasets with known dimensionality.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 LIDL算法原理\n\nLIDL（Tempczyk et al., 2022）基于Wiener过程下概率密度变化率来估计LID。对于小扩散时间t，对数密度与对数t呈线性关系，其斜率为：\n\n$$d - D$$\n\n其中d是流形本征维度，D是环境空间维度。通过估计该斜率，可以反推出LID。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__3D-aware_Disentangled_Representation_for_Compositional_Reinforcement_Learning.md",
+    "title": "3D-aware Disentangled Representation for Compositional Reinforcement Learning",
+    "issues": [
+      "suspicious_short_formula:3",
+      "missing_figure_embed:2,5"
+    ],
+    "topic_row": "Reinforcement Learning, Planning & Agents, Deep RL",
+    "figure_lines": [
+      "*Figure 1: Overall structure of our method: Our proposed pipeline consists of two steps: representation learning and policy training. (a) Pre-training 3D block-slot encoder: The object slots are further decomposed into blocks of attributes. Then, the slot-mixer decoder mixes the object-centric representation to generate images at a query view. (b) Policy training with block transformer policy: We utilize the 3D block-slot encoder to extract a structured representation for the current observation and the goal image. The decomposed latent embedding serves as the input and the goal tokens, respectively, for our block transformer of the policy architecture.*",
+      "*Figure 4: Evaluation scenarios for compositional and out-of-distribution generalization: Composition generalization environments consist of objects with properties during training, but novel in their combinations. Out of such unseen combinations, we separately evaluate cases with objects of the same color when the factorization of attributes is unsuccessful. Out-of-distribution environments use objects with colors that were not present in the training set. Table 2: Performance of goal-conditioned RL: Our proposed 3D block-slot representation, combined with a block transformer (BT) policy, can effectively interpret goal conditions and exhibit superior performance in various scenarios. We com...*"
+    ],
+    "table_lines": [
+      "*Table 1: 3D awareness with novel-view synthesis and decomposition performance: Our method outperforms OSRT across FG-ARI, disentanglement (D), completeness (C), and informativeness (I), while achieving comparable PSNR. The results indicate that our approach improves object decomposition and effectively disentangles information into latent vectors, while maintaining 3D-aware representation.*",
+      "*Table 3: Success rate of view-generalization: Our model, which leverages a pre-trained 3D blockslot representation and a block transformer (BT), effectively captures 3D object information in a viewpoint-agnostic manner and achieves state-of-the-art performance across diverse generalization settings. We evaluate generalization in goal-conditioned RL tasks under four viewpoints settings: ID Multi-View (in-distribution multi-view), ID Single-View (in-distribution single-view), OOD Multi-View (out-of-distribution multi-view), and OOD Single-View (out-of-distribution single-view). Results are computed over 400 randomly sampled goals per seed, with all reported metrics averaged over three random...*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 Slot Mixer加权聚合\n\n根据查询光线特征x与槽矩阵Z的归一化点积相似度，计算加权平均：\n\n$$\\mathbf{w} = \\mathrm{softmax}((W_k \\mathbf{Z}^\\top)^\\top (W_q \\mathbf{x})), \\quad \\bar{\\mathbf{z}} = \\mathbf{w}^\\top \\mathbf{Z}$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__3D_Scene_Prompting_for_Scene-Consistent_Camera-Controllable_Video_Generation.md",
+    "title": "3D Scene Prompting for Scene-Consistent Camera-Controllable Video Generation",
+    "issues": [
+      "suspicious_short_formula:3",
+      "missing_figure_embed:2,3,5"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Image and Video Generation",
+    "figure_lines": [
+      "*Figure 1: Teaser. Our framework generates the next video chunk that follows a user-specified camera trajectory while maintaining scene consistency. Our dual spatio-temporal conditioning jointly leverages the last few frames to ensure temporal continuity and the rendered point cloud to enforce spatial consistency.*"
+    ],
+    "table_lines": [
+      "*Table 1: Evaluation of spatial and geometric consistency. We compare DFoT and our framework on the RealEstate10K (Zhou et al., 2018) and DynPose-100K (Rockwell et al., 2025) datasets. For spatial consistency, we evaluate PSNR, SSIM, and LPIPS on revisited camera trajectories, while for geometric consistency, we report the MEt3R (Asim et al., 2025) metric.*",
+      "*Table 2: Camera controllability evaluation.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 双时空条件\n\n输出视频条件于时间窗口（最后w帧）和空间检索帧（T帧）：\n\n$$\\mathbf{V}_{\\mathrm{out}} = \\mathcal{F}(\\tilde{\\mathbf{V}}_{\\mathrm{in}}, T, \\mathbf{C}), \\quad \\text{where} \\quad \\tilde{\\mathbf{V}}_{\\mathrm{in}} = \\{\\text{Temporal}(w)\\} \\cup \\{\\text{Spatial}(T)\\}$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A2Search_Ambiguity-Aware_Question_Answering_with_Reinforcement_Learning.md",
+    "title": "A$^2$Search: Ambiguity-Aware Question Answering with Reinforcement Learning",
+    "issues": [
+      "suspicious_short_formula:3",
+      "missing_figure_embed:2,6,7"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Language, Speech and Dialog",
+    "figure_lines": [
+      "*Figure 1: Rollout examples on an ambiguous question from MuSiQue. ReSearch yields different answers across rollouts, some diverging from the reference yet still evidence-supported, whereas A2SEARCH explicitly resolves ambiguity by retrieving multiple answers within a single rollout.*"
+    ],
+    "table_lines": [
+      "*Table 1: Main results on four multi-hop QA benchmarks under the Exact Match metric. We report AnsF1/Recall@k with k rollouts. For AbgSearch and \\mathbf { A } ^ { 2 } \\mathbf { S } \\mathbf { E } \\mathbf { A } \\mathbf { R } \\mathbf { C } \\mathbf { H } , only @1 is reported, reflecting their ability to produce multiple answers within a single rollout. For the remaining baselines, where each rollout generates only one answer and thus AnsF1@1 = Recall@1, we additionally include AnsF1/Recall@3 to evaluate their performance when more rollouts are available. The best result in each comparison group is shown in bold, and the second best is underlined.*",
+      "*Table 2: Main results with the Exact Match metric on four general QA benchmarks, using the same notations as Table 1. For AmbigQA, where questions may have multiple reference answers, AnsF1@1 and Recall@1 are not equivalent in this setting, and both are therefore reported.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 GRPO目标函数（无KL惩罚）\n\nA²Search采用GRPO算法，最大化带有归一化优势的裁剪替代目标，无KL惩罚项：\n\n$$\\mathcal{J}(\\theta) = \\mathbb{E}_{x \\sim \\mathcal{D}, \\{y_i\\}_{i=1}^{G} \\sim \\pi_{\\theta\\mathrm{old}}(\\cdot|x)} \\frac{1}{G} \\sum_{i=1}^{G} \\left[ \\min\\left( \\frac{\\pi_\\theta(y_i|x)}{\\pi_{\\theta\\mathrm{old}}(y_i|x)} A_i, \\mathrm{clip}\\left( \\frac{\\pi_\\theta(y_i|x)}{\\pi_{\\theta\\mathrm{old}}(y_i|x)}, 1-\\epsilon, 1+\\epsilon \\right) A_i \\right) \\right]$$\n\n其中归一化优势为：\n\n$$A_i = (r_i - \\mathrm{mean}(\\{r_j\\}_{j=1}^{G})) / \\mathrm{std}(\\{r_j\\}_{j=1}^{G})$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__ARES_Multimodal_Adaptive_Reasoning_via_Difficulty-Aware_Token-Level_Entropy_Shaping.md",
+    "title": "ARES: Multimodal Adaptive Reasoning via Difficulty-Aware Token-Level Entropy Shaping",
+    "issues": [
+      "suspicious_short_formula:6",
+      "missing_figure_embed:10,2,3"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Vision Models & Multimodal",
+    "figure_lines": [
+      "*Figure 1: (a) Difficulty modulates the exploratory effort along the reasoning path*"
+    ],
+    "table_lines": [
+      "*Table 1: Performance comparison of various MLLMs on diverse multimodal reasoning benchmarks. Within each model group (3B and 7B), the best results are highlighted in bold, and the second-best are underlined. Scores in italics indicate that they are not reported in the original work and are obtained using the VLMEvalKit (Duan et al., 2025) for evaluation. MathVerse-V, DynaMath-W and WeMath-S denotes the vision-only, worst, and strict settings, respectively.*",
+      "*Table 2: Accuracy and response length comparison across multimodal and textual benchmarks. We report both accuracy (Acc) and average response length (Len) for five model variants (ARES-CS-Vanilla, ARES-CS-7B, ARES-CS-Vanilla-GRPO, ARES-CS-Vanilla-RL, and ARES-RL-7B) on six benchmarks. Visualization of these results is provided in Figure 8 (accuracy) and Figure 9 (response length) in Appendix.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 在线难度分桶\n\n基于pass@8准确率将问题分为三个难度桶：\n$$d(x) = \\begin{cases} \\mathsf{easy}, & \\mathsf{pass@8}(x) \\ge 6, \\\\ \\mathsf{medium}, & 3 \\le \\mathsf{pass@8}(x) < 6, \\\\ \\mathsf{hard}, & \\mathsf{pass@8}(x) \\le 2 \\end{cases}$$\n\n其中 $\\mathsf{pass@8}(x) = \\frac{1}{8} \\sum_{k=1}^{8} \\mathbf{1}\\{\\mathrm{correct}(y^{(k)}, x)\\}$。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__ARFlow_Auto-regressive_Optical_Flow_Estimation_for_Arbitrary-Length_Videos_via_Progressive_Next-Frame_Forecasting.md",
+    "title": "ARFlow: Auto-regressive Optical Flow Estimation for Arbitrary-Length Videos via Progressive Next-Frame Forecasting",
+    "issues": [
+      "suspicious_short_formula:3",
+      "missing_figure_embed:3"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Vision Models & Multimodal",
+    "figure_lines": [
+      "*Figure 1: (B) Sequence-to-sequence multi-frame pipeline*"
+    ],
+    "table_lines": [
+      "*Table 1: Benchmark results on MPI-Sintel and KITTI-15. We report endpoint-error (EPE) on Sintel (Butler et al., 2012) and Fl on KITTI-15 (Geiger et al., 2013).*",
+      "*Table 2: Benchmark results on Spring. Runtime and maximum GPU memory usage were evaluated using an NVIDIA RTX 3090 GPU. Best results are respectively highlighted as first , second . OOM indicates out of memory. ∗ indicates scene flow methods.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 GRU迭代细化\n\n从当前图像对提取上下文特征和GRU初始隐藏状态，并预测初始光流：\n\n$$c, h^0 = \\mathrm{ContextNetwork}(I_t, I_{t+1}), \\quad f^0 = \\mathrm{FlowHead}(h^0)$$\n\n对于第一帧对，使用上下文网络预测的流；否则使用AFI模块预测的初始流：\n\n$$f_{t,t+1}^0 = \\begin{cases} f^0, & \\text{when } t=0; \\\\ f_{t,t+1}, & \\text{otherwise} \\end{cases}$$\n\n第k次迭代的输出流为上一次迭代流加上残差流：\n\n$$f_{t,t+1}^k = f_{t,t+1}^{k-1} + \\Delta f_{t,t+1}^k$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Balanced_Neuro-Symbolic_Approach_for_Commonsense_Abductive_Logic.md",
+    "title": "A Balanced Neuro-Symbolic Approach for Commonsense Abductive Logic",
+    "issues": [
+      "suspicious_short_formula:2",
+      "missing_figure_embed:2,3,4"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Language, Speech and Dialog",
+    "figure_lines": [
+      "*Figure 1: An example from a children’s comprehension exercise booklet 1. Left: the problem phrased in human language. Right: the same problem translated to first-order-logic.*"
+    ],
+    "table_lines": [
+      "*Table 1: Binary classification accuracy (True/False) of all methods on the datasets, using the chosen language models. Bolded text indicates that the method has the best performance, and that its performance is better than the next-best-performing method in a statistically significant way (p-value < 0.005 according to a Wilcoxon pair-wise rank test). Small-font numbers to the right indicate the bounds of the 95% confidence interval, derived via a bootstrap approach. RQ1: How useful are the scoring and backbone-tracking elements? In Table 2, we test the importance of two elements of ARGOS: (i) score thresholding and (ii) backbone computation. The ablation of each element in isolation results...*",
+      "*Table 3: Average number of COT calls required by each method.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 文字评分函数\n\n为了优先选择最相关的文字，定义了文字评分函数：\n\n$$\\text{scoreB}(L) = \\# \\{ L' \\in B \\mid L' \\text{ has an entity in common with } L \\}$$\n\n该函数计算骨干图中与文字 $L$ 共享实体的文字数量。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Biologically_Plausible_Dense_Associative_Memory_with_Exponential_Capacity.md",
+    "title": "A Biologically Plausible Dense Associative Memory with Exponential Capacity",
+    "issues": [
+      "suspicious_short_formula:3",
+      "missing_figure_embed:10,11,2"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Neuroscience, Cognitive Science",
+    "figure_lines": [
+      "*Figure 1: a*",
+      "*Figure 1: b Figure 1: Capacity versus the number of hidden units, N _ { h } , with N _ { v } = 1 0 0 N _ { h } and \\tau _ { v } = 2 0 \\tau _ { h } . (a) Capacity for different thresholds, θ. The highest storage capacity is achieved when the threshold is set to its optimal theoretical value , \\theta = 0 . 5 . (b) The effect of noise in the visible layer ( \\epsilon _ { i } ^ { v } in Eq. (12a)), shown for different noise variances, demonstrates the large basin of attraction of the fixed points.*"
+    ],
+    "table_lines": [
+      "*Table 2: Architecture and Parameters of the CNN Classifier*",
+      "*Table 3: Architecture and Parameters of the MLP Classifier*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 稳定性保证\n\n系统的雅可比矩阵为下三角结构（Appendix A.2）：\n$$\\mathbf{A} = \\begin{bmatrix} -\\mathbf{I}_{N_v} & \\mathbf{0} \\\\ \\mathbf{A}_{hv} & -\\mathbf{I}_{N_h} \\end{bmatrix}$$\n\n所有对角元均为 -1，且由于 Heaviside 阶跃函数的导数几乎处处为零，非对角块 $\\mathbf{A}_{vh} = 0$，因此所有不动点都是稳定的。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Fano-Style_Accuracy_Upper_Bound_for_LLM_Single-Pass_Reasoning_in_Multi-Hop_QA.md",
+    "title": "A Fano-Style Accuracy Upper Bound for LLM Single-Pass Reasoning in Multi-Hop QA",
+    "issues": [
+      "suspicious_short_formula:1",
+      "missing_figure_embed:2,3,4"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Language, Speech and Dialog",
+    "figure_lines": [
+      "*Figure 1: Comparison of single-pass and multi-call reasoning paradigms. Single-pass reasoning is constrained by the limited output capacity of LLMs, making it difficult to solve long-context and multi-hop problems. Multi-call reasoning mitigates this by decomposing tasks into sequentially dependent sub-steps, ensuring high per-step accuracy and a reliable reasoning chain.*"
+    ],
+    "table_lines": [
+      "*Table 1: Statistics of our synthetic multi-hop QA benchmark.*",
+      "*Table 2: Average F1 scores of Qwen3-14B across different reasoning depths and context lengths. We compare InfoQA with single-pass baselines: Chain-of-Thought (CoT), Self-Refine (S-R), Self-Consistency (S-C), ReAct, Plan-and-Solve (P&S), Self-Ask (S-A), and InfoQA with ablation: w/o Capacity-Aware Task Decomposition (D.) and w/o Pruning Past Reasoning Trace (P.).*"
+    ],
+    "formula_5_2_excerpt": ""
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Probabilistic_Hard_Concept_Bottleneck_for_Steerable_Generative_Models.md",
+    "title": "A Probabilistic Hard Concept Bottleneck for Steerable Generative Models",
+    "issues": [
+      "suspicious_short_formula:2",
+      "missing_figure_embed:2,3,7"
+    ],
+    "topic_row": "Generative Models & Diffusion, Generative Models and Autoencoders",
+    "figure_lines": [
+      "*Figure 1: Block diagram of (a) the general architecture of CBGMs, and (b) the VHCB layer. Note that the Error-Correcting Code (ECC) in the VHCB layer is a deterministic transformation that enables effective inference.*"
+    ],
+    "table_lines": [
+      "*Table 1: Concept inference and disentanglement between c and s. Evaluation on 1k random samples generated by a StyleGAN2 pretrained on CelebA-HQ. Figure 3: Qualitative evaluation of the disentanglement between s and c with the VHCB layer and StyleGAN2 models pretrained on CelebA-HQ.*",
+      "*Table 2: Steerable Generation. Evaluation of generation from specific concept configurations using a StyleGAN2 pretrained on CelebA-HQ. Random samples concept sets uniformly at random, while Patterns samples them according to their empirical frequency in the training data.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 纠错码（ECC）保护\n\nc和s分别使用独立的ECC保护，增加汉明距离并实现错误纠正：\n- c → v_c，v_c ∈ {0,1}^{K'}，K' > K\n- s → v_s，v_s ∈ {0,1}^{L'}，L' > L\n\n推理时通过软多数投票（soft majority voting）纠正编码器错误。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Reward-Free_Viewpoint_on_Multi-Objective_Reinforcement_Learning.md",
+    "title": "A Reward-Free Viewpoint on Multi-Objective Reinforcement Learning",
+    "issues": [
+      "suspicious_short_formula:3",
+      "missing_figure_embed:16,2,3"
+    ],
+    "topic_row": "Reinforcement Learning, Planning & Agents, Deep RL",
+    "figure_lines": [
+      "*Figure 1: A motivating experiment on Deep Sea Treasure. (a)(b) Training performance (UT and HV defined in the sequel) of MORL-FB under different batch sizes for \\hat { z } _ { \\lambda } . (c) KDE contour of return vector distributions of \\pi ( \\cdot , z ) induced by \\hat { z } _ { \\lambda } (with various batch sizes b) and \\hat { z } \\sim \\mathcal { N } ( 0 , \\mathbb { T } ^ { d _ { z } } ) This shows that \\hat { z } _ { \\lambda } corresponds to learning for more diverse and relevant behavior in MORL than z _ { \\lambda } and the z sampling strategy of the original FB. The detailed configuration is provided in Appendix C.*"
+    ],
+    "table_lines": [
+      "*Table 1: Hyperparameters of PGMORL.*",
+      "*Table 2: PPO hyperparameters used in PGMORL.*"
+    ],
+    "formula_5_2_excerpt": ""
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Statistical_Benchmark_for_Diffusion-Posterior-Sampling_Algorithms.md",
+    "title": "A Statistical Benchmark for Diffusion-Posterior-Sampling Algorithms",
+    "issues": [
+      "suspicious_short_formula:4",
+      "missing_figure_embed:3,4,6"
+    ],
+    "topic_row": "Representation, Self-Supervision & Transfer, Representation Learning",
+    "figure_lines": [
+      "*Figure 1: Unconditional reverse-diffusion trajectories obtained by DDPM using the arbitrary-precision Monte Carlo denoiser. Rows: Increment distributions. Columns: Diffusion times. Line styles: Different random states.*"
+    ],
+    "table_lines": [
+      "*Table 1: MMSE optimality gap in decibel (mean ± standard deviation; lower is better; 0 is a perfect reconstruction) of various estimation methods over the test set. Bold: best among DPS algorithms.*",
+      "*Table 2: Univariate distributions used throughout this work. Parameters appear in the order they are specified in this table, e.g. Gauss ( \\mu , \\sigma ^ { 2 } )*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 扩散模型基础\n\n前向扩散SDE为：\n\n$$\\mathrm{d}\\mathbf{X}_t = \\mathbf{f}(\\mathbf{X}_t, t) \\mathrm{d}t + g(t) \\mathrm{d}\\mathbf{W}_t$$\n\n反向SDE为：\n\n$$\\mathrm{d}\\mathbf{X}_t = \\left( \\mathbf{f}(\\mathbf{X}_t, t) - g^2(t) \\nabla \\log p_{\\mathbf{X}_t}(\\mathbf{X}_t) \\right) \\mathrm{d}t + g(t) \\mathrm{d}\\mathbf{W}_t$$\n\nTweedie公式将得分函数与MMSE去噪器联系起来：\n\n$$\\nabla \\log p_{\\mathbf{X}_t}(\\mathbf{x}) = -\\sigma(t)^{-2} \\left( \\mathbf{x} - \\alpha(t) \\mathbb{E}[\\mathbf{X}_0 \\mid \\mathbf{X}_t = \\mathbf{x}] \\right)$$\n\nDDPM离散反向步为：\n\n$$\\mathbf{X}_{t-1} = \\frac{1}{\\sqrt{1-\\beta_t}} \\left( \\mathbf{X}_t + \\beta_t \\nabla \\log p_{\\mathbf{X}_t}(\\mathbf{X}_t) \\right) + \\sqrt{\\beta_t} \\mathbf{Z}_t$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Statistical_Learning_Perspective_on_Semi-dual_Adversarial_Neural_Optimal_Transport_Solvers.md",
+    "title": "A Statistical Learning Perspective on Semi-dual Adversarial Neural Optimal Transport Solvers",
+    "issues": [
+      "suspicious_short_formula:1",
+      "missing_figure_embed:6,7"
+    ],
+    "topic_row": "Generative Models & Diffusion, Generative Models and Autoencoders",
+    "figure_lines": [
+      "*Figure 2: Continuous setup of OT problem.*",
+      "*Figure 3: Convergence rates of the OT solver learned with the quadratic transport cost and a limited number of empirical training samples.*"
+    ],
+    "table_lines": [],
+    "formula_5_2_excerpt": "### 5.2 Rademacher复杂度上界（Theorem 4.2）\n\n$$\\mathcal{E}^{E} \\leq 8 \\mathcal{R}_{p,N}(\\mathcal{H}) + 8 \\mathcal{R}_{q,M}(\\mathcal{F})$$\n\n其中 $\\mathcal{R}_{q,M}(\\mathcal{F}) \\stackrel{\\mathrm{def}}{=} \\frac{1}{M} \\mathbb{E} \\left\\{ \\sup_{\\varphi, Y} \\sum_{m=1}^M \\varphi(y_m) \\sigma_m \\right\\}$ 是函数类 $\\mathcal{F}$ 的Rademacher复杂度。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Study_of_Posterior_Stability_in_Time-Series_Latent_Diffusion.md",
+    "title": "A Study of Posterior Stability in Time-Series Latent Diffusion",
+    "issues": [
+      "suspicious_short_formula:4",
+      "missing_figure_embed:2,3"
+    ],
+    "topic_row": "Generative Models & Diffusion, Generative Models and Autoencoders",
+    "figure_lines": [],
+    "table_lines": [
+      "*Table 1: Wasserstein distances of different models on real time-series datasets. The lower the distance metric, the better the generation quality. More results from other datasets, with another evaluation metric, are placed in Table 5 of Appendix F.3. Table 2: Comparison with more baselines, including recent new methods to mitigate posterior collapse and other types of time-series generative models. Both latent diffusion baselines and our model are with Transformer as the backbone.*",
+      "*Table 3: Ablation studies of the hyper-parameters N, M, which are respectively used in the estimations of likelihood loss \\boldsymbol { \\mathcal { L } } ^ { \\mathrm { V I } } and collapse penalty \\mathcal { L } ^ { \\mathrm { C \\ddot { S } } } . Here LD is short for latent diffusion and the symbol − means “Not Applicable”.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 后验坍缩的理论分析\n\n**Proposition 3.1** 的证明：当后验坍缩时，$q^{VI}(z|X) = p^{prior}(z) = \\mathcal{N}(z;0,I)$，因此潜在变量的边缘分布为：\n$$q^{latent}(z) = \\int q^{VI}(z|X) q^{raw}(X) dX = \\mathcal{N}(z;0,I)$$\n\n这使得扩散模型只需学习从标准高斯分布到自身的映射，失去了生成复杂分布的能力。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__A_Unification_of_Discrete_Gaussian_and_Simplicial_Diffusion.md",
+    "title": "A Unification of Discrete, Gaussian, and Simplicial Diffusion",
+    "issues": [
+      "suspicious_short_formula:1",
+      "missing_figure_embed:11,9"
+    ],
+    "topic_row": "Generative Models & Diffusion, Generative Models and Autoencoders",
+    "figure_lines": [
+      "*Figure 1: Discrete, Gaussian, and Simplicial diffusion for discrete data are unified by Wright-Fisher diffusion. (a) Wright-Fisher diffusion with population size ζ “ 6, showing mutation and reproduction processes across generations. (b) The three diffusion methods emerge as different limits of Wright-Fisher: discrete diffusion corresponds to ζ “ 1, while Gaussian and simplicial diffusion arise as ζ Ñ 8 with zero and non-zero reproduction rates.*",
+      "*Figure 3: The hollow parameterization leads to realistic reverse path samples. \\zeta = 3 0 0*"
+    ],
+    "table_lines": [],
+    "formula_5_2_excerpt": "### 5.2 单纯形扩散的稳定化\n\n单纯形扩散使用父独立突变率矩阵：\n\n$$\\dot{\\mathcal{L}} = \\psi \\times (\\mathbb{1} \\vec{\\pi}^T - I)$$\n\n其中π是平稳分布，ψ>0是突变率。论文利用Jenkins和Spanò (2017)的精确采样公式，在τ_t<0.05时切换到Griffiths近似，仅需80项级数（而Avdeyev等人使用1000项）。\n\n单纯形扩散的ELBO损失为：\n\n$$L = \\frac{\\dot{\\tau}_t}{2} \\| \\vec{s}(\\vec{x}_t | x_0, t) - \\vec{s}(\\tilde{x}_t | x_0, t) \\|_{\\mathrm{diag}(\\vec{x}_t) - \\vec{x}_t \\vec{x}_t^T}^2$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Accelerating_Diffusion_Large_Language_Models_with_SlowFast_Sampling_The_Three_Golden_Principles.md",
+    "title": "Accelerating Diffusion Large Language Models with SlowFast Sampling: The Three Golden Principles",
+    "issues": [
+      "suspicious_short_formula:3",
+      "missing_figure_embed:2,5,6"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Language, Speech and Dialog",
+    "figure_lines": [
+      "*Figure 1: Decoding Step*"
+    ],
+    "table_lines": [
+      "*Table 1: Performance of LLaDA 8B and Dream 7B with SlowFast Sampling on 8 benchmarks. • Fallback Top-k Refinement: If the number of tokens meeting the \\tau _ { h i g h \\_ c o n f } criterion within the span is insufficient to make substantial progress (e.g., less than one), we revert to a more conservative update for this dLLM step within the span. Specifically, we select the { \\mathrm { t o p } } { - } k _ { f a s t } tokens within [ s _ { c y c l e } , e _ { c y c l e } ] based on confidence and unmask them. This ensures steady progress even when widespread high certainty is not yet achieved.*",
+      "*Table 2: Performance of LLaDA 8B and Dream 7B with SlowFast Sampling and dLLM-Cache.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 慢探索阶段\n\n在慢阶段，模型逐步解码，预测收敛终点。候选收敛终点定义为探索窗口中置信度超过阈值 τ_min_conf 的最远令牌位置：\n\n$$e_{cand}^{(k)} = \\operatorname{max}\\{ i \\mid i \\in [s_{cycle}, L] \\land P_\\theta(\\hat{r}_{0,i}^{(k)} | \\mathbf{c}, \\mathbf{y}^{(k)}) > \\tau_{min\\_conf} \\} \\quad \\text{(7)}$$\n\n稳定性检查通过计算历史窗口内候选终点的方差来判断是否达到稳定状态。探索阶段结束的步骤为：\n\n$$k_{final} = \\operatorname{min}\\left( \\left\\{ k_s \\mid W_{hist} \\leq k_s \\leq K_{max} \\land \\operatorname{Var}(H_W(k_s)) < \\sigma_{stable}^2 \\right\\} \\cup \\{K_{max}\\} \\right) \\quad \\text{(8)}$$\n\n周期收敛终点为最终窗口中候选终点的均值：\n\n$$e_{cycle} = \\operatorname{Mean}(H_W(k_{final})) = \\frac{1}{|H_W(k_{final})|} \\sum_{e \\in H_W(k_{final})} e \\quad \\text{(9)}$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Adapting_Self-Supervised_Representations_as_a_Latent_Space_for_Efficient_Generation.md",
+    "title": "Adapting Self-Supervised Representations as a Latent Space for Efficient Generation",
+    "issues": [
+      "suspicious_short_formula:2",
+      "missing_figure_embed:10,2,5"
+    ],
+    "topic_row": "Generative Models & Diffusion, Generative Models and Autoencoders",
+    "figure_lines": [],
+    "table_lines": [
+      "*Table 1: State-of-the-art comparison between tokenizers for reconstruction and class-conditional ImageNet generation. † metrics sourced from (Bachmann et al., 2025).*",
+      "*Table 2: FID comparison on the ImageNet 256 × 256 benchmark, including parameter counts and training FLOPs. Stage 1 refers to the training of the generative decoder, while Stage 2 corresponds to the main generative model training. As all models rely on the SD-VAE and REPA uses DINOv2 as well, we exclude these shared pre-training costs from FLOP estimates.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 带潜在z条件的流匹配损失\n\n编码器-解码器联合训练的目标函数，其中向量场以潜在标记z = E(x)为条件：\n\n$$\\mathcal{L} = \\mathbb{E}_{t, x_0, x_1} || v_θ(t, x_t, z) - (x_1 - x_0) ||$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Adaptive_Conformal_Guidance_for_Learning_under_Uncertainty.md",
+    "title": "Adaptive Conformal Guidance for Learning under Uncertainty",
+    "issues": [
+      "suspicious_short_formula:2",
+      "missing_figure_embed:2,4,6"
+    ],
+    "topic_row": "Representation, Self-Supervision & Transfer, Representation Learning",
+    "figure_lines": [
+      "*Figure 1: Overview of the AdaConG approach. AdaConG leverages split CP with calibration to quantify the uncertainty of guidance signals and adaptively modulate their influence. The estimated uncertainty u is converted into an adaptive weight w, which reweights the guidance loss. This weighted guidance loss is then combined with the task loss to update the model, enabling effective learning under uncertain guidance.*"
+    ],
+    "table_lines": [
+      "*Table 1: Top-1 accuracy (%) of various knowledge distillation methods on CIFAR-100 under homogeneous structure where teacher models underperform due to domain shift. ∆ indicates performance gain over the base method. Following the protocol in (Sun et al., 2024), we highlight in orange ∆ greater than 0.15, indicating non-trivial enhancement. We observe up to +10.89% higher accuracy.*",
+      "*Table 2: Top-1 accuracy (%) of various baselines with and without AdaConG on several semisupervised image classification benchmarks, using cross-entropy as the guidance loss. ∆ shows mean performance gain w.r.t. conventional methods without AdaConG, upto +5.98% in accuracy. EXPERIMENTAL RESULTS. We present the results in Table 2. As shown, integrating AdaConG consistently improves performance across all baselines. This highlights the effectiveness of AdaConG in semi-supervised learning. By adaptively reweighting the influence of pseudolabels, AdaConG reduces reliance on noisy supervision, mitigating error propagation and leading to improved overall performance.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 自适应权重生成\n\n自适应权重 w(x) 通过不确定性 u(x) 的单调递减函数计算：\n\n$$w(x) = h(u(x)) \\quad (2)$$\n\n本文主要采用指数衰减形式：\n\n- 知识蒸馏：$w = \\exp(-\\gamma u)$，其中 $\\gamma = 10.0$\n- 半监督学习：$w = \\exp(-\\gamma u)$，其中 $\\gamma = 8.0$\n\n此外，还探索了硬权重函数：$w = 1 \\text{ if } u = 0, w = 0 \\text{ if } u > 0$，即仅使用零不确定性的教师预测。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Adversarial_Encoding_Perturbation_and_Synthesis_for_Set_Representation_Auxiliary_Learning.md",
+    "title": "Adversarial Encoding Perturbation and Synthesis for Set Representation Auxiliary Learning",
+    "issues": [
+      "suspicious_short_formula:5",
+      "missing_figure_embed:4"
+    ],
+    "topic_row": "Representation, Self-Supervision & Transfer, Representation Learning",
+    "figure_lines": [
+      "*Figure 1: SRAL captures inter-set correlations for adversarial optimization (left); normalized ratiosFigure 1: SRAL captures inter-set correlations for adversarial optimization (left); normalized ratios of second-best methods over SRAL are reported due to varying metric scales (right).of second-best methods over SRAL are reported due to varying metric scales (right).*"
+    ],
+    "table_lines": [
+      "*Table 1: Performance comparison for Tasks 1 (left) and 2 (right). Best and second-best cases are highlighted. Statistically significant improvements (p < 0.05) are marked with ∗.*",
+      "*Table 2: Performance comparison for Task 3: Point Cloud Processing.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 Set Feature Encoder (SFE)\n\nSFE 模块的核心思想是将输入集合 $S_i$ 视为经验分布 $P_i$，并与一个可学习的参考分布 $O$ 进行比较。通过 2-Sliced-Wasserstein 距离，SFE 能够捕捉集合间的分布差异。\n\n**最优传输映射（切片分布）** (Eq. 4)：\n$$g^+(x^\\theta | V_i^\\theta) = F_{P_i^\\theta}^{-1}(F_{O^\\theta}(x^\\theta))$$\n\n**实际排名匹配实现** (Eq. 5)：\n$$g^+(x^\\theta | V_i^\\theta) = \\arg\\min_{x' \\in V_i^\\theta} \\left( \\tau(x' | V_i^\\theta) \\geq \\frac{|S_i|}{H} \\cdot \\tau(x^\\theta | V_O^\\theta) \\right)$$\n\n**SFE 模块输出** (Eq. 6)：\n$$SFE(V_i, V_O | \\Theta) = \\operatorname{Concat}_{r=1\\dots R; h=1\\dots H} \\left( g^+(w_r^\\top z_h | V_i^{\\theta_r}) \\right)$$\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__AgentGym-RL_An_Open-Source_Framework_to_Train_LLM_Agents_for_Long-Horizon_Decision_Making_via_Multi-Turn_RL.md",
+    "title": "AgentGym-RL: An Open-Source Framework to Train LLM Agents for Long-Horizon Decision Making via Multi-Turn RL",
+    "issues": [
+      "suspicious_short_formula:2",
+      "missing_figure_embed:11,4"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Language, Speech and Dialog",
+    "figure_lines": [],
+    "table_lines": [
+      "*Table 1: Evaluation results on Deep Search benchmark. For each group, the best result is in bold, and the second-best is underlined. SearchR1-it-v0.3 baseline uses Search-R1-v0.3 models (Jin et al., 2025a). See Appendix D for results of tasks on other scenarios.*",
+      "*Table 2: Evaluation results of different RL algorithms.*"
+    ],
+    "formula_5_2_excerpt": ""
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Agent_Data_Protocol_Unifying_Datasets_for_Diverse_Effective_Fine-tuning_of_LLM_Agents.md",
+    "title": "Agent Data Protocol: Unifying Datasets for Diverse, Effective Fine-tuning of LLM Agents",
+    "issues": [
+      "suspicious_short_formula:1",
+      "missing_figure_embed:2,3,4"
+    ],
+    "topic_row": "Vision / Multimodal Applications, Language, Speech and Dialog",
+    "figure_lines": [
+      "*Figure 1: Overview of the Agent Data Protocol (ADP). Raw data from diverse sources such as SWE-Gym are converted into a standardized ADP format. ADP unifies data into Trajectory objects, which include two core components: Actions (API action, code action, message action) and Observations (text observation, web observation), enabling seamless integration with various agent SFT formats. Example conversions show how heterogeneous raw data is normalized for training agentic models.*"
+    ],
+    "table_lines": [
+      "*Table 1: Overview of Existing Agent Training Datasets. C=Coding, S=Software Engineering, T=API/Tool Use, W=Web Browsing.*",
+      "*Table 2: Dataset Stats and Trajectory Analysis. A=APIAction, C=CodeAction, M=MessageAction.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 转换管道\n\nADP 转换管道包含三个阶段：\n\n1. **Raw to Standardized 转换器**：将原始数据集格式映射到 ADP 标准化模式，将数据集特定的动作和观察转换为 ADP 的标准动作和观察空间。\n\n2. **Standardized to SFT 转换器**：将 ADP 标准化轨迹转换为特定智能体框架（如 OpenHands、SWE-Agent、AgentLab）的 SFT 格式，处理上下文管理、系统提示和对话格式化。\n\n3. **质量保证模块**：通过自动化验证确保数据正确性和一致性，包括验证工具调用格式、确保工具调用与英文思考配对、检查对话是否正常结束等。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Agentic_Reinforced_Policy_Optimization.md",
+    "title": "Agentic Reinforced Policy Optimization",
+    "issues": [
+      "suspicious_short_formula:3",
+      "missing_figure_embed:2,3,4"
+    ],
+    "topic_row": "Reinforcement Learning, Planning & Agents, Deep RL",
+    "figure_lines": [
+      "*Figure 1: Overview of tool-use token entropy exploration and ARPO algorithm performance. Left: High entropy observed in the LLM following tool usage. Right: LLM performance comparison on deep search tasks using only 1k RL samples, along with a comparison of training tool-use budgets.*"
+    ],
+    "table_lines": [
+      "*Table 1: Overall performances on 10 challenging reasoning tasks are presented. The top two outcomes are bolded and underlined. Dataset abbreviations are as follows: WebW (WebWalker), HQA (HotpotQA), 2Wiki. (2wikiMultiHopQA), MuSi. (MuSiQue), and Bamb (Bamboogle).*",
+      "*Table 2: Overall performance on various deep search tasks, with accuracy results for each dataset obtained using llm-as-judge. The best results are indicated in bold, and the second-best results are underlined. Results from larger or closed-source models are presented in gray for reference.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 熵基自适应展开\n\n基于熵变化ΔH_t定义步骤t的分支概率：\n\n$$P_t = \\alpha + \\beta \\cdot \\Delta H_t, \\quad \\mathrm{Action}(P_t) = \\left\\{ \\mathrm{Branch}(Z), \\quad \\mathrm{if} \\quad P_t > \\tau; \\right.$$\n\n其中α为基础采样概率，β为稳定性熵。当P_t超过阈值τ时，触发Branch(Z)生成Z条部分推理路径。ARPO通过此机制将每次展开的计算复杂度从轨迹级RL的O(n²)降低到介于O(n log n)和O(n²)之间。\n"
+  },
+  {
+    "path": "obsidian-vault/paper/ICLR_2026/P__Agentic_Reinforcement_Learning_with_Implicit_Step_Rewards.md",
+    "title": "Agentic Reinforcement Learning with Implicit Step Rewards",
+    "issues": [
+      "suspicious_short_formula:2",
+      "missing_figure_embed:10,2,3"
+    ],
+    "topic_row": "Reinforcement Learning, Planning & Agents, Deep RL",
+    "figure_lines": [
+      "*Figure 1: Overview of iStar. At each training step, an LLM agent interacts with the environment to generate multi-step rollouts ranked by an outcome reward verifier (or model) to construct positive-negative trajectory pairs. These pairs are used to train an implicit PRM via a multi-turn DPO objective, which generates implicit step rewards for each action produced by the agent. Finally, calculate step-level advantages using the implicit step rewards and episode-level advantages using outcome rewards to optimize the LLM agent (policy model) through RL.*"
+    ],
+    "table_lines": [
+      "*Table 1: Performance on WebShop and VisualSokoban. Qwen2.5-7B-Instruct and Qwen2.5- VL-7B-Instruct serve as the base models for the policy model in WebShop and VisualSokoban, respectively. Note that Deepseek-R1 and PPO training do not currently support multi-modal scenarios, and PRIME is only applicable to tasks with binary outcome rewards. Results are averaged over three random seeds.*",
+      "*Table 2: Performance on Sotopia. ‘Self-Chat” refers to dialogues where the model under evaluation interacts with itself, while “GPT-4o-as-Partner” denotes interactions between the model and GPT-4o. “Goal” refers to the goal completion rate (on a scale of 0-10). The ”Hard” subset comprises test scenarios in SOTOPIA that require advanced reasoning capabilities, and ”All” represents the complete test set. Results are averaged over three random seeds.*"
+    ],
+    "formula_5_2_excerpt": "### 5.2 多轮 DPO 目标\n\n隐式 PRM 通过在线多轮 DPO 目标进行优化：\n\n$$\\mathcal{L}_{\\mathrm{PRM}}(\\phi) = -\\mathbb{E}_{(\\tau^+, \\tau^-) \\sim \\pi_{\\theta_{\\mathrm{old}}}} \\left[ \\log \\sigma \\left( \\beta \\log \\frac{\\pi_{\\phi}(\\tau^+|x)}{\\pi_{\\theta_{\\mathrm{old}}}(\\tau^+|x)} - \\beta \\log \\frac{\\pi_{\\phi}(\\tau^-|x)}{\\pi_{\\theta_{\\mathrm{old}}}(\\tau^-|x)} \\right) \\right] \\quad \\text{(Eq. 2)}$$\n\n该目标使用旧策略采样的正负轨迹对，在线优化隐式 PRM。理论分析（Eq. 7）证明，该目标等价于具有步骤级奖励函数的 Bradley-Terry 模型。\n"
+  }
+]

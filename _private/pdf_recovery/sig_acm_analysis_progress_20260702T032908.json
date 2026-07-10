@@ -1,0 +1,52 @@
+{
+  "queue_rows": 910,
+  "unique_targets": 910,
+  "actual_pdf_exists_header_ok": 910,
+  "analysis_note_by_pdf_ref": 824,
+  "analysis_missing": 86,
+  "validation_not_ok_runs": 36,
+  "by_venue": {
+    "SIGGRAPH 2022": {
+      "total": 68,
+      "pdf_ok": 68,
+      "analysis_note": 68
+    },
+    "SIGGRAPH 2023": {
+      "total": 95,
+      "pdf_ok": 95,
+      "analysis_note": 95
+    },
+    "SIGGRAPH 2024": {
+      "total": 55,
+      "pdf_ok": 55,
+      "analysis_note": 55
+    },
+    "SIGGRAPH 2025": {
+      "total": 195,
+      "pdf_ok": 195,
+      "analysis_note": 195
+    },
+    "SIGGRAPH ASIA 2022": {
+      "total": 60,
+      "pdf_ok": 60,
+      "analysis_note": 60
+    },
+    "SIGGRAPH ASIA 2023": {
+      "total": 67,
+      "pdf_ok": 67,
+      "analysis_note": 67
+    },
+    "SIGGRAPH ASIA 2024": {
+      "total": 69,
+      "pdf_ok": 69,
+      "analysis_note": 69
+    },
+    "SIGGRAPH ASIA 2025": {
+      "total": 301,
+      "pdf_ok": 301,
+      "analysis_note": 215
+    }
+  },
+  "missing_list": "_private/sig_acm_analysis_missing_20260702T032908.tsv",
+  "validation_bad_list": "_private/sig_acm_validation_not_ok_20260702T032908.tsv"
+}

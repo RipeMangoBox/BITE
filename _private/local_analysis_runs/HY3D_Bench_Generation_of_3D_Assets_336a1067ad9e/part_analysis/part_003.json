@@ -1,0 +1,94 @@
+{
+  "part_id": "part_003",
+  "section_role": "introduction and related work",
+  "method_evidence": [
+    {
+      "claim": "We implement a professional pipeline to generate training-ready assets featuring the best watertight mesh and high-fidelity rendered images.",
+      "section": "Introduction",
+      "anchor": "we implement a professional pipeline to generate \\textit{training-ready} assets featuring the \\textit{best watertight mesh} and high-fidelity rendered images",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We utilize a part-merging strategy to produce structured assets with consistent part-level decomposition.",
+      "section": "Introduction",
+      "anchor": "we utilize a part-merging strategy to produce structured assets with consistent part-level decomposition",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We propose a rigorous benchmark comprising 400 high-quality objects across diverse categories.",
+      "section": "Introduction",
+      "anchor": "We propose a rigorous benchmark comprising 400 high-quality objects across diverse categories",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We introduce a scalable AIGC-driven data synthesis pipeline with a three-step paradigm: Text-to-Text, Text-to-Image, Image-to-3D.",
+      "section": "Introduction",
+      "anchor": "Our three-step paradigm, consisting of Text-to-Text for semantic expansion, Text-to-Image for visual synthesis, and Image-to-3D for mesh reconstruction",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "fig:related",
+      "role_hint": "overview figure",
+      "caption": "The evolution of the 3D generation.",
+      "confidence": 0.9
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_003",
+    "part_index": 3,
+    "part_count": 9,
+    "chunk_chars": 6423,
+    "latency_seconds": 5.237,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 2753,
+      "completion_tokens_est": 542,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3295,
+      "total_with_reasoning_tokens_est": 3295,
+      "estimated_cost_usd": 0.001669,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2025,
+      "completion_tokens_api": 424,
+      "total_tokens_api": 2449,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2025,
+      "cached_tokens_api": 0,
+      "api_usage_raw": {
+        "completion_tokens": 424,
+        "prompt_tokens": 2025,
+        "total_tokens": 2449,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 2025
+      },
+      "estimated_cost_usd_api": 0.00125,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 1807,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 426,
+        "api_usage_present": true
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2025/Optimal_r_Adaptive_In_Timestep_Remeshing_for_Elastodynamics.pdf	https://dl.acm.org/doi/pdf/10.1145/3731204	289762206	2486425	289762206	16590797	gs-450dpi-q95; 15.82MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2025/Field_Smoothness_Controlled_Partition_for_Quadrangulation.pdf	https://dl.acm.org/doi/pdf/10.1145/3730889	145454238	4051374	145454238	15850682	gs-360dpi-q95; 15.12MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2025/Faraday_Cage_Estimation_of_Normals_for_Point_Clouds_and_Ribbon_Sketches.pdf	https://dl.acm.org/doi/pdf/10.1145/3731212	144626170	1936921	144626170	13352704	gs-600dpi-q100; 12.73MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Free_space_Diffraction_BSDF.pdf	https://dl.acm.org/doi/pdf/10.1145/3658166	142070554	3254418	75119739			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Alignable_Lamella_Gridshells.pdf	https://dl.acm.org/doi/pdf/10.1145/3687898	140926160	985141	71366836			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2025/Physics_inspired_Estimation_of_Optimal_Cloth_Mesh_Resolution.pdf	https://dl.acm.org/doi/pdf/10.1145/3721238.3730619	139680928	879432	139680928	5038553	gs-600dpi-q100; 4.81MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/DeepMVSHair_Deep_Hair_Modeling_from_Sparse_Views.pdf	https://dl.acm.org/doi/pdf/10.1145/3550469.3555385	139319096	665698	139319096	2809563	gs-600dpi-q100; 2.68MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Example_Based_Feature_Painting_on_Textures.pdf	https://dl.acm.org/doi/pdf/10.1145/3763301	135587363	7366948	40201820			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Automatic_Sampling_for_Discontinuities_in_Differentiable_Shaders.pdf	https://dl.acm.org/doi/pdf/10.1145/3763291	133438601	3233657	40643767			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/RGB_X_Image_Decomposition_and_Synthesis_Using_Material_and_Lighting_aware_Diffusion_Models.pdf	https://dl.acm.org/doi/pdf/10.1145/3641519.3657445	132319512	818190	132319512	4181795	gs-600dpi-q100; 3.99MiB	ok

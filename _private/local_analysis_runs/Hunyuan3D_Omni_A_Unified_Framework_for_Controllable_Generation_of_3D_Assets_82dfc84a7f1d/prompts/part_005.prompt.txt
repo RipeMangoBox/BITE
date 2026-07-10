@@ -1,0 +1,95 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Hunyuan3D-Omni: A Unified Framework for Controllable Generation of 3D Assets
+Part: 5/6
+Character span: 29121-36634
+
+=== PART CONTENT ===
+hen convert the point cloud into voxels. First, we normalize the coordinates of $\text{P}$ to $\left[0, 16\right]^3$, quantize them into integers, and remove duplicate coordinates to obtain voxel coordinates at a resolution of $16\times16\times16$. Then, we map these coordinates back to the center coordinates of the voxels in the $[-1, 1]^3$ space.
+
+\subsubsection{Unified Control Encoder}
+The unified control encoder is used to unify and distinguish these extra control signals. As all control signals can be represented as a type of point cloud, we can design a shared point encoder to extract the corresponding features easily. In particular, we leverage the bone points as the skeleton representation to control the pose of the humanoid input. To align the dimensions of all extra conditions, we repeat the feature channel of the condition of voxel, point cloud, and bounding box. As a result, all controls can be represented as a point cloud $P_c \in \mathbb{R}^{N \times 6}$, where $N$ is the number of points or bones.
+
+
+We then apply a position embedding followed by a linear layer on the point cloud $P_c$ to extract the condition features. Additionally, Different conditions correspond to distinct control objectives. For example, the point cloud condition aims to provide depth information from the image, reducing geometric distortions caused by artifacts, without altering the corresponding geometry of the image. In contrast, the skeleton condition is designed to control the pose of the input image, which does modify the corresponding geometry. Meanwhile, all these conditions are represented by point clouds, which tends to lead to control confusion. Therefore, to differentiate between the various conditions, we employ an embedding function to construct embeddings for the different control signals. Finally, we aggregate the extracted condition features and the distinguished embedding to obtain the final condition features. Thus, we can formulate our shared control encoder as follows:
+\begin{align}
+\beta_i = [\text{Linear}(\text{PosEmb}(P_i^c)), \mathcal{R}(\mathcal{M}(E(i)), r)], i \in [0,1,2,3]
+\end{align}
+where $\beta_i \in \mathbb{R}^{N \times C}$ is final control feature. $P_i^c$ is the control condition. ${E}$ and $M$ are the embedding function and the linear projection, respectively. $\mathcal{R}$ is a repeat operation, and $r$ is the time of repeating, which is used to enhance the signal for the condition type. $[\cdot]$ is a concatenation operation.
+
+Benefiting from the scalability of the attention structure, we can concatenate the image feature $c_i$ and control feature $\beta$ to form a joint feature that is fed into the DiT model of Hunyuan3D 2.1. As a result, we can define the training objective of our \shortname as follows:
+\begin{equation}
+\mathbb{E}_{t, {x}_0, {x_1}, c'}\vert\vert{v}_\theta({x}, t, c')-(x_1-x_0)\vert\vert_2^2
+\end{equation}
+where $c'=[c, \beta_i]$ is the joint feature.
+
+\section{Experiment}
+
+\subsection{Implementation Details}
+
+We follow the PoseMaster~\cite{yan2025posemaster} approach to construct the training data for pose control and adopt the dataset of Hunyuan3D 2.1~\cite{hunyuan3d2025hunyuan3d21imageshighfidelity} for other conditions.  We follow the setting of Hunyuan3D 2.1~\cite{hunyuan3d2025hunyuan3d21imageshighfidelity} to train our \shortname. Due to the varying lengths of different conditions, we set the batch size to 1. Additionally, we employ a random sampling strategy to select the control conditions for the current batch. Notably, since the data for the pose condition is less abundant and more challenging to learn, we use a higher sampling probability to prioritize tasks related to pose control. We directly train our diffusion model and unified control encoder using a fixed learning rate of 1e-5 and the AdamW optimizer. we utilize DINO-v2-Large~\cite{oquab2023dinov2} to extract image features.
+
+\subsection{Qualitative Results}
+In this section, we showcase the qualitative results for our \shortname. Specifically, we first use our \shortname to generate the controlled result and then leverage the Hunyuan3D 2.5~\cite{lai2025hunyuan3d2_5} to refine its geometry.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/exp_pose_control.png}
+    \caption{Qualitative results of pose control, demonstrating that our Omni model generates accurately aligned geometry across diverse poses and input styles.}
+    \label{fig:exp_pose_control}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/exp_bbox_ratio.png}
+    \caption{Qualitative results of bounding box control, our Omni model can generate objects at different scales, given different bounding boxes. }
+    \label{fig:image-generation bbox ratio}
+
+    \includegraphics[width=0.95\linewidth]{figures/exp_bbox_compare.png}
+    \caption{Qualitative results of bounding box control, given the bounding box condition, our Omni model can avoid generating thin, sheet-like geometry.}
+    \label{fig:image-generation bbox compare}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/exp_point_control.png}
+    \caption{Qualitative results of point cloud control, showing improved alignment and detail recovery across complete, depth-projected, and scanned point cloud conditions compared to image-only results.}
+    \label{fig:exp_point_control}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/exp_voxel_control.png}
+    \caption{Qualitative results of voxel control, demonstrating improved scale alignment and fine detail recovery with voxel conditions compared to image-only results.}
+    \label{fig:exp_voxel_control}
+\end{figure}
+
+{\bf Skeleton condition}. In contrast to the point cloud condition and voxel condition that provide sparse 3D information to enhance geometry accuracy, the skeleton condition aims to adjust the pose of the input image, which is usually used in character generation. As shown in Figure~\ref{fig:exp_pose_control}, with the skeleton condition as additional input, our Omni model can generate high-quality character geometry which accurately corresponds to the target pose, including A pose, sky pose, and hands-up pose. In our experiments, we use character images of various styles as conditional inputs, including rendered images from 3D character data and synthetic images produced by generative models. Regardless of the input style, our Omni model consistently produces human body meshes with fine geometric details that remain strictly aligned with the input skeleton, without artifacts. This strong capability for pose control demonstrates significant practical value for downstream applications such as 3D animation production and 3D figurine printing.
+
+{\bf Bounding box condition}. Bounding box control signals allow flexible adjustment of the aspect ratio of the generated object. As shown in Figure~\ref{fig:image-generation bbox ratio}, given the same image condition, different bounding boxes successfully regulate the size of the output mesh. Notably, this manipulation is not a naive stretching: when the sofa is lengthened, extra supporting legs appear, and the Arc de Triomphe likewise acquires a plausible shape. Moreover, as shown in Figure~\ref{fig:image-generation bbox compare}, the bounding box signal can inject an activation cue into the generation network when single-image conditioned generation fails, yielding a valid mesh.

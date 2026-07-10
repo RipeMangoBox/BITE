@@ -1,0 +1,31 @@
+{"event": "started", "at": "2026-05-22T07:40:43.162076+00:00", "task_id": "vault_root_linkage_smoke"}
+{"event": "parse_done", "at": "2026-05-22T07:40:43.178569+00:00", "markdown_chars": 90076, "chunk_count": 15, "parse_seconds": 0.01}
+{"event": "token_budget_selected", "at": "2026-05-22T07:40:43.178624+00:00", "enabled": true, "profile": "extreme", "markdown_chars": 90076, "chunk_count": 15, "page_count": null, "chars_per_page": null, "before": {"part_max_tokens": 16384, "main_max_tokens": 16384, "writer_max_tokens": 16384, "main_context_chars": 36000}, "after": {"part_max_tokens": 16384, "main_max_tokens": 16384, "writer_max_tokens": 16384, "main_context_chars": 54000}, "criteria": {"long_chunk_count": 11, "long_markdown_chars": 144000, "long_chars_per_page": 4500, "extreme_chunk_count": 15, "extreme_markdown_chars": 216000, "extreme_pages": 45}}
+{"event": "part_analysis_done", "part_id": "part_001", "at": "2026-05-22T07:40:43.179075+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_002", "at": "2026-05-22T07:40:43.179388+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_003", "at": "2026-05-22T07:40:43.179693+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_004", "at": "2026-05-22T07:40:43.179994+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_005", "at": "2026-05-22T07:40:43.180303+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_006", "at": "2026-05-22T07:40:43.180612+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_007", "at": "2026-05-22T07:40:43.180918+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_008", "at": "2026-05-22T07:40:43.181223+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_009", "at": "2026-05-22T07:40:43.181530+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_010", "at": "2026-05-22T07:40:43.181837+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_011", "at": "2026-05-22T07:40:43.182151+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_012", "at": "2026-05-22T07:40:43.182477+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_013", "at": "2026-05-22T07:40:43.182839+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_014", "at": "2026-05-22T07:40:43.183268+00:00", "usage": {}}
+{"event": "part_analysis_done", "part_id": "part_015", "at": "2026-05-22T07:40:43.183588+00:00", "usage": {}}
+{"event": "main_analysis_done", "at": "2026-05-22T07:40:43.186256+00:00", "usage": {}}
+{"event": "section_writer_done", "section": "概述", "at": "2026-05-22T07:40:43.197038+00:00", "usage": {}}
+{"event": "section_writer_done", "section": "背景与动机", "at": "2026-05-22T07:40:43.198522+00:00", "usage": {}}
+{"event": "section_writer_done", "section": "核心创新", "at": "2026-05-22T07:40:43.200029+00:00", "usage": {}}
+{"event": "section_writer_done", "section": "整体框架", "at": "2026-05-22T07:40:43.201668+00:00", "usage": {}}
+{"event": "section_writer_done", "section": "核心模块与公式推导", "at": "2026-05-22T07:40:43.202869+00:00", "usage": {}}
+{"event": "section_writer_done", "section": "实验与分析", "at": "2026-05-22T07:40:43.204535+00:00", "usage": {}}
+{"event": "section_writer_done", "section": "方法谱系与知识库定位", "at": "2026-05-22T07:40:43.206351+00:00", "usage": {}}
+{"event": "writer_done", "at": "2026-05-22T07:40:43.207343+00:00"}
+{"event": "figure_placement_done", "at": "2026-05-22T07:40:43.221296+00:00", "count": 2, "usage": {}}
+{"event": "vault_note_validated", "at": "2026-05-22T07:40:43.248126+00:00", "ok": false, "checks": {"frontmatter_valid": true, "openreview_forum_id_present": true, "required_sections_present": true, "pdf_embed_present": true, "image_embeds_present": true, "no_legacy_markdown_image_links": true, "no_pdf_file_label": true, "no_table_cell_aliased_wikilinks": true, "no_fallback_metadata_markers": false, "no_dangling_numeric_refs": true, "note_length_ok": true}, "note_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/vault_root_linkage_smoke/vault/analysis/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.md"}
+{"event": "vault_export_done", "at": "2026-05-22T07:40:43.248201+00:00", "note_path": "/home/ripemangobox/Coding/Github/OpenSource/On_Process/ResearchFlow_Process/_private/vault_root_linkage_smoke/vault/analysis/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.md", "figure_count": 36, "validation_ok": false}
+{"event": "done", "at": "2026-05-22T07:40:43.249398+00:00"}

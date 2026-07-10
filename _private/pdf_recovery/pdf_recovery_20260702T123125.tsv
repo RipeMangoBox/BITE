@@ -1,0 +1,2 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2022/Semantically_Supervised_Appearance_Decomposition_for_Virtual_Staging_From_a_Single_Panorama.pdf	https://arxiv.org/pdf/2205.13150.pdf	130971584	1069273	130971584	12591336	gs-1200dpi-q100; 12.01MiB	ok

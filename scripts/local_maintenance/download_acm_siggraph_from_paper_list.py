@@ -33,8 +33,8 @@ ROOT = Path(__file__).resolve().parents[2]
 PAPER_LIST = ROOT / "obsidian-vault" / "paper_list.csv"
 PDF_ROOT = ROOT / "obsidian-vault" / "paperPDFs"
 PROFILE_DIR = ROOT / "_private" / "browser_profiles" / "acm_chrome"
-REPORT_DIR = ROOT / "_private" / "acm_download_reports"
-QUEUE_DIR = ROOT / "_private" / "acm_download_queue"
+REPORT_DIR = ROOT / "_private" / "acm_download_recovery" / "reports"
+QUEUE_DIR = ROOT / "_private" / "acm_download_recovery" / "queue"
 CSV_FIELDS = [
     "state",
     "importance",

@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-05-12T17:30:00+08:00",
+  "conferences": [
+    {
+      "conference": "ICLR 2026",
+      "accepted": 5355,
+      "oral": 223,
+      "spotlight": 0,
+      "poster_or_regular": 5201,
+      "accepted_source_type": "official retrospective + official virtual data",
+      "notes": "Retrospective gives the accepted total; official virtual data was used for oral/topic proxy counts.",
+      "top_topics_all": [
+        ["Applications", 1037],
+        ["Computer Vision", 911],
+        ["Unlabeled", 892],
+        ["Deep Learning", 840],
+        ["Social Aspects", 434],
+        ["General Machine Learning", 412],
+        ["Reinforcement Learning", 395]
+      ],
+      "top_topics_oral": [
+        ["Unlabeled", 145],
+        ["Applications", 14],
+        ["Deep Learning", 13],
+        ["General Machine Learning", 12],
+        ["Computer Vision", 12],
+        ["Social Aspects", 8],
+        ["Theory", 8]
+      ]
+    },
+    {
+      "conference": "CVPR 2026",
+      "accepted": null,
+      "oral": 141,
+      "spotlight": null,
+      "poster_or_regular": 4070,
+      "accepted_source_type": "official virtual pages only",
+      "notes": "No official chair-published accepted-total / oral-total summary located as of 2026-05-12."
+    },
+    {
+      "conference": "NeurIPS 2025",
+      "accepted": 5290,
+      "oral": 87,
+      "spotlight": 0,
+      "poster_or_regular": 5678,
+      "accepted_source_type": "official fact sheet + official virtual data",
+      "notes": "Fact sheet provides accepted and oral totals; virtual data was used for topic proxies.",
+      "top_topics_all": [
+        ["Computer Vision", 1080],
+        ["Applications", 1055],
+        ["Deep Learning", 951],
+        ["Social Aspects", 496],
+        ["Theory", 443],
+        ["Unlabeled", 401],
+        ["General Machine Learning", 392]
+      ],
+      "top_topics_oral": [
+        ["Unlabeled", 65],
+        ["Computer Vision", 6],
+        ["Applications", 5],
+        ["Deep Learning", 5],
+        ["Theory", 2],
+        ["Reinforcement Learning", 2]
+      ]
+    },
+    {
+      "conference": "ICML 2026",
+      "accepted": 6352,
+      "oral": null,
+      "spotlight": 536,
+      "poster_or_regular": 5816,
+      "accepted_source_type": "official virtual data",
+      "notes": "No official chair-published acceptance-rate summary located as of 2026-05-12; accepted and spotlight/regular counts come from official virtual data deduping by source id.",
+      "top_topics_all": [
+        ["Unlabeled", 5070],
+        ["Deep Learning", 488],
+        ["Applications", 339],
+        ["General Machine Learning", 161],
+        ["Social Aspects", 159],
+        ["Theory", 113],
+        ["Reinforcement Learning", 93]
+      ]
+    }
+  ]
+}

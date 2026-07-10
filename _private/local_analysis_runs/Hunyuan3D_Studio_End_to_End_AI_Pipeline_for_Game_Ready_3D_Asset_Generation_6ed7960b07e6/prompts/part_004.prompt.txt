@@ -1,0 +1,115 @@
+Fixed task contract for prompt-cache reuse.
+
+Task: extract grounded anchors from one chunk of one paper. The variable paper
+title, chunk id, character span, and chunk text appear after this fixed contract.
+
+Return JSON only:
+{
+  "part_id": str,
+  "section_role": str,
+  "method_evidence": [{"claim": str, "section": str, "anchor": str, "confidence": float}],
+  "experiment_evidence": [{"claim": str, "table_or_figure": str, "metric": str, "value": str, "confidence": float}],
+  "formula_evidence": [{"name": str, "latex": str, "meaning": str, "section": str, "confidence": float}],
+  "figure_table_roles": [{"label": str, "role_hint": str, "caption": str, "confidence": float}],
+  "source_links": [{"label": "Project" | "Code", "url": str, "anchor": str, "confidence": float}],
+  "open_questions": [str]
+}
+
+Rules:
+1. Keep each evidence list at 5 items or fewer.
+2. Prefer copied anchors over explanation.
+3. If the chunk has visible headings, formulas, figures, tables, or result
+   sentences, do not return an all-empty evidence object.
+4. Use [] only when that evidence type is absent.
+5. Extract only directly visible project page / code repository / GitHub /
+   GitLab links from the chunk. Do not infer URLs from the title or method name.
+6. Output no markdown fences, no prose, no reference list.
+
+=== VARIABLE PART PAYLOAD ===
+Paper title: Hunyuan3D Studio: End-to-End AI Pipeline for Game-Ready 3D Asset Generation
+Part: 4/12
+Character span: 21735-29560
+
+=== PART CONTENT ===
+listic subject images and their stylized counterparts. For text-to-image stylization, where no reference image is provided, the system first generates a reference image from the text prompt using an in-house general text-to-image model, and then processes it through the same image-to-image stylization pipeline to achieve the final stylized output.
+
+
+\subsection{Pose Standardization}
+Standardizing the pose (e.g., to an A-pose) from an arbitrary character reference image requires simultaneously achieving precise pose control and maintaining strict character consistency. In addition, it involves the removal of background elements and props from reference images. To achieve this, we leverage a character image with arbitrary poses/viewpoints as the reference and inject it as a conditioning input into FLUX.1-dev DiT to guide the generation process, as shown in Figure. \ref{fig:image-pose}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\linewidth]{./figures/image_figures/pipeline_pose.png}
+    \caption{Overall workflow of our pose standardization module.}
+    \label{fig:image-pose}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\linewidth]{./figures/image_figures/vis_pose.png}
+    \caption{Visualization results of our pose standardization module.}
+    \label{fig:image-pose-results}
+\end{figure}
+
+
+
+\begin{itemize}
+  \item \textbf{Dataset Construction.} We first construct image pairs based on rendered character data in the following format: \textit{[character image with arbitrary poses/viewpoints, standard A-pose front views of the same character]}. Subsequently, rendered data that includes props (such as handheld weapons and pedestals) is processed through state-of-the-art editing models, including Flux-Kontext \cite{batifol2025flux}. This step isolates the character by removing all props and background elements, ensuring the subject's consistency is maintained. Finally, the resulting image pairs are manually curated and incorporated into the dataset to equip the model with the capability for prop and background removal.
+
+  \item \textbf{Model Training.} We implement the progressive learning strategy, starting with an initial resolution of $512\times512$ pixels and increasing to $768\times768$. Consequently, the model learns to extract more intricate features, which substantially improves the fidelity of generated outputs, particularly in reproducing detailed facial characteristics and complex clothing textures. In addition, reference images of the same character under different scenarios are randomly selected and injected as conditional inputs, thereby achieving generalized pose control and consistent generation performance. Moreover, we have assembled supplementary high-quality datasets specifically targeting challenging categories,  including half-body portraits, non-human humanoids, and anthropomorphic characters. These datasets are used for post-training techniques like Supervised Fine-Tuning (SFT) and Direct Preference Optimization (DPO) to bolster the model's generalizability and robustness.
+\end{itemize}
+
+
+
+\section{High-Fidelity Geometry Generation}  \label{sec:geometry}
+
+\subsection{Preliminary}
+Our geometry-generation pipeline is built upon the state-of-the-art Hunyuan3D 2.1~\citep{hunyuan3d2025hunyuan3d} and Hunyuan3D 2.5~\citep{lai2025hunyuan3d} frameworks. The Hunyuan3D 2.1 framework comprises two modules:
+
+\begin{itemize}
+  \item \textbf{Hunyuan3D-ShapeVAE} — a variational encoder–decoder transformer that first compresses and then reconstructs 3-D geometry. The encoder receives a point cloud endowed with 3-D positions and surface normals $\{\mathbf{x}_i=(\mathbf{P}_i,\mathbf{N}_i)\mid\mathbf{P}_i,\mathbf{N}_i\in\mathbb{R}^3\}$, and embeds it into compact shape latents  $\mathbf{z}$ via a Vector-Set Transformer with importance sampling~\citep{zhang20233dshape2vecset}. The decoder employs $\mathbf{z}$ to query a 3-D neural field $\mathbf{F}_g\in\mathbb{R}^{D\times H\times W\times d}$ on a uniform grid $\mathbf{Q}_g\in\mathbb{R}^{D\times H\times W\times 3}$, and subsequently maps $\mathbf{F}_g$ to signed-distance values $\mathbf{S}_g\in\mathbb{R}^{D\times H\times W}$.
+
+
+  \item \textbf{Hunyuan3D-DiT} — a flow-based diffusion model that operates in the latent space of ShapeVAE.
+  The network stacks 21 Transformer layers, each enhanced with a Mixture-of-Experts (MoE) sub-layer to significantly enlarge capacity and expressive power. Hunyuan3D-DiT is trained to map gaussian noises to shape latents $\mathbf{z}$ with the flow matching objective~\citep{lipman2022flow, esser2024scaling}.
+\end{itemize}
+
+
+
+
+\subsection{Conditional Generation}
+
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/geo_figures/cond-gen-pipeline.png}
+    \caption{3D shape generation pipeline}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/geo_figures/multiview-pipeline.png}
+    \caption{Image-to-multiview pipeline}
+  \end{subfigure}
+  \caption{Overview of conditional generation.}
+  \label{fig:cond-gen pipe}
+\end{figure}
+
+Hunyuan3D-DiT is primarily conditioned on a single input image, which is first resized to 518 × 518, removed background and then encoded by a frozen DINOv2 backbone~\citep{oquab2023dinov2} to obtain the image latent $\mathbf{c}_I\in\mathbb{R}^{B\times L\times C}$, which is subsequently fused into the generated
+shape latent via cross attention.
+
+To provide additional geometric and prior guidance, Hunyuan3D-Studio supplies two additional control signals: an explicit 3-D bounding box and multi-view images. The overall pipeline is illustrated in Figure~\ref{fig:cond-gen pipe}(a).
+
+
+\subsubsection{Bounding Box Condition}
+To better align the generated 3D assets with user intent, we introduce a bounding box as the simplest 3-D control signal to steer the DiT model. Given a bounding box, we first encode its height, width and length into a single shape latent $\mathbf{c}_B\in\mathbb{R}^{B\times 1\times C}$ with a two-layer MLP. Then, $\mathbf{c}_B$ is concatenated with $\mathbf{c}_I$ along the sequence dimension to form the final conditioning vector.
+
+During training we deliberately misalign the object proportions between the image and the point cloud—via mild deformation of either modality—to force the network to rely on the bounding-box signal.
+
+
+\subsubsection{Generated Multi-view Image Condition}
+To harness the powerful capabilities of image-generation models, we use multi-view images produced by an image diffusion model as the condition for character generation.
+
+\textbf{Image to multiview image generation.} As, shown in Figure~\ref{fig:cond-gen pipe}(b), to synthesize high-fidelity multiview images from a single input, we introduce a lightweight module built upon a pretrained text-to-image foundation model~\citep{li2024hunyuandit}. This is achieved by training a Low-Rank Adaptation (LoRA) layer~\citep{hu2022lora}. The training process begins with the curation of a dataset comprising object-centric images from arbitrary camera poses, each paired with its corresponding ground-truth multiview images. During training, both the input single-view and target multiview images are encoded into their latent representations using the model's pretrained Variational Autoencoder (VAE). The LoRA layer is conditioned on two sources of information: (1) the noise-free latent of the single-view image, which is concatenated with the noised multiview latent, providing structural guidance; and (2) a semantic condition vector extracted from the input image using a pretrained SigLIP vision encoder~\citep{zhai2023siglip}. The LoRA parameters are then optimized using a standard flow-matching loss.

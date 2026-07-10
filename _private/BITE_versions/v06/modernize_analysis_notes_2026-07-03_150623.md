@@ -1,0 +1,116 @@
+# Modernize Analysis Notes Report
+
+- generated: 2026-07-03T15:06:23
+- mode: dry-run
+- cutoff: 2100-01-01
+- checked_notes: 5291
+- changed_notes: 94
+- unchanged_notes: 5197
+- max_images: 6
+- max_caption_chars: 0
+
+## Summary
+
+- links_rows_rewritten: 82
+- arxiv_labels_renamed: 0
+- paper_arxiv_conflicts: 35
+- images_removed: 118
+- captions_compacted: 0
+- captions_escaped: 0
+
+## Changed Notes
+
+- `obsidian-vault/analysis/ACM_MM_2025/Individual_Content_and_Motion_Dynamics_Preserved_Pruning_for_Video_Diffusion_Models.md`: links=0, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/ECCV_2024/E_T_the_Exceptional_Trajectories_Text_to_camera_trajectory_generation_with_character_awareness.md`: links=0, arxiv_labels=0, images_removed=5, captions_compacted=0
+- `obsidian-vault/analysis/ECCV_2024/PoseEmbroider_Towards_a_3D_Visual_Semantic_aware_Human_Pose_Representation.md`: links=0, arxiv_labels=0, images_removed=1, captions_compacted=0
+- `obsidian-vault/analysis/ICCV_2025/You_Think_You_ACT_The_New_Task_of_Arbitrary_Text_to_Motion_Generation.md`: links=0, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/ADOP_Approximate_Differentiable_One-pixel_Point_Rendering.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/ASE_Large_Scale_Reusable_Adversarial_Skill_Embeddings_for_Physically_Simulated_Characters.md`: links=1, arxiv_labels=0, images_removed=2, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Analytically_Integratable_Zero-restlength_Springs_for_Capturing_Dynamic_Modes_Unrepresented_by_Quasistatic_Neural_Networks.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Approximate_Convex_Decomposition_for_3D_Meshes_With_Collision-aware_Concavity_and_Tree_Search.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Artemis_Articulated_Neural_Pets_With_Appearance_and_Motion_Synthesis.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/As-locally-uniform-as-possible_Reshaping_of_Vector_Clip_Art.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/A𝛿_Autodiff_for_Discontinuous_Programs_Applied_to_Shaders.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Co-optimization_of_Design_and_Fabrication_Plans_for_Carpentry.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Comparison_of_Single-image_HDR_Reconstruction_Methods_The_Caveats_of_Quality_Assessment.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Compatible_Intrinsic_Triangulations.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Computational_Pattern_Making_From_3D_Garment_Models.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/DEF_Deep_Estimation_of_Sharp_Geometric_Features_in_3D_Shapes.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Deep_Deformable_3D_Caricatures_With_Learned_Shape_Control.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Disentangling_Random_and_Cyclic_Effects_in_Time-lapse_Sequences.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Dr.Jit_A_Just-in-time_Compiler_for_Differentiable_Rendering.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Drivable_Volumetric_Avatars_Using_Texel-aligned_Features.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/EAMM_One-Shot_Emotional_Talking_Face_via_Audio-based_Emotion-Aware_Motion_Model.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Estimation_of_Yarn-level_Simulation_Models_for_Production_Fabrics.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/EyeNeRF_A_Hybrid_Representation_for_Photorealistic_Synthesis_Animation_and_Relighting_of_Human_Eyes.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Generative_GaitNet.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/ImLoveNet_Misaligned_Image-supported_Registration_Network_for_Low-overlap_Point_Cloud_Pairs.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Instant_Neural_Graphics_Primitives_With_a_Multiresolution_Hash_Encoding.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Learning_to_Brachiate_via_Simplified_Model_Imitation.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Low-poly_Mesh_Generation_for_Building_Models.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Mixed_Integer_Neural_Inverse_Design.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/NIMBLE_A_Non-rigid_Hand_Model_With_Bones_and_Muscles.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/NeROIC_Neural_Rendering_of_Objects_From_Online_Image_Collections.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/NeuralPassthrough_Learned_Real-time_View_Synthesis_for_VR.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/NeuralTailor_Reconstructing_Sewing_Pattern_Structures_From_3D_Point_Clouds_of_Garments.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Neural_3D_Reconstruction_in_the_Wild.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Neural_Jacobian_Fields_Learning_Intrinsic_Mappings_of_Arbitrary_Meshes.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Neural_Layered_BRDFs.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Neural_Rendering_in_a_Room_Amodal_3D_Understanding_and_Free-viewpoint_Rendering_for_the_Closed_Scene_Composed_of_Pre-Captured_Objects.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Photo-to-shape_Material_Transfer_for_Diverse_Structures.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Predicting_Loose-fitting_Garment_Deformations_Using_Bone-driven_Motion_Networks.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Random_Walks_for_Adversarial_Meshes.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Regression-based_Monte_Carlo_Integration.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Rendering_Iridescent_Rock_Dove_Neck_Feathers.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Rendering_Neural_Materials_on_Curved_Surfaces.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Rewriting_Geometric_Rules_of_a_GAN.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/SPAGHETTI_Editing_Implicit_Shapes_Through_Part_Aware_Generation.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Scalable_Neural_Indoor_Scene_Rendering.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Self-Supervised_Post-Correction_for_Monte_Carlo_Denoising.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Self-conditioned_Generative_Adversarial_Networks_for_Image_Editing.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Single-view_View_Synthesis_in_the_Wild_With_Learned_Adaptive_Multiplane_Images.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Sparse_Ellipsometry_Portable_Acquisition_of_Polarimetric_SVBRDF_and_Shape_With_Unstructured_Flash_Photography.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Unbiased_Inverse_Volume_Rendering_With_Differential_Trackers.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2022/Volume_Parametrization_Quantization_for_Hexahedral_Meshing.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2023/A_Method_for_Animating_Childrens_Drawings_of_the_Human_Figure.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2023/Acting_as_Inverse_Inverse_Planning.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2023/Boundary_Value_Caching_for_Walk_on_Spheres.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2023/CALM_Conditional_Adversarial_Latent_Models_for_Directable_Virtual_Characters.md`: links=1, arxiv_labels=0, images_removed=4, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2023/Flexible_Isosurface_Extraction_for_Gradient_Based_Mesh_Optimization.md`: links=1, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2023/Interactive_Hair_Simulation_on_the_GPU_using_ADMM.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2023/Learning_Physically_Simulated_Tennis_Skills_from_Broadcast_Videos.md`: links=0, arxiv_labels=0, images_removed=4, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/3Doodle_Compact_Abstraction_of_Objects_With_3D_Strokes.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/A_Differential_Monte_Carlo_Solver_for_the_Poisson_Equation.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/CNS-Edit_3D_Shape_Editing_via_Coupled_Neural_Shape_Optimization.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/Diffusion_Texture_Painting.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/Direct_a_Video_Customized_Video_Generation_with_User_Directed_Camera_Movement_and_Object_Motion.md`: links=1, arxiv_labels=0, images_removed=3, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation.md`: links=1, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/Near_realtime_Facial_Animation_by_Deep_3D_Simulation_Super_Resolution.md`: links=1, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_Representation_and_GANs_Prior.md`: links=0, arxiv_labels=0, images_removed=5, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.md`: links=1, arxiv_labels=0, images_removed=3, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2024/Walkin_Robin_Walk_on_Stars_with_Robin_Boundary_Conditions.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2025/DAM-VSR_Disentanglement_of_Appearance_and_Motion_for_Video_Super-Resolution.md`: links=0, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2025/Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inversion.md`: links=1, arxiv_labels=0, images_removed=2, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2025/Solving_partial_differential_equations_in_participating_media.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2026/ActCam_Zero_Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation.md`: links=0, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_2026/ArtiFixer_Enhancing_and_Extending_3D_Reconstruction_with_Auto_Regressive_Diffusion_Models.md`: links=1, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Asynchronous_Collaborative_Autoscanning_with_Mode_Switching_for_Multi-Robot_Scene_Reconstruction.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Capturing_and_Animation_of_Body_and_Clothing_from_Monocular_Video.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Brushstroke_Engine_Learning_a_Latent_Style_Space_of_Interactive_Drawing_Tools.md`: links=1, arxiv_labels=0, images_removed=3, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.md`: links=1, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Compact_Neural_Graphics_Primitives_with_Learned_Hash_Probing.md`: links=1, arxiv_labels=0, images_removed=2, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2024/3DGSR_Implicit_Surface_Reconstruction_with_3D_Gaussian_Splatting.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2024/3D_Gaussian_Ray_Tracing_Fast_Tracing_of_Particle_Scenes.md`: links=1, arxiv_labels=0, images_removed=5, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Progressive_Embedding_Approach_to_Bijective_Tetrahedral_Maps_driven_by_Cluster_Mesh_Topology.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Statistical_Approach_to_Monte_Carlo_Denoising.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MaskedMimic_Unified_Physics_Based_Character_Control_Through_Masked_Motion_Inpainting.md`: links=1, arxiv_labels=0, images_removed=2, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Motion_In_Betweening_for_Densely_Interacting_Characters.md`: links=0, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Robust_Derivative_Estimation_with_Walk_on_Stars.md`: links=0, arxiv_labels=0, images_removed=2, captions_compacted=0
+- `obsidian-vault/analysis/TOG_2024/Decorrelating_ReSTIR_Samplers_via_MCMC_Mutations.md`: links=1, arxiv_labels=0, images_removed=0, captions_compacted=0
+- `obsidian-vault/analysis/TOG_2024/NeuralVDB_High_resolution_Sparse_Volume_Representation_using_Hierarchical_Neural_Networks.md`: links=1, arxiv_labels=0, images_removed=3, captions_compacted=0
+- `obsidian-vault/analysis/arxiv_2024/CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_for_Pick_and_Place_Actions.md`: links=0, arxiv_labels=0, images_removed=6, captions_compacted=0
+- `obsidian-vault/analysis/arxiv_2026/CoMoVi_Co_Generation_of_3D_Human_Motions_and_Realistic_Videos.md`: links=0, arxiv_labels=0, images_removed=6, captions_compacted=0

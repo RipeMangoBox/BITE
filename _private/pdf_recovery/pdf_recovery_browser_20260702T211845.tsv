@@ -1,0 +1,63 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Semantic_Shape_Editing_With_Parametric_Implicit_Templates.pdf	https://doi.org/10.1145/3641519.3657421	144357248	1061838				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Adaptive_Fast_Multipole_Accelerated_Hybrid_Boundary_Integral_Equation_Method_for_Accurate_Diffusion_Curves.pdf	https://doi.org/10.1145/3618374	137247397	1740325				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2023/Effect_based_Multi_viewer_Caching_for_Cloud_native_Rendering.pdf	https://doi.org/10.1145/3592431	128995670	2781087				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/MVD_2_Efficient_Multiview_3D_Reconstruction_for_Multiview_Diffusion.pdf	https://doi.org/10.1145/3641519.3657403	126003156	2018426				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/NeurCADRecon_Neural_Representation_for_Reconstructing_CAD_Surfaces_by_Enforcing_Zero_Gaussian_Curvature.pdf	https://doi.org/10.1145/3658171	124632133	1244546				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Multi_color_Holograms_Improve_Brightness_in_Holographic_Displays.pdf	https://doi.org/10.1145/3610548.3618135	112703727	1018961				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Real_time_Neural_Woven_Fabric_Rendering.pdf	https://doi.org/10.1145/3641519.3657496	106388413	1578875				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SOL_NeRF_Sunlight_Modeling_for_Outdoor_Scene_Decomposition_and_Relighting.pdf	https://doi.org/10.1145/3610548.3618143	100695071	2412615				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Variational_Feature_Extraction_in_Scientific_Visualization.pdf	https://doi.org/10.1145/3658219	99476363	827841				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/VRMM_A_Volumetric_Relightable_Morphable_Head_Model.pdf	https://doi.org/10.1145/3641519.3657406	98972763	1138631				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2022/Simulation_and_Optimization_of_Magnetoelastic_Thin_Shells.pdf	https://doi.org/10.1145/3528223.3530142	98435430	1694448				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Controllable_Neural_Style_Transfer_for_Dynamic_Meshes.pdf	https://doi.org/10.1145/3641519.3657474	90198088	1380831				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Seamless_Parametrization_in_Penner_Coordinates.pdf	https://doi.org/10.1145/3658202	89068284	1333570				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fast_MSX_Fast_Multiple_Scattering_Approximation.pdf	https://doi.org/10.1145/3610548.3618231	84613113	1000949				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Implicitly_Stable_Mixture_Model_for_Dynamic_Multi_fluid_Simulations.pdf	https://doi.org/10.1145/3610548.3618215	84511332	586907				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2023/Deep_SVBRDF_Estimation_From_Single_Image_Under_Learned_Planar_Lighting.pdf	https://doi.org/10.1145/3588432.3591559	83960757	548829				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Lifting_Directional_Fields_to_Minimal_Sections.pdf	https://doi.org/10.1145/3658198	82601504	1405352				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/TensoSDF_Roughness_aware_Tensorial_Representation_for_Robust_Geometry_and_Material_Reconstruction.pdf	https://doi.org/10.1145/3658211	81165801	2035773				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Mixed_Variational_Finite_Elements_for_Implicit_Simulation_of_Deformables.pdf	https://doi.org/10.1145/3550469.3555418	80383930	653230				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/TOG_2022/DeepPhase_periodic_autoencoders_for_learning_motion_phase_manifolds.pdf	https://doi.org/10.1145/3528223.3530178	78681518	920628				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/StopThePop_Sorted_Gaussian_Splatting_for_View_consistent_Real_time_Rendering.pdf	https://doi.org/10.1145/3658187	77706922	1712845				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Creating_LEGO_Figurines_From_Single_Images.pdf	https://doi.org/10.1145/3658167	75236050	1453166				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Proxy_Tracing_Unbiased_Reciprocal_Estimation_for_Optimized_Sampling_in_BDPT.pdf	https://doi.org/10.1145/3658216	74949824	1807583				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Learning_Images_Across_Scales_Using_Adversarial_Training.pdf	https://doi.org/10.1145/3658190	74902575	4580202				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/LightFormer_Light_oriented_Global_Neural_Rendering_in_Dynamic_Scene.pdf	https://doi.org/10.1145/3658229	74454711	1528379				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/FlexScale_Modeling_and_Characterization_of_Flexible_Scaled_Sheets.pdf	https://doi.org/10.1145/3658175	73848353	4629719				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/TOG_2019/Neural_State_Machine_for_Character_Scene_Interactions.pdf	https://doi.org/10.1145/3355089.3356505	73292879	792872				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/TOG_2024/Categorical_Codebook_Matching_for_Embodied_Character_Controllers.pdf	https://doi.org/10.1145/3658209	73184948	891106				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Self_Supervised_High_Dynamic_Range_Imaging_What_Can_Be_Learned_from_a_Single_8_bit_Video.pdf	https://doi.org/10.1145/3648570	72559857	1167803				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GarmentCode_Programming_Parametric_Sewing_Patterns.pdf	https://doi.org/10.1145/3618351	72485025	986046				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Neural_Monte_Carlo_Fluid_Simulation.pdf	https://doi.org/10.1145/3641519.3657438	70500446	1332525				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Multiple_bounce_Smith_Microfacet_BRDFs_using_the_Invariance_Principle.pdf	https://doi.org/10.1145/3610548.3618198	70431786	1766195				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MetaLayer_A_Meta_learned_BSDF_Model_for_Layered_Materials.pdf	https://doi.org/10.1145/3618365	69414814	2784203				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Light_Probes_for_Real_time_Global_Illumination.pdf	https://doi.org/10.1145/3550454.3555452	67623040	2998680				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2024/Spatial_and_Surface_Correspondence_Field_for_Interaction_Transfer.pdf	https://doi.org/10.1145/3658169	66935774	1991341				timeout in ACM batch
+download_timeout	obsidian-vault/paperPDFs/SIGGRAPH_2023/Real_time_Radiance_Fields_for_Single_image_Portrait_View_Synthesis.pdf	https://doi.org/10.1145/3592460	65689465	1261905				timeout in ACM batch
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Versatile_Vision_Foundation_Model_for_Image_and_Video_Colorization.pdf	https://doi.org/10.1145/3641519.3657509	64946146	1043107	64946146	5590216	gs-600dpi-q100; 5.33MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/SMERF_Streamable_Memory_Efficient_Radiance_Fields_for_Real_time_Large_scene_Exploration.pdf	https://doi.org/10.1145/3658193	64756103	1634476	64756103	7429826	gs-600dpi-q100; 7.09MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/BoostMVSNeRFs_Boosting_MVS_based_NeRFs_to_Generalizable_View_Synthesis_in_Large_scale_Scenes.pdf	https://doi.org/10.1145/3641519.3657416	62830032	1126438	62830032	5124256	gs-600dpi-q100; 4.89MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Matting_by_Generation.pdf	https://doi.org/10.1145/3641519.3657519	62391668	1124304	62391668	6287562	gs-600dpi-q100; 6.00MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Woven_Fabric_Capture_With_a_Reflection_transmission_Photo_Pair.pdf	https://doi.org/10.1145/3641519.3657410	61001944	1627336	61001944	6752675	gs-600dpi-q100; 6.44MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/CWF_Consolidating_Weak_Features_in_High_quality_Mesh_Simplification.pdf	https://doi.org/10.1145/3658159	60936247	1181726	60936247	8362216	gs-600dpi-q100; 7.97MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Lite2Relight_3D_aware_Single_Image_Portrait_Relighting.pdf	https://doi.org/10.1145/3641519.3657470	59667108	797479	59667108	2660900	gs-600dpi-q100; 2.54MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/Implicit_Swept_Volume_SDF_Enabling_Continuous_Collision_free_Trajectory_Generation_for_Arbitrary_Shapes.pdf	https://doi.org/10.1145/3658181	58883424	1174858	29742768			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/Neural_Gaussian_Scale_space_Fields.pdf	https://doi.org/10.1145/3658163	58641800	2729793	40046098			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Invalid XRef entry 1749
+Syntax Error: Invalid XRef entry 1745
+Syntax Error: Top-level pages object is wrong type (null)
+Command Line Error: Wrong page range given: the first page (1) can not be after the last page (0)."
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/FLARE_Fast_Learning_of_Animatable_and_Relightable_Mesh_Avatars.pdf	https://doi.org/10.1145/3618401	57326201	1247225	57326201	4415988	gs-600dpi-q100; 4.21MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Towards_Practical_Capture_of_High_Fidelity_Relightable_Avatars.pdf	https://doi.org/10.1145/3610548.3618138	55016549	754901	55016549	4151562	gs-600dpi-q100; 3.96MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Computational_Illusion_Knitting.pdf	https://doi.org/10.1145/3658231	54349365	1088028	54349365	5942240	gs-600dpi-q100; 5.67MiB	ok
+download_invalid	obsidian-vault/paperPDFs/TOG_2021/Neural_animation_layering_for_synthesizing_martial_arts_movements.pdf	https://doi.org/10.1145/3450626.3459881	52907443	820987	37675008			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Invalid XRef entry 627
+Syntax Error: Invalid XRef entry 623
+Syntax Error: Top-level pages object is wrong type (null)
+Command Line Error: Wrong page range given: the first page (1) can not be after the last page (0)."
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Vortex_Particle_on_mesh_Method_for_Soap_Film_Simulation.pdf	https://doi.org/10.1145/3658165	51989328	1335225	36720511			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Couldn't read xref table"

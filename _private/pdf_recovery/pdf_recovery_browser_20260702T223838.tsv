@@ -1,0 +1,33 @@
+status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SAILOR_Synergizing_Radiance_and_Occupancy_Fields_for_Live_Human_Performance_Capture.pdf	https://doi.org/10.1145/3618370	38089996	3393294	38089996	12327780	gs-600dpi-q100; 11.76MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Real_Time_Neural_Appearance_Models.pdf	https://doi.org/10.1145/3659577	37439289	1711610	37439289	14268420	gs-600dpi-q100; 13.61MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Shrink_Morph_3D_printed_self_shaping_shells_actuated_by_a_shape_memory_effect.pdf	https://doi.org/10.1145/3618386	37046236	1037342	37046236	4384307	gs-600dpi-q100; 4.18MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/NeuLighting_Neural_Lighting_for_Free_Viewpoint_Outdoor_Scene_Relighting_with_Unconstrained_Photo_Collections.pdf	https://doi.org/10.1145/3550469.3555384	36246018	765658	36246018	2606835	gs-600dpi-q100; 2.49MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Flexible_Motion_In_betweening_With_Diffusion_Models.pdf	https://doi.org/10.1145/3641519.3657414	36060180	430346	36060180	890556	gs-600dpi-q100; 0.85MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/ZeroGrads_Learning_Local_Surrogates_for_Non_differentiable_Graphics.pdf	https://doi.org/10.1145/3658173	35538952	1274621	35538952	3470610	gs-600dpi-q100; 3.31MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Modal_Folding_Discovering_Smooth_Folding_Patterns_for_Sheet_Materials_Using_Strain_space_Modes.pdf	https://doi.org/10.1145/3641519.3657401	35146770	451342	35146770	3544251	gs-600dpi-q100; 3.38MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Micrograin_BSDF_Model_for_the_Rendering_of_Porous_Layers.pdf	https://doi.org/10.1145/3610548.3618241	35019282	1406591	35019282	9568316	gs-600dpi-q100; 9.13MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/X_SLAM_Scalable_Dense_SLAM_for_Task_aware_Optimization_Using_CSFD.pdf	https://doi.org/10.1145/3658233	34492013	956465	34492013	15425472	gs-600dpi-q100; 14.71MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/EASI_Tex_Edge_Aware_Mesh_Texturing_from_Single_Image.pdf	https://doi.org/10.1145/3658222	33710559	1343289	33710559	4108424	gs-600dpi-q100; 3.92MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Stable_Discrete_Bending_by_Analytic_Eigensystem_and_Adaptive_Orthotropic_Geometric_Stiffness.pdf	https://doi.org/10.1145/3618372	33692545	2504261	33692545	4725989	gs-600dpi-q100; 4.51MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Cross_image_Attention_for_Zero_shot_Appearance_Transfer.pdf	https://doi.org/10.1145/3641519.3657423	33132262	1381345	33132262	14241765	gs-600dpi-q100; 13.58MiB	ok
+page_mismatch	obsidian-vault/paperPDFs/PACM_CGIT_2023/Motion_In_Betweening_with_Phase_Manifolds.pdf	https://doi.org/10.1145/3606921	32900905	712741	32792086			current_pages=18; downloaded_pages=17
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Surface_filling_Curve_Flows_via_Implicit_Medial_Axes.pdf	https://doi.org/10.1145/3658158	32464712	1596950	32464712	8699904	gs-600dpi-q100; 8.30MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Mesh_Neural_Cellular_Automata.pdf	https://doi.org/10.1145/3658127	32037835	1352704	32037835	4422274	gs-600dpi-q100; 4.22MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_2024/EyeIR_Single_Eye_Image_Inverse_Rendering_in_the_Wild.pdf	https://doi.org/10.1145/3641519.3657506	31592974	1791199	21979136			"qpdf failed: WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3641519.3657506.pdf: file is damaged
+WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3641519.3657506.pdf: can't find startxref
+WARNING: /home/ripemangobox/Downloads/acm_sig_auto/3641519.3657506.pdf: Attempting to reconstruct cross-reference table
+qpdf: /home/ripemangobox/Downloads/acm_sig_auto/3641519.3657506.pdf: unable to find trailer dictionary while recovering damaged file"
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Modeling_Ambient_Scene_Dynamics_for_Free-view_Synthesis.pdf	https://doi.org/10.1145/3641519.3657488	31568254	1298637	31568254	9815407	gs-600dpi-q100; 9.36MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Terrain_Amplification_Using_Multi_Scale_Erosion.pdf	https://doi.org/10.1145/3658200	31495195	1325559	31495195	7703246	gs-600dpi-q100; 7.35MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VASCO_Volume_and_Surface_Co_Decomposition_for_Hybrid_Manufacturing.pdf	https://doi.org/10.1145/3618324	31320581	867152	31320581	3527129	gs-600dpi-q100; 3.36MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Diffusion_Illusions_Hiding_Images_in_Plain_Sight.pdf	https://doi.org/10.1145/3641519.3657500	31026672	1068573	31026672	6859451	gs-600dpi-q100; 6.54MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Consistent_Point_Orientation_for_Manifold_Surfaces_via_Boundary_Integration.pdf	https://doi.org/10.1145/3641519.3657475	30834440	1556940	30834440	8958703	gs-600dpi-q100; 8.54MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/NeLT_Object_oriented_Neural_Light_Transfer.pdf	https://doi.org/10.1145/3596491	30562250	1458257	30562250	10590263	gs-600dpi-q100; 10.10MiB	ok
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_2024/Subject_Diffusion_Open_Domain_Personalized_Text_to_image_Generation_Without_Test_time_Fine_tuning.pdf	https://doi.org/10.1145/3641519.3657469	30200356	1110333	30200356	3446576	gs-600dpi-q100; 3.29MiB	ok
+download_invalid	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Parametric_Kinetic_Solver_for_Simulating_Boundary_Dominated_Turbulent_Flow_Phenomena.pdf	https://doi.org/10.1145/3618313	30009645	942404	23554460			"pdfinfo failed: Syntax Error: Couldn't find trailer dictionary
+Syntax Error: Invalid XRef entry 1041
+Syntax Error: Invalid XRef entry 1036
+Syntax Error: Top-level pages object is wrong type (null)
+Command Line Error: Wrong page range given: the first page (1) can not be after the last page (0)."
+replaced	obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/High_Fidelity_and_Real_Time_Novel_View_Synthesis_for_Dynamic_Scenes.pdf	https://doi.org/10.1145/3610548.3618142	29708302	745961	29708302	2432530	gs-600dpi-q100; 2.32MiB	ok

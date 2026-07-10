@@ -59,8 +59,26 @@ model*.bin
 **/.claude/first-run
 **/.claude/assistant-daemon-state.json
 
-# === Private/local archives ===
-_private/
+# === Private workspace ===
+# _private is tracked by default; keep secrets, browser state, local app config,
+# bulky dataset staging, and generated recovery work out of Git.
+_private/.archives/
+_private/acm_download_recovery/reports/
+_private/acm_download_recovery/secrets/
+_private/aliyun_key/
+_private/browser_profiles/
+_private/hf_stage/
+_private/hf_updates/**/media/
+_private/hf_updates/**/stage/
+_private/local_obsidian_config/
+_private/mineru_local/
+_private/obsidian_config_backups/
+_private/pdf_overcompressed_backup/
+_private/pdf_recovery_work/
+_private/archives/**/test_side_effects/obsidian-vault/assets/
+_private/archives/**/test_side_effects/obsidian-vault/paperPDFs/
+_private/vault_root_linkage_smoke/vault/assets/
+_private/vault_root_linkage_smoke/vault/paperPDFs/
 .trash/
 artifacts/
 

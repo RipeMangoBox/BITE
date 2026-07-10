@@ -1,0 +1,100 @@
+{
+  "part_id": "part_002",
+  "section_role": "introduction and related work and method start",
+  "method_evidence": [
+    {
+      "claim": "We introduce MaterialMVP, a one-stage model designed to generate PBR textures for 3D meshes.",
+      "section": "Introduction",
+      "anchor": "We introduce MaterialMVP, a one-stage model designed to generate PBR textures for 3D meshes.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We employ a Multiview Diffusion Model framework designed to generate multiple view-consistent PBR maps from image prompts.",
+      "section": "Introduction",
+      "anchor": "we employ a Multiview Diffusion Model framework designed to generate multiple view-consistent PBR maps from image prompts.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We introduce a Dual-Channel Material Generation framework, which extends the original diffusion model by adding an extra channel to generate metallic-roughness (MR) alongside the existing albedo channel.",
+      "section": "Introduction",
+      "anchor": "we introduce a Dual-Channel Material Generation framework, which extends the original diffusion model by adding an extra channel to generate metallic-roughness (MR) alongside the existing albedo channel.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We introduce Consistency-Regularized Training. This strategy trains the model on pairs of reference images with subtle variations in camera pose and lighting but requires the model to produce identical, lighting-invariant results.",
+      "section": "Introduction",
+      "anchor": "we introduce Consistency-Regularized Training. This strategy trains the model on pairs of reference images with subtle variations in camera pose and lighting but requires the model to produce identical, lighting-invariant results.",
+      "confidence": 0.95
+    },
+    {
+      "claim": "We design a Multi-Channel Aligned Attention module to synchronize information between the albedo and MR channels, ensuring the output materials are well-aligned.",
+      "section": "Introduction",
+      "anchor": "we design a Multi-Channel Aligned Attention module to synchronize information between the albedo and MR channels, ensuring the output materials are well-aligned",
+      "confidence": 0.95
+    }
+  ],
+  "experiment_evidence": [],
+  "formula_evidence": [],
+  "figure_table_roles": [
+    {
+      "label": "fig:pipeline",
+      "role_hint": "overview of the proposed method",
+      "caption": "Overview of MaterialMVP, which takes a 3D mesh and a reference image as input and generates high-quality PBR textures through multi-view PBR diffusion. The albedo and MR channels are aligned via MCAA, effectively reducing artifacts. And Consistency-Regularized Training effectively eliminates illumination and addresses material inconsistency across multi-view PBR textures.",
+      "confidence": 0.95
+    }
+  ],
+  "source_links": [],
+  "open_questions": [],
+  "_meta": {
+    "part_id": "part_002",
+    "part_index": 2,
+    "part_count": 5,
+    "chunk_chars": 7130,
+    "latency_seconds": 6.658,
+    "usage": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "thinking": "disabled",
+      "reasoning_effort": "",
+      "prompt_tokens_est": 2979,
+      "completion_tokens_est": 879,
+      "reasoning_tokens_est": 0,
+      "total_tokens_est": 3858,
+      "total_with_reasoning_tokens_est": 3858,
+      "estimated_cost_usd": 0.002061,
+      "cost_basis": "discounted_estimate_from_local_text_lengths",
+      "prompt_tokens_api": 2564,
+      "completion_tokens_api": 639,
+      "total_tokens_api": 3203,
+      "reasoning_tokens_api": 0,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1924,
+      "cached_tokens_api": 640,
+      "api_usage_raw": {
+        "completion_tokens": 639,
+        "prompt_tokens": 2564,
+        "total_tokens": 3203,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 1924
+      },
+      "estimated_cost_usd_api": 0.001395,
+      "cost_basis_api": "discounted_estimate_from_api_usage_with_prompt_cache",
+      "stream_diagnostics": {
+        "content_chars": 2931,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "finish_reasons": [
+          "stop",
+          "stop"
+        ],
+        "stream_chunk_count": 641,
+        "api_usage_present": true
+      }
+    }
+  }
+}
